@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-06-08T07:14:29Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-06-08T07:28:53Z
+
+Can you please add this test to the `TelegramTransportTest`:
+```php
+    public function testSendWithMarkdownShouldEscapeDots()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $content = <<<JSON
+            {
+                "ok": true,
+                "result": {
+                    "message_id": 1,
+                    "from": {
+                        "id": 12345678,
+                        "first_name": "YourBot",
+                        "username": "YourBot"
+                    },
+                    "chat": {
+                        "id": 1234567890,
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "username": "JohnDoe",
+                        "type": "private"
+                    },
+                    "date": 1459958199,
+                    "text": "Hello from Bot!"
+                }
+            }
+JSON;
+
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn($content)
+        ;
+
+        $expectedBody = [
+            'chat_id' => 'testChannel',
+            'text' => 'I contain a \.',
+            'parse_mode' => 'MarkdownV2',
+        ];
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
+            $this->assertSame($expectedBody, json_decode($options['body'], true));
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+
+        $transport->send(new ChatMessage('I contain a .'));
+    }
+```
+
+Not sure its working, but lets see 😄
+
+---------------------------------------------------------------------------
+
+by glukose at 2021-06-08T07:38:50Z
+
+Thanks for the test and review @OskarStark, it seems to pass well
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-06-08T07:41:06Z
+
+Don't worry about fabbot.io, its a false positive

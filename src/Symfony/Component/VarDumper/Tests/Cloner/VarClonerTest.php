@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Tests\Fixtures\Php74;
 use Symfony\Component\VarDumper\Tests\Fixtures\Php81Enums;
+use Symfony\Component\VarDumper\Tests\Fixtures\Php82;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -429,7 +430,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [attr] => Array
                                 (
                                     [file] => %a%eVarClonerTest.php
-                                    [line] => 22
+                                    [line] => 23
                                 )
 
                         )
@@ -657,6 +658,65 @@ Symfony\Component\VarDumper\Cloner\Data Object
                 (
                     [name] => Diamonds
                     [value] => D
+                )
+
+        )
+
+    [position:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [key:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
+    [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
+)
+
+EOTXT;
+        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+    }
+
+    /**
+     * @requires PHP 8.2
+     */
+    public function testPhp82()
+    {
+        $data = new Php82();
+
+        $cloner = new VarCloner();
+        $clone = $cloner->cloneVar($data);
+
+        $expected = <<<'EOTXT'
+Symfony\Component\VarDumper\Cloner\Data Object
+(
+    [data:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+            [0] => Array
+                (
+                    [0] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\Php82
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %i
+                            [refCount] => 0
+                            [position] => 1
+                            [attr] => Array
+                                (
+                                    [file] => %s
+                                    [line] => 5
+                                )
+
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [nil] => 
+                    [false] => 
                 )
 
         )

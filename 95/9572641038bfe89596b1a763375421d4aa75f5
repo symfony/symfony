@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-06-11T14:47:58Z
+
+Anyway, the implementation would have triggered an error in that case due to the type check being done at the beginning of the methods

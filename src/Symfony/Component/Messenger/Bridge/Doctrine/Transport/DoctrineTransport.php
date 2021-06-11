@@ -119,6 +119,11 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
         return $this->connection->getExtraSetupSqlForTable($createdTable);
     }
 
+    public function useAutoSetup(): bool
+    {
+        return $this->connection->useAutoSetup();
+    }
+
     private function getReceiver(): DoctrineReceiver
     {
         return $this->receiver = new DoctrineReceiver($this->connection, $this->serializer);

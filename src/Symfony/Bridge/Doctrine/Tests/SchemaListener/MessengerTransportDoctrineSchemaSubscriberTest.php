@@ -37,6 +37,9 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
 
         $doctrineTransport = $this->createMock(DoctrineTransport::class);
         $doctrineTransport->expects($this->once())
+            ->method('useAutoSetup')
+            ->willReturn(true);
+        $doctrineTransport->expects($this->once())
             ->method('configureSchema')
             ->with($schema, $dbalConnection);
         $otherTransport = $this->createMock(TransportInterface::class);
@@ -44,6 +47,27 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
             ->method($this->anything());
 
         $subscriber = new MessengerTransportDoctrineSchemaSubscriber([$doctrineTransport, $otherTransport]);
+        $subscriber->postGenerateSchema($event);
+    }
+
+    public function testPostGenerateSchemaWithoutAutoSetup()
+    {
+        $schema = new Schema();
+        $dbalConnection = $this->createMock(Connection::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($dbalConnection);
+        $event = new GenerateSchemaEventArgs($entityManager, $schema);
+
+        $doctrineTransport = $this->createMock(DoctrineTransport::class);
+        $doctrineTransport->expects($this->once())
+            ->method('useAutoSetup')
+            ->willReturn(false);
+        $doctrineTransport->expects($this->never())
+            ->method('configureSchema');
+
+        $subscriber = new MessengerTransportDoctrineSchemaSubscriber([$doctrineTransport]);
         $subscriber->postGenerateSchema($event);
     }
 
@@ -58,6 +82,9 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
             ->method($this->anything());
 
         $doctrineTransport = $this->createMock(DoctrineTransport::class);
+        $doctrineTransport->expects($this->once())
+            ->method('useAutoSetup')
+            ->willReturn(true);
         $doctrineTransport->expects($this->once())
             ->method('getExtraSetupSqlForTable')
             ->with($table)
@@ -78,6 +105,27 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
         ], $event->getSql());
     }
 
+    public function testOnSchemaCreateTableWithoutAutoSetup()
+    {
+        $platform = $this->createMock(AbstractPlatform::class);
+        $table = new Table('queue_table');
+        $event = new SchemaCreateTableEventArgs($table, [], [], $platform);
+
+        $doctrineTransport = $this->createMock(DoctrineTransport::class);
+        $doctrineTransport->expects($this->once())
+            ->method('useAutoSetup')
+            ->willReturn(false);
+        $doctrineTransport->expects($this->never())
+            ->method('getExtraSetupSqlForTable');
+
+        $platform->expects($this->never())
+            ->method('getCreateTableSQL');
+
+        $subscriber = new MessengerTransportDoctrineSchemaSubscriber([$doctrineTransport]);
+        $subscriber->onSchemaCreateTable($event);
+        $this->assertFalse($event->isDefaultPrevented());
+    }
+
     public function testOnSchemaCreateTableNoExtraSql()
     {
         $platform = $this->createMock(AbstractPlatform::class);
@@ -85,6 +133,9 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
         $event = new SchemaCreateTableEventArgs($table, [], [], $platform);
 
         $doctrineTransport = $this->createMock(DoctrineTransport::class);
+        $doctrineTransport->expects($this->once())
+            ->method('useAutoSetup')
+            ->willReturn(true);
         $doctrineTransport->expects($this->once())
             ->method('getExtraSetupSqlForTable')
             ->willReturn([]);

@@ -131,6 +131,7 @@ class SymfonyRuntime extends GenericRuntime
             }
 
             $console->setDefaultCommand($application->getName(), true);
+            $console->getDefinition()->addOptions($application->getDefinition()->getOptions());
 
             return $this->getRunner($console);
         }

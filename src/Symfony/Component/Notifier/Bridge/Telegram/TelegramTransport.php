@@ -79,8 +79,9 @@ final class TelegramTransport extends AbstractTransport
 
         $options['text'] = $message->getSubject();
 
-        if (!isset($options['parse_mode'])) {
+        if (!isset($options['parse_mode']) || TelegramOptions::PARSE_MODE_MARKDOWN_V2 === $options['parse_mode']) {
             $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
+            $options['text'] = str_replace('.', '\.', $message->getSubject());
         }
 
         $response = $this->client->request('POST', $endpoint, [

@@ -72,8 +72,8 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 | Property      | Name                                             | Groups  | Options                                                    |
 +---------------+--------------------------------------------------+---------+------------------------------------------------------------+
 | firstArgument | Symfony\Component\Validator\Constraints\NotBlank | Default | [                                                          |
-|               |                                                  |         |   "message" => "This value should not be blank.",          |
 |               |                                                  |         |   "allowNull" => false,                                    |
+|               |                                                  |         |   "message" => "This value should not be blank.",          |
 |               |                                                  |         |   "normalizer" => null,                                    |
 |               |                                                  |         |   "payload" => null                                        |
 |               |                                                  |         | ]                                                          |
@@ -133,8 +133,8 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 | Property      | Name                                             | Groups  | Options                                                    |
 +---------------+--------------------------------------------------+---------+------------------------------------------------------------+
 | firstArgument | Symfony\Component\Validator\Constraints\NotBlank | Default | [                                                          |
-|               |                                                  |         |   "message" => "This value should not be blank.",          |
 |               |                                                  |         |   "allowNull" => false,                                    |
+|               |                                                  |         |   "message" => "This value should not be blank.",          |
 |               |                                                  |         |   "normalizer" => null,                                    |
 |               |                                                  |         |   "payload" => null                                        |
 |               |                                                  |         | ]                                                          |
@@ -153,8 +153,8 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassTwo
 | Property      | Name                                             | Groups  | Options                                                    |
 +---------------+--------------------------------------------------+---------+------------------------------------------------------------+
 | firstArgument | Symfony\Component\Validator\Constraints\NotBlank | Default | [                                                          |
-|               |                                                  |         |   "message" => "This value should not be blank.",          |
 |               |                                                  |         |   "allowNull" => false,                                    |
+|               |                                                  |         |   "message" => "This value should not be blank.",          |
 |               |                                                  |         |   "normalizer" => null,                                    |
 |               |                                                  |         |   "payload" => null                                        |
 |               |                                                  |         | ]                                                          |

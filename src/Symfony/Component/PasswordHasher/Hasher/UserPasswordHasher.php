@@ -32,7 +32,7 @@ class UserPasswordHasher implements UserPasswordHasherInterface
     }
 
     /**
-     * @param PasswordAuthenticatedUserInterface $user
+     * @param PasswordAuthenticatedUserInterface|PasswordHasherAwareInterface $user
      */
     public function hashPassword($user, string $plainPassword): string
     {
@@ -54,7 +54,7 @@ class UserPasswordHasher implements UserPasswordHasherInterface
     }
 
     /**
-     * @param PasswordAuthenticatedUserInterface $user
+     * @param PasswordAuthenticatedUserInterface|PasswordHasherAwareInterface $user
      */
     public function isPasswordValid($user, string $plainPassword): bool
     {
@@ -80,7 +80,7 @@ class UserPasswordHasher implements UserPasswordHasherInterface
     }
 
     /**
-     * @param PasswordAuthenticatedUserInterface $user
+     * @param PasswordAuthenticatedUserInterface|PasswordHasherAwareInterface $user
      */
     public function needsRehash($user): bool
     {

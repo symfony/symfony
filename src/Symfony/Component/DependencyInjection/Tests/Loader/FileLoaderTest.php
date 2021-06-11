@@ -202,10 +202,10 @@ class FileLoaderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('bad_classes_dir', 'BadClasses');
-        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), 'test');
 
         $loader->registerClasses(
-            (new Definition())->setPublic(false),
+            (new Definition())->setAutoconfigured(true),
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\\',
             'Prototype/%bad_classes_dir%/*'
         );

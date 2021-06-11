@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureAttributed;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
 
 /**
  * @requires PHP 8
@@ -77,5 +78,17 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
             ->addTag(AutoconfiguredInterface::class, ['foo' => 123])
         ;
         $this->assertEquals([AutoconfiguredInterface::class => $expected], $container->getAutoconfiguredInstanceof());
+    }
+
+    public function testMissingParent()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(ParentNotExists::class, ParentNotExists::class)
+            ->setAutoconfigured(true);
+
+        (new RegisterAutoconfigureAttributesPass())->process($container);
+
+        $this->addToAssertionCount(1);
     }
 }

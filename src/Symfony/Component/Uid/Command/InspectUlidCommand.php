@@ -62,11 +62,11 @@ EOF
         }
 
         $io->table(['Label', 'Value'], [
-            ['Canonical (Base 32)', (string) $ulid],
-            ['Base 58', $ulid->toBase58()],
-            ['RFC 4122', $ulid->toRfc4122()],
+            ['toBase32 (canonical)', (string) $ulid],
+            ['toBase58', $ulid->toBase58()],
+            ['toRfc4122', $ulid->toRfc4122()],
             new TableSeparator(),
-            ['Timestamp', ($ulid->getDateTime())->format('Y-m-d H:i:s.v')],
+            ['Time', ($ulid->getDateTime())->format('Y-m-d H:i:s.v \U\T\C')],
         ]);
 
         return 0;

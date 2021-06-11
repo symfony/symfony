@@ -21,18 +21,18 @@ use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 class PasswordHasherFactoryTest extends TestCase
 {
     public function testGetHasherWithMessageDigestHasher()
     {
-        $factory = new PasswordHasherFactory([UserInterface::class => [
+        $factory = new PasswordHasherFactory([PasswordAuthenticatedUserInterface::class => [
             'class' => MessageDigestPasswordHasher::class,
             'arguments' => ['sha512', true, 5],
         ]]);
 
-        $hasher = $factory->getPasswordHasher($this->createMock(UserInterface::class));
+        $hasher = $factory->getPasswordHasher($this->createMock(PasswordAuthenticatedUserInterface::class));
         $expectedHasher = new MessageDigestPasswordHasher('sha512', true, 5);
 
         $this->assertEquals($expectedHasher->hash('foo', 'moo'), $hasher->hash('foo', 'moo'));
@@ -41,14 +41,10 @@ class PasswordHasherFactoryTest extends TestCase
     public function testGetHasherWithService()
     {
         $factory = new PasswordHasherFactory([
-            UserInterface::class => new MessageDigestPasswordHasher('sha1'),
+            PasswordAuthenticatedUserInterface::class => new MessageDigestPasswordHasher('sha1'),
         ]);
 
-        $hasher = $factory->getPasswordHasher($this->createMock(UserInterface::class));
-        $expectedHasher = new MessageDigestPasswordHasher('sha1');
-        $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
-
-        $hasher = $factory->getPasswordHasher(new InMemoryUser('user', 'pass'));
+        $hasher = $factory->getPasswordHasher($this->createMock(PasswordAuthenticatedUserInterface::class));
         $expectedHasher = new MessageDigestPasswordHasher('sha1');
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
@@ -56,7 +52,7 @@ class PasswordHasherFactoryTest extends TestCase
     public function testGetHasherWithClassName()
     {
         $factory = new PasswordHasherFactory([
-            UserInterface::class => new MessageDigestPasswordHasher('sha1'),
+            PasswordAuthenticatedUserInterface::class => new MessageDigestPasswordHasher('sha1'),
         ]);
 
         $hasher = $factory->getPasswordHasher(SomeChildUser::class);
@@ -208,7 +204,7 @@ class PasswordHasherFactoryTest extends TestCase
     }
 }
 
-class SomeUser implements UserInterface
+class SomeUser implements PasswordAuthenticatedUserInterface
 {
     public function getRoles(): array
     {

@@ -287,6 +287,10 @@ class Application implements ResetInterface
             $command = $this->find($alternative);
         }
 
+        if ($command instanceof LazyCommand) {
+            $command = $command->getCommand();
+        }
+
         $this->runningCommand = $command;
         $exitCode = $this->doRunCommand($command, $input, $output);
         $this->runningCommand = null;

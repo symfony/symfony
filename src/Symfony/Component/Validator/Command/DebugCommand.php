@@ -166,6 +166,8 @@ EOF
             $options[$propertyName] = $constraint->$propertyName;
         }
 
+        ksort($options);
+
         return $options;
     }
 

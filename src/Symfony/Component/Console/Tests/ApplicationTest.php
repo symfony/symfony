@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
@@ -1672,7 +1673,7 @@ class ApplicationTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass());
         $container
-            ->register('lazy-command', LazyCommand::class)
+            ->register('lazy-command', LazyTestCommand::class)
             ->addTag('console.command', ['command' => 'lazy:command'])
             ->addTag('console.command', ['command' => 'lazy:alias'])
             ->addTag('console.command', ['command' => 'lazy:alias2']);
@@ -1847,7 +1848,7 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         $application->setDispatcher($dispatcher);
         $application->setSignalsToDispatchEvent(\SIGALRM);
-        $application->add($command);
+        $application->add(new LazyCommand('signal', [], '', false, function () use ($command) { return $command; }, true));
 
         $this->assertFalse($command->signaled);
         $this->assertFalse($dispatcherCalled);
@@ -1902,7 +1903,7 @@ class CustomDefaultCommandApplication extends Application
     }
 }
 
-class LazyCommand extends Command
+class LazyTestCommand extends Command
 {
     public function execute(InputInterface $input, OutputInterface $output): int
     {

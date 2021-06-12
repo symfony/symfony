@@ -93,7 +93,9 @@ class SessionHandlerProxyTest extends TestCase
     public function testRead()
     {
         $this->mock->expects($this->once())
-            ->method('read');
+            ->method('read')
+            ->willReturn('foo')
+        ;
 
         $this->proxy->read('id');
     }
@@ -117,7 +119,9 @@ class SessionHandlerProxyTest extends TestCase
     public function testGc()
     {
         $this->mock->expects($this->once())
-            ->method('gc');
+            ->method('gc')
+            ->willReturn(1)
+        ;
 
         $this->proxy->gc(86400);
     }

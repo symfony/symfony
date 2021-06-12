@@ -311,7 +311,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         }
 
         foreach ($curlopts as $opt => $value) {
-            if (null !== $value && !curl_setopt($ch, $opt, $value) && \CURLOPT_CERTINFO !== $opt) {
+            if (null !== $value && !curl_setopt($ch, $opt, $value) && \CURLOPT_CERTINFO !== $opt && (!\defined('CURLOPT_HEADEROPT') || \CURLOPT_HEADEROPT !== $opt)) {
                 $constantName = $this->findConstantName($opt);
                 throw new TransportException(sprintf('Curl option "%s" is not supported.', $constantName ?? $opt));
             }
@@ -552,7 +552,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_HEADER,
             \CURLOPT_CONNECTTIMEOUT,
             \CURLOPT_CONNECTTIMEOUT_MS,
-            \CURLOPT_HEADEROPT,
             \CURLOPT_HTTP_VERSION,
             \CURLOPT_PORT,
             \CURLOPT_DNS_USE_GLOBAL_CACHE,
@@ -564,6 +563,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
         if (\defined('CURLOPT_HTTP09_ALLOWED')) {
             $curloptsToCheck[] = \CURLOPT_HTTP09_ALLOWED;
+        }
+
+        if (\defined('CURLOPT_HEADEROPT')) {
+            $curloptsToCheck[] = \CURLOPT_HEADEROPT;
         }
 
         $methodOpts = [

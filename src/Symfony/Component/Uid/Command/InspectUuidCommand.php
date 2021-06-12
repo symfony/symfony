@@ -72,14 +72,14 @@ EOF
 
         $rows = [
             ['Version', $version],
-            ['Canonical (RFC 4122)', (string) $uuid],
-            ['Base 58', $uuid->toBase58()],
-            ['Base 32', $uuid->toBase32()],
+            ['toRfc4122 (canonical)', (string) $uuid],
+            ['toBase58', $uuid->toBase58()],
+            ['toBase32', $uuid->toBase32()],
         ];
 
         if ($uuid instanceof UuidV1 || $uuid instanceof UuidV6) {
             $rows[] = new TableSeparator();
-            $rows[] = ['Timestamp', $uuid->getDateTime()->format('Y-m-d H:i:s.u')];
+            $rows[] = ['Time', $uuid->getDateTime()->format('Y-m-d H:i:s.u \U\T\C')];
         }
 
         $io->table(['Label', 'Value'], $rows);

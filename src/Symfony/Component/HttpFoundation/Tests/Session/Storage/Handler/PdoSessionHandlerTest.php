@@ -373,6 +373,10 @@ class MockPdo extends \PDO
         $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;
     }
 
+    /**
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
     public function getAttribute($attribute)
     {
         if (\PDO::ATTR_ERRMODE === $attribute) {
@@ -386,6 +390,10 @@ class MockPdo extends \PDO
         return parent::getAttribute($attribute);
     }
 
+    /**
+     * @return false|\PDOStatement
+     */
+    #[\ReturnTypeWillChange]
     public function prepare($statement, $driverOptions = [])
     {
         return \is_callable($this->prepareResult)
@@ -393,11 +401,13 @@ class MockPdo extends \PDO
             : $this->prepareResult;
     }
 
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
+        return true;
     }
 
-    public function rollBack()
+    public function rollBack(): bool
     {
+        return true;
     }
 }

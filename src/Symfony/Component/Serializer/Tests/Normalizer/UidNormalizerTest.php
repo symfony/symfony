@@ -162,7 +162,7 @@ class UidNormalizerTest extends TestCase
     public function testNormalizeWithNormalizationFormatNotValid()
     {
         $this->expectException(LogicException::class);
-        $this->expectDeprecationMessage('The "ccc" format is not valid.');
+        $this->expectExceptionMessage('The "ccc" format is not valid.');
 
         $this->normalizer->normalize(new Ulid(), null, [
             'uid_normalization_format' => 'ccc',

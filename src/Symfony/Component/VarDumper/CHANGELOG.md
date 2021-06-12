@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add casters for Symfony's UUIDs and ULIDs
+
 5.2.0
 -----
 

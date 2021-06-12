@@ -32,7 +32,7 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         foreach ($container->getDefinitions() as $id => $definition) {
-            if ($this->accept($definition) && null !== $class = $container->getReflectionClass($definition->getClass())) {
+            if ($this->accept($definition) && $class = $container->getReflectionClass($definition->getClass(), false)) {
                 $this->processClass($container, $class);
             }
         }

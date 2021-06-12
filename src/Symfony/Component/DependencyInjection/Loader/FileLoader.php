@@ -105,7 +105,7 @@ abstract class FileLoader extends BaseFileLoader
         $serializedPrototype = serialize($prototype);
 
         foreach ($classes as $class => $errorMessage) {
-            if ($autoconfigureAttributes && $this->env) {
+            if (null === $errorMessage && $autoconfigureAttributes && $this->env) {
                 $r = $this->container->getReflectionClass($class);
                 $attribute = null;
                 foreach ($r->getAttributes(When::class) as $attribute) {

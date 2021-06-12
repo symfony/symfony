@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-06-11T13:42:30Z
+
+@nicolas-grekas can you add a test to prevent regressions ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-11T16:28:20Z
+
+I won't be able to so immediately. I'd be happy if this could be merged without them. This won't regress :)

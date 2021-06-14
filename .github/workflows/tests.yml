@@ -114,201 +114,6 @@ jobs:
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
 
-  nightly:
-    name: PHPUnit on PHP nightly
-    runs-on: Ubuntu-20.04
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          coverage: "none"
-          ini-values: "memory_limit=-1"
-          php-version: "8.1"
-
-      - name: Configure composer
-        run: |
-          COMPOSER_HOME="$(composer config home)"
-          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-          echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
-
-      - name: Install dependencies
-        run: |
-          echo "::group::fake PHP version"
-          composer config platform.php 8.0.99
-          echo "::group::composer update"
-          composer update --no-progress --ansi
-          echo "::endgroup::"
-          echo "::group::install phpunit"
-          ./phpunit install
-          echo "::endgroup::"
-
-      - name: Run tests
-        run: |
-          _run_tests() {
-            ok=0
-            echo "::group::$1"
-
-            # Run the tests
-            ./phpunit --colors=always --exclude-group tty,benchmark,intl-data ./$1 2>&1 || ok=1
-
-            echo ""
-            echo "::endgroup::"
-
-            if [ $ok -ne 0 ]; then
-              echo "::error::$1 failed"
-            fi
-
-            # Make the tests always pass because we don't want the build to fail (yet).
-            return 0
-            #return $ok
-          }
-          export -f _run_tests
-
-          find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel _run_tests
-
-  high_deps:
-    name: PHPUnit (7.4, high deps)
-    runs-on: Ubuntu-20.04
-
-    env:
-      SYMFONY_DEPRECATIONS_HELPER: weak
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          coverage: "none"
-          ini-values: "memory_limit=-1"
-          php-version: "7.4"
-          extensions: amqp, apcu, igbinary, intl, mbstring, memcached, mongodb, redis
-          tools: flex
-
-      - name: Configure composer
-        run: |
-          SYMFONY_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*')
-          SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
-          COMPOSER_HOME="$(composer config home)"
-          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-
-          echo COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev >> $GITHUB_ENV
-          echo SYMFONY_VERSION=$SYMFONY_VERSION >> $GITHUB_ENV
-          echo SYMFONY_REQUIRE="$SYMFONY_REQUIRE" >> $GITHUB_ENV
-
-      - name: Install PHPUnit
-        run: |
-          mkdir -p ./vendor/symfony
-          cd ./vendor/symfony
-          ln -s ../../src/Symfony/Bridge/PhpUnit phpunit-bridge
-          cd ../..
-          ./phpunit install
-          echo PHPUNIT=`pwd`/phpunit >> $GITHUB_ENV
-
-      - name: Run tests
-        run: |
-          _run_tests() {
-            ok=0
-            echo "::group::$1"
-
-            # Install dependencies
-            cd ./$1
-            composer update --no-progress --ansi 2>&1 || ok=1
-
-            if [ $ok -eq 0 ]; then
-              # Run the tests
-              $PHPUNIT --colors=always --exclude-group tty,benchmark,intl-data,legacy 2>&1 || ok=1
-            fi
-
-            echo ""
-            echo "::endgroup::"
-
-            if [ $ok -ne 0 ]; then
-              echo "::error::$1 failed"
-            fi
-
-            return $ok
-          }
-          export -f _run_tests
-
-          find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel _run_tests
-
-  low_deps:
-    name: PHPUnit (8.0, low deps)
-    runs-on: Ubuntu-20.04
-
-    env:
-      SYMFONY_DEPRECATIONS_HELPER: weak
-      SYMFONY_REQUIRE: ">=2.3"
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          coverage: "none"
-          ini-values: "memory_limit=-1"
-          php-version: "8.0"
-          # TODO: memcached is excluded because of compatibility issues with PHP 8
-          extensions: amqp, apcu, igbinary, intl, mbstring, :memcached, mongodb, redis
-          tools: flex
-
-      - name: Configure composer
-        run: |
-          SYMFONY_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*')
-          COMPOSER_HOME="$(composer config home)"
-          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-
-          echo COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev >> $GITHUB_ENV
-          echo SYMFONY_VERSION=$SYMFONY_VERSION >> $GITHUB_ENV
-
-      - name: Install PHPUnit
-        run: |
-          mkdir -p ./vendor/symfony
-          cd ./vendor/symfony
-          ln -s ../../src/Symfony/Bridge/PhpUnit phpunit-bridge
-          cd ../..
-          ./phpunit install
-          echo PHPUNIT=`pwd`/phpunit >> $GITHUB_ENV
-
-      - name: Run tests
-        run: |
-          _run_tests() {
-            ok=0
-            echo "::group::$1"
-
-            # Install dependencies
-            cd ./$1
-            composer update --no-progress --ansi --prefer-lowest --prefer-stable 2>&1  || ok=1
-
-            if [ $ok -ne 0 ]; then
-              echo "::error::$1 failed"
-              return $ok
-            fi
-
-            # Run the tests
-            $PHPUNIT --colors=always --exclude-group tty,benchmark,intl-data 2>&1 || ok=1
-
-            echo ""
-            echo "::endgroup::"
-
-            if [ $ok -ne 0 ]; then
-              echo "::error::$1 failed"
-            fi
-
-            return $ok
-          }
-          export -f _run_tests
-
-          find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel _run_tests
-
   phpunit:
     name: PHPUnit
     runs-on: Ubuntu-20.04
@@ -318,7 +123,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['7.1', '7.2', '7.3', '7.4', '8.0']
+        php: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
       fail-fast: false
 
     steps:
@@ -330,6 +135,13 @@ jobs:
         # TODO: memcached is excluded because of compatibility issues with PHP 8
         run: echo "extensions='amqp, apcu, igbinary, intl, mbstring, :memcached, mongodb, redis'" >> $GITHUB_ENV
 
+      - name: Configure extensions
+        if: "${{ matrix.php == '8.1' }}"
+        # Test on PHP 8.1 with bundled extensions only and allow tests to fail for now.
+        run: |
+          echo "extensions='mbstring'" >> $GITHUB_ENV
+          echo "ALLOW_FAILURE=yes" >> $GITHUB_ENV
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -338,6 +150,10 @@ jobs:
           php-version: "${{ matrix.php }}"
           extensions: "${{ env.extensions }}"
           tools: flex
+
+      - name: Fake PHP version
+        if: "${{ matrix.php == '8.1' }}"
+        run: composer config platform.php 8.0.99
 
       - name: Configure composer
         run: |
@@ -368,6 +184,11 @@ jobs:
 
             if [ $ok -ne 0 ]; then
               echo "::error::$1 failed"
+            fi
+
+            if [ "$ALLOW_FAILURE" = "yes" ]; then
+              # Make the tests always pass because we don't want the build to fail (yet).
+              return 0
             fi
 
             return $ok

@@ -154,7 +154,7 @@ jobs:
 
             # Run the tests
             ./phpunit --colors=always --exclude-group tty,benchmark,intl-data ./$1 2>&1 || ok=1
-            echo ::endgroup::
+            echo "\n::endgroup::"
 
             if [ $ok -ne 0 ]; then
               echo "::error::$1 failed"
@@ -223,14 +223,12 @@ jobs:
               $PHPUNIT --colors=always --exclude-group tty,benchmark,intl-data,legacy 2>&1 || ok=1
             fi
 
-            echo
-            echo ::endgroup::
+            echo "\n::endgroup::"
 
             if [ $ok -ne 0 ]; then
               echo "::error::$1 failed"
             fi
 
-            # Make the tests always pass because we don't want the build to fail (yet).
             return $ok
           }
           export -f _run_tests
@@ -294,13 +292,13 @@ jobs:
 
             # Run the tests
             $PHPUNIT --colors=always --exclude-group tty,benchmark,intl-data 2>&1 || ok=1
-            echo ::endgroup::
+
+            echo "\n::endgroup::"
 
             if [ $ok -ne 0 ]; then
               echo "::error::$1 failed"
             fi
 
-            # Make the tests always pass because we don't want the build to fail (yet).
             return $ok
           }
           export -f _run_tests
@@ -360,7 +358,7 @@ jobs:
 
             # Run the tests
             ./phpunit --colors=always --exclude-group tty,benchmark,intl-data ./$1 2>&1 || ok=1
-            echo ::endgroup::
+            echo "\n::endgroup::"
 
             if [ $ok -ne 0 ]; then
               echo "::error::$1 failed"

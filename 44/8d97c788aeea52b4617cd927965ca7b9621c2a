@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-06-14T08:58:23Z
+
+Thank you for this PR. Could you elaborate why this is needed?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-06-14T09:02:08Z
+
+The `LocaleAwareInterface` from the 1.x contracts is incompatible with the type-hint that we added in #41568.
+
+I noticed this while looking at the failing Travis build (see https://travis-ci.com/github/symfony/symfony/jobs/512360890#L9504). I have no idea why Composer installs this version of the contracts package on the CI, but for projects using the String component this is a real issue.

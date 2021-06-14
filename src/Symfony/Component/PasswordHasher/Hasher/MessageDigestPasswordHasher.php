@@ -83,7 +83,7 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
         return false;
     }
 
-    private function mergePasswordAndSalt(string $password, ?string $salt): string
+    protected function mergePasswordAndSalt(string $password, ?string $salt): string
     {
         if (!$salt) {
             return $password;

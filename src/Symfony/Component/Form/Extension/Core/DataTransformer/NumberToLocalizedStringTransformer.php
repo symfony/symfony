@@ -23,41 +23,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class NumberToLocalizedStringTransformer implements DataTransformerInterface
 {
-    /**
-     * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_CEILING instead.
-     */
-    public const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
-
-    /**
-     * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_FLOOR instead.
-     */
-    public const ROUND_FLOOR = \NumberFormatter::ROUND_FLOOR;
-
-    /**
-     * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_UP instead.
-     */
-    public const ROUND_UP = \NumberFormatter::ROUND_UP;
-
-    /**
-     * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_DOWN instead.
-     */
-    public const ROUND_DOWN = \NumberFormatter::ROUND_DOWN;
-
-    /**
-     * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_HALFEVEN instead.
-     */
-    public const ROUND_HALF_EVEN = \NumberFormatter::ROUND_HALFEVEN;
-
-    /**
-     * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_HALFUP instead.
-     */
-    public const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
-
-    /**
-     * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_HALFDOWN instead.
-     */
-    public const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
-
     protected $grouping;
 
     protected $roundingMode;

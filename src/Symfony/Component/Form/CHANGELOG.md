@@ -7,6 +7,7 @@ CHANGELOG
  * Remove `PropertyPathMaper`
  * Remove `Symfony\Component\Form\Extension\Validator\Util\ServiceParams`
  * Remove `FormPass` configuration
+ * Remove the `NumberToLocalizedStringTransformer::ROUND_*` constants, use `\NumberFormatter::ROUND_*` instead
  * Add `FormConfigInterface::getIsEmptyCallback()` and `FormConfigBuilderInterface::setIsEmptyCallback()`
  * Change `$forms` parameter type of the `DataMapper::mapDataToForms()` method from `iterable` to `\Traversable`
  * Change `$forms` parameter type of the `DataMapper::mapFormsToData()` method from `iterable` to `\Traversable`

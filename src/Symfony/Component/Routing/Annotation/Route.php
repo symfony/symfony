@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Annotation;
 
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
+
 /**
  * Annotation class for @Route().
  *

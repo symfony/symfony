@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Annotation;
 
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**

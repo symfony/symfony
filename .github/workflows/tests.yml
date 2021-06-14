@@ -80,7 +80,6 @@ jobs:
       - name: Configure composer
         run: |
           COMPOSER_HOME="$(composer config home)"
-          composer self-update
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
           echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
 
@@ -133,7 +132,6 @@ jobs:
       - name: Configure composer
         run: |
           COMPOSER_HOME="$(composer config home)"
-          composer self-update
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
           echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
 
@@ -195,7 +193,6 @@ jobs:
           SYMFONY_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*')
           SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
           COMPOSER_HOME="$(composer config home)"
-          composer self-update
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
           echo COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev >> $GITHUB_ENV
@@ -219,15 +216,14 @@ jobs:
 
             # Install dependencies
             cd ./$1
-            composer update --no-progress --ansi 2>&1  || ok=1
+            composer update --no-progress --ansi 2>&1 || ok=1
 
-            if [ $ok -ne 0 ]; then
-              echo "::error::$1 failed"
-              return $ok
+            if [ $ok -eq 0 ]; then
+              # Run the tests
+              $PHPUNIT --colors=always --exclude-group tty,benchmark,intl-data,legacy 2>&1 || ok=1
             fi
 
-            # Run the tests
-            $PHPUNIT --colors=always --exclude-group tty,benchmark,intl-data,legacy 2>&1 || ok=1
+            echo
             echo ::endgroup::
 
             if [ $ok -ne 0 ]; then
@@ -266,7 +262,6 @@ jobs:
         run: |
           SYMFONY_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*')
           COMPOSER_HOME="$(composer config home)"
-          composer self-update
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
           echo COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev >> $GITHUB_ENV
@@ -336,7 +331,6 @@ jobs:
       - name: Configure composer
         run: |
           COMPOSER_HOME="$(composer config home)"
-          composer self-update
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
           echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
 

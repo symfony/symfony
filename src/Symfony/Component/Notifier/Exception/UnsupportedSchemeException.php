@@ -80,6 +80,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\LinkedIn\LinkedInTransportFactory::class,
             'package' => 'symfony/linked-in-notifier',
         ],
+        'mailjet' => [
+            'class' => Bridge\Mailjet\MailjetTransportFactory::class,
+            'package' => 'symfony/mailjet-notifier',
+        ],
         'mattermost' => [
             'class' => Bridge\Mattermost\MattermostTransportFactory::class,
             'package' => 'symfony/mattermost-notifier',

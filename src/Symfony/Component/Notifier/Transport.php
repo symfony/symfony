@@ -22,6 +22,7 @@ use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
@@ -68,6 +69,7 @@ class Transport
         InfobipTransportFactory::class,
         IqsmsTransportFactory::class,
         LightSmsTransportFactory::class,
+        MailjetTransportFactory::class,
         MattermostTransportFactory::class,
         MessageBirdTransportFactory::class,
         MessageMediaTransportFactory::class,

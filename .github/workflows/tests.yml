@@ -255,7 +255,8 @@ jobs:
           coverage: "none"
           ini-values: "memory_limit=-1"
           php-version: "8.0"
-          extensions: amqp, apcu, igbinary, intl, mbstring, memcached, mongodb, redis
+          # TODO: memcached is excluded because of compatibility issues with PHP 8
+          extensions: amqp, apcu, igbinary, intl, mbstring, :memcached, mongodb, redis
           tools: flex
 
       - name: Configure composer
@@ -310,6 +311,9 @@ jobs:
     name: PHPUnit
     runs-on: Ubuntu-20.04
 
+    env:
+      extensions: 'amqp, apcu, igbinary, intl, mbstring, memcached, mongodb, redis'
+
     strategy:
       matrix:
         php: ['7.1', '7.2', '7.3', '7.4', '8.0']
@@ -319,13 +323,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Configure extensions
+        if: "${{ matrix.php == '8.0' }}"
+        # TODO: memcached is excluded because of compatibility issues with PHP 8
+        run: echo "extensions='amqp, apcu, igbinary, intl, mbstring, :memcached, mongodb, redis'" >> $GITHUB_ENV
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
           ini-values: "memory_limit=-1"
           php-version: "${{ matrix.php }}"
-          extensions: amqp, apcu, igbinary, intl, mbstring, memcached, mongodb, redis
+          extensions: "${{ env.extensions }}"
           tools: flex
 
       - name: Configure composer

@@ -74,10 +74,7 @@ class UuidFactory
     {
         $node ?? $node = $this->timeBasedNode;
 
-        if (null === $node) {
-            $class = $this->timeBasedClass;
-            $node = $this->timeBasedNode = new $class();
-        } elseif (!$node instanceof Uuid) {
+        if (null !== $node && !$node instanceof Uuid) {
             $node = Uuid::fromString($node);
         }
 

@@ -177,7 +177,7 @@ jobs:
             echo "::group::$1"
 
             # Run the tests
-            ./phpunit --colors=always --exclude-group tty,benchmark,intl-data ./$1 2>&1 || ok=1
+            ./phpunit --colors=always --exclude-group tty,benchmark,intl-data,integration ./$1 2>&1 || ok=1
 
             echo ""
             echo "::endgroup::"

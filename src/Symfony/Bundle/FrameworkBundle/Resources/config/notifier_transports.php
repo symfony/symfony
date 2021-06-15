@@ -24,6 +24,7 @@ use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Iterable\IterableTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
@@ -166,6 +167,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('chatter.transport_factory')
 
         ->set('notifier.transport_factory.gitter', GitterTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('chatter.transport_factory')
+
+        ->set('notifier.transport_factory.iterable', IterableTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
 

@@ -9,7 +9,7 @@ use Symfony\Component\Notifier\Bridge\Iterable\IterableOptions;
 
 final class IterableOptionsTest extends TestCase
 {
-    public function testIterableOptionsWithSetters(): void
+    public function testIterableOptionsWithSetters()
     {
         $options = (new IterableOptions())
             ->recipientEmail('test@email.com')
@@ -31,7 +31,7 @@ final class IterableOptionsTest extends TestCase
         ]);
     }
 
-    public function testIterableOptionsWithConstructorArgs(): void
+    public function testIterableOptionsWithConstructorArgs()
     {
         $options = new IterableOptions([
             'recipientEmail' => 'test@email.com',

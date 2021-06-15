@@ -48,7 +48,7 @@ final class IterableTransportTest extends TransportTestCase
         yield [$this->createMock(MessageInterface::class)];
     }
 
-    public function testSendWithErrorResponseThrows(): void
+    public function testSendWithErrorResponseThrows()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
@@ -70,7 +70,7 @@ final class IterableTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSuccessfulSend(): void
+    public function testSuccessfulSend()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))

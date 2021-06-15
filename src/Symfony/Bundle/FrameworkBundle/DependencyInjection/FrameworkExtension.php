@@ -2457,6 +2457,7 @@ class FrameworkExtension extends Extension
                 case 'fakesms': $package = 'fake-sms'; break;
                 case 'freemobile': $package = 'free-mobile'; break;
                 case 'googlechat': $package = 'google-chat'; break;
+                case 'iterable': $package = 'iterable'; break;
                 case 'lightsms': $package = 'light-sms'; break;
                 case 'linkedin': $package = 'linked-in'; break;
                 case 'messagebird': $package = 'message-bird'; break;

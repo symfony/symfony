@@ -301,7 +301,7 @@ class SendgridApiTransportTest extends TestCase
         $mailer = new SendgridApiTransport('foo', $this->createMock(HttpClientInterface::class));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Invalid TemplateID. Got: %s', $invalidTemplateId));
+        $this->expectExceptionMessage(sprintf('Invalid TemplateID. Got: "%s"', $invalidTemplateId));
 
         $mailer->send($email);
     }

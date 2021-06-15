@@ -4,7 +4,7 @@ CHANGELOG
 5.4
 ---
 
-* Add supporte for templates and dynamic template data
+* Add support for templates and dynamic template data
 
 4.4.0
 -----

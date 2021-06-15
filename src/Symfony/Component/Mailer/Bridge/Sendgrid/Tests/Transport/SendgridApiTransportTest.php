@@ -260,9 +260,9 @@ class SendgridApiTransportTest extends TestCase
                     'personalizations' => [
                         [
                             'to' => [[
-                                         'email' => 'bar@example.com',
-                                         'name' => 'Mr. Recipient',
-                                     ]],
+                                'email' => 'bar@example.com',
+                                'name' => 'Mr. Recipient',
+                            ]],
                             'subject' => null,
                             'dynamic_template_data' => $dynamicTemplateData,
                             'bcc' => [['email' => 'baz@example.com']],

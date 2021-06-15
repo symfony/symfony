@@ -225,7 +225,7 @@ class SendgridApiTransportTest extends TestCase
 
     public function testSendTemplateIdWithDynamicTemplateData()
     {
-        $templateId = 'd-d-0aac27809ad64ae98d5ebaf896ea8b33';
+        $templateId = 'd-0aac27809ad64ae98d5ebaf896ea8b33';
         $dynamicTemplateData = [
             'foo' => 'bar',
         ];

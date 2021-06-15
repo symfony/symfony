@@ -49,7 +49,9 @@ class KernelBrowser extends HttpKernelBrowser
      */
     public function getContainer()
     {
-        return $this->kernel->getContainer();
+        $container = $this->kernel->getContainer();
+
+        return $container->has('test.service_container') ? $container->get('test.service_container') : $container;
     }
 
     /**
@@ -69,11 +71,11 @@ class KernelBrowser extends HttpKernelBrowser
      */
     public function getProfile()
     {
-        if (null === $this->response || !$this->kernel->getContainer()->has('profiler')) {
+        if (null === $this->response || !$this->getContainer()->has('profiler')) {
             return false;
         }
 
-        return $this->kernel->getContainer()->get('profiler')->loadProfileFromResponse($this->response);
+        return $this->getContainer()->get('profiler')->loadProfileFromResponse($this->response);
     }
 
     /**
@@ -83,7 +85,7 @@ class KernelBrowser extends HttpKernelBrowser
      */
     public function enableProfiler()
     {
-        if ($this->kernel->getContainer()->has('profiler')) {
+        if ($this->getContainer()->has('profiler')) {
             $this->profiler = true;
         }
     }
@@ -123,7 +125,7 @@ class KernelBrowser extends HttpKernelBrowser
         $token = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
         $token->setAuthenticated(true);
 
-        $container = $this->kernel->getContainer()->get('test.service_container');
+        $container = $this->getContainer()->get('test.service_container');
         $container->get('security.untracked_token_storage')->setToken($token);
 
         if (!$container->has('session')) {
@@ -161,7 +163,7 @@ class KernelBrowser extends HttpKernelBrowser
             $this->profiler = false;
 
             $this->kernel->boot();
-            $this->kernel->getContainer()->get('profiler')->enable();
+            $this->getContainer()->get('profiler')->enable();
         }
 
         return parent::doRequest($request);
@@ -220,7 +222,11 @@ class KernelBrowser extends HttpKernelBrowser
 
         $profilerCode = '';
         if ($this->profiler) {
-            $profilerCode = '$kernel->getContainer()->get(\'profiler\')->enable();';
+            $profilerCode = <<<'EOF'
+$container = $kernel->getContainer();
+$container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
+$container->get('profiler')->enable();
+EOF;
         }
 
         $code = <<<EOF

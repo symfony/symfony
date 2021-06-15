@@ -116,7 +116,7 @@ class SendgridApiTransport extends AbstractApiTransport
                 $templateId = $header->getBodyAsString();
 
                 if (!preg_match('/^d\-[a-z0-9]{32}$/', $templateId)) {
-                    throw new InvalidArgumentException(sprintf('Invalid TemplateID. Got: %s', $templateId));
+                    throw new InvalidArgumentException(sprintf('Invalid TemplateID. Got: "%s".', $templateId));
                 }
 
                 $payload['template_id'] = $templateId;

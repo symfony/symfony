@@ -1,6 +1,15 @@
 <?php
 
-declare(strict_types = 1);
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Symfony\Component\Notifier\Bridge\Iterable;
 
@@ -80,10 +89,10 @@ final class IterableTransport extends AbstractTransport
         if (200 !== $response->getStatusCode()) {
             $errorMessage = $content ? $content['msg'] : $response->getContent(false);
 
-            throw new TransportException('Unable to post the Iterable message: ' . $errorMessage, $response);
+            throw new TransportException('Unable to post the Iterable message: '.$errorMessage, $response);
         }
-        if ($content && $content['code'] !== self::RESPONSE_CODE_SUCCESS) {
-            throw new TransportException('Unable to post the Iterable message: ' . $content['msg'], $response);
+        if ($content && self::RESPONSE_CODE_SUCCESS !== $content['code']) {
+            throw new TransportException('Unable to post the Iterable message: '.$content['msg'], $response);
         }
 
         return new SentMessage($message, (string) $this);

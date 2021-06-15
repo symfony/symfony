@@ -1,6 +1,15 @@
 <?php
 
-declare(strict_types = 1);
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 
 namespace Symfony\Component\Notifier\Bridge\Iterable;
 
@@ -53,7 +62,7 @@ class IterableOptions implements MessageOptionsInterface
     }
 
     /**
-     * Either email or userId must be passed in to identify the user. If both are passed in, email takes precedence
+     * Either email or userId must be passed in to identify the user. If both are passed in, email takes precedence.
      */
     public function recipientEmail(string $recipientEmail): self
     {
@@ -63,7 +72,7 @@ class IterableOptions implements MessageOptionsInterface
     }
 
     /**
-     * UserId that was passed into the updateUser call
+     * UserId that was passed into the updateUser call.
      */
     public function recipientUserId(string $recipientUserId): self
     {
@@ -73,7 +82,7 @@ class IterableOptions implements MessageOptionsInterface
     }
 
     /**
-     * JSON object containing fields to merge into email template
+     * JSON object containing fields to merge into email template.
      *
      * @param array<mixed> $dataFields
      */
@@ -86,7 +95,7 @@ class IterableOptions implements MessageOptionsInterface
 
     /**
      * Schedule the message for up to 365 days in the future. If set in the past, message is sent immediately.
-     * Format is YYYY-MM-DD HH:MM:SS in UTC
+     * Format is YYYY-MM-DD HH:MM:SS in UTC.
      */
     public function sendAt(string $sendAt): self
     {
@@ -96,7 +105,7 @@ class IterableOptions implements MessageOptionsInterface
     }
 
     /**
-     * Allow repeat marketing sends? Defaults to true
+     * Allow repeat marketing sends? Defaults to true.
      */
     public function allowRepeatMarketingSends(bool $allowRepeatMarketingSends): self
     {
@@ -106,7 +115,7 @@ class IterableOptions implements MessageOptionsInterface
     }
 
     /**
-     * Metadata to pass back via system webhooks. Not used for rendering
+     * Metadata to pass back via system webhooks. Not used for rendering.
      *
      * @param array<mixed> $metadata
      */

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Symfony\Component\Notifier\Bridge\Iterable\Tests;
 

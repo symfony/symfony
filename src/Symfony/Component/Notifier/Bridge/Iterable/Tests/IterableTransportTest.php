@@ -11,14 +11,13 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class IterableTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null): AbstractTransport
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
         return (new IterableTransport('testToken', 'testCampaignId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
@@ -60,7 +59,9 @@ final class IterableTransportTest extends TransportTestCase
             ->willReturn(json_encode(['msg' => 'testDescription', 'code' => 'testErrorCode']))
         ;
 
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
+            return $response;
+        });
 
         $transport = $this->createTransport($client);
 
@@ -82,7 +83,9 @@ final class IterableTransportTest extends TransportTestCase
             ->willReturn(json_encode(['msg' => 'testDescription', 'code' => 'Success']))
         ;
 
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
+            return $response;
+        });
 
         $transport = $this->createTransport($client);
         try {

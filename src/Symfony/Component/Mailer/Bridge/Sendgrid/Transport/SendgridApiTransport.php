@@ -101,6 +101,8 @@ class SendgridApiTransport extends AbstractApiTransport
 
         $payload['personalizations'][] = $personalization;
 
+        $dynamicTemplateData = [];
+
         // these headers can't be overwritten according to Sendgrid docs
         // see https://sendgrid.api-docs.io/v3.0/mail-send/mail-send-errors#-Headers-Errors
         $headersToBypass = ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'];
@@ -109,7 +111,26 @@ class SendgridApiTransport extends AbstractApiTransport
                 continue;
             }
 
+            if ('x-template-id' === $name) {
+                $payload['template_id'] = $header->getBodyAsString();
+
+                continue;
+            }
+
+            if ('x-dynamic-template-data' === $name) {
+                $dynamicTemplateData = json_decode($header->getBodyAsString(), true);
+
+                continue;
+            }
+
             $payload['headers'][$name] = $header->getBodyAsString();
+        }
+
+        if ([] !== $dynamicTemplateData) {
+            // we need to add the substitutions to every available personalization
+            foreach ($payload['personalizations'] as $key => $personalization) {
+                $payload['personalizations'][$key] = array_merge($payload['personalizations'][$key], ['dynamic_template_data' => $dynamicTemplateData]);
+            }
         }
 
         return $payload;

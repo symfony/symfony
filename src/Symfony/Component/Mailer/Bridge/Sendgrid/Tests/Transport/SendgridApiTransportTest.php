@@ -222,4 +222,66 @@ class SendgridApiTransportTest extends TestCase
         $this->assertCount(1, $payload['personalizations'][0]['to']);
         $this->assertSame($envelopeTo, $payload['personalizations'][0]['to'][0]['email']);
     }
+
+    public function testSendTemplateIdWithDynamicTemplateData()
+    {
+        $templateId = 'd-d-0aac27809ad64ae98d5ebaf896ea8b33';
+        $dynamicTemplateData = [
+            'foo' => 'bar',
+        ];
+
+        $email = new Email();
+        $email->from(new Address('foo@example.com', 'Ms. Foo Bar'))
+            ->to(new Address('bar@example.com', 'Mr. Recipient'))
+            ->bcc('baz@example.com')
+            ->text('content');
+
+        $email->getHeaders()->addTextHeader('X-Template-ID', $templateId);
+        $email->getHeaders()->addTextHeader('X-Dynamic-Template-Data', json_encode($dynamicTemplateData));
+
+        $response = $this->createMock(ResponseInterface::class);
+
+        $response
+            ->expects($this->once())
+            ->method('getStatusCode')
+            ->willReturn(202);
+        $response
+            ->expects($this->once())
+            ->method('getHeaders')
+            ->willReturn(['x-message-id' => '1']);
+
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
+            ->expects($this->once())
+            ->method('request')
+            ->with('POST', 'https://api.sendgrid.com/v3/mail/send', [
+                'json' => [
+                    'personalizations' => [
+                        [
+                            'to' => [[
+                                         'email' => 'bar@example.com',
+                                         'name' => 'Mr. Recipient',
+                                     ]],
+                            'subject' => null,
+                            'dynamic_template_data' => $dynamicTemplateData,
+                            'bcc' => [['email' => 'baz@example.com']],
+                        ],
+                    ],
+                    'from' => [
+                        'email' => 'foo@example.com',
+                        'name' => 'Ms. Foo Bar',
+                    ],
+                    'content' => [
+                        ['type' => 'text/plain', 'value' => 'content'],
+                    ],
+                    'template_id' => $templateId,
+                ],
+                'auth_bearer' => 'foo',
+            ])
+            ->willReturn($response);
+
+        $mailer = new SendgridApiTransport('foo', $httpClient);
+        $mailer->send($email);
+    }
 }

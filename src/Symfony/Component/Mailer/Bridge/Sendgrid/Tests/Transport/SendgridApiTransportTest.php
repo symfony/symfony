@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -282,6 +283,26 @@ class SendgridApiTransportTest extends TestCase
             ->willReturn($response);
 
         $mailer = new SendgridApiTransport('foo', $httpClient);
+        $mailer->send($email);
+    }
+
+    public function testSendWithInvalidTemplateIdThrowsInvalidArgumentException()
+    {
+        $invalidTemplateId = 'd-abcd';
+
+        $email = new Email();
+        $email->from(new Address('foo@example.com', 'Ms. Foo Bar'))
+            ->to(new Address('bar@example.com', 'Mr. Recipient'))
+            ->bcc('baz@example.com')
+            ->text('content');
+
+        $email->getHeaders()->addTextHeader('X-Template-ID', $invalidTemplateId);
+
+        $mailer = new SendgridApiTransport('foo', $this->createMock(HttpClientInterface::class));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Invalid TemplateID. Got: %s', $invalidTemplateId));
+
         $mailer->send($email);
     }
 }

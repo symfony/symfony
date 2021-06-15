@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Sendgrid\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -112,7 +113,13 @@ class SendgridApiTransport extends AbstractApiTransport
             }
 
             if ('x-template-id' === $name) {
-                $payload['template_id'] = $header->getBodyAsString();
+                $templateId = $header->getBodyAsString();
+
+                if (!preg_match('/^d\-[a-z0-9]{32}$/', $templateId)) {
+                    throw new InvalidArgumentException(sprintf('Invalid TemplateID. Got: %s', $templateId));
+                }
+
+                $payload['template_id'] = $templateId;
 
                 continue;
             }

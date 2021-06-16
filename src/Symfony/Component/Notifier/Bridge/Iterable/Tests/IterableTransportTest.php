@@ -17,9 +17,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class IterableTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(?HttpClientInterface $client = null, ?string $campaignId = null): TransportInterface
     {
-        return (new IterableTransport('testToken', 'testCampaignId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new IterableTransport('testToken', $campaignId, $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     /**
@@ -28,6 +28,7 @@ final class IterableTransportTest extends TransportTestCase
     public function toStringProvider(): iterable
     {
         yield ['iterable://host.test', $this->createTransport()];
+        yield ['iterable://host.test?campaign_id=testCampaignId', $this->createTransport(null, 'testCampaignId')];
     }
 
     /**
@@ -63,7 +64,7 @@ final class IterableTransportTest extends TransportTestCase
             return $response;
         });
 
-        $transport = $this->createTransport($client);
+        $transport = $this->createTransport($client, 'testCampaignId');
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');
@@ -87,7 +88,7 @@ final class IterableTransportTest extends TransportTestCase
             return $response;
         });
 
-        $transport = $this->createTransport($client);
+        $transport = $this->createTransport($client, 'testCampaignId');
         try {
             $transport->send(new ChatMessage('testMessage'));
         } catch (TransportException $exception) {

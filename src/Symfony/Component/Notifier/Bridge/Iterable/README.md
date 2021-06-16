@@ -5,12 +5,13 @@ Provides [Iterable](https://iterable.com/) integration for Symfony Notifier.
 ## DSN example
 
 ```
-ITERABLE_DSN=iterable://API_KEY@default?campaign_id=ID
+ITERABLE_DSN=iterable://API_KEY@default?campaign_id=CAMPAIGN_ID
 ```
 
 where:
 
--   `API_KEY` is your Iterable API key
+ - `API_KEY` is your Iterable API key
+ - `CAMPAIGN_ID` (optional) is the campaign's ID where to send messages (for e.g. push notifications) - The campaign ID can be set on the `IterableOptions` as well
 
 ## Resources
 

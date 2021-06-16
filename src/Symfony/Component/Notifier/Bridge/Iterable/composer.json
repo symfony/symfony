@@ -2,7 +2,7 @@
     "name": "symfony/iterable-notifier",
     "type": "symfony-bridge",
     "description": "Symfony Iterable Notifier Bridge",
-    "keywords": ["iterable", "notifier"],
+    "keywords": ["iterable", "notifier", "chat"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

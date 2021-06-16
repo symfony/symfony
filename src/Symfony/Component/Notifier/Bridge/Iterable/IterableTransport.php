@@ -30,7 +30,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class IterableTransport extends AbstractTransport
 {
     protected const HOST = 'api.iterable.com/api/push/target';
-    private const RESPONSE_CODE_SUCCESS = 'Success';
 
     /** @var string */
     private $apiKey;
@@ -42,13 +41,16 @@ final class IterableTransport extends AbstractTransport
     {
         $this->apiKey = $apiKey;
         $this->campaignId = $campaignId;
-        $this->client = $client;
 
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
+        if (null !== $this->campaignId) {
+            return sprintf('iterable://%s?campaign_id=%s', $this->getEndpoint(), $this->campaignId);
+        }
+
         return sprintf('iterable://%s', $this->getEndpoint());
     }
 
@@ -91,7 +93,7 @@ final class IterableTransport extends AbstractTransport
 
             throw new TransportException('Unable to post the Iterable message: '.$errorMessage, $response);
         }
-        if ($content && self::RESPONSE_CODE_SUCCESS !== $content['code']) {
+        if ($content && 'Success' !== $content['code']) {
             throw new TransportException('Unable to post the Iterable message: '.$content['msg'], $response);
         }
 

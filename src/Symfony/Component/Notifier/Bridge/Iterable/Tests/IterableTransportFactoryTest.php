@@ -21,7 +21,7 @@ final class IterableTransportFactoryTest extends TransportFactoryTestCase
     public function createProvider(): iterable
     {
         yield ['iterable://host.test', 'iterable://token@host.test'];
-        yield ['iterable://host.test', 'iterable://token@host.test?campaign_id=testCampaignId'];
+        yield ['iterable://host.test?campaign_id=testCampaignId', 'iterable://token@host.test?campaign_id=testCampaignId'];
     }
 
     public function supportsProvider(): iterable

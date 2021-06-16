@@ -68,6 +68,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Infobip\InfobipTransportFactory::class,
             'package' => 'symfony/infobip-notifier',
         ],
+        'iterable' => [
+            'class' => Bridge\Iterable\IterableTransportFactory::class,
+            'package' => 'symfony/iterable-notifier',
+        ],
         'iqsms' => [
             'class' => Bridge\Iqsms\IqsmsTransportFactory::class,
             'package' => 'symfony/iqsms-notifier',

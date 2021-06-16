@@ -34,12 +34,8 @@ class IterableOptions implements MessageOptionsInterface
      */
     private $campaignId;
 
-    /**
-     * @param array<mixed> $options
-     */
-    public function __construct(array $options = [], ?int $campaignId = null)
+    public function __construct(?int $campaignId = null)
     {
-        $this->options = $options;
         $this->campaignId = $campaignId;
     }
 
@@ -97,9 +93,9 @@ class IterableOptions implements MessageOptionsInterface
      * Schedule the message for up to 365 days in the future. If set in the past, message is sent immediately.
      * Format is YYYY-MM-DD HH:MM:SS in UTC.
      */
-    public function sendAt(string $sendAt): self
+    public function sendAt(\DateTimeInterface $sendAt): self
     {
-        $this->options['sendAt'] = $sendAt;
+        $this->options['sendAt'] = $sendAt->format('Y-m-d H:i:s');
 
         return $this;
     }

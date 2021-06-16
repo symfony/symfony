@@ -11,11 +11,12 @@ final class IterableOptionsTest extends TestCase
 {
     public function testIterableOptionsWithSetters()
     {
+        $sendAt = new \DateTime('2021-05-05 01:01:00');
         $options = (new IterableOptions())
             ->recipientEmail('test@email.com')
             ->recipientUserId('1234')
             ->dataFields(['field' => 'value'])
-            ->sendAt('2021-05-05 01:01:00')
+            ->sendAt($sendAt)
             ->allowRepeatMarketingSends(false)
             ->metadata(['some' => 'data'])
         ;
@@ -24,7 +25,7 @@ final class IterableOptionsTest extends TestCase
             'recipientEmail' => 'test@email.com',
             'recipientUserId' => '1234',
             'dataFields' => ['field' => 'value'],
-            'sendAt' => '2021-05-05 01:01:00',
+            'sendAt' => $sendAt->format('Y-m-d H:i:s'),
             'allowRepeatMarketingSends' => false,
             'metadata' => ['some' => 'data'],
             'campaignId' => null,
@@ -33,22 +34,12 @@ final class IterableOptionsTest extends TestCase
 
     public function testIterableOptionsWithConstructorArgs()
     {
-        $options = new IterableOptions([
-            'recipientEmail' => 'test@email.com',
-            'recipientUserId' => '1234',
-            'dataFields' => ['field' => 'value'],
-            'sendAt' => '2021-05-05 01:01:00',
-            'allowRepeatMarketingSends' => false,
-            'metadata' => ['some' => 'data'],
-        ], 12345);
+        $sendAt = new \DateTime('2021-05-05 01:01:00');
+        $options = (new IterableOptions(12345))
+            ->sendAt($sendAt);
 
         $this->assertSame($options->toArray(), [
-            'recipientEmail' => 'test@email.com',
-            'recipientUserId' => '1234',
-            'dataFields' => ['field' => 'value'],
-            'sendAt' => '2021-05-05 01:01:00',
-            'allowRepeatMarketingSends' => false,
-            'metadata' => ['some' => 'data'],
+            'sendAt' => $sendAt->format('Y-m-d H:i:s'),
             'campaignId' => 12345,
         ]);
     }

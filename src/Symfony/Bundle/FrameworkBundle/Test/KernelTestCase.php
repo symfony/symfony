@@ -91,7 +91,7 @@ abstract class KernelTestCase extends TestCase
 
     /**
      * Provides a dedicated test container with access to both public and private
-     * services. The container will not include private services that has been
+     * services. The container will not include private services that have been
      * inlined or removed. Private services will be removed when they are not
      * used by other services.
      *

@@ -68,7 +68,7 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>Ο τύπος mime του αρχείου δεν είναι έγκυρος ({{ type }}). Οι έγκρυοι τύποι mime είναι {{ types }}.</target>
+                <target>Ο τύπος mime του αρχείου δεν είναι έγκυρος ({{ type }}). Οι έγκυροι τύποι mime είναι {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -144,7 +144,7 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>Αυτή η τιμή δεν αντιστοιχεί σε έκγυρο κωδικό τοποθεσίας.</target>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε έγκυρο κωδικό τοποθεσίας.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Αυτό δεν αντιστοιχεί σε έκγυρο διεθνή αριθμό τραπεζικού λογαριασμού (IBAN).</target>
+                <target>Αυτό δεν αντιστοιχεί σε έγκυρο διεθνή αριθμό τραπεζικού λογαριασμού (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Αυτός δεν έιναι ένας έγκυρος κωδικός BIC.</target>
+                <target>Αυτός δεν είναι ένας έγκυρος κωδικός BIC.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -356,11 +356,11 @@
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
-                <target>Αυτή η τιμή θα δέν είναι έγκυρη ζώνη ώρας.</target>
+                <target>Αυτή η τιμή θα δεν είναι έγκυρη ζώνη ώρας.</target>
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>Αυτός ο κωδικός πρόσβασης έχει διερρεύσει σε παραβίαση δεδομένων. Παρακαλούμε να χρησιμοποιήσετε έναν άλλο κωδικό.</target>
+                <target>Αυτός ο κωδικός πρόσβασης έχει διαρρεύσει σε παραβίαση δεδομένων. Παρακαλούμε να χρησιμοποιήσετε έναν άλλο κωδικό.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
@@ -368,7 +368,7 @@
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
-                <target>Αυτή η τιμή δέν είναι έγκυρο όνομα υποδοχής.</target>
+                <target>Αυτή η τιμή δεν είναι έγκυρο όνομα υποδοχής.</target>
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
@@ -376,7 +376,7 @@
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Αυτή η τιμή θα πρέπει να ικανοποιεί τουλάχιστον έναν απο τους παρακάτω περιορισμούς: </target>
+                <target>Αυτή η τιμή θα πρέπει να ικανοποιεί τουλάχιστον έναν από τους παρακάτω περιορισμούς: </target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
@@ -384,7 +384,7 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>Αυτή η τιμή δέν είναι έγυρο International Securities Identification Number (ISIN).</target>
+                <target>Αυτή η τιμή δεν είναι έγκυρο International Securities Identification Number (ISIN).</target>
             </trans-unit>
         </body>
     </file>

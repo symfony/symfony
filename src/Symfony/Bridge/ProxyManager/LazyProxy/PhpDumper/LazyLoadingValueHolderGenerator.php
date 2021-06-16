@@ -28,12 +28,12 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
         parent::generate($originalClass, $classGenerator, $proxyOptions);
 
         foreach ($classGenerator->getMethods() as $method) {
-            if (0 === strpos($originalClass->getFilename(), __FILE__)) {
+            if (str_starts_with($originalClass->getFilename(), __FILE__)) {
                 $method->setBody(str_replace(var_export($originalClass->name, true), '__CLASS__', $method->getBody()));
             }
         }
 
-        if (0 === strpos($originalClass->getFilename(), __FILE__)) {
+        if (str_starts_with($originalClass->getFilename(), __FILE__)) {
             $interfaces = $classGenerator->getImplementedInterfaces();
             array_pop($interfaces);
             $classGenerator->setImplementedInterfaces(array_merge($interfaces, $originalClass->getInterfaceNames()));

@@ -149,7 +149,7 @@ class HttpUtils
      */
     public function generateUri($request, $path)
     {
-        if (0 === strpos($path, 'http') || !$path) {
+        if (str_starts_with($path, 'http') || !$path) {
             return $path;
         }
 

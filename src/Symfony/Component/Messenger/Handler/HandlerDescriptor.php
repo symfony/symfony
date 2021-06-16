@@ -65,7 +65,7 @@ final class HandlerDescriptor
 
         if ($handler instanceof \Closure) {
             $r = new \ReflectionFunction($handler);
-            if (false !== strpos($r->name, '{closure}')) {
+            if (str_contains($r->name, '{closure}')) {
                 return 'Closure';
             }
             if ($class = $r->getClosureScopeClass()) {

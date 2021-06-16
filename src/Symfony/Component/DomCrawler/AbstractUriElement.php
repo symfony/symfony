@@ -104,7 +104,7 @@ abstract class AbstractUriElement
         }
 
         // absolute URL with relative schema
-        if (0 === strpos($uri, '//')) {
+        if (str_starts_with($uri, '//')) {
             return preg_replace('#^([^/]*)//.*$#', '$1', $baseUri).$uri;
         }
 

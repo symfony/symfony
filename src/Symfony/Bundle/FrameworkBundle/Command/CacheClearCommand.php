@@ -142,7 +142,7 @@ EOF
                     }
                     $mount = implode(' ', $mount).'/';
 
-                    if (0 === strpos($realCacheDir, $mount)) {
+                    if (str_starts_with($realCacheDir, $mount)) {
                         $io->note('For better performances, you should move the cache and log directories to a non-shared folder of the VM.');
                         $oldCacheDir = false;
                         break;

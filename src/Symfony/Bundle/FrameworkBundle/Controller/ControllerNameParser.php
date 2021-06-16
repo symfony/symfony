@@ -107,7 +107,7 @@ class ControllerNameParser
         $controllerName = $match[2];
         $actionName = $match[3];
         foreach ($this->kernel->getBundles() as $name => $bundle) {
-            if (0 !== strpos($className, $bundle->getNamespace())) {
+            if (!str_starts_with($className, $bundle->getNamespace())) {
                 continue;
             }
 
@@ -130,7 +130,7 @@ class ControllerNameParser
         $shortest = null;
         foreach ($bundleNames as $bundleName) {
             // if there's a partial match, return it immediately
-            if (false !== strpos($bundleName, $nonExistentBundleName)) {
+            if (str_contains($bundleName, $nonExistentBundleName)) {
                 return $bundleName;
             }
 

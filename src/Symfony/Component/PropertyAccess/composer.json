@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=7.1.3",
-        "symfony/inflector": "^3.4|^4.0|^5.0"
+        "symfony/inflector": "^3.4|^4.0|^5.0",
+        "symfony/polyfill-php80": "^1.16"
     },
     "require-dev": {
         "symfony/cache": "^3.4|^4.0|^5.0"

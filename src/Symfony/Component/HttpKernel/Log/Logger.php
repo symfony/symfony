@@ -88,7 +88,7 @@ class Logger extends AbstractLogger
 
     private function format(string $level, string $message, array $context, bool $prefixDate = true): string
     {
-        if (false !== strpos($message, '{')) {
+        if (str_contains($message, '{')) {
             $replacements = [];
             foreach ($context as $key => $val) {
                 if (null === $val || is_scalar($val) || (\is_object($val) && method_exists($val, '__toString'))) {

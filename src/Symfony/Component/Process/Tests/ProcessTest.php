@@ -39,7 +39,7 @@ class ProcessTest extends TestCase
 
         ob_start();
         phpinfo(\INFO_GENERAL);
-        self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
+        self::$sigchild = str_contains(ob_get_clean(), '--enable-sigchild');
     }
 
     protected function tearDown(): void
@@ -114,7 +114,7 @@ class ProcessTest extends TestCase
         $p = $this->getProcess([self::$phpBin, __DIR__.'/NonStopableProcess.php', 30]);
         $p->start();
 
-        while ($p->isRunning() && false === strpos($p->getOutput(), 'received')) {
+        while ($p->isRunning() && !str_contains($p->getOutput(), 'received')) {
             usleep(1000);
         }
 
@@ -143,7 +143,7 @@ class ProcessTest extends TestCase
 
         $completeOutput = '';
         $result = $p->waitUntil(function ($type, $output) use (&$completeOutput) {
-            return false !== strpos($completeOutput .= $output, 'One more');
+            return str_contains($completeOutput .= $output, 'One more');
         });
         $this->assertTrue($result);
         $this->assertLessThan(20, microtime(true) - $start);
@@ -409,7 +409,7 @@ class ProcessTest extends TestCase
         $p->start();
 
         foreach (['foo', 'bar'] as $s) {
-            while (false === strpos($p->$getOutput(), $s)) {
+            while (!str_contains($p->$getOutput(), $s)) {
                 usleep(1000);
             }
 
@@ -842,7 +842,7 @@ class ProcessTest extends TestCase
         $process->setTimeout(1);
         $process->start();
 
-        while (false === strpos($process->getOutput(), 'foo')) {
+        while (!str_contains($process->getOutput(), 'foo')) {
             usleep(1000);
         }
 
@@ -907,7 +907,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcess([self::$phpBin, __DIR__.'/SignalListener.php']);
         $process->start();
 
-        while (false === strpos($process->getOutput(), 'Caught')) {
+        while (!str_contains($process->getOutput(), 'Caught')) {
             usleep(1000);
         }
         $process->signal(\SIGUSR1);

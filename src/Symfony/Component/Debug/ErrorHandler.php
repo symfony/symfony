@@ -385,7 +385,7 @@ class ErrorHandler
      */
     public function handleError($type, $message, $file, $line)
     {
-        if (\PHP_VERSION_ID >= 70300 && \E_WARNING === $type && '"' === $message[0] && false !== strpos($message, '" targeting switch is equivalent to "break')) {
+        if (\PHP_VERSION_ID >= 70300 && \E_WARNING === $type && '"' === $message[0] && str_contains($message, '" targeting switch is equivalent to "break')) {
             $type = \E_DEPRECATED;
         }
 
@@ -403,7 +403,7 @@ class ErrorHandler
         }
         $scope = $this->scopedErrors & $type;
 
-        if (false !== strpos($message, "@anonymous\0")) {
+        if (str_contains($message, "@anonymous\0")) {
             $logMessage = $this->levels[$type].': '.(new FlattenException())->setMessage($message)->getMessage();
         } else {
             $logMessage = $this->levels[$type].': '.$message;
@@ -530,7 +530,7 @@ class ErrorHandler
         $handlerException = null;
 
         if (($this->loggedErrors & $type) || $exception instanceof FatalThrowableError) {
-            if (false !== strpos($message = $exception->getMessage(), "@anonymous\0")) {
+            if (str_contains($message = $exception->getMessage(), "@anonymous\0")) {
                 $message = (new FlattenException())->setMessage($message)->getMessage();
             }
             if ($exception instanceof FatalErrorException) {
@@ -638,7 +638,7 @@ class ErrorHandler
             $handler->throwAt(0, true);
             $trace = $error['backtrace'] ?? null;
 
-            if (0 === strpos($error['message'], 'Allowed memory') || 0 === strpos($error['message'], 'Out of memory')) {
+            if (str_starts_with($error['message'], 'Allowed memory') || str_starts_with($error['message'], 'Out of memory')) {
                 $exception = new OutOfMemoryException($handler->levels[$error['type']].': '.$error['message'], 0, $error['type'], $error['file'], $error['line'], 2, false, $trace);
             } else {
                 $exception = new FatalErrorException($handler->levels[$error['type']].': '.$error['message'], 0, $error['type'], $error['file'], $error['line'], 2, true, $trace);

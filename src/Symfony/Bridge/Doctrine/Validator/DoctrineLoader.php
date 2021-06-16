@@ -104,7 +104,7 @@ final class DoctrineLoader implements LoaderInterface
             }
 
             if (null === $lengthConstraint) {
-                if (isset($mapping['originalClass']) && false === strpos($mapping['declaredField'], '.')) {
+                if (isset($mapping['originalClass']) && !str_contains($mapping['declaredField'], '.')) {
                     $metadata->addPropertyConstraint($mapping['declaredField'], new Valid());
                     $loaded = true;
                 } elseif (property_exists($className, $mapping['fieldName'])) {

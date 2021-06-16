@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=7.1.3"
+        "php": ">=7.1.3",
+        "symfony/polyfill-php80": "^1.16"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Process\\": "" },

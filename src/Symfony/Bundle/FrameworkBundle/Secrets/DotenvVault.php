@@ -54,7 +54,7 @@ class DotenvVault extends AbstractVault
     {
         $this->lastMessage = null;
         $this->validateName($name);
-        $v = \is_string($_SERVER[$name] ?? null) && 0 !== strpos($name, 'HTTP_') ? $_SERVER[$name] : ($_ENV[$name] ?? null);
+        $v = \is_string($_SERVER[$name] ?? null) && !str_starts_with($name, 'HTTP_') ? $_SERVER[$name] : ($_ENV[$name] ?? null);
 
         if (null === $v) {
             $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));

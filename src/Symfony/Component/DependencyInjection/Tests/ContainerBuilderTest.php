@@ -1008,7 +1008,7 @@ class ContainerBuilderTest extends TestCase
         $container->addResource($b = new FileResource(__DIR__.'/Fixtures/xml/services2.xml'));
         $resources = [];
         foreach ($container->getResources() as $resource) {
-            if (false === strpos($resource, '.php')) {
+            if (!str_contains($resource, '.php')) {
                 $resources[] = $resource;
             }
         }
@@ -1028,7 +1028,7 @@ class ContainerBuilderTest extends TestCase
 
         $resources = [];
         foreach ($container->getResources() as $resource) {
-            if (false === strpos($resource, '.php')) {
+            if (!str_contains($resource, '.php')) {
                 $resources[] = $resource;
             }
         }

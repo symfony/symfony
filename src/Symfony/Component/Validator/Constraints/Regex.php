@@ -95,7 +95,7 @@ class Regex extends Constraint
 
         // If the pattern contains an or statement, wrap the pattern in
         // .*(pattern).* and quit. Otherwise we'd need to parse the pattern
-        if (false !== strpos($pattern, '|')) {
+        if (str_contains($pattern, '|')) {
             return '.*('.$pattern.').*';
         }
 

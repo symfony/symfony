@@ -225,7 +225,7 @@ EOF
         foreach ($types as $index => $type) {
             $items = [];
             foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
-                if (!$filter || false !== strpos($name, $filter)) {
+                if (!$filter || str_contains($name, $filter)) {
                     $items[$name] = $name.$this->getPrettyMetadata($type, $entity, $decorated);
                 }
             }
@@ -259,7 +259,7 @@ EOF
         $data = [];
         foreach ($types as $type) {
             foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
-                if (!$filter || false !== strpos($name, $filter)) {
+                if (!$filter || str_contains($name, $filter)) {
                     $data[$type][$name] = $this->getMetadata($type, $entity);
                 }
             }
@@ -409,7 +409,7 @@ EOF
             $folders = glob($this->rootDir.'/Resources/*/views', \GLOB_ONLYDIR);
             $relativePath = ltrim(substr($this->rootDir.\DIRECTORY_SEPARATOR.'Resources/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
             $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
-                if (0 === strpos($absolutePath, $this->projectDir)) {
+                if (str_starts_with($absolutePath, $this->projectDir)) {
                     $name = basename(\dirname($absolutePath));
                     $path = ltrim($relativePath.$name, \DIRECTORY_SEPARATOR);
                     $carry[$name] = $path;
@@ -425,7 +425,7 @@ EOF
             $folders = glob($this->twigDefaultPath.'/bundles/*', \GLOB_ONLYDIR);
             $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
             $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
-                if (0 === strpos($absolutePath, $this->projectDir)) {
+                if (str_starts_with($absolutePath, $this->projectDir)) {
                     $name = basename($absolutePath);
                     $path = ltrim($relativePath.$name, \DIRECTORY_SEPARATOR);
                     $carry[$name] = $path;
@@ -555,7 +555,7 @@ EOF
         $alternatives = [];
         foreach ($collection as $item) {
             $lev = levenshtein($name, $item);
-            if ($lev <= \strlen($name) / 3 || false !== strpos($item, $name)) {
+            if ($lev <= \strlen($name) / 3 || str_contains($item, $name)) {
                 $alternatives[$item] = isset($alternatives[$item]) ? $alternatives[$item] - $lev : $lev;
             }
         }
@@ -569,7 +569,7 @@ EOF
 
     private function getRelativePath(string $path): string
     {
-        if (null !== $this->projectDir && 0 === strpos($path, $this->projectDir)) {
+        if (null !== $this->projectDir && str_starts_with($path, $this->projectDir)) {
             return ltrim(substr($path, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
         }
 

@@ -20,6 +20,6 @@ class NilUuid extends Uuid
 
     public function __construct()
     {
-        $this->uid = '00000000-0000-0000-0000-000000000000';
+        $this->uid = parent::NIL;
     }
 }

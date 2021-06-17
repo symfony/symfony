@@ -764,6 +764,27 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
+    public function testItCanBeConstructedWithTLSOptionsAndNonTLSDsn()
+    {
+        $this->assertEquals(
+            new Connection([
+                'host' => 'localhost',
+                'port' => 5672,
+                'vhost' => '/',
+            ], [
+                'name' => self::DEFAULT_EXCHANGE_NAME,
+            ], [
+                self::DEFAULT_EXCHANGE_NAME => [],
+            ]),
+            Connection::fromDsn('amqp://', [
+                'cacert' => 'foobar',
+                'cert' => 'foobar',
+                'key' => 'foobar',
+                'verify' => false,
+            ])
+        );
+    }
+
     private function createDelayOrRetryConnection(\AMQPExchange $delayExchange, string $deadLetterExchangeName, string $delayQueueName): Connection
     {
         $amqpConnection = $this->createMock(\AMQPConnection::class);

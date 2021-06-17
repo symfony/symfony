@@ -77,11 +77,19 @@ jobs:
           entrypoint: /bin/bash
           args: -c "(/opt/bitnami/openldap/bin/ldapwhoami -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony||sleep 5) && /opt/bitnami/openldap/bin/ldapadd -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif && /opt/bitnami/openldap/bin/ldapdelete -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony cn=a,ou=users,dc=symfony,dc=com"
 
+      - name: Detect Symfony version
+        id: symfony-versions
+        run: |
+          echo "::set-output name=symfony-major-version::$(grep "const MAJOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+          echo "::set-output name=symfony-minor-version::$(grep "const MINOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+          echo "::set-output name=symfony-version::$(grep "const MAJOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+').$(grep "const MINOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+
       - name: Configure composer
         run: |
           COMPOSER_HOME="$(composer config home)"
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-          echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
+
+          echo "COMPOSER_ROOT_VERSION=${{ steps.symfony-versions.outputs.symfony-version }}.x-dev" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |
@@ -156,11 +164,19 @@ jobs:
         if: "${{ matrix.php == '8.1' }}"
         run: composer config platform.php 8.0.99
 
+      - name: Detect Symfony version
+        id: symfony-versions
+        run: |
+          echo "::set-output name=symfony-major-version::$(grep "const MAJOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+          echo "::set-output name=symfony-minor-version::$(grep "const MINOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+          echo "::set-output name=symfony-version::$(grep "const MAJOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+').$(grep "const MINOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+
       - name: Configure composer
         run: |
           COMPOSER_HOME="$(composer config home)"
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-          echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
+
+          echo "COMPOSER_ROOT_VERSION=${{ steps.symfony-versions.outputs.symfony-version }}.x-dev" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |

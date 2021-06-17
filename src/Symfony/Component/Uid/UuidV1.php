@@ -20,6 +20,8 @@ class UuidV1 extends Uuid
 {
     protected const TYPE = 1;
 
+    private static $clockSeq;
+
     public function __construct(string $uuid = null)
     {
         if (null === $uuid) {
@@ -41,11 +43,25 @@ class UuidV1 extends Uuid
 
     public static function generate(\DateTimeInterface $time = null, Uuid $node = null): string
     {
-        $uuid = uuid_create(static::TYPE);
+        $uuid = !$time || !$node ? uuid_create(static::TYPE) : parent::NIL;
 
-        if (null !== $time) {
+        if ($time) {
+            if ($node) {
+                // use clock_seq from the node
+                $seq = substr($node->uid, 19, 4);
+            } else {
+                // generate a static random clock_seq to prevent any collisions with the real one
+                $seq = substr($uuid, 19, 4);
+
+                while (null === self::$clockSeq || $seq === self::$clockSeq) {
+                    self::$clockSeq = sprintf('%04x', random_int(0, 0x3fff) | 0x8000);
+                }
+
+                $seq = self::$clockSeq;
+            }
+
             $time = BinaryUtil::dateTimeToHex($time);
-            $uuid = substr($time, 8).'-'.substr($time, 4, 4).'-1'.substr($time, 1, 3).substr($uuid, 18);
+            $uuid = substr($time, 8).'-'.substr($time, 4, 4).'-1'.substr($time, 1, 3).'-'.$seq.substr($uuid, 23);
         }
 
         if ($node) {

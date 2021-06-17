@@ -24,16 +24,17 @@ class Uuid extends AbstractUid
     public const NAMESPACE_X500 = '6ba7b814-9dad-11d1-80b4-00c04fd430c8';
 
     protected const TYPE = 0;
+    protected const NIL = '00000000-0000-0000-0000-000000000000';
 
     public function __construct(string $uuid)
     {
-        $type = uuid_is_valid($uuid) ? uuid_type($uuid) : false;
+        $type = preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $uuid) ? (int) $uuid[14] : false;
 
-        if (false === $type || \UUID_TYPE_INVALID === $type || (static::TYPE ?: $type) !== $type) {
+        if (false === $type || (static::TYPE ?: $type) !== $type) {
             throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
         }
 
-        $this->uid = strtr($uuid, 'ABCDEF', 'abcdef');
+        $this->uid = strtolower($uuid);
     }
 
     /**
@@ -60,17 +61,16 @@ class Uuid extends AbstractUid
             return new static($uuid);
         }
 
-        if (!uuid_is_valid($uuid)) {
-            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
+        if (self::NIL === $uuid) {
+            return new NilUuid();
         }
 
-        switch (uuid_type($uuid)) {
+        switch ($uuid[14]) {
             case UuidV1::TYPE: return new UuidV1($uuid);
             case UuidV3::TYPE: return new UuidV3($uuid);
             case UuidV4::TYPE: return new UuidV4($uuid);
             case UuidV5::TYPE: return new UuidV5($uuid);
             case UuidV6::TYPE: return new UuidV6($uuid);
-            case NilUuid::TYPE: return new NilUuid();
         }
 
         return new self($uuid);
@@ -109,11 +109,11 @@ class Uuid extends AbstractUid
 
     public static function isValid(string $uuid): bool
     {
-        if (__CLASS__ === static::class) {
-            return uuid_is_valid($uuid);
+        if (!preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $uuid)) {
+            return false;
         }
 
-        return uuid_is_valid($uuid) && static::TYPE === uuid_type($uuid);
+        return __CLASS__ === static::class || static::TYPE === (int) $uuid[14];
     }
 
     public function toBinary(): string

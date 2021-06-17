@@ -20,6 +20,8 @@ namespace Symfony\Component\Uid;
  */
 class Ulid extends AbstractUid
 {
+    private const NIL = '00000000000000000000000000';
+
     private static $time = '';
     private static $rand = [];
 
@@ -27,6 +29,12 @@ class Ulid extends AbstractUid
     {
         if (null === $ulid) {
             $this->uid = static::generate();
+
+            return;
+        }
+
+        if (self::NIL === $ulid) {
+            $this->uid = $ulid;
 
             return;
         }
@@ -77,7 +85,10 @@ class Ulid extends AbstractUid
             base_convert(substr($ulid, 27, 5), 16, 32)
         );
 
-        return new static(strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ'));
+        $u = new static(self::NIL);
+        $u->uid = strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
+
+        return $u;
     }
 
     public function toBinary(): string

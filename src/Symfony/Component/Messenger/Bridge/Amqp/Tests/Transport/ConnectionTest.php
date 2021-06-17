@@ -748,6 +748,27 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
         $connection->publish('body');
     }
+
+    public function testItCanBeConstructedWithTLSOptionsAndNonTLSDsn()
+    {
+        $this->assertEquals(
+            new Connection([
+                'host' => 'localhost',
+                'port' => 5672,
+                'vhost' => '/',
+            ], [
+                'name' => self::DEFAULT_EXCHANGE_NAME,
+            ], [
+                self::DEFAULT_EXCHANGE_NAME => [],
+            ]),
+            Connection::fromDsn('amqp://', [
+                'cacert' => 'foobar',
+                'cert' => 'foobar',
+                'key' => 'foobar',
+                'verify' => false,
+            ])
+        );
+    }
 }
 
 class TestAmqpFactory extends AmqpFactory

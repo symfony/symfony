@@ -106,7 +106,7 @@ class ContextListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken('test1', 'pass1', 'phpunit'));
         $request = new Request();
-        $request->attributes->set('_security_firewall_run', true);
+        $request->attributes->set('_security_firewall_run', '_security_session');
         $session = new Session(new MockArraySessionStorage());
         $request->setSession($session);
 
@@ -212,7 +212,7 @@ class ContextListenerTest extends TestCase
         $listener = new ContextListener($tokenStorage, [], 'key123', null, $dispatcher);
 
         $request = new Request();
-        $request->attributes->set('_security_firewall_run', true);
+        $request->attributes->set('_security_firewall_run', '_security_key123');
         $request->setSession($session);
 
         $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, new Response());
@@ -370,7 +370,7 @@ class ContextListenerTest extends TestCase
     {
         $session = new Session(new MockArraySessionStorage());
         $request = new Request();
-        $request->attributes->set('_security_firewall_run', true);
+        $request->attributes->set('_security_firewall_run', '_security_session');
         $request->setSession($session);
         $requestStack = new RequestStack();
         $requestStack->push($request);

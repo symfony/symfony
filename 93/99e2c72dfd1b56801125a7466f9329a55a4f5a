@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by YaFou at 2021-06-09T07:45:44Z
+
+Can you implement a test, please?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-06-10T10:57:01Z
+
+I don't know if my question makes sense ... but I'll ask it: if we silently drop the TLS config when using `amqp://` instead of `amqps://` ... what would happen if someone makes a mistake in their configuration and forgot to add the `s` of `amqps` (or removes it unwillingly) ?
+
+Before, this typo would have been caught by the exception ... but now that typo could become a potential security issue?
+
+---------------------------------------------------------------------------
+
+by odolbeau at 2021-06-10T12:47:10Z
+
+@javiereguiluz if your broker is configured to accept both TLS & non-TLS connections, you are right, the non-TLS connection will be used even if it's not what you were looking for.
+That's why I filled `Bugfix: not really`: you won't have the error anymore but IMO it improves the DX: you don't have to worry about TLS & non-TLS connections (for prod / dev env typically), both will work with the same configuration.

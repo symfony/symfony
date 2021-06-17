@@ -230,7 +230,8 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     private function handleAuthenticationSuccess(TokenInterface $authenticatedToken, PassportInterface $passport, Request $request, AuthenticatorInterface $authenticator): ?Response
     {
         // @deprecated since 5.3
-        if (!method_exists($authenticatedToken->getUser(), 'getUserIdentifier')) {
+        $user = $authenticatedToken->getUser();
+        if ($user instanceof UserInterface && !method_exists($user, 'getUserIdentifier')) {
             trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "getUserIdentifier(): string" in user class "%s" is deprecated. This method will replace "getUsername()" in Symfony 6.0.', get_debug_type($authenticatedToken->getUser()));
         }
 

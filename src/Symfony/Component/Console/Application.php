@@ -147,7 +147,7 @@ class Application implements ResetInterface
 
         try {
             $exitCode = $this->doRun($input, $output);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             if (!$this->catchExceptions) {
                 throw $e;
             }

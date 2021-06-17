@@ -120,6 +120,7 @@ jobs:
 
     env:
       extensions: 'amqp, apcu, igbinary, intl, mbstring, memcached, mongodb, redis'
+      EXCLUDE_GROUPS: tty,benchmark,intl-data,integration
 
     strategy:
       matrix:
@@ -170,6 +171,15 @@ jobs:
           ./phpunit install
           echo "::endgroup::"
 
+      - name: Patch return types
+        if: "${{ matrix.php == '8.0' }}"
+        run: |
+          sed -i 's/"\*\*\/Tests\/"//' composer.json
+          composer install --optimize-autoloader
+          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php # ensure the script is idempotent
+          echo EXCLUDE_GROUPS="$EXCLUDE_GROUPS,legacy" >> $GITHUB_ENV
+
       - name: Run tests
         run: |
           _run_tests() {
@@ -177,7 +187,7 @@ jobs:
             echo "::group::$1"
 
             # Run the tests
-            ./phpunit --colors=always --exclude-group tty,benchmark,intl-data,integration ./$1 2>&1 || ok=1
+            ./phpunit --colors=always --exclude-group $EXCLUDE_GROUPS ./$1 2>&1 || ok=1
 
             echo ""
             echo "::endgroup::"

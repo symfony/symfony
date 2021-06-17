@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-06-14T08:24:58Z
+
+Do you have numbers to share? :grin:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-14T08:28:19Z
+
+Yes, you need to see my talk :P
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-14T15:48:35Z
+
+For my understanding: The fix is that you prevent validating the same UUID/ULID twice when initializing them with `fromString()`, correct?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-14T16:20:32Z
+
+Absolutely!

@@ -98,7 +98,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
             $this->tokenProvider->updateToken($series, $tokenValueHash, $tokenLastUsed);
         }
 
-        $this->createCookie($rememberMeDetails->withValue($tokenValue));
+        $this->createCookie($rememberMeDetails->withValue($series.':'.$tokenValue));
     }
 
     /**

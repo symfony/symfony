@@ -336,11 +336,7 @@ class TimeType extends AbstractType
             },
             'compound' => $compound,
             'choice_translation_domain' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please enter a valid time.';
-            },
+            'invalid_message' => 'Please enter a valid time.',
         ]);
 
         $resolver->setNormalizer('view_timezone', function (Options $options, $viewTimezone): ?string {

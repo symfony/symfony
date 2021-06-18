@@ -130,11 +130,7 @@ class FileType extends AbstractType
             'empty_data' => $emptyData,
             'multiple' => false,
             'allow_file_upload' => true,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid file.';
-            },
+            'invalid_message' => 'Please select a valid file.',
         ]);
     }
 

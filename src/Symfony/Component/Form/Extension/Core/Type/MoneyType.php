@@ -67,11 +67,7 @@ class MoneyType extends AbstractType
             'currency' => 'EUR',
             'compound' => false,
             'html5' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please enter a valid money amount.';
-            },
+            'invalid_message' => 'Please enter a valid money amount.',
         ]);
 
         $resolver->setAllowedValues('rounding_mode', [

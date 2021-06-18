@@ -39,14 +39,14 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * @see self::$types for a list of supported types
      *
-     * @param int      $scale        The scale
-     * @param string   $type         One of the supported types
-     * @param int|null $roundingMode A value from \NumberFormatter, such as \NumberFormatter::ROUND_HALFUP
-     * @param bool     $html5Format  Use an HTML5 specific format, see https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
+     * @param int    $scale        The scale
+     * @param string $type         One of the supported types
+     * @param int    $roundingMode A value from \NumberFormatter, such as \NumberFormatter::ROUND_HALFUP
+     * @param bool   $html5Format  Use an HTML5 specific format, see https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
      *
      * @throws UnexpectedTypeException if the given value of type is unknown
      */
-    public function __construct(int $scale = null, string $type = null, ?int $roundingMode = null, bool $html5Format = false)
+    public function __construct(int $scale = null, string $type = null, int $roundingMode = \NumberFormatter::ROUND_HALFUP, bool $html5Format = false)
     {
         if (null === $scale) {
             $scale = 0;
@@ -54,10 +54,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
         if (null === $type) {
             $type = self::FRACTIONAL;
-        }
-
-        if (null === $roundingMode && (\func_num_args() < 4 || func_get_arg(3))) {
-            trigger_deprecation('symfony/form', '5.1', 'Not passing a rounding mode to "%s()" is deprecated. Starting with Symfony 6.0 it will default to "\NumberFormatter::ROUND_HALFUP".', __METHOD__);
         }
 
         if (!\in_array($type, self::$types, true)) {

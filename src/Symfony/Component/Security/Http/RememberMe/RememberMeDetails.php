@@ -40,6 +40,9 @@ class RememberMeDetails
         if (false === $cookieParts[1] = base64_decode($cookieParts[1], true)) {
             throw new AuthenticationException('The user identifier contains a character from outside the base64 alphabet.');
         }
+        if (4 !== \count($cookieParts)) {
+            throw new AuthenticationException('The cookie contains invalid data.');
+        }
 
         return new static(...$cookieParts);
     }

@@ -32,13 +32,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @param callable|null $filter
      */
-    public function createListFromChoices(iterable $choices, callable $value = null/*, callable $filter = null*/)
+    public function createListFromChoices(iterable $choices, callable $value = null, callable $filter = null)
     {
-        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         if ($filter) {
             // filter the choice list lazily
             return $this->createListFromLoader(new FilterChoiceLoaderDecorator(
@@ -53,13 +49,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param callable|null $filter
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null/*, callable $filter = null*/)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null, callable $filter = null)
     {
-        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         if ($filter) {
             $loader = new FilterChoiceLoaderDecorator($loader, $filter);
         }
@@ -72,9 +64,8 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      *
      * @param array|callable $labelTranslationParameters The parameters used to translate the choice labels
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null, $labelTranslationParameters = [])
     {
-        $labelTranslationParameters = \func_num_args() > 6 ? func_get_arg(6) : [];
         $preferredViews = [];
         $preferredViewsOrder = [];
         $otherViews = [];

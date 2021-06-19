@@ -73,16 +73,11 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals('12,34', $transformer->transform(0.1234));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testReverseTransformWithScaleAndRoundingDisabled()
+    public function testReverseTransformWithScaleAndImplicitRounding()
     {
-        $this->expectDeprecation('Since symfony/form 5.1: Not passing a rounding mode to "Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer::__construct()" is deprecated. Starting with Symfony 6.0 it will default to "\NumberFormatter::ROUND_HALFUP".');
-
         $transformer = new PercentToLocalizedStringTransformer(2, PercentToLocalizedStringTransformer::FRACTIONAL);
 
-        $this->assertEquals(0.0123456, $transformer->reverseTransform('1.23456'));
+        $this->assertEquals(0.0123, $transformer->reverseTransform('1.23456'));
     }
 
     public function testReverseTransform()

@@ -58,11 +58,7 @@ class LanguageType extends AbstractType
             'choice_translation_locale' => null,
             'alpha3' => false,
             'choice_self_translation' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid language.';
-            },
+            'invalid_message' => 'Please select a valid language.',
         ]);
 
         $resolver->setAllowedTypes('choice_self_translation', ['bool']);

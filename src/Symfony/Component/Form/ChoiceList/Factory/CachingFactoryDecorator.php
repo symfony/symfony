@@ -89,10 +89,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
      * @param callable|Cache\ChoiceFilter|null $filter The callable or static option for
      *                                                 filtering the choices
      */
-    public function createListFromChoices(iterable $choices, $value = null/*, $filter = null*/)
+    public function createListFromChoices(iterable $choices, $value = null, $filter = null)
     {
-        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
         }
@@ -134,10 +132,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
      * @param callable|Cache\ChoiceFilter|null         $filter The callable or static option for
      *                                                         filtering the choices
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null/*, $filter = null*/)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null, $filter = null)
     {
-        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         $cache = true;
 
         if ($loader instanceof Cache\ChoiceLoader) {
@@ -181,9 +177,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
      * @param array|callable|Cache\ChoiceAttr|null             $attr                       The option or static option generating the HTML attributes
      * @param array|callable|Cache\ChoiceTranslationParameters $labelTranslationParameters The parameters used to translate the choice labels
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelTranslationParameters = [])
     {
-        $labelTranslationParameters = \func_num_args() > 6 ? func_get_arg(6) : [];
         $cache = true;
 
         if ($preferredChoices instanceof Cache\PreferredChoice) {

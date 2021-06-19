@@ -30,10 +30,6 @@ class RadioListMapper implements DataMapperInterface
      */
     public function mapDataToForms($choice, \Traversable $radios)
     {
-        if (\is_array($radios)) {
-            trigger_deprecation('symfony/form', '5.3', 'Passing an array as the second argument of the "%s()" method is deprecated, pass "\Traversable" instead.', __METHOD__);
-        }
-
         if (!\is_string($choice)) {
             throw new UnexpectedTypeException($choice, 'string');
         }

@@ -42,11 +42,6 @@ class DebugCommandTest extends TestCase
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertSame(<<<TXT
 
-Built-in form types (Symfony\Component\Form\Extension\Core\Type)
-----------------------------------------------------------------
-
- PercentType
-
 Service form types
 ------------------
 

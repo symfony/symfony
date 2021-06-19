@@ -66,11 +66,7 @@ class TimezoneType extends AbstractType
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'input' => 'string',
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid timezone.';
-            },
+            'invalid_message' => 'Please select a valid timezone.',
             'regions' => \DateTimeZone::ALL,
         ]);
 

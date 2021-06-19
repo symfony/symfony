@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.4
+---
+ * Deprecate `Middleware\RejectRedeliveredMessageMiddleware`. Install `symfony/amqp-messenger` and use same class from there.
+
 5.3
 ---
 

@@ -127,6 +127,6 @@ final class Envelope
     {
         static $resolved;
 
-        return $resolved[$fqcn] ?? ($resolved[$fqcn] = (new \ReflectionClass($fqcn))->getName());
+        return $resolved[$fqcn] ?? ($resolved[$fqcn] = class_exists($fqcn) ? (new \ReflectionClass($fqcn))->getName() : $fqcn);
     }
 }

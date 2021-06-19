@@ -20,14 +20,14 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  *
  * @see https://api.iterable.com/api/docs#push_target
  */
-class IterableOptions implements MessageOptionsInterface
+final class IterableOptions implements MessageOptionsInterface
 {
     /**
      * @var array<mixed>
      *
      * @see https://api.iterable.com/api/docs#schema-push_target_body
      */
-    protected $options;
+    private $options;
 
     /**
      * @var int|null

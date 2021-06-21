@@ -37,7 +37,7 @@ final class EmailMessage implements MessageInterface
     public static function fromNotification(Notification $notification, EmailRecipientInterface $recipient): self
     {
         if ('' === $recipient->getEmail()) {
-            throw new InvalidArgumentException(sprintf('"%s" needs an email, it cannot be empty.', static::class));
+            throw new InvalidArgumentException(sprintf('"%s" needs an email, it cannot be empty.', __CLASS__));
         }
 
         if (!class_exists(NotificationEmail::class)) {

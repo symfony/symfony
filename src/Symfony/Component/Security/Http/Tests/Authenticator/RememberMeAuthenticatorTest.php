@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
@@ -79,5 +80,13 @@ class RememberMeAuthenticatorTest extends TestCase
         $this->expectException(\LogicException::class);
 
         $this->authenticator->authenticate(Request::create('/'));
+    }
+
+    public function testAuthenticateWithoutOldToken()
+    {
+        $this->expectException(AuthenticationException::class);
+
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => base64_encode('foo:bar')]);
+        $this->authenticator->authenticate($request);
     }
 }

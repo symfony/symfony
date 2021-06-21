@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-06-20T13:39:07Z
+
+Thanks for the perfect report and the patch, Denis.
+Could you please check other places where the very same deprecation notice is triggered?
+I suspect that at least `CheckCredentialsListener` and `PasswordMigratingListener` have the same issue (might be a few more)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-20T14:26:23Z
+
+If a user class already implements `PasswordAuthenticatedUserInterface`, but not `LegacyPasswordAuthenticatedUserInterface`: do we still want to check if `getSalt()` exists?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-06-20T15:47:53Z
+
+Very good question.
+When introducing the PasswordHasher contracts, I decided to not bind them to `UserInterface` to allow for greater flexibility for both developers and us (maintainers, for potential future evolutions).
+
+But, the current code (before this patch) assumes that if your user class is not implementing `LegacyPasswordHasherInterface`, it still inevitably has the `getSalt()` method anyway because it is probably implementing `UserInterface` which enforces having this method until 6.0.
+
+This patch basically removes that assumption. And actually, because `UserPasswordHasher` is located in password-hasher and not in security-core, it makes sense to me not to tie it to `UserInterface`.
+So this `method_exists()` check is just a way to not check for `$user instanceof UserInterface`.
+Yet it won't be needed at all in 6.0+, but having it now allows for non-`UserInterface` implementations to be compatible with this service, while they get a meaningful notice telling them to implement the new interface.
+
+We could consider this a too edge case for supporting it.
+Personally, I think it does not harm so I'm in favor of doing this change.
+
+---------------------------------------------------------------------------
+
+by dbrumann at 2021-06-20T17:30:28Z
+
+> Thanks for the perfect report and the patch, Denis.
+> Could you please check other places where the very same deprecation notice is triggered?
+> I suspect that at least `CheckCredentialsListener` and `PasswordMigratingListener` have the same issue (might be a few more)
+
+Sure thing, but probably not today.
+
+---------------------------------------------------------------------------
+
+by dbrumann at 2021-06-20T19:08:00Z
+
+@chalasr as far as I can tell, the other places do not (yet) need this change, because all occurrences I could find where getting the user via `UserPassportInterface` which will always return a `UserInterface` which still has a `getSalt()` method.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-06-20T20:22:35Z
+
+Thanks for confirming.

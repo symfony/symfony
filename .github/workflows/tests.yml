@@ -128,7 +128,7 @@ jobs:
 
     env:
       extensions: 'amqp, apcu, igbinary, intl, mbstring, memcached, mongodb, redis'
-      EXCLUDE_GROUPS: tty,benchmark,intl-data,integration
+      EXCLUDE_GROUPS: benchmark,intl-data,integration
 
     strategy:
       matrix:

@@ -128,7 +128,7 @@ jobs:
 
     env:
       extensions: 'amqp, apcu, igbinary, intl, mbstring, memcached, mongodb, redis'
-      EXCLUDE_GROUPS: benchmark,intl-data,integration
+      EXCLUDE_GROUPS: benchmark,intl-data,tty,integration
 
     strategy:
       matrix:
@@ -223,6 +223,14 @@ jobs:
           export -f _run_tests
 
           find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel _run_tests
+
+      - name: Run TTY tests
+        run: |
+          ok=0
+          ./phpunit --colors=always --group tty src/Symfony/Component/Console 2>&1 || ok=1
+          ./phpunit --colors=always --group tty rc/Symfony/Bridge/Twig 2>&1 || ok=1
+
+          $ok || false
 
       - name: Run tests with SIGCHLD enabled PHP
         if: "${{ matrix.php == '7.1' }}"

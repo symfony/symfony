@@ -15,13 +15,14 @@ services:
             - { name: t, a: b }
         autowire: true
         autoconfigure: true
-        arguments: ['@bar']
+        arguments: ['@bar', !tagged_iterator foo]
     bar:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
         public: true
         tags:
             - { name: t, a: b }
         autowire: true
+        arguments: [null, !tagged_iterator foo]
         calls:
             - [setFoo, ['@bar']]
 

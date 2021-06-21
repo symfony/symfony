@@ -222,3 +222,14 @@ jobs:
           export -f _run_tests
 
           find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel _run_tests
+
+      - name: Run tests with SIGCHLD enabled PHP
+        if: "${{ matrix.php == '7.1' }}"
+        run: |
+          mkdir build
+          cd build
+          wget https://github.com/derrabus/php-pcntl-binaries/raw/main/php-7.1.3-pcntl-sigchild.tar.bz2
+          tar -xjf php-7.1.3-pcntl-sigchild.tar.bz2
+          cd ..
+
+          ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process

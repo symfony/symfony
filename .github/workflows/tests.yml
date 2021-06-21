@@ -176,7 +176,8 @@ jobs:
           COMPOSER_HOME="$(composer config home)"
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
-          echo "COMPOSER_ROOT_VERSION=${{ steps.symfony-versions.outputs.symfony-version }}.x-dev" >> $GITHUB_ENV
+          echo 'COMPOSER_ROOT_VERSION=${{ steps.symfony-versions.outputs.symfony-version }}.x-dev' >> $GITHUB_ENV
+          echo 'SYMFONY_REQUIRE=>=${{ steps.symfony-versions.outputs.symfony-version }}' >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |

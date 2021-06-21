@@ -19,8 +19,6 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -68,7 +66,7 @@ class ContextListener extends AbstractListener
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
 
-        $this->trustResolver = $trustResolver ?? new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
+        $this->trustResolver = $trustResolver ?? new AuthenticationTrustResolver();
         $this->sessionTrackerEnabler = $sessionTrackerEnabler;
     }
 
@@ -180,7 +178,7 @@ class ContextListener extends AbstractListener
         $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : null;
         $token = $this->tokenStorage->getToken();
 
-        if (null === $token || $this->trustResolver->isAnonymous($token)) {
+        if (null === $token) {
             if ($request->hasPreviousSession()) {
                 $session->remove($this->sessionKey);
             }

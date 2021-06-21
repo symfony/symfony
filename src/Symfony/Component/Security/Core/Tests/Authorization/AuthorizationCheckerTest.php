@@ -22,53 +22,19 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 
 class AuthorizationCheckerTest extends TestCase
 {
-    private $authenticationManager;
     private $accessDecisionManager;
     private $authorizationChecker;
     private $tokenStorage;
 
     protected function setUp(): void
     {
-        $this->authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
         $this->accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $this->tokenStorage = new TokenStorage();
 
         $this->authorizationChecker = new AuthorizationChecker(
             $this->tokenStorage,
-            $this->authenticationManager,
             $this->accessDecisionManager
         );
-    }
-
-    public function testVoteAuthenticatesTokenIfNecessary()
-    {
-        $token = new UsernamePasswordToken('username', 'password', 'provider');
-        $this->tokenStorage->setToken($token);
-
-        $newToken = new UsernamePasswordToken('username', 'password', 'provider');
-
-        $this->authenticationManager
-            ->expects($this->once())
-            ->method('authenticate')
-            ->with($this->equalTo($token))
-            ->willReturn($newToken);
-
-        // default with() isn't a strict check
-        $tokenComparison = function ($value) use ($newToken) {
-            // make sure that the new token is used in "decide()" and not the old one
-            return $value === $newToken;
-        };
-
-        $this->accessDecisionManager
-            ->expects($this->once())
-            ->method('decide')
-            ->with($this->callback($tokenComparison))
-            ->willReturn(true);
-
-        // first run the token has not been re-authenticated yet, after isGranted is called, it should be equal
-        $this->assertNotSame($newToken, $this->tokenStorage->getToken());
-        $this->assertTrue($this->authorizationChecker->isGranted('foo'));
-        $this->assertSame($newToken, $this->tokenStorage->getToken());
     }
 
     public function testVoteWithoutAuthenticationToken()
@@ -79,7 +45,7 @@ class AuthorizationCheckerTest extends TestCase
 
     public function testVoteWithoutAuthenticationTokenAndExceptionOnNoTokenIsFalse()
     {
-        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->authenticationManager, $this->accessDecisionManager, false, false);
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager, false, false);
 
         $this->accessDecisionManager
             ->expects($this->once())

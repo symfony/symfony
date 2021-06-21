@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 
 /**
  * Define some ExpressionLanguage functions.
@@ -31,9 +32,9 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             }),
 
             new ExpressionFunction('is_authenticated', function () {
-                return '$token && !$auth_checker->isGranted("IS_ANONYMOUS")';
+                return '!$token instanceof '.NullToken::class;
             }, function (array $variables) {
-                return $variables['token'] && !$variables['auth_checker']->isGranted('IS_ANONYMOUS');
+                return !$variables['token'] instanceof NullToken;
             }),
 
             new ExpressionFunction('is_fully_authenticated', function () {

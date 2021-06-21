@@ -401,7 +401,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         if (!\is_object($user = $token->getUser())) {
-            // e.g. anonymous authentication
             return null;
         }
 

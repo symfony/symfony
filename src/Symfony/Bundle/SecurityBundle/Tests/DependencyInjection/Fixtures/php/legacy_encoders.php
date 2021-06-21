@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('security', [
+    'enable_authenticator_manager' => true,
     'encoders' => [
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => [
@@ -70,34 +71,32 @@ $container->loadFromExtension('security', [
             'provider' => 'default',
             'http_basic' => true,
             'form_login' => true,
-            'anonymous' => true,
             'switch_user' => true,
             'x509' => true,
             'remote_user' => true,
             'logout' => true,
             'remember_me' => ['secret' => 'TheSecret'],
             'user_checker' => null,
+            'entry_point' => 'form_login',
         ],
         'host' => [
             'provider' => 'default',
             'pattern' => '/test',
             'host' => 'foo\\.example\\.org',
             'methods' => ['GET', 'POST'],
-            'anonymous' => true,
             'http_basic' => true,
         ],
         'with_user_checker' => [
             'provider' => 'default',
             'user_checker' => 'app.user_checker',
-            'anonymous' => true,
             'http_basic' => true,
         ],
     ],
 
     'access_control' => [
         ['path' => '/blog/524', 'role' => 'ROLE_USER', 'requires_channel' => 'https', 'methods' => ['get', 'POST'], 'port' => 8000],
-        ['path' => '/blog/.*', 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY'],
-        ['path' => '/blog/524', 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY', 'allow_if' => "token.getUserIdentifier() matches '/^admin/'"],
+        ['path' => '/blog/.*', 'role' => 'PUBLIC_ACCESS'],
+        ['path' => '/blog/524', 'role' => 'PUBLIC_ACCESS', 'allow_if' => "token.getUserIdentifier() matches '/^admin/'"],
     ],
 
     'role_hierarchy' => [

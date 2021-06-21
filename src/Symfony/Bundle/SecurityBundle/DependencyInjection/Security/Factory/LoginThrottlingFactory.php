@@ -27,13 +27,8 @@ use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
  *
  * @internal
  */
-class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityFactoryInterface
+class LoginThrottlingFactory implements AuthenticatorFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
-    {
-        throw new \LogicException('Login throttling is not supported when "security.enable_authenticator_manager" is not set to true.');
-    }
-
     public function getPosition(): string
     {
         // this factory doesn't register any authenticators, this position doesn't matter

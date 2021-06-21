@@ -15,7 +15,6 @@ use Symfony\Bridge\Twig\Extension\LogoutUrlExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Bundle\SecurityBundle\Security\LegacyLogoutHandlerListener;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -62,8 +61,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private $factories = [];
     private $userProviderFactories = [];
     private $statelessFirewallKeys = [];
-
-    private $authenticatorManagerEnabled = false;
 
     public function __construct()
     {
@@ -114,35 +111,22 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $loader->load('security.php');
         $loader->load('password_hasher.php');
         $loader->load('security_listeners.php');
-        $loader->load('security_rememberme.php');
 
-        if ($this->authenticatorManagerEnabled = $config['enable_authenticator_manager']) {
-            if ($config['always_authenticate_before_granting']) {
-                throw new InvalidConfigurationException('The security option "always_authenticate_before_granting" cannot be used when "enable_authenticator_manager" is set to true. If you rely on this behavior, set it to false.');
-            }
-
-            $loader->load('security_authenticator.php');
-
-            // The authenticator system no longer has anonymous tokens. This makes sure AccessListener
-            // and AuthorizationChecker do not throw AuthenticationCredentialsNotFoundException when no
-            // token is available in the token storage.
-            $container->getDefinition('security.access_listener')->setArgument(4, false);
-            $container->getDefinition('security.authorization_checker')->setArgument(4, false);
-            $container->getDefinition('security.authorization_checker')->setArgument(5, false);
-        } else {
-            trigger_deprecation('symfony/security-bundle', '5.3', 'Not setting the "security.enable_authenticator_manager" config option to true is deprecated.');
-
-            $loader->load('security_legacy.php');
+        if (!$config['enable_authenticator_manager']) {
+            throw new InvalidConfigurationException('"security.enable_authenticator_manager" must be set to "true" in Symfony 6.0+.');
         }
+
+        if ($config['always_authenticate_before_granting']) {
+            throw new InvalidConfigurationException('The security option "always_authenticate_before_granting" cannot be used when "enable_authenticator_manager" is set to true. If you rely on this behavior, set it to false.');
+        }
+
+        $loader->load('security_authenticator.php');
 
         if ($container::willBeAvailable('symfony/twig-bridge', LogoutUrlExtension::class, ['symfony/security-bundle'])) {
             $loader->load('templating_twig.php');
         }
 
         $loader->load('collectors.php');
-        $loader->load('guard.php');
-
-        $container->getDefinition('data_collector.security')->addArgument($this->authenticatorManagerEnabled);
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $loader->load('security_debug.php');
@@ -173,16 +157,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         if (class_exists(Application::class)) {
             $loader->load('debug_console.php');
-            $debugCommand = $container->getDefinition('security.command.debug_firewall');
-            $debugCommand->replaceArgument(4, $this->authenticatorManagerEnabled);
         }
 
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
-
-        $container->getDefinition('security.authentication.guard_handler')
-            ->replaceArgument(2, $this->statelessFirewallKeys);
 
         // @deprecated since Symfony 5.3
         if ($config['encoders']) {
@@ -323,17 +302,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $mapDef->replaceArgument(0, new Reference('security.firewall.context_locator'));
         $mapDef->replaceArgument(1, new IteratorArgument($map));
 
-        if (!$this->authenticatorManagerEnabled) {
-            // add authentication providers to authentication manager
-            $authenticationProviders = array_map(function ($id) {
-                return new Reference($id);
-            }, array_values(array_unique($authenticationProviders)));
-
-            $container
-                ->getDefinition('security.authentication.manager')
-                ->replaceArgument(0, new IteratorArgument($authenticationProviders));
-        }
-
         // register an autowire alias for the UserCheckerInterface if no custom user checker service is configured
         if (!$customUserChecker) {
             $container->setAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', new Alias('security.user_checker', false));
@@ -377,11 +345,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             }
             $defaultProvider = $providerIds[$normalizedName];
 
-            if ($this->authenticatorManagerEnabled) {
-                $container->setDefinition('security.listener.'.$id.'.user_provider', new ChildDefinition('security.listener.user_provider.abstract'))
-                    ->addTag('kernel.event_listener', ['dispatcher' => $firewallEventDispatcherId, 'event' => CheckPassportEvent::class, 'priority' => 2048, 'method' => 'checkPassport'])
-                    ->replaceArgument(0, new Reference($defaultProvider));
-            }
+            $container->setDefinition('security.listener.'.$id.'.user_provider', new ChildDefinition('security.listener.user_provider.abstract'))
+                ->addTag('kernel.event_listener', ['dispatcher' => $firewallEventDispatcherId, 'event' => CheckPassportEvent::class, 'priority' => 2048, 'method' => 'checkPassport'])
+                ->replaceArgument(0, new Reference($defaultProvider));
         } elseif (1 === \count($providerIds)) {
             $defaultProvider = reset($providerIds);
         }
@@ -404,14 +370,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Context serializer listener
         if (false === $firewall['stateless']) {
             $contextKey = $firewall['context'] ?? $id;
-            $listeners[] = new Reference($contextListenerId = $this->createContextListener($container, $contextKey, $this->authenticatorManagerEnabled ? $firewallEventDispatcherId : null));
+            $listeners[] = new Reference($contextListenerId = $this->createContextListener($container, $contextKey, $firewallEventDispatcherId));
             $sessionStrategyId = 'security.authentication.session_strategy';
 
-            if ($this->authenticatorManagerEnabled) {
-                $container
-                    ->setDefinition('security.listener.session.'.$id, new ChildDefinition('security.listener.session'))
-                    ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
-            }
+            $container
+                ->setDefinition('security.listener.session.'.$id, new ChildDefinition('security.listener.session'))
+                ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
         } else {
             $this->statelessFirewallKeys[] = $id;
             $sessionStrategyId = 'security.authentication.session_strategy_noop';
@@ -492,46 +456,42 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $firewallAuthenticationProviders = [];
         [$authListeners, $defaultEntryPoint] = $this->createAuthenticationListeners($container, $id, $firewall, $firewallAuthenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint, $contextListenerId);
 
-        if (!$this->authenticatorManagerEnabled) {
-            $authenticationProviders = array_merge($authenticationProviders, $firewallAuthenticationProviders);
-        } else {
-            // $configuredEntryPoint is resolved into a service ID and stored in $defaultEntryPoint
-            $configuredEntryPoint = $defaultEntryPoint;
+        // $configuredEntryPoint is resolved into a service ID and stored in $defaultEntryPoint
+        $configuredEntryPoint = $defaultEntryPoint;
 
-            // authenticator manager
-            $authenticators = array_map(function ($id) {
-                return new Reference($id);
-            }, $firewallAuthenticationProviders);
-            $container
-                ->setDefinition($managerId = 'security.authenticator.manager.'.$id, new ChildDefinition('security.authenticator.manager'))
-                ->replaceArgument(0, $authenticators)
-                ->replaceArgument(2, new Reference($firewallEventDispatcherId))
-                ->replaceArgument(3, $id)
-                ->replaceArgument(7, $firewall['required_badges'] ?? [])
-                ->addTag('monolog.logger', ['channel' => 'security'])
-            ;
+        // authenticator manager
+        $authenticators = array_map(function ($id) {
+            return new Reference($id);
+        }, $firewallAuthenticationProviders);
+        $container
+            ->setDefinition($managerId = 'security.authenticator.manager.'.$id, new ChildDefinition('security.authenticator.manager'))
+            ->replaceArgument(0, $authenticators)
+            ->replaceArgument(2, new Reference($firewallEventDispatcherId))
+            ->replaceArgument(3, $id)
+            ->replaceArgument(7, $firewall['required_badges'] ?? [])
+            ->addTag('monolog.logger', ['channel' => 'security'])
+        ;
 
-            $managerLocator = $container->getDefinition('security.authenticator.managers_locator');
-            $managerLocator->replaceArgument(0, array_merge($managerLocator->getArgument(0), [$id => new ServiceClosureArgument(new Reference($managerId))]));
+        $managerLocator = $container->getDefinition('security.authenticator.managers_locator');
+        $managerLocator->replaceArgument(0, array_merge($managerLocator->getArgument(0), [$id => new ServiceClosureArgument(new Reference($managerId))]));
 
-            // authenticator manager listener
-            $container
-                ->setDefinition('security.firewall.authenticator.'.$id, new ChildDefinition('security.firewall.authenticator'))
-                ->replaceArgument(0, new Reference($managerId))
-            ;
+        // authenticator manager listener
+        $container
+            ->setDefinition('security.firewall.authenticator.'.$id, new ChildDefinition('security.firewall.authenticator'))
+            ->replaceArgument(0, new Reference($managerId))
+        ;
 
-            // user checker listener
-            $container
-                ->setDefinition('security.listener.user_checker.'.$id, new ChildDefinition('security.listener.user_checker'))
-                ->replaceArgument(0, new Reference('security.user_checker.'.$id))
-                ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
+        // user checker listener
+        $container
+            ->setDefinition('security.listener.user_checker.'.$id, new ChildDefinition('security.listener.user_checker'))
+            ->replaceArgument(0, new Reference('security.user_checker.'.$id))
+            ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
 
-            $listeners[] = new Reference('security.firewall.authenticator.'.$id);
+        $listeners[] = new Reference('security.firewall.authenticator.'.$id);
 
-            // Add authenticators to the debug:firewall command
-            $debugCommand = $container->getDefinition('security.command.debug_firewall');
-            $debugCommand->replaceArgument(3, array_merge($debugCommand->getArgument(3), [$id => $authenticators]));
-        }
+        // Add authenticators to the debug:firewall command
+        $debugCommand = $container->getDefinition('security.command.debug_firewall');
+        $debugCommand->replaceArgument(3, array_merge($debugCommand->getArgument(3), [$id => $authenticators]));
 
         $config->replaceArgument(7, $configuredEntryPoint ?: $defaultEntryPoint);
 
@@ -589,7 +549,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private function createAuthenticationListeners(ContainerBuilder $container, string $id, array $firewall, array &$authenticationProviders, ?string $defaultProvider, array $providerIds, ?string $defaultEntryPoint, string $contextListenerId = null)
     {
         $listeners = [];
-        $hasListeners = false;
         $entryPoints = [];
 
         foreach ($this->listenerPositions as $position) {
@@ -599,26 +558,19 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 if (isset($firewall[$key])) {
                     $userProvider = $this->getUserProvider($container, $id, $firewall, $key, $defaultProvider, $providerIds, $contextListenerId);
 
-                    if ($this->authenticatorManagerEnabled) {
-                        if (!$factory instanceof AuthenticatorFactoryInterface) {
-                            throw new InvalidConfigurationException(sprintf('Cannot configure AuthenticatorManager as "%s" authentication does not support it, set "security.enable_authenticator_manager" to `false`.', $key));
-                        }
+                    if (!$factory instanceof AuthenticatorFactoryInterface) {
+                        throw new InvalidConfigurationException(sprintf('Cannot configure AuthenticatorManager as "%s" authentication does not support it, set "security.enable_authenticator_manager" to `false`.', $key));
+                    }
 
-                        $authenticators = $factory->createAuthenticator($container, $id, $firewall[$key], $userProvider);
-                        if (\is_array($authenticators)) {
-                            foreach ($authenticators as $authenticator) {
-                                $authenticationProviders[] = $authenticator;
-                                $entryPoints[] = $authenticator;
-                            }
-                        } else {
-                            $authenticationProviders[] = $authenticators;
-                            $entryPoints[$key] = $authenticators;
+                    $authenticators = $factory->createAuthenticator($container, $id, $firewall[$key], $userProvider);
+                    if (\is_array($authenticators)) {
+                        foreach ($authenticators as $authenticator) {
+                            $authenticationProviders[] = $authenticator;
+                            $entryPoints[] = $authenticator;
                         }
                     } else {
-                        [$provider, $listenerId, $defaultEntryPoint] = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
-
-                        $listeners[] = new Reference($listenerId);
-                        $authenticationProviders[] = $provider;
+                        $authenticationProviders[] = $authenticators;
+                        $entryPoints[$key] = $authenticators;
                     }
 
                     if ($factory instanceof FirewallListenerFactoryInterface) {
@@ -627,18 +579,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                             $listeners[] = new Reference($firewallListenerId);
                         }
                     }
-
-                    $hasListeners = true;
                 }
             }
         }
 
         // the actual entry point is configured by the RegisterEntryPointPass
         $container->setParameter('security.'.$id.'._indexed_authenticators', $entryPoints);
-
-        if (false === $hasListeners && !$this->authenticatorManagerEnabled) {
-            throw new InvalidConfigurationException(sprintf('No authentication listener registered for firewall "%s".', $id));
-        }
 
         return [$listeners, $defaultEntryPoint];
     }
@@ -1060,7 +1006,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $this->requestMatchers[$id] = new Reference($id);
     }
 
-    public function addSecurityListenerFactory(SecurityFactoryInterface $factory)
+    public function addAuthenticatorFactory(AuthenticatorFactoryInterface $factory)
     {
         $this->factories[$factory->getPosition()][] = $factory;
     }

@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
@@ -44,9 +43,8 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     private $firewallMap;
     private $firewall;
     private $hasVarDumper;
-    private $authenticatorManagerEnabled;
 
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null, bool $authenticatorManagerEnabled = false)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
@@ -55,7 +53,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         $this->firewallMap = $firewallMap;
         $this->firewall = $firewall;
         $this->hasVarDumper = class_exists(ClassStub::class);
-        $this->authenticatorManagerEnabled = $authenticatorManagerEnabled;
     }
 
     /**
@@ -114,7 +111,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
             $logoutUrl = null;
             try {
-                if (null !== $this->logoutUrlGenerator && !$token instanceof AnonymousToken) {
+                if (null !== $this->logoutUrlGenerator) {
                     $logoutUrl = $this->logoutUrlGenerator->getLogoutPath();
                 }
             } catch (\Exception $e) {
@@ -180,7 +177,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             if (null !== $firewallConfig) {
                 $this->data['firewall'] = [
                     'name' => $firewallConfig->getName(),
-                    'allows_anonymous' => $firewallConfig->allowsAnonymous(),
                     'request_matcher' => $firewallConfig->getRequestMatcher(),
                     'security_enabled' => $firewallConfig->isSecurityEnabled(),
                     'stateless' => $firewallConfig->isStateless(),
@@ -209,8 +205,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         if ($this->firewall) {
             $this->data['listeners'] = $this->firewall->getWrappedListeners();
         }
-
-        $this->data['authenticator_manager_enabled'] = $this->authenticatorManagerEnabled;
     }
 
     /**
@@ -399,6 +393,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     public function isAuthenticatorManagerEnabled(): bool
     {
-        return $this->data['authenticator_manager_enabled'];
+        return true;
     }
 }

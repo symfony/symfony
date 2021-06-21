@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -70,72 +69,7 @@ class AccessListenerTest extends TestCase
         $listener = new AccessListener(
             $tokenStorage,
             $accessDecisionManager,
-            $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class)
-        );
-
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
-    }
-
-    public function testHandleWhenTheTokenIsNotAuthenticated()
-    {
-        $request = new Request();
-
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap
-            ->expects($this->any())
-            ->method('getPatterns')
-            ->with($this->equalTo($request))
-            ->willReturn([['foo' => 'bar'], null])
-        ;
-
-        $notAuthenticatedToken = $this->createMock(TokenInterface::class);
-        $notAuthenticatedToken
-            ->expects($this->any())
-            ->method('isAuthenticated')
-            ->willReturn(false)
-        ;
-
-        $authenticatedToken = $this->createMock(TokenInterface::class);
-        $authenticatedToken
-            ->expects($this->any())
-            ->method('isAuthenticated')
-            ->willReturn(true)
-        ;
-
-        $authManager = $this->createMock(AuthenticationManagerInterface::class);
-        $authManager
-            ->expects($this->once())
-            ->method('authenticate')
-            ->with($this->equalTo($notAuthenticatedToken))
-            ->willReturn($authenticatedToken)
-        ;
-
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $tokenStorage
-            ->expects($this->any())
-            ->method('getToken')
-            ->willReturn($notAuthenticatedToken)
-        ;
-        $tokenStorage
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($this->equalTo($authenticatedToken))
-        ;
-
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
-        $accessDecisionManager
-            ->expects($this->once())
-            ->method('decide')
-            ->with($this->equalTo($authenticatedToken), $this->equalTo(['foo' => 'bar']), $this->equalTo($request))
-            ->willReturn(true)
-        ;
-
-        $listener = new AccessListener(
-            $tokenStorage,
-            $accessDecisionManager,
-            $accessMap,
-            $authManager
+            $accessMap
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
@@ -169,8 +103,7 @@ class AccessListenerTest extends TestCase
         $listener = new AccessListener(
             $tokenStorage,
             $this->createMock(AccessDecisionManagerInterface::class),
-            $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class)
+            $accessMap
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
@@ -197,8 +130,7 @@ class AccessListenerTest extends TestCase
         $listener = new AccessListener(
             $tokenStorage,
             $this->createMock(AccessDecisionManagerInterface::class),
-            $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class)
+            $accessMap
         );
 
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
@@ -208,7 +140,7 @@ class AccessListenerTest extends TestCase
 
     public function testHandleWhenTheSecurityTokenStorageHasNoToken()
     {
-        $this->expectException(AuthenticationCredentialsNotFoundException::class);
+        $this->expectException(AccessDeniedException::class);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage
             ->expects($this->any())
@@ -229,8 +161,7 @@ class AccessListenerTest extends TestCase
         $listener = new AccessListener(
             $tokenStorage,
             $this->createMock(AccessDecisionManagerInterface::class),
-            $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class)
+            $accessMap
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
@@ -259,7 +190,6 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class),
             false
         );
 
@@ -288,7 +218,6 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class),
             false
         );
 
@@ -319,7 +248,6 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class),
             false
         );
 
@@ -354,8 +282,7 @@ class AccessListenerTest extends TestCase
         $listener = new AccessListener(
             $tokenStorage,
             $accessDecisionManager,
-            $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class)
+            $accessMap
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));

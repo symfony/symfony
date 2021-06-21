@@ -1,9 +1,0 @@
-imports:
-    - { resource: ./legacy_base_config.yml }
-
-security:
-    firewalls:
-        default:
-            anonymous: ~
-        second_area:
-            anonymous: ~

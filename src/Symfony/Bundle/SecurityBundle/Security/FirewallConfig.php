@@ -64,11 +64,6 @@ final class FirewallConfig
         return $this->securityEnabled;
     }
 
-    public function allowsAnonymous(): bool
-    {
-        return \in_array('anonymous', $this->listeners, true);
-    }
-
     public function isStateless(): bool
     {
         return $this->stateless;

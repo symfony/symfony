@@ -22,16 +22,6 @@ interface AuthenticationTrustResolverInterface
 {
     /**
      * Resolves whether the passed token implementation is authenticated
-     * anonymously.
-     *
-     * If null is passed, the method must return false.
-     *
-     * @return bool
-     */
-    public function isAnonymous(TokenInterface $token = null);
-
-    /**
-     * Resolves whether the passed token implementation is authenticated
      * using remember-me capabilities.
      *
      * @return bool

@@ -27,39 +27,4 @@ class FirewallEntryPointTest extends AbstractWebTestCase
             "Custom entry point wasn't started"
         );
     }
-
-    /**
-     * @group legacy
-     */
-    public function testItUsesTheConfiguredEntryPointWhenUsingUnknownCredentials()
-    {
-        $client = $this->createClient(['test_case' => 'FirewallEntryPoint', 'root_config' => 'legacy_config.yml']);
-
-        $client->request('GET', '/secure/resource', [], [], [
-            'PHP_AUTH_USER' => 'unknown',
-            'PHP_AUTH_PW' => 'credentials',
-        ]);
-
-        $this->assertEquals(
-            EntryPointStub::RESPONSE_TEXT,
-            $client->getResponse()->getContent(),
-            "Custom entry point wasn't started"
-        );
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials()
-    {
-        $client = $this->createClient(['test_case' => 'FirewallEntryPoint', 'root_config' => 'legacy_config_form_login.yml']);
-
-        $client->request('GET', '/secure/resource');
-
-        $this->assertEquals(
-            EntryPointStub::RESPONSE_TEXT,
-            $client->getResponse()->getContent(),
-            "Custom entry point wasn't started"
-        );
-    }
 }

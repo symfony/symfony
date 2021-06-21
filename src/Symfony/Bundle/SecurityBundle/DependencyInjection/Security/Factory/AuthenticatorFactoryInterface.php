@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -18,6 +19,24 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 interface AuthenticatorFactoryInterface
 {
+    /**
+     * Defines the position at which the provider is called.
+     * Possible values: pre_auth, form, http, and remember_me.
+     *
+     * @return string
+     */
+    public function getPosition();
+
+    /**
+     * Defines the configuration key used to reference the provider
+     * in the firewall configuration.
+     *
+     * @return string
+     */
+    public function getKey();
+
+    public function addConfiguration(NodeDefinition $builder);
+
     /**
      * Creates the authenticator service(s) for the provided configuration.
      *

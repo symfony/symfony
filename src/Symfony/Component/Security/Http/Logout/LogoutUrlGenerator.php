@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\Logout;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
@@ -131,10 +130,6 @@ class LogoutUrlGenerator
         // Fetch the current provider key from token, if possible
         if (null !== $this->tokenStorage) {
             $token = $this->tokenStorage->getToken();
-
-            if ($token instanceof AnonymousToken) {
-                throw new \InvalidArgumentException('Unable to generate a logout url for an anonymous token.');
-            }
 
             if (null !== $token) {
                 if (method_exists($token, 'getFirewallName')) {

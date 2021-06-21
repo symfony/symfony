@@ -23,29 +23,8 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  */
-class X509Factory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
+class X509Factory implements AuthenticatorFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
-    {
-        $providerId = 'security.authentication.provider.pre_authenticated.'.$id;
-        $container
-            ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.pre_authenticated'))
-            ->replaceArgument(0, new Reference($userProvider))
-            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
-            ->addArgument($id)
-        ;
-
-        // listener
-        $listenerId = 'security.authentication.listener.x509.'.$id;
-        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.x509'));
-        $listener->replaceArgument(2, $id);
-        $listener->replaceArgument(3, $config['user']);
-        $listener->replaceArgument(4, $config['credentials']);
-        $listener->addMethodCall('setSessionAuthenticationStrategy', [new Reference('security.authentication.session_strategy.'.$id)]);
-
-        return [$providerId, $listenerId, $defaultEntryPoint];
-    }
-
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId)
     {
         $authenticatorId = 'security.authenticator.x509.'.$firewallName;

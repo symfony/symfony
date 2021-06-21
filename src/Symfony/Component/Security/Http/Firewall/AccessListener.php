@@ -35,16 +35,12 @@ class AccessListener extends AbstractListener
     private $tokenStorage;
     private $accessDecisionManager;
     private $map;
-    private $authManager;
-    private $exceptionOnNoToken;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager, bool $exceptionOnNoToken = true)
+    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map)
     {
         $this->tokenStorage = $tokenStorage;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->map = $map;
-        $this->authManager = $authManager;
-        $this->exceptionOnNoToken = $exceptionOnNoToken;
     }
 
     /**
@@ -55,45 +51,28 @@ class AccessListener extends AbstractListener
         [$attributes] = $this->map->getPatterns($request);
         $request->attributes->set('_access_control_attributes', $attributes);
 
-        return $attributes && ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] !== $attributes && [AuthenticatedVoter::PUBLIC_ACCESS] !== $attributes) ? true : null;
+        return ($attributes && [AuthenticatedVoter::PUBLIC_ACCESS] !== $attributes) ? true : null;
     }
 
     /**
      * Handles access authorization.
      *
      * @throws AccessDeniedException
-     * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token and $exceptionOnNoToken is set to true
      */
     public function authenticate(RequestEvent $event)
     {
-        if (!$event instanceof LazyResponseEvent && null === ($token = $this->tokenStorage->getToken()) && $this->exceptionOnNoToken) {
-            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
-        }
-
         $request = $event->getRequest();
 
         $attributes = $request->attributes->get('_access_control_attributes');
         $request->attributes->remove('_access_control_attributes');
 
-        if (!$attributes || ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] === $attributes && $event instanceof LazyResponseEvent)) {
+        if (!$attributes || ([AuthenticatedVoter::PUBLIC_ACCESS] === $attributes && $event instanceof LazyResponseEvent)) {
             return;
         }
 
-        if ($event instanceof LazyResponseEvent) {
-            $token = $this->tokenStorage->getToken();
-        }
-
+        $token = $this->tokenStorage->getToken();
         if (null === $token) {
-            if ($this->exceptionOnNoToken) {
-                throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
-            }
-
             $token = new NullToken();
-        }
-
-        if (!$token->isAuthenticated()) {
-            $token = $this->authManager->authenticate($token);
-            $this->tokenStorage->setToken($token);
         }
 
         if (!$this->accessDecisionManager->decide($token, $attributes, $request, true)) {

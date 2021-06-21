@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -26,8 +25,6 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertFalse($resolver->isAnonymous($this->getToken()));
         $this->assertFalse($resolver->isAnonymous($this->getRememberMeToken()));
         $this->assertFalse($resolver->isAnonymous(new FakeCustomToken()));
-        $this->assertTrue($resolver->isAnonymous(new RealCustomAnonymousToken()));
-        $this->assertTrue($resolver->isAnonymous($this->getAnonymousToken()));
     }
 
     public function testIsRememberMe()
@@ -36,7 +33,6 @@ class AuthenticationTrustResolverTest extends TestCase
 
         $this->assertFalse($resolver->isRememberMe(null));
         $this->assertFalse($resolver->isRememberMe($this->getToken()));
-        $this->assertFalse($resolver->isRememberMe($this->getAnonymousToken()));
         $this->assertFalse($resolver->isRememberMe(new FakeCustomToken()));
         $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
         $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
@@ -47,46 +43,10 @@ class AuthenticationTrustResolverTest extends TestCase
         $resolver = new AuthenticationTrustResolver();
 
         $this->assertFalse($resolver->isFullFledged(null));
-        $this->assertFalse($resolver->isFullFledged($this->getAnonymousToken()));
         $this->assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
-        $this->assertFalse($resolver->isFullFledged(new RealCustomAnonymousToken()));
         $this->assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
         $this->assertTrue($resolver->isFullFledged($this->getToken()));
         $this->assertTrue($resolver->isFullFledged(new FakeCustomToken()));
-    }
-
-    public function testIsAnonymousWithClassAsConstructorButStillExtending()
-    {
-        $resolver = $this->getResolver();
-
-        $this->assertFalse($resolver->isAnonymous(null));
-        $this->assertFalse($resolver->isAnonymous($this->getToken()));
-        $this->assertFalse($resolver->isAnonymous($this->getRememberMeToken()));
-        $this->assertTrue($resolver->isAnonymous($this->getAnonymousToken()));
-        $this->assertTrue($resolver->isAnonymous(new RealCustomAnonymousToken()));
-    }
-
-    public function testIsRememberMeWithClassAsConstructorButStillExtending()
-    {
-        $resolver = $this->getResolver();
-
-        $this->assertFalse($resolver->isRememberMe(null));
-        $this->assertFalse($resolver->isRememberMe($this->getToken()));
-        $this->assertFalse($resolver->isRememberMe($this->getAnonymousToken()));
-        $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
-        $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
-    }
-
-    public function testisFullFledgedWithClassAsConstructorButStillExtending()
-    {
-        $resolver = $this->getResolver();
-
-        $this->assertFalse($resolver->isFullFledged(null));
-        $this->assertFalse($resolver->isFullFledged($this->getAnonymousToken()));
-        $this->assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
-        $this->assertFalse($resolver->isFullFledged(new RealCustomAnonymousToken()));
-        $this->assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
-        $this->assertTrue($resolver->isFullFledged($this->getToken()));
     }
 
     protected function getToken()
@@ -94,22 +54,9 @@ class AuthenticationTrustResolverTest extends TestCase
         return $this->createMock(TokenInterface::class);
     }
 
-    protected function getAnonymousToken()
-    {
-        return $this->getMockBuilder(AnonymousToken::class)->setConstructorArgs(['', ''])->getMock();
-    }
-
     protected function getRememberMeToken()
     {
         return $this->getMockBuilder(RememberMeToken::class)->setMethods(['setPersistent'])->disableOriginalConstructor()->getMock();
-    }
-
-    protected function getResolver()
-    {
-        return new AuthenticationTrustResolver(
-            AnonymousToken::class,
-            RememberMeToken::class
-        );
     }
 }
 
@@ -188,13 +135,6 @@ class FakeCustomToken implements TokenInterface
     }
 
     public function setAttribute(string $name, $value)
-    {
-    }
-}
-
-class RealCustomAnonymousToken extends AnonymousToken
-{
-    public function __construct()
     {
     }
 }

@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * AuthenticatedVoter votes if an attribute like IS_AUTHENTICATED_FULLY,
- * IS_AUTHENTICATED_REMEMBERED, or IS_AUTHENTICATED_ANONYMOUSLY is present.
+ * IS_AUTHENTICATED_REMEMBERED, IS_IMPERSONATOR or IS_REMEMBERED is present.
  *
  * This list is most restrictive to least restrictive checking.
  *
@@ -28,8 +28,6 @@ class AuthenticatedVoter implements VoterInterface
 {
     public const IS_AUTHENTICATED_FULLY = 'IS_AUTHENTICATED_FULLY';
     public const IS_AUTHENTICATED_REMEMBERED = 'IS_AUTHENTICATED_REMEMBERED';
-    public const IS_AUTHENTICATED_ANONYMOUSLY = 'IS_AUTHENTICATED_ANONYMOUSLY';
-    public const IS_ANONYMOUS = 'IS_ANONYMOUS';
     public const IS_IMPERSONATOR = 'IS_IMPERSONATOR';
     public const IS_REMEMBERED = 'IS_REMEMBERED';
     public const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
@@ -54,8 +52,6 @@ class AuthenticatedVoter implements VoterInterface
         foreach ($attributes as $attribute) {
             if (null === $attribute || (self::IS_AUTHENTICATED_FULLY !== $attribute
                     && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
-                    && self::IS_AUTHENTICATED_ANONYMOUSLY !== $attribute
-                    && self::IS_ANONYMOUS !== $attribute
                     && self::IS_IMPERSONATOR !== $attribute
                     && self::IS_REMEMBERED !== $attribute)) {
                 continue;
@@ -74,18 +70,7 @@ class AuthenticatedVoter implements VoterInterface
                 return VoterInterface::ACCESS_GRANTED;
             }
 
-            if (self::IS_AUTHENTICATED_ANONYMOUSLY === $attribute
-                && ($this->authenticationTrustResolver->isAnonymous($token)
-                    || $this->authenticationTrustResolver->isRememberMe($token)
-                    || $this->authenticationTrustResolver->isFullFledged($token))) {
-                return VoterInterface::ACCESS_GRANTED;
-            }
-
             if (self::IS_REMEMBERED === $attribute && $this->authenticationTrustResolver->isRememberMe($token)) {
-                return VoterInterface::ACCESS_GRANTED;
-            }
-
-            if (self::IS_ANONYMOUS === $attribute && $this->authenticationTrustResolver->isAnonymous($token)) {
                 return VoterInterface::ACCESS_GRANTED;
             }
 

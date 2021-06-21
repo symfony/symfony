@@ -28,16 +28,12 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 {
     private $tokenStorage;
     private $accessDecisionManager;
-    private $authenticationManager;
-    private $alwaysAuthenticate;
     private $exceptionOnNoToken;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, bool $alwaysAuthenticate = false, bool $exceptionOnNoToken = true)
+    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, bool $exceptionOnNoToken = true)
     {
         $this->tokenStorage = $tokenStorage;
-        $this->authenticationManager = $authenticationManager;
         $this->accessDecisionManager = $accessDecisionManager;
-        $this->alwaysAuthenticate = $alwaysAuthenticate;
         $this->exceptionOnNoToken = $exceptionOnNoToken;
     }
 
@@ -54,10 +50,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
             }
 
             $token = new NullToken();
-        } else {
-            if ($this->alwaysAuthenticate || !$token->isAuthenticated()) {
-                $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
-            }
         }
 
         return $this->accessDecisionManager->decide($token, [$attribute], $subject);

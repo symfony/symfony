@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication;
 
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -23,18 +22,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AuthenticationTrustResolver implements AuthenticationTrustResolverInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function isAnonymous(TokenInterface $token = null)
-    {
-        if (null === $token) {
-            return false;
-        }
-
-        return $token instanceof AnonymousToken || $token instanceof NullToken;
-    }
-
     /**
      * {@inheritdoc}
      */

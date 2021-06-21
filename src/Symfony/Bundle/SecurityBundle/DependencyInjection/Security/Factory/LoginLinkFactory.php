@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
 /**
  * @internal
  */
-class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryInterface
+class LoginLinkFactory extends AbstractFactory
 {
     public function addConfiguration(NodeDefinition $node)
     {
@@ -150,25 +150,5 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
     public function getPosition()
     {
         return 'form';
-    }
-
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function getListenerId()
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function createListener(ContainerBuilder $container, string $id, array $config, string $userProvider)
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
     }
 }

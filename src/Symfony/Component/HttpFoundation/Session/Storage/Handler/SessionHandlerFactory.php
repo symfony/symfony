@@ -48,7 +48,9 @@ class SessionHandlerFactory
             case !\is_string($connection):
                 throw new \InvalidArgumentException(sprintf('Unsupported Connection: "%s".', \get_class($connection)));
             case 0 === strpos($connection, 'file://'):
-                return new StrictSessionHandler(new NativeFileSessionHandler(substr($connection, 7)));
+                $savePath = substr($connection, 7);
+
+                return new StrictSessionHandler(new NativeFileSessionHandler('' === $savePath ? null : $savePath));
 
             case 0 === strpos($connection, 'redis:'):
             case 0 === strpos($connection, 'rediss:'):

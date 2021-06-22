@@ -147,8 +147,13 @@ abstract class Input implements InputInterface, StreamableInputInterface
     public function getOption(string $name)
     {
         if ($this->definition->hasNegation($name)) {
-            if (null === $value = $this->getOption($this->definition->negationToName($name))) {
-                return $value;
+            $negatedName = $this->definition->negationToName($name);
+            if (!$this->definition->hasOption($negatedName)) {
+                throw new InvalidArgumentException(sprintf('The "%s" option does not exist.', $negatedName));
+            }
+            $value = \array_key_exists($negatedName, $this->options) ? $this->options[$negatedName] : $this->definition->getOption($negatedName)->getDefault();
+            if (null === $value) {
+                return false;
             }
 
             return !$value;
@@ -158,7 +163,12 @@ abstract class Input implements InputInterface, StreamableInputInterface
             throw new InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
         }
 
-        return \array_key_exists($name, $this->options) ? $this->options[$name] : $this->definition->getOption($name)->getDefault();
+        $value = \array_key_exists($name, $this->options) ? $this->options[$name] : $this->definition->getOption($name)->getDefault();
+        if (null === $value && $this->definition->getOption($name)->isNegatable()) {
+            return false;
+        }
+
+        return $value;
     }
 
     /**

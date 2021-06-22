@@ -363,12 +363,6 @@ trait RedisTrait
     protected function doClear($namespace)
     {
         $cleared = true;
-        if ($this->redis instanceof \Predis\ClientInterface) {
-            $evalArgs = [0, $namespace];
-        } else {
-            $evalArgs = [[$namespace], 0];
-        }
-
         $hosts = $this->getHosts();
         $host = reset($hosts);
         if ($host instanceof \Predis\Client && $host->getConnection() instanceof ReplicationInterface) {
@@ -385,17 +379,20 @@ trait RedisTrait
             $info = $host->info('Server');
             $info = $info['Server'] ?? $info;
 
+            $pattern = $namespace.'*';
+
             if (!version_compare($info['redis_version'], '2.8', '>=')) {
                 // As documented in Redis documentation (http://redis.io/commands/keys) using KEYS
                 // can hang your server when it is executed against large databases (millions of items).
                 // Whenever you hit this scale, you should really consider upgrading to Redis 2.8 or above.
-                $cleared = $host->eval("local keys=redis.call('KEYS',ARGV[1]..'*') for i=1,#keys,5000 do redis.call('DEL',unpack(keys,i,math.min(i+4999,#keys))) end return 1", $evalArgs[0], $evalArgs[1]) && $cleared;
+                $args = $this->redis instanceof \Predis\ClientInterface ? [0, $pattern] : [[$pattern], 0];
+                $cleared = $host->eval("local keys=redis.call('KEYS',ARGV[1]) for i=1,#keys,5000 do redis.call('DEL',unpack(keys,i,math.min(i+4999,#keys))) end return 1", $args[0], $args[1]) && $cleared;
                 continue;
             }
 
             $cursor = null;
             do {
-                $keys = $host instanceof \Predis\ClientInterface ? $host->scan($cursor, 'MATCH', $namespace.'*', 'COUNT', 1000) : $host->scan($cursor, $namespace.'*', 1000);
+                $keys = $host instanceof \Predis\ClientInterface ? $host->scan($cursor, 'MATCH', $pattern, 'COUNT', 1000) : $host->scan($cursor, $pattern, 1000);
                 if (isset($keys[1]) && \is_array($keys[1])) {
                     $cursor = $keys[0];
                     $keys = $keys[1];
@@ -505,6 +502,11 @@ trait RedisTrait
                 $ids[] = 'eval' === $command ? $args[1][0] : $args[0];
             }
             $results = $redis->exec();
+        }
+
+        if (!$redis instanceof \Predis\ClientInterface && 'eval' === $command && $redis->getLastError()) {
+            $e = new \RedisException($redis->getLastError());
+            $results = array_map(function ($v) use ($e) { return false === $v ? $e : $v; }, $results);
         }
 
         foreach ($ids as $k => $id) {

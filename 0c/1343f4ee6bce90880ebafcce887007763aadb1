@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-15T04:24:04Z
+
+Can you explain why the dumper behaves differently on PHP 8.1?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-06-15T10:14:13Z
+
+@derrabus looks like the behavior of `ReflectionGenerator::getTrace()` changed in PHP 8.1, returning some info when there was none before.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-06-15T10:23:19Z
+
+@derrabus also, some other functions seem to have changed their behaviour. For example, when `null`, `ReflectionParameter::getDefaultValue()` returns null on PHP 8.0, and `ReflectionException: Internal error: Failed to retrieve the default value` on PHP 8.1. Searched why in recent PRs of https://github.com/php/php-src/, but couldn't find which commit is responsible of it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-16T18:03:22Z
+
+> @derrabus For example, when `null`, `ReflectionParameter::getDefaultValue()` returns null on PHP 8.0, and `ReflectionException: Internal error: Failed to retrieve the default value` on PHP 8.1.
+
+I'd like to clarify first, if that change was intentional: https://bugs.php.net/bug.php?id=81147
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-16T18:35:01Z
+
+The other changes look reasonable to me.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-16T18:38:55Z
+
+Okay, that was fast and we've got the answer we were looking for.
+
+> Just to confirm, this is indeed an intentional change to ensure that optional-before-required is consistently treated as a required parameter. Previously it was treated as such in nearly all situations, but there were loopholes. One, as you have discovered, is reflection. The other is named arguments, where it was possible to not specify such a parameter if later required parameters were specified.
+
+Can you have a look at the Travis failure? It looks related.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-06-16T19:09:22Z
+
+Thank you so much for your investigation, super good to know! I'll definitely take a look at Travis tomorrow to finish this PR. 👍
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-06-17T06:43:55Z
+
+@derrabus done :ok_hand: [This failing build](https://travis-ci.com/github/symfony/symfony/jobs/515175456) for 7.4 seems unrelated to this PR.
+
+I'm not sure I understand the difference between "Tests / Integration (x.x)" and Travis CI tests ?

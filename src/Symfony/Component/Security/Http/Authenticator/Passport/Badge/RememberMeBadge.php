@@ -47,10 +47,14 @@ class RememberMeBadge implements BadgeInterface
      *
      * The default is disabled, this can be called to suppress creation
      * after it was enabled.
+     *
+     * @return $this
      */
-    public function disable(): void
+    public function disable(): self
     {
         $this->enabled = false;
+
+        return $this;
     }
 
     public function isEnabled(): bool

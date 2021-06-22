@@ -46,7 +46,7 @@ class Link implements EvolvableLinkInterface
     private $rel = [];
 
     /**
-     * @var array<string, string|\Stringable|int|float|bool|array>
+     * @var array<string, string|bool|string[]>
      */
     private $attributes = [];
 

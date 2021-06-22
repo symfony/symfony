@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-06-22T14:06:18Z
+
+While I'm OK with merging, is there a real use-case for disable being fluent? I mean, `$badge->disabled()->isEnabled()` doesn't make much sense, and there aren't any other methods in the badge?
+
+The reason btw for `enabled()` being fluent is because the default is disabled. I like doing `(new RememberMeBadge())->enabled()` instead of having to use a variable.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-22T14:16:54Z
+
+I made this PR mainly to create a consistent behavior. The only use-case I can think of is a function that mutates and returns the badge, e.g.
+
+```php
+return $badge->disable();
+```
+instead of
+```php
+$badge->disable();
+
+return $badge;
+```

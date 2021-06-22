@@ -193,5 +193,18 @@ class InputOptionTest extends TestCase
         $option = new InputOption('foo', 'f', null, 'Some description');
         $option2 = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, 'Some description');
         $this->assertFalse($option->equals($option2));
+
+        $option = new InputOption('foo', null, InputOption::VALUE_NEGATABLE, 'Some description');
+        $option2 = new InputOption('no-foo', null, null, 'Alternative description');
+        $this->assertTrue($option->equals($option2));
+        $this->assertTrue($option2->equals($option));
+
+        $option = new InputOption('foo', null, InputOption::VALUE_NEGATABLE, 'Some description');
+        $option2 = new InputOption('foo', null, null, 'Alternative description');
+        $this->assertTrue($option->equals($option2));
+
+        $option = new InputOption('foo', null, InputOption::VALUE_NEGATABLE, 'Some description');
+        $option2 = new InputOption('bar', null, null, 'Alternative description');
+        $this->assertFalse($option->equals($option2));
     }
 }

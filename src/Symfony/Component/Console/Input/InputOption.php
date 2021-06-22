@@ -219,13 +219,36 @@ class InputOption
      */
     public function equals(self $option)
     {
-        return $option->getName() === $this->getName()
+        if ($option->getName() === $this->getName()
             && $option->getShortcut() === $this->getShortcut()
             && $option->getDefault() === $this->getDefault()
-            && $option->isNegatable() === $this->isNegatable()
             && $option->isArray() === $this->isArray()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
-        ;
+        ) {
+            return true;
+        }
+
+        if (!($option->isNegatable() xor $this->isNegatable())) {
+            return false;
+        }
+
+        if ($option->isNegatable()) {
+            $n = $option;
+            $p = $this;
+        } else {
+            $p = $option;
+            $n = $this;
+        }
+
+        return (
+            (
+                $n->getName() === $p->getName()
+                && $n->getShortcut() === $p->getShortcut()
+            ) || (
+                'no-'.$n->getName() === $p->getName()
+                && null === $p->getShortcut()
+            )
+        ) && !$p->acceptValue();
     }
 }

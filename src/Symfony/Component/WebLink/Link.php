@@ -132,7 +132,7 @@ class Link implements EvolvableLinkInterface
     /**
      * {@inheritdoc}
      *
-     * @param string|bool|string[] $value
+     * @param string|\Stringable|int|float|bool|string[] $value
      *
      * @return static
      */

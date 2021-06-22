@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 class DecoratorServicePassTest extends TestCase
@@ -260,6 +261,23 @@ class DecoratorServicePassTest extends TestCase
 
         $this->assertEquals(['container.service_subscriber' => []], $container->getDefinition('baz.inner')->getTags());
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
+    }
+
+    public function testCannotDecorateSyntheticService()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setSynthetic(true)
+        ;
+        $container
+            ->register('baz')
+            ->setDecoratedService('foo')
+        ;
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A synthetic service cannot be decorated: service "baz" cannot decorate "foo".');
+        $this->process($container);
     }
 
     protected function process(ContainerBuilder $container)

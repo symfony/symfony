@@ -127,7 +127,7 @@ jobs:
     runs-on: Ubuntu-20.04
 
     env:
-      extensions: 'amqp, apcu, igbinary, intl, mbstring, memcached, mongodb, redis'
+      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,mongodb,redis
       EXCLUDE_GROUPS: benchmark,intl-data,tty,integration
 
     strategy:
@@ -142,13 +142,13 @@ jobs:
       - name: Configure extensions
         if: "${{ matrix.php == '8.0' }}"
         # TODO: memcached is excluded because of compatibility issues with PHP 8
-        run: echo "extensions='amqp, apcu, igbinary, intl, mbstring, :memcached, mongodb, redis'" >> $GITHUB_ENV
+        run: echo "extensions=amqp,apcu,igbinary,intl,mbstring,:memcached,mongodb,redis" >> $GITHUB_ENV
 
       - name: Configure extensions
         if: "${{ matrix.php == '8.1' }}"
         # Test on PHP 8.1 with bundled extensions only and allow tests to fail for now.
         run: |
-          echo "extensions='mbstring'" >> $GITHUB_ENV
+          echo "extensions=mbstring" >> $GITHUB_ENV
           echo "ALLOW_FAILURE=yes" >> $GITHUB_ENV
 
       - name: Setup PHP

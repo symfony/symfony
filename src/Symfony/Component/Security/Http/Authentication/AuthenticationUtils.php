@@ -42,7 +42,7 @@ class AuthenticationUtils
 
         if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
             $authenticationException = $request->attributes->get(Security::AUTHENTICATION_ERROR);
-        } elseif (($session = $this->getSession())->has(Security::AUTHENTICATION_ERROR)) {
+        } elseif (($session = $this->getSession()) && $session->has(Security::AUTHENTICATION_ERROR)) {
             $authenticationException = $session->get(Security::AUTHENTICATION_ERROR);
 
             if ($clearSession) {

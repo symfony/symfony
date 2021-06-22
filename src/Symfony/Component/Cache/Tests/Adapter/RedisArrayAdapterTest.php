@@ -23,5 +23,6 @@ class RedisArrayAdapterTest extends AbstractRedisAdapterTest
             self::markTestSkipped('The RedisArray class is required.');
         }
         self::$redis = new \RedisArray([getenv('REDIS_HOST')], ['lazy_connect' => true]);
+        self::$redis->setOption(\Redis::OPT_PREFIX, 'prefix_');
     }
 }

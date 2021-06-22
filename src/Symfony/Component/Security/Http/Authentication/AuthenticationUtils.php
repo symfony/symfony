@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Security\Http\Authentication;
 
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 
@@ -40,7 +42,7 @@ class AuthenticationUtils
 
         if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
             $authenticationException = $request->attributes->get(Security::AUTHENTICATION_ERROR);
-        } elseif ($request->hasSession() && ($session = $request->getSession())->has(Security::AUTHENTICATION_ERROR)) {
+        } elseif (($session = $this->getSession())->has(Security::AUTHENTICATION_ERROR)) {
             $authenticationException = $session->get(Security::AUTHENTICATION_ERROR);
 
             if ($clearSession) {
@@ -62,7 +64,7 @@ class AuthenticationUtils
             return $request->attributes->get(Security::LAST_USERNAME, '');
         }
 
-        return $request->hasSession() ? $request->getSession()->get(Security::LAST_USERNAME, '') : '';
+        return ($session = $this->getSession()) ? $session->get(Security::LAST_USERNAME, '') : '';
     }
 
     /**
@@ -77,5 +79,14 @@ class AuthenticationUtils
         }
 
         return $request;
+    }
+
+    private function getSession(): ?SessionInterface
+    {
+        try {
+            return $this->requestStack->getSession();
+        } catch (SessionNotFoundException $e) {
+            return null;
+        }
     }
 }

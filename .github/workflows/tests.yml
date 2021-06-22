@@ -218,6 +218,8 @@ jobs:
         run: |
           echo "::group::fake PHP version"
           composer config platform.php 8.0.99
+          echo "::group::Adjust dependencies"
+          composer require --dev --no-update masterminds/html5:~2.7.5@dev
           echo "::group::composer update"
           composer update --no-progress --ansi
           echo "::endgroup::"

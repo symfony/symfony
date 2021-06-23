@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-06-22T08:03:42Z
+
+wasn't this solved previously by a separate compiler pass setting the class for that tag at an earlier priority ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-22T08:08:40Z
+
+Yes it was, but that pass has now moved after AutowiringPass in #40406

@@ -144,6 +144,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Telegram\TelegramTransportFactory::class,
             'package' => 'symfony/telegram-notifier',
         ],
+        'telnyx' => [
+            'class' => Bridge\Telnyx\TelnyxTransportFactory::class,
+            'package' => 'symfony/telnyx-notifier',
+        ],
         'twilio' => [
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',

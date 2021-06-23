@@ -36,6 +36,7 @@ use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
+use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
@@ -80,6 +81,7 @@ class Transport
         SmsapiTransportFactory::class,
         SmsBiurasTransportFactory::class,
         TelegramTransportFactory::class,
+        TelnyxTransportFactory::class,
         TwilioTransportFactory::class,
         ZulipTransportFactory::class,
     ];

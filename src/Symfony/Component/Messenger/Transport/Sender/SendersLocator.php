@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Messenger\Attribute\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
@@ -41,20 +42,56 @@ class SendersLocator implements SendersLocatorInterface
      */
     public function getSenders(Envelope $envelope): iterable
     {
-        $seen = [];
+        $senderAliases = [];
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
-            foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {
-                if (!\in_array($senderAlias, $seen, true)) {
-                    if (!$this->sendersLocator->has($senderAlias)) {
-                        throw new RuntimeException(sprintf('Invalid senders configuration: sender "%s" is not in the senders locator.', $senderAlias));
-                    }
+            $typeSenderAliases = [];
 
-                    $seen[] = $senderAlias;
-                    $sender = $this->sendersLocator->get($senderAlias);
-                    yield $senderAlias => $sender;
-                }
+            foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {
+                $typeSenderAliases[] = $senderAlias;
             }
+
+            if (\PHP_VERSION_ID >= 80000 && empty($typeSenderAliases)) {
+                $typeSenderAliases = $this->getSendersFromAttributes($type);
+            }
+
+            $senderAliases = array_merge($senderAliases, $typeSenderAliases);
         }
+
+        $senderAliases = array_unique($senderAliases);
+
+        foreach ($senderAliases as $senderAlias) {
+            if (!$this->sendersLocator->has($senderAlias)) {
+                throw new RuntimeException(sprintf('Invalid senders configuration: sender "%s" is not in the senders locator.', $senderAlias));
+            }
+
+            $sender = $this->sendersLocator->get($senderAlias);
+            yield $senderAlias => $sender;
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getSendersFromAttributes(string $type): array
+    {
+        if (!class_exists($type) && !interface_exists($type)) {
+            return [];
+        }
+
+        try {
+            $reflectionClass = new \ReflectionClass($type);
+        } catch (\ReflectionException $e) {
+            return [];
+        }
+
+        $attributes = $reflectionClass->getAttributes(Transport::class);
+
+        return array_map(function (\ReflectionAttribute $attribute): string {
+            /** @var Transport $attributeInstance */
+            $attributeInstance = $attribute->newInstance();
+
+            return $attributeInstance->name;
+        }, $attributes);
     }
 }

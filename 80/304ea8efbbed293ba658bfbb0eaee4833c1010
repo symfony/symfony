@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-05-19T09:12:38Z
+
+@nicolas-grekas open for a `5.2` merge?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-05-19T09:32:16Z
+
+We don't change error messages in patch releases, except for obvious mistakes.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-06-17T09:16:55Z
+
+open for finishing this PR?
+
+---------------------------------------------------------------------------
+
+by scuben at 2021-06-17T09:22:03Z
+
+> open for finishing this PR?
+
+Yes. I missed the mail notification of fabpot's review.

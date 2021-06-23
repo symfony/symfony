@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `AsMessageHandler` attribute for declaring message handlers on PHP 8.
+
 5.3
 ---
 

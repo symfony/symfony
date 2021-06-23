@@ -32,10 +32,15 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTest
         }
 
         self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['lazy' => true, 'redis_cluster' => true]);
+        self::$redis->setOption(\Redis::OPT_PREFIX, 'prefix_');
     }
 
-    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
     {
+        if ('testClearWithPrefix' === $testMethod && \defined('Redis::SCAN_PREFIX')) {
+            self::$redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_PREFIX);
+        }
+
         $this->assertInstanceOf(RedisClusterProxy::class, self::$redis);
         $adapter = new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
 

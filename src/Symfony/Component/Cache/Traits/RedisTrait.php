@@ -362,6 +362,11 @@ trait RedisTrait
      */
     protected function doClear($namespace)
     {
+        if ($this->redis instanceof \Predis\ClientInterface) {
+            $prefix = $this->redis->getOptions()->prefix ? $this->redis->getOptions()->prefix->getPrefix() : '';
+            $prefixLen = \strlen($prefix);
+        }
+
         $cleared = true;
         $hosts = $this->getHosts();
         $host = reset($hosts);
@@ -379,7 +384,11 @@ trait RedisTrait
             $info = $host->info('Server');
             $info = $info['Server'] ?? $info;
 
-            $pattern = $namespace.'*';
+            if (!$host instanceof \Predis\ClientInterface) {
+                $prefix = \defined('Redis::SCAN_PREFIX') && (\Redis::SCAN_PREFIX & $host->getOption(\Redis::OPT_SCAN)) ? '' : $host->getOption(\Redis::OPT_PREFIX);
+                $prefixLen = \strlen($host->getOption(\Redis::OPT_PREFIX) ?? '');
+            }
+            $pattern = $prefix.$namespace.'*';
 
             if (!version_compare($info['redis_version'], '2.8', '>=')) {
                 // As documented in Redis documentation (http://redis.io/commands/keys) using KEYS
@@ -398,6 +407,11 @@ trait RedisTrait
                     $keys = $keys[1];
                 }
                 if ($keys) {
+                    if ($prefixLen) {
+                        foreach ($keys as $i => $key) {
+                            $keys[$i] = substr($key, $prefixLen);
+                        }
+                    }
                     $this->doDelete($keys);
                 }
             } while ($cursor = (int) $cursor);

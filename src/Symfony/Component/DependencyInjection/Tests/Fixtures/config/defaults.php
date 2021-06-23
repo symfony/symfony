@@ -14,6 +14,7 @@ return function (ContainerConfigurator $c) {
         ->autowire()
         ->tag('t', ['a' => 'b'])
         ->bind(Foo::class, ref('bar'))
+        ->bind('iterable $foo', tagged_iterator('foo'))
         ->public();
 
     $s->set(Foo::class)->args([ref('bar')])->public();

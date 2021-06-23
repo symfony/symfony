@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2021-06-10T21:19:34Z
+
+@Toflar and @dbu I guess you might have opinions on this.
+
+---------------------------------------------------------------------------
+
+by dbu at 2021-06-11T06:03:15Z
+
+regarding mixed s-maxage and no s-maxage: if we talk about what to send out with the combined response: i would expect the most restrictive result. take the lowest value for s-maxage from all fragments, and if either the main request *or* the fragment is not `public` then the whole response is not public.
+
+that does not need to be in this PR though. i think the bugfix of this PR is valid and simple and should be merged.
+
+if we have confusion about how to merge the cache headers from sub requests, that might be a more complicated thing to solve, and also has more risk of side effects and breaking running systems. if there is need to look into that, i suggest we discuss that in a new issue.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2021-06-11T06:18:49Z
+
+@dbu Indeed it's better to separate the topics; see #41665 for the other issue.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2021-06-21T06:44:27Z
+
+#41665 will probably merge-conflict with this PR here.
+
+I don't know what your workflows look like, but if anybody (@nicolas-grekas?) merges this PR here, I can rebase & resolve the other one.

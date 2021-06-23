@@ -27,7 +27,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 final class LockRegistry
 {
     private static $openedFiles = [];
-    private static $lockedFiles = [];
+    private static $lockedFiles;
 
     /**
      * The number of items in this list controls the max number of concurrent processes.
@@ -81,6 +81,11 @@ final class LockRegistry
 
     public static function compute(callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata = null, LoggerInterface $logger = null)
     {
+        if ('\\' === \DIRECTORY_SEPARATOR && null === self::$lockedFiles) {
+            // disable locking on Windows by default
+            self::$files = self::$lockedFiles = [];
+        }
+
         $key = self::$files ? abs(crc32($item->getKey())) % \count(self::$files) : -1;
 
         if ($key < 0 || (self::$lockedFiles[$key] ?? false) || !$lock = self::open($key)) {

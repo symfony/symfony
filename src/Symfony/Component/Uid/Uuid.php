@@ -54,7 +54,9 @@ class Uuid extends AbstractUid
             $uuid = substr_replace($uuid, '-', 18, 0);
             $uuid = substr_replace($uuid, '-', 23, 0);
         } elseif (26 === \strlen($uuid) && Ulid::isValid($uuid)) {
-            $uuid = (new Ulid($uuid))->toRfc4122();
+            $ulid = new Ulid('00000000000000000000000000');
+            $ulid->uid = strtoupper($uuid);
+            $uuid = $ulid->toRfc4122();
         }
 
         if (__CLASS__ !== static::class || 36 !== \strlen($uuid)) {

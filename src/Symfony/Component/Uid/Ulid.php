@@ -43,7 +43,7 @@ class Ulid extends AbstractUid
             throw new \InvalidArgumentException(sprintf('Invalid ULID: "%s".', $ulid));
         }
 
-        $this->uid = strtr($ulid, 'abcdefghjkmnpqrstvwxyz', 'ABCDEFGHJKMNPQRSTVWXYZ');
+        $this->uid = strtoupper($ulid);
     }
 
     public static function isValid(string $ulid): bool

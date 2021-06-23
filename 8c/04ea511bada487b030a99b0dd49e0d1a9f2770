@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-06-22T14:18:50Z
+
+do we need quoting the value to avoid issues with `=` in the base64 alphabet ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-22T15:14:25Z
+
+> do we need quoting the value to avoid issues with = in the base64 alphabet ?
+
+we don't have to, I don't think a `=` in the value is an issue.

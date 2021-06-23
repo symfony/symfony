@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-22T18:43:14Z
+
+> RedisCluster::rename(): Keys don't hash to the same slot
+
+4 failures to investigate.
+
+Status: needs work

@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-14T12:31:03Z
+
+I need to check the failing test
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-15T04:59:45Z
+
+@Nyholm @jderusse good to go? Tests green
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-15T07:41:38Z
+
+.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-16T07:10:39Z
+
+@Nyholm can we please get this merged before feature freeze? Thanks
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-16T12:56:15Z
+
+Still needs work and a rebase
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-19T12:52:02Z
+
+Let me know when you are ready for a review
+
+---------------------------------------------------------------------------
+
+by KamilKubicki at 2021-04-23T06:53:28Z
+
+Just tested the feature for:
+- ordinary messages (text & title fields)
+- MessageCards (Title, Text, ThemeColor, ActionCard, Facts & Sections, Inputs)
+
+feature seems to be working as expected:
+
+![image](https://user-images.githubusercontent.com/13560497/115830107-21e4b200-a410-11eb-9c0c-21b376a0f7f5.png)
+```php
+    $input = new TextInput();
+    $input->id('input_title');
+    $input->isMultiline(true)->maxLength(5)->title('Input Title');
+    $inputDate = new DateInput();
+    $inputDate->title('Input Date Title')->id('input_date');
+    $microsoftTeamsOptions = (new MicrosoftTeamsOptions(
+        [
+            '@type' => 'MessageCard',
+            '@context' => 'https://schema.org/extensions',
+        ]
+    ))
+        ->title('Title')
+        ->summary('Summary')
+        ->themeColor('#0076D7')
+        ->section(
+            (new Section())
+            ->title('Section - name')
+            ->fact((new Fact())
+                ->name('Section Fact 1')
+                ->value('Section Fact 1 value')
+            )
+            ->fact((new Fact())
+                ->name('Section Fact 2')
+                ->value('Section Fact 2 ')
+            )
+        )
+        ->action((new ActionCard())
+            ->name('ActionCard - name')
+            ->input($input)
+            ->input($inputDate)
+            ->action((new HttpPostAction())
+                ->name('Add comment')
+                ->target('http://target')
+            )
+        );
+
+```
+I will prepare appropriate documentation for the feature and complete missing parts (if any).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-06-17T09:05:38Z
+
+> I'm not a big fan of the protected options and everybody writing into it.
+I wonder if the property shouldn't be private, and each class is responsible for its own properties. Then change the toArray method for something like
+
+@jderusse makes sense, did that 👍

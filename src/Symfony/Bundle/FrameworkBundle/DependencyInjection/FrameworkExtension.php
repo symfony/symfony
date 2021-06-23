@@ -140,6 +140,7 @@ use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
+use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransport;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Notifier;
@@ -2443,6 +2444,7 @@ class FrameworkExtension extends Extension
             SmsBiurasTransportFactory::class => 'notifier.transport_factory.smsbiuras',
             SpotHitTransportFactory::class => 'notifier.transport_factory.spothit',
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
+            TurboSmsTransport::class => 'notifier.transport_factory.turbosms',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
         ];
@@ -2463,6 +2465,7 @@ class FrameworkExtension extends Extension
                 case 'rocketchat': $package = 'rocket-chat'; break;
                 case 'smsbiuras': $package = 'sms-biuras'; break;
                 case 'spothit': $package = 'spot-hit'; break;
+                case 'turbosms': $package = 'turbo-sms'; break;
             }
 
             if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-notifier', $package), $class, $parentPackages)) {

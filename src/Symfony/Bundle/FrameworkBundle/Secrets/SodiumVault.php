@@ -200,9 +200,10 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
     private function export(string $file, string $data): void
     {
+        $b64 = 'decrypt.private' === $file ? '// SYMFONY_DECRYPTION_SECRET='.base64_encode($data)."\n" : '';
         $name = basename($this->pathPrefix.$file);
         $data = str_replace('%', '\x', rawurlencode($data));
-        $data = sprintf("<?php // %s on %s\n\nreturn \"%s\";\n", $name, date('r'), $data);
+        $data = sprintf("<?php // %s on %s\n\n%sreturn \"%s\";\n", $name, date('r'), $b64, $data);
 
         $this->createSecretsDir();
 

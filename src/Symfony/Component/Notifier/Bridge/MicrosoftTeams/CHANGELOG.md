@@ -5,3 +5,4 @@ CHANGELOG
 ---
 
  * Add the bridge
+ * Add options support

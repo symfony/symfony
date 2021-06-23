@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by andrerom at 2021-06-23T17:15:06Z
+
++1 moving this logic to server when we can is great, might fix som edge case issues where cache becomes inconsistent as well 👍

@@ -187,12 +187,22 @@ class UuidTest extends TestCase
         $this->assertSame([$a, $b, $c, $d], $uuids);
     }
 
-    public function testNilUuid()
+    /**
+     * @testWith    ["00000000-0000-0000-0000-000000000000"]
+     *              ["1111111111111111111111"]
+     *              ["00000000000000000000000000"]
+     */
+    public function testNilUuid(string $uuid)
     {
-        $uuid = Uuid::fromString('00000000-0000-0000-0000-000000000000');
+        $uuid = Uuid::fromString($uuid);
 
         $this->assertInstanceOf(NilUuid::class, $uuid);
         $this->assertSame('00000000-0000-0000-0000-000000000000', (string) $uuid);
+    }
+
+    public function testNewNilUuid()
+    {
+        $this->assertSame('00000000-0000-0000-0000-000000000000', (string) new NilUuid());
     }
 
     public function testFromBinary()
@@ -317,5 +327,10 @@ class UuidTest extends TestCase
         $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13813fff-1dd2-11b2-a456-426655440000'))->getDateTime());
         $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '-0.000001'), ((new UuidV1('13813ff6-1dd2-11b2-a456-426655440000'))->getDateTime()));
         $this->assertEquals(new \DateTimeImmutable('@-12219292800'), ((new UuidV1('00000000-0000-1000-a456-426655440000'))->getDateTime()));
+    }
+
+    public function testFromStringBase58Padding()
+    {
+        $this->assertInstanceOf(Uuid::class, Uuid::fromString('111111111u9QRyVM94rdmZ'));
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams;
 
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -56,12 +57,18 @@ final class MicrosoftTeamsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
+        if ($message->getOptions() && !$message->getOptions() instanceof MicrosoftTeamsOptions) {
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, MicrosoftTeamsOptions::class));
+        }
+
+        $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
+
+        $options['text'] = $options['text'] ?? $message->getSubject();
+
         $path = $message->getRecipientId() ?? $this->path;
         $endpoint = sprintf('https://%s%s', $this->getEndpoint(), $path);
         $response = $this->client->request('POST', $endpoint, [
-            'json' => [
-                'text' => $message->getSubject(),
-            ],
+            'json' => $options,
         ]);
 
         $requestId = $response->getHeaders(false)['request-id'][0] ?? null;

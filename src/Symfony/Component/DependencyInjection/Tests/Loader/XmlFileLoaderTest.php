@@ -39,6 +39,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
@@ -895,6 +897,32 @@ class XmlFileLoaderTest extends TestCase
         $this->assertTrue($definition->isAutowired());
         $this->assertTrue($definition->isLazy());
         $this->assertSame(['foo' => [[]], 'bar' => [[]]], $definition->getTags());
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testEnumeration()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_with_enumeration.xml');
+        $container->compile();
+
+        $definition = $container->getDefinition(FooClassWithEnumAttribute::class);
+        $this->assertSame([FooUnitEnum::BAR], $definition->getArguments());
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testInvalidEnumeration()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+
+        $this->expectException(\Error::class);
+        $loader->load('services_with_invalid_enumeration.xml');
     }
 
     public function testInstanceOfAndChildDefinition()

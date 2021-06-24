@@ -43,11 +43,12 @@ class CacheTokenVerifier implements TokenVerifierInterface
             return true;
         }
 
-        if (!$this->cache->hasItem($this->cacheKeyPrefix.$token->getSeries())) {
+        $cacheKey = $this->getCacheKey($token);
+        if (!$this->cache->hasItem($cacheKey)) {
             return false;
         }
 
-        $item = $this->cache->getItem($this->cacheKeyPrefix.$token->getSeries());
+        $item = $this->cache->getItem($cacheKey);
         $outdatedToken = $item->get();
 
         return hash_equals($outdatedToken, $tokenValue);
@@ -60,9 +61,14 @@ class CacheTokenVerifier implements TokenVerifierInterface
     {
         // When a token gets updated, persist the outdated token for $outdatedTokenTtl seconds so we can
         // still accept it as valid in verifyToken
-        $item = $this->cache->getItem($this->cacheKeyPrefix.$token->getSeries());
+        $item = $this->cache->getItem($this->getCacheKey($token));
         $item->set($token->getTokenValue());
         $item->expiresAfter($this->outdatedTokenTtl);
         $this->cache->save($item);
+    }
+
+    private function getCacheKey(PersistentTokenInterface $token): string
+    {
+        return $this->cacheKeyPrefix.rawurlencode($token->getSeries());
     }
 }

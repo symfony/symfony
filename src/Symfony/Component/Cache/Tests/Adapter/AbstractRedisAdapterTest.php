@@ -24,7 +24,7 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
 
     protected static $redis;
 
-    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
     {
         return new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
@@ -44,5 +44,19 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
     public static function tearDownAfterClass(): void
     {
         self::$redis = null;
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testClearWithPrefix()
+    {
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $cache->save($cache->getItem('foo')->set('bar'));
+        $this->assertTrue($cache->hasItem('foo'));
+
+        $cache->clear();
+        $this->assertFalse($cache->hasItem('foo'));
     }
 }

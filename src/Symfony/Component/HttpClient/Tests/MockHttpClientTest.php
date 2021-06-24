@@ -27,7 +27,7 @@ class MockHttpClientTest extends HttpClientTestCase
      */
     public function testMocking($factory, array $expectedResponses)
     {
-        $client = new MockHttpClient($factory, 'https://example.com/');
+        $client = new MockHttpClient($factory);
         $this->assertSame(0, $client->getRequestsCount());
 
         $urls = ['/foo', '/bar'];
@@ -126,7 +126,7 @@ class MockHttpClientTest extends HttpClientTestCase
      */
     public function testTransportExceptionThrowsIfPerformedMoreRequestsThanConfigured($factory)
     {
-        $client = new MockHttpClient($factory, 'https://example.com/');
+        $client = new MockHttpClient($factory);
 
         $client->request('POST', '/foo');
         $client->request('POST', '/foo');

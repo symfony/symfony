@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-06-11T14:20:43Z
+
+Although I agree that this change makes sense (for the reasons explained by @Toflar), I'm wondering whether we should change the behavior of `Cache-Control: public` in a patch release of the LTS version or whether we should include such behavior change only in the next minor version (i.e. 5.4).
+
+what do you think @fabpot @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2021-06-11T15:16:45Z
+
+@stof Yes, I've thought about this as well. I came to the conclusion that it is a real bug fix (and thus against 4.4), since it may lead to responses being kept in caches longer than you wanted.
+
+I "found" this only yesterday when a customer reported they made changes somewhere but those did not show up for the end users: The old version was kept in the CDN although it should not have been.
+
+But that's my 2e-2 💰, you decide :-).
+
+---------------------------------------------------------------------------
+
+by mpdude at 2021-06-24T06:27:53Z
+
+Rebased and resolved merge conflicts after #41663 has been merged.

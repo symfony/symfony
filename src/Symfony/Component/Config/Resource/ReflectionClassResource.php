@@ -163,6 +163,8 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             }
         }
 
+        $defined = \Closure::bind(static function ($c) { return \defined($c); }, null, $class->name);
+
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
             if (\PHP_VERSION_ID >= 80000) {
                 foreach ($m->getAttributes() as $a) {
@@ -189,7 +191,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                     continue;
                 }
 
-                if (!$p->isDefaultValueConstant() || \defined($p->getDefaultValueConstantName())) {
+                if (!$p->isDefaultValueConstant() || $defined($p->getDefaultValueConstantName())) {
                     $defaults[$p->name] = $p->getDefaultValue();
 
                     continue;

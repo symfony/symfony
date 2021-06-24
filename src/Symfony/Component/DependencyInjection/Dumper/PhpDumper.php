@@ -1871,6 +1871,8 @@ EOF;
 
                 return $code;
             }
+        } elseif ($value instanceof \UnitEnum) {
+            return sprintf('\%s::%s', \get_class($value), $value->name);
         } elseif ($value instanceof AbstractArgument) {
             throw new RuntimeException($value->getTextWithContext());
         } elseif (\is_object($value) || \is_resource($value)) {

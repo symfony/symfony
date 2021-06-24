@@ -164,6 +164,7 @@ EOPHP;
 
         yield [true, 17, 'public function ccc($bar = 187) {}'];
         yield [true, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}'];
+        yield [true, 17, 'public function ccc($bar = parent::BOOM) {}'];
         yield [true, 17, null, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
     }
 

@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Console\Tester;
 
+use PHPUnit\Framework\Assert;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Tester\Constraint\CommandIsSuccessful;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -108,6 +110,11 @@ trait TesterTrait
         }
 
         return $this->statusCode;
+    }
+
+    public function assertCommandIsSuccessful(string $message = ''): void
+    {
+        Assert::assertThat($this->statusCode, new CommandIsSuccessful(), $message);
     }
 
     /**

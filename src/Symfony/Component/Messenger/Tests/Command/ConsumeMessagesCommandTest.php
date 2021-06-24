@@ -63,7 +63,7 @@ class ConsumeMessagesCommandTest extends TestCase
             '--limit' => 1,
         ]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
     }
 
@@ -96,7 +96,7 @@ class ConsumeMessagesCommandTest extends TestCase
             '--limit' => 1,
         ]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
     }
 }

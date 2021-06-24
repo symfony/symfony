@@ -135,7 +135,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
             }
 
             if (null !== $bindingValue && !$bindingValue instanceof Reference && !$bindingValue instanceof Definition && !$bindingValue instanceof TaggedIteratorArgument && !$bindingValue instanceof ServiceLocatorArgument) {
-                throw new InvalidArgumentException(sprintf('Invalid value for binding key "%s" for service "%s": expected null, "%s", "%s", "%s" or ServiceLocatorArgument, "%s" given.', $key, $this->currentId, Reference::class, Definition::class, TaggedIteratorArgument::class, get_debug_type($bindingValue)));
+                throw new InvalidArgumentException(sprintf('Invalid value for binding key "%s" for service "%s": expected "%s", "%s", "%s", "%s" or null, "%s" given.', $key, $this->currentId, Reference::class, Definition::class, TaggedIteratorArgument::class, ServiceLocatorArgument::class, get_debug_type($bindingValue)));
             }
         }
 

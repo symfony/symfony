@@ -237,4 +237,9 @@ class UlidTest extends TestCase
     {
         $this->assertInstanceOf(CustomUlid::class, CustomUlid::fromString((new CustomUlid())->toBinary()));
     }
+
+    public function testFromStringBase58Padding()
+    {
+        $this->assertInstanceOf(Ulid::class, Ulid::fromString('111111111u9QRyVM94rdmZ'));
+    }
 }

@@ -22,7 +22,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        self::$redis = new \Predis\Client(['host' => getenv('REDIS_HOST')]);
+        self::$redis = new \Predis\Client(['host' => getenv('REDIS_HOST')], ['prefix' => 'prefix_']);
     }
 
     public function testCreateConnection()

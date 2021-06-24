@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Security\Http\Authenticator\Passport\Badge;
 
+use Symfony\Component\Security\Http\EventListener\CheckRememberMeConditionsListener;
+
 /**
  * Adds support for remember me to this authenticator.
  *
  * The presence of this badge doesn't create the remember-me cookie. The actual
  * cookie is only created if this badge is enabled. By default, this is done
- * by the {@see RememberMeConditionsListener} if all conditions are met.
+ * by the {@see CheckRememberMeConditionsListener} if all conditions are met.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
@@ -29,7 +31,7 @@ class RememberMeBadge implements BadgeInterface
     /**
      * Enables remember-me cookie creation.
      *
-     * In most cases, {@see RememberMeConditionsListener} enables this
+     * In most cases, {@see CheckRememberMeConditionsListener} enables this
      * automatically if always_remember_me is true or the remember_me_parameter
      * exists in the request.
      *

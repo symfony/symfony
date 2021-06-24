@@ -23,17 +23,13 @@ use Symfony\Component\Cache\Marshaller\TagAwareMarshaller;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
 /**
- * Stores tag id <> cache id relationship as a Redis Set, lookup on invalidation using RENAME+SMEMBERS.
+ * Stores tag id <> cache id relationship as a Redis Set.
  *
  * Set (tag relation info) is stored without expiry (non-volatile), while cache always gets an expiry (volatile) even
  * if not set by caller. Thus if you configure redis with the right eviction policy you can be safe this tag <> cache
  * relationship survives eviction (cache cleanup when Redis runs out of memory).
  *
- * Requirements:
- *  - Client: PHP Redis or Predis
- *            Note: Due to lack of RENAME support it is NOT recommended to use Cluster on Predis, instead use phpredis.
- *  - Server: Redis 2.8+
- *            Configured with any `volatile-*` eviction policy, OR `noeviction` if it will NEVER fill up memory
+ * Redis server 2.8+ with any `volatile-*` eviction policy, OR `noeviction` if you're sure memory will NEVER fill up
  *
  * Design limitations:
  *  - Max 4 billion cache keys per cache tag as limited by Redis Set datatype.
@@ -48,11 +44,6 @@ use Symfony\Component\Cache\Traits\RedisTrait;
 class RedisTagAwareAdapter extends AbstractTagAwareAdapter
 {
     use RedisTrait;
-
-    /**
-     * Limits for how many keys are deleted in batch.
-     */
-    private const BULK_DELETE_LIMIT = 10000;
 
     /**
      * On cache items without a lifetime set, we set it to 100 days. This is to make sure cache items are
@@ -96,7 +87,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     {
         $eviction = $this->getRedisEvictionPolicy();
         if ('noeviction' !== $eviction && 0 !== strpos($eviction, 'volatile-')) {
-            throw new LogicException(sprintf('Redis maxmemory-policy setting "%s" is *not* supported by RedisTagAwareAdapter, use "noeviction" or  "volatile-*" eviction policies.', $eviction));
+            throw new LogicException(sprintf('Redis maxmemory-policy setting "%s" is *not* supported by RedisTagAwareAdapter, use "noeviction" or "volatile-*" eviction policies.', $eviction));
         }
 
         // serialize values
@@ -163,15 +154,9 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             return v:sub(14, 13 + v:byte(13) + v:byte(12) * 256 + v:byte(11) * 65536)
 EOLUA;
 
-        if ($this->redis instanceof \Predis\ClientInterface) {
-            $evalArgs = [$lua, 1, &$id];
-        } else {
-            $evalArgs = [$lua, [&$id], 1];
-        }
-
-        $results = $this->pipeline(function () use ($ids, &$id, $evalArgs) {
+        $results = $this->pipeline(function () use ($ids, $lua) {
             foreach ($ids as $id) {
-                yield 'eval' => $evalArgs;
+                yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? [$lua, 1, $id] : [$lua, [$id], 1];
             }
         });
 
@@ -189,12 +174,15 @@ EOLUA;
      */
     protected function doDeleteTagRelations(array $tagData): bool
     {
-        $this->pipeline(static function () use ($tagData) {
+        $results = $this->pipeline(static function () use ($tagData) {
             foreach ($tagData as $tagId => $idList) {
                 array_unshift($idList, $tagId);
                 yield 'sRem' => $idList;
             }
-        })->rewind();
+        });
+        foreach ($results as $result) {
+            // no-op
+        }
 
         return true;
     }
@@ -204,77 +192,81 @@ EOLUA;
      */
     protected function doInvalidate(array $tagIds): bool
     {
-        if (!$this->redis instanceof \Predis\ClientInterface || !$this->redis->getConnection() instanceof PredisCluster) {
-            $movedTagSetIds = $this->renameKeys($this->redis, $tagIds);
-        } else {
-            $clusterConnection = $this->redis->getConnection();
-            $tagIdsByConnection = new \SplObjectStorage();
-            $movedTagSetIds = [];
+        // This script scans the set of items linked to tag: it empties the set
+        // and removes the linked items. When the set is still not empty after
+        // the scan, it means we're in cluster mode and that the linked items
+        // are on other nodes: we move the links to a temporary set and we
+        // gargage collect that set from the client side.
+
+        $lua = <<<'EOLUA'
+            local cursor = '0'
+            local id = KEYS[1]
+            repeat
+                local result = redis.call('SSCAN', id, cursor, 'COUNT', 5000);
+                cursor = result[1];
+                local rems = {}
+
+                for _, v in ipairs(result[2]) do
+                    local ok, _ = pcall(redis.call, 'DEL', ARGV[1]..v)
+                    if ok then
+                        table.insert(rems, v)
+                    end
+                end
+                if 0 < #rems then
+                    redis.call('SREM', id, unpack(rems))
+                end
+            until '0' == cursor;
+
+            redis.call('SUNIONSTORE', '{'..id..'}'..id, id)
+            redis.call('DEL', id)
+
+            return redis.call('SSCAN', '{'..id..'}'..id, '0', 'COUNT', 5000)
+EOLUA;
+
+        $results = $this->pipeline(function () use ($tagIds, $lua) {
+            if ($this->redis instanceof \Predis\ClientInterface) {
+                $prefix = $this->redis->getOptions()->prefix ? $this->redis->getOptions()->prefix->getPrefix() : '';
+            } elseif (\is_array($prefix = $this->redis->getOption(\Redis::OPT_PREFIX) ?? '')) {
+                $prefix = current($prefix);
+            }
 
             foreach ($tagIds as $id) {
-                $connection = $clusterConnection->getConnectionByKey($id);
-                $slot = $tagIdsByConnection[$connection] ?? $tagIdsByConnection[$connection] = new \ArrayObject();
-                $slot[] = $id;
-            }
-
-            foreach ($tagIdsByConnection as $connection) {
-                $slot = $tagIdsByConnection[$connection];
-                $movedTagSetIds = array_merge($movedTagSetIds, $this->renameKeys(new $this->redis($connection, $this->redis->getOptions()), $slot->getArrayCopy()));
-            }
-        }
-
-        // No Sets found
-        if (!$movedTagSetIds) {
-            return false;
-        }
-
-        // Now safely take the time to read the keys in each set and collect ids we need to delete
-        $tagIdSets = $this->pipeline(static function () use ($movedTagSetIds) {
-            foreach ($movedTagSetIds as $movedTagId) {
-                yield 'sMembers' => [$movedTagId];
+                yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? [$lua, 1, $id, $prefix] : [$lua, [$id, $prefix], 1];
             }
         });
 
-        // Return combination of the temporary Tag Set ids and their values (cache ids)
-        $ids = array_merge($movedTagSetIds, ...iterator_to_array($tagIdSets, false));
+        $lua = <<<'EOLUA'
+            local id = KEYS[1]
+            local cursor = table.remove(ARGV)
+            redis.call('SREM', '{'..id..'}'..id, unpack(ARGV))
 
-        // Delete cache in chunks to avoid overloading the connection
-        foreach (array_chunk(array_unique($ids), self::BULK_DELETE_LIMIT) as $chunkIds) {
-            $this->doDelete($chunkIds);
+            return redis.call('SSCAN', '{'..id..'}'..id, cursor, 'COUNT', 5000)
+EOLUA;
+
+        foreach ($results as $id => [$cursor, $ids]) {
+            while ($ids || '0' !== $cursor) {
+                $this->doDelete($ids);
+
+                $evalArgs = [$id, $cursor];
+                array_splice($evalArgs, 1, 0, $ids);
+
+                if ($this->redis instanceof \Predis\ClientInterface) {
+                    array_unshift($evalArgs, $lua, 1);
+                } else {
+                    $evalArgs = [$lua, $evalArgs, 1];
+                }
+
+                $results = $this->pipeline(function () use ($evalArgs) {
+                    yield 'eval' => $evalArgs;
+                });
+
+                foreach ($results as [$cursor, $ids]) {
+                    // no-op
+                }
+            }
         }
 
         return true;
-    }
-
-    /**
-     * Renames several keys in order to be able to operate on them without risk of race conditions.
-     *
-     * Filters out keys that do not exist before returning new keys.
-     *
-     * @see https://redis.io/commands/rename
-     * @see https://redis.io/topics/cluster-spec#keys-hash-tags
-     *
-     * @return array Filtered list of the valid moved keys (only those that existed)
-     */
-    private function renameKeys($redis, array $ids): array
-    {
-        $newIds = [];
-        $uniqueToken = bin2hex(random_bytes(10));
-
-        $results = $this->pipeline(static function () use ($ids, $uniqueToken) {
-            foreach ($ids as $id) {
-                yield 'rename' => [$id, '{'.$id.'}'.$uniqueToken];
-            }
-        }, $redis);
-
-        foreach ($results as $id => $result) {
-            if (true === $result || ($result instanceof Status && Status::get('OK') === $result)) {
-                // Only take into account if ok (key existed), will be false on phpredis if it did not exist
-                $newIds[] = '{'.$id.'}'.$uniqueToken;
-            }
-        }
-
-        return $newIds;
     }
 
     private function getRedisEvictionPolicy(): string

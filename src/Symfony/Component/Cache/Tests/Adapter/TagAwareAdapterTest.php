@@ -19,6 +19,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\LockRegistry;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -200,6 +201,8 @@ class TagAwareAdapterTest extends AdapterTestCase
 
     public function testLog()
     {
+        $lockFiles = LockRegistry::setFiles([__FILE__]);
+
         $logger = $this->createMock(LoggerInterface::class);
         $logger
             ->expects($this->atLeastOnce())
@@ -210,6 +213,8 @@ class TagAwareAdapterTest extends AdapterTestCase
 
         // Computing will produce at least one log
         $cache->get('foo', static function (): string { return 'ccc'; });
+
+        LockRegistry::setFiles($lockFiles);
     }
 
     /**

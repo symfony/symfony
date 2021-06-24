@@ -97,7 +97,7 @@ abstract class AbstractUid implements \JsonSerializable
     abstract public function toBinary(): string;
 
     /**
-     * Returns the identifier as a base-58 case sensitive string.
+     * Returns the identifier as a base58 case sensitive string.
      */
     public function toBase58(): string
     {
@@ -105,7 +105,7 @@ abstract class AbstractUid implements \JsonSerializable
     }
 
     /**
-     * Returns the identifier as a base-32 case insensitive string.
+     * Returns the identifier as a base32 case insensitive string.
      */
     public function toBase32(): string
     {

@@ -377,6 +377,22 @@ class ResponseCacheStrategyTest extends TestCase
             ],
         ];
 
+        yield 's-maxage may be set to 0' => [
+            ['public' => true, 's-maxage' => '0', 'max-age' => null],
+            ['public' => true, 's-maxage' => '0'],
+            [
+                ['public' => true, 's-maxage' => '60'],
+            ],
+        ];
+
+        yield 's-maxage may be set to 0, and works independently from maxage' => [
+            ['public' => true, 's-maxage' => '0', 'max-age' => '30'],
+            ['public' => true, 's-maxage' => '0', 'max-age' => '30'],
+            [
+                ['public' => true, 'max-age' => '60'],
+            ],
+        ];
+
         yield 'result is private when combining private responses' => [
             ['no-cache' => false, 'must-revalidate' => false, 'private' => true],
             ['s-maxage' => 60, 'private' => true],

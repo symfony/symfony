@@ -18,6 +18,9 @@ class LockRegistryTest extends TestCase
 {
     public function testFiles()
     {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('LockRegistry is disabled on Windows');
+        }
         $lockFiles = LockRegistry::setFiles([]);
         LockRegistry::setFiles($lockFiles);
         $expected = array_map('realpath', glob(__DIR__.'/../Adapter/*'));

@@ -177,7 +177,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 
-        ->set('notifier.transport_factory.amazon', AmazonSnsTransportFactory::class)
+        ->set('notifier.transport_factory.amazonsns', AmazonSnsTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
             ->tag('chatter.transport_factory')

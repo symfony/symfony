@@ -13,7 +13,7 @@ jobs:
     runs-on: Ubuntu-20.04
 
     steps:
-      - name: Set up PHP
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.0'
@@ -29,22 +29,19 @@ jobs:
       - name: Checkout PR
         uses: actions/checkout@v2
 
-      - name: Configure composer
+      - name: Install dependencies
         run: |
           COMPOSER_HOME="$(composer config home)"
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-          echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
-
-      - name: Install Psalm
-        run: |
-          echo "::group::modify composer.json"
+          export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
           composer remove --no-update --no-interaction symfony/phpunit-bridge
           composer require --no-update psalm/phar phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher
-          echo "::endgroup::"
+
           echo "::group::composer update"
           composer update --no-progress --ansi
           git checkout composer.json
           echo "::endgroup::"
+
           ./vendor/bin/psalm.phar --version
 
       - name: Generate Psalm baseline

@@ -35,6 +35,7 @@ class TranslatorTest extends TestCase
     protected function setUp(): void
     {
         $this->defaultLocale = \Locale::getDefault();
+        \Locale::setDefault('en');
     }
 
     protected function tearDown(): void
@@ -65,7 +66,6 @@ class TranslatorTest extends TestCase
     public function testTransChoiceWithExplicitLocale($expected, $id, $number)
     {
         $translator = $this->getTranslator();
-        $translator->setLocale('en');
 
         $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
     }
@@ -75,8 +75,6 @@ class TranslatorTest extends TestCase
      */
     public function testTransChoiceWithDefaultLocale($expected, $id, $number)
     {
-        \Locale::setDefault('en');
-
         $translator = $this->getTranslator();
 
         $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
@@ -85,7 +83,6 @@ class TranslatorTest extends TestCase
     public function testGetSetLocale()
     {
         $translator = $this->getTranslator();
-        $translator->setLocale('en');
 
         $this->assertEquals('en', $translator->getLocale());
     }

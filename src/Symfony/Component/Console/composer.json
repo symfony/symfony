@@ -35,6 +35,7 @@
         "psr/log-implementation": "1.0"
     },
     "suggest": {
+        "ext-pcntl": "To listen for terminal resizes",
         "symfony/event-dispatcher": "",
         "symfony/lock": "",
         "symfony/process": "",

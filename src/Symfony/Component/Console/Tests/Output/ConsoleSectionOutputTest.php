@@ -19,6 +19,8 @@ use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Terminal;
+use Symfony\Component\Console\Tests\Fixtures\SizableTerminalMock;
 
 class ConsoleSectionOutputTest extends TestCase
 {
@@ -91,6 +93,21 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals(\PHP_EOL.'foo'.\PHP_EOL."\x1b[1A\x1b[0J\x1b[1A\x1b[0J".'bar'.\PHP_EOL.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
+    public function testClearMoreLinesThenExisting()
+    {
+        [$section,] = $this->prepareSectionsInSizedTerminal(1, 5, 10);
+
+        $section->writeln("foo1");
+        $section->writeln("foo2");
+        $section->clear(10);
+        $section->writeln("foo3");
+        $section->writeln("foo4");
+        $section->clear(1);
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['foo1', 'foo2', "\x1b[2A\x1b[0Jfoo3", 'foo4', "\x1b[1A\x1b[0J"]), stream_get_contents($this->stream));
+    }
+
     public function testOverwrite()
     {
         $sections = [];
@@ -113,6 +130,56 @@ class ConsoleSectionOutputTest extends TestCase
 
         rewind($output->getStream());
         $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.'Baz'.\PHP_EOL.sprintf("\x1b[%dA", 3)."\x1b[0J".'Bar'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
+    public function testOverwriteEmptySection()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->overwrite('Foobar');
+
+        rewind($output->getStream());
+        $this->assertEquals('Foobar'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
+    public function testOverwriteWithFormat()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->overwrite('<info>Foobar</info>');
+
+        rewind($output->getStream());
+        $this->assertEquals('[32mFoobar[39m'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
+    public function testOverwriteWithFormatButDisabledDecoration()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, false, new OutputFormatter());
+
+        $output->overwrite('<info>Foobar</info>');
+
+        rewind($output->getStream());
+        $this->assertEquals('Foobar'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
+    public function testOverwriteWithDirtyLines()
+    {
+        [$section] = $this->prepareSectionsInSizedTerminal(1, 3, 10);
+
+        // write something larger then terminal
+        $section->writeln(implode(\PHP_EOL, ['1', '2', '3', '4', '5']));
+
+        // first two lines are now dirty
+        $section->clear();
+
+        // should only re-write last three lines onto terminal
+        $section->overwrite(implode(\PHP_EOL, ['1', '2', '3', '4', '5']));
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', "\x1b[3A\x1b[0J3", '4', '5', '']), stream_get_contents($this->stream));
     }
 
     public function testAddingMultipleSections()
@@ -138,7 +205,7 @@ class ConsoleSectionOutputTest extends TestCase
         $output2->overwrite('Foobar');
 
         rewind($output->getStream());
-        $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL."\x1b[2A\x1b[0JBar".\PHP_EOL."\x1b[1A\x1b[0JBaz".\PHP_EOL.'Bar'.\PHP_EOL."\x1b[1A\x1b[0JFoobar".\PHP_EOL, stream_get_contents($output->getStream()));
+        $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL."\x1b[2A\x1b[0JBaz".\PHP_EOL.'Bar'.\PHP_EOL."\x1b[1A\x1b[0JFoobar".\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
     public function testClearSectionContainingQuestion()
@@ -159,5 +226,220 @@ class ConsoleSectionOutputTest extends TestCase
 
         rewind($output->getStream());
         $this->assertSame('What\'s your favorite super hero?'.\PHP_EOL."\x1b[2A\x1b[0J", stream_get_contents($output->getStream()));
+    }
+
+    public function testClearAfterOverwriteClearsCorrectNumberOfLines()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->overwrite('foo');
+        $output->clear();
+
+        rewind($output->getStream());
+        $this->assertEquals(implode(\PHP_EOL, ['foo', "\x1b[1A\x1b[0J"]), stream_get_contents($output->getStream()));
+    }
+
+    public function testClearAboveTerminal()
+    {
+        [$section1, $section2] = $this->prepareSectionsInSizedTerminal(2, 3, 10);
+
+        $section1->writeln('foo');
+
+        // push section1 out of terminal
+        $section2->writeln(implode(\PHP_EOL, ['1', '2', '3', '4', '5']));
+
+        // should not trigger re-write as section is not visible
+        $section1->clear();
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['foo', '1', '2', '3', '4', '5', '']), stream_get_contents($this->stream));
+    }
+
+    public function testClearOnTerminalEdge()
+    {
+        [$section1, $section2] = $this->prepareSectionsInSizedTerminal(2, 5, 10);
+
+        $section1->writeln(implode(\PHP_EOL, ['1', '2', '3']));
+
+        // push section1 on edge of terminal
+        $section2->writeln(implode(\PHP_EOL, ['4', '5', '6']));
+
+        $section1->clear();
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6', "\x1b[5A\x1b[0J4", '5', '6', '']), stream_get_contents($this->stream));
+    }
+
+    public function testWriteAboveTerminal()
+    {
+        [$section1, $section2] = $this->prepareSectionsInSizedTerminal(2, 3, 10);
+
+        $section1->writeln('foo');
+
+        // push section1 out of terminal
+        $section2->writeln(implode(\PHP_EOL, ['1', '2', '3', '4', '5']));
+
+        // should not be written as section is not visible on terminal
+        $section1->writeln('bar');
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['foo', '1', '2', '3', '4', '5', '']), stream_get_contents($this->stream));
+    }
+
+    public function testOverwriteAboveTerminal()
+    {
+        [$section] = $this->prepareSectionsInSizedTerminal(1, 3, 10);
+
+        $section->writeln(implode(\PHP_EOL, ['foo', '1', '2', '3', '4', '5']));
+
+        // should have no effect as overwritten portion is not visible
+        $section->overwrite(implode(\PHP_EOL, ['bar', '1', '2', '3', '4', '5']));
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['foo', '1', '2', '3', '4', '5', '']), stream_get_contents($this->stream));
+    }
+
+    public function testOverwriteOnTerminalEdge()
+    {
+        [$section] = $this->prepareSectionsInSizedTerminal(1, 3, 10);
+
+        $section->writeln(implode(\PHP_EOL, ['1', '2', '3', '4', '5']));
+
+        // should overwrite only those lines that are on the terminal
+        $section->overwrite(implode(\PHP_EOL, ['6', '7', '8', '9', '10']));
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', "\x1b[3A\x1b[0J8", '9', '10', '']), stream_get_contents($this->stream));
+    }
+
+    public function testOverwriteAboveTerminalInDifferentSection()
+    {
+        [$section1, $section2] = $this->prepareSectionsInSizedTerminal(2, 3, 10);
+
+        $section1->writeln(implode(\PHP_EOL, ['foo']));
+
+        // push section1 on edge of terminal
+        $section2->writeln(implode(\PHP_EOL, ['1', '2', '3', '4']));
+
+        // should have no effect as section1 is not visible
+        $section1->overwrite('bar');
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['foo', '1', '2', '3', '4', '']), stream_get_contents($this->stream));
+    }
+
+    public function testOverwriteOnTerminalEdgeInDifferentSection()
+    {
+        [$section1, $section2] = $this->prepareSectionsInSizedTerminal(2, 5, 10);
+
+        $section1->writeln(implode(\PHP_EOL, ['1', '2', '3']));
+
+        // push section1 on edge of terminal
+        $section2->writeln(implode(\PHP_EOL, ['4', '5', '6']));
+
+        // should re-write only visible portion of section1
+        $section1->overwrite(implode(\PHP_EOL, ['foo', 'bar', 'baz']));
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6', "\x1b[5A\x1b[0Jbar", 'baz', '4', '5', '6', '']), stream_get_contents($this->stream));
+    }
+
+    public function testOverwriteOnTerminalEdgeWithOverhang()
+    {
+        [$section] = $this->prepareSectionsInSizedTerminal(1, 3, 10);
+
+        $section->writeln(implode(\PHP_EOL, ['1', '2', '3', '4', '5']));
+
+        // should overwrite only those lines that are on the terminal
+        $section->overwrite(implode(\PHP_EOL, ['foo', 'bar', 'bazbazbazbaz', '5']));
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', "\x1b[3A\x1b[0Jbazbazbazbaz", '5', '']), stream_get_contents($this->stream));
+    }
+
+    public function testOverwriteOnTerminalEdgeWithOverhangInDifferentSection()
+    {
+        [$section1, $section2] = $this->prepareSectionsInSizedTerminal(2, 5, 10);
+
+        $section1->writeln(implode(\PHP_EOL, ['1', '2', '3']));
+
+        // push section1 on edge of terminal
+        $section2->writeln(implode(\PHP_EOL, ['4', '5', '6']));
+
+        // should re-write only last text overhanging to two lines
+        $section1->overwrite(implode(\PHP_EOL, ['foo', 'bar', 'bazbazbazbaz']));
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6', "\x1b[5A\x1b[0Jbazbazbazbaz", '4', '5', '6', '']), stream_get_contents($this->stream));
+    }
+
+    public function testClearIsCompletedAfterTerminalResize()
+    {
+        putenv('LINES=3');
+        putenv('COLUMNS=10');
+
+        $terminal = new Terminal();
+
+        $sections = [];
+        $section = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter(), $terminal);
+
+        // content does not fit on terminal
+        $section->writeln(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6']));
+
+        // only visible portion can be cleared
+        $section->clear();
+
+        // resize terminal
+        putenv('LINES=10');
+
+        // any interaction should now finalize the incomplete clear
+        $section->writeln('foo');
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6', "\x1b[3A\x1b[0J\x1b[3A\x1b[0Jfoo", '']), stream_get_contents($this->stream));
+    }
+
+    public function testClearsAreCompletedAfterTerminalResize()
+    {
+        putenv('LINES=3');
+        putenv('COLUMNS=10');
+
+        $terminal = new Terminal();
+
+        $sections = [];
+        $section = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter(), $terminal);
+
+        // content does not fit on terminal
+        $section->writeln(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6']));
+
+        // only visible portion can be cleared
+        $section->clear(4);
+        $section->clear(2);
+
+        // resize terminal
+        putenv('LINES=10');
+
+        // any interaction should now finalize the incomplete clear
+        $section->writeln('foo');
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6', "\x1b[3A\x1b[0J\x1b[3A\x1b[0Jfoo", '']), stream_get_contents($this->stream));
+    }
+
+    /**
+     * @return ConsoleSectionOutput[]
+     */
+    private function prepareSectionsInSizedTerminal(int $numSections, int $terminalHeight, int $terminalWidth): array
+    {
+        // cannot use phpunit mocks as static functions have to be callable for terminal resize listener (de)registration
+        $terminal = new SizableTerminalMock($terminalWidth, $terminalHeight);
+
+        $sections = [];
+        for($i = 0; $i < $numSections; $i++) {
+            new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter(), $terminal);
+        }
+
+        return array_reverse($sections);
     }
 }

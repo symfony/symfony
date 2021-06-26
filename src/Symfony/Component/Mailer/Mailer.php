@@ -38,16 +38,18 @@ final class Mailer implements MailerInterface
 
     public function send(RawMessage $message, Envelope $envelope = null): void
     {
+        // If a bus is not available, send directly to the transport
         if (null === $this->bus) {
             $this->transport->send($message, $envelope);
 
             return;
         }
 
+        // Allows the transformation of a Message and the Envelope before the email is sent
         if (null !== $this->dispatcher) {
-            $clonedMessage = clone $message;
-            $clonedEnvelope = null !== $envelope ? clone $envelope : Envelope::create($clonedMessage);
-            $event = new MessageEvent($clonedMessage, $clonedEnvelope, (string) $this->transport, true);
+            $envelope = null !== $envelope ? $envelope : Envelope::create($message);
+            $event = new MessageEvent($message, $envelope, (string) $this->transport, true);
+
             $this->dispatcher->dispatch($event);
         }
 

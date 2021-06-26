@@ -18,5 +18,5 @@
                 </delete-cookies>
             </logout>
         </firewall>
-    </config>
+    </sec:config>
 </srv:container>

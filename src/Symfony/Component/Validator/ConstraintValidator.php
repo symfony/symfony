@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Polyfill\Intl\Icu\Exception\NotImplementedException;
 
 /**
  * Base class for constraint validators.
@@ -90,10 +92,19 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
             if (class_exists(\IntlDateFormatter::class)) {
                 $formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', null, $dateFormat);
 
-                return $formatter->format(new \DateTime(
-                    $value->format('Y-m-d H:i:s.u'),
-                    new \DateTimeZone('UTC')
-                ));
+                if (!$formatter) {
+                    throw new InvalidOptionsException(intl_get_error_message(), intl_get_error_code());
+                }
+
+                try {
+                    return $formatter->format(
+                        new \DateTime(
+                            $value->format('Y-m-d H:i:s.u'),
+                            new \DateTimeZone('UTC')
+                        )
+                    );
+                } catch (NotImplementedException $e) {
+                }
             }
 
             return $value->format($dateFormat ?? 'Y-m-d H:i:s');

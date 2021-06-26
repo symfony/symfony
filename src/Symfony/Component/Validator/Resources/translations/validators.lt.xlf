@@ -386,6 +386,10 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Ši reišmė neatitinka tarptautinio vertybinių popierių identifikavimo numerio formato (ISIN).</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Ši vertė turėtų būti teisinga išraiška.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -4,7 +4,7 @@ CHANGELOG
 5.4
 ---
 
- * Add support for vertical table rendering
+ * Add support to display table vertically
 
 5.3
 ---

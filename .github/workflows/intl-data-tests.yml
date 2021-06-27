@@ -1,4 +1,4 @@
-name: Intl data tests
+name: Intl data
 
 on:
   push:
@@ -14,7 +14,7 @@ defaults:
 
 jobs:
   tests:
-    name: Tests (intl-data)
+    name: Tests
     runs-on: Ubuntu-20.04
 
     steps:

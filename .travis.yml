@@ -10,6 +10,7 @@ addons:
         - parallel
         - zookeeperd
         - libzookeeper-mt-dev
+        - libsodium-dev
 
 matrix:
     include:

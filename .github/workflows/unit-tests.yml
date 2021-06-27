@@ -57,6 +57,7 @@ jobs:
           git config --global user.email ""
           git config --global user.name "Symfony"
           git config --global init.defaultBranch main
+          git config --global advice.detachedHead false
 
           COMPOSER_HOME="$(composer config home)"
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
@@ -148,7 +149,7 @@ jobs:
         run: |
           _run_tests() {
             local ok=0
-            local title="$1 $FLIP"
+            local title="$1$FLIP"
             local start=$(date -u +%s)
             OUTPUT=$(bash -xc "$2" 2>&1) || ok=1
             local end=$(date -u +%s)

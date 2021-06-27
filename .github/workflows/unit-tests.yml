@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '7.3'
+          - php: '7.4'
           - php: '8.0'
           - php: '7.4'
             mode: high-deps
@@ -203,7 +203,7 @@ jobs:
           [[ ! $X ]] || (exit 1)
 
       - name: Run tests with SIGCHLD enabled PHP
-        if: "${{ matrix.php == '7.3' }}"
+        if: "${{ matrix.php == '7.4' && ! matrix.mode }}"
         run: |
           mkdir build
           cd build

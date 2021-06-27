@@ -13,7 +13,7 @@ addons:
 
 matrix:
     include:
-        - php: 7.4
+        - php: 7.3
     fast_finish: true
 
 cache:

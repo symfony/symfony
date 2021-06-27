@@ -44,29 +44,17 @@ jobs:
           ini-values: "memory_limit=-1"
           php-version: "8.0"
 
-      - name: Configure composer
-        run: |
-          COMPOSER_HOME="$(composer config home)"
-          composer self-update
-          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-          echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
-
-      - name: Determine composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=directory::$(composer config cache-dir)"
-
-      - name: Cache composer dependencies
-        uses: actions/cache@v1
-        with:
-          path: ${{ steps.composer-cache.outputs.directory }}
-          key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ matrix.php }}-composer-
-
       - name: Install dependencies
         run: |
+          COMPOSER_HOME="$(composer config home)"
+          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+          export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
+          echo COMPOSER_ROOT_VERSION=$COMPOSER_ROOT_VERSION >> $GITHUB_ENV
+
           echo "::group::composer update"
           composer update --no-progress --ansi
           echo "::endgroup::"
+
           echo "::group::install phpunit"
           ./phpunit install
           echo "::endgroup::"

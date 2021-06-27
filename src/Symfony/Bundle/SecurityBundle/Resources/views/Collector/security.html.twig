@@ -6,8 +6,10 @@
     {% if collector.token %}
         {% set is_authenticated = collector.enabled and collector.authenticated  %}
         {% set color_code = is_authenticated ? '' : 'yellow' %}
+    {% elseif collector.enabled %}
+        {% set color_code = collector.authenticatorManagerEnabled ? 'yellow' : 'red' %}
     {% else %}
-        {% set color_code = collector.enabled ? 'red' : '' %}
+        {% set color_code = '' %}
     {% endif %}
 
     {% set icon %}
@@ -35,7 +37,7 @@
 
                     <div class="sf-toolbar-info-piece">
                         <b>Authenticated</b>
-                        <span class="sf-toolbar-status sf-toolbar-status-{{ is_authenticated ? 'green' : 'red' }}">{{ is_authenticated ? 'Yes' : 'No' }}</span>
+                        <span class="sf-toolbar-status sf-toolbar-status-{{ is_authenticated ? 'green' : 'yellow' }}">{{ is_authenticated ? 'Yes' : 'No' }}</span>
                     </div>
 
                     <div class="sf-toolbar-info-piece">
@@ -45,7 +47,7 @@
                 {% else %}
                     <div class="sf-toolbar-info-piece">
                         <b>Authenticated</b>
-                        <span class="sf-toolbar-status sf-toolbar-status-red">No</span>
+                        <span class="sf-toolbar-status sf-toolbar-status-yellow">No</span>
                     </div>
                 {% endif %}
 

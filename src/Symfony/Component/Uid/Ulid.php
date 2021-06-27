@@ -20,7 +20,7 @@ namespace Symfony\Component\Uid;
  */
 class Ulid extends AbstractUid
 {
-    private const NIL = '00000000000000000000000000';
+    protected const NIL = '00000000000000000000000000';
 
     private static $time = '';
     private static $rand = [];
@@ -71,6 +71,10 @@ class Ulid extends AbstractUid
         }
 
         if (16 !== \strlen($ulid)) {
+            if (self::NIL === $ulid) {
+                return new NilUlid();
+            }
+
             return new static($ulid);
         }
 
@@ -84,6 +88,10 @@ class Ulid extends AbstractUid
             base_convert(substr($ulid, 22, 5), 16, 32),
             base_convert(substr($ulid, 27, 5), 16, 32)
         );
+
+        if (self::NIL === $ulid) {
+            return new NilUlid();
+        }
 
         $u = new static(self::NIL);
         $u->uid = strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');

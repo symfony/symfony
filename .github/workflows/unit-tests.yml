@@ -1,0 +1,213 @@
+name: PHPUnit
+
+on:
+  push:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  tests:
+    name: Tests
+    runs-on: Ubuntu-20.04
+
+    env:
+      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,mongodb,redis
+
+    strategy:
+      matrix:
+        include:
+          - php: '8.0'
+          - php: '8.0'
+            mode: high-deps
+          - php: '8.0'
+            mode: low-deps
+          - php: '8.1'
+            mode: experimental
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Configure for PHP 8.1
+        if: "${{ matrix.php == '8.1' }}"
+        run: |
+          echo "extensions=mbstring" >> $GITHUB_ENV
+          composer config platform.php 8.0.99
+          composer require --dev --no-update masterminds/html5:~2.7.5@dev
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: "none"
+          ini-values: date.timezone=Europe/Paris,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1
+          php-version: "${{ matrix.php }}"
+          extensions: "${{ env.extensions }}"
+          tools: flex
+
+      - name: Configure environment
+        run: |
+          git config --global user.email ""
+          git config --global user.name "Symfony"
+          git config --global init.defaultBranch main
+
+          COMPOSER_HOME="$(composer config home)"
+          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+
+          echo COLUMNS=120 >> $GITHUB_ENV
+          echo PHPUNIT="$(readlink -f ./phpunit) --exclude-group tty,benchmark,intl-data" >> $GITHUB_ENV
+          echo COMPOSER_UP='composer update --no-progress --ansi' >> $GITHUB_ENV
+
+          SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
+          SYMFONY_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+')
+          SYMFONY_FEATURE_BRANCH=$(curl -s https://flex.symfony.com/versions.json | jq -r '."dev-name"')
+
+          # Install the phpunit-bridge from a PR if required
+          #
+          # To run a PR with a patched phpunit-bridge, first submit the patch for the
+          # phpunit-bridge as a separate PR against the next feature-branch then
+          # uncomment and update the following line with that PR number
+          #SYMFONY_PHPUNIT_BRIDGE_PR=32886
+
+          if [[ $SYMFONY_PHPUNIT_BRIDGE_PR ]]; then
+            git fetch --depth=2 origin refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head
+            git rm -rq src/Symfony/Bridge/PhpUnit
+            git checkout -q FETCH_HEAD -- src/Symfony/Bridge/PhpUnit
+            SYMFONY_PHPUNIT_BRIDGE_REF=$(curl -s https://api.github.com/repos/symfony/symfony/pulls/$SYMFONY_PHPUNIT_BRIDGE_PR | jq -r .base.ref)
+            sed -i 's/"symfony\/phpunit-bridge": ".*"/"symfony\/phpunit-bridge": "'$SYMFONY_PHPUNIT_BRIDGE_REF'.x@dev"/' composer.json
+            rm -rf .phpunit
+          fi
+
+          # Create local composer packages for each patched components and reference them in composer.json files when cross-testing components
+          if [[ ! "${{ matrix.mode }}" = *-deps ]]; then
+              php .github/build-packages.php HEAD^ $SYMFONY_VERSION src/Symfony/Bridge/PhpUnit
+          else
+            echo SYMFONY_DEPRECATIONS_HELPER=weak >> $GITHUB_ENV
+            cp composer.json composer.json.orig
+            echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json
+            php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n')
+            mv composer.json composer.json.phpunit
+            mv composer.json.orig composer.json
+          fi
+          if [[ $SYMFONY_PHPUNIT_BRIDGE_PR ]]; then
+            git rm -fq -- src/Symfony/Bridge/PhpUnit/composer.json
+            git diff --staged -- src/Symfony/Bridge/PhpUnit/ | git apply -R --index
+          fi
+
+          # For the highest branch, in high-deps mode, the version before it is checked out and tested with the locally patched components
+          if [[ "${{ matrix.mode }}" = high-deps && $SYMFONY_VERSION = $(echo "$SYMFONY_VERSIONS" | tail -n 1 | sed s/.//) ]]; then
+            echo FLIP='🙃' >> $GITHUB_ENV
+            SYMFONY_VERSION=$(echo "$SYMFONY_VERSIONS" | grep -FB1 /$SYMFONY_VERSION | head -n 1 | sed s/.//)
+            git fetch --depth=2 origin $SYMFONY_VERSION
+            git checkout -m FETCH_HEAD
+            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h ') >> $GITHUB_ENV
+          fi
+
+          # Skip the phpunit-bridge on bugfix-branches when not in *-deps mode
+          if [[ ! "${{ matrix.mode }}" = *-deps && $SYMFONY_VERSION != $SYMFONY_FEATURE_BRANCH ]]; then
+            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h ') >> $GITHUB_ENV
+          else
+            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h ') >> $GITHUB_ENV
+          fi
+
+          # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
+          [[ "${{ matrix.mode }}" = high-deps && $SYMFONY_VERSION = *.4 ]] && echo LEGACY=,legacy >> $GITHUB_ENV || true
+
+          echo SYMFONY_VERSION=$SYMFONY_VERSION >> $GITHUB_ENV
+          echo COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev >> $GITHUB_ENV
+          echo SYMFONY_REQUIRE=">=$([ '${{ matrix.mode }}' = low-deps ] && echo 3.4 || echo $SYMFONY_VERSION)" >> $GITHUB_ENV
+          [[ "${{ matrix.mode }}" = *-deps ]] && mv composer.json.phpunit composer.json || true
+
+      - name: Install dependencies
+        run: |
+          echo "::group::composer update"
+          $COMPOSER_UP
+          echo "::endgroup::"
+
+          echo "::group::install phpunit"
+          ./phpunit install
+          echo "::endgroup::"
+
+      - name: Patch return types
+        if: "${{ matrix.php == '8.0' && ! matrix.mode }}"
+        run: |
+          sed -i 's/"\*\*\/Tests\/"//' composer.json
+          composer install --optimize-autoloader
+          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php # ensure the script is idempotent
+          echo PHPUNIT="$PHPUNIT,legacy" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: |
+          _run_tests() {
+            local ok=0
+            local title="$1 $FLIP"
+            local start=$(date -u +%s)
+            OUTPUT=$(bash -xc "$2" 2>&1) || ok=1
+            local end=$(date -u +%s)
+
+            if [[ $ok -ne 0 ]]; then
+              printf "\n%-70s%10s\n" $title $(($end-$start))s
+              echo "$OUTPUT"
+              echo -e "\n\\e[41mKO\\e[0m $title\\n"
+            else
+              printf "::group::%-68s%10s\n" $title $(($end-$start))s
+              echo "$OUTPUT"
+              echo -e "\n\\e[32mOK\\e[0m $title\\n\\n::endgroup::"
+            fi
+
+            [[ "${{ matrix.mode }}" = experimental ]] || (exit $ok)
+          }
+          export -f _run_tests
+
+          if [[ ! "${{ matrix.mode }}" = *-deps ]]; then
+            echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} '$PHPUNIT {}'"
+
+            exit 0
+          fi
+
+          (cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb)
+
+          if [[ "${{ matrix.mode }}" = low-deps ]]; then
+            echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} 'cd {} && $COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT'"
+
+            exit 0
+          fi
+
+          # matrix.mode = high-deps
+          echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} 'cd {} && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
+
+          (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
+          COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
+
+          if [[ $COMPONENTS && $SYMFONY_VERSION = *.4 ]]; then
+              export FLIP='🙃'
+              SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
+              echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
+              export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
+              export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
+              git fetch --depth=2 origin $SYMFONY_VERSION
+              git checkout -m FETCH_HEAD
+              COMPONENTS=$(echo "$COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort || true)
+              (cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
+              [[ ! $COMPONENTS ]] || echo "$COMPONENTS" | parallel -j +3 "_run_tests {} 'cd {} && rm composer.lock vendor/ -Rf && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
+          fi
+
+          [[ ! $X ]] || (exit 1)
+
+      - name: Run tests with SIGCHLD enabled PHP
+        if: "${{ matrix.php == '8.0' && ! matrix.mode }}"
+        run: |
+          mkdir build
+          cd build
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.0.2-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.0.2-pcntl-sigchild.tar.bz2
+          cd ..
+
+          ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process

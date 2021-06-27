@@ -36,7 +36,7 @@ class DebugCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        putenv('COLUMNS=');
+        putenv('COLUMNS');
     }
 
     public function testOutput()

@@ -31,6 +31,18 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
 {
     /** @var CommandTester */
     private $passwordEncoderCommandTester;
+    private $colSize;
+
+    protected function setUp(): void
+    {
+        $this->colSize = getenv('COLUMNS');
+        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
+    }
+
+    protected function tearDown(): void
+    {
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
+    }
 
     public function testEncodePasswordEmptySalt()
     {
@@ -316,7 +328,6 @@ EOTXT
 
     protected function setUp(): void
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode']);
         $kernel->boot();
 
@@ -334,7 +345,6 @@ EOTXT
 
     private function setupArgon2i()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode', 'root_config' => 'argon2i.yml']);
         $kernel->boot();
 
@@ -347,7 +357,6 @@ EOTXT
 
     private function setupArgon2id()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode', 'root_config' => 'argon2id.yml']);
         $kernel->boot();
 
@@ -360,7 +369,6 @@ EOTXT
 
     private function setupBcrypt()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode', 'root_config' => 'bcrypt.yml']);
         $kernel->boot();
 
@@ -373,7 +381,6 @@ EOTXT
 
     private function setupSodium()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode', 'root_config' => 'sodium.yml']);
         $kernel->boot();
 

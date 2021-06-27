@@ -61,6 +61,7 @@ jobs:
           COMPOSER_HOME="$(composer config home)"
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
+          echo COLUMNS=120 >> $GITHUB_ENV
           echo PHPUNIT="$(readlink -f ./phpunit) --exclude-group tty,benchmark,intl-data" >> $GITHUB_ENV
           echo COMPOSER_UP='composer update --no-progress --ansi' >> $GITHUB_ENV
 
@@ -149,7 +150,6 @@ jobs:
             local ok=0
             local title="$1 $FLIP"
             local start=$(date -u +%s)
-            export COLUMNS=120
             OUTPUT=$(bash -xc "$2" 2>&1) || ok=1
             local end=$(date -u +%s)
 

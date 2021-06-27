@@ -29,6 +29,19 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
  */
 class FailedMessagesShowCommandTest extends TestCase
 {
+    private $colSize;
+
+    protected function setUp(): void
+    {
+        $this->colSize = getenv('COLUMNS');
+        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
+    }
+
+    protected function tearDown(): void
+    {
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
+    }
+
     /**
      * @group legacy
      */

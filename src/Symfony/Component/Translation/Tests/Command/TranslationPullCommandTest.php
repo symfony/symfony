@@ -27,16 +27,19 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
  */
 class TranslationPullCommandTest extends TranslationProviderTestCase
 {
+    private $colSize;
+
     protected function setUp(): void
     {
-        putenv('COLUMNS=121');
+        $this->colSize = getenv('COLUMNS');
+        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
         parent::setUp();
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-        putenv('COLUMNS');
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     public function testPullNewXlf12Messages()

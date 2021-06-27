@@ -38,7 +38,15 @@ class MemcachedSessionHandlerTest extends TestCase
             $this->markTestSkipped('Tests can only be run with memcached extension 2.1.0 or lower, or 3.0.0b1 or higher');
         }
 
-        $this->memcached = $this->createMock(\Memcached::class);
+        $r = new \ReflectionClass(\Memcached::class);
+        $methodsToMock = array_map(function ($m) { return $m->name; }, $r->getMethods(\ReflectionMethod::IS_PUBLIC));
+        $methodsToMock = array_diff($methodsToMock, ['getDelayed','getDelayedByKey']);
+
+        $this->memcached = $this->getMockBuilder(\Memcached::class)
+            ->disableOriginalConstructor()
+            ->setMethods($methodsToMock)
+            ->getMock();
+
         $this->storage = new MemcachedSessionHandler(
             $this->memcached,
             ['prefix' => self::PREFIX, 'expiretime' => self::TTL]

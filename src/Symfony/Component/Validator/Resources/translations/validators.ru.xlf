@@ -131,24 +131,24 @@
                 <target>Значение должно быть числом.</target>
             </trans-unit>
             <trans-unit id="36">
-                <source>This value is not a valid country.</source>
-                <target>Значение не является допустимой страной.</target>
-            </trans-unit>
-            <trans-unit id="37">
                 <source>This file is not a valid image.</source>
                 <target>Файл не является допустимым форматом изображения.</target>
             </trans-unit>
-            <trans-unit id="38">
+            <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
                 <target>Значение не является допустимым IP адресом.</target>
             </trans-unit>
-            <trans-unit id="39">
+            <trans-unit id="38">
                 <source>This value is not a valid language.</source>
                 <target>Значение не является допустимым языком.</target>
             </trans-unit>
-            <trans-unit id="40">
+            <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
                 <target>Значение не является допустимой локалью.</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>Значение не является допустимой страной.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>

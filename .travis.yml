@@ -13,7 +13,7 @@ addons:
 
 matrix:
     include:
-        - php: 7.4
+        - php: 7.3
     fast_finish: true
 
 cache:
@@ -118,6 +118,6 @@ install:
     - ./phpunit install
 
 script:
-    - echo "$COMPONENTS" | parallel --gnu "tfold {} ./phpunit --exclude-group tty,benchmark,intl-data {}"
+    - echo "$COMPONENTS" | parallel --gnu -j +3 "tfold {} ./phpunit --exclude-group tty,benchmark,intl-data {}"
     - tfold src/Symfony/Component/Console.tty ./phpunit src/Symfony/Component/Console --group tty
     - tfold src/Symfony/Bridge/Twig.tty ./phpunit src/Symfony/Bridge/Twig --group tty

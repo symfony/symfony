@@ -15,19 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Descriptor\TextDescriptor;
 
 class TextDescriptorTest extends AbstractDescriptorTest
 {
-    private $colSize;
-
-    protected function setUp(): void
-    {
-        $this->colSize = getenv('COLUMNS');
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-    }
-
-    protected function tearDown(): void
-    {
-        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
-    }
-
     protected function getDescriptor()
     {
         return new TextDescriptor();

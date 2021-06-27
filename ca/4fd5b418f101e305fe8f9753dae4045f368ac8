@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-06-26T11:28:33Z
+
+Fyi, I just pushed 6713ab3291b3ce41eb7ab5d702000239a460c1e7 to 4.4 to fix the security XML failure (the branch was broken)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-26T21:33:53Z
+
+Greeeen! :green_apple:
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-06-26T21:37:10Z
+
+Greeeat! Thanks a lot of effort @nicolas-grekas and @derrabus! I also love the speed improvement over Travis :)
+
+Fyi: Looking at all the stuff we do, I think it would be good to make some sort of overview of all types of test we run (both to increase the bus factor of our CI configuration and to help contributors discover why things fail). I'll try to come up with a list of test cases I'm aware of in a doc PR shortly :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-26T21:44:34Z
+
+Please do!
+Quickly (for 4.4):
+- 7.1 + x86 + with&without extensions + Windows on appveyor
+- 7.2, 8.0 on GHA
+- 7.4+high-deps, 8.0+low-deps on GHA
+- 8.0 flipped tests on GHA (aka checkout previous version and test with patched deps)
+- 7.3 + tty + zookeeper on Travis-ci
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-26T22:01:05Z
+
+> fatal: couldn't find remote ref 3.4
+
+new transient behavior :)

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-05-16T12:07:25Z
+
+Are you by any chance using the new authenticator system (`enable_authenticator_manager: true`)? I think that messed up this color (you can see "not authenticated" being defined as yellow for the old system on line 8).
+If so, we probably should do this only for the new system. In that case, let's wait on #41139 to be merged as it introduces a way to detect which system is used in the data collector.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2021-05-16T14:13:59Z
+
+@wouterj let me check and I’ll report back soon
+Lets wait for now :)
+
+edit: yes indeed my project uses the new security system
+
+---------------------------------------------------------------------------
+
+by pavol-tk at 2021-06-18T09:30:47Z
+
+I think there should be no extra color if no firewall is matched, element should be black. Consider public website with no auth at all. Should by developer "warned" or "errored" if no firewall match is expected?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-06-18T09:36:55Z
+
+@pavol-tk if a firewall doesn't match, the security block isn't visible in the toolbar. The yellow color is shown when a firewall matches, but a user is not authenticated (this is currently red).
+
+---------------------------------------------------------------------------
+
+by pavol-tk at 2021-06-18T09:45:46Z
+
+@wouterj No firewall matched, and block is visible ...and red ... or am I missing something?
+
+https://user-images.githubusercontent.com/30590523/122542195-b5122080-d02a-11eb-9682-7887177d9757.mp4

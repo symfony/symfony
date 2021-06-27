@@ -57,6 +57,8 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
 
     /**
      * @dataProvider provideCodePointsAt
+     *
+     * @requires extension intl 66.2
      */
     public function testCodePointsAt(array $expected, string $string, int $offset, int $form = null)
     {

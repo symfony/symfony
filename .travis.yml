@@ -10,11 +10,10 @@ addons:
         - parallel
         - zookeeperd
         - libzookeeper-mt-dev
-        - libsodium-dev
 
 matrix:
     include:
-        - php: 7.2
+        - php: 7.4
     fast_finish: true
 
 cache:
@@ -107,9 +106,6 @@ before_install:
           export PHP=$PHP
           phpenv global $PHP
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
-          if ! php --ri sodium > /dev/null; then
-              tfold ext.libsodium tpecl libsodium sodium.so $INI
-          fi
           if [[ $PHP != 8.* ]]; then
               tfold ext.zookeeper tpecl zookeeper-0.7.2 zookeeper.so $INI
           fi

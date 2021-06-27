@@ -27,17 +27,6 @@ class UserPasswordHashCommandTest extends TestCase
     private $passwordHasherCommandTester;
     private $colSize;
 
-    protected function setUp(): void
-    {
-        $this->colSize = getenv('COLUMNS');
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-    }
-
-    protected function tearDown(): void
-    {
-        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
-    }
-
     public function testEncodePasswordEmptySalt()
     {
         $this->passwordHasherCommandTester->execute([
@@ -299,6 +288,9 @@ EOTXT
 
     protected function setUp(): void
     {
+        $this->colSize = getenv('COLUMNS');
+        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
+
         $hasherFactory = new PasswordHasherFactory([
             InMemoryUser::class => ['algorithm' => 'plaintext'],
             'Custom\Class\Native\User' => ['algorithm' => 'native', 'cost' => 10],
@@ -315,6 +307,7 @@ EOTXT
     protected function tearDown(): void
     {
         $this->passwordHasherCommandTester = null;
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     private function setupArgon2i()

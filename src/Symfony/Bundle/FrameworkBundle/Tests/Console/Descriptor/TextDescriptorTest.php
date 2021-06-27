@@ -15,14 +15,17 @@ use Symfony\Bundle\FrameworkBundle\Console\Descriptor\TextDescriptor;
 
 class TextDescriptorTest extends AbstractDescriptorTest
 {
+    private $colSize;
+
     protected function setUp(): void
     {
-        putenv('COLUMNS=121');
+        $this->colSize = getenv('COLUMNS');
+        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
     }
 
     protected function tearDown(): void
     {
-        putenv('COLUMNS');
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     protected function getDescriptor()

@@ -29,14 +29,17 @@ use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler;
  */
 class DebugCommandTest extends TestCase
 {
+    private $colSize;
+
     protected function setUp(): void
     {
+        $this->colSize = getenv('COLUMNS');
         putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
     }
 
     protected function tearDown(): void
     {
-        putenv('COLUMNS');
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     public function testOutput()

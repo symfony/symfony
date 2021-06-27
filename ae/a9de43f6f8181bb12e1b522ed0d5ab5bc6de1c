@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-06-27T06:04:01Z
+
+Hi, thanks for contributing, but I think wrong trans-unit ids small list of ids from RU and LT countries https://github.com/symfony/symfony/pull/41872/files, but not critical :)
+
+---------------------------------------------------------------------------
+
+by danielTiringer at 2021-06-27T06:11:06Z
+
+> Hi, thanks for contributing, but I think wrong trans-unit ids small list of ids from RU and LT countries https://github.com/symfony/symfony/pull/41872/files, but not critical :)
+
+That is a nice catch! :)
+I did double check the Hungarian ones, and thankfully it had no such issues.
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-06-27T07:29:19Z
+
+@danielTiringer thanks for checking 👍💪

@@ -33,17 +33,6 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
     private $passwordEncoderCommandTester;
     private $colSize;
 
-    protected function setUp(): void
-    {
-        $this->colSize = getenv('COLUMNS');
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-    }
-
-    protected function tearDown(): void
-    {
-        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
-    }
-
     public function testEncodePasswordEmptySalt()
     {
         $this->passwordEncoderCommandTester->execute([
@@ -328,6 +317,9 @@ EOTXT
 
     protected function setUp(): void
     {
+        $this->colSize = getenv('COLUMNS');
+        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
+
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode']);
         $kernel->boot();
 
@@ -341,6 +333,7 @@ EOTXT
     protected function tearDown(): void
     {
         $this->passwordEncoderCommandTester = null;
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     private function setupArgon2i()

@@ -18,18 +18,6 @@ use Symfony\Component\Routing\Route;
 class TextDescriptorTest extends AbstractDescriptorTest
 {
     private $fileLinkFormatter = null;
-    private $colSize;
-
-    protected function setUp(): void
-    {
-        $this->colSize = getenv('COLUMNS');
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-    }
-
-    protected function tearDown(): void
-    {
-        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
-    }
 
     protected function getDescriptor()
     {

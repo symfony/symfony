@@ -81,7 +81,7 @@ class PhpSerializer implements SerializerInterface
     /**
      * @internal
      */
-    public static function handleUnserializeCallback($class)
+    public static function handleUnserializeCallback(string $class)
     {
         throw new MessageDecodingFailedException(sprintf('Message class "%s" not found during decoding.', $class));
     }

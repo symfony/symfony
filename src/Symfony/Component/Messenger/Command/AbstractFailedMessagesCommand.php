@@ -15,7 +15,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
@@ -43,21 +42,9 @@ abstract class AbstractFailedMessagesCommand extends Command
 
     private $globalFailureReceiverName;
 
-    /**
-     * @param ServiceProviderInterface $failureTransports
-     */
-    public function __construct(?string $globalFailureReceiverName, $failureTransports)
+    public function __construct(?string $globalFailureReceiverName, ServiceProviderInterface $failureTransports)
     {
         $this->failureTransports = $failureTransports;
-        if (!$failureTransports instanceof ServiceProviderInterface) {
-            trigger_deprecation('symfony/messenger', '5.3', 'Passing a receiver as 2nd argument to "%s()" is deprecated, pass a service locator instead.', __METHOD__);
-
-            if (null === $globalFailureReceiverName) {
-                throw new InvalidArgumentException(sprintf('The argument "globalFailureReceiver" from method "%s()" must be not null if 2nd argument is not a ServiceLocator.', __METHOD__));
-            }
-
-            $this->failureTransports = new ServiceLocator([$globalFailureReceiverName => static function () use ($failureTransports) { return $failureTransports; }]);
-        }
         $this->globalFailureReceiverName = $globalFailureReceiverName;
 
         parent::__construct();
@@ -177,18 +164,10 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
-    /**
-     * @param string|null $name
-     */
-    protected function getReceiver(/* string $name = null */): ReceiverInterface
+    protected function getReceiver(string $name = null): ReceiverInterface
     {
-        if (1 > \func_num_args() && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
-            trigger_error_deprecation('symfony/messenger', '5.3', 'The "%s()" method will have a new "string $name" argument in version 6.0, not defining it is deprecated.', __METHOD__);
-        }
-        $name = \func_num_args() > 0 ? func_get_arg(0) : null;
-
         if (null === $name = $name ?? $this->globalFailureReceiverName) {
-            throw new InvalidArgumentException(sprintf('No default failure transport is defined. Available transports are: "%s".', $name, implode('", "', array_keys($this->failureTransports->getProvidedServices()))));
+            throw new InvalidArgumentException(sprintf('No default failure transport is defined. Available transports are: "%s".', implode('", "', array_keys($this->failureTransports->getProvidedServices()))));
         }
 
         if (!$this->failureTransports->has($name)) {

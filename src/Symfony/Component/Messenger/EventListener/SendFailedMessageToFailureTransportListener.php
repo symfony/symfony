@@ -17,7 +17,6 @@ use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
-use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
  * Sends a rejected message to a "failure transport".
@@ -29,15 +28,8 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
     private $failureSenders;
     private $logger;
 
-    /**
-     * @param ContainerInterface $failureSenders
-     */
-    public function __construct($failureSenders, LoggerInterface $logger = null)
+    public function __construct(ContainerInterface $failureSenders, LoggerInterface $logger = null)
     {
-        if (!$failureSenders instanceof ContainerInterface) {
-            trigger_deprecation('symfony/messenger', '5.3', 'Passing a SenderInterface value as 1st argument to "%s()" is deprecated, pass a ServiceLocator instead.', __METHOD__);
-        }
-
         $this->failureSenders = $failureSenders;
         $this->logger = $logger;
     }
@@ -48,14 +40,11 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
             return;
         }
 
-        if (!$this->hasFailureTransports($event)) {
+        if (!$this->failureSenders->has($event->getReceiverName())) {
             return;
         }
 
-        $failureSender = $this->getFailureSender($event->getReceiverName());
-        if (null === $failureSender) {
-            return;
-        }
+        $failureSender = $this->failureSenders->get($event->getReceiverName());
 
         $envelope = $event->getEnvelope();
 
@@ -85,19 +74,5 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         return [
             WorkerMessageFailedEvent::class => ['onMessageFailed', -100],
         ];
-    }
-
-    private function getFailureSender(string $receiverName): SenderInterface
-    {
-        if ($this->failureSenders instanceof SenderInterface) {
-            return $this->failureSenders;
-        }
-
-        return $this->failureSenders->get($receiverName);
-    }
-
-    private function hasFailureTransports(WorkerMessageFailedEvent $event): bool
-    {
-        return ($this->failureSenders instanceof ContainerInterface && $this->failureSenders->has($event->getReceiverName())) || $this->failureSenders instanceof SenderInterface;
     }
 }

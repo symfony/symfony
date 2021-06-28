@@ -44,7 +44,7 @@ before_install:
 
       # tfold is a helper to create folded reports
       tfold () {
-          local title="$PHP $1 $FLIP"
+          local title="$PHP $1"
           local fold=$(echo $title | sed -r 's/[^-_A-Za-z0-9]+/./g')
           shift
           local id=$(printf %08x $(( RANDOM * RANDOM )))

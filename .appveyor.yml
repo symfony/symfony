@@ -52,7 +52,7 @@ install:
     - php composer.phar global require --no-progress --no-scripts --no-plugins symfony/flex
     - git config --global user.email ""
     - git config --global user.name "Symfony"
-    - FOR /F "tokens=* USEBACKQ" %%F IN (`bash -c "grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+'"`) DO (SET SYMFONY_VERSION=%%F)
+    - FOR /F "tokens=* USEBACKQ" %%F IN (`bash -c "grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -o '[0-9][0-9]*\.[0-9]'"`) DO (SET SYMFONY_VERSION=%%F)
     - php .github/build-packages.php HEAD^ %SYMFONY_VERSION% src\Symfony\Bridge\PhpUnit
     - SET "SYMFONY_REQUIRE=>=%SYMFONY_VERSION%"
     - SET COMPOSER_ROOT_VERSION=%SYMFONY_VERSION%.x-dev

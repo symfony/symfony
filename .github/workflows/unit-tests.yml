@@ -56,6 +56,7 @@ jobs:
           git config --global user.email ""
           git config --global user.name "Symfony"
           git config --global init.defaultBranch main
+          git config --global advice.detachedHead false
 
           COMPOSER_HOME="$(composer config home)"
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
@@ -102,7 +103,7 @@ jobs:
 
           # For the highest branch, in high-deps mode, the version before it is checked out and tested with the locally patched components
           if [[ "${{ matrix.mode }}" = high-deps && $SYMFONY_VERSION = $(echo "$SYMFONY_VERSIONS" | tail -n 1 | sed s/.//) ]]; then
-            echo FLIP='🙃' >> $GITHUB_ENV
+            echo FLIP='^' >> $GITHUB_ENV
             SYMFONY_VERSION=$(echo "$SYMFONY_VERSIONS" | grep -FB1 /$SYMFONY_VERSION | head -n 1 | sed s/.//)
             git fetch --depth=2 origin $SYMFONY_VERSION
             git checkout -m FETCH_HEAD
@@ -147,7 +148,7 @@ jobs:
         run: |
           _run_tests() {
             local ok=0
-            local title="$1 $FLIP"
+            local title="$1$FLIP"
             local start=$(date -u +%s)
             OUTPUT=$(bash -xc "$2" 2>&1) || ok=1
             local end=$(date -u +%s)
@@ -155,7 +156,7 @@ jobs:
             if [[ $ok -ne 0 ]]; then
               printf "\n%-70s%10s\n" $title $(($end-$start))s
               echo "$OUTPUT"
-              echo -e "\n\\e[41mKO\\e[0m $title\\n"
+              echo -e "\n::error::\\e[41mKO\\e[0m $title\\n"
             else
               printf "::group::%-68s%10s\n" $title $(($end-$start))s
               echo "$OUTPUT"
@@ -187,7 +188,7 @@ jobs:
           COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
           if [[ $COMPONENTS && $SYMFONY_VERSION = *.4 ]]; then
-              export FLIP='🙃'
+              export FLIP='^'
               SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
               echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
               export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev

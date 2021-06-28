@@ -30,7 +30,7 @@ class UnstructuredHeader extends AbstractHeader
     /**
      * @param string $body
      */
-    public function setBody($body)
+    public function setBody(mixed $body)
     {
         $this->setValue($body);
     }

@@ -71,11 +71,9 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string $address
-     *
      * @return $this
      */
-    public function returnPath($address)
+    public function returnPath(Address|string $address)
     {
         return $this->setHeaderBody('Path', 'Return-Path', Address::create($address));
     }
@@ -86,11 +84,9 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string $address
-     *
      * @return $this
      */
-    public function sender($address)
+    public function sender(Address|string $address)
     {
         return $this->setHeaderBody('Mailbox', 'Sender', Address::create($address));
     }
@@ -101,21 +97,17 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string ...$addresses
-     *
      * @return $this
      */
-    public function addFrom(...$addresses)
+    public function addFrom(Address|string ...$addresses)
     {
         return $this->addListAddressHeaderBody('From', $addresses);
     }
 
     /**
-     * @param Address|string ...$addresses
-     *
      * @return $this
      */
-    public function from(...$addresses)
+    public function from(Address|string ...$addresses)
     {
         return $this->setListAddressHeaderBody('From', $addresses);
     }
@@ -129,21 +121,17 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string ...$addresses
-     *
      * @return $this
      */
-    public function addReplyTo(...$addresses)
+    public function addReplyTo(Address|string ...$addresses)
     {
         return $this->addListAddressHeaderBody('Reply-To', $addresses);
     }
 
     /**
-     * @param Address|string ...$addresses
-     *
      * @return $this
      */
-    public function replyTo(...$addresses)
+    public function replyTo(Address|string ...$addresses)
     {
         return $this->setListAddressHeaderBody('Reply-To', $addresses);
     }
@@ -157,21 +145,17 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string ...$addresses
-     *
      * @return $this
      */
-    public function addTo(...$addresses)
+    public function addTo(Address|string ...$addresses)
     {
         return $this->addListAddressHeaderBody('To', $addresses);
     }
 
     /**
-     * @param Address|string ...$addresses
-     *
      * @return $this
      */
-    public function to(...$addresses)
+    public function to(Address|string ...$addresses)
     {
         return $this->setListAddressHeaderBody('To', $addresses);
     }
@@ -185,21 +169,17 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string ...$addresses
-     *
      * @return $this
      */
-    public function addCc(...$addresses)
+    public function addCc(Address|string ...$addresses)
     {
         return $this->addListAddressHeaderBody('Cc', $addresses);
     }
 
     /**
-     * @param Address|string ...$addresses
-     *
      * @return $this
      */
-    public function cc(...$addresses)
+    public function cc(Address|string ...$addresses)
     {
         return $this->setListAddressHeaderBody('Cc', $addresses);
     }
@@ -213,21 +193,17 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string ...$addresses
-     *
      * @return $this
      */
-    public function addBcc(...$addresses)
+    public function addBcc(Address|string ...$addresses)
     {
         return $this->addListAddressHeaderBody('Bcc', $addresses);
     }
 
     /**
-     * @param Address|string ...$addresses
-     *
      * @return $this
      */
-    public function bcc(...$addresses)
+    public function bcc(Address|string ...$addresses)
     {
         return $this->setListAddressHeaderBody('Bcc', $addresses);
     }

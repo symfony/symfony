@@ -90,27 +90,21 @@ final class Address
         return sprintf('"%s"', preg_replace('/"/u', '\"', $this->getName()));
     }
 
-    /**
-     * @param Address|string $address
-     */
-    public static function create($address): self
+    public static function create(Address|string $address): self
     {
         if ($address instanceof self) {
             return $address;
         }
-        if (\is_string($address)) {
-            if (false === strpos($address, '<')) {
-                return new self($address);
-            }
 
-            if (!preg_match(self::FROM_STRING_PATTERN, $address, $matches)) {
-                throw new InvalidArgumentException(sprintf('Could not parse "%s" to a "%s" instance.', $address, self::class));
-            }
-
-            return new self($matches['addrSpec'], trim($matches['displayName'], ' \'"'));
+        if (false === strpos($address, '<')) {
+            return new self($address);
         }
 
-        throw new InvalidArgumentException(sprintf('An address can be an instance of Address or a string ("%s" given).', get_debug_type($address)));
+        if (!preg_match(self::FROM_STRING_PATTERN, $address, $matches)) {
+            throw new InvalidArgumentException(sprintf('Could not parse "%s" to a "%s" instance.', $address, self::class));
+        }
+
+        return new self($matches['addrSpec'], trim($matches['displayName'], ' \'"'));
     }
 
     /**

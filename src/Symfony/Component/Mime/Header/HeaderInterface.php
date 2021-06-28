@@ -22,10 +22,8 @@ interface HeaderInterface
      * Sets the body.
      *
      * The type depends on the Header concrete class.
-     *
-     * @param mixed $body
      */
-    public function setBody($body);
+    public function setBody(mixed $body);
 
     /**
      * Gets the body.

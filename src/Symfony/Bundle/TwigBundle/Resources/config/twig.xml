@@ -166,7 +166,7 @@
             <argument type="service" id="twig" />
             <argument type="service" id="twig.error_renderer.html.inner" />
             <argument type="service">
-                <service>
+                <service class="bool">
                     <factory class="Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer" method="isDebug" />
                     <argument type="service" id="request_stack" />
                     <argument>%kernel.debug%</argument>

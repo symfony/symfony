@@ -80,6 +80,7 @@
         "symfony/sms-biuras-notifier": "^5.4|^6.0",
         "symfony/spot-hit-notifier": "^5.4|^6.0",
         "symfony/telegram-notifier": "^5.4|^6.0",
+        "symfony/telnyx-notifier": "^5.4|^6.0",
         "symfony/twilio-notifier": "^5.4|^6.0",
         "symfony/zulip-notifier": "^5.4|^6.0",
         "symfony/process": "^5.4|^6.0",

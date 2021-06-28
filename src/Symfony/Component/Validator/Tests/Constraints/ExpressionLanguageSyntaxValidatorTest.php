@@ -75,6 +75,9 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @group legacy
+     */
     public function testNullWithoutAllowOptionIsNotValid()
     {
         $this->expectExceptionMessage('Expected argument of type "string", "null" given');
@@ -91,6 +94,9 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @group legacy
+     */
     public function testEmptyStringWithoutAllowOptionIsNotValid()
     {
         $this->validator->validate('', new ExpressionLanguageSyntax());

@@ -42,8 +42,8 @@ class ExpressionLanguageSyntax extends Constraint
         $this->allowedVariables = $allowedVariables ?? $this->allowedVariables;
         $this->allowNullAndEmptyString = $allowNullAndEmptyString ?? $this->allowNullAndEmptyString;
 
-        if (isset($options['allowNullAndEmptyString'])) {
-            trigger_deprecation('symfony/validator', '5.4', sprintf('The "allowNullAndEmptyString" option of the "%s" constraint is deprecated.', self::class));
+        if (!$this->allowNullAndEmptyString) {
+            trigger_deprecation('symfony/validator', '5.4', 'Not setting "allowNullAndEmptyString" of the "%s" constraint to "true" is deprecated.', __CLASS__);
         }
     }
 

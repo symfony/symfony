@@ -156,7 +156,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('twig'),
                 service('twig.error_renderer.html.inner'),
-                inline_service(TwigErrorRenderer::class)
+                inline_service('bool')
                     ->factory([TwigErrorRenderer::class, 'isDebug'])
                     ->args([service('request_stack'), param('kernel.debug')]),
             ])

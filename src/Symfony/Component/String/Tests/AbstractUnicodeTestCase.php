@@ -57,11 +57,13 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
 
     /**
      * @dataProvider provideCodePointsAt
-     *
-     * @requires extension intl 66.2
      */
     public function testCodePointsAt(array $expected, string $string, int $offset, int $form = null)
     {
+        if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
+            $this->markTestSkipped('Skipping due to issue ICU-21661.');
+        }
+
         $instance = static::createFromString($string);
         $instance = $form ? $instance->normalize($form) : $instance;
 

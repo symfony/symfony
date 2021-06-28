@@ -104,7 +104,7 @@ jobs:
 
           # For the highest branch, in high-deps mode, the version before it is checked out and tested with the locally patched components
           if [[ "${{ matrix.mode }}" = high-deps && $SYMFONY_VERSION = $(echo "$SYMFONY_VERSIONS" | tail -n 1 | sed s/.//) ]]; then
-            echo FLIP='🙃' >> $GITHUB_ENV
+            echo FLIP='^' >> $GITHUB_ENV
             SYMFONY_VERSION=$(echo "$SYMFONY_VERSIONS" | grep -FB1 /$SYMFONY_VERSION | head -n 1 | sed s/.//)
             git fetch --depth=2 origin $SYMFONY_VERSION
             git checkout -m FETCH_HEAD
@@ -189,7 +189,7 @@ jobs:
           COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
           if [[ $COMPONENTS && $SYMFONY_VERSION = *.4 ]]; then
-              export FLIP='🙃'
+              export FLIP='^'
               SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
               echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
               export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev

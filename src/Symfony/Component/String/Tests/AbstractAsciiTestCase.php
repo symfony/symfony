@@ -36,11 +36,13 @@ abstract class AbstractAsciiTestCase extends TestCase
 
     /**
      * @dataProvider provideBytesAt
-     *
-     * @requires extension intl 66.2
      */
     public function testBytesAt(array $expected, string $string, int $offset, int $form = null)
     {
+        if (!defined('INTL_ICU_VERSION') || !version_compare(\INTL_ICU_VERSION, '66.2', '==')) {
+            self::markTestSkipped('Extension intl with icu4c 66.2 is required.');
+        }
+
         $instance = static::createFromString($string);
         $instance = $form ? $instance->normalize($form) : $instance;
 
@@ -159,11 +161,13 @@ abstract class AbstractAsciiTestCase extends TestCase
 
     /**
      * @dataProvider provideLength
-     *
-     * @requires extension intl 66.2
      */
     public function testLength(int $length, string $string)
     {
+        if (!defined('INTL_ICU_VERSION') || !version_compare(\INTL_ICU_VERSION, '66.2', '==')) {
+            self::markTestSkipped('Extension intl with icu4c 66.2 is required.');
+        }
+
         $instance = static::createFromString($string);
 
         $this->assertSame($length, $instance->length());

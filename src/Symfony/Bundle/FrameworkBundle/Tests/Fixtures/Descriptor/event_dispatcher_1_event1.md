@@ -3,7 +3,7 @@
 ## Listener 1
 
 - Type: `function`
-- Name: `global_function`
+- Name: `var_dump`
 - Priority: `255`
 
 ## Listener 2

@@ -156,7 +156,7 @@ jobs:
             if [[ $ok -ne 0 ]]; then
               printf "\n%-70s%10s\n" $title $(($end-$start))s
               echo "$OUTPUT"
-              echo -e "\n::error::\\e[41mKO\\e[0m $title\\n"
+              echo -e "\n::error::KO $title\\n"
             else
               printf "::group::%-68s%10s\n" $title $(($end-$start))s
               echo "$OUTPUT"

@@ -129,7 +129,7 @@ abstract class Descriptor implements DescriptorInterface
 
     abstract protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null);
 
-    abstract protected function describeContainerParameter($parameter, array $options = []);
+    abstract protected function describeContainerParameter(mixed $parameter, array $options = []);
 
     abstract protected function describeContainerEnvVars(array $envs, array $options = []);
 
@@ -141,19 +141,9 @@ abstract class Descriptor implements DescriptorInterface
      */
     abstract protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = []);
 
-    /**
-     * Describes a callable.
-     *
-     * @param mixed $callable
-     */
-    abstract protected function describeCallable($callable, array $options = []);
+    abstract protected function describeCallable(mixed $callable, array $options = []);
 
-    /**
-     * Formats a value as string.
-     *
-     * @param mixed $value
-     */
-    protected function formatValue($value): string
+    protected function formatValue(mixed $value): string
     {
         if (\is_object($value)) {
             return sprintf('object(%s)', \get_class($value));

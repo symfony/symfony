@@ -139,7 +139,7 @@ class JsonDescriptor extends Descriptor
         $this->writeData($this->getEventDispatcherListenersData($eventDispatcher, $options), $options);
     }
 
-    protected function describeCallable($callable, array $options = [])
+    protected function describeCallable(mixed $callable, array $options = [])
     {
         $this->writeData($this->getCallableData($callable), $options);
     }

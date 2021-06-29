@@ -20,8 +20,6 @@ use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 
 /**
- * Translator.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Translator extends BaseTranslator implements WarmableInterface
@@ -119,7 +117,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         return [];
     }
 
-    public function addResource(string $format, $resource, string $locale, string $domain = null)
+    public function addResource(string $format, mixed $resource, string $locale, string $domain = null)
     {
         if ($this->resourceFiles) {
             $this->addResourceFiles();

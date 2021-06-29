@@ -82,7 +82,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function setParameter(string $name, $value)
+    public function setParameter(string $name, mixed $value)
     {
         $this->getPublicContainer()->setParameter($name, $value);
     }
@@ -90,7 +90,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function set(string $id, $service)
+    public function set(string $id, mixed $service)
     {
         $this->getPublicContainer()->set($id, $service);
     }

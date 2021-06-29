@@ -35,9 +35,9 @@ class HttpCache extends BaseHttpCache
     private $options;
 
     /**
-     * @param string|StoreInterface $cache The cache directory (default used if null) or the storage instance
+     * @param $cache The cache directory (default used if null) or the storage instance
      */
-    public function __construct(KernelInterface $kernel, $cache = null, SurrogateInterface $surrogate = null, array $options = null)
+    public function __construct(KernelInterface $kernel, string|StoreInterface $cache = null, SurrogateInterface $surrogate = null, array $options = null)
     {
         $this->kernel = $kernel;
         $this->surrogate = $surrogate;

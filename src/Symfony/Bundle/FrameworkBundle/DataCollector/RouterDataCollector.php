@@ -16,15 +16,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\DataCollector\RouterDataCollector as BaseRouterDataCollector;
 
 /**
- * RouterDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @final
  */
 class RouterDataCollector extends BaseRouterDataCollector
 {
-    public function guessRoute(Request $request, $controller)
+    public function guessRoute(Request $request, mixed $controller)
     {
         if (\is_array($controller)) {
             $controller = $controller[0];

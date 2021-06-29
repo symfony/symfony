@@ -50,7 +50,7 @@ class Route implements \Serializable
      * @param string|string[] $methods      A required HTTP method or an array of restricted methods
      * @param string|null     $condition    A condition that should evaluate to true for the route to match
      */
-    public function __construct(string $path, array $defaults = [], array $requirements = [], array $options = [], ?string $host = '', $schemes = [], $methods = [], ?string $condition = '')
+    public function __construct(string $path, array $defaults = [], array $requirements = [], array $options = [], ?string $host = '', string|array $schemes = [], string|array $methods = [], ?string $condition = '')
     {
         $this->setPath($path);
         $this->addDefaults($defaults);

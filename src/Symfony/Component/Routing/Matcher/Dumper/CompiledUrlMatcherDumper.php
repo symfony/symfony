@@ -463,7 +463,7 @@ EOF;
     /**
      * @internal
      */
-    public static function export($value): string
+    public static function export(mixed $value): string
     {
         if (null === $value) {
             return 'null';

@@ -222,8 +222,6 @@ class ExprBuilderTest extends TestCase
      *
      * @param array|null $config The config you want to use for the finalization, if nothing provided
      *                           a simple ['key'=>'value'] will be used
-     *
-     * @return array The finalized config values
      */
     protected function finalizeTestBuilder(NodeDefinition $nodeDefinition, ?array $config = null): array
     {
@@ -254,7 +252,7 @@ class ExprBuilderTest extends TestCase
      * @param mixed $value  The value to test
      * @param mixed $config The config values that new to be finalized
      */
-    protected function assertFinalizedValueIs($value, NodeDefinition $nodeDefinition, $config = null)
+    protected function assertFinalizedValueIs($value, NodeDefinition $nodeDefinition, $config = null): void
     {
         $this->assertEquals(['key' => $value], $this->finalizeTestBuilder($nodeDefinition, $config));
     }

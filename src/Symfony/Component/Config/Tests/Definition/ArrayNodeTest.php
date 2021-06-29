@@ -68,11 +68,9 @@ class ArrayNodeTest extends TestCase
     }
 
     /**
-     * @param array|\Exception $expected
-     *
      * @dataProvider ignoreAndRemoveMatrixProvider
      */
-    public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, $expected, string $message = '')
+    public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, array|\Exception $expected, string $message = '')
     {
         if ($expected instanceof \Exception) {
             $this->expectException(\get_class($expected));

@@ -65,36 +65,29 @@ interface NodeInterface
     /**
      * Normalizes a value.
      *
-     * @param mixed $value The value to normalize
-     *
      * @return mixed The normalized value
      *
      * @throws InvalidTypeException if the value type is invalid
      */
-    public function normalize($value);
+    public function normalize(mixed $value);
 
     /**
      * Merges two values together.
-     *
-     * @param mixed $leftSide
-     * @param mixed $rightSide
      *
      * @return mixed The merged value
      *
      * @throws ForbiddenOverwriteException if the configuration path cannot be overwritten
      * @throws InvalidTypeException        if the value type is invalid
      */
-    public function merge($leftSide, $rightSide);
+    public function merge(mixed $leftSide, mixed $rightSide);
 
     /**
      * Finalizes a value.
-     *
-     * @param mixed $value The value to finalize
      *
      * @return mixed The finalized value
      *
      * @throws InvalidTypeException          if the value type is invalid
      * @throws InvalidConfigurationException if the value is invalid configuration
      */
-    public function finalize($value);
+    public function finalize(mixed $value);
 }

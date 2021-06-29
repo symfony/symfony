@@ -32,17 +32,17 @@ class CustomNode implements NodeInterface
         return true;
     }
 
-    public function normalize($value)
+    public function normalize(mixed $value)
     {
         return $value;
     }
 
-    public function merge($leftSide, $rightSide)
+    public function merge(mixed $leftSide, mixed $rightSide)
     {
         return array_merge($leftSide, $rightSide);
     }
 
-    public function finalize($value)
+    public function finalize(mixed $value)
     {
         return $value;
     }

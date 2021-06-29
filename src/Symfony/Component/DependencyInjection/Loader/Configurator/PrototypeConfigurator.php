@@ -78,7 +78,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
      *
      * @return $this
      */
-    final public function exclude($excludes): self
+    final public function exclude(array|string $excludes): self
     {
         $this->excludes = (array) $excludes;
 

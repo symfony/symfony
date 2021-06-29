@@ -67,11 +67,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     /**
      * Processes a value found in a definition tree.
      *
-     * @param mixed $value
-     *
      * @return mixed The processed value
      */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false)
     {
         if (\is_array($value)) {
             foreach ($value as $k => $v) {

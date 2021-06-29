@@ -54,12 +54,11 @@ abstract class AbstractConfigurator
     /**
      * Checks that a value is valid, optionally replacing Definition and Reference configurators by their configure value.
      *
-     * @param mixed $value
-     * @param bool  $allowServices whether Definition and Reference are allowed; by default, only scalars and arrays are
+     * @param bool $allowServices whether Definition and Reference are allowed; by default, only scalars and arrays are
      *
      * @return mixed the value, optionally cast to a Definition/Reference
      */
-    public static function processValue($value, $allowServices = false)
+    public static function processValue(mixed $value, bool $allowServices = false)
     {
         if (\is_array($value)) {
             foreach ($value as $k => $v) {

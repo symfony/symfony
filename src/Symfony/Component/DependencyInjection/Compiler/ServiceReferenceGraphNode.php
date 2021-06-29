@@ -28,11 +28,7 @@ class ServiceReferenceGraphNode
     private $outEdges = [];
     private $value;
 
-    /**
-     * @param string $id    The node identifier
-     * @param mixed  $value The node value
-     */
-    public function __construct(string $id, $value)
+    public function __construct(string $id, mixed $value)
     {
         $this->id = $id;
         $this->value = $value;

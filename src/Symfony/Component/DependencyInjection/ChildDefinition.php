@@ -44,11 +44,9 @@ class ChildDefinition extends Definition
     /**
      * Sets the Definition to inherit from.
      *
-     * @param string $parent
-     *
      * @return $this
      */
-    public function setParent($parent)
+    public function setParent(string $parent)
     {
         $this->parent = $parent;
 
@@ -61,13 +59,11 @@ class ChildDefinition extends Definition
      * If replaceArgument() has been used to replace an argument, this method
      * will return the replacement value.
      *
-     * @param int|string $index
-     *
      * @return mixed The argument value
      *
      * @throws OutOfBoundsException When the argument does not exist
      */
-    public function getArgument($index)
+    public function getArgument(int|string $index)
     {
         if (\array_key_exists('index_'.$index, $this->arguments)) {
             return $this->arguments['index_'.$index];
@@ -84,14 +80,11 @@ class ChildDefinition extends Definition
      * certain conventions when you want to overwrite the arguments of the
      * parent definition, otherwise your arguments will only be appended.
      *
-     * @param int|string $index
-     * @param mixed      $value
-     *
      * @return $this
      *
      * @throws InvalidArgumentException when $index isn't an integer
      */
-    public function replaceArgument($index, $value)
+    public function replaceArgument(int|string $index, mixed $value)
     {
         if (\is_int($index)) {
             $this->arguments['index_'.$index] = $value;

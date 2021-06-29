@@ -25,16 +25,13 @@ class ParameterBag implements ParameterBagInterface
     protected $parameters = [];
     protected $resolved = false;
 
-    /**
-     * @param array $parameters An array of parameters
-     */
     public function __construct(array $parameters = [])
     {
         $this->add($parameters);
     }
 
     /**
-     * Clears all parameters.
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -42,9 +39,7 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Adds parameters to the service container parameters.
-     *
-     * @param array $parameters An array of parameters
+     * {@inheritdoc}
      */
     public function add(array $parameters)
     {
@@ -102,12 +97,9 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Sets a service container parameter.
-     *
-     * @param string $name  The parameter name
-     * @param mixed  $value The parameter value
+     * {@inheritdoc}
      */
-    public function set(string $name, $value)
+    public function set(string $name, mixed $value)
     {
         $this->parameters[$name] = $value;
     }
@@ -121,9 +113,7 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Removes a parameter.
-     *
-     * @param string $name The parameter name
+     * {@inheritdoc}
      */
     public function remove(string $name)
     {
@@ -158,7 +148,6 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Replaces parameter placeholders (%name%) by their values.
      *
-     * @param mixed $value     A value
      * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
      *
      * @return mixed The resolved value
@@ -167,7 +156,7 @@ class ParameterBag implements ParameterBagInterface
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException                    when a given parameter has a type problem
      */
-    public function resolveValue($value, array $resolving = [])
+    public function resolveValue(mixed $value, array $resolving = [])
     {
         if (\is_array($value)) {
             $args = [];
@@ -245,7 +234,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function escapeValue($value)
+    public function escapeValue(mixed $value)
     {
         if (\is_string($value)) {
             return str_replace('%', '%%', $value);
@@ -266,7 +255,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function unescapeValue($value)
+    public function unescapeValue(mixed $value)
     {
         if (\is_string($value)) {
             return str_replace('%%', '%', $value);

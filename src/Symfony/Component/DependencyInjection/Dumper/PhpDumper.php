@@ -84,7 +84,6 @@ class PhpDumper extends Dumper
     private $circularReferences = [];
     private $singleUsePrivateIds = [];
     private $preload = [];
-    private $addThrow = false;
     private $addGetService = false;
     private $locatedIds = [];
     private $serviceLocatorTag;
@@ -151,7 +150,7 @@ class PhpDumper extends Dumper
             'build_time' => time(),
         ], $options);
 
-        $this->addThrow = $this->addGetService = false;
+        $this->addGetService = false;
         $this->namespace = $options['namespace'];
         $this->asFiles = $options['as_files'];
         $this->hotPathTag = $options['hot_path_tag'];
@@ -867,9 +866,7 @@ EOF;
         }
 
         if ($definition->hasErrors() && $e = $definition->getErrors()) {
-            $this->addThrow = true;
-
-            $code .= sprintf("        \$this->throw(%s);\n", $this->export(reset($e)));
+            $code .= sprintf("        throw new RuntimeException(%s);\n", $this->export(reset($e)));
         } else {
             $this->serviceCalls = [];
             $this->inlinedDefinitions = $this->getDefinitionsFromArguments([$definition], null, $this->serviceCalls);
@@ -1632,25 +1629,13 @@ EOF;
 
     private function endClass(): string
     {
-        if ($this->addThrow) {
-            return <<<'EOF'
-
-    protected function throw($message)
-    {
-        throw new RuntimeException($message);
-    }
-}
-
-EOF;
-        }
-
         return <<<'EOF'
 }
 
 EOF;
     }
 
-    private function wrapServiceConditionals($value, string $code): string
+    private function wrapServiceConditionals(mixed $value, string $code): string
     {
         if (!$condition = $this->getServiceConditionals($value)) {
             return $code;
@@ -1662,7 +1647,7 @@ EOF;
         return sprintf("        if (%s) {\n%s        }\n", $condition, $code);
     }
 
-    private function getServiceConditionals($value): string
+    private function getServiceConditionals(mixed $value): string
     {
         $conditions = [];
         foreach (ContainerBuilder::getInitializedConditionals($value) as $service) {
@@ -1728,7 +1713,7 @@ EOF;
     /**
      * @throws RuntimeException
      */
-    private function dumpValue($value, bool $interpolate = true): string
+    private function dumpValue(mixed $value, bool $interpolate = true): string
     {
         if (\is_array($value)) {
             if ($value && $interpolate && false !== $param = array_search($value, $this->container->getParameterBag()->all(), true)) {
@@ -1821,9 +1806,7 @@ EOF;
             }
         } elseif ($value instanceof Definition) {
             if ($value->hasErrors() && $e = $value->getErrors()) {
-                $this->addThrow = true;
-
-                return sprintf('$this->throw(%s)', $this->export(reset($e)));
+                return sprintf('throw new RuntimeException(%s)', $this->export(reset($e)));
             }
             if (null !== $this->definitionVariables && $this->definitionVariables->contains($value)) {
                 return $this->dumpValue($this->definitionVariables[$value], $interpolate);
@@ -1939,9 +1922,7 @@ EOF;
                 }
             } elseif ($this->isTrivialInstance($definition)) {
                 if ($definition->hasErrors() && $e = $definition->getErrors()) {
-                    $this->addThrow = true;
-
-                    return sprintf('$this->throw(%s)', $this->export(reset($e)));
+                    return sprintf('throw new RuntimeException(%s)', $this->export(reset($e)));
                 }
                 $code = $this->addNewInstance($definition, '', $id);
                 if ($definition->isShared() && !isset($this->singleUsePrivateIds[$id])) {
@@ -2100,10 +2081,7 @@ EOF;
         return 1 === \count($ids);
     }
 
-    /**
-     * @return mixed
-     */
-    private function export($value)
+    private function export(mixed $value): mixed
     {
         if (null !== $this->targetDirRegex && \is_string($value) && preg_match($this->targetDirRegex, $value, $matches, \PREG_OFFSET_CAPTURE)) {
             $suffix = $matches[0][1] + \strlen($matches[0][0]);
@@ -2137,10 +2115,7 @@ EOF;
         return $this->doExport($value, true);
     }
 
-    /**
-     * @return mixed
-     */
-    private function doExport($value, bool $resolveEnv = false)
+    private function doExport(mixed $value, bool $resolveEnv = false): mixed
     {
         $shouldCacheValue = $resolveEnv && \is_string($value);
         if ($shouldCacheValue && isset($this->exportedVariables[$value])) {

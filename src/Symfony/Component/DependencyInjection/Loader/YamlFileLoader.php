@@ -148,7 +148,7 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    private function loadContent($content, $path)
+    private function loadContent(array $content, string $path)
     {
         // imports
         $this->parseImports($content, $path);
@@ -335,13 +335,9 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a definition.
-     *
-     * @param array|string|null $service
-     *
      * @throws InvalidArgumentException When tags are invalid
      */
-    private function parseDefinition(string $id, $service, string $file, array $defaults, bool $return = false)
+    private function parseDefinition(string $id, array|string|null $service, string $file, array $defaults, bool $return = false)
     {
         if (preg_match('/^_[a-zA-Z0-9_]*$/', $id)) {
             throw new InvalidArgumentException(sprintf('Service names that start with an underscore are reserved. Rename the "%s" service or define it in XML instead.', $id));
@@ -702,15 +698,9 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a callable.
-     *
-     * @param string|array $callable A callable reference
-     *
      * @throws InvalidArgumentException When errors occur
-     *
-     * @return string|array|Reference A parsed callable
      */
-    private function parseCallable($callable, string $parameter, string $id, string $file)
+    private function parseCallable(mixed $callable, string $parameter, string $id, string $file): string|array|Reference
     {
         if (\is_string($callable)) {
             if ('' !== $callable && '@' === $callable[0]) {
@@ -742,13 +732,11 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a YAML file.
      *
-     * @param string $file
-     *
      * @return array The file content
      *
      * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
      */
-    protected function loadFile($file)
+    protected function loadFile(string $file)
     {
         if (!class_exists(\Symfony\Component\Yaml\Parser::class)) {
             throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed.');
@@ -780,7 +768,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When service file is not valid
      */
-    private function validate($content, string $file): ?array
+    private function validate(mixed $content, string $file): ?array
     {
         if (null === $content) {
             return $content;
@@ -804,12 +792,7 @@ class YamlFileLoader extends FileLoader
         return $content;
     }
 
-    /**
-     * Resolves services.
-     *
-     * @return array|string|Reference|ArgumentInterface
-     */
-    private function resolveServices($value, string $file, bool $isParameter = false)
+    private function resolveServices(mixed $value, string $file, bool $isParameter = false): mixed
     {
         if ($value instanceof TaggedValue) {
             $argument = $value->getValue();
@@ -931,9 +914,6 @@ class YamlFileLoader extends FileLoader
         return $value;
     }
 
-    /**
-     * Loads from Extensions.
-     */
     private function loadFromExtensions(array $content)
     {
         foreach ($content as $namespace => $values) {
@@ -949,9 +929,6 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    /**
-     * Checks the keywords used to define a service.
-     */
     private function checkDefinition(string $id, array $definition, string $file)
     {
         if ($this->isLoadingInstanceof) {

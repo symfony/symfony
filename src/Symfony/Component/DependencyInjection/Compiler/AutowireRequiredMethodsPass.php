@@ -24,7 +24,7 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false)
     {
         $value = parent::processValue($value, $isRoot);
 

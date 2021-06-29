@@ -100,7 +100,7 @@ class Definition
      *
      * @return $this
      */
-    public function setFactory($factory)
+    public function setFactory(string|array|Reference|null $factory)
     {
         $this->changes['factory'] = true;
 
@@ -227,11 +227,9 @@ class Definition
     /**
      * Sets a specific property.
      *
-     * @param mixed $value
-     *
      * @return $this
      */
-    public function setProperty(string $name, $value)
+    public function setProperty(string $name, mixed $value)
     {
         $this->properties[$name] = $value;
 
@@ -241,11 +239,9 @@ class Definition
     /**
      * Adds an argument to pass to the service constructor/factory method.
      *
-     * @param mixed $argument An argument
-     *
      * @return $this
      */
-    public function addArgument($argument)
+    public function addArgument(mixed $argument)
     {
         $this->arguments[] = $argument;
 
@@ -255,14 +251,11 @@ class Definition
     /**
      * Replaces a specific argument.
      *
-     * @param int|string $index
-     * @param mixed      $argument
-     *
      * @return $this
      *
      * @throws OutOfBoundsException When the replaced argument does not exist
      */
-    public function replaceArgument($index, $argument)
+    public function replaceArgument(int|string $index, mixed $argument)
     {
         if (0 === \count($this->arguments)) {
             throw new OutOfBoundsException('Cannot replace arguments if none have been configured yet.');
@@ -284,12 +277,9 @@ class Definition
     /**
      * Sets a specific argument.
      *
-     * @param int|string $key
-     * @param mixed      $value
-     *
      * @return $this
      */
-    public function setArgument($key, $value)
+    public function setArgument(int|string $key, mixed $value)
     {
         $this->arguments[$key] = $value;
 
@@ -309,13 +299,11 @@ class Definition
     /**
      * Gets an argument to pass to the service constructor/factory method.
      *
-     * @param int|string $index
-     *
      * @return mixed The argument value
      *
      * @throws OutOfBoundsException When the argument does not exist
      */
-    public function getArgument($index)
+    public function getArgument(int|string $index)
     {
         if (!\array_key_exists($index, $this->arguments)) {
             throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist.', $index));
@@ -790,11 +778,11 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param string|array|Reference $configurator A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param string|array|Reference|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
-    public function setConfigurator($configurator)
+    public function setConfigurator(string|array|Reference|null $configurator)
     {
         $this->changes['configurator'] = true;
 
@@ -882,11 +870,9 @@ class Definition
     /**
      * Add an error that occurred when building this Definition.
      *
-     * @param string|\Closure|self $error
-     *
      * @return $this
      */
-    public function addError($error)
+    public function addError(string|\Closure|Definition $error)
     {
         if ($error instanceof self) {
             $this->errors = array_merge($this->errors, $error->errors);

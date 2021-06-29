@@ -31,7 +31,7 @@ trait BindTrait
      *
      * @return $this
      */
-    final public function bind(string $nameOrFqcn, $valueOrRef): self
+    final public function bind(string $nameOrFqcn, mixed $valueOrRef): self
     {
         $valueOrRef = static::processValue($valueOrRef, true);
         if (!preg_match('/^(?:(?:array|bool|float|int|string|iterable)[ \t]*+)?\$/', $nameOrFqcn) && !$valueOrRef instanceof Reference) {

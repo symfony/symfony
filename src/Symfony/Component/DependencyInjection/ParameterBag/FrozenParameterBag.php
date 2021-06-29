@@ -53,7 +53,7 @@ class FrozenParameterBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function set(string $name, $value)
+    public function set(string $name, mixed $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }

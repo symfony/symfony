@@ -34,12 +34,9 @@ class JsonResponse extends Response
     protected $encodingOptions = self::DEFAULT_ENCODING_OPTIONS;
 
     /**
-     * @param mixed $data    The response data
-     * @param int   $status  The response status code
-     * @param array $headers An array of response headers
-     * @param bool  $json    If the data is already a JSON string
+     * @param bool $json If the data is already a JSON string
      */
-    public function __construct($data = null, int $status = 200, array $headers = [], bool $json = false)
+    public function __construct(mixed $data = null, int $status = 200, array $headers = [], bool $json = false)
     {
         parent::__construct('', $status, $headers);
 
@@ -123,13 +120,11 @@ class JsonResponse extends Response
     /**
      * Sets the data to be sent as JSON.
      *
-     * @param mixed $data
-     *
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function setData($data = [])
+    public function setData(mixed $data = [])
     {
         try {
             $data = json_encode($data, $this->encodingOptions);

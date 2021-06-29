@@ -95,10 +95,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * sid_bits_per_character, "5"
      * trans_sid_hosts, $_SERVER['HTTP_HOST']
      * trans_sid_tags, "a=href,area=href,frame=src,form="
-     *
-     * @param AbstractProxy|\SessionHandlerInterface|null $handler
      */
-    public function __construct(array $options = [], $handler = null, MetadataBag $metaBag = null)
+    public function __construct(array $options = [], AbstractProxy|\SessionHandlerInterface|null $handler = null, MetadataBag $metaBag = null)
     {
         if (!\extension_loaded('session')) {
             throw new \LogicException('PHP extension "session" is required.');
@@ -385,11 +383,9 @@ class NativeSessionStorage implements SessionStorageInterface
      * @see https://php.net/sessionhandlerinterface
      * @see https://php.net/sessionhandler
      *
-     * @param AbstractProxy|\SessionHandlerInterface|null $saveHandler
-     *
      * @throws \InvalidArgumentException
      */
-    public function setSaveHandler($saveHandler = null)
+    public function setSaveHandler(AbstractProxy|\SessionHandlerInterface|null $saveHandler = null)
     {
         if (!$saveHandler instanceof AbstractProxy &&
             !$saveHandler instanceof \SessionHandlerInterface &&

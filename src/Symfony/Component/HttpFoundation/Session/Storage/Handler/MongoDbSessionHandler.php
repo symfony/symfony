@@ -102,7 +102,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     /**
      * @return bool
      */
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime)
     {
         $this->getCollection()->deleteMany([
             $this->options['expiry_field'] => ['$lt' => new \MongoDB\BSON\UTCDateTime()],
@@ -136,7 +136,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     /**
      * @return bool
      */
-    public function updateTimestamp($sessionId, $data)
+    public function updateTimestamp(string $sessionId, string $data)
     {
         $expiry = new \MongoDB\BSON\UTCDateTime((time() + (int) ini_get('session.gc_maxlifetime')) * 1000);
 

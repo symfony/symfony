@@ -138,11 +138,9 @@ class AcceptHeaderItem
     /**
      * Returns an attribute by its name.
      *
-     * @param mixed $default
-     *
      * @return mixed
      */
-    public function getAttribute(string $name, $default = null)
+    public function getAttribute(string $name, mixed $default = null)
     {
         return $this->attributes[$name] ?? $default;
     }

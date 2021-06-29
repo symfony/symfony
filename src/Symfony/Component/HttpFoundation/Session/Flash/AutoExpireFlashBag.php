@@ -60,7 +60,7 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function add(string $type, $message)
+    public function add(string $type, mixed $message)
     {
         $this->flashes['new'][$type][] = $message;
     }
@@ -122,7 +122,7 @@ class AutoExpireFlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $type, $messages)
+    public function set(string $type, string|array $messages)
     {
         $this->flashes['new'][$type] = (array) $messages;
     }

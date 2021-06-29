@@ -31,7 +31,7 @@ class NullSessionHandler extends AbstractSessionHandler
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function validateId($sessionId)
+    public function validateId(string $sessionId)
     {
         return true;
     }
@@ -48,7 +48,7 @@ class NullSessionHandler extends AbstractSessionHandler
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function updateTimestamp($sessionId, $data)
+    public function updateTimestamp(string $sessionId, string $data)
     {
         return true;
     }
@@ -73,7 +73,7 @@ class NullSessionHandler extends AbstractSessionHandler
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime)
     {
         return true;
     }

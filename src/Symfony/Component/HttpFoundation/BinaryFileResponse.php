@@ -44,7 +44,7 @@ class BinaryFileResponse extends Response
      * @param bool                $autoEtag           Whether the ETag header should be automatically set
      * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
      */
-    public function __construct($file, int $status = 200, array $headers = [], bool $public = true, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
+    public function __construct(\SplFileInfo|string $file, int $status = 200, array $headers = [], bool $public = true, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
     {
         parent::__construct(null, $status, $headers);
 
@@ -58,13 +58,11 @@ class BinaryFileResponse extends Response
     /**
      * Sets the file to stream.
      *
-     * @param \SplFileInfo|string $file The file to stream
-     *
      * @return $this
      *
      * @throws FileException
      */
-    public function setFile($file, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
+    public function setFile(\SplFileInfo|string $file, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
     {
         if (!$file instanceof File) {
             if ($file instanceof \SplFileInfo) {

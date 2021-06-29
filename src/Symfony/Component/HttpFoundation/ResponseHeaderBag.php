@@ -108,7 +108,7 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
-    public function set(string $key, $values, bool $replace = true)
+    public function set(string $key, string|array|null $values, bool $replace = true)
     {
         $uniqueKey = strtr($key, self::UPPER, self::LOWER);
 

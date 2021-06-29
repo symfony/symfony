@@ -59,12 +59,10 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * Constructs a property path from a string.
      *
-     * @param PropertyPath|string $propertyPath The property path as string or instance
-     *
      * @throws InvalidArgumentException     If the given path is not a string
      * @throws InvalidPropertyPathException If the syntax of the property path is not valid
      */
-    public function __construct($propertyPath)
+    public function __construct(PropertyPath|string $propertyPath)
     {
         // Can be used as copy constructor
         if ($propertyPath instanceof self) {
@@ -75,9 +73,6 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $this->pathAsString = $propertyPath->pathAsString;
 
             return;
-        }
-        if (!\is_string($propertyPath)) {
-            throw new InvalidArgumentException(sprintf('The property path constructor needs a string or an instance of "Symfony\Component\PropertyAccess\PropertyPath". Got: "%s".', get_debug_type($propertyPath)));
         }
 
         if ('' === $propertyPath) {

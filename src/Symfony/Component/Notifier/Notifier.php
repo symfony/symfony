@@ -32,7 +32,7 @@ final class Notifier implements NotifierInterface
     /**
      * @param ChannelInterface[]|ContainerInterface $channels
      */
-    public function __construct($channels, ChannelPolicyInterface $policy = null)
+    public function __construct(array|ContainerInterface $channels, ChannelPolicyInterface $policy = null)
     {
         $this->channels = $channels;
         $this->policy = $policy;

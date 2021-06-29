@@ -97,7 +97,7 @@ abstract class BaseNode implements NodeInterface
         self::$placeholders = [];
     }
 
-    public function setAttribute(string $key, $value)
+    public function setAttribute(string $key, mixed $value)
     {
         $this->attributes[$key] = $value;
     }
@@ -105,7 +105,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * @return mixed
      */
-    public function getAttribute(string $key, $default = null)
+    public function getAttribute(string $key, mixed $default = null)
     {
         return $this->attributes[$key] ?? $default;
     }
@@ -156,10 +156,8 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Sets the example configuration for this node.
-     *
-     * @param string|array $example
      */
-    public function setExample($example)
+    public function setExample(string|array $example)
     {
         $this->setAttribute('example', $example);
     }
@@ -176,19 +174,14 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Adds an equivalent value.
-     *
-     * @param mixed $originalValue
-     * @param mixed $equivalentValue
      */
-    public function addEquivalentValue($originalValue, $equivalentValue)
+    public function addEquivalentValue(mixed $originalValue, mixed $equivalentValue)
     {
         $this->equivalentValues[] = [$originalValue, $equivalentValue];
     }
 
     /**
      * Set this node as required.
-     *
-     * @param bool $boolean Required node
      */
     public function setRequired(bool $boolean)
     {
@@ -296,7 +289,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    final public function merge($leftSide, $rightSide)
+    final public function merge(mixed $leftSide, mixed $rightSide)
     {
         if (!$this->allowOverwrite) {
             throw new ForbiddenOverwriteException(sprintf('Configuration path "%s" cannot be overwritten. You have to define all options for this path, and any of its sub-paths in one configuration section.', $this->getPath()));
@@ -337,7 +330,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    final public function normalize($value)
+    final public function normalize(mixed $value)
     {
         $value = $this->preNormalize($value);
 
@@ -377,11 +370,9 @@ abstract class BaseNode implements NodeInterface
     /**
      * Normalizes the value before any other normalization is applied.
      *
-     * @param mixed $value
-     *
      * @return mixed The normalized array value
      */
-    protected function preNormalize($value)
+    protected function preNormalize(mixed $value)
     {
         return $value;
     }
@@ -399,7 +390,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    final public function finalize($value)
+    final public function finalize(mixed $value)
     {
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
             foreach ($placeholders as $placeholder) {
@@ -440,39 +431,30 @@ abstract class BaseNode implements NodeInterface
     /**
      * Validates the type of a Node.
      *
-     * @param mixed $value The value to validate
-     *
      * @throws InvalidTypeException when the value is invalid
      */
-    abstract protected function validateType($value);
+    abstract protected function validateType(mixed $value);
 
     /**
      * Normalizes the value.
      *
-     * @param mixed $value The value to normalize
-     *
      * @return mixed The normalized value
      */
-    abstract protected function normalizeValue($value);
+    abstract protected function normalizeValue(mixed $value);
 
     /**
      * Merges two values together.
      *
-     * @param mixed $leftSide
-     * @param mixed $rightSide
-     *
      * @return mixed The merged value
      */
-    abstract protected function mergeValues($leftSide, $rightSide);
+    abstract protected function mergeValues(mixed $leftSide, mixed $rightSide);
 
     /**
      * Finalizes a value.
      *
-     * @param mixed $value The value to finalize
-     *
      * @return mixed The finalized value
      */
-    abstract protected function finalizeValue($value);
+    abstract protected function finalizeValue(mixed $value);
 
     /**
      * Tests if placeholder values are allowed for this node.
@@ -498,7 +480,7 @@ abstract class BaseNode implements NodeInterface
         return [];
     }
 
-    private static function resolvePlaceholderValue($value)
+    private static function resolvePlaceholderValue(mixed $value)
     {
         if (\is_string($value)) {
             if (isset(self::$placeholders[$value])) {
@@ -515,7 +497,7 @@ abstract class BaseNode implements NodeInterface
         return $value;
     }
 
-    private function doValidateType($value): void
+    private function doValidateType(mixed $value): void
     {
         if (null !== $this->handlingPlaceholder && !$this->allowPlaceholders()) {
             $e = new InvalidTypeException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', static::class, $this->getPath()));

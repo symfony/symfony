@@ -43,20 +43,11 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     private static $template = 'views/error.html.php';
 
     /**
-     * @param bool|callable                 $debug          The debugging mode as a boolean or a callable that should return it
-     * @param string|FileLinkFormatter|null $fileLinkFormat
-     * @param bool|callable                 $outputBuffer   The output buffer as a string or a callable that should return it
+     * @param bool|callable   $debug        The debugging mode as a boolean or a callable that should return it
+     * @param string|callable $outputBuffer The output buffer as a string or a callable that should return it
      */
-    public function __construct($debug = false, string $charset = null, $fileLinkFormat = null, string $projectDir = null, $outputBuffer = '', LoggerInterface $logger = null)
+    public function __construct(bool|callable $debug = false, string $charset = null, string|FileLinkFormatter|null $fileLinkFormat = null, string $projectDir = null, string|callable $outputBuffer = '', LoggerInterface $logger = null)
     {
-        if (!\is_bool($debug) && !\is_callable($debug)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a boolean or a callable, "%s" given.', __METHOD__, get_debug_type($debug)));
-        }
-
-        if (!\is_string($outputBuffer) && !\is_callable($outputBuffer)) {
-            throw new \TypeError(sprintf('Argument 5 passed to "%s()" must be a string or a callable, "%s" given.', __METHOD__, get_debug_type($outputBuffer)));
-        }
-
         $this->debug = $debug;
         $this->charset = $charset ?: (ini_get('default_charset') ?: 'UTF-8');
         $this->fileLinkFormat = $fileLinkFormat ?: (ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format'));

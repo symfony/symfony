@@ -230,7 +230,7 @@ EOF
         );
     }
 
-    private function formatCallable($callable): string
+    private function formatCallable(mixed $callable): string
     {
         if (\is_array($callable)) {
             if (\is_object($callable[0])) {

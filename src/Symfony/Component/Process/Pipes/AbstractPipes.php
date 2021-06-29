@@ -30,7 +30,7 @@ abstract class AbstractPipes implements PipesInterface
     /**
      * @param resource|string|int|float|bool|\Iterator|null $input
      */
-    public function __construct($input)
+    public function __construct(mixed $input)
     {
         if (\is_resource($input) || $input instanceof \Iterator) {
             $this->input = $input;
@@ -171,7 +171,7 @@ abstract class AbstractPipes implements PipesInterface
     /**
      * @internal
      */
-    public function handleError($type, $msg)
+    public function handleError(int $type, string $msg)
     {
         $this->lastError = $msg;
     }

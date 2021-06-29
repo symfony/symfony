@@ -26,10 +26,7 @@ class NotifierHandler extends AbstractHandler
 {
     private $notifier;
 
-    /**
-     * @param string|int $level The minimum logging level at which this handler will be triggered
-     */
-    public function __construct(NotifierInterface $notifier, $level = Logger::ERROR, bool $bubble = true)
+    public function __construct(NotifierInterface $notifier, string|int $level = Logger::ERROR, bool $bubble = true)
     {
         $this->notifier = $notifier;
 

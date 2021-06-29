@@ -26,10 +26,7 @@ final class CodeExtension extends AbstractExtension
     private $charset;
     private $projectDir;
 
-    /**
-     * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
-     */
-    public function __construct($fileLinkFormat, string $projectDir, string $charset)
+    public function __construct(string|FileLinkFormatter $fileLinkFormat, string $projectDir, string $charset)
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->projectDir = str_replace('\\', '/', $projectDir).'/';

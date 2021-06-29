@@ -69,11 +69,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets example configuration.
      *
-     * @param string|array $example
-     *
      * @return $this
      */
-    public function example($example)
+    public function example(string|array $example)
     {
         return $this->attribute('example', $example);
     }
@@ -81,11 +79,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets an attribute on the node.
      *
-     * @param mixed $value
-     *
      * @return $this
      */
-    public function attribute(string $key, $value)
+    public function attribute(string $key, mixed $value)
     {
         $this->attributes[$key] = $value;
 
@@ -104,8 +100,6 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Creates the node.
-     *
-     * @param bool $forceRootNode Whether to force this node as the root node
      *
      * @return NodeInterface
      */
@@ -134,11 +128,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets the default value.
      *
-     * @param mixed $value The default value
-     *
      * @return $this
      */
-    public function defaultValue($value)
+    public function defaultValue(mixed $value)
     {
         $this->default = true;
         $this->defaultValue = $value;
@@ -184,11 +176,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets the equivalent value used when the node contains null.
      *
-     * @param mixed $value
-     *
      * @return $this
      */
-    public function treatNullLike($value)
+    public function treatNullLike(mixed $value)
     {
         $this->nullEquivalent = $value;
 
@@ -198,11 +188,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets the equivalent value used when the node contains true.
      *
-     * @param mixed $value
-     *
      * @return $this
      */
-    public function treatTrueLike($value)
+    public function treatTrueLike(mixed $value)
     {
         $this->trueEquivalent = $value;
 
@@ -212,11 +200,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets the equivalent value used when the node contains false.
      *
-     * @param mixed $value
-     *
      * @return $this
      */
-    public function treatFalseLike($value)
+    public function treatFalseLike(mixed $value)
     {
         $this->falseEquivalent = $value;
 

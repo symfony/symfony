@@ -117,7 +117,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *                                                      register alias
      * @param string[]             $aliasMap                Map of alias to namespace
      */
-    public function __construct($driver, array $namespaces, array $managerParameters, string $driverPattern, $enabledParameter = false, string $configurationPattern = '', string $registerAliasMethodName = '', array $aliasMap = [])
+    public function __construct(Definition|Reference $driver, array $namespaces, array $managerParameters, string $driverPattern, string|false $enabledParameter = false, string $configurationPattern = '', string $registerAliasMethodName = '', array $aliasMap = [])
     {
         $this->driver = $driver;
         $this->namespaces = $namespaces;

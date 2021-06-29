@@ -43,11 +43,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     private $dumper;
     private $sourceContextProvider;
 
-    /**
-     * @param string|FileLinkFormatter|null       $fileLinkFormat
-     * @param DataDumperInterface|Connection|null $dumper
-     */
-    public function __construct(Stopwatch $stopwatch = null, $fileLinkFormat = null, string $charset = null, RequestStack $requestStack = null, $dumper = null)
+    public function __construct(Stopwatch $stopwatch = null, string|FileLinkFormatter|null $fileLinkFormat = null, string $charset = null, RequestStack $requestStack = null, DataDumperInterface|Connection|null $dumper = null)
     {
         $this->stopwatch = $stopwatch;
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
@@ -192,7 +188,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         return $this->dataCount;
     }
 
-    public function getDumps($format, $maxDepthLimit = -1, $maxItemsPerDepth = -1): array
+    public function getDumps(string $format, int $maxDepthLimit = -1, int $maxItemsPerDepth = -1): array
     {
         $data = fopen('php://memory', 'r+');
 

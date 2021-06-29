@@ -293,7 +293,7 @@ EOF
         return $loaderPaths;
     }
 
-    private function getMetadata(string $type, $entity)
+    private function getMetadata(string $type, mixed $entity)
     {
         if ('globals' === $type) {
             return $entity;
@@ -351,7 +351,7 @@ EOF
         return null;
     }
 
-    private function getPrettyMetadata(string $type, $entity, bool $decorated): ?string
+    private function getPrettyMetadata(string $type, mixed $entity, bool $decorated): ?string
     {
         if ('tests' === $type) {
             return '';

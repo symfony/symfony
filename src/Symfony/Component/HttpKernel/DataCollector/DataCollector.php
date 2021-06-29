@@ -44,11 +44,9 @@ abstract class DataCollector implements DataCollectorInterface
      * This array can be displayed in the template using
      * the VarDumper component.
      *
-     * @param mixed $var
-     *
      * @return Data
      */
-    protected function cloneVar($var)
+    protected function cloneVar(mixed $var)
     {
         if ($var instanceof Data) {
             return $var;
@@ -106,7 +104,7 @@ abstract class DataCollector implements DataCollectorInterface
     /**
      * @internal to prevent implementing \Serializable
      */
-    final protected function unserialize($data)
+    final protected function unserialize(string $data)
     {
     }
 }

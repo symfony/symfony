@@ -37,12 +37,8 @@ final class MercureTransport extends AbstractTransport
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct(HubInterface $hub, string $hubId, $topics = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
+    public function __construct(HubInterface $hub, string $hubId, string|array|null $topics = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
-        if (null !== $topics && !\is_array($topics) && !\is_string($topics)) {
-            throw new \TypeError(sprintf('"%s()" expects parameter 3 to be an array of strings, a string or null, "%s" given.', __METHOD__, get_debug_type($topics)));
-        }
-
         $this->hub = $hub;
         $this->hubId = $hubId;
         $this->topics = $topics ?? 'https://symfony.com/notifier';

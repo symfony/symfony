@@ -38,7 +38,7 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describe(OutputInterface $output, $object, array $options = [])
+    public function describe(OutputInterface $output, mixed $object, array $options = [])
     {
         $this->output = $output;
 
@@ -113,7 +113,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param Definition|Alias|object $service
      */
-    abstract protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null);
+    abstract protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null);
 
     /**
      * Describes container services.
@@ -166,12 +166,7 @@ abstract class Descriptor implements DescriptorInterface
         return preg_replace("/\n\s*/s", '', var_export($value, true));
     }
 
-    /**
-     * Formats a parameter.
-     *
-     * @param mixed $value
-     */
-    protected function formatParameter($value): string
+    protected function formatParameter(mixed $value): string
     {
         if (\is_bool($value) || \is_array($value) || (null === $value)) {
             $jsonString = json_encode($value);

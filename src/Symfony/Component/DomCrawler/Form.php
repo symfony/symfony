@@ -315,7 +315,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return bool true if the field exists, false otherwise
      */
-    public function offsetExists($name)
+    public function offsetExists(mixed $name)
     {
         return $this->has($name);
     }
@@ -329,7 +329,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetGet($name)
+    public function offsetGet(mixed $name)
     {
         return $this->fields->get($name);
     }
@@ -342,7 +342,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetSet($name, $value)
+    public function offsetSet(mixed $name, mixed $value)
     {
         $this->fields->set($name, $value);
     }
@@ -352,7 +352,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      */
-    public function offsetUnset($name)
+    public function offsetUnset(mixed $name)
     {
         $this->fields->remove($name);
     }

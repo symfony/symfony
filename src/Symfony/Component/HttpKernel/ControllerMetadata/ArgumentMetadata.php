@@ -33,7 +33,7 @@ class ArgumentMetadata
     /**
      * @param object[] $attributes
      */
-    public function __construct(string $name, ?string $type, bool $isVariadic, bool $hasDefaultValue, $defaultValue, bool $isNullable = false, $attributes = [])
+    public function __construct(string $name, ?string $type, bool $isVariadic, bool $hasDefaultValue, mixed $defaultValue, bool $isNullable = false, array $attributes = [])
     {
         $this->name = $name;
         $this->type = $type;
@@ -41,12 +41,6 @@ class ArgumentMetadata
         $this->hasDefaultValue = $hasDefaultValue;
         $this->defaultValue = $defaultValue;
         $this->isNullable = $isNullable || null === $type || ($hasDefaultValue && null === $defaultValue);
-
-        if (null === $attributes || $attributes instanceof ArgumentInterface) {
-            trigger_deprecation('symfony/http-kernel', '5.3', 'The "%s" constructor expects an array of PHP attributes as last argument, %s given.', __CLASS__, get_debug_type($attributes));
-            $attributes = $attributes ? [$attributes] : [];
-        }
-
         $this->attributes = $attributes;
     }
 

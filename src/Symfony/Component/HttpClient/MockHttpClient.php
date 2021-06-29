@@ -34,7 +34,7 @@ class MockHttpClient implements HttpClientInterface
     /**
      * @param callable|callable[]|ResponseInterface|ResponseInterface[]|iterable|null $responseFactory
      */
-    public function __construct($responseFactory = null, ?string $baseUri = 'https://example.com')
+    public function __construct(callable|iterable|ResponseInterface|null $responseFactory = null, ?string $baseUri = 'https://example.com')
     {
         if ($responseFactory instanceof ResponseInterface) {
             $responseFactory = [$responseFactory];

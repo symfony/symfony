@@ -202,7 +202,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
         }
     }
 
-    private function checkStatusCode($code)
+    private function checkStatusCode(int $code)
     {
         if (500 <= $code) {
             throw new ServerException($this);

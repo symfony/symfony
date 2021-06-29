@@ -342,11 +342,9 @@ trait HttpClientTrait
     }
 
     /**
-     * @param string|string[] $fingerprint
-     *
      * @throws InvalidArgumentException When an invalid fingerprint is passed
      */
-    private static function normalizePeerFingerprint($fingerprint): array
+    private static function normalizePeerFingerprint(mixed $fingerprint): array
     {
         if (\is_string($fingerprint)) {
             switch (\strlen($fingerprint = str_replace(':', '', $fingerprint))) {
@@ -368,11 +366,9 @@ trait HttpClientTrait
     }
 
     /**
-     * @param mixed $value
-     *
      * @throws InvalidArgumentException When the value cannot be json-encoded
      */
-    private static function jsonEncode($value, int $flags = null, int $maxDepth = 512): string
+    private static function jsonEncode(mixed $value, int $flags = null, int $maxDepth = 512): string
     {
         $flags = $flags ?? (\JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_PRESERVE_ZERO_FRACTION);
 

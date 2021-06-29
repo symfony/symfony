@@ -82,13 +82,6 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
     }
 
-    public function testAddInvalidType()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $crawler = $this->createCrawler();
-        $crawler->add(1);
-    }
-
     public function testAddMultipleDocumentNode()
     {
         $this->expectException(\InvalidArgumentException::class);

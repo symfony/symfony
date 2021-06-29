@@ -27,10 +27,7 @@ class ErrorChunk implements ChunkInterface
     private $errorMessage;
     private $error;
 
-    /**
-     * @param \Throwable|string $error
-     */
-    public function __construct(int $offset, $error)
+    public function __construct(int $offset, \Throwable|string $error)
     {
         $this->offset = $offset;
 

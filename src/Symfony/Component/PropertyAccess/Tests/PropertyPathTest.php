@@ -65,18 +65,6 @@ class PropertyPathTest extends TestCase
         new PropertyPath('');
     }
 
-    public function testPathCannotBeNull()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new PropertyPath(null);
-    }
-
-    public function testPathCannotBeFalse()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new PropertyPath(false);
-    }
-
     public function testZeroIsValidPropertyPath()
     {
         $propertyPath = new PropertyPath('0');

@@ -28,8 +28,6 @@ final class OptionConfigurator
     /**
      * Adds allowed types for this option.
      *
-     * @param string ...$types One or more accepted types
-     *
      * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
@@ -50,7 +48,7 @@ final class OptionConfigurator
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function allowedValues(...$values): self
+    public function allowedValues(mixed ...$values): self
     {
         $this->resolver->setAllowedValues($this->name, $values);
 
@@ -60,13 +58,11 @@ final class OptionConfigurator
     /**
      * Sets the default value for this option.
      *
-     * @param mixed $value The default value of the option
-     *
      * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function default($value): self
+    public function default(mixed $value): self
     {
         $this->resolver->setDefault($this->name, $value);
 
@@ -90,7 +86,7 @@ final class OptionConfigurator
      *
      * @return $this
      */
-    public function deprecated(string $package, string $version, $message = 'The option "%name%" is deprecated.'): self
+    public function deprecated(string $package, string $version, string|\Closure $message = 'The option "%name%" is deprecated.'): self
     {
         $this->resolver->setDeprecated($this->name, $package, $version, $message);
 
@@ -99,8 +95,6 @@ final class OptionConfigurator
 
     /**
      * Sets the normalizer for this option.
-     *
-     * @param \Closure $normalizer The normalizer
      *
      * @return $this
      *

@@ -91,7 +91,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListenerPriority(string $eventName, $listener)
+    public function getListenerPriority(string $eventName, callable|array $listener)
     {
         if (empty($this->listeners[$eventName])) {
             return null;
@@ -138,7 +138,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function addListener(string $eventName, $listener, int $priority = 0)
+    public function addListener(string $eventName, callable|array $listener, int $priority = 0)
     {
         $this->listeners[$eventName][$priority][] = $listener;
         unset($this->sorted[$eventName], $this->optimized[$eventName]);
@@ -147,7 +147,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function removeListener(string $eventName, $listener)
+    public function removeListener(string $eventName, callable|array $listener)
     {
         if (empty($this->listeners[$eventName])) {
             return;

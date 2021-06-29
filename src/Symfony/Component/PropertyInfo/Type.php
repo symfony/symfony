@@ -66,7 +66,7 @@ class Type
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $builtinType, bool $nullable = false, string $class = null, bool $collection = false, $collectionKeyType = null, $collectionValueType = null)
+    public function __construct(string $builtinType, bool $nullable = false, string $class = null, bool $collection = false, array|Type|null $collectionKeyType = null, array|Type|null $collectionValueType = null)
     {
         if (!\in_array($builtinType, self::$builtinTypes)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid PHP type.', $builtinType));
@@ -80,14 +80,10 @@ class Type
         $this->collectionValueType = $this->validateCollectionArgument($collectionValueType, 6, '$collectionValueType') ?? [];
     }
 
-    private function validateCollectionArgument($collectionArgument, int $argumentIndex, string $argumentName): ?array
+    private function validateCollectionArgument(array|Type|null $collectionArgument, int $argumentIndex, string $argumentName): ?array
     {
         if (null === $collectionArgument) {
             return null;
-        }
-
-        if (!\is_array($collectionArgument) && !$collectionArgument instanceof self) {
-            throw new \TypeError(sprintf('"%s()": Argument #%d (%s) must be of type "%s[]", "%s" or "null", "%s" given.', __METHOD__, $argumentIndex, $argumentName, self::class, self::class, get_debug_type($collectionArgument)));
         }
 
         if (\is_array($collectionArgument)) {

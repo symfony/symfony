@@ -33,7 +33,7 @@ class ErrorListener implements EventSubscriberInterface
     protected $logger;
     protected $debug;
 
-    public function __construct($controller, LoggerInterface $logger = null, bool $debug = false)
+    public function __construct(string|object|array $controller, LoggerInterface $logger = null, bool $debug = false)
     {
         $this->controller = $controller;
         $this->logger = $logger;

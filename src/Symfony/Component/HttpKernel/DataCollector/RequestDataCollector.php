@@ -214,12 +214,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return new ParameterBag($this->data['request_headers']->getValue());
     }
 
-    public function getRequestServer($raw = false)
+    public function getRequestServer(bool $raw = false)
     {
         return new ParameterBag($this->data['request_server']->getValue($raw));
     }
 
-    public function getRequestCookies($raw = false)
+    public function getRequestCookies(bool $raw = false)
     {
         return new ParameterBag($this->data['request_cookies']->getValue($raw));
     }
@@ -433,11 +433,9 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * Parse a controller.
      *
-     * @param mixed $controller The controller to parse
-     *
      * @return array|string An array of controller data or a simple string
      */
-    protected function parseController($controller)
+    protected function parseController(array|object|string|null $controller)
     {
         if (\is_string($controller) && false !== strpos($controller, '::')) {
             $controller = explode('::', $controller);

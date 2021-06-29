@@ -36,7 +36,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function addListener(string $eventName, $listener, int $priority = 0)
+    public function addListener(string $eventName, callable|array $listener, int $priority = 0)
     {
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');
     }
@@ -52,7 +52,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function removeListener(string $eventName, $listener)
+    public function removeListener(string $eventName, callable|array $listener)
     {
         throw new \BadMethodCallException('Unmodifiable event dispatchers must not be modified.');
     }
@@ -76,7 +76,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListenerPriority(string $eventName, $listener)
+    public function getListenerPriority(string $eventName, callable|array $listener)
     {
         return $this->dispatcher->getListenerPriority($eventName, $listener);
     }

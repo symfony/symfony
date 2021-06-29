@@ -297,7 +297,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     /**
      * Resolves the IP of the host using the local DNS cache if possible.
      */
-    private static function dnsResolve($host, NativeClientState $multi, array &$info, ?\Closure $onProgress): string
+    private static function dnsResolve(string $host, NativeClientState $multi, array &$info, ?\Closure $onProgress): string
     {
         if (null === $ip = $multi->dnsCache[$host] ?? null) {
             $info['debug'] .= "* Hostname was NOT found in DNS cache\n";

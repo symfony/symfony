@@ -464,16 +464,6 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDeprecated('foo', 'vendor/package', '1.1');
     }
 
-    public function testSetDeprecatedFailsIfInvalidDeprecationMessageType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid type for deprecation message argument, expected string or \Closure, but got "bool".');
-        $this->resolver
-            ->setDefined('foo')
-            ->setDeprecated('foo', 'vendor/package', '1.1', true)
-        ;
-    }
-
     public function testLazyDeprecationFailsIfInvalidDeprecationMessageType()
     {
         $this->expectException(InvalidArgumentException::class);

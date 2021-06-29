@@ -48,20 +48,6 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    public function getPathsWithUnexpectedType()
-    {
-        return [
-            ['', 'foobar'],
-            ['foo', 'foobar'],
-            [null, 'foobar'],
-            [123, 'foobar'],
-            [(object) ['prop' => null], 'prop.foobar'],
-            [(object) ['prop' => (object) ['subProp' => null]], 'prop.subProp.foobar'],
-            [['index' => null], '[index][foobar]'],
-            [['index' => ['subIndex' => null]], '[index][subIndex][foobar]'],
-        ];
-    }
-
     public function getPathsWithMissingProperty()
     {
         return [
@@ -278,16 +264,6 @@ class PropertyAccessorTest extends TestCase
     }
 
     /**
-     * @dataProvider getPathsWithUnexpectedType
-     */
-    public function testGetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
-    {
-        $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
-        $this->propertyAccessor->getValue($objectOrArray, $path);
-    }
-
-    /**
      * @dataProvider getValidPropertyPaths
      */
     public function testSetValue($objectOrArray, $path)
@@ -381,16 +357,6 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals('Updated', $author->__call('getMagicCallProperty', []));
     }
 
-    /**
-     * @dataProvider getPathsWithUnexpectedType
-     */
-    public function testSetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
-    {
-        $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
-        $this->propertyAccessor->setValue($objectOrArray, $path, 'value');
-    }
-
     public function testGetValueWhenArrayValueIsNull()
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
@@ -451,14 +417,6 @@ class PropertyAccessorTest extends TestCase
     }
 
     /**
-     * @dataProvider getPathsWithUnexpectedType
-     */
-    public function testIsReadableReturnsFalseIfNotObjectOrArray($objectOrArray, $path)
-    {
-        $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
-    }
-
-    /**
      * @dataProvider getValidPropertyPaths
      */
     public function testIsWritable($objectOrArray, $path)
@@ -509,14 +467,6 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_CALL);
 
         $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
-    }
-
-    /**
-     * @dataProvider getPathsWithUnexpectedType
-     */
-    public function testIsWritableReturnsFalseIfNotObjectOrArray($objectOrArray, $path)
-    {
-        $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
     public function getValidPropertyPaths()

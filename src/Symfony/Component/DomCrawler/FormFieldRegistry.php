@@ -104,11 +104,9 @@ class FormFieldRegistry
     /**
      * Set the value of a field based on the fully qualified name and its children.
      *
-     * @param mixed $value The value
-     *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function set(string $name, $value)
+    public function set(string $name, mixed $value)
     {
         $target = &$this->get($name);
         if ((!\is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {

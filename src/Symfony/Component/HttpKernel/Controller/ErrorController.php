@@ -29,7 +29,7 @@ class ErrorController
     private $controller;
     private $errorRenderer;
 
-    public function __construct(HttpKernelInterface $kernel, $controller, ErrorRendererInterface $errorRenderer)
+    public function __construct(HttpKernelInterface $kernel, string|object|array|null $controller, ErrorRendererInterface $errorRenderer)
     {
         $this->kernel = $kernel;
         $this->controller = $controller;

@@ -245,7 +245,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function escape($value): string
+    protected function escape(string|bool $value): string
     {
         return \is_bool($value) ? ($value ? '1' : '0') : addslashes($value);
     }

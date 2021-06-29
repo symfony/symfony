@@ -211,7 +211,7 @@ class SplCaster
         return $a;
     }
 
-    private static function castSplArray($c, array $a, Stub $stub, bool $isNested): array
+    private static function castSplArray(\ArrayObject|\ArrayIterator $c, array $a, Stub $stub, bool $isNested): array
     {
         $prefix = Caster::PREFIX_VIRTUAL;
         $flags = $c->getFlags();

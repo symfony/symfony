@@ -42,6 +42,21 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testExpressionEmpty()
+    {
+        $this->validator->validate(null, new ExpressionLanguageSyntax([
+            'message' => 'myMessage',
+        ]));
+
+        $this->assertNoViolation();
+
+        $this->validator->validate('', new ExpressionLanguageSyntax([
+            'message' => 'myMessage',
+        ]));
+
+        $this->assertNoViolation();
+    }
+
     public function testExpressionWithAllowedVariableName()
     {
         $this->validator->validate('a + 1', new ExpressionLanguageSyntax([

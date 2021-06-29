@@ -72,7 +72,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false)
     {
         try {
             return $this->doProcessValue($value, $isRoot);
@@ -87,10 +87,7 @@ class AutowirePass extends AbstractRecursivePass
         }
     }
 
-    /**
-     * @return mixed
-     */
-    private function doProcessValue($value, bool $isRoot = false)
+    private function doProcessValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof TypedReference) {
             if ($ref = $this->getAutowiredReference($value)) {
@@ -408,7 +405,7 @@ class AutowirePass extends AbstractRecursivePass
         $this->ambiguousServiceTypes[$type][] = $id;
     }
 
-    private function createTypeNotFoundMessageCallback(TypedReference $reference, string $label): callable
+    private function createTypeNotFoundMessageCallback(TypedReference $reference, string $label): \Closure
     {
         if (null === $this->typesClone->container) {
             $this->typesClone->container = new ContainerBuilder($this->container->getParameterBag());

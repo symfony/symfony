@@ -121,7 +121,7 @@ class DecoratorServicePass extends AbstractRecursivePass
         }
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false)
     {
         if ($value instanceof Reference && $this->innerId === (string) $value) {
             return new Reference($this->currentId, $value->getInvalidBehavior());

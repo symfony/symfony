@@ -93,7 +93,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false)
     {
         if ($value instanceof TypedReference && $value->getType() === (string) $value) {
             // Already checked

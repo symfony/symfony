@@ -33,7 +33,7 @@ final class AliasDeprecatedPublicServicesPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false)
     {
         if ($value instanceof Reference && isset($this->aliases[$id = (string) $value])) {
             return new Reference($this->aliases[$id], $value->getInvalidBehavior());

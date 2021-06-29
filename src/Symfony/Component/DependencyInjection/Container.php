@@ -107,9 +107,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a parameter.
      *
-     * @param string $name The parameter name
-     *
-     * @return array|bool|float|int|string|null The parameter value
+     * @return mixed The parameter value
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
@@ -119,10 +117,6 @@ class Container implements ContainerInterface, ResetInterface
     }
 
     /**
-     * Checks if a parameter exists.
-     *
-     * @param string $name The parameter name
-     *
      * @return bool The presence of parameter in container
      */
     public function hasParameter(string $name)
@@ -130,13 +124,7 @@ class Container implements ContainerInterface, ResetInterface
         return $this->parameterBag->has($name);
     }
 
-    /**
-     * Sets a parameter.
-     *
-     * @param string $name  The parameter name
-     * @param mixed  $value The parameter value
-     */
-    public function setParameter(string $name, $value)
+    public function setParameter(string $name, mixed $value)
     {
         $this->parameterBag->set($name, $value);
     }
@@ -210,9 +198,6 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a service.
      *
-     * @param string $id              The service identifier
-     * @param int    $invalidBehavior The behavior when the service does not exist
-     *
      * @return object|null The associated service
      *
      * @throws ServiceCircularReferenceException When a circular reference is detected
@@ -221,7 +206,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @see Reference
      */
-    public function get(string $id, int $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1)
+    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
         return $this->services[$id]
             ?? $this->services[$id = $this->aliases[$id] ?? $id]
@@ -286,8 +271,6 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Returns true if the given service has actually been initialized.
      *
-     * @param string $id The service identifier
-     *
      * @return bool true if service has already been initialized, false otherwise
      */
     public function initialized(string $id)
@@ -345,11 +328,9 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Camelizes a string.
      *
-     * @param string $id A string to camelize
-     *
      * @return string The camelized string
      */
-    public static function camelize($id)
+    public static function camelize(string $id)
     {
         return strtr(ucwords(strtr($id, ['_' => ' ', '.' => '_ ', '\\' => '_ '])), [' ' => '']);
     }
@@ -357,11 +338,9 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * A string to underscore.
      *
-     * @param string $id The string to underscore
-     *
      * @return string The underscored string
      */
-    public static function underscore($id)
+    public static function underscore(string $id)
     {
         return strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], str_replace('_', '.', $id)));
     }
@@ -369,7 +348,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Creates a service by requiring its factory file.
      */
-    protected function load($file)
+    protected function load(string $file)
     {
         return require $file;
     }
@@ -377,13 +356,11 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Fetches a variable from the environment.
      *
-     * @param string $name The name of the environment variable
-     *
      * @return mixed The value to use for the provided environment variable name
      *
      * @throws EnvNotFoundException When the environment variable is not found and has no default value
      */
-    protected function getEnv($name)
+    protected function getEnv(string $name)
     {
         if (isset($this->resolving[$envName = "env($name)"])) {
             throw new ParameterCircularReferenceException(array_keys($this->resolving));
@@ -419,14 +396,9 @@ class Container implements ContainerInterface, ResetInterface
     }
 
     /**
-     * @param string|false $registry
-     * @param string|bool  $load
-     *
-     * @return mixed
-     *
      * @internal
      */
-    final protected function getService($registry, string $id, ?string $method, $load)
+    final protected function getService(string|false $registry, string $id, ?string $method, string|bool $load): mixed
     {
         if ('service_container' === $id) {
             return $this;

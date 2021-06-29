@@ -27,7 +27,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false)
     {
         if ($value instanceof AbstractArgument && $value->getText().'.' === $value->getTextWithContext()) {
             $value->setContext(sprintf('A value found in service "%s"', $this->currentId));

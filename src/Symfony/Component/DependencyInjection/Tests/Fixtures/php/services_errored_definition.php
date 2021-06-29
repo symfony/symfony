@@ -381,7 +381,7 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
      */
     protected function getRuntimeErrorService()
     {
-        return $this->services['runtime_error'] = new \stdClass($this->throw('Service "errored_definition" is broken.'));
+        return $this->services['runtime_error'] = new \stdClass(throw new RuntimeException('Service "errored_definition" is broken.'));
     }
 
     /**
@@ -475,10 +475,5 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
             'foo' => 'bar',
             'foo_bar' => 'foo_bar',
         ];
-    }
-
-    protected function throw($message)
-    {
-        throw new RuntimeException($message);
     }
 }

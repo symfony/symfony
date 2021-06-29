@@ -381,7 +381,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getRuntimeErrorService()
     {
-        return $this->services['runtime_error'] = new \stdClass($this->throw('Service "errored_definition" is broken.'));
+        return $this->services['runtime_error'] = new \stdClass(throw new RuntimeException('Service "errored_definition" is broken.'));
     }
 
     /**
@@ -474,10 +474,5 @@ class ProjectServiceContainer extends Container
             'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
         ];
-    }
-
-    protected function throw($message)
-    {
-        throw new RuntimeException($message);
     }
 }

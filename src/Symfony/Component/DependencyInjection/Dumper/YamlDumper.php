@@ -225,12 +225,8 @@ class YamlDumper extends Dumper
 
     /**
      * Dumps callable to YAML format.
-     *
-     * @param mixed $callable
-     *
-     * @return mixed
      */
-    private function dumpCallable($callable)
+    private function dumpCallable(mixed $callable): mixed
     {
         if (\is_array($callable)) {
             if ($callable[0] instanceof Reference) {
@@ -246,11 +242,9 @@ class YamlDumper extends Dumper
     /**
      * Dumps the value to YAML format.
      *
-     * @return mixed
-     *
      * @throws RuntimeException When trying to dump object or resource
      */
-    private function dumpValue($value)
+    private function dumpValue(mixed $value): mixed
     {
         if ($value instanceof ServiceClosureArgument) {
             $value = $value->getValues()[0];

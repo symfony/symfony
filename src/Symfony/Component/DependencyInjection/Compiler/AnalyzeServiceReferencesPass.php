@@ -76,7 +76,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
         }
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false)
     {
         $lazy = $this->lazy;
         $inExpression = $this->inExpression();

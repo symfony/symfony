@@ -39,12 +39,12 @@ interface ContextualValidatorInterface
      * {@link \Symfony\Component\Validator\Constraints\Valid} is assumed.
      *
      * @param mixed                                                 $value       The value to validate
-     * @param Constraint|Constraint[]                               $constraints The constraint(s) to validate against
+     * @param Constraint|Constraint[]|null                          $constraints The constraint(s) to validate against
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups      The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return $this
      */
-    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array|null $groups = null);
+    public function validate(mixed $value, Constraint|array|null $constraints = null, string|GroupSequence|array|null $groups = null);
 
     /**
      * Validates a property of an object against the constraints specified

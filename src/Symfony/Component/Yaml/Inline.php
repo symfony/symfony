@@ -116,7 +116,7 @@ class Inline
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    public static function dump($value, int $flags = 0): string
+    public static function dump(mixed $value, int $flags = 0): string
     {
         switch (true) {
             case \is_resource($value):

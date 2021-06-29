@@ -37,16 +37,9 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     private $plural;
     private $constraint;
     private $code;
-
-    /**
-     * @var mixed
-     */
     private $cause;
 
-    /**
-     * @param string $message The error message as a string or a stringable object
-     */
-    public function __construct(ConstraintViolationList $violations, Constraint $constraint, $message, array $parameters, mixed $root, ?string $propertyPath, mixed $invalidValue, TranslatorInterface $translator, string $translationDomain = null)
+    public function __construct(ConstraintViolationList $violations, Constraint $constraint, string|\Stringable $message, array $parameters, mixed $root, ?string $propertyPath, mixed $invalidValue, TranslatorInterface $translator, string $translationDomain = null)
     {
         $this->violations = $violations;
         $this->message = $message;
@@ -102,7 +95,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setInvalidValue($invalidValue)
+    public function setInvalidValue(mixed $invalidValue)
     {
         $this->invalidValue = $invalidValue;
 
@@ -132,7 +125,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setCause($cause)
+    public function setCause(mixed $cause)
     {
         $this->cause = $cause;
 

@@ -225,7 +225,7 @@ class ExprBuilderTest extends TestCase
      *
      * @return array The finalized config values
      */
-    protected function finalizeTestBuilder(NodeDefinition $nodeDefinition, ?array $config = null): array
+    protected function finalizeTestBuilder(NodeDefinition $nodeDefinition, array $config = null): array
     {
         return $nodeDefinition
             ->end()

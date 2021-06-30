@@ -27,6 +27,8 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  */
 final class FixedWindowLimiter implements LimiterInterface
 {
+    use ResetLimiterTrait;
+
     private $id;
     private $limit;
     private $storage;
@@ -40,8 +42,6 @@ final class FixedWindowLimiter implements LimiterInterface
      * @var LockInterface
      */
     private $lock;
-
-    use ResetLimiterTrait;
 
     public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
     {

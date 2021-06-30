@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
  */
 class PrototypeConfigurator extends AbstractServiceConfigurator
 {
-    public const FACTORY = 'load';
-
     use Traits\AbstractTrait;
     use Traits\ArgumentTrait;
     use Traits\AutoconfigureTrait;
@@ -36,6 +34,8 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
     use Traits\PublicTrait;
     use Traits\ShareTrait;
     use Traits\TagTrait;
+
+    public const FACTORY = 'load';
 
     private $loader;
     private $resource;

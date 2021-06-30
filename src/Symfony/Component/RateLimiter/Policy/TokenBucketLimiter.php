@@ -26,6 +26,8 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
  */
 final class TokenBucketLimiter implements LimiterInterface
 {
+    use ResetLimiterTrait;
+
     private $id;
     private $maxBurst;
     private $rate;
@@ -35,8 +37,6 @@ final class TokenBucketLimiter implements LimiterInterface
      * @var LockInterface
      */
     private $lock;
-
-    use ResetLimiterTrait;
 
     public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, LockInterface $lock = null)
     {

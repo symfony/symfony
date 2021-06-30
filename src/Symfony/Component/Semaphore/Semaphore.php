@@ -96,7 +96,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function refresh(?float $ttlInSecond = null)
+    public function refresh(float $ttlInSecond = null)
     {
         if (null === $ttlInSecond) {
             $ttlInSecond = $this->ttlInSecond;

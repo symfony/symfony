@@ -25,7 +25,7 @@ class BeanstalkdSender implements SenderInterface
     private $connection;
     private $serializer;
 
-    public function __construct(Connection $connection, ?SerializerInterface $serializer = null)
+    public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
         $this->connection = $connection;
         $this->serializer = $serializer ?? new PhpSerializer();

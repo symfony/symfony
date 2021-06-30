@@ -154,7 +154,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * @return $this
      */
-    public function addDefaultChildrenIfNoneSet(int|string|array|null $children = null)
+    public function addDefaultChildrenIfNoneSet(int|string|array $children = null)
     {
         $this->addDefaultChildren = $children;
 

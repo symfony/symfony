@@ -63,7 +63,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array|null $groups = null)
+    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null)
     {
         $violations = $this->validator->validate($value, $constraints, $groups);
 
@@ -107,7 +107,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array|null $groups = null)
+    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null)
     {
         return $this->validator->validateProperty($object, $propertyName, $groups);
     }
@@ -115,7 +115,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array|null $groups = null)
+    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null)
     {
         return $this->validator->validatePropertyValue($objectOrClass, $propertyName, $value, $groups);
     }

@@ -32,7 +32,7 @@ final class Definition
      * @param Transition[]         $transitions
      * @param string|string[]|null $initialPlaces
      */
-    public function __construct(array $places, array $transitions, string|array|null $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
+    public function __construct(array $places, array $transitions, string|array $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -76,7 +76,7 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlaces(string|array|null $places = null)
+    private function setInitialPlaces(string|array $places = null)
     {
         if (!$places) {
             return;

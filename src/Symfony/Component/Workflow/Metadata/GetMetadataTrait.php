@@ -18,7 +18,7 @@ use Symfony\Component\Workflow\Transition;
  */
 trait GetMetadataTrait
 {
-    public function getMetadata(string $key, string|Transition|null $subject = null)
+    public function getMetadata(string $key, string|Transition $subject = null)
     {
         if (null === $subject) {
             return $this->getWorkflowMetadata()[$key] ?? null;

@@ -33,23 +33,27 @@ class AbstractTokenTest extends TestCase
         $token->setUser(new TestUser('fabien'));
         $this->assertEquals('fabien', $token->getUsername());
 
-        $legacyUser = new class implements UserInterface {
+        $legacyUser = new class() implements UserInterface {
             public function getUsername()
             {
                 return 'fabien';
             }
 
             public function getRoles()
-            {}
+            {
+            }
 
             public function getPassword()
-            {}
+            {
+            }
 
             public function getSalt()
-            {}
+            {
+            }
 
             public function eraseCredentials()
-            {}
+            {
+            }
         };
         $token->setUser($legacyUser);
         $this->assertEquals('fabien', $token->getUsername());

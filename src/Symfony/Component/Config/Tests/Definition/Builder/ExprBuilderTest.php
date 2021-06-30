@@ -223,7 +223,7 @@ class ExprBuilderTest extends TestCase
      * @param array|null $config The config you want to use for the finalization, if nothing provided
      *                           a simple ['key'=>'value'] will be used
      */
-    protected function finalizeTestBuilder(NodeDefinition $nodeDefinition, ?array $config = null): array
+    protected function finalizeTestBuilder(NodeDefinition $nodeDefinition, array $config = null): array
     {
         return $nodeDefinition
             ->end()

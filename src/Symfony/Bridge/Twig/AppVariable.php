@@ -152,7 +152,7 @@ class AppVariable
      *
      * @return array
      */
-    public function getFlashes(string|array|null $types = null)
+    public function getFlashes(string|array $types = null)
     {
         try {
             if (null === $session = $this->getSession()) {

@@ -24,7 +24,7 @@ final class Validation
     /**
      * Creates a callable chain of constraints.
      */
-    public static function createCallable(Constraint|ValidatorInterface|null $constraintOrValidator = null, Constraint ...$constraints): callable
+    public static function createCallable(Constraint|ValidatorInterface $constraintOrValidator = null, Constraint ...$constraints): callable
     {
         $validator = self::createIsValidCallable($constraintOrValidator, ...$constraints);
 
@@ -42,7 +42,7 @@ final class Validation
      *
      * @return callable(mixed $value, ConstraintViolationListInterface &$violations = null): bool
      */
-    public static function createIsValidCallable(Constraint|ValidatorInterface|null $constraintOrValidator = null, Constraint ...$constraints): callable
+    public static function createIsValidCallable(Constraint|ValidatorInterface $constraintOrValidator = null, Constraint ...$constraints): callable
     {
         $validator = $constraintOrValidator;
 

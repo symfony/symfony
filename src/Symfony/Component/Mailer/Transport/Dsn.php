@@ -25,7 +25,7 @@ final class Dsn
     private $port;
     private $options;
 
-    public function __construct(string $scheme, string $host, ?string $user = null, ?string $password = null, ?int $port = null, array $options = [])
+    public function __construct(string $scheme, string $host, string $user = null, string $password = null, int $port = null, array $options = [])
     {
         $this->scheme = $scheme;
         $this->host = $host;

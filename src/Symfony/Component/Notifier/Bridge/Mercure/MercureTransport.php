@@ -37,7 +37,7 @@ final class MercureTransport extends AbstractTransport
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct(HubInterface $hub, string $hubId, string|array|null $topics = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
+    public function __construct(HubInterface $hub, string $hubId, string|array $topics = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->hub = $hub;
         $this->hubId = $hubId;

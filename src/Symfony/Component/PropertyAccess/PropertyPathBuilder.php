@@ -21,7 +21,7 @@ class PropertyPathBuilder
     private $elements = [];
     private $isIndex = [];
 
-    public function __construct(PropertyPathInterface|string|null $path = null)
+    public function __construct(PropertyPathInterface|string $path = null)
     {
         if (null !== $path) {
             $this->append($path);

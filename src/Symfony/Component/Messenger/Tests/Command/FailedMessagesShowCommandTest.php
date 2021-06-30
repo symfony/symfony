@@ -186,10 +186,9 @@ EOF
         $expectedLoadingMessage = <<<EOF
 > Available failure transports are: failure_receiver, failure_receiver_2, failure_receiver_3
 EOF;
-        
+
         $this->assertStringContainsString($expectedLoadingMessage, $tester->getDisplay());
         $this->assertStringContainsString('Run messenger:failed:show {id} --transport=failure_receiver -vv to see message details.', $tester->getDisplay());
-        
     }
 
     public function testListMessagesReturnsNoMessagesFoundWithServiceLocator()

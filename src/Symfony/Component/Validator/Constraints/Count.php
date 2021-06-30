@@ -42,7 +42,7 @@ class Count extends Constraint
     public $divisibleBy;
 
     public function __construct(
-        int|array|null $exactly = null,
+        int|array $exactly = null,
         int $min = null,
         int $max = null,
         int $divisibleBy = null,

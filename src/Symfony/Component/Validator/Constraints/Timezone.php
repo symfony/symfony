@@ -42,7 +42,7 @@ class Timezone extends Constraint
     ];
 
     public function __construct(
-        int|array|null $zone = null,
+        int|array $zone = null,
         string $message = null,
         string $countryCode = null,
         bool $intlCompatible = null,

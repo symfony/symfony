@@ -44,7 +44,7 @@ class Length extends Constraint
     public $normalizer;
 
     public function __construct(
-        int|array|null $exactly = null,
+        int|array $exactly = null,
         int $min = null,
         int $max = null,
         string $charset = null,

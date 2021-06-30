@@ -242,6 +242,7 @@ class MockHttpClientTest extends HttpClientTestCase
 
             case 'testHandleIsRemovedOnException':
                 $this->markTestSkipped("MockHttpClient doesn't cache handles");
+                break;
 
             case 'testPause':
             case 'testPauseReplace':

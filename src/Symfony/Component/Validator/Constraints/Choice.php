@@ -52,7 +52,7 @@ class Choice extends Constraint
     }
 
     public function __construct(
-        string|array|null $choices = null,
+        string|array $choices = null,
         callable|string $callback = null,
         bool $multiple = null,
         bool $strict = null,

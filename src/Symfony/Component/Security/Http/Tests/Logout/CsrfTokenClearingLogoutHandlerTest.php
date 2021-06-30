@@ -33,7 +33,7 @@ class CsrfTokenClearingLogoutHandlerTest extends TestCase
         $this->session = new Session(new MockArraySessionStorage());
 
         // BC for symfony/security-core < 5.3
-        if (\method_exists(SessionTokenStorage::class, 'getSession')) {
+        if (method_exists(SessionTokenStorage::class, 'getSession')) {
             $request = new Request();
             $request->setSession($this->session);
             $this->requestStack = new RequestStack();

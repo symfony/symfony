@@ -138,6 +138,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
         $this->assertSame(0, self::getContainer()->get('session')->getUsageIndex());
     }
+
     /**
      * @dataProvider provideLegacyClientOptions
      * @group legacy

@@ -62,9 +62,9 @@ class File extends Constraint
 
     public function __construct(
         array $options = null,
-        int|string|null $maxSize = null,
+        int|string $maxSize = null,
         bool $binaryFormat = null,
-        array|string|null $mimeTypes = null,
+        array|string $mimeTypes = null,
         string $notFoundMessage = null,
         string $notReadableMessage = null,
         string $maxSizeMessage = null,
@@ -135,7 +135,7 @@ class File extends Constraint
         return parent::__isset($option);
     }
 
-    private function normalizeBinaryFormat(int|string|null $maxSize)
+    private function normalizeBinaryFormat(int|string $maxSize)
     {
         $factors = [
             'k' => 1000,

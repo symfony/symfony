@@ -27,7 +27,7 @@ final class MercureOptions implements MessageOptionsInterface
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct(string|array|null $topics = null, bool $private = false, ?string $id = null, ?string $type = null, ?int $retry = null)
+    public function __construct(string|array $topics = null, bool $private = false, string $id = null, string $type = null, int $retry = null)
     {
         $this->topics = null !== $topics ? (array) $topics : null;
         $this->private = $private;

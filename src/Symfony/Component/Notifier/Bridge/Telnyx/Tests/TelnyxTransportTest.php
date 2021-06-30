@@ -24,7 +24,7 @@ final class TelnyxTransportTest extends TransportTestCase
     /**
      * @return TelnyxTransport
      */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
         return new TelnyxTransport('api_key', 'from', 'messaging_profile_id', $client ?? $this->createMock(HttpClientInterface::class));
     }

@@ -62,7 +62,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
             try {
                 // @deprecated since 5.3, change to $provider->loadUserByIdentifier() in 6.0
                 if (!method_exists($provider, 'loadUserByIdentifier')) {
-                    trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', \get_debug_type($provider));
+                    trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($provider));
 
                     return $provider->loadUserByUsername($userIdentifier);
                 }

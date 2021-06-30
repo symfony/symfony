@@ -239,7 +239,7 @@ class ParserTest extends TestCase
     /**
      * @dataProvider getLintData
      */
-    public function testLint($expression, $names, ?string $exception = null)
+    public function testLint($expression, $names, string $exception = null)
     {
         if ($exception) {
             $this->expectException(SyntaxError::class);

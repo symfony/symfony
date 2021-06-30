@@ -60,7 +60,7 @@ class HttpKernelBrowser extends AbstractBrowser
      *
      * @return Response A Response instance
      */
-    protected function doRequest($request)
+    protected function doRequest(object $request)
     {
         $response = $this->kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, $this->catchExceptions);
 
@@ -78,7 +78,7 @@ class HttpKernelBrowser extends AbstractBrowser
      *
      * @return string
      */
-    protected function getScript($request)
+    protected function getScript(object $request)
     {
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);
@@ -196,7 +196,7 @@ EOF;
      *
      * @return DomResponse A DomResponse instance
      */
-    protected function filterResponse($response)
+    protected function filterResponse(object $response)
     {
         // this is needed to support StreamedResponse
         ob_start();

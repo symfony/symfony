@@ -32,7 +32,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function open($savePath, $sessionName)
+    public function open(string $savePath, string $sessionName)
     {
         $this->sessionName = $sessionName;
         if (!headers_sent() && !ini_get('session.cache_limiter') && '0' !== ini_get('session.cache_limiter')) {
@@ -61,7 +61,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function validateId($sessionId)
+    public function validateId(string $sessionId)
     {
         $this->prefetchData = $this->read($sessionId);
         $this->prefetchId = $sessionId;
@@ -73,7 +73,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
      * @return string
      */
     #[\ReturnTypeWillChange]
-    public function read($sessionId)
+    public function read(string $sessionId)
     {
         if (null !== $this->prefetchId) {
             $prefetchId = $this->prefetchId;
@@ -97,7 +97,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function write($sessionId, $data)
+    public function write(string $sessionId, string $data)
     {
         if (null === $this->igbinaryEmptyData) {
             // see https://github.com/igbinary/igbinary/issues/146
@@ -115,7 +115,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function destroy($sessionId)
+    public function destroy(string $sessionId)
     {
         if (!headers_sent() && filter_var(ini_get('session.use_cookies'), \FILTER_VALIDATE_BOOLEAN)) {
             if (!$this->sessionName) {

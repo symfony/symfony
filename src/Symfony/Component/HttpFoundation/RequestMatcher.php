@@ -58,7 +58,7 @@ class RequestMatcher implements RequestMatcherInterface
      * @param string|string[]|null $ips
      * @param string|string[]|null $schemes
      */
-    public function __construct(string $path = null, string $host = null, $methods = null, $ips = null, array $attributes = [], $schemes = null, int $port = null)
+    public function __construct(string $path = null, string $host = null, string|array|null $methods = null, string|array|null $ips = null, array $attributes = [], string|array|null $schemes = null, int $port = null)
     {
         $this->matchPath($path);
         $this->matchHost($host);
@@ -77,7 +77,7 @@ class RequestMatcher implements RequestMatcherInterface
      *
      * @param string|string[]|null $scheme An HTTP scheme or an array of HTTP schemes
      */
-    public function matchScheme($scheme)
+    public function matchScheme(string|array|null $scheme)
     {
         $this->schemes = null !== $scheme ? array_map('strtolower', (array) $scheme) : [];
     }
@@ -123,7 +123,7 @@ class RequestMatcher implements RequestMatcherInterface
      *
      * @param string|string[]|null $ips A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
      */
-    public function matchIps($ips)
+    public function matchIps(string|array|null $ips)
     {
         $ips = null !== $ips ? (array) $ips : [];
 
@@ -137,7 +137,7 @@ class RequestMatcher implements RequestMatcherInterface
      *
      * @param string|string[]|null $method An HTTP method or an array of HTTP methods
      */
-    public function matchMethod($method)
+    public function matchMethod(string|array|null $method)
     {
         $this->methods = null !== $method ? array_map('strtoupper', (array) $method) : [];
     }

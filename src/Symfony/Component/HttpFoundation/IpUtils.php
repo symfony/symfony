@@ -34,7 +34,7 @@ class IpUtils
      *
      * @return bool Whether the IP is valid
      */
-    public static function checkIp(?string $requestIp, $ips)
+    public static function checkIp(?string $requestIp, string|array $ips)
     {
         if (!\is_array($ips)) {
             $ips = [$ips];

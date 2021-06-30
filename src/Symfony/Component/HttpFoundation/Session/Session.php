@@ -70,7 +70,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function get(string $name, $default = null)
+    public function get(string $name, mixed $default = null)
     {
         return $this->getAttributeBag()->get($name, $default);
     }
@@ -78,7 +78,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function set(string $name, $value)
+    public function set(string $name, mixed $value)
     {
         $this->getAttributeBag()->set($name, $value);
     }

@@ -40,11 +40,9 @@ class RedisSessionHandler extends AbstractSessionHandler
      *  * prefix: The prefix to use for the keys in order to avoid collision on the Redis server
      *  * ttl: The time to live in seconds.
      *
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis
-     *
      * @throws \InvalidArgumentException When unsupported client or options are passed
      */
-    public function __construct($redis, array $options = [])
+    public function __construct(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis, array $options = [])
     {
         if (
             !$redis instanceof \Redis &&
@@ -117,7 +115,7 @@ class RedisSessionHandler extends AbstractSessionHandler
     /**
      * {@inheritdoc}
      */
-    public function gc($maxlifetime): bool
+    public function gc(int $maxlifetime): bool
     {
         return true;
     }
@@ -125,7 +123,7 @@ class RedisSessionHandler extends AbstractSessionHandler
     /**
      * @return bool
      */
-    public function updateTimestamp($sessionId, $data)
+    public function updateTimestamp(string $sessionId, string $data)
     {
         return (bool) $this->redis->expire($this->prefix.$sessionId, (int) ($this->ttl ?? ini_get('session.gc_maxlifetime')));
     }

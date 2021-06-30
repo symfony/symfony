@@ -693,11 +693,9 @@ class Request
      *
      * Order of precedence: PATH (routing placeholders or custom attributes), GET, POST
      *
-     * @param mixed $default The default value if the parameter key does not exist
-     *
      * @return mixed
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null)
     {
         if ($this !== $result = $this->attributes->get($key, $this)) {
             return $result;
@@ -1351,7 +1349,7 @@ class Request
      *
      * @param string|array $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
      */
-    public function setFormat(?string $format, $mimeTypes)
+    public function setFormat(?string $format, string|array $mimeTypes)
     {
         if (null === static::$formats) {
             static::initializeFormats();

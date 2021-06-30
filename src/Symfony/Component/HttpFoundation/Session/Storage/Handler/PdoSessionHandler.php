@@ -170,7 +170,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * @throws \InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      */
-    public function __construct($pdoOrDsn = null, array $options = [])
+    public function __construct(\PDO|string|null $pdoOrDsn = null, array $options = [])
     {
         if ($pdoOrDsn instanceof \PDO) {
             if (\PDO::ERRMODE_EXCEPTION !== $pdoOrDsn->getAttribute(\PDO::ATTR_ERRMODE)) {
@@ -263,7 +263,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function open($savePath, $sessionName)
+    public function open(string $savePath, string $sessionName)
     {
         $this->sessionExpired = false;
 
@@ -278,7 +278,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      * @return string
      */
     #[\ReturnTypeWillChange]
-    public function read($sessionId)
+    public function read(string $sessionId)
     {
         try {
             return parent::read($sessionId);
@@ -293,7 +293,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime)
     {
         // We delay gc() to close() so that it is executed outside the transactional and blocking read-write process.
         // This way, pruning expired sessions does not block them from being started while the current session is used.
@@ -373,7 +373,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function updateTimestamp($sessionId, $data)
+    public function updateTimestamp(string $sessionId, string $data)
     {
         $expiry = time() + (int) ini_get('session.gc_maxlifetime');
 

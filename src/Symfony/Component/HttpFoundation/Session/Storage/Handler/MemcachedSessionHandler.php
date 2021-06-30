@@ -73,7 +73,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     /**
      * @return bool
      */
-    public function updateTimestamp($sessionId, $data)
+    public function updateTimestamp(string $sessionId, string $data)
     {
         $this->memcached->touch($this->prefix.$sessionId, time() + $this->ttl);
 
@@ -101,7 +101,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     /**
      * @return bool
      */
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime)
     {
         // not required here because memcached will auto expire the records anyhow.
         return true;

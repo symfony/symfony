@@ -441,7 +441,7 @@ class Response
      *
      * @final
      */
-    public function setStatusCode(int $code, $text = null): object
+    public function setStatusCode(int $code, string $text = null): object
     {
         $this->statusCode = $code;
         if ($this->isInvalid()) {
@@ -1034,14 +1034,13 @@ class Response
     /**
      * Sets the Vary header.
      *
-     * @param string|array $headers
-     * @param bool         $replace Whether to replace the actual value or not (true by default)
+     * @param bool $replace Whether to replace the actual value or not (true by default)
      *
      * @return $this
      *
      * @final
      */
-    public function setVary($headers, bool $replace = true): object
+    public function setVary(string|array $headers, bool $replace = true): object
     {
         $this->headers->set('Vary', $headers, $replace);
 

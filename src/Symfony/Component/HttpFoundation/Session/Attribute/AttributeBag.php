@@ -69,7 +69,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function get(string $name, $default = null)
+    public function get(string $name, mixed $default = null)
     {
         return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
@@ -77,7 +77,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function set(string $name, $value)
+    public function set(string $name, mixed $value)
     {
         $this->attributes[$name] = $value;
     }

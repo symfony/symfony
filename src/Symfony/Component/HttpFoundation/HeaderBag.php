@@ -121,10 +121,10 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Sets a header by name.
      *
-     * @param string|string[] $values  The value or an array of values
-     * @param bool            $replace Whether to replace the actual value or not (true by default)
+     * @param string|string[]|null $values  The value or an array of values
+     * @param bool                 $replace Whether to replace the actual value or not (true by default)
      */
-    public function set(string $key, $values, bool $replace = true)
+    public function set(string $key, string|array|null $values, bool $replace = true)
     {
         $key = strtr($key, self::UPPER, self::LOWER);
 
@@ -186,7 +186,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns the HTTP header value converted to a date.
      *
-     * @return \DateTimeInterface|null The parsed DateTime or the default value if the header does not exist
+     * @return \DateTime|null The parsed DateTime or the default value if the header does not exist
      *
      * @throws \RuntimeException When the HTTP header is not parseable
      */
@@ -205,10 +205,8 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Adds a custom Cache-Control directive.
-     *
-     * @param mixed $value The Cache-Control directive value
      */
-    public function addCacheControlDirective(string $key, $value = true)
+    public function addCacheControlDirective(string $key, bool|string $value = true)
     {
         $this->cacheControl[$key] = $value;
 
@@ -228,11 +226,11 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns a Cache-Control directive value by name.
      *
-     * @return mixed The directive value if defined, null otherwise
+     * @return bool|string|null The directive value if defined, null otherwise
      */
     public function getCacheControlDirective(string $key)
     {
-        return \array_key_exists($key, $this->cacheControl) ? $this->cacheControl[$key] : null;
+        return $this->cacheControl[$key] ?? null;
     }
 
     /**

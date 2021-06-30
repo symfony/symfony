@@ -54,7 +54,7 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function add(string $type, $message)
+    public function add(string $type, mixed $message)
     {
         $this->flashes[$type][] = $message;
     }
@@ -105,7 +105,7 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $type, $messages)
+    public function set(string $type, string|array $messages)
     {
         $this->flashes[$type] = (array) $messages;
     }

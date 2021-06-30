@@ -21,10 +21,7 @@ use Symfony\Component\Cache\Traits\RedisProxy;
  */
 class SessionHandlerFactory
 {
-    /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy|\Memcached|\PDO|string $connection Connection or DSN
-     */
-    public static function createHandler($connection): AbstractSessionHandler
+    public static function createHandler(object|string $connection): AbstractSessionHandler
     {
         if (!\is_string($connection) && !\is_object($connection)) {
             throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a string or a connection object, "%s" given.', __METHOD__, get_debug_type($connection)));

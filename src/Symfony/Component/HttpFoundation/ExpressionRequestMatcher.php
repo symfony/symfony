@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
@@ -23,7 +24,7 @@ class ExpressionRequestMatcher extends RequestMatcher
     private $language;
     private $expression;
 
-    public function setExpression(ExpressionLanguage $language, $expression)
+    public function setExpression(ExpressionLanguage $language, Expression|string $expression)
     {
         $this->language = $language;
         $this->expression = $expression;

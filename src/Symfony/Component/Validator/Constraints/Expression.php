@@ -35,6 +35,7 @@ class Expression extends Constraint
     public $message = 'This value is not valid.';
     public $expression;
     public $values = [];
+    public $errorPath;
 
     /**
      * {@inheritdoc}
@@ -46,6 +47,7 @@ class Expression extends Constraint
         string $message = null,
         array $values = null,
         array $groups = null,
+        string $errorPath = null,
         $payload = null,
         array $options = []
     ) {
@@ -65,6 +67,7 @@ class Expression extends Constraint
 
         $this->message = $message ?? $this->message;
         $this->values = $values ?? $this->values;
+        $this->errorPath = $errorPath ?? $this->errorPath;
     }
 
     /**

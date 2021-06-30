@@ -123,6 +123,29 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testFailingExpressionAtObjectLevelWithErrorPath()
+    {
+        $constraint = new Expression([
+            'expression' => 'this.data == 1',
+            'message' => 'myMessage',
+            'errorPath' => '__root__',
+        ]);
+
+        $object = new ToString();
+        $object->data = '2';
+
+        $this->setObject($object);
+        $this->setPropertyPath('');
+
+        $this->validator->validate($object, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->atPath('__root__')
+            ->setParameter('{{ value }}', 'toString')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
+            ->assertRaised();
+    }
+
     public function testSucceedingExpressionAtPropertyLevel()
     {
         $constraint = new Expression('value == this.data');

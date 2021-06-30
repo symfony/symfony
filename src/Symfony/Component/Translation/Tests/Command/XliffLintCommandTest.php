@@ -140,6 +140,33 @@ EOF;
         $this->assertStringContainsString($expected, $command->getHelp());
     }
 
+    public function testLintIncorrectFileWithGithubFormat()
+    {
+        $filename = $this->createFile('note <target>');
+        $tester = $this->createCommandTester();
+        $tester->execute(['filename' => [$filename], '--format' => 'github'], ['decorated' => false]);
+        self::assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
+        self::assertStringMatchesFormat('%A::error file=%s,line=6,col=47::Opening and ending tag mismatch: target line 6 and source%A', trim($tester->getDisplay()));
+    }
+
+    public function testLintAutodetectsGithubActionEnvironment()
+    {
+        $prev = getenv('GITHUB_ACTIONS');
+        putenv('GITHUB_ACTIONS');
+
+        try {
+            putenv('GITHUB_ACTIONS=1');
+
+            $filename = $this->createFile('note <target>');
+            $tester = $this->createCommandTester();
+
+            $tester->execute(['filename' => [$filename]], ['decorated' => false]);
+            self::assertStringMatchesFormat('%A::error file=%s,line=6,col=47::Opening and ending tag mismatch: target line 6 and source%A', trim($tester->getDisplay()));
+        } finally {
+            putenv('GITHUB_ACTIONS'.($prev ? "=$prev" : ''));
+        }
+    }
+
     private function createFile($sourceContent = 'note', $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.xlf'): string
     {
         $xliffContent = <<<XLIFF

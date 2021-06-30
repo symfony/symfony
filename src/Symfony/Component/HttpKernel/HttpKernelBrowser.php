@@ -54,11 +54,13 @@ class HttpKernelBrowser extends AbstractBrowser
     }
 
     /**
-     * Makes a request.
+     * {@inheritdoc}
+     *
+     * @param Request $request
      *
      * @return Response A Response instance
      */
-    protected function doRequest(mixed $request)
+    protected function doRequest(object $request)
     {
         $response = $this->kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, $this->catchExceptions);
 
@@ -70,11 +72,13 @@ class HttpKernelBrowser extends AbstractBrowser
     }
 
     /**
-     * Returns the script to execute when the request must be insulated.
+     * {@inheritdoc}
+     *
+     * @param Request $request
      *
      * @return string
      */
-    protected function getScript(mixed $request)
+    protected function getScript(object $request)
     {
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);
@@ -124,7 +128,7 @@ EOF;
     }
 
     /**
-     * Converts the BrowserKit request to a HttpKernel request.
+     * {@inheritdoc}
      *
      * @return Request A Request instance
      */
@@ -186,11 +190,13 @@ EOF;
     }
 
     /**
-     * Converts the HttpKernel response to a BrowserKit response.
+     * {@inheritdoc}
+     *
+     * @param Request $request
      *
      * @return DomResponse A DomResponse instance
      */
-    protected function filterResponse(mixed $response)
+    protected function filterResponse(object $response)
     {
         // this is needed to support StreamedResponse
         ob_start();

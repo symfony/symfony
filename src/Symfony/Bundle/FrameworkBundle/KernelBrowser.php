@@ -145,11 +145,11 @@ class KernelBrowser extends HttpKernelBrowser
     /**
      * {@inheritdoc}
      *
-     * @param Request $request A Request instance
+     * @param Request $request
      *
-     * @return Response A Response instance
+     * @return Response
      */
-    protected function doRequest($request)
+    protected function doRequest(object $request)
     {
         // avoid shutting down the Kernel if no request has been performed yet
         // WebTestCase::createClient() boots the Kernel but do not handle a request
@@ -172,11 +172,11 @@ class KernelBrowser extends HttpKernelBrowser
     /**
      * {@inheritdoc}
      *
-     * @param Request $request A Request instance
+     * @param Request $request
      *
-     * @return Response A Response instance
+     * @return Response
      */
-    protected function doRequestInProcess($request)
+    protected function doRequestInProcess(object $request)
     {
         $response = parent::doRequestInProcess($request);
 
@@ -193,11 +193,11 @@ class KernelBrowser extends HttpKernelBrowser
      * Symfony Standard Edition). If this is not your case, create your own
      * client and override this method.
      *
-     * @param Request $request A Request instance
+     * @param Request $request
      *
-     * @return string The script content
+     * @return string
      */
-    protected function getScript($request)
+    protected function getScript(object $request)
     {
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);

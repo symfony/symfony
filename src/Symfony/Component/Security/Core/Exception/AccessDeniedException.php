@@ -34,10 +34,7 @@ class AccessDeniedException extends RuntimeException
         return $this->attributes;
     }
 
-    /**
-     * @param array|string $attributes
-     */
-    public function setAttributes($attributes)
+    public function setAttributes(array|string $attributes)
     {
         $this->attributes = (array) $attributes;
     }
@@ -50,10 +47,7 @@ class AccessDeniedException extends RuntimeException
         return $this->subject;
     }
 
-    /**
-     * @param mixed $subject
-     */
-    public function setSubject($subject)
+    public function setSubject(mixed $subject)
     {
         $this->subject = $subject;
     }

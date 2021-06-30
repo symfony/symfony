@@ -31,13 +31,13 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     private $namespace;
 
     /**
-     * @param string|RequestStack|callable|null $namespace
-     *                                                     * null: generates a namespace using $_SERVER['HTTPS']
-     *                                                     * string: uses the given string
-     *                                                     * RequestStack: generates a namespace using the current main request
-     *                                                     * callable: uses the result of this callable (must return a string)
+     * @param $namespace
+     *                   * null: generates a namespace using $_SERVER['HTTPS']
+     *                   * string: uses the given string
+     *                   * RequestStack: generates a namespace using the current main request
+     *                   * callable: uses the result of this callable (must return a string)
      */
-    public function __construct(TokenGeneratorInterface $generator = null, TokenStorageInterface $storage = null, $namespace = null)
+    public function __construct(TokenGeneratorInterface $generator = null, TokenStorageInterface $storage = null, string|RequestStack|callable $namespace = null)
     {
         $this->generator = $generator ?? new UriSafeTokenGenerator();
         $this->storage = $storage ?? new NativeSessionTokenStorage();

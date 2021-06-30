@@ -46,7 +46,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      *
      * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token and $exceptionOnNoToken is set to true
      */
-    final public function isGranted($attribute, $subject = null): bool
+    final public function isGranted(mixed $attribute, mixed $subject = null): bool
     {
         if (null === ($token = $this->tokenStorage->getToken())) {
             if ($this->exceptionOnNoToken) {

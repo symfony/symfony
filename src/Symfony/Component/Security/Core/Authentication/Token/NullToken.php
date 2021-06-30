@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
@@ -36,7 +38,7 @@ class NullToken implements TokenInterface
         return '';
     }
 
-    public function setUser($user)
+    public function setUser(string|\Stringable|UserInterface $user)
     {
         throw new \BadMethodCallException('Cannot set user on a NullToken.');
     }
@@ -87,7 +89,7 @@ class NullToken implements TokenInterface
         return null;
     }
 
-    public function setAttribute(string $name, $value)
+    public function setAttribute(string $name, mixed $value)
     {
         throw new \BadMethodCallException('Cannot add attribute to NullToken.');
     }

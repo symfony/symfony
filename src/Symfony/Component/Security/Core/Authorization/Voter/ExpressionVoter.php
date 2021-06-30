@@ -42,7 +42,7 @@ class ExpressionVoter implements VoterInterface
     /**
      * {@inheritdoc}
      */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes)
     {
         $result = VoterInterface::ACCESS_ABSTAIN;
         $variables = null;
@@ -64,7 +64,7 @@ class ExpressionVoter implements VoterInterface
         return $result;
     }
 
-    private function getVariables(TokenInterface $token, $subject): array
+    private function getVariables(TokenInterface $token, mixed $subject): array
     {
         $roleNames = $token->getRoleNames();
 

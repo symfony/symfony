@@ -55,11 +55,8 @@ class Security implements AuthorizationCheckerInterface
 
     /**
      * Checks if the attributes are granted against the current authentication token and optionally supplied subject.
-     *
-     * @param mixed $attributes
-     * @param mixed $subject
      */
-    public function isGranted($attributes, $subject = null): bool
+    public function isGranted(mixed $attributes, mixed $subject = null): bool
     {
         return $this->container->get('security.authorization_checker')
             ->isGranted($attributes, $subject);

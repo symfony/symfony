@@ -59,20 +59,15 @@ class Passport implements UserPassportInterface
         return $this->user;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function setAttribute(string $name, $value): void
+    public function setAttribute(string $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
     }
 
     /**
-     * @param mixed $default
-     *
      * @return mixed
      */
-    public function getAttribute(string $name, $default = null)
+    public function getAttribute(string $name, mixed $default = null)
     {
         return $this->attributes[$name] ?? $default;
     }

@@ -24,11 +24,9 @@ class PreAuthenticatedToken extends AbstractToken
     private $firewallName;
 
     /**
-     * @param string|\Stringable|UserInterface $user
-     * @param mixed                            $credentials
-     * @param string[]                         $roles
+     * @param string[] $roles
      */
-    public function __construct($user, $credentials, string $firewallName, array $roles = [])
+    public function __construct(string|\Stringable|UserInterface $user, mixed $credentials, string $firewallName, array $roles = [])
     {
         parent::__construct($roles);
 

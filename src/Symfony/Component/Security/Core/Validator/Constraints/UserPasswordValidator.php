@@ -28,15 +28,8 @@ class UserPasswordValidator extends ConstraintValidator
     private $tokenStorage;
     private $hasherFactory;
 
-    /**
-     * @param PasswordHasherFactoryInterface $hasherFactory
-     */
-    public function __construct(TokenStorageInterface $tokenStorage, $hasherFactory)
+    public function __construct(TokenStorageInterface $tokenStorage, PasswordHasherFactoryInterface $hasherFactory)
     {
-        if ($hasherFactory instanceof EncoderFactoryInterface) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Passing a "%s" instance to the "%s" constructor is deprecated, use "%s" instead.', EncoderFactoryInterface::class, __CLASS__, PasswordHasherFactoryInterface::class);
-        }
-
         $this->tokenStorage = $tokenStorage;
         $this->hasherFactory = $hasherFactory;
     }
@@ -44,7 +37,7 @@ class UserPasswordValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($password, Constraint $constraint)
+    public function validate(mixed $password, Constraint $constraint)
     {
         if (!$constraint instanceof UserPassword) {
             throw new UnexpectedTypeException($constraint, UserPassword::class);
@@ -54,6 +47,10 @@ class UserPasswordValidator extends ConstraintValidator
             $this->context->addViolation($constraint->message);
 
             return;
+        }
+
+        if (!\is_string($password)) {
+            throw new UnexpectedTypeException($password, 'string');
         }
 
         $user = $this->tokenStorage->getToken()->getUser();

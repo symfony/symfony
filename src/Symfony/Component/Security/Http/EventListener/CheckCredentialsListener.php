@@ -35,15 +35,8 @@ class CheckCredentialsListener implements EventSubscriberInterface
 {
     private $hasherFactory;
 
-    /**
-     * @param PasswordHasherFactoryInterface $hasherFactory
-     */
-    public function __construct($hasherFactory)
+    public function __construct(PasswordHasherFactoryInterface $hasherFactory)
     {
-        if ($hasherFactory instanceof EncoderFactoryInterface) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Passing a "%s" instance to the "%s" constructor is deprecated, use "%s" instead.', EncoderFactoryInterface::class, __CLASS__, PasswordHasherFactoryInterface::class);
-        }
-
         $this->hasherFactory = $hasherFactory;
     }
 

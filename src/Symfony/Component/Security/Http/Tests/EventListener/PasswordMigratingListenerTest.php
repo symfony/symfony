@@ -134,6 +134,7 @@ class PasswordMigratingListenerTest extends TestCase
 abstract class TestMigratingUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
     abstract public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void;
+
     abstract public function loadUserByIdentifier(string $identifier): UserInterface;
 }
 

@@ -29,7 +29,7 @@ final class MattermostTransport extends AbstractTransport
     private $channel;
     private $path;
 
-    public function __construct(string $token, string $channel, ?string $path = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $token, string $channel, string $path = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->channel = $channel;

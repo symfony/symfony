@@ -49,7 +49,7 @@ class ArrayAdapterTest extends AdapterTestCase
 
         // Fail (should be missing from $values)
         $item = $cache->getItem('buz');
-        $cache->save($item->set(function() {}));
+        $cache->save($item->set(function () {}));
 
         $values = $cache->getValues();
 

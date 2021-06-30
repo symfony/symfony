@@ -73,6 +73,7 @@ final class LazyResponseEvent extends RequestEvent
     {
         return $this->event->isMainRequest();
     }
+
     /**
      * {@inheritdoc}
      */

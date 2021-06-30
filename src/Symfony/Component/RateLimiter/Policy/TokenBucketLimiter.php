@@ -26,6 +26,8 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
  */
 final class TokenBucketLimiter implements LimiterInterface
 {
+    use ResetLimiterTrait;
+
     private $id;
     private $maxBurst;
     private $rate;
@@ -36,9 +38,7 @@ final class TokenBucketLimiter implements LimiterInterface
      */
     private $lock;
 
-    use ResetLimiterTrait;
-
-    public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, ?LockInterface $lock = null)
+    public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, LockInterface $lock = null)
     {
         $this->id = $id;
         $this->maxBurst = $maxBurst;
@@ -60,7 +60,7 @@ final class TokenBucketLimiter implements LimiterInterface
      * @throws MaxWaitDurationExceededException if $maxTime is set and the process needs to wait longer than its value (in seconds)
      * @throws \InvalidArgumentException        if $tokens is larger than the maximum burst size
      */
-    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
     {
         if ($tokens > $this->maxBurst) {
             throw new \InvalidArgumentException(sprintf('Cannot reserve more tokens (%d) than the burst size of the rate limiter (%d).', $tokens, $this->maxBurst));

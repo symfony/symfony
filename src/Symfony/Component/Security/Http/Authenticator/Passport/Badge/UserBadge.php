@@ -42,7 +42,7 @@ class UserBadge implements BadgeInterface
      * is thrown). If this is not set, the default user provider will be used with
      * $userIdentifier as username.
      */
-    public function __construct(string $userIdentifier, ?callable $userLoader = null)
+    public function __construct(string $userIdentifier, callable $userLoader = null)
     {
         $this->userIdentifier = $userIdentifier;
         $this->userLoader = $userLoader;

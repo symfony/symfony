@@ -41,7 +41,7 @@ interface InputInterface
      *
      * @return bool true if the value is contained in the raw parameters
      */
-    public function hasParameterOption($values, bool $onlyParams = false);
+    public function hasParameterOption(string|array $values, bool $onlyParams = false);
 
     /**
      * Returns the value of a raw option (not parsed).
@@ -57,7 +57,7 @@ interface InputInterface
      *
      * @return mixed The option value
      */
-    public function getParameterOption($values, $default = false, bool $onlyParams = false);
+    public function getParameterOption(string|array $values, mixed $default = false, bool $onlyParams = false);
 
     /**
      * Binds the current Input instance with the given arguments and options.
@@ -83,7 +83,7 @@ interface InputInterface
     /**
      * Returns the argument value for a given argument name.
      *
-     * @return string|string[]|null The argument value
+     * @return mixed
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
@@ -92,20 +92,16 @@ interface InputInterface
     /**
      * Sets an argument value by name.
      *
-     * @param string|string[]|null $value The argument value
-     *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function setArgument(string $name, $value);
+    public function setArgument(string $name, mixed $value);
 
     /**
      * Returns true if an InputArgument object exists by name or position.
      *
-     * @param string|int $name The InputArgument name or position
-     *
      * @return bool true if the InputArgument object exists, false otherwise
      */
-    public function hasArgument($name);
+    public function hasArgument(string|int $name);
 
     /**
      * Returns all the given options merged with the default values.
@@ -117,7 +113,7 @@ interface InputInterface
     /**
      * Returns the option value for a given option name.
      *
-     * @return string|string[]|bool|null The option value
+     * @return mixed
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
@@ -126,11 +122,9 @@ interface InputInterface
     /**
      * Sets an option value by name.
      *
-     * @param string|string[]|bool|null $value The option value
-     *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function setOption(string $name, $value);
+    public function setOption(string $name, mixed $value);
 
     /**
      * Returns true if an InputOption object exists by name.

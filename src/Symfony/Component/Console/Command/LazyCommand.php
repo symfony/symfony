@@ -90,7 +90,7 @@ final class LazyCommand extends Command
     /**
      * @return $this
      */
-    public function setDefinition($definition): self
+    public function setDefinition(array|InputDefinition $definition): self
     {
         $this->getCommand()->setDefinition($definition);
 
@@ -110,7 +110,7 @@ final class LazyCommand extends Command
     /**
      * @return $this
      */
-    public function addArgument(string $name, int $mode = null, string $description = '', $default = null): self
+    public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null): self
     {
         $this->getCommand()->addArgument($name, $mode, $description, $default);
 
@@ -120,7 +120,7 @@ final class LazyCommand extends Command
     /**
      * @return $this
      */
-    public function addOption(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null): self
+    public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null): self
     {
         $this->getCommand()->addOption($name, $shortcut, $mode, $description, $default);
 

@@ -133,11 +133,9 @@ class Table
     /**
      * Sets table style.
      *
-     * @param TableStyle|string $name The style name or a TableStyle instance
-     *
      * @return $this
      */
-    public function setStyle($name)
+    public function setStyle(TableStyle|string $name)
     {
         $this->style = $this->resolveStyle($name);
 
@@ -161,7 +159,7 @@ class Table
      *
      * @return $this
      */
-    public function setColumnStyle(int $columnIndex, $name)
+    public function setColumnStyle(int $columnIndex, TableStyle|string $name)
     {
         $this->columnStyles[$columnIndex] = $this->resolveStyle($name);
 
@@ -254,16 +252,12 @@ class Table
         return $this;
     }
 
-    public function addRow($row)
+    public function addRow(TableSeparator|array $row)
     {
         if ($row instanceof TableSeparator) {
             $this->rows[] = $row;
 
             return $this;
-        }
-
-        if (!\is_array($row)) {
-            throw new InvalidArgumentException('A row must be an array or a TableSeparator instance.');
         }
 
         $this->rows[] = array_values($row);
@@ -274,7 +268,7 @@ class Table
     /**
      * Adds a row to the table, and re-renders the table.
      */
-    public function appendRow($row): self
+    public function appendRow(TableSeparator|array $row): self
     {
         if (!$this->output instanceof ConsoleSectionOutput) {
             throw new RuntimeException(sprintf('Output should be an instance of "%s" when calling "%s".', ConsoleSectionOutput::class, __METHOD__));
@@ -290,7 +284,7 @@ class Table
         return $this;
     }
 
-    public function setRow($column, array $row)
+    public function setRow(int|string $column, array $row)
     {
         $this->rows[$column] = $row;
 
@@ -596,11 +590,11 @@ class Table
 
         return new TableRows(function () use ($rows, $unmergedRows): \Traversable {
             foreach ($rows as $rowKey => $row) {
-                yield $this->fillCells($row);
+                yield $row instanceof TableSeparator ? $row : $this->fillCells($row);
 
                 if (isset($unmergedRows[$rowKey])) {
-                    foreach ($unmergedRows[$rowKey] as $unmergedRow) {
-                        yield $this->fillCells($unmergedRow);
+                    foreach ($unmergedRows[$rowKey] as $row) {
+                        yield $row instanceof TableSeparator ? $row : $this->fillCells($row);
                     }
                 }
             }
@@ -681,7 +675,7 @@ class Table
     /**
      * fill cells for a row that contains colspan > 1.
      */
-    private function fillCells($row)
+    private function fillCells(iterable $row)
     {
         $newRow = [];
 
@@ -848,7 +842,7 @@ class Table
         ];
     }
 
-    private function resolveStyle($name): TableStyle
+    private function resolveStyle(TableStyle|string $name): TableStyle
     {
         if ($name instanceof TableStyle) {
             return $name;

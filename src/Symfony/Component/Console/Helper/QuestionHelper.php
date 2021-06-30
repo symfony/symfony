@@ -552,11 +552,9 @@ class QuestionHelper extends Helper
     /**
      * Sets console I/O to the specified code page and converts the user input.
      *
-     * @param string|false $input
-     *
      * @return string|false
      */
-    private function resetIOCodepage(int $cp, $input)
+    private function resetIOCodepage(int $cp, string|false $input)
     {
         if (0 !== $cp) {
             sapi_windows_cp_set($cp);

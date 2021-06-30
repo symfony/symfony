@@ -31,14 +31,14 @@ class InputArgument
     private $description;
 
     /**
-     * @param string               $name        The argument name
-     * @param int|null             $mode        The argument mode: self::REQUIRED or self::OPTIONAL
-     * @param string               $description A description text
-     * @param string|string[]|null $default     The default value (for self::OPTIONAL mode only)
+     * @param $name        The argument name
+     * @param $mode        The argument mode: self::REQUIRED or self::OPTIONAL
+     * @param $description A description text
+     * @param $default     The default value (for self::OPTIONAL mode only)
      *
      * @throws InvalidArgumentException When argument mode is not valid
      */
-    public function __construct(string $name, int $mode = null, string $description = '', $default = null)
+    public function __construct(string $name, int $mode = null, string $description = '', mixed $default = null)
     {
         if (null === $mode) {
             $mode = self::OPTIONAL;
@@ -86,11 +86,9 @@ class InputArgument
     /**
      * Sets the default value.
      *
-     * @param string|string[]|null $default The default value
-     *
      * @throws LogicException When incorrect default value is given
      */
-    public function setDefault($default = null)
+    public function setDefault(mixed $default = null)
     {
         if (self::REQUIRED === $this->mode && null !== $default) {
             throw new LogicException('Cannot set a default value except for InputArgument::OPTIONAL mode.');
@@ -110,7 +108,7 @@ class InputArgument
     /**
      * Returns the default value.
      *
-     * @return string|string[]|null The default value
+     * @return mixed
      */
     public function getDefault()
     {

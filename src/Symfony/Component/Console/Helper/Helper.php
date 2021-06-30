@@ -93,7 +93,7 @@ abstract class Helper implements HelperInterface
         return mb_substr($string, $from, $length, $encoding);
     }
 
-    public static function formatTime($secs)
+    public static function formatTime(int|float $secs)
     {
         static $timeFormats = [
             [0, '< 1 sec'],

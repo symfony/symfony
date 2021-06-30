@@ -57,7 +57,7 @@ final class Dumper
         }
     }
 
-    public function __invoke($var): string
+    public function __invoke(mixed $var): string
     {
         return ($this->handler)($var);
     }

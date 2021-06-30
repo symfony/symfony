@@ -53,15 +53,13 @@ class InputOption
     private $description;
 
     /**
-     * @param string                    $name        The option name
-     * @param string|array|null         $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param int|null                  $mode        The option mode: One of the VALUE_* constants
-     * @param string                    $description A description text
-     * @param string|string[]|bool|null $default     The default value (must be null for self::VALUE_NONE)
+     * @param $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param $mode     The option mode: One of the VALUE_* constants
+     * @param $default  The default value (must be null for self::VALUE_NONE)
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function __construct(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null)
+    public function __construct(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null)
     {
         if (0 === strpos($name, '--')) {
             $name = substr($name, 2);
@@ -177,11 +175,9 @@ class InputOption
     /**
      * Sets the default value.
      *
-     * @param string|string[]|bool|null $default The default value
-     *
      * @throws LogicException When incorrect default value is given
      */
-    public function setDefault($default = null)
+    public function setDefault(mixed $default = null)
     {
         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
@@ -201,7 +197,7 @@ class InputOption
     /**
      * Returns the default value.
      *
-     * @return string|string[]|bool|null The default value
+     * @return mixed
      */
     public function getDefault()
     {

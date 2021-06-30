@@ -192,8 +192,15 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
             return;
         }
 
-        $this->deleteTokenBySeries($tmpSeries);
-        $this->createNewToken(new PersistentToken($token->getClass(), $token->getUserIdentifier(), $tmpSeries, $token->getTokenValue(), $lastUsed));
+        $this->conn->beginTransaction();
+        try {
+            $this->deleteTokenBySeries($tmpSeries);
+            $this->createNewToken(new PersistentToken($token->getClass(), $token->getUserIdentifier(), $tmpSeries, $token->getTokenValue(), $lastUsed));
+
+            $this->conn->commit();
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+        }
     }
 
     /**

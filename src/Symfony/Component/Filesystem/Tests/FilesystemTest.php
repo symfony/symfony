@@ -1766,6 +1766,27 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(767, $targetFilePath);
     }
 
+    public function testDumpToProtectedDirectory()
+    {
+        if (\DIRECTORY_SEPARATOR !== '\\') {
+            $this->markTestSkipped('This test is specific to Windows.');
+        }
+
+        if (($userProfilePath = getenv('USERPROFILE')) === false || !is_dir($userProfilePath)) {
+            throw new \RuntimeException('Failed to retrieve user profile path.');
+        }
+
+        $targetPath = implode(\DIRECTORY_SEPARATOR, [$userProfilePath, 'Downloads', '__test_file.ext']);
+
+        try {
+            $this->assertFileDoesNotExist($targetPath);
+            $this->filesystem->dumpFile($targetPath, 'foobar');
+            $this->assertFileExists($targetPath);
+        } finally {
+            $this->filesystem->remove($targetPath);
+        }
+    }
+
     /**
      * Normalize the given path (transform each forward slash into a real directory separator).
      */

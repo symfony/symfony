@@ -28,7 +28,7 @@ class ArgumentMetadata
     private $isNullable;
     private $attribute;
 
-    public function __construct(string $name, ?string $type, bool $isVariadic, bool $hasDefaultValue, $defaultValue, bool $isNullable = false, ?ArgumentInterface $attribute = null)
+    public function __construct(string $name, ?string $type, bool $isVariadic, bool $hasDefaultValue, $defaultValue, bool $isNullable = false, ArgumentInterface $attribute = null)
     {
         $this->name = $name;
         $this->type = $type;

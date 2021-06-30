@@ -86,7 +86,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *                          to specify the allowed magic methods (__get, __set, __call)
      *                          or self::DISALLOW_MAGIC_METHODS for none
      */
-    public function __construct(/*int */$magicMethods = self::MAGIC_GET | self::MAGIC_SET, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, bool $throwExceptionOnInvalidPropertyPath = true, PropertyReadInfoExtractorInterface $readInfoExtractor = null, PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
+    public function __construct($magicMethods = self::MAGIC_GET | self::MAGIC_SET, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, bool $throwExceptionOnInvalidPropertyPath = true, PropertyReadInfoExtractorInterface $readInfoExtractor = null, PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
     {
         if (\is_bool($magicMethods)) {
             trigger_deprecation('symfony/property-access', '5.2', 'Passing a boolean as the first argument to "%s()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).', __METHOD__);

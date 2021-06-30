@@ -27,7 +27,7 @@ final class EsendexTransportTest extends TransportTestCase
     /**
      * @return EsendexTransport
      */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
         return (new EsendexTransport('testToken', 'testAccountReference', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }

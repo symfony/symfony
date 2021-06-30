@@ -33,7 +33,7 @@ final class RateLimiterFactory
     private $storage;
     private $lockFactory;
 
-    public function __construct(array $config, StorageInterface $storage, ?LockFactory $lockFactory = null)
+    public function __construct(array $config, StorageInterface $storage, LockFactory $lockFactory = null)
     {
         $this->storage = $storage;
         $this->lockFactory = $lockFactory;
@@ -44,7 +44,7 @@ final class RateLimiterFactory
         $this->config = $options->resolve($config);
     }
 
-    public function create(?string $key = null): LimiterInterface
+    public function create(string $key = null): LimiterInterface
     {
         $id = $this->config['id'].'-'.$key;
         $lock = $this->lockFactory ? $this->lockFactory->createLock($id) : new NoLock();

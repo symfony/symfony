@@ -28,7 +28,7 @@ final class SlackOptionsTest extends TestCase
      * @dataProvider toArrayProvider
      * @dataProvider toArraySimpleOptionsProvider
      */
-    public function testToArray(array $options, ?array $expected = null)
+    public function testToArray(array $options, array $expected = null)
     {
         $this->assertSame($expected ?? $options, (new SlackOptions($options))->toArray());
     }

@@ -306,7 +306,7 @@ class Connection
         return (int) ($attributes[QueueAttributeName::APPROXIMATE_NUMBER_OF_MESSAGES] ?? 0);
     }
 
-    public function send(string $body, array $headers, int $delay = 0, ?string $messageGroupId = null, ?string $messageDeduplicationId = null): void
+    public function send(string $body, array $headers, int $delay = 0, string $messageGroupId = null, string $messageDeduplicationId = null): void
     {
         if ($this->configuration['auto_setup']) {
             $this->setup();

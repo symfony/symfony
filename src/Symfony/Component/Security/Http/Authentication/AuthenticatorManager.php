@@ -58,7 +58,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     /**
      * @param AuthenticatorInterface[] $authenticators
      */
-    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true, bool $hideUserNotFoundExceptions = true)
+    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, LoggerInterface $logger = null, bool $eraseCredentials = true, bool $hideUserNotFoundExceptions = true)
     {
         $this->authenticators = $authenticators;
         $this->tokenStorage = $tokenStorage;

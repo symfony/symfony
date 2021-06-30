@@ -29,7 +29,7 @@ final class Dsn
     private $path;
     private $dsn;
 
-    public function __construct(string $scheme, string $host, ?string $user = null, ?string $password = null, ?int $port = null, array $options = [], ?string $path = null)
+    public function __construct(string $scheme, string $host, string $user = null, string $password = null, int $port = null, array $options = [], string $path = null)
     {
         $this->scheme = $scheme;
         $this->host = $host;

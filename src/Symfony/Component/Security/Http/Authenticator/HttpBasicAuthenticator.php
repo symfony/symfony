@@ -41,7 +41,7 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
     private $userProvider;
     private $logger;
 
-    public function __construct(string $realmName, UserProviderInterface $userProvider, ?LoggerInterface $logger = null)
+    public function __construct(string $realmName, UserProviderInterface $userProvider, LoggerInterface $logger = null)
     {
         $this->realmName = $realmName;
         $this->userProvider = $userProvider;

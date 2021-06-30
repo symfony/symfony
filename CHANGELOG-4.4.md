@@ -7,6 +7,34 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.26 (2021-06-30)
+
+ * bug #41893 [Filesystem] Workaround cannot dumpFile into "protected" folders on Windows (arnegroskurth)
+ * bug #41665 [HttpKernel] Keep max lifetime also when part of the responses don't set it (mpdude)
+ * bug #41760 [ErrorHandler] fix handling buffered SilencedErrorContext (nicolas-grekas)
+ * bug #41807 [HttpClient] fix Psr18Client when allow_url_fopen=0 (nicolas-grekas)
+ * bug #40857 [DependencyInjection] Add support of PHP enumerations (alexandre-daubois)
+ * bug #41767 [Config] fix tracking default values that reference the parent class (nicolas-grekas)
+ * bug #41768 [DependencyInjection] Fix binding "iterable $foo" when using the PHP-DSL (nicolas-grekas)
+ * bug #41793 [Cache] handle prefixed redis connections when clearing pools (nicolas-grekas)
+ * bug #41804 [Cache] fix eventual consistency when using RedisTagAwareAdapter with a cluster (nicolas-grekas)
+ * bug #41773 [Cache] Disable locking on Windows by default (nicolas-grekas)
+ * bug #41655 [Mailer] fix encoding of addresses using SmtpTransport (dmaicher)
+ * bug #41663 [HttpKernel] [HttpCache] Keep s-maxage=0 from ESI sub-responses (mpdude)
+ * bug #41701 [VarDumper] Fix tests for PHP 8.1 (alexandre-daubois)
+ * bug #41795 [FrameworkBundle] Replace var_export with VarExporter to use array short syntax in secrets list files (alexandre-daubois)
+ * bug #41779 [DependencyInjection] throw proper exception when decorating a synthetic service (nicolas-grekas)
+ * bug #41776 [ErrorHandler] [DebugClassLoader] Do not check Phake mocks classes (adoy)
+ * bug #41780 [PhpUnitBridge] fix handling the COMPOSER_BINARY env var when using simple-phpunit (Taluu)
+ * bug #41670 [HttpFoundation] allow savePath of NativeFileSessionHandler to be null (simon.chrzanowski)
+ * bug #41644 [Config] fix tracking attributes in ReflectionClassResource (nicolas-grekas)
+ * bug #41621 [Process] Fix incorrect parameter type (bch36)
+ * bug #41624 [HttpClient] Revert bindto workaround for unaffected PHP versions (derrabus)
+ * bug #41549 [Security] Fix opcache preload with alias classes (jderusse)
+ * bug #41491 [Serializer] Do not allow to denormalize string with spaces only to valid a DateTime object (sidz)
+ * bug #41386 [Console] Escape synopsis output (jschaedl)
+ * bug #41495 [HttpFoundation] Add ReturnTypeWillChange to SessionHandlers (nikic)
+
 * 4.4.25 (2021-06-01)
 
  * bug #41000 [Form] Use !isset for checks cause this doesn't falsely include 0 (Kai Dederichs)

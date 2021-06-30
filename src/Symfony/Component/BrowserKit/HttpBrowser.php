@@ -42,7 +42,7 @@ class HttpBrowser extends AbstractBrowser
     /**
      * @param Request $request
      */
-    protected function doRequest($request): Response
+    protected function doRequest(object $request): Response
     {
         $headers = $this->getHeaders($request);
         [$body, $extraHeaders] = $this->getBodyAndExtraHeaders($request, $headers);

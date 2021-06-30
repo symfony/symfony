@@ -80,7 +80,7 @@ class Type
         $this->collectionValueType = $this->validateCollectionArgument($collectionValueType, 6, '$collectionValueType') ?? [];
     }
 
-    private function validateCollectionArgument(array|Type $collectionArgument, int $argumentIndex, string $argumentName): ?array
+    private function validateCollectionArgument(array|Type|null $collectionArgument, int $argumentIndex, string $argumentName): ?array
     {
         if (null === $collectionArgument) {
             return null;

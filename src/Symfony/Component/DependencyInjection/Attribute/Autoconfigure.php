@@ -23,12 +23,12 @@ class Autoconfigure
         public ?array $tags = null,
         public ?array $calls = null,
         public ?array $bind = null,
-        public bool|string $lazy = null,
+        public bool|string|null $lazy = null,
         public ?bool $public = null,
         public ?bool $shared = null,
         public ?bool $autowire = null,
         public ?array $properties = null,
-        public array|string $configurator = null,
+        public array|string|null $configurator = null,
     ) {
     }
 }

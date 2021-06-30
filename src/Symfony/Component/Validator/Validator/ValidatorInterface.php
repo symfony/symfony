@@ -44,7 +44,6 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * Validates a property of an object against the constraints specified
      * for this property.
      *
-     * @param object                                                $object       The object
      * @param string                                                $propertyName The name of the validated property
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups       The validation groups to validate. If none is given, "Default" is assumed
      *
@@ -52,7 +51,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validateProperty($object, string $propertyName, $groups = null);
+    public function validateProperty(object $object, string $propertyName, $groups = null);
 
     /**
      * Validates a value against the constraints specified for an object's

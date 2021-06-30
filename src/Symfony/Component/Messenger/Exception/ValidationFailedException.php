@@ -21,10 +21,7 @@ class ValidationFailedException extends RuntimeException
     private $violations;
     private $violatingMessage;
 
-    /**
-     * @param object $violatingMessage
-     */
-    public function __construct($violatingMessage, ConstraintViolationListInterface $violations)
+    public function __construct(object $violatingMessage, ConstraintViolationListInterface $violations)
     {
         $this->violatingMessage = $violatingMessage;
         $this->violations = $violations;

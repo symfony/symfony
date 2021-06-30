@@ -18,10 +18,7 @@ final class ObjectParameter
     private $stringable;
     private $class;
 
-    /**
-     * @param object $object
-     */
-    public function __construct($object, ?\Throwable $error)
+    public function __construct(object $object, ?\Throwable $error)
     {
         $this->object = $object;
         $this->error = $error;
@@ -29,10 +26,7 @@ final class ObjectParameter
         $this->class = \get_class($object);
     }
 
-    /**
-     * @return object
-     */
-    public function getObject()
+    public function getObject(): object
     {
         return $this->object;
     }

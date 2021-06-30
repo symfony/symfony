@@ -5,6 +5,7 @@
             "symfony/form": "source",
             "symfony/http-kernel": "source",
             "symfony/notifier": "source",
+            "symfony/proxy-manager-bridge": "source",
             "symfony/validator": "source",
             "*": "dist"
         }

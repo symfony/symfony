@@ -38,7 +38,7 @@ class PlaintextPasswordHasher implements LegacyPasswordHasherInterface
     /**
      * {@inheritdoc}
      */
-    public function hash(string $plainPassword, ?string $salt = null): string
+    public function hash(string $plainPassword, string $salt = null): string
     {
         if ($this->isPasswordTooLong($plainPassword)) {
             throw new InvalidPasswordException();
@@ -47,7 +47,7 @@ class PlaintextPasswordHasher implements LegacyPasswordHasherInterface
         return $this->mergePasswordAndSalt($plainPassword, $salt);
     }
 
-    public function verify(string $hashedPassword, string $plainPassword, ?string $salt = null): bool
+    public function verify(string $hashedPassword, string $plainPassword, string $salt = null): bool
     {
         if ($this->isPasswordTooLong($plainPassword)) {
             return false;

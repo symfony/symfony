@@ -32,7 +32,7 @@ final class SlackTransportTest extends TransportTestCase
     /**
      * @return SlackTransport
      */
-    public function createTransport(?HttpClientInterface $client = null, string $channel = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $channel = null): TransportInterface
     {
         return new SlackTransport('xoxb-TestToken', $channel, $client ?? $this->createMock(HttpClientInterface::class));
     }

@@ -53,7 +53,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function getUsername(/* $legacy = true */)
     {
-        if (1 === func_num_args() && false === func_get_arg(0)) {
+        if (1 === \func_num_args() && false === func_get_arg(0)) {
             return null;
         }
 

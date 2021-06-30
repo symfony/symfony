@@ -12,10 +12,9 @@
 namespace Symfony\Component\Security\Core\Signature;
 
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureException;
 use Symfony\Component\Security\Core\Signature\Exception\InvalidSignatureException;
-use Symfony\Component\Security\Core\Signature\ExpiredSignatureStorage;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Creates and validates secure hashes used in login links and remember-me cookies.
@@ -36,7 +35,7 @@ class SignatureHasher
      * @param ExpiredSignatureStorage|null $expiredSignaturesStorage if provided, secures a sequence of hashes that are expired
      * @param int|null                     $maxUses                  used together with $expiredSignatureStorage to allow a maximum usage of a hash
      */
-    public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, ?ExpiredSignatureStorage $expiredSignaturesStorage = null, ?int $maxUses = null)
+    public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, ExpiredSignatureStorage $expiredSignaturesStorage = null, int $maxUses = null)
     {
         $this->propertyAccessor = $propertyAccessor;
         $this->signatureProperties = $signatureProperties;

@@ -192,7 +192,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             return (string) $env;
         }
 
-        if (in_array($prefix, ['bool', 'not'], true)) {
+        if (\in_array($prefix, ['bool', 'not'], true)) {
             $env = (bool) (filter_var($env, \FILTER_VALIDATE_BOOLEAN) ?: filter_var($env, \FILTER_VALIDATE_INT) ?: filter_var($env, \FILTER_VALIDATE_FLOAT));
 
             return 'not' === $prefix ? !$env : $env;

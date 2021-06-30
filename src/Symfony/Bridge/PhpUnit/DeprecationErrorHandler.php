@@ -162,7 +162,7 @@ class DeprecationErrorHandler
 
         if ('legacy' === $group) {
             $this->deprecationGroups[$group]->addNotice();
-        } else if ($deprecation->originatesFromAnObject()) {
+        } elseif ($deprecation->originatesFromAnObject()) {
             $class = $deprecation->originatingClass();
             $method = $deprecation->originatingMethod();
             $this->deprecationGroups[$group]->addNoticeFromObject($msg, $class, $method);

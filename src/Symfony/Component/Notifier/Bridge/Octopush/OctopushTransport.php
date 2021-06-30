@@ -32,7 +32,7 @@ final class OctopushTransport extends AbstractTransport
     private $from;
     private $type;
 
-    public function __construct(string $userLogin, string $apiKey, string $from, string $type, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $userLogin, string $apiKey, string $from, string $type, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->userLogin = $userLogin;
         $this->apiKey = $apiKey;

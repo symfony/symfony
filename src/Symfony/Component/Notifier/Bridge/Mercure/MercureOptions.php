@@ -27,7 +27,7 @@ final class MercureOptions implements MessageOptionsInterface
     /**
      * @param string|string[]|null $topics
      */
-    public function __construct($topics = null, bool $private = false, ?string $id = null, ?string $type = null, ?int $retry = null)
+    public function __construct($topics = null, bool $private = false, string $id = null, string $type = null, int $retry = null)
     {
         if (null !== $topics && !\is_array($topics) && !\is_string($topics)) {
             throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an array of strings, a string or null, "%s" given.', __METHOD__, get_debug_type($topics)));

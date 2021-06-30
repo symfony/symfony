@@ -20,8 +20,6 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class ServiceConfigurator extends AbstractServiceConfigurator
 {
-    public const FACTORY = 'services';
-
     use Traits\AbstractTrait;
     use Traits\ArgumentTrait;
     use Traits\AutoconfigureTrait;
@@ -41,6 +39,8 @@ class ServiceConfigurator extends AbstractServiceConfigurator
     use Traits\ShareTrait;
     use Traits\SyntheticTrait;
     use Traits\TagTrait;
+
+    public const FACTORY = 'services';
 
     private $container;
     private $instanceof;

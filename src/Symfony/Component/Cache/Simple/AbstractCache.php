@@ -27,16 +27,16 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterface, ResettableInterface
 {
-    /**
-     * @internal
-     */
-    protected const NS_SEPARATOR = ':';
-
     use AbstractTrait {
         deleteItems as private;
         AbstractTrait::deleteItem as delete;
         AbstractTrait::hasItem as has;
     }
+
+    /**
+     * @internal
+     */
+    protected const NS_SEPARATOR = ':';
 
     private $defaultLifetime;
 

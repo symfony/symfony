@@ -25,7 +25,10 @@ class ExpressionValidator extends ConstraintValidator
 {
     private $expressionLanguage;
 
-    public function __construct(/*ExpressionLanguage */$expressionLanguage = null)
+    /**
+     * @param ExpressionLanguage|null $expressionLanguage
+     */
+    public function __construct($expressionLanguage = null)
     {
         if (\func_num_args() > 1) {
             @trigger_error(sprintf('The "%s" instance should be passed as "%s" first argument instead of second argument since 4.4.', ExpressionLanguage::class, __METHOD__), \E_USER_DEPRECATED);

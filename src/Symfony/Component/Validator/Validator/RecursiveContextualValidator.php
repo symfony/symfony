@@ -166,7 +166,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validateProperty($object, string $propertyName, $groups = null)
+    public function validateProperty(object $object, string $propertyName, $groups = null)
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
@@ -300,7 +300,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *                                      metadata factory does not implement
      *                                      {@link ClassMetadataInterface}
      */
-    private function validateObject($object, string $propertyPath, array $groups, int $traversalStrategy, ExecutionContextInterface $context)
+    private function validateObject(object $object, string $propertyPath, array $groups, int $traversalStrategy, ExecutionContextInterface $context)
     {
         try {
             $classMetadata = $this->metadataFactory->getMetadataFor($object);
@@ -765,10 +765,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         }
     }
 
-    /**
-     * @param object $object
-     */
-    private function generateCacheKey($object, bool $dependsOnPropertyPath = false): string
+    private function generateCacheKey(object $object, bool $dependsOnPropertyPath = false): string
     {
         if ($this->context instanceof ExecutionContext) {
             $cacheKey = $this->context->generateCacheKey($object);

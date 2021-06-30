@@ -26,10 +26,7 @@ final class ObjectParameter
         $this->class = \get_class($object);
     }
 
-    /**
-     * @return object
-     */
-    public function getObject()
+    public function getObject(): object
     {
         return $this->object;
     }

@@ -32,20 +32,18 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     protected $logger;
     protected $stopwatch;
 
-    private $callStack;
-    private $dispatcher;
-    private $wrappedListeners;
-    private $orphanedEvents;
-    private $requestStack;
-    private $currentRequestHash = '';
+    private ?\SplObjectStorage $callStack = null;
+    private EventDispatcherInterface $dispatcher;
+    private array $wrappedListeners = [];
+    private array $orphanedEvents = [];
+    private ?RequestStack $requestStack;
+    private string $currentRequestHash = '';
 
     public function __construct(EventDispatcherInterface $dispatcher, Stopwatch $stopwatch, LoggerInterface $logger = null, RequestStack $requestStack = null)
     {
         $this->dispatcher = $dispatcher;
         $this->stopwatch = $stopwatch;
         $this->logger = $logger;
-        $this->wrappedListeners = [];
-        $this->orphanedEvents = [];
         $this->requestStack = $requestStack;
     }
 

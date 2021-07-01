@@ -80,7 +80,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * {@inheritdoc}
      */
-    public function encode($data, string $format, array $context = [])
+    public function encode(mixed $data, string $format, array $context = [])
     {
         $encoderIgnoredNodeTypes = $context[self::ENCODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::ENCODER_IGNORED_NODE_TYPES];
         $ignorePiNode = \in_array(\XML_PI_NODE, $encoderIgnoredNodeTypes, true);
@@ -217,10 +217,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         return true;
     }
 
-    /**
-     * @param \DOMDocumentFragment $fragment
-     */
-    final protected function appendDocumentFragment(\DOMNode $node, $fragment): bool
+    final protected function appendDocumentFragment(\DOMNode $node, \DOMDocumentFragment $fragment): bool
     {
         if ($fragment instanceof \DOMDocumentFragment) {
             $node->appendChild($fragment);
@@ -357,11 +354,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Parse the data and convert it to DOMElements.
      *
-     * @param array|object $data
-     *
      * @throws NotEncodableValueException
      */
-    private function buildXml(\DOMNode $parentNode, $data, string $xmlRootNodeName = null): bool
+    private function buildXml(\DOMNode $parentNode, mixed $data, string $xmlRootNodeName = null): bool
     {
         $append = true;
         $removeEmptyTags = $this->context[self::REMOVE_EMPTY_TAGS] ?? $this->defaultContext[self::REMOVE_EMPTY_TAGS] ?? false;
@@ -431,10 +426,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     /**
      * Selects the type of node to create and appends it to the parent.
-     *
-     * @param array|object $data
      */
-    private function appendNode(\DOMNode $parentNode, $data, string $nodeName, string $key = null): bool
+    private function appendNode(\DOMNode $parentNode, mixed $data, string $nodeName, string $key = null): bool
     {
         $node = $this->dom->createElement($nodeName);
         if (null !== $key) {
@@ -462,7 +455,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @throws NotEncodableValueException
      */
-    private function selectNodeType(\DOMNode $node, $val): bool
+    private function selectNodeType(\DOMNode $node, mixed $val): bool
     {
         if (\is_array($val)) {
             return $this->buildXml($node, $val);

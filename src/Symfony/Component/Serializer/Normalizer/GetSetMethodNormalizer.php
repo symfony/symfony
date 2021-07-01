@@ -39,7 +39,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization(mixed $data, string $format = null)
     {
         return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
     }
@@ -47,7 +47,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, string $type, string $format = null)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null)
     {
         return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
@@ -146,7 +146,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
     {
         $setter = 'set'.ucfirst($attribute);
         $key = \get_class($object).':'.$setter;

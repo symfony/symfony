@@ -54,7 +54,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function encode($data, string $format, array $context = [])
+    public function encode(mixed $data, string $format, array $context = [])
     {
         $context = array_merge($this->defaultContext, $context);
 

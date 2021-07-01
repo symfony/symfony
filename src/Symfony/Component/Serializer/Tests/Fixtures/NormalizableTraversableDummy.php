@@ -26,7 +26,7 @@ class NormalizableTraversableDummy extends TraversableDummy implements Normaliza
         ];
     }
 
-    public function denormalize(DenormalizerInterface $denormalizer, $data, string $format = null, array $context = [])
+    public function denormalize(DenormalizerInterface $denormalizer, array|string|int|float|bool $data, string $format = null, array $context = [])
     {
         return [
             'foo' => 'denormalizedFoo',

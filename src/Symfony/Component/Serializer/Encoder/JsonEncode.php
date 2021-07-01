@@ -32,11 +32,9 @@ class JsonEncode implements EncoderInterface
     }
 
     /**
-     * Encodes PHP data to a JSON string.
-     *
      * {@inheritdoc}
      */
-    public function encode($data, string $format, array $context = [])
+    public function encode(mixed $data, string $format, array $context = [])
     {
         $options = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
 

@@ -43,7 +43,7 @@ class CacheClassMetadataFactory implements ClassMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getMetadataFor($value)
+    public function getMetadataFor(string|object $value)
     {
         $class = $this->getClass($value);
 
@@ -67,7 +67,7 @@ class CacheClassMetadataFactory implements ClassMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function hasMetadataFor($value)
+    public function hasMetadataFor(mixed $value)
     {
         return $this->decorated->hasMetadataFor($value);
     }

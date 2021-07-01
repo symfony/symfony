@@ -50,7 +50,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
      *
      * @return string
      */
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = [])
     {
         if (!$object instanceof \SplFileInfo) {
             throw new InvalidArgumentException('The object must be an instance of "\SplFileInfo".');
@@ -76,7 +76,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization(mixed $data, string $format = null)
     {
         return $data instanceof \SplFileInfo;
     }
@@ -93,7 +93,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
      *
      * @return \SplFileInfo
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
     {
         if (!preg_match('/^data:([a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}\/[a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}(;[a-z0-9\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
             throw new NotNormalizableValueException('The provided "data:" URI is not valid.');
@@ -122,7 +122,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, string $type, string $format = null)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null)
     {
         return isset(self::SUPPORTED_TYPES[$type]);
     }

@@ -153,7 +153,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
     {
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);
@@ -165,7 +165,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAllowedAttributes($classOrObject, array $context, bool $attributesAsString = false)
+    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false)
     {
         if (false === $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString)) {
             return false;

@@ -125,7 +125,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization(mixed $data, string $format = null)
     {
         return \is_object($data) && !$data instanceof \Traversable;
     }
@@ -133,7 +133,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -217,7 +217,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Computes the normalization context merged with current one. Metadata always wins over global context, as more specific.
      */
-    private function getAttributeNormalizationContext($object, string $attribute, array $context): array
+    private function getAttributeNormalizationContext(object $object, string $attribute, array $context): array
     {
         if (null === $metadata = $this->getAttributeMetadata($object, $attribute)) {
             return $context;
@@ -238,7 +238,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return array_merge($context, $metadata->getDenormalizationContextForGroups($this->getGroups($context)));
     }
 
-    private function getAttributeMetadata($objectOrClass, string $attribute): ?AttributeMetadataInterface
+    private function getAttributeMetadata(object|string $objectOrClass, string $attribute): ?AttributeMetadataInterface
     {
         if (!$this->classMetadataFactory) {
             return null;
@@ -250,7 +250,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
     {
         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
             if (!isset($data[$mapping->getTypeProperty()])) {
@@ -324,7 +324,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, string $type, string $format = null)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null)
     {
         return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
@@ -332,7 +332,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -386,19 +386,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Sets attribute value.
      */
-    abstract protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []);
+    abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = []);
 
     /**
      * Validates the submitted data and denormalizes it.
      *
-     * @param mixed $data
-     *
-     * @return mixed
-     *
      * @throws NotNormalizableValueException
      * @throws LogicException
      */
-    private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context)
+    private function validateAndDenormalize(string $currentClass, string $attribute, mixed $data, ?string $format, array $context): mixed
     {
         if (null === $types = $this->getTypes($currentClass, $attribute)) {
             return $data;
@@ -534,7 +530,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * @internal
      */
-    protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, $parameterData, array $context, string $format = null)
+    protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, mixed $parameterData, array $context, string $format = null): mixed
     {
         if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $this->propertyTypeExtractor->getTypes($class->getName(), $parameterName)) {
             return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
@@ -582,10 +578,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * Sets an attribute and apply the name converter if necessary.
-     *
-     * @param mixed $attributeValue
      */
-    private function updateData(array $data, string $attribute, $attributeValue, string $class, ?string $format, array $context): array
+    private function updateData(array $data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context): array
     {
         if (null === $attributeValue && ($context[self::SKIP_NULL_VALUES] ?? $this->defaultContext[self::SKIP_NULL_VALUES] ?? false)) {
             return $data;
@@ -653,10 +647,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * Builds the cache key for the attributes cache.
      *
      * The key must be different for every option in the context that could change which attributes should be handled.
-     *
-     * @return bool|string
      */
-    private function getCacheKey(?string $format, array $context)
+    private function getCacheKey(?string $format, array $context): bool|string
     {
         foreach ($context[self::EXCLUDE_FROM_CACHE_KEY] ?? $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] as $key) {
             unset($context[$key]);

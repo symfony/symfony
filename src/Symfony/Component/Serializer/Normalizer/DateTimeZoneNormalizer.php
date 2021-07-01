@@ -28,7 +28,7 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
      *
      * @return string
      */
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = [])
     {
         if (!$object instanceof \DateTimeZone) {
             throw new InvalidArgumentException('The object must be an instance of "\DateTimeZone".');
@@ -40,7 +40,7 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization(mixed $data, string $format = null)
     {
         return $data instanceof \DateTimeZone;
     }
@@ -52,7 +52,7 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
      *
      * @return \DateTimeZone
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
     {
         if ('' === $data || null === $data) {
             throw new NotNormalizableValueException('The data is either an empty string or null, you should pass a string that can be parsed as a DateTimeZone.');
@@ -68,7 +68,7 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, string $type, string $format = null)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null)
     {
         return \DateTimeZone::class === $type;
     }

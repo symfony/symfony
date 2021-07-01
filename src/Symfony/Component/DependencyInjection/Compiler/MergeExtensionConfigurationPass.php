@@ -109,7 +109,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
  */
 class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
 {
-    private $processedEnvPlaceholders;
+    private array $processedEnvPlaceholders;
 
     public function __construct(parent $parameterBag)
     {
@@ -143,12 +143,12 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
      */
     public function getEnvPlaceholders(): array
     {
-        return null !== $this->processedEnvPlaceholders ? $this->processedEnvPlaceholders : parent::getEnvPlaceholders();
+        return $this->processedEnvPlaceholders ?? parent::getEnvPlaceholders();
     }
 
     public function getUnusedEnvPlaceholders(): array
     {
-        return null === $this->processedEnvPlaceholders ? [] : array_diff_key(parent::getEnvPlaceholders(), $this->processedEnvPlaceholders);
+        return !isset($this->processedEnvPlaceholders) ? [] : array_diff_key(parent::getEnvPlaceholders(), $this->processedEnvPlaceholders);
     }
 }
 
@@ -159,7 +159,7 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
  */
 class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
 {
-    private $extensionClass;
+    private string $extensionClass;
 
     public function __construct(ExtensionInterface $extension, ParameterBagInterface $parameterBag = null)
     {

@@ -59,10 +59,10 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         'string' => true,
     ];
 
-    private $autoload;
-    private $skippedIds;
+    private bool $autoload;
+    private array $skippedIds;
 
-    private $expressionLanguage;
+    private ExpressionLanguage $expressionLanguage;
 
     /**
      * @param bool  $autoload   Whether services who's class in not loaded should be checked or not.
@@ -309,10 +309,6 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
 
     private function getExpressionLanguage(): ExpressionLanguage
     {
-        if (null === $this->expressionLanguage) {
-            $this->expressionLanguage = new ExpressionLanguage(null, $this->container->getExpressionLanguageProviders());
-        }
-
-        return $this->expressionLanguage;
+        return $this->expressionLanguage ??= new ExpressionLanguage(null, $this->container->getExpressionLanguageProviders());
     }
 }

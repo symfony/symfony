@@ -30,10 +30,10 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class GraphvizDumper extends Dumper
 {
-    private $nodes;
-    private $edges;
+    private array $nodes;
+    private array $edges;
     // All values should be strings
-    private $options = [
+    private array $options = [
             'graph' => ['ratio' => 'compress'],
             'node' => ['fontsize' => '11', 'fontname' => 'Arial', 'shape' => 'record'],
             'edge' => ['fontsize' => '9', 'fontname' => 'Arial', 'color' => 'grey', 'arrowhead' => 'open', 'arrowsize' => '0.5'],

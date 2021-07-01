@@ -37,7 +37,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlDumper extends Dumper
 {
-    private $dumper;
+    private YmlDumper $dumper;
 
     /**
      * Dumps the service container as an YAML string.
@@ -46,13 +46,11 @@ class YamlDumper extends Dumper
      */
     public function dump(array $options = [])
     {
-        if (!class_exists(\Symfony\Component\Yaml\Dumper::class)) {
+        if (!class_exists(YmlDumper::class)) {
             throw new LogicException('Unable to dump the container as the Symfony Yaml Component is not installed.');
         }
 
-        if (null === $this->dumper) {
-            $this->dumper = new YmlDumper();
-        }
+        $this->dumper ??= new YmlDumper();
 
         return $this->container->resolveEnvPlaceholders($this->addParameters()."\n".$this->addServices());
     }

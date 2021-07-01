@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class CheckArgumentsValidityPass extends AbstractRecursivePass
 {
-    private $throwExceptions;
+    private bool $throwExceptions;
 
     public function __construct(bool $throwExceptions = true)
     {

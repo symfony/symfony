@@ -21,10 +21,10 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 final class ReverseContainer
 {
-    private $serviceContainer;
-    private $reversibleLocator;
-    private $tagName;
-    private $getServiceId;
+    private Container $serviceContainer;
+    private ContainerInterface $reversibleLocator;
+    private string $tagName;
+    private \Closure $getServiceId;
 
     public function __construct(Container $serviceContainer, ContainerInterface $reversibleLocator, string $tagName = 'container.reversible')
     {

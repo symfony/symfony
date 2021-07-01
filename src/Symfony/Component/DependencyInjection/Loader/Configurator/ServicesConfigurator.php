@@ -26,13 +26,13 @@ class ServicesConfigurator extends AbstractConfigurator
 {
     public const FACTORY = 'services';
 
-    private $defaults;
-    private $container;
-    private $loader;
-    private $instanceof;
-    private $path;
-    private $anonymousHash;
-    private $anonymousCount;
+    private Definition $defaults;
+    private ContainerBuilder $container;
+    private PhpFileLoader $loader;
+    private array $instanceof;
+    private ?string $path;
+    private string $anonymousHash;
+    private int $anonymousCount;
 
     public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, string $path = null, int &$anonymousCount = 0)
     {

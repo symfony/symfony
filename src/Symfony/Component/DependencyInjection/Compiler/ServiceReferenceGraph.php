@@ -29,7 +29,7 @@ class ServiceReferenceGraph
     /**
      * @var ServiceReferenceGraphNode[]
      */
-    private $nodes = [];
+    private array $nodes = [];
 
     public function hasNode(string $id): bool
     {

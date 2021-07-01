@@ -62,38 +62,34 @@ class PhpDumper extends Dumper
      */
     public const NON_FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 
-    private $definitionVariables;
-    private $referenceVariables;
-    private $variableCount;
-    private $inlinedDefinitions;
-    private $serviceCalls;
-    private $reservedVariables = ['instance', 'class', 'this', 'container'];
-    private $expressionLanguage;
-    private $targetDirRegex;
-    private $targetDirMaxMatches;
-    private $docStar;
-    private $serviceIdToMethodNameMap;
-    private $usedMethodNames;
-    private $namespace;
-    private $asFiles;
-    private $hotPathTag;
-    private $preloadTags;
-    private $inlineFactories;
-    private $inlineRequires;
-    private $inlinedRequires = [];
-    private $circularReferences = [];
-    private $singleUsePrivateIds = [];
-    private $preload = [];
-    private $addGetService = false;
-    private $locatedIds = [];
-    private $serviceLocatorTag;
-    private $exportedVariables = [];
-    private $baseClass;
-
-    /**
-     * @var ProxyDumper
-     */
-    private $proxyDumper;
+    private ?\SplObjectStorage $definitionVariables = null;
+    private ?array $referenceVariables = null;
+    private int $variableCount;
+    private ?\SplObjectStorage $inlinedDefinitions = null;
+    private ?array $serviceCalls = null;
+    private array $reservedVariables = ['instance', 'class', 'this', 'container'];
+    private ExpressionLanguage $expressionLanguage;
+    private ?string $targetDirRegex = null;
+    private int $targetDirMaxMatches;
+    private string $docStar;
+    private array $serviceIdToMethodNameMap;
+    private array $usedMethodNames;
+    private string $namespace;
+    private bool $asFiles;
+    private string $hotPathTag;
+    private array $preloadTags;
+    private bool $inlineFactories;
+    private bool $inlineRequires;
+    private array $inlinedRequires = [];
+    private array $circularReferences = [];
+    private array $singleUsePrivateIds = [];
+    private array $preload = [];
+    private bool $addGetService = false;
+    private array $locatedIds = [];
+    private string $serviceLocatorTag;
+    private array $exportedVariables = [];
+    private string $baseClass;
+    private ProxyDumper $proxyDumper;
 
     /**
      * {@inheritdoc}
@@ -402,11 +398,7 @@ EOF;
      */
     private function getProxyDumper(): ProxyDumper
     {
-        if (!$this->proxyDumper) {
-            $this->proxyDumper = new NullDumper();
-        }
-
-        return $this->proxyDumper;
+        return $this->proxyDumper ??= new NullDumper();
     }
 
     private function analyzeReferences()
@@ -2032,7 +2024,7 @@ EOF;
 
     private function getExpressionLanguage(): ExpressionLanguage
     {
-        if (null === $this->expressionLanguage) {
+        if (!isset($this->expressionLanguage)) {
             if (!class_exists(\Symfony\Component\ExpressionLanguage\ExpressionLanguage::class)) {
                 throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }

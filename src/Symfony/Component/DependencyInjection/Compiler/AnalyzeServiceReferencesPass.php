@@ -30,15 +30,15 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AnalyzeServiceReferencesPass extends AbstractRecursivePass
 {
-    private $graph;
-    private $currentDefinition;
-    private $onlyConstructorArguments;
-    private $hasProxyDumper;
-    private $lazy;
-    private $byConstructor;
-    private $byFactory;
-    private $definitions;
-    private $aliases;
+    private ServiceReferenceGraph $graph;
+    private ?Definition $currentDefinition = null;
+    private bool $onlyConstructorArguments;
+    private bool $hasProxyDumper;
+    private bool $lazy;
+    private bool $byConstructor;
+    private bool $byFactory;
+    private array $definitions;
+    private array $aliases;
 
     /**
      * @param bool $onlyConstructorArguments Sets this Service Reference pass to ignore method calls

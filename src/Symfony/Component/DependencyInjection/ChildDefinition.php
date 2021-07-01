@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  */
 class ChildDefinition extends Definition
 {
-    private $parent;
+    private string $parent;
 
     /**
      * @param string $parent The id of Definition instance to decorate

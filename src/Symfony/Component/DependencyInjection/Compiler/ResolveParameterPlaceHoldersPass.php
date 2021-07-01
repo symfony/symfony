@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * Resolves all parameter placeholders "%somevalue%" to their real values.
@@ -22,7 +23,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
  */
 class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
 {
-    private $bag;
+    private ParameterBagInterface $bag;
 
     public function __construct(
         private bool $resolveArrays = true,
@@ -56,7 +57,7 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
         }
 
         $this->bag->resolve();
-        $this->bag = null;
+        unset($this->bag);
     }
 
     protected function processValue(mixed $value, bool $isRoot = false)

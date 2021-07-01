@@ -34,7 +34,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 class PhpFileLoader extends FileLoader
 {
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
-    private $generator;
+    private ?ConfigBuilderGeneratorInterface $generator;
 
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null, ConfigBuilderGeneratorInterface $generator = null)
     {

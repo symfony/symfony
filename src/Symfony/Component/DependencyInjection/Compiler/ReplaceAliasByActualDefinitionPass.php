@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
 {
-    private $replacements;
+    private array $replacements;
 
     /**
      * Process the Container to replace aliases with service definitions.

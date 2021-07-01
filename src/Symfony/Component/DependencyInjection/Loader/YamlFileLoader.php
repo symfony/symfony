@@ -107,10 +107,10 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private $yamlParser;
+    private YamlParser $yamlParser;
 
-    private $anonymousServicesCount;
-    private $anonymousServicesSuffix;
+    private int $anonymousServicesCount;
+    private string $anonymousServicesSuffix;
 
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
@@ -750,9 +750,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The file "%s" does not exist.', $file));
         }
 
-        if (null === $this->yamlParser) {
-            $this->yamlParser = new YamlParser();
-        }
+        $this->yamlParser ??= new YamlParser();
 
         try {
             $configuration = $this->yamlParser->parseFile($file, Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS);

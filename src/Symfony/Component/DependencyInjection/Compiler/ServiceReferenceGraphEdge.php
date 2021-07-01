@@ -20,12 +20,12 @@ namespace Symfony\Component\DependencyInjection\Compiler;
  */
 class ServiceReferenceGraphEdge
 {
-    private $sourceNode;
-    private $destNode;
-    private $value;
-    private $lazy;
-    private $weak;
-    private $byConstructor;
+    private ServiceReferenceGraphNode $sourceNode;
+    private ServiceReferenceGraphNode $destNode;
+    private mixed $value;
+    private bool $lazy;
+    private bool $weak;
+    private bool $byConstructor;
 
     public function __construct(ServiceReferenceGraphNode $sourceNode, ServiceReferenceGraphNode $destNode, mixed $value = null, bool $lazy = false, bool $weak = false, bool $byConstructor = false)
     {

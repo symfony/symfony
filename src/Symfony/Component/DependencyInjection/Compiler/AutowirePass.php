@@ -32,18 +32,18 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class AutowirePass extends AbstractRecursivePass
 {
-    private $types;
-    private $ambiguousServiceTypes;
-    private $autowiringAliases;
-    private $lastFailure;
-    private $throwOnAutowiringException;
-    private $decoratedClass;
-    private $decoratedId;
-    private $methodCalls;
-    private $getPreviousValue;
-    private $decoratedMethodIndex;
-    private $decoratedMethodArgumentIndex;
-    private $typesClone;
+    private array $types;
+    private array $ambiguousServiceTypes;
+    private array $autowiringAliases;
+    private ?string $lastFailure = null;
+    private bool $throwOnAutowiringException;
+    private ?string $decoratedClass = null;
+    private ?string $decoratedId = null;
+    private ?array $methodCalls = null;
+    private ?\Closure $getPreviousValue = null;
+    private ?int $decoratedMethodIndex = null;
+    private ?int $decoratedMethodArgumentIndex = null;
+    private ?self $typesClone = null;
 
     public function __construct(bool $throwOnAutowireException = true)
     {
@@ -460,7 +460,7 @@ class AutowirePass extends AbstractRecursivePass
         if ($message = $this->getAliasesSuggestionForType($container, $type = $reference->getType())) {
             return ' '.$message;
         }
-        if (null === $this->ambiguousServiceTypes) {
+        if (!isset($this->ambiguousServiceTypes)) {
             $this->populateAvailableTypes($container);
         }
 

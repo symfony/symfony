@@ -28,9 +28,9 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class ResolveBindingsPass extends AbstractRecursivePass
 {
-    private $usedBindings = [];
-    private $unusedBindings = [];
-    private $errorMessages = [];
+    private array $usedBindings = [];
+    private array $unusedBindings = [];
+    private array $errorMessages = [];
 
     /**
      * {@inheritdoc}

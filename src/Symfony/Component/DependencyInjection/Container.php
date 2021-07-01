@@ -58,9 +58,9 @@ class Container implements ContainerInterface, ResetInterface
     protected $resolving = [];
     protected $syntheticIds = [];
 
-    private $envCache = [];
-    private $compiled = false;
-    private $getEnv;
+    private array $envCache = [];
+    private bool $compiled = false;
+    private \Closure $getEnv;
 
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
@@ -371,11 +371,7 @@ class Container implements ContainerInterface, ResetInterface
         if (!$this->has($id = 'container.env_var_processors_locator')) {
             $this->set($id, new ServiceLocator([]));
         }
-        if (!$this->getEnv) {
-            $this->getEnv = new \ReflectionMethod($this, __FUNCTION__);
-            $this->getEnv->setAccessible(true);
-            $this->getEnv = $this->getEnv->getClosure($this);
-        }
+        $this->getEnv ??= \Closure::fromCallable([$this, 'getEnv']);
         $processors = $this->get($id);
 
         if (false !== $i = strpos($name, ':')) {

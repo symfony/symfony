@@ -28,7 +28,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
 {
     private const TYPE_FIXTURES = ['array' => [], 'bool' => false, 'float' => 0.0, 'int' => 0, 'string' => ''];
 
-    private $extensionConfig = [];
+    private array $extensionConfig = [];
 
     /**
      * {@inheritdoc}

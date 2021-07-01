@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
  */
 abstract class Extension implements ExtensionInterface, ConfigurationExtensionInterface
 {
-    private $processedConfigs = [];
+    private array $processedConfigs = [];
 
     /**
      * {@inheritdoc}

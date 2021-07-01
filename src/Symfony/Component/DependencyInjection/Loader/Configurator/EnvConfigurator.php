@@ -18,7 +18,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @var string[]
      */
-    private $stack;
+    private array $stack;
 
     public function __construct(string $name)
     {

@@ -35,7 +35,7 @@ final class Context
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $options = [], array $context = [], array $normalizationContext = [], array $denormalizationContext = [], $groups = [])
+    public function __construct(array $options = [], array $context = [], array $normalizationContext = [], array $denormalizationContext = [], string|array $groups = [])
     {
         if (!$context) {
             if (!array_intersect((array_keys($options)), ['normalizationContext', 'groups', 'context', 'value', 'denormalizationContext'])) {
@@ -47,9 +47,6 @@ final class Context
                 // If at least one of the options match, it's likely to be Doctrine-style options. Search for the context inside:
                 $context = $options['value'] ?? $options['context'] ?? [];
             }
-        }
-        if (!\is_string($groups) && !\is_array($groups)) {
-            throw new \TypeError(sprintf('"%s": Expected parameter $groups to be a string or an array of strings, got "%s".', __METHOD__, get_debug_type($groups)));
         }
 
         $normalizationContext = $options['normalizationContext'] ?? $normalizationContext;

@@ -34,5 +34,5 @@ interface DenormalizableInterface
      *                                                  differently based on different input formats
      * @param array                       $context      Options for denormalizing
      */
-    public function denormalize(DenormalizerInterface $denormalizer, $data, string $format = null, array $context = []);
+    public function denormalize(DenormalizerInterface $denormalizer, array|string|int|float|bool $data, string $format = null, array $context = []);
 }

@@ -29,7 +29,7 @@ interface EncoderInterface
      *
      * @throws UnexpectedValueException
      */
-    public function encode($data, string $format, array $context = []);
+    public function encode(mixed $data, string $format, array $context = []);
 
     /**
      * Checks whether the serializer can encode to given format.

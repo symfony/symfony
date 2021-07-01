@@ -58,7 +58,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function encode($data, string $format, array $context = [])
+    public function encode(mixed $data, string $format, array $context = [])
     {
         $handle = fopen('php://temp,', 'w+');
 

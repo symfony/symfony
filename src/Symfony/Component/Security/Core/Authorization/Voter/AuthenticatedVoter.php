@@ -44,7 +44,7 @@ class AuthenticatedVoter implements VoterInterface
     /**
      * {@inheritdoc}
      */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes)
     {
         if ($attributes === [self::PUBLIC_ACCESS]) {
             return VoterInterface::ACCESS_GRANTED;

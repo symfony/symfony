@@ -93,12 +93,8 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function setUser($user)
+    public function setUser(string|\Stringable|UserInterface $user)
     {
-        if (!($user instanceof UserInterface || $user instanceof \Stringable || \is_string($user))) {
-            throw new \InvalidArgumentException('$user must be an instanceof UserInterface, an object implementing a __toString method, or a primitive string.');
-        }
-
         if (null === $this->user) {
             $changed = false;
         } elseif ($this->user instanceof UserInterface) {
@@ -233,12 +229,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
         return $this->attributes[$name];
     }
 
-    /**
-     * Sets an attribute.
-     *
-     * @param mixed $value The attribute value
-     */
-    public function setAttribute(string $name, $value)
+    public function setAttribute(string $name, mixed $value)
     {
         $this->attributes[$name] = $value;
     }
@@ -267,9 +258,9 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     /**
      * @internal
      */
-    final public function unserialize($serialized)
+    final public function unserialize(string $serialized)
     {
-        $this->__unserialize(\is_array($serialized) ? $serialized : unserialize($serialized));
+        $this->__unserialize(unserialize($serialized));
     }
 
     private function hasUserChanged(UserInterface $user): bool

@@ -74,13 +74,11 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      * You may throw an AuthenticationException if you wish. If you return
      * null, then a UserNotFoundException is thrown for you.
      *
-     * @param mixed $credentials
-     *
      * @throws AuthenticationException
      *
      * @return UserInterface|null
      */
-    public function getUser($credentials, UserProviderInterface $userProvider);
+    public function getUser(mixed $credentials, UserProviderInterface $userProvider);
 
     /**
      * Returns true if the credentials are valid.
@@ -90,13 +88,11 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * The *credentials* are the return value from getCredentials()
      *
-     * @param mixed $credentials
-     *
      * @return bool
      *
      * @throws AuthenticationException
      */
-    public function checkCredentials($credentials, UserInterface $user);
+    public function checkCredentials(mixed $credentials, UserInterface $user);
 
     /**
      * Create an authenticated token for the given user.

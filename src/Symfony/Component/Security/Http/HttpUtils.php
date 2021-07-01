@@ -33,18 +33,14 @@ class HttpUtils
     private $secureDomainRegexp;
 
     /**
-     * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher         The URL or Request matcher
-     * @param string|null                                 $domainRegexp       A regexp the target of HTTP redirections must match, scheme included
-     * @param string|null                                 $secureDomainRegexp A regexp the target of HTTP redirections must match when the scheme is "https"
+     * @param $domainRegexp       A regexp the target of HTTP redirections must match, scheme included
+     * @param $secureDomainRegexp A regexp the target of HTTP redirections must match when the scheme is "https"
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null, string $domainRegexp = null, string $secureDomainRegexp = null)
+    public function __construct(UrlGeneratorInterface $urlGenerator = null, UrlMatcherInterface|RequestMatcherInterface $urlMatcher = null, string $domainRegexp = null, string $secureDomainRegexp = null)
     {
         $this->urlGenerator = $urlGenerator;
-        if (null !== $urlMatcher && !$urlMatcher instanceof UrlMatcherInterface && !$urlMatcher instanceof RequestMatcherInterface) {
-            throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
-        }
         $this->urlMatcher = $urlMatcher;
         $this->domainRegexp = $domainRegexp;
         $this->secureDomainRegexp = $secureDomainRegexp;

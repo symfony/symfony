@@ -59,11 +59,9 @@ interface TokenInterface
      * The user can be a UserInterface instance, or an object implementing
      * a __toString method or the username as a regular string.
      *
-     * @param string|\Stringable|UserInterface $user
-     *
      * @throws \InvalidArgumentException
      */
-    public function setUser($user);
+    public function setUser(string|\Stringable|UserInterface $user);
 
     /**
      * Returns whether the user is authenticated or not.
@@ -114,10 +112,8 @@ interface TokenInterface
 
     /**
      * Sets an attribute.
-     *
-     * @param mixed $value The attribute value
      */
-    public function setAttribute(string $name, $value);
+    public function setAttribute(string $name, mixed $value);
 
     /**
      * Returns all the necessary state of the object for serialization purposes.

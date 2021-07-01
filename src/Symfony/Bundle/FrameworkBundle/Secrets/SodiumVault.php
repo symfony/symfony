@@ -29,10 +29,10 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
     private $secretsDir;
 
     /**
-     * @param string|\Stringable|null $decryptionKey A string or a stringable object that defines the private key to use to decrypt the vault
-     *                                               or null to store generated keys in the provided $secretsDir
+     * @param $decryptionKey A string or a stringable object that defines the private key to use to decrypt the vault
+     *                       or null to store generated keys in the provided $secretsDir
      */
-    public function __construct(string $secretsDir, $decryptionKey = null)
+    public function __construct(string $secretsDir, string|\Stringable $decryptionKey = null)
     {
         if (null !== $decryptionKey && !\is_string($decryptionKey) && !$decryptionKey instanceof \Stringable) {
             throw new \TypeError(sprintf('Decryption key should be a string or an object that implements the __toString() method, "%s" given.', get_debug_type($decryptionKey)));

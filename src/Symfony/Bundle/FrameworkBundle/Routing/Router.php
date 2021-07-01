@@ -40,7 +40,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
     /**
      * @param mixed $resource The main resource to load
      */
-    public function __construct(ContainerInterface $container, $resource, array $options = [], RequestContext $context = null, ContainerInterface $parameters = null, LoggerInterface $logger = null, string $defaultLocale = null)
+    public function __construct(ContainerInterface $container, mixed $resource, array $options = [], RequestContext $context = null, ContainerInterface $parameters = null, LoggerInterface $logger = null, string $defaultLocale = null)
     {
         $this->container = $container;
         $this->resource = $resource;
@@ -154,7 +154,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
      * @throws ParameterNotFoundException When a placeholder does not exist as a container parameter
      * @throws RuntimeException           When a container value is not a string or a numeric value
      */
-    private function resolve($value)
+    private function resolve(mixed $value)
     {
         if (\is_array($value)) {
             foreach ($value as $key => $val) {

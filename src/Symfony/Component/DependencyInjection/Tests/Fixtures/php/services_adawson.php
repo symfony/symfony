@@ -45,8 +45,6 @@ class ProjectServiceContainer extends Container
             'App\\Processor' => true,
             'App\\Registry' => true,
             'App\\Schema' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
         ];
     }
 

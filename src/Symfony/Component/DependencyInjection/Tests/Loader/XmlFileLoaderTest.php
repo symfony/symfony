@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocator;
@@ -48,8 +47,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class XmlFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     protected static $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -454,24 +451,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame($message, $container->getDefinition('bar')->getDeprecation('bar')['message']);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" in "%s" is deprecated.');
-
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('services_deprecated_without_package_and_version.xml');
-
-        $this->assertTrue($container->getDefinition('foo')->isDeprecated());
-        $deprecation = $container->getDefinition('foo')->getDeprecation('foo');
-        $this->assertSame('The "foo" service is deprecated.', $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
-    }
-
     public function testDeprecatedAliases()
     {
         $container = new ContainerBuilder();
@@ -487,22 +466,14 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecation('alias_for_foobar')['message']);
     }
 
-    /**
-     * @group legacy
-     */
     public function testDeprecatedAliaseWithoutPackageAndVersion()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" in "%s" is deprecated.');
-
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('deprecated_alias_definitions_without_package_and_version.xml');
 
-        $this->assertTrue($container->getAlias('alias_for_foo')->isDeprecated());
-        $deprecation = $container->getAlias('alias_for_foo')->getDeprecation('alias_for_foo');
-        $this->assertSame('The "alias_for_foo" service alias is deprecated. You should stop using it, as it will be removed in the future.', $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/^Missing attribute "package" at node "deprecated" in "[^"]*".$/');
+        $loader->load('deprecated_alias_definitions_without_package_and_version.xml');
     }
 
     public function testConvertDomElementToArray()

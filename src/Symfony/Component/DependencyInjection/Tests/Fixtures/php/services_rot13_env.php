@@ -45,8 +45,6 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
     {
         return [
             '.service_locator.PWbaRiJ' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
         ];
     }
 

@@ -153,18 +153,6 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('%env(int:CCC)%', $container->getDefinition('foo')->getArgument(0));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Loader\Configurator\Traits\DeprecateTrait::deprecate()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-
-        $fixtures = realpath(__DIR__.'/../Fixtures');
-        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
-        $loader->load($fixtures.'/config/deprecated_without_package_version.php');
-    }
-
     public function testNestedBundleConfigNotAllowed()
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');

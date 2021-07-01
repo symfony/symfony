@@ -104,35 +104,11 @@ function param(string $name): ParamConfigurator
 }
 
 /**
- * Creates a service reference.
- *
- * @deprecated since Symfony 5.1, use service() instead.
- */
-function ref(string $id): ReferenceConfigurator
-{
-    trigger_deprecation('symfony/dependency-injection', '5.1', '"%s()" is deprecated, use "service()" instead.', __FUNCTION__);
-
-    return new ReferenceConfigurator($id);
-}
-
-/**
  * Creates a reference to a service.
  */
 function service(string $serviceId): ReferenceConfigurator
 {
     return new ReferenceConfigurator($serviceId);
-}
-
-/**
- * Creates an inline service.
- *
- * @deprecated since Symfony 5.1, use inline_service() instead.
- */
-function inline(string $class = null): InlineServiceConfigurator
-{
-    trigger_deprecation('symfony/dependency-injection', '5.1', '"%s()" is deprecated, use "inline_service()" instead.', __FUNCTION__);
-
-    return new InlineServiceConfigurator(new Definition($class));
 }
 
 /**

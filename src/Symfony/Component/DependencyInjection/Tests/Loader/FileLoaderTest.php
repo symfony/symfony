@@ -101,14 +101,7 @@ class FileLoaderTest extends TestCase
             ['service_container', Bar::class],
             array_keys($container->getDefinitions())
         );
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                BarInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        $this->assertEquals([BarInterface::class], array_keys($container->getAliases()));
     }
 
     public function testRegisterClassesWithExclude()
@@ -130,14 +123,7 @@ class FileLoaderTest extends TestCase
         $this->assertFalse($container->has(Foo::class));
         $this->assertFalse($container->has(DeeperBaz::class));
 
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                BarInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        $this->assertEquals([BarInterface::class], array_keys($container->getAliases()));
 
         $loader->registerClasses(
             new Definition(),
@@ -179,14 +165,7 @@ class FileLoaderTest extends TestCase
         $this->assertTrue($container->has(Baz::class));
         $this->assertTrue($container->has(Foo::class));
 
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                FooInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        $this->assertEquals([FooInterface::class], array_keys($container->getAliases()));
 
         $alias = $container->getAlias(FooInterface::class);
         $this->assertSame(Foo::class, (string) $alias);

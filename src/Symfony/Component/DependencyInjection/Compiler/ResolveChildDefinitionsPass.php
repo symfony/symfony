@@ -137,13 +137,9 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         if (isset($changes['lazy'])) {
             $def->setLazy($definition->isLazy());
         }
-        if (isset($changes['deprecated'])) {
-            if ($definition->isDeprecated()) {
-                $deprecation = $definition->getDeprecation('%service_id%');
-                $def->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message']);
-            } else {
-                $def->setDeprecated(false);
-            }
+        if (isset($changes['deprecated']) && $definition->isDeprecated()) {
+            $deprecation = $definition->getDeprecation('%service_id%');
+            $def->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message']);
         }
         if (isset($changes['autowired'])) {
             $def->setAutowired($definition->isAutowired());

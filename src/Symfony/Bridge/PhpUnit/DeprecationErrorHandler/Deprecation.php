@@ -14,7 +14,6 @@ namespace Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Metadata\Api\Groups;
-use PHPUnit\Util\Error\Handler;
 use PHPUnit\Util\Test;
 use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor;
 use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;

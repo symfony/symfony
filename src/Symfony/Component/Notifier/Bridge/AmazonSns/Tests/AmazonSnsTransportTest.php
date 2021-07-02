@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AmazonSnsTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
         return (new AmazonSnsTransport(new SnsClient(['region' => 'eu-west-3']), $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }

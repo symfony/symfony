@@ -960,7 +960,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone, $willBeAvailable)
+    private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone, callable $willBeAvailable)
     {
         $rootNode
             ->children()

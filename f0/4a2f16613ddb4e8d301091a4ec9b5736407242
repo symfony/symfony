@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-27T13:47:05Z
+
+I think that this change is a good idea. I'm unsure about merging it as a bugfix, though.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-06-27T13:53:44Z
+
+I agree with @derrabus, this should target 5.4 instead (I would have been ok-ish if this was a "behavior" that changed in 5.3, but here, the behavior has been consistent since a long time).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-06-27T15:26:04Z
+
+rebase needed

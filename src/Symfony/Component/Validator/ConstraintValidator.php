@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Polyfill\Intl\Icu\Exception\NotImplementedException;
 
 /**
  * Base class for constraint validators.
@@ -84,19 +86,28 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return string The string representation of the passed value
      */
-    protected function formatValue($value, int $format = 0)
+    protected function formatValue($value, int $format = 0, ?string $dateFormat = null)
     {
         if (($format & self::PRETTY_DATE) && $value instanceof \DateTimeInterface) {
             if (class_exists(\IntlDateFormatter::class)) {
-                $formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
+                $formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', null, $dateFormat);
 
-                return $formatter->format(new \DateTime(
-                    $value->format('Y-m-d H:i:s.u'),
-                    new \DateTimeZone('UTC')
-                ));
+                if (!$formatter) {
+                    throw new InvalidOptionsException(intl_get_error_message(), intl_get_error_code());
+                }
+
+                try {
+                    return $formatter->format(
+                        new \DateTime(
+                            $value->format('Y-m-d H:i:s.u'),
+                            new \DateTimeZone('UTC')
+                        )
+                    );
+                } catch (NotImplementedException $e) {
+                }
             }
 
-            return $value->format('Y-m-d H:i:s');
+            return $value->format($dateFormat ?? 'Y-m-d H:i:s');
         }
 
         if (\is_object($value)) {

@@ -77,6 +77,7 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
             [new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', '2005/01/01', 'Jan 1, 2005, 12:00 AM', 'DateTime'],
             [new \DateTime('2000/01/01 UTC'), 'Jan 1, 2000, 12:00 AM', '2005/01/01 UTC', 'Jan 1, 2005, 12:00 AM', 'DateTime'],
             ['b', '"b"', 'c', '"c"', 'string'],
+            [new \DateTime('2000/01/01'), '2000-01-01', new \DateTime('2005/01/01'), '2005-01-01', 'DateTime', 'Y-MM-dd'],
         ];
     }
 

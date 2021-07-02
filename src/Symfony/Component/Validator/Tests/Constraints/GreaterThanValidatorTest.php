@@ -79,6 +79,7 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             ['22', '"22"', '333', '"333"', 'string'],
             ['22', '"22"', '22', '"22"', 'string'],
+            [new \DateTime('2000/01/01'), '2000-01-01', new \DateTime('2005/01/01'), '2005-01-01', 'DateTime', 'Y-MM-dd'],
         ];
     }
 

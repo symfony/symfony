@@ -71,7 +71,7 @@ final class Dotenv
      *
      * @return $this
      */
-    public function usePutenv($usePutenv = true): self
+    public function usePutenv(bool $usePutenv = true): self
     {
         $this->usePutenv = $usePutenv;
 

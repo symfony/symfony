@@ -264,7 +264,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function ask(string $question, string $default = null, $validator = null)
+    public function ask(string $question, string $default = null, callable $validator = null)
     {
         $question = new Question($question, $default);
         $question->setValidator($validator);
@@ -275,7 +275,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function askHidden(string $question, $validator = null)
+    public function askHidden(string $question, callable $validator = null)
     {
         $question = new Question($question);
 

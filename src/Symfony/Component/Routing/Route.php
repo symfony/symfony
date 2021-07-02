@@ -120,8 +120,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Sets the pattern for the path.
-     *
      * @return $this
      */
     public function setPath(string $pattern)
@@ -145,8 +143,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Sets the pattern for the host.
-     *
      * @return $this
      */
     public function setHost(?string $pattern)
@@ -270,8 +266,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Get an option value.
-     *
      * @return mixed The option value or null when not given
      */
     public function getOption(string $name)
@@ -280,8 +274,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Checks if an option has been set.
-     *
      * @return bool true if the option is set, false otherwise
      */
     public function hasOption(string $name)
@@ -325,8 +317,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Gets a default value.
-     *
      * @return mixed The default value or null when not given
      */
     public function getDefault(string $name)
@@ -335,8 +325,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Checks if a default value is set for the given variable.
-     *
      * @return bool true if the default value is set, false otherwise
      */
     public function hasDefault(string $name)
@@ -399,8 +387,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Returns the requirement for the given key.
-     *
      * @return string|null The regex or null when not given
      */
     public function getRequirement(string $key)
@@ -409,8 +395,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Checks if a requirement is set for the given key.
-     *
      * @return bool true if a requirement is specified, false otherwise
      */
     public function hasRequirement(string $key)
@@ -419,8 +403,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Sets a requirement for the given key.
-     *
      * @return $this
      */
     public function setRequirement(string $key, string $regex)
@@ -444,8 +426,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Sets the condition.
-     *
      * @return $this
      */
     public function setCondition(?string $condition)

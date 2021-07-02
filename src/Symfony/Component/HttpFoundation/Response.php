@@ -462,7 +462,7 @@ class Response
      *
      * @final
      */
-    public function setStatusCode(int $code, $text = null): object
+    public function setStatusCode(int $code, string $text = null): object
     {
         $this->statusCode = $code;
         if ($this->isInvalid()) {

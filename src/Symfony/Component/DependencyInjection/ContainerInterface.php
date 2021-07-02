@@ -65,22 +65,14 @@ interface ContainerInterface extends PsrContainerInterface
     public function initialized(string $id);
 
     /**
-     * Gets a parameter.
-     *
-     * @param string $name The parameter name
-     *
-     * @return mixed The parameter value
+     * @return mixed
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
     public function getParameter(string $name);
 
     /**
-     * Checks if a parameter exists.
-     *
-     * @param string $name The parameter name
-     *
-     * @return bool The presence of parameter in container
+     * @return bool
      */
     public function hasParameter(string $name);
 

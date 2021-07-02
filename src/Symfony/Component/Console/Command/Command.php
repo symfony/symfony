@@ -376,7 +376,7 @@ class Command
      * Adds an argument.
      *
      * @param int|null $mode    The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param mixed    $default     The default value (for InputArgument::OPTIONAL mode only)
+     * @param mixed    $default The default value (for InputArgument::OPTIONAL mode only)
      *
      * @throws InvalidArgumentException When argument mode is not valid
      *

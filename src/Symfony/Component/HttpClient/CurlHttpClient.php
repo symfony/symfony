@@ -512,7 +512,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         };
     }
 
-    private function findConstantName($opt): ?string
+    private function findConstantName(int $opt): ?string
     {
         $constants = array_filter(get_defined_constants(), static function ($v, $k) use ($opt) {
             return $v === $opt && 'C' === $k[0] && (0 === strpos($k, 'CURLOPT_') || 0 === strpos($k, 'CURLINFO_'));

@@ -27,7 +27,7 @@ class ResourceStub implements SelfCheckingResourceInterface
         return 'stub';
     }
 
-    public function isFresh($timestamp): bool
+    public function isFresh(int $timestamp): bool
     {
         return $this->fresh;
     }

@@ -53,7 +53,7 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getContainerTagsDocument($builder, isset($options['show_hidden']) && $options['show_hidden']));
     }
 
-    protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -255,7 +255,7 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    private function getContainerServiceDocument($service, string $id, ContainerBuilder $builder = null, bool $showArguments = false): \DOMDocument
+    private function getContainerServiceDocument(object $service, string $id, ContainerBuilder $builder = null, bool $showArguments = false): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
 

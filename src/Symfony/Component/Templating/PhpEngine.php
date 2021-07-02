@@ -272,8 +272,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Decorates the current template with another one.
-     *
-     * @param string $template The decorator logical name
      */
     public function extend(string $template)
     {

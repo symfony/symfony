@@ -192,7 +192,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         return $this->dataCount;
     }
 
-    public function getDumps($format, $maxDepthLimit = -1, $maxItemsPerDepth = -1): array
+    public function getDumps(string $format, int $maxDepthLimit = -1, int $maxItemsPerDepth = -1): array
     {
         $data = fopen('php://memory', 'r+');
 

@@ -112,7 +112,7 @@ trait BrowserKitAssertionsTrait
         self::assertThat(self::getRequest(), new ResponseConstraint\RequestAttributeValueSame($name, $expectedValue), $message);
     }
 
-    public static function assertRouteSame($expectedRoute, array $parameters = [], string $message = ''): void
+    public static function assertRouteSame(string $expectedRoute, array $parameters = [], string $message = ''): void
     {
         $constraint = new ResponseConstraint\RequestAttributeValueSame('_route', $expectedRoute);
         $constraints = [];

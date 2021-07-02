@@ -60,7 +60,7 @@ class ResourceCaster
         return @stream_context_get_params($stream) ?: $a;
     }
 
-    public static function castGd($gd, array $a, Stub $stub, $isNested)
+    public static function castGd($gd, array $a, Stub $stub, bool $isNested)
     {
         $a['size'] = imagesx($gd).'x'.imagesy($gd);
         $a['trueColor'] = imageistruecolor($gd);

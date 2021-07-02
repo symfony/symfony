@@ -264,7 +264,7 @@ class PrototypedArrayNodeTest extends TestCase
      *
      * @dataProvider getDataForKeyRemovedLeftValueOnly
      */
-    public function testMappedAttributeKeyIsRemovedLeftValueOnly($value, $children, array $expected)
+    public function testMappedAttributeKeyIsRemovedLeftValueOnly($value, array $children, array $expected)
     {
         $node = new PrototypedArrayNode('root');
         $node->setKeyAttribute('id', true);

@@ -324,7 +324,7 @@ class CliDumper extends AbstractDumper
      * @param bool $hasChild When the dump of the hash has child item
      * @param int  $cut      The number of items the hash has been cut by
      */
-    protected function dumpEllipsis(Cursor $cursor, $hasChild, $cut)
+    protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut)
     {
         if ($cut) {
             $this->line .= ' …';
@@ -428,7 +428,7 @@ class CliDumper extends AbstractDumper
      *
      * @return string The value with style decoration
      */
-    protected function style($style, $value, $attr = [])
+    protected function style(string $style, string $value, array $attr = [])
     {
         if (null === $this->colors) {
             $this->colors = $this->supportsColors();

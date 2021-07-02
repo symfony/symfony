@@ -386,6 +386,10 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Qiymat Qimmatli qog'ozlarning xalqaro identifikatsiya raqami (ISIN) ga mos emas.</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Ushbu qiymat to'g'ri ifoda bo'lishi kerak.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

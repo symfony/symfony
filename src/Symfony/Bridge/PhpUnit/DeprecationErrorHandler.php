@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\PhpUnit;
 
 use PHPUnit\Framework\TestResult;
+use PHPUnit\Util\Error\Handler;
 use PHPUnit\Util\ErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
@@ -38,7 +39,7 @@ class DeprecationErrorHandler
     private $deprecationGroups = [];
 
     private static $isRegistered = false;
-    private static $isAtLeastPhpUnit83;
+    private static $errorHandler;
 
     public function __construct()
     {
@@ -347,16 +348,23 @@ class DeprecationErrorHandler
 
     private static function getPhpUnitErrorHandler()
     {
-        if (!isset(self::$isAtLeastPhpUnit83)) {
-            self::$isAtLeastPhpUnit83 = class_exists(ErrorHandler::class) && method_exists(ErrorHandler::class, '__invoke');
+        if (!$eh = self::$errorHandler) {
+            if (class_exists(Handler::class)) {
+                $eh = self::$errorHandler = Handler::class;
+            } elseif (method_exists(ErrorHandler::class, '__invoke')) {
+                $eh = self::$errorHandler = ErrorHandler::class;
+            } else {
+                return self::$errorHandler = 'PHPUnit\Util\ErrorHandler::handleError';
+            }
         }
-        if (!self::$isAtLeastPhpUnit83) {
-            return 'PHPUnit\Util\ErrorHandler::handleError';
+
+        if ('PHPUnit\Util\ErrorHandler::handleError' === $eh) {
+            return $eh;
         }
 
         foreach (debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
             if (isset($frame['object']) && $frame['object'] instanceof TestResult) {
-                return new ErrorHandler(
+                return new $eh(
                     $frame['object']->getConvertDeprecationsToExceptions(),
                     $frame['object']->getConvertErrorsToExceptions(),
                     $frame['object']->getConvertNoticesToExceptions(),

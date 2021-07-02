@@ -164,8 +164,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * Sets the fallback locales.
      *
-     * @param array $locales The fallback locales
-     *
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
     public function setFallbackLocales(array $locales)

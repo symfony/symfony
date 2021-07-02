@@ -44,11 +44,9 @@ class ChildDefinition extends Definition
     /**
      * Sets the Definition to inherit from.
      *
-     * @param string $parent
-     *
      * @return $this
      */
-    public function setParent($parent)
+    public function setParent(string $parent)
     {
         $this->parent = $parent;
 

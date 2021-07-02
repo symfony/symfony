@@ -229,7 +229,7 @@ class MongoDbStore implements PersistingStoreInterface
      * @throws LockStorageException
      * @throws LockExpiredException
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, float $ttl)
     {
         $key->reduceLifetime($ttl);
 

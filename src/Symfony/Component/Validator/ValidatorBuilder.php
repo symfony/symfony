@@ -115,7 +115,7 @@ class ValidatorBuilder
      *
      * @return $this
      */
-    public function addXmlMapping($path)
+    public function addXmlMapping(string $path)
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
@@ -151,7 +151,7 @@ class ValidatorBuilder
      *
      * @return $this
      */
-    public function addYamlMapping($path)
+    public function addYamlMapping(string $path)
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
@@ -185,7 +185,7 @@ class ValidatorBuilder
      *
      * @return $this
      */
-    public function addMethodMapping($methodName)
+    public function addMethodMapping(string $methodName)
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
@@ -341,7 +341,7 @@ class ValidatorBuilder
      *
      * @return $this
      */
-    public function setTranslationDomain($translationDomain)
+    public function setTranslationDomain(?string $translationDomain)
     {
         $this->translationDomain = $translationDomain;
 

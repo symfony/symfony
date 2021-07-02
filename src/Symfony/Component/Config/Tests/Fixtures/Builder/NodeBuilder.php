@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 class NodeBuilder extends BaseNodeBuilder
 {
-    public function barNode($name): NodeDefinition
+    public function barNode(?string $name): NodeDefinition
     {
         return $this->node($name, 'bar');
     }

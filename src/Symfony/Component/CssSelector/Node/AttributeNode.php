@@ -71,9 +71,6 @@ class AttributeNode extends AbstractNode
         return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString(): string
     {
         $attribute = $this->namespace ? $this->namespace.'|'.$this->attribute : $this->attribute;

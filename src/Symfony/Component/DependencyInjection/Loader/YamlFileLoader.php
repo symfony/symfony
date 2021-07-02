@@ -905,9 +905,6 @@ class YamlFileLoader extends FileLoader
         return $value;
     }
 
-    /**
-     * Loads from Extensions.
-     */
     private function loadFromExtensions(array $content)
     {
         foreach ($content as $namespace => $values) {
@@ -923,9 +920,6 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    /**
-     * Checks the keywords used to define a service.
-     */
     private function checkDefinition(string $id, array $definition, string $file)
     {
         if ($this->isLoadingInstanceof) {

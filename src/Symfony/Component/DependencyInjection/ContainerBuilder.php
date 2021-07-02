@@ -853,8 +853,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Gets all defined aliases.
-     *
      * @return Alias[] An array of aliases
      */
     public function getAliases()

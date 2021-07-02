@@ -31,8 +31,6 @@ interface ParameterBagInterface
     /**
      * Adds parameters to the service container parameters.
      *
-     * @param array $parameters An array of parameters
-     *
      * @throws LogicException if the parameter can not be added
      */
     public function add(array $parameters);

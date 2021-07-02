@@ -30,7 +30,7 @@ class Groups
     private $groups;
 
     /**
-     * @throws InvalidArgumentException
+     * @param string[] $groups
      */
     public function __construct(array $groups)
     {
@@ -51,8 +51,6 @@ class Groups
     }
 
     /**
-     * Gets groups.
-     *
      * @return string[]
      */
     public function getGroups()

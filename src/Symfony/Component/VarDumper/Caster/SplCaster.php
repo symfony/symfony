@@ -129,7 +129,7 @@ class SplCaster
             }
         }
 
-        if (isset($a[$prefix.'realPath'])) {
+        if ($a[$prefix.'realPath'] ?? false) {
             $a[$prefix.'realPath'] = new LinkStub($a[$prefix.'realPath']);
         }
 

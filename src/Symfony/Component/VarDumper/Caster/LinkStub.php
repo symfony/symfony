@@ -23,7 +23,7 @@ class LinkStub extends ConstStub
     private static $vendorRoots;
     private static $composerRoots;
 
-    public function __construct($label, int $line = 0, $href = null)
+    public function __construct(string $label, int $line = 0, string $href = null)
     {
         $this->value = $label;
 

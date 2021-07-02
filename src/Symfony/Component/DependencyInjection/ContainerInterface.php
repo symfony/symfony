@@ -51,8 +51,6 @@ interface ContainerInterface extends PsrContainerInterface
     public function get($id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
 
     /**
-     * Returns true if the given service is defined.
-     *
      * @param string $id The service identifier
      *
      * @return bool true if the service is defined, false otherwise
@@ -71,7 +69,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @param string $name The parameter name
      *
-     * @return array|bool|float|int|string|null The parameter value
+     * @return mixed The parameter value
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */

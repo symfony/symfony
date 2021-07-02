@@ -45,6 +45,10 @@ class UserPasswordValidator extends ConstraintValidator
             return;
         }
 
+        if (!\is_string($password)) {
+            throw new UnexpectedTypeException($password, 'string');
+        }
+
         $user = $this->tokenStorage->getToken()->getUser();
 
         if (!$user instanceof UserInterface) {

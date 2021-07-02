@@ -39,9 +39,6 @@ class DirectoryResource implements SelfCheckingResourceInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString()
     {
         return md5(serialize([$this->resource, $this->pattern]));

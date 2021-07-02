@@ -250,7 +250,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
         $container->register('parent', 'parentClass');
         $container->register('sibling', 'siblingClass')
-            ->setConfigurator(new ChildDefinition('parent'), 'foo')
+            ->setConfigurator([new ChildDefinition('parent'), 'foo'])
             ->setFactory([new ChildDefinition('parent'), 'foo'])
             ->addArgument(new ChildDefinition('parent'))
             ->setProperty('prop', new ChildDefinition('parent'))
@@ -260,8 +260,8 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $configurator = $container->getDefinition('sibling')->getConfigurator();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($configurator));
-        $this->assertSame('parentClass', $configurator->getClass());
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($configurator[0]));
+        $this->assertSame('parentClass', $configurator[0]->getClass());
 
         $factory = $container->getDefinition('sibling')->getFactory();
         $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($factory[0]));

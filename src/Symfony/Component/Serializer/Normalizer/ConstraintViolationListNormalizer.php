@@ -32,7 +32,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     private $defaultContext;
     private $nameConverter;
 
-    public function __construct($defaultContext = [], NameConverterInterface $nameConverter = null)
+    public function __construct(array $defaultContext = [], NameConverterInterface $nameConverter = null)
     {
         $this->defaultContext = $defaultContext;
         $this->nameConverter = $nameConverter;

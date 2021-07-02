@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
- * LogDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @final since Symfony 4.4

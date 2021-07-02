@@ -35,6 +35,8 @@ class ContainerBag extends FrozenParameterBag implements ContainerBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function get($name)
     {
@@ -43,6 +45,8 @@ class ContainerBag extends FrozenParameterBag implements ContainerBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function has($name)
     {

@@ -116,8 +116,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Returns the pattern for the path.
-     *
      * @return string The path pattern
      */
     public function getPath()
@@ -127,8 +125,6 @@ class Route implements \Serializable
 
     /**
      * Sets the pattern for the path.
-     *
-     * This method implements a fluent interface.
      *
      * @param string $pattern The path pattern
      *
@@ -158,8 +154,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Returns the pattern for the host.
-     *
      * @return string The host pattern
      */
     public function getHost()
@@ -169,8 +163,6 @@ class Route implements \Serializable
 
     /**
      * Sets the pattern for the host.
-     *
-     * This method implements a fluent interface.
      *
      * @param string $pattern The host pattern
      *
@@ -198,8 +190,6 @@ class Route implements \Serializable
     /**
      * Sets the schemes (e.g. 'https') this route is restricted to.
      * So an empty array means that any scheme is allowed.
-     *
-     * This method implements a fluent interface.
      *
      * @param string|string[] $schemes The scheme or an array of schemes
      *
@@ -240,8 +230,6 @@ class Route implements \Serializable
      * Sets the HTTP methods (e.g. 'POST') this route is restricted to.
      * So an empty array means that any method is allowed.
      *
-     * This method implements a fluent interface.
-     *
      * @param string|string[] $methods The method or an array of methods
      *
      * @return $this
@@ -255,8 +243,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Returns the options.
-     *
      * @return array The options
      */
     public function getOptions()
@@ -265,10 +251,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Sets the options.
-     *
-     * This method implements a fluent interface.
-     *
      * @return $this
      */
     public function setOptions(array $options)
@@ -281,10 +263,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Adds options.
-     *
-     * This method implements a fluent interface.
-     *
      * @return $this
      */
     public function addOptions(array $options)
@@ -299,8 +277,6 @@ class Route implements \Serializable
 
     /**
      * Sets an option value.
-     *
-     * This method implements a fluent interface.
      *
      * @param string $name  An option name
      * @param mixed  $value The option value
@@ -340,8 +316,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Returns the defaults.
-     *
      * @return array The defaults
      */
     public function getDefaults()
@@ -350,12 +324,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Sets the defaults.
-     *
-     * This method implements a fluent interface.
-     *
-     * @param array $defaults The defaults
-     *
      * @return $this
      */
     public function setDefaults(array $defaults)
@@ -366,12 +334,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Adds defaults.
-     *
-     * This method implements a fluent interface.
-     *
-     * @param array $defaults The defaults
-     *
      * @return $this
      */
     public function addDefaults(array $defaults)
@@ -433,8 +395,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Returns the requirements.
-     *
      * @return array The requirements
      */
     public function getRequirements()
@@ -443,12 +403,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Sets the requirements.
-     *
-     * This method implements a fluent interface.
-     *
-     * @param array $requirements The requirements
-     *
      * @return $this
      */
     public function setRequirements(array $requirements)
@@ -459,12 +413,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Adds requirements.
-     *
-     * This method implements a fluent interface.
-     *
-     * @param array $requirements The requirements
-     *
      * @return $this
      */
     public function addRequirements(array $requirements)
@@ -526,8 +474,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Returns the condition.
-     *
      * @return string The condition
      */
     public function getCondition()
@@ -537,8 +483,6 @@ class Route implements \Serializable
 
     /**
      * Sets the condition.
-     *
-     * This method implements a fluent interface.
      *
      * @param string $condition The condition
      *

@@ -328,7 +328,7 @@ class ContextListener extends AbstractListener implements ListenerInterface
     /**
      * @internal
      */
-    public static function handleUnserializeCallback($class)
+    public static function handleUnserializeCallback(string $class)
     {
         throw new \ErrorException('Class not found: '.$class, 0x37313bc);
     }

@@ -476,6 +476,10 @@ class TestEventListener
             $e->stopPropagation();
         }
     }
+
+    public function __invoke()
+    {
+    }
 }
 
 class TestWithDispatcher

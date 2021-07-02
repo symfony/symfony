@@ -805,7 +805,7 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param string|array|Reference $configurator A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param string|array|Reference|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */

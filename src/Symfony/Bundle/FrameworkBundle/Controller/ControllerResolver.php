@@ -67,11 +67,8 @@ class ControllerResolver extends ContainerControllerResolver
      */
     protected function instantiateController($class)
     {
-        return $this->configureController(parent::instantiateController($class), $class);
-    }
+        $controller = parent::instantiateController($class);
 
-    private function configureController($controller, string $class)
-    {
         if ($controller instanceof ContainerAwareInterface) {
             $controller->setContainer($this->container);
         }

@@ -273,10 +273,8 @@ class TextDescriptor extends Descriptor
 
     /**
      * Formats input option/argument default value.
-     *
-     * @param mixed $default
      */
-    private function formatDefaultValue($default): string
+    private function formatDefaultValue(mixed $default): string
     {
         if (\INF === $default) {
             return 'INF';

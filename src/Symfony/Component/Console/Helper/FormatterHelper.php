@@ -33,11 +33,9 @@ class FormatterHelper extends Helper
     /**
      * Formats a message as a block of text.
      *
-     * @param string|array $messages The message to write in the block
-     *
      * @return string The formatter message
      */
-    public function formatBlock($messages, string $style, bool $large = false)
+    public function formatBlock(string|array $messages, string $style, bool $large = false)
     {
         if (!\is_array($messages)) {
             $messages = [$messages];

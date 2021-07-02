@@ -63,10 +63,8 @@ class ConsoleSectionOutput extends StreamOutput
 
     /**
      * Overwrites the previous output with a new message.
-     *
-     * @param array|string $message
      */
-    public function overwrite($message)
+    public function overwrite(string|iterable $message)
     {
         $this->clear();
         $this->writeln($message);
@@ -92,7 +90,7 @@ class ConsoleSectionOutput extends StreamOutput
     /**
      * {@inheritdoc}
      */
-    protected function doWrite($message, $newline)
+    protected function doWrite(string $message, bool $newline)
     {
         if (!$this->isDecorated()) {
             parent::doWrite($message, $newline);

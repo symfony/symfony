@@ -36,7 +36,7 @@ class Question
      * @param string $question The question to ask to the user
      * @param mixed  $default  The default answer to return if the user enters nothing
      */
-    public function __construct(string $question, $default = null)
+    public function __construct(string $question, mixed $default = null)
     {
         $this->question = $question;
         $this->default = $default;
@@ -95,13 +95,11 @@ class Question
     /**
      * Sets whether the user response must be hidden or not.
      *
-     * @param bool $hidden
-     *
      * @return $this
      *
      * @throws LogicException In case the autocompleter is also used
      */
-    public function setHidden($hidden)
+    public function setHidden(bool $hidden)
     {
         if ($this->autocompleterCallback) {
             throw new LogicException('A hidden question cannot use the autocompleter.');
@@ -125,11 +123,9 @@ class Question
     /**
      * Sets whether to fallback on non-hidden question if the response can not be hidden.
      *
-     * @param bool $fallback
-     *
      * @return $this
      */
-    public function setHiddenFallback($fallback)
+    public function setHiddenFallback(bool $fallback)
     {
         $this->hiddenFallback = (bool) $fallback;
 

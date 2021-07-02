@@ -124,13 +124,11 @@ class InputDefinition
     /**
      * Returns an InputArgument by name or by position.
      *
-     * @param string|int $name The InputArgument name or position
-     *
      * @return InputArgument An InputArgument object
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function getArgument($name)
+    public function getArgument(string|int $name)
     {
         if (!$this->hasArgument($name)) {
             throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
@@ -144,11 +142,9 @@ class InputDefinition
     /**
      * Returns true if an InputArgument object exists by name or position.
      *
-     * @param string|int $name The InputArgument name or position
-     *
      * @return bool true if the InputArgument object exists, false otherwise
      */
-    public function hasArgument($name)
+    public function hasArgument(string|int $name)
     {
         $arguments = \is_int($name) ? array_values($this->arguments) : $this->arguments;
 

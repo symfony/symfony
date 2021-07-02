@@ -13,6 +13,8 @@ namespace Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
+use PHPUnit\Metadata\Api\Groups;
+use PHPUnit\Util\Error\Handler;
 use PHPUnit\Util\Test;
 use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor;
 use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
@@ -201,12 +203,13 @@ class Deprecation
         }
 
         $method = $this->originatingMethod();
+        $groups = class_exists(Groups::class) ? [new Groups(), 'groups'] : [Test::class, 'getGroups'];
 
         return 0 === strpos($method, 'testLegacy')
             || 0 === strpos($method, 'provideLegacy')
             || 0 === strpos($method, 'getLegacy')
             || strpos($this->originClass, '\Legacy')
-            || \in_array('legacy', Test::getGroups($this->originClass, $method), true);
+            || \in_array('legacy', $groups($this->originClass, $method), true);
     }
 
     /**

@@ -1,6 +1,11 @@
 UPGRADE FROM 5.3 to 5.4
 =======================
 
+Messenger
+---------
+* Deprecate `Middleware\RejectRedeliveredMessageMiddleware`. Install `symfony/amqp-messenger` and use same class from there.
+
+
 FrameworkBundle
 ---------------
 

@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
+use Symfony\Component\Messenger\Bridge\Amqp\Middleware\RejectRedeliveredMessageMiddleware;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
@@ -26,7 +27,6 @@ use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
-use Symfony\Component\Messenger\Middleware\RejectRedeliveredMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
@@ -43,8 +43,8 @@ use Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 
 return static function (ContainerConfigurator $container) {
-    $container->services()
-        ->alias(SerializerInterface::class, 'messenger.default_serializer')
+    $services = $container->services();
+    $services->alias(SerializerInterface::class, 'messenger.default_serializer')
 
         // Asynchronous
         ->set('messenger.senders_locator', SendersLocator::class)
@@ -90,11 +90,13 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.middleware.validation', ValidationMiddleware::class)
             ->args([
                 service('validator'),
-            ])
+            ]);
 
-        ->set('messenger.middleware.reject_redelivered_message_middleware', RejectRedeliveredMessageMiddleware::class)
+    if (class_exists(RejectRedeliveredMessageMiddleware::class)) {
+        $services->set('messenger.middleware.reject_redelivered_message_middleware', RejectRedeliveredMessageMiddleware::class);
+    }
 
-        ->set('messenger.middleware.failed_message_processing_middleware', FailedMessageProcessingMiddleware::class)
+    $services->set('messenger.middleware.failed_message_processing_middleware', FailedMessageProcessingMiddleware::class)
 
         ->set('messenger.middleware.traceable', TraceableMiddleware::class)
             ->abstract()

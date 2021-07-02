@@ -26,9 +26,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class RegisterListenersPass implements CompilerPassInterface
 {
     private array $hotPathEvents = [];
-    private string $hotPathTagName = 'container.hot_path';
     private array $noPreloadEvents = [];
-    private string $noPreloadTagName = 'container.no_preload';
 
     /**
      * @return $this
@@ -36,11 +34,6 @@ class RegisterListenersPass implements CompilerPassInterface
     public function setHotPathEvents(array $hotPathEvents)
     {
         $this->hotPathEvents = array_flip($hotPathEvents);
-
-        if (1 < \func_num_args()) {
-            trigger_deprecation('symfony/event-dispatcher', '5.4', 'Configuring "$tagName" in "%s" is deprecated.', __METHOD__);
-            $this->hotPathTagName = func_get_arg(1);
-        }
 
         return $this;
     }
@@ -51,11 +44,6 @@ class RegisterListenersPass implements CompilerPassInterface
     public function setNoPreloadEvents(array $noPreloadEvents): self
     {
         $this->noPreloadEvents = array_flip($noPreloadEvents);
-
-        if (1 < \func_num_args()) {
-            trigger_deprecation('symfony/event-dispatcher', '5.4', 'Configuring "$tagName" in "%s" is deprecated.', __METHOD__);
-            $this->noPreloadTagName = func_get_arg(1);
-        }
 
         return $this;
     }
@@ -111,14 +99,14 @@ class RegisterListenersPass implements CompilerPassInterface
                 $dispatcherDefinition->addMethodCall('addListener', [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]);
 
                 if (isset($this->hotPathEvents[$event['event']])) {
-                    $container->getDefinition($id)->addTag($this->hotPathTagName);
+                    $container->getDefinition($id)->addTag('container.hot_path');
                 } elseif (isset($this->noPreloadEvents[$event['event']])) {
                     ++$noPreload;
                 }
             }
 
             if ($noPreload && \count($events) === $noPreload) {
-                $container->getDefinition($id)->addTag($this->noPreloadTagName);
+                $container->getDefinition($id)->addTag('container.no_preload');
             }
         }
 
@@ -162,13 +150,13 @@ class RegisterListenersPass implements CompilerPassInterface
                 }
 
                 if (isset($this->hotPathEvents[$args[0]])) {
-                    $container->getDefinition($id)->addTag($this->hotPathTagName);
+                    $container->getDefinition($id)->addTag('container.hot_path');
                 } elseif (isset($this->noPreloadEvents[$args[0]])) {
                     ++$noPreload;
                 }
             }
             if ($noPreload && \count($extractingDispatcher->listeners) === $noPreload) {
-                $container->getDefinition($id)->addTag($this->noPreloadTagName);
+                $container->getDefinition($id)->addTag('container.no_preload');
             }
             $extractingDispatcher->listeners = [];
             ExtractingEventDispatcher::$aliases = [];

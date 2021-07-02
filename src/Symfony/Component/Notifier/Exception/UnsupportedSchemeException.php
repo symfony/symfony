@@ -92,6 +92,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\MessageBird\MessageBirdTransportFactory::class,
             'package' => 'symfony/message-bird-notifier',
         ],
+        'messagemedia' => [
+            'class' => Bridge\MessageMedia\MessageMediaTransportFactory::class,
+            'package' => 'symfony/message-media-notifier',
+        ],
         'microsoftteams' => [
             'class' => Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class,
             'package' => 'symfony/microsoft-teams-notifier',

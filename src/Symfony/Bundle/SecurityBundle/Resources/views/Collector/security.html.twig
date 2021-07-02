@@ -3,7 +3,7 @@
 {% block page_title 'Security' %}
 
 {% block toolbar %}
-    {% if not collector.firewall %}
+    {% if collector.firewall %}
         {% if collector.token %}
             {% set is_authenticated = collector.enabled and collector.authenticated  %}
             {% set color_code = is_authenticated ? '' : 'yellow' %}

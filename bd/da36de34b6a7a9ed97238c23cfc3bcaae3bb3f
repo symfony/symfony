@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-01T16:56:55Z
+
+We removed it because we dropped PHP 5 compat on the 5.3 branch.

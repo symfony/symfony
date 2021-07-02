@@ -177,8 +177,6 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     /**
      * Sets the fallback locales.
      *
-     * @param array $locales The fallback locales
-     *
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
     public function setFallbackLocales(array $locales)

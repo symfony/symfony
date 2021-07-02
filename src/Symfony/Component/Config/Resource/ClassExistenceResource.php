@@ -42,9 +42,6 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString()
     {
         return $this->resource;

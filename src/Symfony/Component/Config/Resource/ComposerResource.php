@@ -35,9 +35,6 @@ class ComposerResource implements SelfCheckingResourceInterface
         return array_keys($this->vendors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString()
     {
         return __CLASS__;

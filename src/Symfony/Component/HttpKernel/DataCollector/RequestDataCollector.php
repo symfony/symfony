@@ -388,7 +388,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * Parse a controller.
      *
-     * @param mixed $controller The controller to parse
+     * @param string|object|array|null $controller The controller to parse
      *
      * @return array|string An array of controller data or a simple string
      */

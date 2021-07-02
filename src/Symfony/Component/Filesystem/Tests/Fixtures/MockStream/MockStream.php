@@ -33,7 +33,7 @@ class MockStream
 
     /**
      * @param string $path  The file path or URL to stat
-     * @param array  $flags Holds additional flags set by the streams API
+     * @param int    $flags Holds additional flags set by the streams API
      *
      * @return array File stats
      */

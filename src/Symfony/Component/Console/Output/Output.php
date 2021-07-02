@@ -163,7 +163,7 @@ abstract class Output implements OutputInterface
                     break;
             }
 
-            $this->doWrite($message, $newline);
+            $this->doWrite($message ?? '', $newline);
         }
     }
 

@@ -232,10 +232,6 @@ class OptionsResolver implements Options
     }
 
     /**
-     * Sets a list of default values.
-     *
-     * @param array $defaults The default values to set
-     *
      * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
@@ -468,8 +464,7 @@ class OptionsResolver implements Options
      *
      * The resolved option value is set to the return value of the closure.
      *
-     * @param string   $option     The option name
-     * @param \Closure $normalizer The normalizer
+     * @param string $option The option name
      *
      * @return $this
      *
@@ -511,10 +506,6 @@ class OptionsResolver implements Options
      * the option.
      *
      * The resolved option value is set to the return value of the closure.
-     *
-     * @param string   $option       The option name
-     * @param \Closure $normalizer   The normalizer
-     * @param bool     $forcePrepend If set to true, prepend instead of appending
      *
      * @return $this
      *
@@ -766,8 +757,6 @@ class OptionsResolver implements Options
      *  - Required options are missing;
      *  - Options have invalid types;
      *  - Options have invalid values.
-     *
-     * @param array $options A map of option names to values
      *
      * @return array The merged and validated options
      *

@@ -25,16 +25,13 @@ class ParameterBag implements ParameterBagInterface
     protected $parameters = [];
     protected $resolved = false;
 
-    /**
-     * @param array $parameters An array of parameters
-     */
     public function __construct(array $parameters = [])
     {
         $this->add($parameters);
     }
 
     /**
-     * Clears all parameters.
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -42,9 +39,7 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Adds parameters to the service container parameters.
-     *
-     * @param array $parameters An array of parameters
+     * {@inheritdoc}
      */
     public function add(array $parameters)
     {
@@ -104,10 +99,7 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Sets a service container parameter.
-     *
-     * @param string $name  The parameter name
-     * @param mixed  $value The parameter value
+     * {@inheritdoc}
      */
     public function set($name, $value)
     {
@@ -123,9 +115,7 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Removes a parameter.
-     *
-     * @param string $name The parameter name
+     * {@inheritdoc}
      */
     public function remove($name)
     {

@@ -47,10 +47,10 @@ class AuthenticatedVoter implements VoterInterface
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
         if ($attributes === [self::PUBLIC_ACCESS]) {
-            return VoterInterface::ACCESS_GRANTED;
+            return Vote::createGranted();
         }
 
-        $result = VoterInterface::ACCESS_ABSTAIN;
+        $result = Vote::createAbstain();
         foreach ($attributes as $attribute) {
             if (null === $attribute || (self::IS_AUTHENTICATED_FULLY !== $attribute
                     && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
@@ -61,36 +61,36 @@ class AuthenticatedVoter implements VoterInterface
                 continue;
             }
 
-            $result = VoterInterface::ACCESS_DENIED;
+            $result = Vote::createDenied();
 
             if (self::IS_AUTHENTICATED_FULLY === $attribute
                 && $this->authenticationTrustResolver->isFullFledged($token)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_AUTHENTICATED_REMEMBERED === $attribute
                 && ($this->authenticationTrustResolver->isRememberMe($token)
                     || $this->authenticationTrustResolver->isFullFledged($token))) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_AUTHENTICATED_ANONYMOUSLY === $attribute
                 && ($this->authenticationTrustResolver->isAnonymous($token)
                     || $this->authenticationTrustResolver->isRememberMe($token)
                     || $this->authenticationTrustResolver->isFullFledged($token))) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_REMEMBERED === $attribute && $this->authenticationTrustResolver->isRememberMe($token)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_ANONYMOUS === $attribute && $this->authenticationTrustResolver->isAnonymous($token)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_IMPERSONATOR === $attribute && $token instanceof SwitchUserToken) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
         }
 

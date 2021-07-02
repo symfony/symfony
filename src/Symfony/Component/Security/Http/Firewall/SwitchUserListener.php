@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -174,9 +175,16 @@ class SwitchUserListener extends AbstractListener
             throw $e;
         }
 
-        if (false === $this->accessDecisionManager->decide($token, [$this->role], $user)) {
+        if (method_exists($this->accessDecisionManager, 'getDecision')) {
+            $decision = $this->accessDecisionManager->getDecision($token, [$this->role], $user);
+        } else {
+            $decision = $this->accessDecisionManager->decide($token, [$this->role], $user) ? AccessDecision::createGranted() : AccessDecision::createDenied();
+        }
+
+        if ($decision->isDenied()) {
             $exception = new AccessDeniedException();
             $exception->setAttributes($this->role);
+            $exception->setAccessDecision($decision);
 
             throw $exception;
         }

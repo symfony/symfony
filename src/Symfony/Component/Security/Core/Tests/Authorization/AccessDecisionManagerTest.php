@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends TestCase
@@ -24,13 +25,26 @@ class AccessDecisionManagerTest extends TestCase
     public function testSetUnsupportedStrategy()
     {
         $this->expectException(\InvalidArgumentException::class);
-        new AccessDecisionManager([$this->getVoter(VoterInterface::ACCESS_GRANTED)], 'fooBar');
+        new AccessDecisionManager([$this->getVoter(Vote::createGranted())], 'fooBar');
     }
 
     /**
      * @dataProvider getStrategyTests
      */
     public function testStrategies($strategy, $voters, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions, $expected)
+    {
+        $token = $this->createMock(TokenInterface::class);
+        $manager = new AccessDecisionManager($voters, $strategy, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions);
+
+        $this->assertSame($expected, $manager->getDecision($token, ['ROLE_FOO'])->isGranted());
+    }
+
+    /**
+     * @dataProvider getStrategyTests
+     *
+     * @group legacy
+     */
+    public function testStrategiesLegacy($strategy, $voters, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions, $expected)
     {
         $token = $this->createMock(TokenInterface::class);
         $manager = new AccessDecisionManager($voters, $strategy, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions);
@@ -47,7 +61,8 @@ class AccessDecisionManagerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $manager = new AccessDecisionManager([$this->getVoter(3)], $strategy);
 
-        $this->expectDeprecation('Since symfony/security-core 5.3: Returning "3" in "%s::vote()" is deprecated, return one of "Symfony\Component\Security\Core\Authorization\Voter\VoterInterface" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".');
+        $this->expectDeprecation('Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.');
+        $this->expectDeprecation('Since symfony/security-core 5.3: Returning "3" in "%s::vote()" is deprecated, return an instance of "%s" instead.');
 
         $manager->decide($token, ['ROLE_FOO']);
     }
@@ -87,27 +102,27 @@ class AccessDecisionManagerTest extends TestCase
 
             // priority
             [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_GRANTED),
-                $this->getVoter(VoterInterface::ACCESS_DENIED),
-                $this->getVoter(VoterInterface::ACCESS_DENIED),
+                $this->getVoter(Vote::createAbstain()),
+                $this->getVoter(Vote::createGranted()),
+                $this->getVoter(Vote::createDenied()),
+                $this->getVoter(Vote::createDenied()),
             ], true, true, true],
 
             [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_DENIED),
-                $this->getVoter(VoterInterface::ACCESS_GRANTED),
-                $this->getVoter(VoterInterface::ACCESS_GRANTED),
+                $this->getVoter(Vote::createAbstain()),
+                $this->getVoter(Vote::createDenied()),
+                $this->getVoter(Vote::createGranted()),
+                $this->getVoter(Vote::createGranted()),
             ], true, true, false],
 
             [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
+                $this->getVoter(Vote::createAbstain()),
+                $this->getVoter(Vote::createAbstain()),
             ], false, true, false],
 
             [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
+                $this->getVoter(Vote::createAbstain()),
+                $this->getVoter(Vote::createAbstain()),
             ], true, true, true],
         ];
     }
@@ -124,13 +139,13 @@ class AccessDecisionManagerTest extends TestCase
     {
         $voters = [];
         for ($i = 0; $i < $grants; ++$i) {
-            $voters[] = $this->getVoter(VoterInterface::ACCESS_GRANTED);
+            $voters[] = $this->getVoter(Vote::createGranted());
         }
         for ($i = 0; $i < $denies; ++$i) {
-            $voters[] = $this->getVoter(VoterInterface::ACCESS_DENIED);
+            $voters[] = $this->getVoter(Vote::createDenied());
         }
         for ($i = 0; $i < $abstains; ++$i) {
-            $voters[] = $this->getVoter(VoterInterface::ACCESS_ABSTAIN);
+            $voters[] = $this->getVoter(Vote::createAbstain());
         }
 
         return $voters;

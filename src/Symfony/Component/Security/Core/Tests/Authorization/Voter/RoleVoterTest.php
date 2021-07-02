@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 
 class RoleVoterTest extends TestCase
 {
@@ -28,22 +28,22 @@ class RoleVoterTest extends TestCase
     {
         $voter = new RoleVoter();
 
-        $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
+        $this->assertSame($expected->getAccess(), $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes)->getAccess());
     }
 
     public function getVoteTests()
     {
         return [
-            [[], [], VoterInterface::ACCESS_ABSTAIN],
-            [[], ['FOO'], VoterInterface::ACCESS_ABSTAIN],
-            [[], ['ROLE_FOO'], VoterInterface::ACCESS_DENIED],
-            [['ROLE_FOO'], ['ROLE_FOO'], VoterInterface::ACCESS_GRANTED],
-            [['ROLE_FOO'], ['FOO', 'ROLE_FOO'], VoterInterface::ACCESS_GRANTED],
-            [['ROLE_BAR', 'ROLE_FOO'], ['ROLE_FOO'], VoterInterface::ACCESS_GRANTED],
+            [[], [], Vote::createAbstain()],
+            [[], ['FOO'], Vote::createAbstain()],
+            [[], ['ROLE_FOO'], Vote::createDenied()],
+            [['ROLE_FOO'], ['ROLE_FOO'], Vote::createGranted()],
+            [['ROLE_FOO'], ['FOO', 'ROLE_FOO'], Vote::createGranted()],
+            [['ROLE_BAR', 'ROLE_FOO'], ['ROLE_FOO'], Vote::createGranted()],
 
             // Test mixed Types
-            [[], [[]], VoterInterface::ACCESS_ABSTAIN],
-            [[], [new \stdClass()], VoterInterface::ACCESS_ABSTAIN],
+            [[], [[]], Vote::createAbstain()],
+            [[], [new \stdClass()], Vote::createAbstain()],
         ];
     }
 

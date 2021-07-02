@@ -96,7 +96,13 @@ class AccessListener extends AbstractListener
             $this->tokenStorage->setToken($token);
         }
 
-        if (!$this->accessDecisionManager->decide($token, $attributes, $request, true)) {
+        if (method_exists($this->accessDecisionManager, 'getDecision')) {
+            $denied = $this->accessDecisionManager->getDecision($token, $attributes, $request)->isDenied();
+        } else {
+            $denied = !$this->accessDecisionManager->decide($token, $attributes, $request);
+        }
+
+        if ($denied) {
             throw $this->createAccessDeniedException($request, $attributes);
         }
     }

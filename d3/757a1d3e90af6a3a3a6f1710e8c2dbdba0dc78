@@ -1,0 +1,224 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-21T22:57:28Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-21T23:05:54Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-05-22T18:34:42Z
+
+@OskarStark I updated all your suggestions. Could you take a look again?
+
+By the way, Travis CI build is always failed in the FrameworkBundle tests because the package hasn't loaded yet. Could you advise what should I do for this case?
+
+Thanks for your quick review!
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2021-05-23T08:33:15Z
+
+Hi @vuphuong87
+
+Thanks for providing this new notifier bridge. Code looks perfect already.
+
+> By the way, Travis CI build is always failed in the FrameworkBundle tests because the package hasn't loaded yet. Could you advise what should I do for this case?
+
+To fix this issue, you need to add the new bridge as a composer dev requirement in the FrameworkBundle: https://github.com/symfony/symfony/blob/5.4/src/Symfony/Bundle/FrameworkBundle/composer.json#L70
+Otherwise the factory service for this bridge will be removed: https://github.com/symfony/symfony/blob/5.4/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L2468
+
+@OskarStark Not sure how it works, but creating the repository for the MessageMedia bridge (symfony/message-media-notifier) before we merge this PR is not possible, is it? Alternatively I could change this test:
+https://github.com/symfony/symfony/blob/5.4/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php#L1883
+and trigger a warning instead of letting the test fail in case an expected factory service is not found. It could look like this: https://github.com/symfony/symfony/commit/468e44bb7d1fcf906be2285d2ddb052e54e8ff2a
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-05-24T03:50:18Z
+
+@jschaedl I think possible merge while we do not have 📦 like additional repository.
+
+@OskarStark know much more than me :)
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-05-24T15:26:48Z
+
+@jschaedl My thought is the tests should be there to make sure the integration is correct or reviewers will always need to remind new contributors like me 😛 Do you know how did it work with the previous bridges?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-05-26T07:04:19Z
+
+I think we can ignore this error for new bridges, it will be green after merging.
+
+WDYT @chalasr ?
+
+EDIT:
+Oh no, it will be green after merge and the release of the package. So I think we should go this way @jschaedl proposed
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-05-26T10:52:04Z
+
+I think I clicked on the wrong button, sorry for pinging you again @OskarStark
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-05-28T16:10:41Z
+
+I guess it's good to go now! Thank you for your detailed review & approval @OskarStark
+Thanks for your input too @jschaedl . Let's see if we agree to go with your approach in https://github.com/symfony/symfony/pull/41416
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-06-23T11:50:00Z
+
+@vuphuong87 Can you answer the last remaining questions? Thank you.
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-06-23T14:34:42Z
+
+@Nyholm @fabpot Sorry for the late response. I will update the PR this weekend. Thanks a lot for your input.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-06-27T11:14:47Z
+
+@vuphuong87 Can you check why the tests fail?
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-06-27T11:37:19Z
+
+```
+PHPUnit 9.5.6 by Sebastian Bergmann and contributors.
+
+Warning:       Your XML configuration validates against a deprecated schema.
+Suggestion:    Migrate your XML configuration using "--migrate-configuration"!
+
+Testing /var/www/symfony/symfony/src/Symfony/Component/Notifier/Bridge/MessageMedia
+.....SS....R..........                                            22 / 22 (100%)
+
+Time: 00:00.033, Memory: 10.00 MB
+
+There was 1 risky test:
+
+1) Symfony\Component\Notifier\Bridge\MessageMedia\Tests\MessageMediaTransportTest::testExceptionIsThrownWhenHttpSendFailedProvider
+This test did not perform any assertions
+
+/var/www/symfony/symfony/src/Symfony/Component/Notifier/Bridge/MessageMedia/Tests/MessageMediaTransportTest.php:75
+```
+Hey, are you ready to finish your PR @vuphuong87 ? :+1:
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-06-27T14:45:09Z
+
+@fabpot @StaffNowa My bad. I put a bad naming for the data provider which phpunit think it was a test. I fixed it now.
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-06-27T15:28:56Z
+
+Looks like there are flaky tests for 7.2 & 8.0.
+For 8.0 (low-deps) I guess it will be good when I rebase with 5.4 branch given https://github.com/symfony/symfony/pull/41868 were merged.
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-07-01T01:46:04Z
+
+@OskarStark still get the same errors about Telnyx in the latest build. Look like it is because of the subsplit not being configured yet (as @wouterj commented in the PR).
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-07-01T03:17:57Z
+
+@vuphuong87 telnyx not yet pushed to packagist. Which error did you get?
+
+https://github.com/symfony/recipes/pull/951
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-01T06:06:27Z
+
+Can you please rebase, afterwards I will merge this PR, thanks
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-07-01T06:47:33Z
+
+@StaffNowa Yep, I think that is the case. The error is by the way:
+`
+Did you forget to add the TransportFactory: "Telnyx" to the $classToServices array in the FrameworkBundleExtension?
+`
+
+@OskarStark I rebased it. Thank you very much!!
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-01T10:06:23Z
+
+<img width="1584" alt="CleanShot 2021-07-01 at 12 05 57@2x" src="https://user-images.githubusercontent.com/995707/124106683-bbf65580-da64-11eb-80f3-f6b74667aa20.png">
+
+can you please fix the test?
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-07-01T16:21:59Z
+
+@OskarStark I pushed a new fix for it. Turn out it throws another exception for `low-deps` so I added another catch: https://github.com/symfony/symfony/pull/41375/commits/cb524ab3f7a43611cb26cf565129ca96d77d6726
+
+Could you review again. Really it works well for now.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-01T17:31:15Z
+
+Yes lets see, what the tests say.
+
+btw. can you please check, why your commuter e-mails not associated with your Github account:
+![CleanShot 2021-07-01 at 19 30 23@2x](https://user-images.githubusercontent.com/995707/124166266-e49d4000-daa2-11eb-9f58-9377a3c722fc.png)
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by vuphuong87 at 2021-07-02T02:31:28Z
+
+@OskarStark I messed up with my work email. Updated the PR again, my face is now shown up :p Thanks.

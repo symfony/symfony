@@ -28,8 +28,6 @@ final class OptionConfigurator
     /**
      * Adds allowed types for this option.
      *
-     * @param string ...$types One or more accepted types
-     *
      * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
@@ -99,8 +97,6 @@ final class OptionConfigurator
 
     /**
      * Sets the normalizer for this option.
-     *
-     * @param \Closure $normalizer The normalizer
      *
      * @return $this
      *

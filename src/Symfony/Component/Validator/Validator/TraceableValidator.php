@@ -105,7 +105,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validateProperty($object, string $propertyName, $groups = null)
+    public function validateProperty(object $object, string $propertyName, $groups = null)
     {
         return $this->validator->validateProperty($object, $propertyName, $groups);
     }

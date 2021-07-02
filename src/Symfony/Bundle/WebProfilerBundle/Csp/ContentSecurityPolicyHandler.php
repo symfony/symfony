@@ -235,7 +235,7 @@ class ContentSecurityPolicyHandler
         return false;
     }
 
-    private function getDirectiveFallback(array $directiveSet, $type)
+    private function getDirectiveFallback(array $directiveSet, string $type)
     {
         if (\in_array($type, ['script-src-elem', 'style-src-elem'], true) || !isset($directiveSet['default-src'])) {
             // Let the browser fallback on it's own

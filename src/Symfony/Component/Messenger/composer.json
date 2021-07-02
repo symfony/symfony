@@ -32,7 +32,7 @@
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/process": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0",
-        "symfony/serializer": "^4.4|^5.0",
+        "symfony/serializer": "^5.0",
         "symfony/service-contracts": "^1.1|^2",
         "symfony/stopwatch": "^4.4|^5.0",
         "symfony/validator": "^4.4|^5.0"
@@ -40,7 +40,8 @@
     "conflict": {
         "symfony/event-dispatcher": "<4.4",
         "symfony/framework-bundle": "<4.4",
-        "symfony/http-kernel": "<4.4"
+        "symfony/http-kernel": "<4.4",
+        "symfony/serializer": "<5.0"
     },
     "suggest": {
         "enqueue/messenger-adapter": "For using the php-enqueue library as a transport."

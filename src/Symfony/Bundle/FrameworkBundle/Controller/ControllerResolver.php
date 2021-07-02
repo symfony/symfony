@@ -24,7 +24,7 @@ class ControllerResolver extends ContainerControllerResolver
     /**
      * {@inheritdoc}
      */
-    protected function instantiateController($class): object
+    protected function instantiateController(string $class): object
     {
         $controller = parent::instantiateController($class);
 

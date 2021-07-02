@@ -42,8 +42,8 @@ class Groups
         }
 
         foreach ($groups as $group) {
-            if (!\is_string($group)) {
-                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a string or an array of strings.', static::class));
+            if (!\is_string($group) || '' === $group) {
+                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a string or an array of non-empty strings.', static::class));
             }
         }
 

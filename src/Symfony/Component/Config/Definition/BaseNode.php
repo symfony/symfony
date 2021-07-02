@@ -187,8 +187,6 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Set this node as required.
-     *
-     * @param bool $boolean Required node
      */
     public function setRequired(bool $boolean)
     {

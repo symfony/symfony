@@ -28,8 +28,6 @@ interface ContextualValidatorInterface
      * If called multiple times, the path will always be reset to the context's
      * original path with the given path appended to it.
      *
-     * @param string $path The path to append
-     *
      * @return $this
      */
     public function atPath(string $path);

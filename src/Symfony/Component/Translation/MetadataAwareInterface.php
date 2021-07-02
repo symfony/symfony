@@ -34,7 +34,7 @@ interface MetadataAwareInterface
      *
      * @param mixed $value
      */
-    public function setMetadata(string $key, mixed $value, string $domain = 'messages');
+    public function setMetadata(string $key, $value, string $domain = 'messages');
 
     /**
      * Deletes metadata for the given key and domain.

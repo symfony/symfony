@@ -24,6 +24,7 @@ final class Envelope
     private $message;
 
     /**
+     * @param object|Envelope  $message
      * @param StampInterface[] $stamps
      */
     public function __construct(object $message, array $stamps = [])

@@ -35,14 +35,14 @@ class Route
      * @param string[]|string $schemes
      */
     public function __construct(
-        string | array | null $path = null,
+        string|array $path = null,
         private ?string $name = null,
         private array $requirements = [],
         private array $options = [],
         private array $defaults = [],
         private ?string $host = null,
-        array | string $methods = [],
-        array | string $schemes = [],
+        array|string $methods = [],
+        array|string $schemes = [],
         private ?string $condition = null,
         private ?int $priority = null,
         string $locale = null,
@@ -146,7 +146,7 @@ class Route
         return $this->defaults;
     }
 
-    public function setSchemes(array | string $schemes)
+    public function setSchemes(array|string $schemes)
     {
         $this->schemes = (array) $schemes;
     }
@@ -156,7 +156,7 @@ class Route
         return $this->schemes;
     }
 
-    public function setMethods(array | string $methods)
+    public function setMethods(array|string $methods)
     {
         $this->methods = (array) $methods;
     }

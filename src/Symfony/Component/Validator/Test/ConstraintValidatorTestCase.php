@@ -231,7 +231,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
         });
     }
 
-    protected function expectValidateValue(int $i, mixed $value, Constraint|array $constraints = [], string|GroupSequence|array $group = null)
+    protected function expectValidateValue(int $i, mixed $value, array $constraints = [], string|GroupSequence|array $group = null)
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
         $contextualValidator->expectValidation($i, '', $value, $group, function ($passedConstraints) use ($constraints) {
@@ -243,7 +243,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
         });
     }
 
-    protected function expectFailingValueValidation(int $i, mixed $value, Constraint|array $constraints, string|GroupSequence|array|null $group, ConstraintViolationInterface $violation)
+    protected function expectFailingValueValidation(int $i, mixed $value, array $constraints, string|GroupSequence|array|null $group, ConstraintViolationInterface $violation)
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
         $contextualValidator->expectValidation($i, '', $value, $group, function ($passedConstraints) use ($constraints) {

@@ -110,8 +110,6 @@ abstract class Input implements InputInterface, StreamableInputInterface
             throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
         }
 
-        $name = \is_int($name) ? key(\array_slice($this->definition->getArguments(), $name, 1, true)) : $name;
-
         return $this->arguments[$name] ?? $this->definition->getArgument($name)->getDefault();
     }
 
@@ -123,8 +121,6 @@ abstract class Input implements InputInterface, StreamableInputInterface
         if (!$this->definition->hasArgument($name)) {
             throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
         }
-
-        $name = \is_int($name) ? key(\array_slice($this->definition->getArguments(), $name, 1, true)) : $name;
 
         $this->arguments[$name] = $value;
     }

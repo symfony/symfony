@@ -240,7 +240,7 @@ class Container implements ContainerInterface, ResetInterface
             unset($this->loading[$id]);
         }
 
-        if (/* self::EXCEPTION_ON_INVALID_REFERENCE */ 1 === $invalidBehavior) {
+        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
             if (!$id) {
                 throw new ServiceNotFoundException($id);
             }

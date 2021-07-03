@@ -20,10 +20,6 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *
  * It manages an environment made of application kernel and bundles.
  *
- * @method string getBuildDir() Returns the build directory - not implementing it is deprecated since Symfony 5.2.
- *                              This directory should be used to store build artifacts, and can be read-only at runtime.
- *                              Caches written at runtime should be stored in the "cache directory" ({@see KernelInterface::getCacheDir()}).
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface KernelInterface extends HttpKernelInterface
@@ -132,6 +128,14 @@ interface KernelInterface extends HttpKernelInterface
      * @return string The cache directory
      */
     public function getCacheDir();
+
+    /**
+     * Returns the build directory.
+     *
+     * This directory should be used to store build artifacts, and can be read-only at runtime.
+     * Caches written at runtime should be stored in the "cache directory" ({@see KernelInterface::getCacheDir()}).
+     */
+    public function getBuildDir(): string;
 
     /**
      * Gets the log directory.

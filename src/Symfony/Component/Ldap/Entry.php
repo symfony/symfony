@@ -50,9 +50,8 @@ class Entry
      *
      * @return bool
      */
-    public function hasAttribute(string $name/* , bool $caseSensitive = true */)
+    public function hasAttribute(string $name, bool $caseSensitive = true)
     {
-        $caseSensitive = 2 > \func_num_args() || true === func_get_arg(1);
         $attributeKey = $this->getAttributeKey($name, $caseSensitive);
 
         if (null === $attributeKey) {
@@ -73,9 +72,8 @@ class Entry
      *
      * @return array|null
      */
-    public function getAttribute(string $name/* , bool $caseSensitive = true */)
+    public function getAttribute(string $name, bool $caseSensitive = true)
     {
-        $caseSensitive = 2 > \func_num_args() || true === func_get_arg(1);
         $attributeKey = $this->getAttributeKey($name, $caseSensitive);
 
         if (null === $attributeKey) {

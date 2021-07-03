@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\ControllerMetadata;
 
-use Symfony\Component\HttpKernel\Attribute\ArgumentInterface;
-
 /**
  * Responsible for storing metadata of an argument.
  *
@@ -112,20 +110,6 @@ class ArgumentMetadata
         }
 
         return $this->defaultValue;
-    }
-
-    /**
-     * Returns the attribute (if any) that was set on the argument.
-     */
-    public function getAttribute(): ?ArgumentInterface
-    {
-        trigger_deprecation('symfony/http-kernel', '5.3', 'Method "%s()" is deprecated, use "getAttributes()" instead.', __METHOD__);
-
-        if (!$this->attributes) {
-            return null;
-        }
-
-        return $this->attributes[0] instanceof ArgumentInterface ? $this->attributes[0] : null;
     }
 
     /**

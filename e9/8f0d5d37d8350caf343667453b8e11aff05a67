@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-01T09:02:27Z
+
+Note: One thing I intentionally kept out of this PR was constructor property promotion. Introducing property types would technically enable us to use CPP.
+
+However, this is mainly syntactic sugar that makes merges from lower branches for existing classes difficult and would bloat the diff for a PR that introduces property types. If we ever feel like migrating to CPP, that step can be automated well, once we have private properties.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-07-01T09:04:21Z
+
+> Another pitfall is the `callable` pseudo-type: PHP does not allow us to assign it to a property. I've used `string|array|object` instead, but I'm open for better ideas.
+
+I'd rather leaving it untyped that adding a wrong type (`string|array|object` does not enforce it being callable)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-01T09:09:44Z
+
+> `string|array|object` does not enforce it being callable
+
+No, but it does make sure that the property is not null for instance. As I said, I'm not super happy either, but I tried to narrow down that type as much as possible.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-07-01T09:14:18Z
+
+@derrabus I'd still keep it untyped, relying on phpdoc (and the static analysis).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-01T10:52:08Z
+
+> as a rule of thumb, we'd better store closures than callables anyway
+
+All right, so for future PRs I'll check if I can turn a callable into a closure.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-01T13:09:26Z
+
+Next attempt: The DI component: #41928

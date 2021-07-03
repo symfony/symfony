@@ -29,8 +29,6 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
 
     /**
      * {@inheritdoc}
-     *
-     * @throws InvalidArgumentException
      */
     public function normalize(mixed $object, string $format = null, array $context = [])
     {

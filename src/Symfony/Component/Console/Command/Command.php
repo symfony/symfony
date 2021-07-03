@@ -418,8 +418,8 @@ class Command
     /**
      * Adds an argument.
      *
-     * @param $mode    The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param $default The default value (for InputArgument::OPTIONAL mode only)
+     * @param int|null $mode    The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param mixed    $default The default value (for InputArgument::OPTIONAL mode only)
      *
      * @throws InvalidArgumentException When argument mode is not valid
      *

@@ -31,10 +31,10 @@ class InputArgument
     private $description;
 
     /**
-     * @param $name        The argument name
-     * @param $mode        The argument mode: self::REQUIRED or self::OPTIONAL
-     * @param $description A description text
-     * @param $default     The default value (for self::OPTIONAL mode only)
+     * @param string   $name        The argument name
+     * @param int|null $mode        The argument mode: self::REQUIRED or self::OPTIONAL
+     * @param string   $description A description text
+     * @param mixed    $default     The default value (for self::OPTIONAL mode only)
      *
      * @throws InvalidArgumentException When argument mode is not valid
      */

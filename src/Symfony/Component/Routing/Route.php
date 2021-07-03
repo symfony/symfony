@@ -251,6 +251,8 @@ class Route implements \Serializable
     }
 
     /**
+     * Sets an option value.
+     *
      * @return $this
      */
     public function setOption(string $name, mixed $value)

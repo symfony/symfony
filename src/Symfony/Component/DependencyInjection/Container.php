@@ -107,7 +107,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a parameter.
      *
-     * @return mixed The parameter value
+     * @return mixed
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */

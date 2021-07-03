@@ -6,6 +6,11 @@ CHANGELOG
 
  * Remove deprecated classes `Symfony/Component/Messenger/Transport/AmqpExt`, `Symfony/Component/Messenger/Transport/Doctrine` and `Symfony/Component/Messenger/Transport/Redis`.
 
+5.4
+---
+
+ * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
+
 5.3
 ---
 

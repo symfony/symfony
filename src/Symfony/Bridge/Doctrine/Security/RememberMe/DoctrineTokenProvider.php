@@ -200,6 +200,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
             $this->conn->commit();
         } catch (\Exception $e) {
             $this->conn->rollBack();
+            throw $e;
         }
     }
 

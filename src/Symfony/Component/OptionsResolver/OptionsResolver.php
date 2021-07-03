@@ -258,8 +258,6 @@ class OptionsResolver implements Options
     }
 
     /**
-     * Sets a list of default values.
-     *
      * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer

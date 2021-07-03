@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-12-23T17:49:02Z
+
+> I'd rather use an interface to let people add behavior on existing Exception (like we do with
+> UnrecoverableExceptionInterface)
+
+I dont follow you, I could create an interface, and implementing it, but what could you add to the Exception? I'll not used anyway
+
+> We already have a mechanism to stop the worker using eventDispatcher.
+
+Yes I know, but this is more complex IMHO. Having something native is way more efficient
+And BTW, 2 people already asked me how do to that :) And the issue receive a good feedback.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-23T19:10:02Z
+
+> but what could you add to the Exception?
+
+hmm.. nothing, It's just a Marker interface
+
+```php
+interface StopWorkerExceptionInterface extends \Throwable
+{
+}
+class StopWorkerException extends RuntimeException implements StopWorkerExceptionInterface
+{
+}
+
+if ($throwable instanceof StopWorkerExceptionInterface) {
+    $this->stop();
+}
+```
+
+That would allow people use
+```php
+class MyBusinessException implements StopWorkerExceptionInterface
+{
+}
+```
+
+Instead of
+
+```php
+try {
+} catch (MyBusinessException $e) {
+    throw new StopWorkerExceptionInterface(??, ??, $e);
+}
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-12-23T21:45:54Z
+
+I see how much this can be handy and simple, but throwing such an exception from e.g. a message handler feels weird to me. Stopping the worker is a consequence of an error, not an error on its own.
+I agree that hooking into worker lifecycle events sounds better from a design pov.
+Adding a sample listener to the docs like the one showed by @jderusse may be enough to fix this issue and could avoid having several paths for the same goal.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-12-28T09:27:16Z
+
+I agree this PR could leverage the Event Dispatcher System. But messenger could work without messenger, so the exception would become useless... But I think we don't care.
+
+But IMHO this should not be a doc cookbook. The proposed system is really hackish. Many (good) developers did not find it by them-self.
+
+Let's add a native / simple behavior here.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-12-31T15:48:14Z
+
+* I added an interface
+* the system uses the Event Dispatch
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-05-10T14:41:38Z
+
+I have rebased this PR and added some tests. There are 9 👍🏼 on the issue, so I do think we should consider to merge this PR

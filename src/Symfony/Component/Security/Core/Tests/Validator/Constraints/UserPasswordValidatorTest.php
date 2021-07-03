@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Tests\Validator\Constraints;
 
-use Foo\Bar\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
@@ -25,7 +24,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
+class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 {
     private const PASSWORD = 's3Cr3t';
     private const SALT = '^S4lt$';
@@ -119,7 +118,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     public function testUserIsNotValid()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        $user = $this->createMock(User::class);
+        $user = new \stdClass();
 
         $this->tokenStorage = $this->createTokenStorage($user);
         $this->validator = $this->createValidator();

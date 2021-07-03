@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add support to display table vertically
+
 5.3
 ---
 

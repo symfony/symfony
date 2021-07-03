@@ -35,6 +35,9 @@ class Table
     private const SEPARATOR_BOTTOM = 3;
     private const BORDER_OUTSIDE = 0;
     private const BORDER_INSIDE = 1;
+    private const DISPLAY_ORIENTATION_DEFAULT = 'default';
+    private const DISPLAY_ORIENTATION_HORIZONTAL = 'horizontal';
+    private const DISPLAY_ORIENTATION_VERTICAL = 'vertical';
 
     private $headerTitle;
     private $footerTitle;
@@ -48,7 +51,14 @@ class Table
      * Table rows.
      */
     private $rows = [];
-    private $horizontal = false;
+
+    /**
+     * Defines the way the table will be displayed.
+     * It can be either 'default', 'horizontal' or 'vertical'.
+     *
+     * @var string
+     */
+    private $displayOrientation = self::DISPLAY_ORIENTATION_DEFAULT;
 
     /**
      * Column widths cache.
@@ -313,7 +323,14 @@ class Table
 
     public function setHorizontal(bool $horizontal = true): self
     {
-        $this->horizontal = $horizontal;
+        $this->displayOrientation = $horizontal ? self::DISPLAY_ORIENTATION_HORIZONTAL : self::DISPLAY_ORIENTATION_DEFAULT;
+
+        return $this;
+    }
+
+    public function setVertical(bool $vertical = true): self
+    {
+        $this->displayOrientation = $vertical ? self::DISPLAY_ORIENTATION_VERTICAL : self::DISPLAY_ORIENTATION_DEFAULT;
 
         return $this;
     }
@@ -334,8 +351,15 @@ class Table
     public function render()
     {
         $divider = new TableSeparator();
-        if ($this->horizontal) {
-            $rows = [];
+        $isCellWithColspan = static function ($cell): bool {
+            return $cell instanceof TableCell && $cell->getColspan() >= 2;
+        };
+
+        $horizontal = self::DISPLAY_ORIENTATION_HORIZONTAL === $this->displayOrientation;
+        $vertical = self::DISPLAY_ORIENTATION_VERTICAL === $this->displayOrientation;
+
+        $rows = [];
+        if ($horizontal) {
             foreach ($this->headers[0] ?? [] as $i => $header) {
                 $rows[$i] = [$header];
                 foreach ($this->rows as $row) {
@@ -344,10 +368,43 @@ class Table
                     }
                     if (isset($row[$i])) {
                         $rows[$i][] = $row[$i];
-                    } elseif ($rows[$i][0] instanceof TableCell && $rows[$i][0]->getColspan() >= 2) {
+                    } elseif ($isCellWithColspan($rows[$i][0])) {
                         // Noop, there is a "title"
                     } else {
                         $rows[$i][] = null;
+                    }
+                }
+            }
+        } elseif ($vertical) {
+            $maxHeaderLength = max(array_map(static function (string $header) {
+                return mb_strlen($header);
+            }, $this->headers[0] ?? ['']));
+
+            foreach ($this->rows as $row) {
+                if ($row instanceof TableSeparator) {
+                    continue;
+                }
+
+                if (0 < \count($rows)) {
+                    $rows[] = [$divider];
+                }
+
+                $containsColspan = 0 < \count(array_filter($row, static function ($cell) use ($isCellWithColspan): bool {
+                    return $isCellWithColspan($cell);
+                }));
+
+                $headers = $this->headers[0] ?? [];
+                $maxRows = max(\count($headers), \count($row));
+                for ($i = 0; $i < $maxRows; ++$i) {
+                    $cell = (string) ($row[$i] ?? '');
+                    if (!empty($headers) && !$containsColspan) {
+                        $rows[] = [sprintf(
+                            '<comment>%s</>: %s',
+                            str_pad($headers[$i] ?? '', $maxHeaderLength, ' ', \STR_PAD_LEFT),
+                            $cell
+                        )];
+                    } elseif (!empty($cell)) {
+                        $rows[] = [$cell];
                     }
                 }
             }
@@ -360,8 +417,8 @@ class Table
         $rows = $this->buildTableRows($rows);
         $this->calculateColumnsWidth($rows);
 
-        $isHeader = !$this->horizontal;
-        $isFirstRow = $this->horizontal;
+        $isHeader = !$horizontal;
+        $isFirstRow = $horizontal;
         foreach ($rows as $row) {
             if ($divider === $row) {
                 $isHeader = false;
@@ -386,7 +443,12 @@ class Table
                     $this->renderRowSeparator(self::SEPARATOR_TOP, $this->headerTitle, $this->style->getHeaderTitleFormat());
                 }
             }
-            if ($this->horizontal) {
+            if ($vertical) {
+                $isHeader = false;
+                $isFirstRow = false;
+            }
+
+            if ($horizontal) {
                 $this->renderRow($row, $this->style->getCellRowFormat(), $this->style->getCellHeaderFormat());
             } else {
                 $this->renderRow($row, $isHeader ? $this->style->getCellHeaderFormat() : $this->style->getCellRowFormat());

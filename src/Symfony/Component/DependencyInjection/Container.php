@@ -404,9 +404,7 @@ class Container implements ResettableContainerInterface
             $this->set($id, new ServiceLocator([]));
         }
         if (!$this->getEnv) {
-            $this->getEnv = new \ReflectionMethod($this, __FUNCTION__);
-            $this->getEnv->setAccessible(true);
-            $this->getEnv = $this->getEnv->getClosure($this);
+            $this->getEnv = \Closure::fromCallable([$this, 'getEnv']);
         }
         $processors = $this->get($id);
 

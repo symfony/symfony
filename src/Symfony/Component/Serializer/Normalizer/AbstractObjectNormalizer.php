@@ -217,7 +217,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Computes the normalization context merged with current one. Metadata always wins over global context, as more specific.
      */
-    private function getAttributeNormalizationContext($object, string $attribute, array $context): array
+    private function getAttributeNormalizationContext(object $object, string $attribute, array $context): array
     {
         if (null === $metadata = $this->getAttributeMetadata($object, $attribute)) {
             return $context;

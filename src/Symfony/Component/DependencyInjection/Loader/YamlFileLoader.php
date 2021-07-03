@@ -148,7 +148,7 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    private function loadContent($content, $path)
+    private function loadContent(array $content, string $path)
     {
         // imports
         $this->parseImports($content, $path);

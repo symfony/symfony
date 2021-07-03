@@ -4,6 +4,7 @@ CHANGELOG
 5.4
 ---
 
+ * Add per-message priority for AMQP & Beanstalkd transports
  * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
 
 5.3

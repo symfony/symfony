@@ -35,6 +35,14 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
         }
     }
 
+    public static function createFromMessage(string $message): self
+    {
+        $self = new self();
+        $self->add(new ConstraintViolation($message, '', [], null, '', null));
+
+        return $self;
+    }
+
     /**
      * Converts the violation into a string for debugging purposes.
      *

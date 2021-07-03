@@ -40,8 +40,6 @@ use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -184,20 +182,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->getDefinition('security.authentication.guard_handler')
             ->replaceArgument(2, $this->statelessFirewallKeys);
 
-        // @deprecated since Symfony 5.3
-        if ($config['encoders']) {
-            $this->createEncoders($config['encoders'], $container);
-        }
-
         if ($config['password_hashers']) {
             $this->createHashers($config['password_hashers'], $container);
         }
 
         if (class_exists(Application::class)) {
             $loader->load('console.php');
-
-            // @deprecated since Symfony 5.3
-            $container->getDefinition('security.command.user_password_encoder')->replaceArgument(1, array_keys($config['encoders']));
 
             $container->getDefinition('security.command.user_password_hash')->replaceArgument(1, array_keys($config['password_hashers']));
         }
@@ -678,120 +668,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $factoryKey, $id));
-    }
-
-    private function createEncoders(array $encoders, ContainerBuilder $container)
-    {
-        $encoderMap = [];
-        foreach ($encoders as $class => $encoder) {
-            if (class_exists($class) && !is_a($class, PasswordAuthenticatedUserInterface::class, true)) {
-                trigger_deprecation('symfony/security-bundle', '5.3', 'Configuring an encoder for a user class that does not implement "%s" is deprecated, class "%s" should implement it.', PasswordAuthenticatedUserInterface::class, $class);
-            }
-            $encoderMap[$class] = $this->createEncoder($encoder);
-        }
-
-        $container
-            ->getDefinition('security.encoder_factory.generic')
-            ->setArguments([$encoderMap])
-        ;
-    }
-
-    private function createEncoder(array $config)
-    {
-        // a custom encoder service
-        if (isset($config['id'])) {
-            return new Reference($config['id']);
-        }
-
-        if ($config['migrate_from'] ?? false) {
-            return $config;
-        }
-
-        // plaintext encoder
-        if ('plaintext' === $config['algorithm']) {
-            $arguments = [$config['ignore_case']];
-
-            return [
-                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
-                'arguments' => $arguments,
-            ];
-        }
-
-        // pbkdf2 encoder
-        if ('pbkdf2' === $config['algorithm']) {
-            return [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
-                'arguments' => [
-                    $config['hash_algorithm'],
-                    $config['encode_as_base64'],
-                    $config['iterations'],
-                    $config['key_length'],
-                ],
-            ];
-        }
-
-        // bcrypt encoder
-        if ('bcrypt' === $config['algorithm']) {
-            $config['algorithm'] = 'native';
-            $config['native_algorithm'] = \PASSWORD_BCRYPT;
-
-            return $this->createEncoder($config);
-        }
-
-        // Argon2i encoder
-        if ('argon2i' === $config['algorithm']) {
-            if (SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
-                $config['algorithm'] = 'sodium';
-            } elseif (\defined('PASSWORD_ARGON2I')) {
-                $config['algorithm'] = 'native';
-                $config['native_algorithm'] = \PASSWORD_ARGON2I;
-            } else {
-                throw new InvalidConfigurationException(sprintf('Algorithm "argon2i" is not available. Use "%s" instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? 'argon2id", "auto' : 'auto'));
-            }
-
-            return $this->createEncoder($config);
-        }
-
-        if ('argon2id' === $config['algorithm']) {
-            if (($hasSodium = SodiumPasswordHasher::isSupported()) && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
-                $config['algorithm'] = 'sodium';
-            } elseif (\defined('PASSWORD_ARGON2ID')) {
-                $config['algorithm'] = 'native';
-                $config['native_algorithm'] = \PASSWORD_ARGON2ID;
-            } else {
-                throw new InvalidConfigurationException(sprintf('Algorithm "argon2id" is not available. Either use "%s", upgrade to PHP 7.3+ or use libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
-            }
-
-            return $this->createEncoder($config);
-        }
-
-        if ('native' === $config['algorithm']) {
-            return [
-                'class' => NativePasswordEncoder::class,
-                'arguments' => [
-                        $config['time_cost'],
-                        (($config['memory_cost'] ?? 0) << 10) ?: null,
-                        $config['cost'],
-                    ] + (isset($config['native_algorithm']) ? [3 => $config['native_algorithm']] : []),
-            ];
-        }
-
-        if ('sodium' === $config['algorithm']) {
-            if (!SodiumPasswordHasher::isSupported()) {
-                throw new InvalidConfigurationException('Libsodium is not available. Install the sodium extension or use "auto" instead.');
-            }
-
-            return [
-                'class' => SodiumPasswordEncoder::class,
-                'arguments' => [
-                    $config['time_cost'],
-                    (($config['memory_cost'] ?? 0) << 10) ?: null,
-                ],
-            ];
-        }
-
-        // run-time configured encoder
-        return $config;
     }
 
     private function createHashers(array $hashers, ContainerBuilder $container)

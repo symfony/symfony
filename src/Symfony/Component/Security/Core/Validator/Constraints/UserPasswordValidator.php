@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Validator\Constraints;
 
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -68,9 +66,9 @@ class UserPasswordValidator extends ConstraintValidator
             trigger_deprecation('symfony/security-core', '5.3', 'Returning a string from "getSalt()" without implementing the "%s" interface is deprecated, the "%s" class should implement it.', LegacyPasswordAuthenticatedUserInterface::class, get_debug_type($user));
         }
 
-        $hasher = $this->hasherFactory instanceof EncoderFactoryInterface ? $this->hasherFactory->getEncoder($user) : $this->hasherFactory->getPasswordHasher($user);
+        $hasher = $this->hasherFactory->getPasswordHasher($user);
 
-        if (null === $user->getPassword() || !($hasher instanceof PasswordEncoderInterface ? $hasher->isPasswordValid($user->getPassword(), $password, $user->getSalt()) : $hasher->verify($user->getPassword(), $password, $user->getSalt()))) {
+        if (null === $user->getPassword() || !$hasher->verify($user->getPassword(), $password, $user->getSalt())) {
             $this->context->addViolation($constraint->message);
         }
     }

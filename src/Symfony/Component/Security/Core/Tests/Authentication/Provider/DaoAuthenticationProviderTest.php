@@ -18,7 +18,6 @@ use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
@@ -49,18 +48,6 @@ class DaoAuthenticationProviderTest extends TestCase
         $method->setAccessible(true);
 
         $this->expectDeprecation('Since symfony/security-core 5.3: Not implementing method "loadUserByIdentifier()" in user provider "'.get_debug_type($userProvider).'" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.');
-
-        $method->invoke($provider, 'fabien', $this->getSupportedToken());
-    }
-
-    public function testRetrieveUserWhenUsernameIsNotFoundWithLegacyEncoderFactory()
-    {
-        $this->expectException(UserNotFoundException::class);
-        $userProvider = new InMemoryUserProvider();
-
-        $provider = new DaoAuthenticationProvider($userProvider, $this->createMock(UserCheckerInterface::class), 'key', $this->createMock(EncoderFactoryInterface::class));
-        $method = new \ReflectionMethod($provider, 'retrieveUser');
-        $method->setAccessible(true);
 
         $method->invoke($provider, 'fabien', $this->getSupportedToken());
     }

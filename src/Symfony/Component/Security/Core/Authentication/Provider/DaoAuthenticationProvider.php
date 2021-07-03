@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Authentication\Provider;
 
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
@@ -39,16 +38,9 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
     private $hasherFactory;
     private $userProvider;
 
-    /**
-     * @param PasswordHasherFactoryInterface $hasherFactory
-     */
-    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, $hasherFactory, bool $hideUserNotFoundExceptions = true)
+    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, PasswordHasherFactoryInterface $hasherFactory, bool $hideUserNotFoundExceptions = true)
     {
         parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
-
-        if ($hasherFactory instanceof EncoderFactoryInterface) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Passing a "%s" instance to the "%s" constructor is deprecated, use "%s" instead.', EncoderFactoryInterface::class, __CLASS__, PasswordHasherFactoryInterface::class);
-        }
 
         $this->hasherFactory = $hasherFactory;
         $this->userProvider = $userProvider;
@@ -80,21 +72,6 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
             $salt = $user->getSalt();
             if ($salt && !$user instanceof LegacyPasswordAuthenticatedUserInterface) {
                 trigger_deprecation('symfony/security-core', '5.3', 'Returning a string from "getSalt()" without implementing the "%s" interface is deprecated, the "%s" class should implement it.', LegacyPasswordAuthenticatedUserInterface::class, get_debug_type($user));
-            }
-
-            // deprecated since Symfony 5.3
-            if ($this->hasherFactory instanceof EncoderFactoryInterface) {
-                $encoder = $this->hasherFactory->getEncoder($user);
-
-                if (!$encoder->isPasswordValid($user->getPassword(), $presentedPassword, $salt)) {
-                    throw new BadCredentialsException('The presented password is invalid.');
-                }
-
-                if ($this->userProvider instanceof PasswordUpgraderInterface && method_exists($encoder, 'needsRehash') && $encoder->needsRehash($user->getPassword())) {
-                    $this->userProvider->upgradePassword($user, $encoder->encodePassword($presentedPassword, $user->getSalt()));
-                }
-
-                return;
             }
 
             $hasher = $this->hasherFactory->getPasswordHasher($user);

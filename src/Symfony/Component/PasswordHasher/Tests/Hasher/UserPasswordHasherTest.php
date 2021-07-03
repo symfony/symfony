@@ -12,7 +12,6 @@
 namespace Symfony\Component\PasswordHasher\Tests\Hasher;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
@@ -24,8 +23,6 @@ use Symfony\Component\Security\Core\User\User;
 
 class UserPasswordHasherTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testHashWithLegacyUser()
     {
         $user = new TestLegacyPasswordAuthenticatedUser('name', null, 'userSalt');

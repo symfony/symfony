@@ -30,8 +30,8 @@ class ServiceLocator implements ServiceProviderInterface
         get as private doGet;
     }
 
-    private $externalId;
-    private $container;
+    private ?string $externalId = null;
+    private ?Container $container = null;
 
     /**
      * {@inheritdoc}

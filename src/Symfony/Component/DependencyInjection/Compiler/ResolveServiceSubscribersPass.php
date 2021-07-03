@@ -23,7 +23,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 class ResolveServiceSubscribersPass extends AbstractRecursivePass
 {
-    private $serviceLocator;
+    private ?string $serviceLocator = null;
 
     protected function processValue(mixed $value, bool $isRoot = false)
     {

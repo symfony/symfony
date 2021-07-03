@@ -19,12 +19,12 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class EnvPlaceholderParameterBag extends ParameterBag
 {
-    private $envPlaceholderUniquePrefix;
-    private $envPlaceholders = [];
-    private $unusedEnvPlaceholders = [];
-    private $providedTypes = [];
+    private string $envPlaceholderUniquePrefix;
+    private array $envPlaceholders = [];
+    private array $unusedEnvPlaceholders = [];
+    private array $providedTypes = [];
 
-    private static $counter = 0;
+    private static int $counter = 0;
 
     /**
      * {@inheritdoc}
@@ -66,7 +66,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
      */
     public function getEnvPlaceholderUniquePrefix(): string
     {
-        if (null === $this->envPlaceholderUniquePrefix) {
+        if (!isset($this->envPlaceholderUniquePrefix)) {
             $reproducibleEntropy = unserialize(serialize($this->parameters));
             array_walk_recursive($reproducibleEntropy, function (&$v) { $v = null; });
             $this->envPlaceholderUniquePrefix = 'env_'.substr(md5(serialize($reproducibleEntropy)), -16);

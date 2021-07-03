@@ -24,26 +24,26 @@ class Definition
 {
     private const DEFAULT_DEPRECATION_TEMPLATE = 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.';
 
-    private $class;
-    private $file;
-    private $factory;
-    private $shared = true;
-    private $deprecation = [];
-    private $properties = [];
-    private $calls = [];
-    private $instanceof = [];
-    private $autoconfigured = false;
-    private $configurator;
-    private $tags = [];
-    private $public = false;
-    private $synthetic = false;
-    private $abstract = false;
-    private $lazy = false;
-    private $decoratedService;
-    private $autowired = false;
-    private $changes = [];
-    private $bindings = [];
-    private $errors = [];
+    private ?string $class = null;
+    private ?string $file = null;
+    private string|array|null $factory = null;
+    private bool $shared = true;
+    private array $deprecation = [];
+    private array $properties = [];
+    private array $calls = [];
+    private array $instanceof = [];
+    private bool $autoconfigured = false;
+    private string|array|null $configurator = null;
+    private array $tags = [];
+    private bool $public = false;
+    private bool $synthetic = false;
+    private bool $abstract = false;
+    private bool $lazy = false;
+    private ?array $decoratedService = null;
+    private bool $autowired = false;
+    private array $changes = [];
+    private array $bindings = [];
+    private array $errors = [];
 
     protected $arguments = [];
 

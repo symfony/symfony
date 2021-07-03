@@ -26,7 +26,7 @@ namespace Symfony\Component\DependencyInjection;
  */
 class Variable
 {
-    private $name;
+    private string $name;
 
     public function __construct(string $name)
     {

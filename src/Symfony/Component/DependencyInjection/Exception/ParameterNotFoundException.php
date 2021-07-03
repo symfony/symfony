@@ -20,11 +20,11 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class ParameterNotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface
 {
-    private $key;
-    private $sourceId;
-    private $sourceKey;
-    private $alternatives;
-    private $nonNestedAlternative;
+    private string $key;
+    private ?string $sourceId;
+    private ?string $sourceKey;
+    private array $alternatives;
+    private ?string $nonNestedAlternative;
 
     /**
      * @param string          $key                  The requested parameter key

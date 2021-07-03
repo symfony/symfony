@@ -31,9 +31,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     protected $container;
     protected $currentId;
 
-    private $processExpressions = false;
-    private $expressionLanguage;
-    private $inExpression = false;
+    private bool $processExpressions = false;
+    private ExpressionLanguage $expressionLanguage;
+    private bool $inExpression = false;
 
     /**
      * {@inheritdoc}
@@ -194,7 +194,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
 
     private function getExpressionLanguage(): ExpressionLanguage
     {
-        if (null === $this->expressionLanguage) {
+        if (!isset($this->expressionLanguage)) {
             if (!class_exists(ExpressionLanguage::class)) {
                 throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
             }

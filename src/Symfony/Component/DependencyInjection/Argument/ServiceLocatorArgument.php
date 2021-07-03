@@ -22,7 +22,7 @@ class ServiceLocatorArgument implements ArgumentInterface
 {
     use ReferenceSetArgumentTrait;
 
-    private $taggedIteratorArgument;
+    private ?TaggedIteratorArgument $taggedIteratorArgument = null;
 
     /**
      * @param Reference[]|TaggedIteratorArgument $values

@@ -18,7 +18,7 @@ namespace Symfony\Component\DependencyInjection;
  */
 class Parameter
 {
-    private $id;
+    private string $id;
 
     public function __construct(string $id)
     {

@@ -57,82 +57,69 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * @var ExtensionInterface[]
      */
-    private $extensions = [];
+    private array $extensions = [];
 
     /**
      * @var ExtensionInterface[]
      */
-    private $extensionsByNs = [];
+    private array $extensionsByNs = [];
 
     /**
      * @var Definition[]
      */
-    private $definitions = [];
+    private array $definitions = [];
 
     /**
      * @var Alias[]
      */
-    private $aliasDefinitions = [];
+    private array $aliasDefinitions = [];
 
     /**
      * @var ResourceInterface[]
      */
-    private $resources = [];
+    private array $resources = [];
 
-    private $extensionConfigs = [];
-
-    /**
-     * @var Compiler
-     */
-    private $compiler;
-
-    private $trackResources;
-
-    /**
-     * @var InstantiatorInterface|null
-     */
-    private $proxyInstantiator;
-
-    /**
-     * @var ExpressionLanguage|null
-     */
-    private $expressionLanguage;
+    private array $extensionConfigs = [];
+    private Compiler $compiler;
+    private bool $trackResources;
+    private ?InstantiatorInterface $proxyInstantiator = null;
+    private ExpressionLanguage $expressionLanguage;
 
     /**
      * @var ExpressionFunctionProviderInterface[]
      */
-    private $expressionLanguageProviders = [];
+    private array $expressionLanguageProviders = [];
 
     /**
      * @var string[] with tag names used by findTaggedServiceIds
      */
-    private $usedTags = [];
+    private array $usedTags = [];
 
     /**
      * @var string[][] a map of env var names to their placeholders
      */
-    private $envPlaceholders = [];
+    private array $envPlaceholders = [];
 
     /**
      * @var int[] a map of env vars to their resolution counter
      */
-    private $envCounters = [];
+    private array $envCounters = [];
 
     /**
      * @var string[] the list of vendor directories
      */
-    private $vendors;
+    private array $vendors;
 
-    private $autoconfiguredInstanceof = [];
+    private array $autoconfiguredInstanceof = [];
 
     /**
      * @var callable[]
      */
-    private $autoconfiguredAttributes = [];
+    private array $autoconfiguredAttributes = [];
 
-    private $removedIds = [];
+    private array $removedIds = [];
 
-    private $removedBindingIds = [];
+    private array $removedBindingIds = [];
 
     private const INTERNAL_TYPES = [
         'int' => true,
@@ -161,7 +148,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * @var \ReflectionClass[] a list of class reflectors
      */
-    private $classReflectors;
+    private array $classReflectors;
 
     /**
      * Sets the track resources flag.
@@ -476,11 +463,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getCompiler()
     {
-        if (null === $this->compiler) {
-            $this->compiler = new Compiler();
-        }
-
-        return $this->compiler;
+        return $this->compiler ??= new Compiler();
     }
 
     /**
@@ -1611,7 +1594,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private function getExpressionLanguage(): ExpressionLanguage
     {
-        if (null === $this->expressionLanguage) {
+        if (!isset($this->expressionLanguage)) {
             if (!class_exists(\Symfony\Component\ExpressionLanguage\ExpressionLanguage::class)) {
                 throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
@@ -1623,9 +1606,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private function inVendors(string $path): bool
     {
-        if (null === $this->vendors) {
-            $this->vendors = (new ComposerResource())->getVendors();
-        }
+        $this->vendors ??= (new ComposerResource())->getVendors();
         $path = realpath($path) ?: $path;
 
         foreach ($this->vendors as $vendor) {

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
@@ -76,6 +77,10 @@ class ProfilerListener implements EventSubscriberInterface
         }
 
         if ($this->onlyException && null === $this->exception) {
+            return;
+        }
+
+        if ($event->getResponse() instanceof StreamedResponse) {
             return;
         }
 

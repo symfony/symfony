@@ -37,7 +37,7 @@ class Valid extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function addImplicitGroupName($group)
+    public function addImplicitGroupName(string $group)
     {
         if (null !== $this->groups) {
             parent::addImplicitGroupName($group);

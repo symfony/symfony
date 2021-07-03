@@ -114,10 +114,8 @@ abstract class Composite extends Constraint
      * {@inheritdoc}
      *
      * Implicit group names are forwarded to nested constraints.
-     *
-     * @param string $group
      */
-    public function addImplicitGroupName($group)
+    public function addImplicitGroupName(string $group)
     {
         parent::addImplicitGroupName($group);
 

@@ -1117,11 +1117,9 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param \DOMElement $node
-     *
      * @return array
      */
-    protected function sibling($node, string $siblingDir = 'nextSibling')
+    protected function sibling(\DOMNode $node, string $siblingDir = 'nextSibling')
     {
         $nodes = [];
 

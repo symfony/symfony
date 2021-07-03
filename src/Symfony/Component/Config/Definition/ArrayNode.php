@@ -32,9 +32,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $removeExtraKeys = true;
     protected $normalizeKeys = true;
 
-    public function setNormalizeKeys($normalizeKeys)
+    public function setNormalizeKeys(bool $normalizeKeys)
     {
-        $this->normalizeKeys = (bool) $normalizeKeys;
+        $this->normalizeKeys = $normalizeKeys;
     }
 
     /**

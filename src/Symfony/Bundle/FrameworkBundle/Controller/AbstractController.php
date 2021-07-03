@@ -428,7 +428,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @param object|Envelope $message The message or the message pre-wrapped in an envelope
      */
-    protected function dispatchMessage($message, array $stamps = []): Envelope
+    protected function dispatchMessage(object $message, array $stamps = []): Envelope
     {
         if (!$this->container->has('messenger.default_bus')) {
             $message = class_exists(Envelope::class) ? 'You need to define the "messenger.default_bus" configuration option.' : 'Try running "composer require symfony/messenger".';

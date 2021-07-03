@@ -78,7 +78,7 @@ final class MercureTransportTest extends TransportTestCase
     public function testConstructWithWrongTopicsThrows()
     {
         $this->expectException(TypeError::class);
-        $this->createTransport(null, null, 'publisherId', 1);
+        $this->createTransport(null, null, 'publisherId', new \stdClass());
     }
 
     public function testSendWithNonMercureOptionsThrows()

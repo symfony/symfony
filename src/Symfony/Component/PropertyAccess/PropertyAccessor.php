@@ -660,10 +660,8 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * Returns whether a property is writable in the given object.
-     *
-     * @param object $object The object to write to
      */
-    private function isPropertyWritable($object, string $property): bool
+    private function isPropertyWritable(object $object, string $property): bool
     {
         if (!\is_object($object)) {
             return false;

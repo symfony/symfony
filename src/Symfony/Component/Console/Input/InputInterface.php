@@ -83,7 +83,7 @@ interface InputInterface
     /**
      * Returns the argument value for a given argument name.
      *
-     * @return string|string[]|null The argument value
+     * @return mixed
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
@@ -92,7 +92,7 @@ interface InputInterface
     /**
      * Sets an argument value by name.
      *
-     * @param string|string[]|null $value The argument value
+     * @param mixed $value The argument value
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
@@ -117,7 +117,7 @@ interface InputInterface
     /**
      * Returns the option value for a given option name.
      *
-     * @return string|string[]|bool|null The option value
+     * @return mixed
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
@@ -126,7 +126,7 @@ interface InputInterface
     /**
      * Sets an option value by name.
      *
-     * @param string|string[]|bool|null $value The option value
+     * @param mixed $value The option value
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */

@@ -22,22 +22,22 @@ Form
 
  * Deprecated `PropertyPathMapper` in favor of `DataMapper` and `PropertyPathAccessor`.
 
- Before:
+   Before:
 
- ```php
- use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+   ```php
+   use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 
- $builder->setDataMapper(new PropertyPathMapper());
- ```
+   $builder->setDataMapper(new PropertyPathMapper());
+   ```
 
- After:
+   After:
 
- ```php
- use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
- use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+   ```php
+   use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
+   use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 
- $builder->setDataMapper(new DataMapper(new PropertyPathAccessor()));
- ```
+   $builder->setDataMapper(new DataMapper(new PropertyPathAccessor()));
+   ```
 
 HttpFoundation
 --------------

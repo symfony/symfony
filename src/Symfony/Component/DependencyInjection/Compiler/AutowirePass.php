@@ -408,7 +408,7 @@ class AutowirePass extends AbstractRecursivePass
         $this->ambiguousServiceTypes[$type][] = $id;
     }
 
-    private function createTypeNotFoundMessageCallback(TypedReference $reference, string $label): callable
+    private function createTypeNotFoundMessageCallback(TypedReference $reference, string $label): \Closure
     {
         if (null === $this->typesClone->container) {
             $this->typesClone->container = new ContainerBuilder($this->container->getParameterBag());

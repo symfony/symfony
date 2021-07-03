@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-07-01T13:36:38Z
+
+for the Psalm false positive, I reported the bug at https://github.com/vimeo/psalm/issues/6027

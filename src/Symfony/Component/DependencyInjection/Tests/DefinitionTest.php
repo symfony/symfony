@@ -188,22 +188,6 @@ class DefinitionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testSetDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-
-        $def = new Definition('stdClass');
-        $def->setDeprecated(true, '%service_id%');
-
-        $deprecation = $def->getDeprecation('deprecated_service');
-        $this->assertSame('deprecated_service', $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
-    }
-
-    /**
      * @dataProvider invalidDeprecationMessageProvider
      */
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)

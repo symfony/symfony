@@ -47,8 +47,6 @@ class ProjectServiceContainer extends Container
             '.service_locator.JmEob1b' => true,
             '.service_locator.JmEob1b.foo_service' => true,
             '.service_locator.KIgkoLM' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
         ];
     }

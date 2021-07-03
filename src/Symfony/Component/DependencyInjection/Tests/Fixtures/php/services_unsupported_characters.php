@@ -40,14 +40,6 @@ class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        ];
-    }
-
     /**
      * Gets the public 'bar$' shared service.
      *

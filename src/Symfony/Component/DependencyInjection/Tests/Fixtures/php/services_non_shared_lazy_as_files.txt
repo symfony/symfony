@@ -1,14 +1,5 @@
 Array
 (
-    [Container%s/removed-ids.php] => <?php
-
-namespace Container%s;
-
-return [
-    'Psr\\Container\\ContainerInterface' => true,
-    'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-];
-
     [Container%s/getNonSharedFooService.php] => <?php
 
 namespace Container%s;
@@ -100,11 +91,6 @@ class ProjectServiceContainer extends Container
     public function isCompiled(): bool
     {
         return true;
-    }
-
-    public function getRemovedIds(): array
-    {
-        return require $this->containerDir.\DIRECTORY_SEPARATOR.'removed-ids.php';
     }
 
     protected function load($file, $lazyLoad = true)

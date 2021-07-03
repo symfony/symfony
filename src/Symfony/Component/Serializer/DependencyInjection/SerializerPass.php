@@ -27,36 +27,21 @@ class SerializerPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    private $serializerService;
-    private $normalizerTag;
-    private $encoderTag;
-
-    public function __construct(string $serializerService = 'serializer', string $normalizerTag = 'serializer.normalizer', string $encoderTag = 'serializer.encoder')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/serializer', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->serializerService = $serializerService;
-        $this->normalizerTag = $normalizerTag;
-        $this->encoderTag = $encoderTag;
-    }
-
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->serializerService)) {
+        if (!$container->hasDefinition('serializer')) {
             return;
         }
 
-        if (!$normalizers = $this->findAndSortTaggedServices($this->normalizerTag, $container)) {
-            throw new RuntimeException(sprintf('You must tag at least one service as "%s" to use the "%s" service.', $this->normalizerTag, $this->serializerService));
+        if (!$normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container)) {
+            throw new RuntimeException('You must tag at least one service as "serializer.normalizer" to use the "serializer" service.');
         }
 
-        $serializerDefinition = $container->getDefinition($this->serializerService);
+        $serializerDefinition = $container->getDefinition('serializer');
         $serializerDefinition->replaceArgument(0, $normalizers);
 
-        if (!$encoders = $this->findAndSortTaggedServices($this->encoderTag, $container)) {
-            throw new RuntimeException(sprintf('You must tag at least one service as "%s" to use the "%s" service.', $this->encoderTag, $this->serializerService));
+        if (!$encoders = $this->findAndSortTaggedServices('serializer.encoder', $container)) {
+            throw new RuntimeException('You must tag at least one service as "serializer.encoder" to use the "serializer" service.');
         }
 
         $serializerDefinition->replaceArgument(1, $encoders);

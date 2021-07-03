@@ -28,26 +28,24 @@ class Groups
     /**
      * @var string[]
      */
-    private $groups;
+    private array $groups;
 
     /**
      * @param string|string[] $groups
      */
     public function __construct(string|array $groups)
     {
-        $groups = (array) $groups;
+        $this->groups = (array) $groups;
 
-        if (empty($groups)) {
+        if (empty($this->groups)) {
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" cannot be empty.', static::class));
         }
 
-        foreach ($groups as $group) {
+        foreach ($this->groups as $group) {
             if (!\is_string($group) || '' === $group) {
                 throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a string or an array of non-empty strings.', static::class));
             }
         }
-
-        $this->groups = $groups;
     }
 
     /**

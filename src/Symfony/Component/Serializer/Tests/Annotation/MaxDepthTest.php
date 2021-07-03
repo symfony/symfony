@@ -20,11 +20,15 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class MaxDepthTest extends TestCase
 {
-    public function testNotAnIntMaxDepthParameter()
+    /**
+     * @testWith    [-4]
+     *              [0]
+     */
+    public function testNotAnIntMaxDepthParameter(int $value)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\MaxDepth" must be a positive integer.');
-        new MaxDepth(0);
+        new MaxDepth($value);
     }
 
     public function testMaxDepthParameters()

@@ -22,10 +22,10 @@ class DiscriminatorMapTest extends TestCase
 {
     public function testGetTypePropertyAndMapping()
     {
-        $annotation = new DiscriminatorMap(...['typeProperty' => 'type', 'mapping' => [
+        $annotation = new DiscriminatorMap(typeProperty: 'type', mapping: [
             'foo' => 'FooClass',
             'bar' => 'BarClass',
-        ]]);
+        ]);
 
         $this->assertEquals('type', $annotation->getTypeProperty());
         $this->assertEquals([
@@ -37,12 +37,12 @@ class DiscriminatorMapTest extends TestCase
     public function testExceptionWithEmptyTypeProperty()
     {
         $this->expectException(InvalidArgumentException::class);
-        new DiscriminatorMap(...['typeProperty' => '', 'mapping' => ['foo' => 'FooClass']]);
+        new DiscriminatorMap(typeProperty: '', mapping: ['foo' => 'FooClass']);
     }
 
     public function testExceptionWitEmptyMappingProperty()
     {
         $this->expectException(InvalidArgumentException::class);
-        new DiscriminatorMap(...['typeProperty' => 'type', 'mapping' => []]);
+        new DiscriminatorMap(typeProperty: 'type', mapping: []);
     }
 }

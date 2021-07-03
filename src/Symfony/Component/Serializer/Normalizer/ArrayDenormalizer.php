@@ -14,9 +14,6 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Denormalizes arrays of objects.
@@ -25,7 +22,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @final
  */
-class ArrayDenormalizer implements ContextAwareDenormalizerInterface, DenormalizerAwareInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
+class ArrayDenormalizer implements ContextAwareDenormalizerInterface, DenormalizerAwareInterface, CacheableSupportsMethodInterface
 {
     use DenormalizerAwareTrait;
 
@@ -71,24 +68,6 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
 
         return '[]' === substr($type, -2)
             && $this->denormalizer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated call setDenormalizer() instead
-     */
-    public function setSerializer(SerializerInterface $serializer)
-    {
-        if (!$serializer instanceof DenormalizerInterface) {
-            throw new InvalidArgumentException('Expected a serializer that also implements DenormalizerInterface.');
-        }
-
-        if (Serializer::class !== debug_backtrace()[1]['class'] ?? null) {
-            trigger_deprecation('symfony/serializer', '5.3', 'Calling "%s" is deprecated. Please call setDenormalizer() instead.');
-        }
-
-        $this->setDenormalizer($serializer);
     }
 
     /**

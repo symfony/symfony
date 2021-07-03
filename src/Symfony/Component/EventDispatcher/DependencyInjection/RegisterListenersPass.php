@@ -25,10 +25,10 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class RegisterListenersPass implements CompilerPassInterface
 {
-    private $hotPathEvents = [];
-    private $hotPathTagName = 'container.hot_path';
-    private $noPreloadEvents = [];
-    private $noPreloadTagName = 'container.no_preload';
+    private array $hotPathEvents = [];
+    private string $hotPathTagName = 'container.hot_path';
+    private array $noPreloadEvents = [];
+    private string $noPreloadTagName = 'container.no_preload';
 
     /**
      * @return $this

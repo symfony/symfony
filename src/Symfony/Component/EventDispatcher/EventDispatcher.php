@@ -31,9 +31,9 @@ use Symfony\Component\EventDispatcher\Debug\WrappedListener;
  */
 class EventDispatcher implements EventDispatcherInterface
 {
-    private $listeners = [];
-    private $sorted = [];
-    private $optimized;
+    private array $listeners = [];
+    private array $sorted = [];
+    private array $optimized;
 
     public function __construct()
     {
@@ -49,7 +49,7 @@ class EventDispatcher implements EventDispatcherInterface
     {
         $eventName = $eventName ?? \get_class($event);
 
-        if (null !== $this->optimized) {
+        if (isset($this->optimized)) {
             $listeners = $this->optimized[$eventName] ?? (empty($this->listeners[$eventName]) ? [] : $this->optimizeListeners($eventName));
         } else {
             $listeners = $this->getListeners($eventName);

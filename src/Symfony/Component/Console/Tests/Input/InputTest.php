@@ -89,6 +89,11 @@ class InputTest extends TestCase
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default')]));
         $this->assertEquals('default', $input->getArgument('bar'), '->getArgument() returns the default value for optional arguments');
         $this->assertEquals(['name' => 'foo', 'bar' => 'default'], $input->getArguments(), '->getArguments() returns all argument values, even optional ones');
+
+        $input = new ArrayInput(['arg1' => 'foo'], new InputDefinition([new InputArgument('arg1'), new InputArgument('arg2')]));
+        $input->setArgument(1, 'bar');
+        $this->assertEquals('bar', $input->getArgument(1));
+        $this->assertEquals(['arg1' => 'foo', 'arg2' => 'bar'], $input->getArguments());
     }
 
     public function testSetInvalidArgument()

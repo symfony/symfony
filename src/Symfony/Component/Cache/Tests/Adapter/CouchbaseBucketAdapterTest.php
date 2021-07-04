@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter;
@@ -34,7 +35,7 @@ class CouchbaseBucketAdapterTest extends AdapterTestCase
     public static function setupBeforeClass(): void
     {
         if (!CouchbaseBucketAdapter::isSupported()) {
-            self::markTestSkipped('Couchbase >= 2.6.0 < 3.0.0 is required.');
+            throw new SkippedTestSuiteError('Couchbase >= 2.6.0 < 3.0.0 is required.');
         }
 
         self::$client = AbstractAdapter::createConnection('couchbase://'.getenv('COUCHBASE_HOST').'/cache',

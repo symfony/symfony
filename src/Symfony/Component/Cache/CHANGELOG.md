@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `DoctrineProvider`
+
 5.4
 ---
 

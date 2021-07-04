@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Allow to pass `TranslatableMessage` objects to the `help` option
+
 5.3
 ---
 

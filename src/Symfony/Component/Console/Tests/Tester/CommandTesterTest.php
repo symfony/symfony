@@ -79,7 +79,7 @@ class CommandTesterTest extends TestCase
 
     public function testGetStatusCode()
     {
-        $this->assertSame(0, $this->tester->getStatusCode(), '->getStatusCode() returns the status code');
+        $this->tester->assertCommandIsSuccessful('->getStatusCode() returns the status code');
     }
 
     public function testGetStatusCodeWithoutCallingExecuteBefore()
@@ -129,7 +129,7 @@ class CommandTesterTest extends TestCase
         $tester->setInputs(['Bobby', 'Fine', 'France']);
         $tester->execute([]);
 
-        $this->assertEquals(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertEquals(implode('', $questions), $tester->getDisplay(true));
     }
 
@@ -154,7 +154,7 @@ class CommandTesterTest extends TestCase
         $tester->setInputs(['', '', '']);
         $tester->execute([]);
 
-        $this->assertEquals(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertEquals(implode('', $questions), $tester->getDisplay(true));
     }
 
@@ -227,7 +227,7 @@ class CommandTesterTest extends TestCase
         $tester->setInputs(['Bobby', 'Fine', 'France']);
         $tester->execute([]);
 
-        $this->assertEquals(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
     }
 
     public function testErrorOutput()

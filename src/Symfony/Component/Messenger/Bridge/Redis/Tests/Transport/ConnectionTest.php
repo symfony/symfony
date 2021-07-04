@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
@@ -31,12 +32,12 @@ class ConnectionTest extends TestCase
             $redis->get();
         } catch (TransportException $e) {
             if (0 === strpos($e->getMessage(), 'ERR unknown command \'X')) {
-                self::markTestSkipped('Redis server >= 5 is required');
+                throw new SkippedTestSuiteError('Redis server >= 5 is required');
             }
 
             throw $e;
         } catch (\RedisException $e) {
-            self::markTestSkipped($e->getMessage());
+            throw new SkippedTestSuiteError($e->getMessage());
         }
     }
 

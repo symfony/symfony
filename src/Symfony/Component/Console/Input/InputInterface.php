@@ -101,7 +101,7 @@ interface InputInterface
      *
      * @return bool true if the InputArgument object exists, false otherwise
      */
-    public function hasArgument(string|int $name);
+    public function hasArgument(string $name);
 
     /**
      * Returns all the given options merged with the default values.

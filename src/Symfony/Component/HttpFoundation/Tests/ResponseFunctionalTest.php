@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
 
 class ResponseFunctionalTest extends TestCase
@@ -24,7 +25,7 @@ class ResponseFunctionalTest extends TestCase
             2 => ['file', '/dev/null', 'w'],
         ];
         if (!self::$server = @proc_open('exec '.\PHP_BINARY.' -S localhost:8054', $spec, $pipes, __DIR__.'/Fixtures/response-functional')) {
-            self::markTestSkipped('PHP server unable to start.');
+            throw new SkippedTestSuiteError('PHP server unable to start.');
         }
         sleep(1);
     }

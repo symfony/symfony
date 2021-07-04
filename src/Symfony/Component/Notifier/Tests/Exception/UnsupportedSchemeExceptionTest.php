@@ -28,6 +28,7 @@ use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
@@ -75,6 +76,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             IqsmsTransportFactory::class => false,
             LightSmsTransportFactory::class => false,
             LinkedInTransportFactory::class => false,
+            MailjetTransportFactory::class => false,
             MattermostTransportFactory::class => false,
             MercureTransportFactory::class => false,
             MessageBirdTransportFactory::class => false,
@@ -128,6 +130,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['iqsms', 'symfony/iqsms-notifier'];
         yield ['lightsms', 'symfony/light-sms-notifier'];
         yield ['linkedin', 'symfony/linked-in-notifier'];
+        yield ['mailjet', 'symfony/mailjet-notifier'];
         yield ['mattermost', 'symfony/mattermost-notifier'];
         yield ['mercure', 'symfony/mercure-notifier'];
         yield ['messagebird', 'symfony/message-bird-notifier'];

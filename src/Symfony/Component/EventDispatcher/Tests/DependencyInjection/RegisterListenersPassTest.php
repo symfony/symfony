@@ -175,6 +175,7 @@ class RegisterListenersPassTest extends TestCase
         $container->register('foo', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
         $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
         $container->register('baz', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'event']);
+        $container->register('zar', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar_zar']);
         $container->register('event_dispatcher', \stdClass::class);
 
         $registerListenersPass = new RegisterListenersPass();
@@ -203,6 +204,14 @@ class RegisterListenersPassTest extends TestCase
                 [
                     'event',
                     [new ServiceClosureArgument(new Reference('baz')), 'onEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'foo.bar_zar',
+                    [new ServiceClosureArgument(new Reference('zar')), 'onFooBarZar'],
                     0,
                 ],
             ],

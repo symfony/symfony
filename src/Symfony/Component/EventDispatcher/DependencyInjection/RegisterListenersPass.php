@@ -102,7 +102,7 @@ class RegisterListenersPass implements CompilerPassInterface
 
                 if (!isset($event['method'])) {
                     $event['method'] = 'on'.preg_replace_callback([
-                        '/(?<=\b)[a-z]/i',
+                        '/(?<=\b|_)[a-z]/i',
                         '/[^a-z0-9]/i',
                     ], function ($matches) { return strtoupper($matches[0]); }, $event['event']);
                     $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);

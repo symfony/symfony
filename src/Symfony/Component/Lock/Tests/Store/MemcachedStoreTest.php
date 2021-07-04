@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -34,7 +35,7 @@ class MemcachedStoreTest extends AbstractStoreTest
         $code = $memcached->getResultCode();
 
         if (\Memcached::RES_SUCCESS !== $code && \Memcached::RES_NOTFOUND !== $code) {
-            self::markTestSkipped('Unable to connect to the memcache host');
+            throw new SkippedTestSuiteError('Unable to connect to the memcache host');
         }
     }
 

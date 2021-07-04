@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
+
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
@@ -28,7 +30,7 @@ class RedisStoreTest extends AbstractRedisStoreTest
         try {
             (new \Redis())->connect(getenv('REDIS_HOST'));
         } catch (\Exception $e) {
-            self::markTestSkipped($e->getMessage());
+            throw new SkippedTestSuiteError($e->getMessage());
         }
     }
 

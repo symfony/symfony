@@ -24,46 +24,30 @@ class Crawler implements \Countable, \IteratorAggregate
     protected $uri;
 
     /**
-     * @var string The default namespace prefix to be used with XPath and CSS expressions
+     * The default namespace prefix to be used with XPath and CSS expressions
      */
-    private $defaultNamespacePrefix = 'default';
+    private string $defaultNamespacePrefix = 'default';
 
     /**
-     * @var array A map of manually registered namespaces
+     * A map of manually registered namespaces
      */
-    private $namespaces = [];
+    private array $namespaces = [];
 
     /**
-     * @var \ArrayObject A map of cached namespaces
+     * A map of cached namespaces
      */
-    private $cachedNamespaces;
+    private \ArrayObject $cachedNamespaces;
 
-    /**
-     * @var string The base href value
-     */
-    private $baseHref;
-
-    /**
-     * @var \DOMDocument|null
-     */
-    private $document;
-
-    /**
-     * @var \DOMNode[]
-     */
-    private $nodes = [];
+    private ?string $baseHref;
+    private ?\DOMDocument $document = null;
+    private array $nodes = [];
 
     /**
      * Whether the Crawler contains HTML or XML content (used when converting CSS to XPath).
-     *
-     * @var bool
      */
-    private $isHtml = true;
+    private bool $isHtml = true;
 
-    /**
-     * @var HTML5|null
-     */
-    private $html5Parser;
+    private ?HTML5 $html5Parser;
 
     /**
      * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A Node to use as the base for the crawling

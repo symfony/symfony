@@ -21,28 +21,16 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form extends Link implements \ArrayAccess
 {
-    /**
-     * @var \DOMElement
-     */
-    private $button;
-
-    /**
-     * @var FormFieldRegistry
-     */
-    private $fields;
-
-    /**
-     * @var string
-     */
-    private $baseHref;
+    private \DOMElement $button;
+    private FormFieldRegistry $fields;
+    private ?string $baseHref;
 
     /**
      * @param \DOMElement $node       A \DOMElement instance
-     * @param string      $currentUri The URI of the page where the form is embedded
-     * @param string      $method     The method to use for the link (if null, it defaults to the method defined by the form)
-     * @param string      $baseHref   The URI of the <base> used for relative links, but not for empty action
+     * @param string|null $currentUri The URI of the page where the form is embedded
+     * @param string|null $method     The method to use for the link (if null, it defaults to the method defined by the form)
+     * @param string|null $baseHref   The URI of the <base> used for relative links, but not for empty action
      *
-     * @throws \LogicException if the node is not a button inside a form tag
      */
     public function __construct(\DOMElement $node, string $currentUri = null, string $method = null, string $baseHref = null)
     {

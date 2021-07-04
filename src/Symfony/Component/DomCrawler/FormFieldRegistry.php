@@ -20,9 +20,8 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class FormFieldRegistry
 {
-    private $fields = [];
-
-    private $base = '';
+    private array $fields = [];
+    private string $base = '';
 
     /**
      * Adds a field to the registry.

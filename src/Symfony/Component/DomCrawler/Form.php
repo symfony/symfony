@@ -21,20 +21,9 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form extends Link implements \ArrayAccess
 {
-    /**
-     * @var \DOMElement
-     */
-    private $button;
-
-    /**
-     * @var FormFieldRegistry
-     */
-    private $fields;
-
-    /**
-     * @var string
-     */
-    private $baseHref;
+    private \DOMElement $button;
+    private FormFieldRegistry $fields;
+    private ?string $baseHref;
 
     /**
      * @param \DOMElement $node       A \DOMElement instance

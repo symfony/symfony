@@ -23,9 +23,9 @@ namespace Symfony\Component\CssSelector\Parser;
  */
 class Reader
 {
-    private $source;
-    private $length;
-    private $position = 0;
+    private string $source;
+    private int $length;
+    private int $position = 0;
 
     public function __construct(string $source)
     {

@@ -18,7 +18,8 @@
     "require": {
         "php": ">=7.1.3",
         "symfony/polyfill-intl-idn": "^1.10",
-        "symfony/polyfill-mbstring": "^1.0"
+        "symfony/polyfill-mbstring": "^1.0",
+        "symfony/polyfill-php80": "^1.16"
     },
     "require-dev": {
         "egulias/email-validator": "^2.1.10|^3.1",

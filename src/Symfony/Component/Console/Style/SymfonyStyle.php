@@ -442,7 +442,7 @@ class SymfonyStyle extends OutputStyle
     {
         $fetched = $this->bufferedOutput->fetch();
         //Prepend new line if last char isn't EOL:
-        if ("\n" !== substr($fetched, -1)) {
+        if (!str_ends_with($fetched, "\n")) {
             $this->newLine();
         }
     }

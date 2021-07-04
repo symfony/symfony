@@ -84,7 +84,7 @@ class AddAutoMappingConfigurationPass implements CompilerPassInterface
             $regex = strtr($regex, ['\\*\\*' => '.*?', '\\*' => '[^\\\\]*?']);
 
             // If this class does not end by a slash, anchor the end
-            if ('\\' !== substr($regex, -1)) {
+            if (!str_ends_with($regex, '\\')) {
                 $regex .= '$';
             }
 

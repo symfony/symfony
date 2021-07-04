@@ -460,7 +460,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         foreach ($noProxy as $rule) {
             $dotRule = '.'.ltrim($rule, '.');
 
-            if ('*' === $rule || $host === $rule || substr($host, -\strlen($dotRule)) === $dotRule) {
+            if ('*' === $rule || $host === $rule || str_ends_with($host, $dotRule)) {
                 stream_context_set_option($context, 'http', 'proxy', null);
                 stream_context_set_option($context, 'http', 'request_fulluri', false);
                 stream_context_set_option($context, 'http', 'header', $requestHeaders);

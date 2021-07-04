@@ -34,7 +34,7 @@ class FileLoaderLoadException extends \Exception
             // Include the previous exception, to help the user see what might be the underlying cause
 
             // Trim the trailing period of the previous message. We only want 1 period remove so no rtrim...
-            if ('.' === substr($previous->getMessage(), -1)) {
+            if (str_ends_with($previous->getMessage(), '.')) {
                 $trimmedMessage = substr($previous->getMessage(), 0, -1);
                 $message .= sprintf('%s', $trimmedMessage).' in ';
             } else {

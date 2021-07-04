@@ -479,7 +479,7 @@ class CliDumper extends AbstractDumper
             } else {
                 $value = "\033[{$this->styles[$style]}m".$value;
             }
-            if ($cchrCount && $endCchr === substr($value, -\strlen($endCchr))) {
+            if ($cchrCount && str_ends_with($value, $endCchr)) {
                 $value = substr($value, 0, -\strlen($endCchr));
             } else {
                 $value .= "\033[{$this->styles['default']}m";

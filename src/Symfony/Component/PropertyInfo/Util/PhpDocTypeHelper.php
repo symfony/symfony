@@ -108,7 +108,7 @@ final class PhpDocTypeHelper
             return null;
         }
 
-        if ('[]' === substr($docType, -2)) {
+        if (str_ends_with($docType, '[]')) {
             if ('mixed[]' === $docType) {
                 $collectionKeyType = null;
                 $collectionValueType = null;

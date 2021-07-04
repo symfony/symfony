@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -188,7 +189,7 @@ class DaoAuthenticationProviderTest extends TestCase
     public function testCheckAuthenticationDoesNotReauthenticateWhenPasswordHasChanged()
     {
         $this->expectException(BadCredentialsException::class);
-        $user = $this->createMock(UserInterface::class);
+        $user = $this->createMock(TestUser::class);
         $user->expects($this->once())
              ->method('getPassword')
              ->willReturn('foo')
@@ -199,7 +200,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->method('getUser')
               ->willReturn($user);
 
-        $dbUser = $this->createMock(UserInterface::class);
+        $dbUser = $this->createMock(TestUser::class);
         $dbUser->expects($this->once())
                ->method('getPassword')
                ->willReturn('newFoo')
@@ -213,7 +214,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testCheckAuthenticationWhenTokenNeedsReauthenticationWorksWithoutOriginalCredentials()
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = $this->createMock(TestUser::class);
         $user->expects($this->once())
              ->method('getPassword')
              ->willReturn('foo')
@@ -224,7 +225,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->method('getUser')
               ->willReturn($user);
 
-        $dbUser = $this->createMock(UserInterface::class);
+        $dbUser = $this->createMock(TestUser::class);
         $dbUser->expects($this->once())
                ->method('getPassword')
                ->willReturn('foo')
@@ -338,7 +339,7 @@ class DaoAuthenticationProviderTest extends TestCase
     }
 }
 
-class TestUser implements UserInterface
+class TestUser implements PasswordAuthenticatedUserInterface, UserInterface
 {
     public function getRoles(): array
     {
@@ -348,11 +349,6 @@ class TestUser implements UserInterface
     public function getPassword(): ?string
     {
         return 'secret';
-    }
-
-    public function getSalt(): ?string
-    {
-        return null;
     }
 
     public function getUsername(): string
@@ -371,7 +367,7 @@ class TestUser implements UserInterface
 }
 interface PasswordUpgraderProvider extends UserProviderInterface, PasswordUpgraderInterface
 {
-    public function upgradePassword($user, string $newHashedPassword): void;
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void;
 
     public function loadUserByIdentifier(string $identifier): UserInterface;
 }

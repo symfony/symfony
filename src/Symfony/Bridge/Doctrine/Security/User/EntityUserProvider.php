@@ -133,16 +133,8 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
      *
      * @final
      */
-    public function upgradePassword($user, string $newHashedPassword): void
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
-        if (!$user instanceof PasswordAuthenticatedUserInterface) {
-            trigger_deprecation('symfony/doctrine-bridge', '5.3', 'The "%s::upgradePassword()" method expects an instance of "%s" as first argument, the "%s" class should implement it.', PasswordUpgraderInterface::class, PasswordAuthenticatedUserInterface::class, get_debug_type($user));
-
-            if (!$user instanceof UserInterface) {
-                throw new \TypeError(sprintf('The "%s::upgradePassword()" method expects an instance of "%s" as first argument, "%s" given.', PasswordAuthenticatedUserInterface::class, get_debug_type($user)));
-            }
-        }
-
         $class = $this->getClass();
         if (!$user instanceof $class) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));

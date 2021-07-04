@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -59,6 +60,10 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
 
         if (!$user instanceof UserInterface) {
             throw new \RuntimeException(sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', get_debug_type($user)));
+        }
+
+        if (!$user instanceof PasswordAuthenticatedUserInterface) {
+            throw new \RuntimeException(sprintf('Class "%s" must implement "%s" for using "%s".', get_debug_type($user), PasswordAuthenticatedUserInterface::class, __CLASS__));
         }
 
         if (true !== hash_equals($this->generateCookieHash($class, $userIdentifier, $expires, $user->getPassword()), $hash)) {

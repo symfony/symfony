@@ -47,7 +47,7 @@ class CheckCredentialsListener implements EventSubscriberInterface
             $user = $passport->getUser();
 
             if (!$user instanceof PasswordAuthenticatedUserInterface) {
-                trigger_deprecation('symfony/security-http', '5.3', 'Not implementing the "%s" interface in class "%s" while using password-based authentication is deprecated.', PasswordAuthenticatedUserInterface::class, get_debug_type($user));
+                throw new \LogicException(sprintf('Class "%s" must implement "%s" for using password-based authentication.', get_debug_type($user), PasswordAuthenticatedUserInterface::class));
             }
 
             /** @var PasswordCredentials $badge */
@@ -66,12 +66,7 @@ class CheckCredentialsListener implements EventSubscriberInterface
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 
-            $salt = $user->getSalt();
-            if ($salt && !$user instanceof LegacyPasswordAuthenticatedUserInterface) {
-                trigger_deprecation('symfony/security-http', '5.3', 'Returning a string from "getSalt()" without implementing the "%s" interface is deprecated, the "%s" class should implement it.', LegacyPasswordAuthenticatedUserInterface::class, get_debug_type($user));
-            }
-
-            if (!$this->hasherFactory->getPasswordHasher($user)->verify($user->getPassword(), $presentedPassword, $salt)) {
+            if (!$this->hasherFactory->getPasswordHasher($user)->verify($user->getPassword(), $presentedPassword, $user instanceof LegacyPasswordAuthenticatedUserInterface ? $user->getSalt() : null)) {
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 

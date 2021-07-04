@@ -15,6 +15,7 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -51,8 +52,13 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
      */
     protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
     {
+        if (!$user instanceof PasswordAuthenticatedUserInterface) {
+            throw new InvalidArgumentException(sprintf('Class "%s" must implement "%s" for using password-based authentication.', get_debug_type($user), PasswordAuthenticatedUserInterface::class));
+        }
+
         $currentUser = $token->getUser();
-        if ($currentUser instanceof UserInterface) {
+
+        if ($currentUser instanceof PasswordAuthenticatedUserInterface) {
             if ($currentUser->getPassword() !== $user->getPassword()) {
                 throw new BadCredentialsException('The credentials were changed from another session.');
             }
@@ -65,15 +71,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 
-            if (!$user instanceof PasswordAuthenticatedUserInterface) {
-                trigger_deprecation('symfony/security-core', '5.3', 'Using password-based authentication listeners while not implementing "%s" interface from class "%s" is deprecated.', PasswordAuthenticatedUserInterface::class, get_debug_type($user));
-            }
-
-            $salt = $user->getSalt();
-            if ($salt && !$user instanceof LegacyPasswordAuthenticatedUserInterface) {
-                trigger_deprecation('symfony/security-core', '5.3', 'Returning a string from "getSalt()" without implementing the "%s" interface is deprecated, the "%s" class should implement it.', LegacyPasswordAuthenticatedUserInterface::class, get_debug_type($user));
-            }
-
+            $salt = $user instanceof LegacyPasswordAuthenticatedUserInterface ? $user->getSalt() : null;
             $hasher = $this->hasherFactory->getPasswordHasher($user);
 
             if (!$hasher->verify($user->getPassword(), $presentedPassword, $salt)) {

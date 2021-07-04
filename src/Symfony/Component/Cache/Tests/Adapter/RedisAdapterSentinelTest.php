@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -23,13 +24,13 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
     public static function setUpBeforeClass(): void
     {
         if (!class_exists(\Predis\Client::class)) {
-            self::markTestSkipped('The Predis\Client class is required.');
+            throw new SkippedTestSuiteError('The Predis\Client class is required.');
         }
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
-            self::markTestSkipped('REDIS_SENTINEL_HOSTS env var is not defined.');
+            throw new SkippedTestSuiteError('REDIS_SENTINEL_HOSTS env var is not defined.');
         }
         if (!$service = getenv('REDIS_SENTINEL_SERVICE')) {
-            self::markTestSkipped('REDIS_SENTINEL_SERVICE env var is not defined.');
+            throw new SkippedTestSuiteError('REDIS_SENTINEL_SERVICE env var is not defined.');
         }
 
         self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['redis_sentinel' => $service, 'prefix' => 'prefix_']);

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-04T04:46:10Z
+
+Then we need to also revert the change on the interface, and I'm in favor of deprecating positions in hasArgument and in InputDefinition. The current behavior doesn't make sense when integers are passed. Can you give it a try?

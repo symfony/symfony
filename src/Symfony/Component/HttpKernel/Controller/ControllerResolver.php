@@ -48,15 +48,8 @@ class ControllerResolver implements ControllerResolverInterface
                 try {
                     $controller[0] = $this->instantiateController($controller[0]);
                 } catch (\Error | \LogicException $e) {
-                    try {
-                        // We cannot just check is_callable but have to use reflection because a non-static method
-                        // can still be called statically in PHP but we don't want that. This is deprecated in PHP 7, so we
-                        // could simplify this with PHP 8.
-                        if ((new \ReflectionMethod($controller[0], $controller[1]))->isStatic()) {
-                            return $controller;
-                        }
-                    } catch (\ReflectionException $reflectionException) {
-                        throw $e;
+                    if (\is_callable($controller)) {
+                        return $controller;
                     }
 
                     throw $e;

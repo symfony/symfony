@@ -466,16 +466,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecation('alias_for_foobar')['message']);
     }
 
-    public function testDeprecatedAliaseWithoutPackageAndVersion()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/^Missing attribute "package" at node "deprecated" in "[^"]*".$/');
-        $loader->load('deprecated_alias_definitions_without_package_and_version.xml');
-    }
-
     public function testConvertDomElementToArray()
     {
         $doc = new \DOMDocument('1.0');

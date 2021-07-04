@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by JJsty1e at 2021-06-29T16:09:47Z
+
+sorry, it seems this PR should be filed to branch 4.4
+
+---------------------------------------------------------------------------
+
+by JJsty1e at 2021-06-30T01:42:14Z
+
+failed tests😭, so hard to make a pull request, but problem indeed exists
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-30T05:04:39Z
+
+The current behavior might be somewhat unexpected. But if we just change it, we will break existing applications. Can we make it so that both ways work?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-06-30T07:20:49Z
+
+Method names are case insentitive in PHP, right? So, is there a bug that needs to fix here or is it just for a better looking method name?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-30T07:27:24Z
+
+> Method names are case insentitive in PHP, right?
+
+If we don't configure a method name, `RegisterListenersPass` will guess it. And that logic is case-sensitive.
+
+> So, is there a bug that needs to fix here or is it just for a better looking method name?
+
+It's about allowing a less surprising method name, I'd say.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-06-30T15:43:39Z
+
+Ref https://github.com/symfony/symfony/pull/41876
+
+---------------------------------------------------------------------------
+
+by JJsty1e at 2021-07-03T04:42:14Z
+
+> @JJsty1e how did you discovered this? :D
+
+when do some breakpoint debugging in my project.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-03T20:07:53Z
+
+please apply the code style fix from fabbot

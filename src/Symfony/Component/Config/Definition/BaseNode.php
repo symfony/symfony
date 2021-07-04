@@ -26,8 +26,8 @@ abstract class BaseNode implements NodeInterface
 {
     public const DEFAULT_PATH_SEPARATOR = '.';
 
-    private static $placeholderUniquePrefixes = [];
-    private static $placeholders = [];
+    private static array $placeholderUniquePrefixes = [];
+    private static array $placeholders = [];
 
     protected $name;
     protected $parent;
@@ -40,7 +40,7 @@ abstract class BaseNode implements NodeInterface
     protected $attributes = [];
     protected $pathSeparator;
 
-    private $handlingPlaceholder;
+    private mixed $handlingPlaceholder = null;
 
     /**
      * @throws \InvalidArgumentException if the name contains a period
@@ -480,7 +480,7 @@ abstract class BaseNode implements NodeInterface
         return [];
     }
 
-    private static function resolvePlaceholderValue(mixed $value)
+    private static function resolvePlaceholderValue(mixed $value): mixed
     {
         if (\is_string($value)) {
             if (isset(self::$placeholders[$value])) {

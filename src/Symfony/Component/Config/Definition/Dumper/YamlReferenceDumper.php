@@ -28,7 +28,7 @@ use Symfony\Component\Yaml\Inline;
  */
 class YamlReferenceDumper
 {
-    private $reference;
+    private ?string $reference = null;
 
     public function dump(ConfigurationInterface $configuration)
     {

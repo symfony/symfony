@@ -23,15 +23,12 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class ResourceCheckerConfigCache implements ConfigCacheInterface
 {
-    /**
-     * @var string
-     */
-    private $file;
+    private string $file;
 
     /**
      * @var iterable|ResourceCheckerInterface[]
      */
-    private $resourceCheckers;
+    private iterable $resourceCheckers;
 
     /**
      * @param string                              $file             The absolute cache path

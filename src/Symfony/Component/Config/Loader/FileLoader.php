@@ -29,7 +29,7 @@ abstract class FileLoader extends Loader
 
     protected $locator;
 
-    private $currentDir;
+    private ?string $currentDir = null;
 
     public function __construct(FileLocatorInterface $locator, string $env = null)
     {

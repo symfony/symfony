@@ -31,8 +31,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
  */
 class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
 {
-    private $classes;
-    private $outputDir;
+    private array $classes = [];
+    private string $outputDir;
 
     public function __construct(string $outputDir)
     {

@@ -22,11 +22,11 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class ReflectionClassResource implements SelfCheckingResourceInterface
 {
-    private $files = [];
-    private $className;
-    private $classReflector;
-    private $excludedVendors = [];
-    private $hash;
+    private array $files = [];
+    private string $className;
+    private \ReflectionClass $classReflector;
+    private array $excludedVendors = [];
+    private string $hash;
 
     public function __construct(\ReflectionClass $classReflector, array $excludedVendors = [])
     {
@@ -40,7 +40,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
      */
     public function isFresh(int $timestamp): bool
     {
-        if (null === $this->hash) {
+        if (!isset($this->hash)) {
             $this->hash = $this->computeHash();
             $this->loadFiles($this->classReflector);
         }
@@ -68,7 +68,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
      */
     public function __sleep(): array
     {
-        if (null === $this->hash) {
+        if (!isset($this->hash)) {
             $this->hash = $this->computeHash();
             $this->loadFiles($this->classReflector);
         }
@@ -102,13 +102,11 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
 
     private function computeHash(): string
     {
-        if (null === $this->classReflector) {
-            try {
-                $this->classReflector = new \ReflectionClass($this->className);
-            } catch (\ReflectionException $e) {
-                // the class does not exist anymore
-                return false;
-            }
+        try {
+            $this->classReflector ??= new \ReflectionClass($this->className);
+        } catch (\ReflectionException $e) {
+            // the class does not exist anymore
+            return false;
         }
         $hash = hash_init('md5');
 

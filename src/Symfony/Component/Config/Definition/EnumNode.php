@@ -20,7 +20,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  */
 class EnumNode extends ScalarNode
 {
-    private $values;
+    private array $values;
 
     public function __construct(?string $name, NodeInterface $parent = null, array $values = [], string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR)
     {

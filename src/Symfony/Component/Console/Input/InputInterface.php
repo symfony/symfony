@@ -104,7 +104,7 @@ interface InputInterface
     /**
      * Returns true if an InputArgument object exists by name or position.
      *
-     * @param string $name The InputArgument name or position
+     * @param string $name The argument name
      *
      * @return bool true if the InputArgument object exists, false otherwise
      */

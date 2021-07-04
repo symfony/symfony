@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\AmazonSns;
 
 use AsyncAws\Sns\SnsClient;
 use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -63,10 +64,14 @@ final class AmazonSnsTransport extends AbstractTransport
         $options['Message'] = $message->getSubject();
         $options[($message instanceof ChatMessage) ? 'TopicArn' : 'PhoneNumber'] = $message->getRecipientId();
 
-        $response = $this->snsClient->publish($options);
-
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($response->getMessageId());
+        try {
+            $response = $this->snsClient->publish($options);
+            $message = new SentMessage($message, (string) $this);
+            $message->setMessageId($response->getMessageId());
+        } catch (\Exception $exception) {
+            $info = isset($response) ? $response->info() : [];
+            throw new TransportException("Unable to send the message.", $info['response'] ?? null, $info['status'] ?? 0, $exception);
+        }
 
         return $message;
     }

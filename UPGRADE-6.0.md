@@ -11,6 +11,11 @@ DoctrineBridge
 
  * Remove `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()`
 
+Cache
+-----
+
+ * Remove `DoctrineProvider` because it has been added to the `doctrine/cache` package
+
 Config
 ------
 

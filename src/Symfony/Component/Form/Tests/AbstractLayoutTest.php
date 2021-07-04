@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 
 abstract class AbstractLayoutTest extends FormIntegrationTestCase
 {
@@ -2664,6 +2665,36 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             '/*
     [@id="name_help"]
     [.="[trans]for company ACME Ltd.[/trans]"]
+'
+        );
+    }
+
+    public function testLabelWithTranslatableMessage()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => new TranslatableMessage('foo'),
+        ]);
+        $html = $this->renderLabel($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/label
+    [@for="name"]
+    [.="[trans]foo[/trans]"]
+'
+        );
+    }
+
+    public function testHelpWithTranslatableMessage()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => new TranslatableMessage('foo'),
+        ]);
+        $html = $this->renderHelp($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/*
+    [@id="name_help"]
+    [.="[trans]foo[/trans]"]
 '
         );
     }

@@ -18,6 +18,11 @@ CHANGELOG
  * Change `$radios` parameter type of the `RadioListMapper::mapDataToForms()` method from `iterable` to `\Traversable`
  * Change `$radios` parameter type of the `RadioListMapper::mapFormsToData()` method from `iterable` to `\Traversable`
 
+5.4
+---
+
+ * Allow to pass `TranslatableMessage` objects to the `help` option
+
 5.3
 ---
 

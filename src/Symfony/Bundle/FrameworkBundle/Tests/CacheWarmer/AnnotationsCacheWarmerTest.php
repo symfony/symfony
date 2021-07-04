@@ -6,13 +6,13 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Cache\DoctrineProvider;
 use Symfony\Component\Filesystem\Filesystem;
 
 class AnnotationsCacheWarmerTest extends TestCase
@@ -51,7 +51,7 @@ class AnnotationsCacheWarmerTest extends TestCase
             )
             : new CachedReader(
                 $this->getReadOnlyReader(),
-                new DoctrineProvider(new PhpArrayAdapter($cacheFile, new NullAdapter()))
+                DoctrineProvider::wrap(new PhpArrayAdapter($cacheFile, new NullAdapter()))
             )
         ;
         $refClass = new \ReflectionClass($this);
@@ -79,7 +79,7 @@ class AnnotationsCacheWarmerTest extends TestCase
             )
             : new CachedReader(
                 $this->getReadOnlyReader(),
-                new DoctrineProvider($phpArrayAdapter),
+                DoctrineProvider::wrap($phpArrayAdapter),
                 true
             )
         ;

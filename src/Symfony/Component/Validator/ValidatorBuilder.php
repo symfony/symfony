@@ -19,7 +19,6 @@ use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\DoctrineProvider as SymfonyDoctrineProvider;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -424,18 +423,8 @@ class ValidatorBuilder
         }
 
         // Doctrine Annotations < 1.13, Doctrine Cache >= 1.11, Symfony Cache
-        if (class_exists(CachedReader::class) && class_exists(DoctrineProvider::class) && class_exists(ArrayAdapter::class)) {
+        if (class_exists(CachedReader::class) && class_exists(ArrayAdapter::class)) {
             return new CachedReader(new AnnotationReader(), DoctrineProvider::wrap(new ArrayAdapter()));
-        }
-
-        // Doctrine Annotations < 1.13, Doctrine Cache < 1.11, Symfony Cache
-        if (class_exists(CachedReader::class) && !class_exists(DoctrineProvider::class) && class_exists(ArrayAdapter::class)) {
-            return new CachedReader(new AnnotationReader(), new SymfonyDoctrineProvider(new ArrayAdapter()));
-        }
-
-        // Doctrine Annotations < 1.13, Doctrine Cache < 1.11
-        if (class_exists(CachedReader::class) && class_exists(ArrayCache::class)) {
-            return new CachedReader(new AnnotationReader(), new ArrayCache());
         }
 
         // Doctrine Annotation >= 1.13, Doctrine Cache >= 2, no Symfony Cache

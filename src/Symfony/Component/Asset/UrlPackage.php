@@ -35,8 +35,8 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  */
 class UrlPackage extends Package
 {
-    private $baseUrls = [];
-    private $sslPackage;
+    private array $baseUrls = [];
+    private ?self $sslPackage = null;
 
     /**
      * @param string|string[] $baseUrls Base asset URLs

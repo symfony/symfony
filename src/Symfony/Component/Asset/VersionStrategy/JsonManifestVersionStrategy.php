@@ -27,9 +27,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class JsonManifestVersionStrategy implements VersionStrategyInterface
 {
-    private $manifestPath;
-    private $manifestData;
-    private $httpClient;
+    private string $manifestPath;
+    private array $manifestData;
+    private ?HttpClientInterface $httpClient;
 
     /**
      * @param string $manifestPath Absolute path to the manifest file
@@ -61,7 +61,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
 
     private function getManifestPath(string $path): ?string
     {
-        if (null === $this->manifestData) {
+        if (!isset($this->manifestData)) {
             if (null !== $this->httpClient && 0 === strpos(parse_url($this->manifestPath, \PHP_URL_SCHEME), 'http')) {
                 try {
                     $this->manifestData = $this->httpClient->request('GET', $this->manifestPath, [
@@ -75,9 +75,10 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
                     throw new \RuntimeException(sprintf('Asset manifest file "%s" does not exist.', $this->manifestPath));
                 }
 
-                $this->manifestData = json_decode(file_get_contents($this->manifestPath), true);
-                if (0 < json_last_error()) {
-                    throw new \RuntimeException(sprintf('Error parsing JSON from asset manifest file "%s": ', $this->manifestPath).json_last_error_msg());
+                try {
+                    $this->manifestData = json_decode(file_get_contents($this->manifestPath), true, flags: \JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \RuntimeException(sprintf('Error parsing JSON from asset manifest file "%s": ', $this->manifestPath).$e->getMessage(), previous: $e);
                 }
             }
         }

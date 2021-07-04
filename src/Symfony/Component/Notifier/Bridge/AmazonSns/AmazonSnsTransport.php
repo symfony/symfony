@@ -70,7 +70,7 @@ final class AmazonSnsTransport extends AbstractTransport
             $message->setMessageId($response->getMessageId());
         } catch (\Exception $exception) {
             $info = isset($response) ? $response->info() : [];
-            throw new TransportException("Unable to send the message.", $info['response'] ?? null, $info['status'] ?? 0, $exception);
+            throw new TransportException('Unable to send the message.', $info['response'] ?? null, $info['status'] ?? 0, $exception);
         }
 
         return $message;

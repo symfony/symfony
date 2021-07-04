@@ -16,9 +16,9 @@ namespace Symfony\Component\BrowserKit;
  */
 final class Response
 {
-    private $content;
-    private $status;
-    private $headers;
+    private string $content;
+    private int $status;
+    private array $headers;
 
     /**
      * The headers array is a set of key/value pairs. If a header is present multiple times

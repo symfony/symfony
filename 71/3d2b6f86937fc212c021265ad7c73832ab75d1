@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-04T10:06:27Z
+
+Does this mean we can remove all notifier bridges from the require-dev of the bundle?
+Can you please give it a try?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-07-04T10:57:22Z
+
+Turns out we can :smiley:

@@ -29,16 +29,16 @@ final class Dotenv
     public const STATE_VARNAME = 0;
     public const STATE_VALUE = 1;
 
-    private $path;
-    private $cursor;
-    private $lineno;
-    private $data;
-    private $end;
-    private $values;
-    private $envKey;
-    private $debugKey;
-    private $prodEnvs = ['prod'];
-    private $usePutenv = false;
+    private string $path;
+    private int $cursor;
+    private int $lineno;
+    private string $data;
+    private int $end;
+    private array $values = [];
+    private string $envKey;
+    private string $debugKey;
+    private array $prodEnvs = ['prod'];
+    private bool $usePutenv = false;
 
     public function __construct(string $envKey = 'APP_ENV', string $debugKey = 'APP_DEBUG')
     {
@@ -89,10 +89,10 @@ final class Dotenv
      * .env.local is always ignored in test env because tests should produce the same results for everyone.
      * .env.dist is loaded when it exists and .env is not found.
      *
-     * @param string $path        A file to load
-     * @param string $envKey|null The name of the env vars that defines the app env
-     * @param string $defaultEnv  The app env to use when none is defined
-     * @param array  $testEnvs    A list of app envs for which .env.local should be ignored
+     * @param string      $path        A file to load
+     * @param string|null $envKey The name of the env vars that defines the app env
+     * @param string      $defaultEnv  The app env to use when none is defined
+     * @param array       $testEnvs    A list of app envs for which .env.local should be ignored
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
@@ -257,8 +257,7 @@ final class Dotenv
             return $this->values;
         } finally {
             $this->values = [];
-            $this->data = null;
-            $this->path = null;
+            unset($this->path, $this->cursor, $this->lineno, $this->data, $this->end);
         }
     }
 

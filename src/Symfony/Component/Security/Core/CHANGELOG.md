@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * `TokenInterface` does not extend `Serializable` anymore
+ *  Remove all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead
 
 5.3
 ---

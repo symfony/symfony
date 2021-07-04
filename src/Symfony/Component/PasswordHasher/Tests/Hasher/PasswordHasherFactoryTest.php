@@ -19,7 +19,6 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
-use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
@@ -183,24 +182,6 @@ class PasswordHasherFactoryTest extends TestCase
             MigratingPasswordHasher::class,
             (new PasswordHasherFactory([SomeUser::class => ['class' => SodiumPasswordHasher::class, 'arguments' => []]]))->getPasswordHasher(SomeUser::class)
         );
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyEncoderObject()
-    {
-        $factory = new PasswordHasherFactory([SomeUser::class => new PlaintextPasswordEncoder()]);
-        self::assertSame('foo{bar}', $factory->getPasswordHasher(SomeUser::class)->hash('foo', 'bar'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyEncoderClass()
-    {
-        $factory = new PasswordHasherFactory([SomeUser::class => ['class' => PlaintextPasswordEncoder::class, 'arguments' => []]]);
-        self::assertSame('foo{bar}', $factory->getPasswordHasher(SomeUser::class)->hash('foo', 'bar'));
     }
 }
 

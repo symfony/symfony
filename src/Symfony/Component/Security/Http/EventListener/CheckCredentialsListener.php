@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -72,15 +71,8 @@ class CheckCredentialsListener implements EventSubscriberInterface
                 trigger_deprecation('symfony/security-http', '5.3', 'Returning a string from "getSalt()" without implementing the "%s" interface is deprecated, the "%s" class should implement it.', LegacyPasswordAuthenticatedUserInterface::class, get_debug_type($user));
             }
 
-            // @deprecated since Symfony 5.3
-            if ($this->hasherFactory instanceof EncoderFactoryInterface) {
-                if (!$this->hasherFactory->getEncoder($user)->isPasswordValid($user->getPassword(), $presentedPassword, $salt)) {
-                    throw new BadCredentialsException('The presented password is invalid.');
-                }
-            } else {
-                if (!$this->hasherFactory->getPasswordHasher($user)->verify($user->getPassword(), $presentedPassword, $salt)) {
-                    throw new BadCredentialsException('The presented password is invalid.');
-                }
+            if (!$this->hasherFactory->getPasswordHasher($user)->verify($user->getPassword(), $presentedPassword, $salt)) {
+                throw new BadCredentialsException('The presented password is invalid.');
             }
 
             $badge->markResolved();

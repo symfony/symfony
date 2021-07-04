@@ -83,7 +83,7 @@ interface InputInterface
     /**
      * Returns the argument value for a given argument name.
      *
-     * @param string|int $name The InputArgument name or position
+     * @param string $name The argument name
      *
      * @return mixed
      *
@@ -94,8 +94,8 @@ interface InputInterface
     /**
      * Sets an argument value by name.
      *
-     * @param string|int $name  The InputArgument name or position
-     * @param mixed      $value The argument value
+     * @param string $name  The argument name
+     * @param mixed  $value The argument value
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
@@ -104,7 +104,7 @@ interface InputInterface
     /**
      * Returns true if an InputArgument object exists by name or position.
      *
-     * @param string|int $name The InputArgument name or position
+     * @param string $name The InputArgument name or position
      *
      * @return bool true if the InputArgument object exists, false otherwise
      */

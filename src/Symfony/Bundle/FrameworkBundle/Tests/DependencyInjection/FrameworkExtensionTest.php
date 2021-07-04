@@ -1876,6 +1876,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testIfNotifierTransportsAreKnownByFrameworkExtension()
     {
+        if (!class_exists(FullStack::class)) {
+            $this->markTestSkipped('This test can only run in fullstack test suites');
+        }
+
         $container = $this->createContainerFromFile('notifier');
 
         foreach ((new Finder())->in(\dirname(__DIR__, 4).'/Component/Notifier/Bridge')->directories()->depth(0)->exclude('Mercure') as $bridgeDirectory) {

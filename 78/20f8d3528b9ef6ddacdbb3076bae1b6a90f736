@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-26T09:41:12Z
+
+But this method is now `@internal`. Maybe we should report this to phpunit before?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-05-26T10:06:58Z
+
+Issue opened in https://github.com/sebastianbergmann/phpunit/issues/4689
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-03T05:40:09Z
+
+As there is no feedback upstream, can we merge this one in the meantime?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-04T09:15:33Z
+
+Thank you @jderusse.

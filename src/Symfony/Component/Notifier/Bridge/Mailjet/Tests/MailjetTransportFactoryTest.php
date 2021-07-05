@@ -39,9 +39,9 @@ final class MailjetTransportFactoryTest extends TransportFactoryTestCase
         yield [false, 'somethingElse://Mailjet:authtoken@default'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public function incompleteDsnProvider(): iterable
     {
-        yield 'missing option: from' => ['mailjet://authtoken@default'];
+        yield 'missing from' => ['mailjet://authtoken@default', 'Invalid "mailjet://authtoken@default" notifier DSN: Password is not set.'];
     }
 
     public function unsupportedSchemeProvider(): iterable

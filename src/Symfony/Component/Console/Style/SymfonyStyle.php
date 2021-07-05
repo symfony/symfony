@@ -288,7 +288,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function confirm($question, $default = true)
+    public function confirm(string $question, bool $default = true)
     {
         return $this->askQuestion(new ConfirmationQuestion($question, $default));
     }

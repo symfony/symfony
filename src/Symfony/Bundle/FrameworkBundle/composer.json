@@ -54,7 +54,7 @@
         "symfony/process": "^4.4|^5.0|^6.0",
         "symfony/rate-limiter": "^5.2|^6.0",
         "symfony/security-bundle": "^5.3|^6.0",
-        "symfony/serializer": "^5.2|^6.0",
+        "symfony/serializer": "^5.4|^6.0",
         "symfony/stopwatch": "^4.4|^5.0|^6.0",
         "symfony/string": "^5.0|^6.0",
         "symfony/translation": "^5.3|^6.0",

@@ -47,7 +47,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\TypedReference;
-use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
@@ -162,28 +161,6 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/custom_container_class_with_mandatory_constructor_arguments.php', $dumper->dump(['base_class' => 'ConstructorWithMandatoryArgumentsContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Tests\Fixtures\Container']));
-    }
-
-    /**
-     * @dataProvider provideInvalidParameters
-     */
-    public function testExportParameters($parameters)
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $container = new ContainerBuilder(new ParameterBag($parameters));
-        $container->compile();
-        $dumper = new PhpDumper($container);
-        $dumper->dump();
-    }
-
-    public function provideInvalidParameters()
-    {
-        return [
-            [['foo' => new Definition('stdClass')]],
-            [['foo' => new Expression('service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")')]],
-            [['foo' => new Reference('foo')]],
-            [['foo' => new Variable('foo')]],
-        ];
     }
 
     public function testAddParameters()

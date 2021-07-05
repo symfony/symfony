@@ -74,7 +74,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @param string $name The parameter name
      *
-     * @return mixed The parameter value
+     * @return array|bool|string|int|float|null
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
@@ -92,8 +92,8 @@ interface ContainerInterface extends PsrContainerInterface
     /**
      * Sets a parameter.
      *
-     * @param string $name  The parameter name
-     * @param mixed  $value The parameter value
+     * @param string                           $name  The parameter name
+     * @param array|bool|string|int|float|null $value The parameter value
      */
     public function setParameter($name, $value);
 }

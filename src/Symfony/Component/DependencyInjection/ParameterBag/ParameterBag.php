@@ -99,7 +99,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $name, mixed $value)
+    public function set(string $name, array|bool|string|int|float|null $value)
     {
         $this->parameters[$name] = $value;
     }

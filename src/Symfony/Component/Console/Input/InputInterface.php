@@ -51,13 +51,13 @@ interface InputInterface
      * Does not necessarily return the correct result for short options
      * when multiple flags are combined in the same option.
      *
-     * @param string|array $values     The value(s) to look for in the raw parameters (can be an array)
-     * @param mixed        $default    The default value to return if no result is found
-     * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
+     * @param string|array                     $values     The value(s) to look for in the raw parameters (can be an array)
+     * @param string|bool|int|float|array|null $default    The default value to return if no result is found
+     * @param bool                             $onlyParams Only check real parameters, skip those following an end of options (--) signal
      *
      * @return mixed The option value
      */
-    public function getParameterOption(string|array $values, mixed $default = false, bool $onlyParams = false);
+    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false);
 
     /**
      * Binds the current Input instance with the given arguments and options.
@@ -76,7 +76,7 @@ interface InputInterface
     /**
      * Returns all the given arguments merged with the default values.
      *
-     * @return array
+     * @return array<string|bool|int|float|array|null>
      */
     public function getArguments();
 
@@ -106,7 +106,7 @@ interface InputInterface
     /**
      * Returns all the given options merged with the default values.
      *
-     * @return array
+     * @return array<string|bool|int|float|array|null>
      */
     public function getOptions();
 

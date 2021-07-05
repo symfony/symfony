@@ -77,7 +77,7 @@ class ArrayInput extends Input
     /**
      * {@inheritdoc}
      */
-    public function getParameterOption(string|array $values, mixed $default = false, bool $onlyParams = false)
+    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false)
     {
         $values = (array) $values;
 

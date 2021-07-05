@@ -45,7 +45,7 @@ interface ParameterBagInterface
     /**
      * Gets a service container parameter.
      *
-     * @return mixed The parameter value
+     * @return array|bool|string|int|float|null
      *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
@@ -61,7 +61,7 @@ interface ParameterBagInterface
      *
      * @throws LogicException if the parameter can not be set
      */
-    public function set(string $name, mixed $value);
+    public function set(string $name, array|bool|string|int|float|null $value);
 
     /**
      * Returns true if a parameter name is defined.

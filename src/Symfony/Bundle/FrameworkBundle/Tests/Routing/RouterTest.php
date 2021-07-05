@@ -410,16 +410,24 @@ class RouterTest extends TestCase
 
     public function testExceptionOnNonStringParameterWithSfContainer()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%object%'));
 
         $sc = $this->getServiceContainer($routes);
-        $sc->setParameter('object', new \stdClass());
 
-        $router = new Router($sc, 'foo');
+        $pc = $this->createMock(ContainerInterface::class);
+        $pc
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn(new \stdClass())
+        ;
+
+        $router = new Router($sc, 'foo', [], null, $pc);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
+
         $router->getRouteCollection()->get('foo');
     }
 

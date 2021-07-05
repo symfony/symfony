@@ -37,6 +37,7 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         $this->addOption('csrf_token_id', 'authenticate');
         $this->addOption('enable_csrf', false);
         $this->addOption('post_only', true);
+        $this->addOption('form_only', false);
     }
 
     public function getPriority(): int

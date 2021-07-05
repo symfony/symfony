@@ -37,6 +37,7 @@ CHANGELOG
  * Deprecate the `security.authentication.provider.*` services, use the new authenticator system instead
  * Deprecate the `security.authentication.listener.*` services, use the new authenticator system instead
  * Deprecate the Guard component integration, use the new authenticator system instead
+ * Add `form_login.form_only` option
 
 5.2.0
 -----

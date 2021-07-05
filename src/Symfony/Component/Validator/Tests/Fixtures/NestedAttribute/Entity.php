@@ -9,42 +9,65 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests\Fixtures\Annotation;
+namespace Symfony\Component\Validator\Tests\Fixtures\NestedAttribute;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Tests\Fixtures\Attribute\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
+use Symfony\Component\Validator\Tests\Fixtures\CallbackClass;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
-/**
- * @Symfony\Component\Validator\Tests\Fixtures\ConstraintA
- * @Assert\GroupSequence({"Foo", "Entity"})
- * @Assert\Callback({"Symfony\Component\Validator\Tests\Fixtures\CallbackClass", "callback"})
- */
+#[
+    ConstraintA,
+    Assert\GroupSequence(['Foo', 'Entity']),
+    Assert\Callback([CallbackClass::class, 'callback']),
+]
 class Entity extends EntityParent implements EntityInterfaceB
 {
-    /**
-     * @Assert\NotNull
-     * @Assert\Range(min=3)
-     * @Assert\All({@Assert\NotNull, @Assert\Range(min=3)}),
-     * @Assert\All(constraints={@Assert\NotNull, @Assert\Range(min=3)})
-     * @Assert\Collection(fields={
-     *   "foo" = {@Assert\NotNull, @Assert\Range(min=3)},
-     *   "bar" = @Assert\Range(min=5),
-     *   "baz" = @Assert\Required({@Assert\Email()}),
-     *   "qux" = @Assert\Optional({@Assert\NotBlank()})
-     * }, allowExtraFields=true)
-     * @Assert\Choice(choices={"A", "B"}, message="Must be one of %choices%")
-     * @Assert\AtLeastOneOf({@Assert\NotNull, @Assert\Range(min=3)}, message="foo", includeInternalMessages=false)
-     * @Assert\Sequentially({@Assert\NotBlank, @Assert\Range(min=5)})
-     */
+    #[
+        Assert\NotNull,
+        Assert\Range(min: 3),
+        Assert\All([
+            new Assert\NotNull(),
+            new Assert\Range(min: 3),
+        ]),
+        Assert\All(
+            constraints: [
+                new Assert\NotNull(),
+                new Assert\Range(min: 3),
+            ],
+        ),
+        Assert\Collection(
+            fields: [
+                'foo' => [
+                    new Assert\NotNull(),
+                    new Assert\Range(min: 3),
+                ],
+                'bar' => new Assert\Range(min: 5),
+                'baz' => new Assert\Required([new Assert\Email()]),
+                'qux' => new Assert\Optional([new Assert\NotBlank()]),
+            ],
+            allowExtraFields: true
+        ),
+        Assert\Choice(choices: ['A', 'B'], message: 'Must be one of %choices%'),
+        Assert\AtLeastOneOf(
+            constraints: [
+                new Assert\NotNull(),
+                new Assert\Range(min: 3),
+            ],
+            message: 'foo',
+            includeInternalMessages: false,
+        ),
+        Assert\Sequentially([
+            new Assert\NotBlank(),
+            new Assert\Range(min: 5),
+        ]),
+    ]
     public $firstName;
-    /**
-     * @Assert\Valid
-     */
+    #[Assert\Valid]
     public $childA;
-    /**
-     * @Assert\Valid
-     */
+    #[Assert\Valid]
     public $childB;
     protected $lastName;
     public $reference;
@@ -73,9 +96,7 @@ class Entity extends EntityParent implements EntityInterfaceB
         $this->lastName = $lastName;
     }
 
-    /**
-     * @Assert\NotNull
-     */
+    #[Assert\NotNull]
     public function getLastName()
     {
         return $this->lastName;
@@ -85,17 +106,13 @@ class Entity extends EntityParent implements EntityInterfaceB
     {
     }
 
-    /**
-     * @Assert\IsTrue
-     */
+    #[Assert\IsTrue]
     public function isValid()
     {
         return 'valid';
     }
 
-    /**
-     * @Assert\IsTrue
-     */
+    #[Assert\IsTrue]
     public function hasPermissions()
     {
         return 'permissions';
@@ -106,16 +123,12 @@ class Entity extends EntityParent implements EntityInterfaceB
         return 'Overridden data';
     }
 
-    /**
-     * @Assert\Callback(payload="foo")
-     */
+    #[Assert\Callback(payload: 'foo')]
     public function validateMe(ExecutionContextInterface $context)
     {
     }
 
-    /**
-     * @Assert\Callback
-     */
+    #[Assert\Callback]
     public static function validateMeStatic($object, ExecutionContextInterface $context)
     {
     }

@@ -43,7 +43,7 @@ interface EventSubscriberInterface
      * The code must not depend on runtime state as it will only be called at compile time.
      * All logic depending on runtime state must be put into the individual methods handling the events.
      *
-     * @return array The event names to listen to
+     * @return array<string, mixed> The event names to listen to
      */
     public static function getSubscribedEvents();
 }

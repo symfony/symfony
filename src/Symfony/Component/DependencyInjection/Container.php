@@ -107,7 +107,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a parameter.
      *
-     * @return mixed
+     * @return array|bool|string|int|float|null
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
@@ -124,7 +124,7 @@ class Container implements ContainerInterface, ResetInterface
         return $this->parameterBag->has($name);
     }
 
-    public function setParameter(string $name, mixed $value)
+    public function setParameter(string $name, array|bool|string|int|float|null $value)
     {
         $this->parameterBag->set($name, $value);
     }

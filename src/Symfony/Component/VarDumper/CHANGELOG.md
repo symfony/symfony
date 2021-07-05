@@ -4,6 +4,7 @@ CHANGELOG
 5.4
 ---
 
+ * Add ability to style integer and double values independently
  * Add casters for Symfony's UUIDs and ULIDs
 
 5.2.0

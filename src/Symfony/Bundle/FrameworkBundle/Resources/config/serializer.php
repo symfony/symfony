@@ -32,6 +32,7 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -207,4 +208,11 @@ return static function (ContainerConfigurator $container) {
                     ->args([service('request_stack'), param('kernel.debug')]),
             ])
     ;
+
+    if (interface_exists(\BackedEnum::class)) {
+        $container->services()
+            ->set('serializer.normalizer.backed_enum', BackedEnumNormalizer::class)
+            ->tag('serializer.normalizer', ['priority' => -915])
+        ;
+    }
 };

@@ -58,7 +58,7 @@ class UserPasswordValidator extends ConstraintValidator
         }
 
         if (!$user instanceof PasswordAuthenticatedUserInterface) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Using the "%s" validation constraint is deprecated.', PasswordAuthenticatedUserInterface::class, get_debug_type($user), UserPassword::class);
+            trigger_deprecation('symfony/security-core', '5.3', 'Using the "%s" validation constraint without implementing the "%s" interface is deprecated, the "%s" class should implement it.', UserPassword::class, PasswordAuthenticatedUserInterface::class, get_debug_type($user));
         }
 
         $salt = $user->getSalt();

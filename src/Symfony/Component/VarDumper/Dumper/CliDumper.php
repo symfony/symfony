@@ -139,10 +139,19 @@ class CliDumper extends AbstractDumper
 
             case 'integer':
                 $style = 'num';
+
+                if (isset($this->styles['integer'])) {
+                    $style = 'integer';
+                }
+
                 break;
 
             case 'double':
                 $style = 'num';
+
+                if (isset($this->styles['float'])) {
+                    $style = 'float';
+                }
 
                 switch (true) {
                     case \INF === $value:  $value = 'INF'; break;

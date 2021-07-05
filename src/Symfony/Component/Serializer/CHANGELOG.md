@@ -7,6 +7,11 @@ CHANGELOG
  * Remove `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
  * Remove the ability to create instances of the annotation classes by passing an array of parameters, use named arguments instead
 
+5.4
+---
+
+ * Add support of PHP backed enumerations
+
 5.3
 ---
 

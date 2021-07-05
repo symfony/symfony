@@ -24,14 +24,14 @@ final class MailjetTransportTest extends TransportTestCase
     /**
      * @return MailjetTransport
      */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
         return (new MailjetTransport('authtoken', 'Mailjet', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
     {
-        yield ['mailjet://Mailjet:authtoken@host.test', $this->createTransport()];
+        yield ['mailjet://Mailjet@host.test', $this->createTransport()];
     }
 
     public function supportedMessagesProvider(): iterable

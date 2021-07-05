@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-04-15T20:33:21Z
+
+Thank you for your reviews!
+
+> Why only BackedEnum? can't we also normalize Enum via Reflexion?
+
+@stof [commented](https://github.com/symfony/symfony/issues/40241#issuecomment-781366348) in the original ticket #40241 that we should only create this normalizer for `BackedEnum`, as serializing pure enum case would be better with a custom normalizer. Do you think that it would be better to create some `UnitEnumNormalizer` too?
+
+> I would go with 5.4 but we need to add a php version id check somewhere monocle_face
+
+Edit: added version check in https://github.com/symfony/symfony/commit/d8298fa24e569c9d3305f010a9cb3a1e086cd38e
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-04-19T14:26:39Z
+
+Changed `@requires PHP 8.1` annotations after @derrabus comment on https://github.com/symfony/symfony/pull/40857#discussion_r615812580
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-06-23T05:24:36Z
+
+Rebased to 4.4, as it is considered a bug fix. How to deal with the change of configuration format, going from XML to PHP configuration in latest Symfony version?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-23T07:02:54Z
+
+Thanks. We'll deal with it while merging up.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-07-05T11:31:58Z
+
+Alright! Rebase to 5.4 is done

@@ -56,11 +56,11 @@ class TestServiceContainerRefPassesTest extends TestCase
             'Test\private_used_non_shared_service' => new ServiceClosureArgument(new Reference('Test\private_used_non_shared_service')),
             'Test\soon_private_service' => new ServiceClosureArgument(new Reference('.container.private.Test\soon_private_service')),
         ];
-        $actual = $container->getDefinition('test.private_services_locator')->getArgument(0);
-        // When testing against DependencyInjection 5.4, those deprecated services will still appear.
-        unset($actual['Psr\Container\ContainerInterface'], $actual['Symfony\Component\DependencyInjection\ContainerInterface']);
 
-        $this->assertEquals($expected, $actual);
+        $privateServices = $container->getDefinition('test.private_services_locator')->getArgument(0);
+        unset($privateServices['Symfony\Component\DependencyInjection\ContainerInterface'], $privateServices['Psr\Container\ContainerInterface']);
+
+        $this->assertEquals($expected, $privateServices);
         $this->assertFalse($container->getDefinition('Test\private_used_non_shared_service')->isShared());
     }
 }

@@ -63,7 +63,7 @@ class SemaphoreStore implements StoreInterface, BlockingStoreInterface
             return;
         }
 
-        $keyId = crc32($key);
+        $keyId = unpack('i', md5($key, true))[1];
         $resource = sem_get($keyId);
         $acquired = @sem_acquire($resource, !$blocking);
 

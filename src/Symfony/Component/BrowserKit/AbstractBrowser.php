@@ -42,10 +42,10 @@ abstract class AbstractBrowser
     protected $followRedirects = true;
     protected $followMetaRefresh = false;
 
-    private $maxRedirects = -1;
-    private $redirectCount = 0;
-    private $redirects = [];
-    private $isMainRequest = true;
+    private int $maxRedirects = -1;
+    private int $redirectCount = 0;
+    private array $redirects = [];
+    private bool $isMainRequest = true;
 
     /**
      * @param array $server The server parameters (equivalent of $_SERVER)

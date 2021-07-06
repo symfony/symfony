@@ -40,7 +40,7 @@ class Cookie
     protected $secure;
     protected $httponly;
     protected $rawValue;
-    private $samesite;
+    private ?string $samesite;
 
     /**
      * Sets a cookie.

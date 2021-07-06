@@ -136,7 +136,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
         $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
-        $this->assertSame(0, self::getContainer()->get('session')->getUsageIndex());
+        $this->assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
     }
 
     /**
@@ -274,7 +274,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
         $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
-        $this->assertSame(0, self::getContainer()->get('session')->getUsageIndex());
+        $this->assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
     }
 
     private function assertAllowed($client, $path)

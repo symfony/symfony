@@ -24,7 +24,7 @@ class LoaderResolver implements LoaderResolverInterface
     /**
      * @var LoaderInterface[] An array of LoaderInterface objects
      */
-    private $loaders = [];
+    private array $loaders = [];
 
     /**
      * @param LoaderInterface[] $loaders An array of loaders

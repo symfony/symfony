@@ -20,20 +20,17 @@ namespace Symfony\Component\Config\Builder;
  */
 class ClassBuilder
 {
-    /** @var string */
-    private $namespace;
-
-    /** @var string */
-    private $name;
+    private string $namespace;
+    private string $name;
 
     /** @var Property[] */
-    private $properties = [];
+    private array $properties = [];
 
     /** @var Method[] */
-    private $methods = [];
-    private $require = [];
-    private $use = [];
-    private $implements = [];
+    private array $methods = [];
+    private array $require = [];
+    private array $use = [];
+    private array $implements = [];
 
     public function __construct(string $namespace, string $name)
     {

@@ -25,7 +25,7 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
  */
 class ConfigCache extends ResourceCheckerConfigCache
 {
-    private $debug;
+    private bool $debug;
 
     /**
      * @param string $file  The absolute cache path

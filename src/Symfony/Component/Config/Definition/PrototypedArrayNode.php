@@ -32,7 +32,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * @var NodeInterface[] An array of the prototypes of the simplified value children
      */
-    private $valuePrototypes = [];
+    private array $valuePrototypes = [];
 
     /**
      * Sets the minimum number of elements that a prototype based node must

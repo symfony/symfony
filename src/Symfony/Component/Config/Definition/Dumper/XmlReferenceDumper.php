@@ -25,7 +25,7 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
  */
 class XmlReferenceDumper
 {
-    private $reference;
+    private ?string $reference = null;
 
     public function dump(ConfigurationInterface $configuration, string $namespace = null)
     {

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
+* Added message envelope to handler `__invoke()` calls
 
 5.3
 ---

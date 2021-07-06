@@ -141,4 +141,6 @@ abstract class TestMigratingUserProvider implements UserProviderInterface, Passw
 abstract class TestPasswordAuthenticatedUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
     abstract public function getPassword(): ?string;
+
+    abstract public function getSalt();
 }

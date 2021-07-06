@@ -75,8 +75,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         return ($this->options['post_only'] ? $request->isMethod('POST') : true)
             && $this->httpUtils->checkRequestPath($request, $this->options['check_path'])
-            && (false === strpos($request->getContentType(), 'json'))
-            && (false === strpos($request->getRequestFormat(), 'json'));
+            && ($this->options['form_only'] ? 'application/x-www-form-urlencoded' === $request->getContentType() : true);
     }
 
     public function authenticate(Request $request): PassportInterface

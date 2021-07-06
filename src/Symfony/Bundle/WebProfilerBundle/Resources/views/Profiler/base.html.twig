@@ -21,8 +21,8 @@
                 document.body.classList.add(localStorage.getItem('symfony/profiler/theme'));
             }
             // needed to respond dynamically to OS changes without having to refresh the page
-            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
-                document.body.classList.remove(e.matches ? 'theme-light' : 'theme-dark');
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                document.body.classList.remove('theme-light', 'theme-dark');
                 document.body.classList.add(e.matches ? 'theme-dark' : 'theme-light');
             });
 

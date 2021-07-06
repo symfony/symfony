@@ -371,7 +371,7 @@ class TestUser implements UserInterface
 }
 interface PasswordUpgraderProvider extends UserProviderInterface, PasswordUpgraderInterface
 {
-    public function upgradePassword(UserInterface $user, string $newHashedPassword): void;
+    public function upgradePassword($user, string $newHashedPassword): void;
 
     public function loadUserByIdentifier(string $identifier): UserInterface;
 }

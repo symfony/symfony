@@ -20,9 +20,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class RequestStackContext implements ContextInterface
 {
-    private $requestStack;
-    private $basePath;
-    private $secure;
+    private RequestStack $requestStack;
+    private string $basePath;
+    private bool $secure;
 
     public function __construct(RequestStack $requestStack, string $basePath = '', bool $secure = false)
     {

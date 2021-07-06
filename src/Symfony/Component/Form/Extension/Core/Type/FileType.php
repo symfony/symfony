@@ -210,10 +210,8 @@ class FileType extends AbstractType
      * (i.e. try "MB", then "kB", then "bytes").
      *
      * This method should be kept in sync with Symfony\Component\Validator\Constraints\FileValidator::factorizeSizes().
-     *
-     * @param int|float $limit
      */
-    private function factorizeSizes(int $size, $limit)
+    private function factorizeSizes(int $size, int|float $limit)
     {
         $coef = self::MIB_BYTES;
         $coefFactor = self::KIB_BYTES;

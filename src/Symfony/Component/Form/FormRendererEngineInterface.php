@@ -25,7 +25,7 @@ interface FormRendererEngineInterface
      * @param mixed    $themes The theme(s). The type of these themes
      *                         is open to the implementation.
      */
-    public function setTheme(FormView $view, $themes, bool $useDefaultThemes = true);
+    public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true);
 
     /**
      * Returns the resource for a block name.
@@ -132,5 +132,5 @@ interface FormRendererEngineInterface
      *
      * @return string The HTML markup
      */
-    public function renderBlock(FormView $view, $resource, string $blockName, array $variables = []);
+    public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []);
 }

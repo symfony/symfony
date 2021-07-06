@@ -54,7 +54,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
-    public function transform($dateTime)
+    public function transform(mixed $dateTime)
     {
         if (null === $dateTime) {
             return array_intersect_key([
@@ -110,7 +110,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not an array,
      *                                       if the value could not be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value)
     {
         if (null === $value) {
             return null;

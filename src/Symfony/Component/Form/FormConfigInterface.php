@@ -156,11 +156,9 @@ interface FormConfigInterface
     /**
      * Returns the value of the given attribute.
      *
-     * @param mixed $default The value returned if the attribute does not exist
-     *
      * @return mixed The attribute value
      */
-    public function getAttribute(string $name, $default = null);
+    public function getAttribute(string $name, mixed $default = null);
 
     /**
      * Returns the initial data of the form.
@@ -240,11 +238,9 @@ interface FormConfigInterface
     /**
      * Returns the value of a specific option.
      *
-     * @param mixed $default The value returned if the option does not exist
-     *
      * @return mixed The option value
      */
-    public function getOption(string $name, $default = null);
+    public function getOption(string $name, mixed $default = null);
 
     /**
      * Returns a callable that takes the model data as argument and that returns if it is empty or not.

@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * A builder for {@link Button} instances.
@@ -71,7 +72,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function add($child, string $type = null, array $options = [])
+    public function add(string|FormBuilderInterface $child, string $type = null, array $options = [])
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -217,7 +218,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setAttribute(string $name, $value)
+    public function setAttribute(string $name, mixed $value)
     {
         $this->attributes[$name] = $value;
 
@@ -263,11 +264,9 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $emptyData
-     *
      * @throws BadMethodCallException
      */
-    public function setEmptyData($emptyData)
+    public function setEmptyData(mixed $emptyData)
     {
         throw new BadMethodCallException('Buttons do not support empty data.');
     }
@@ -301,11 +300,9 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param null $propertyPath
-     *
      * @throws BadMethodCallException
      */
-    public function setPropertyPath($propertyPath)
+    public function setPropertyPath(string|PropertyPathInterface|null $propertyPath)
     {
         throw new BadMethodCallException('Buttons do not support property paths.');
     }
@@ -363,11 +360,9 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $data
-     *
      * @throws BadMethodCallException
      */
-    public function setData($data)
+    public function setData(mixed $data)
     {
         throw new BadMethodCallException('Buttons do not support data.');
     }
@@ -629,11 +624,9 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Returns the value of the given attribute.
      *
-     * @param mixed $default The value returned if the attribute does not exist
-     *
      * @return mixed The attribute value
      */
-    public function getAttribute(string $name, $default = null)
+    public function getAttribute(string $name, mixed $default = null)
     {
         return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
@@ -739,11 +732,9 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Returns the value of a specific option.
      *
-     * @param mixed $default The value returned if the option does not exist
-     *
      * @return mixed The option value
      */
-    public function getOption(string $name, $default = null)
+    public function getOption(string $name, mixed $default = null)
     {
         return \array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }

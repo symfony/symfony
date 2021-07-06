@@ -31,7 +31,7 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($intlTimeZone)
+    public function transform(mixed $intlTimeZone)
     {
         if (null === $intlTimeZone) {
             return null;
@@ -55,7 +55,7 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value)
     {
         if (null === $value) {
             return;

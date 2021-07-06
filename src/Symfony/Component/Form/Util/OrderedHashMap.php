@@ -101,7 +101,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @return bool
      */
-    public function offsetExists($key)
+    public function offsetExists(mixed $key)
     {
         return isset($this->elements[$key]);
     }
@@ -109,7 +109,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($key)
+    public function offsetGet(mixed $key)
     {
         if (!isset($this->elements[$key])) {
             throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $key));
@@ -121,7 +121,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($key, $value)
+    public function offsetSet(mixed $key, mixed $value)
     {
         if (null === $key || !isset($this->elements[$key])) {
             if (null === $key) {
@@ -142,7 +142,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($key)
+    public function offsetUnset(mixed $key)
     {
         if (false !== ($position = array_search((string) $key, $this->orderedKeys))) {
             array_splice($this->orderedKeys, $position, 1);

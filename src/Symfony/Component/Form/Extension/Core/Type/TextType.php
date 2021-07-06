@@ -51,7 +51,7 @@ class TextType extends AbstractType implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($data)
+    public function transform(mixed $data)
     {
         // Model data should not be transformed
         return $data;
@@ -60,7 +60,7 @@ class TextType extends AbstractType implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($data)
+    public function reverseTransform(mixed $data)
     {
         return null === $data ? '' : $data;
     }

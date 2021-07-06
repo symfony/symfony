@@ -75,7 +75,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException if the given value is not a \DateTimeInterface
      *                                       or if the date could not be transformed
      */
-    public function transform($dateTime)
+    public function transform(mixed $dateTime)
     {
         if (null === $dateTime) {
             return '';
@@ -104,7 +104,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException if the given value is not a string,
      *                                       if the date could not be parsed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value)
     {
         if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');

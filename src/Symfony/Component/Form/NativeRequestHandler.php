@@ -44,7 +44,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * @throws Exception\UnexpectedTypeException If the $request is not null
      */
-    public function handleRequest(FormInterface $form, $request = null)
+    public function handleRequest(FormInterface $form, mixed $request = null)
     {
         if (null !== $request) {
             throw new UnexpectedTypeException($request, 'null');
@@ -127,7 +127,7 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function isFileUpload($data)
+    public function isFileUpload(mixed $data)
     {
         // POST data will always be strings or arrays of strings. Thus, we can be sure
         // that the submitted data is a file upload if the "error" value is an integer
@@ -138,7 +138,7 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * @return int|null
      */
-    public function getUploadFileError($data)
+    public function getUploadFileError(mixed $data)
     {
         if (!\is_array($data)) {
             return null;
@@ -192,7 +192,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * @return mixed
      */
-    private static function fixPhpFilesArray($data)
+    private static function fixPhpFilesArray(mixed $data)
     {
         if (!\is_array($data)) {
             return $data;
@@ -228,7 +228,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * @return mixed Returns the stripped upload data
      */
-    private static function stripEmptyFiles($data)
+    private static function stripEmptyFiles(mixed $data)
     {
         if (!\is_array($data)) {
             return $data;

@@ -108,7 +108,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return self The child view
      */
-    public function offsetGet($name)
+    public function offsetGet(mixed $name)
     {
         return $this->children[$name];
     }
@@ -120,7 +120,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return bool Whether the child view exists
      */
-    public function offsetExists($name)
+    public function offsetExists(mixed $name)
     {
         return isset($this->children[$name]);
     }
@@ -130,7 +130,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @throws BadMethodCallException always as setting a child by name is not allowed
      */
-    public function offsetSet($name, $value)
+    public function offsetSet(mixed $name, mixed $value)
     {
         throw new BadMethodCallException('Not supported.');
     }
@@ -140,7 +140,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param string $name The child name
      */
-    public function offsetUnset($name)
+    public function offsetUnset(mixed $name)
     {
         unset($this->children[$name]);
     }

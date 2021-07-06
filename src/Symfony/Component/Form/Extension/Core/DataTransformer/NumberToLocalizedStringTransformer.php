@@ -56,7 +56,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * @throws TransformationFailedException if the given value is not numeric
      *                                       or if the value can not be transformed
      */
-    public function transform($value)
+    public function transform(mixed $value)
     {
         if (null === $value) {
             return '';
@@ -89,7 +89,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * @throws TransformationFailedException if the given value is not a string
      *                                       or if the value can not be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value)
     {
         if (null !== $value && !\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
@@ -182,7 +182,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * @internal
      */
-    protected function castParsedValue($value)
+    protected function castParsedValue(int|float $value): int|float
     {
         if (\is_int($value) && $value === (int) $float = (float) $value) {
             return $float;
@@ -193,12 +193,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Rounds a number according to the configured scale and rounding mode.
-     *
-     * @param int|float $number A number
-     *
-     * @return int|float The rounded number
      */
-    private function round($number)
+    private function round(int|float $number): int|float
     {
         if (null !== $this->scale && null !== $this->roundingMode) {
             // shift number to maintain the correct scale during rounding

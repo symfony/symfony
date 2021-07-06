@@ -28,7 +28,7 @@ class StringToFloatTransformer implements DataTransformerInterface
      *
      * @return float|null
      */
-    public function transform($value)
+    public function transform(mixed $value)
     {
         if (null === $value) {
             return null;
@@ -46,7 +46,7 @@ class StringToFloatTransformer implements DataTransformerInterface
      *
      * @return string|null
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value)
     {
         if (null === $value) {
             return null;

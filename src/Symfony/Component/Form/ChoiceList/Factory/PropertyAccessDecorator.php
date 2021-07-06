@@ -66,7 +66,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListInterface The choice list
      */
-    public function createListFromChoices(iterable $choices, $value = null, $filter = null)
+    public function createListFromChoices(iterable $choices, callable|string|PropertyPath $value = null, callable|string|PropertyPath $filter = null)
     {
         if (\is_string($value)) {
             $value = new PropertyPath($value);
@@ -107,7 +107,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListInterface The choice list
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null, $filter = null)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, callable|string|PropertyPath $value = null, callable|string|PropertyPath $filter = null)
     {
         if (\is_string($value)) {
             $value = new PropertyPath($value);
@@ -150,7 +150,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListView The choice list view
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelTranslationParameters = [])
+    public function createView(ChoiceListInterface $list, array|callable|string|PropertyPath $preferredChoices = null, callable|false|string|PropertyPath $label = null, callable|string|PropertyPath $index = null, callable|string|PropertyPath $groupBy = null, array|callable|string|PropertyPath $attr = null, array|callable|string|PropertyPath $labelTranslationParameters = [])
     {
         $accessor = $this->propertyAccessor;
 

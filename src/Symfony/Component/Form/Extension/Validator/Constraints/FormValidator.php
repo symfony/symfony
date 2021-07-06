@@ -29,7 +29,7 @@ class FormValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($form, Constraint $formConstraint)
+    public function validate(mixed $form, Constraint $formConstraint)
     {
         if (!$formConstraint instanceof Form) {
             throw new UnexpectedTypeException($formConstraint, Form::class);
@@ -246,7 +246,7 @@ class FormValidator extends ConstraintValidator
      *
      * @return GroupSequence|array<string|GroupSequence> The validation groups
      */
-    private static function resolveValidationGroups($groups, FormInterface $form)
+    private static function resolveValidationGroups(string|GroupSequence|array|callable $groups, FormInterface $form): GroupSequence|array
     {
         if (!\is_string($groups) && \is_callable($groups)) {
             $groups = $groups($form);
@@ -259,10 +259,18 @@ class FormValidator extends ConstraintValidator
         return (array) $groups;
     }
 
-    private static function getConstraintsInGroups($constraints, $group)
+    private static function getConstraintsInGroups(array $constraints, string|array $group): array
     {
-        return array_filter($constraints, static function (Constraint $constraint) use ($group) {
-            return \in_array($group, $constraint->groups, true);
+        $groups = (array) $group;
+
+        return array_filter($constraints, static function (Constraint $constraint) use ($groups) {
+            foreach ($groups as $group) {
+                if (\in_array($group, $constraint->groups, true)) {
+                    return true;
+                }
+            }
+
+            return false;
         });
     }
 }

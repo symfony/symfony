@@ -29,7 +29,7 @@ class CallbackTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($data)
+    public function transform(mixed $data)
     {
         return ($this->transform)($data);
     }
@@ -37,7 +37,7 @@ class CallbackTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($data)
+    public function reverseTransform(mixed $data)
     {
         return ($this->reverseTransform)($data);
     }

@@ -28,7 +28,7 @@ class CheckboxListMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapDataToForms($choices, \Traversable $checkboxes)
+    public function mapDataToForms(mixed $choices, \Traversable $checkboxes)
     {
         if (null === $choices) {
             $choices = [];

@@ -47,11 +47,9 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @param mixed $offset
-     *
      * @return bool Always returns false
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset)
     {
         return false;
     }
@@ -61,11 +59,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $offset
-     *
      * @throws BadMethodCallException
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset)
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -75,12 +71,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $offset
-     * @param mixed $value
-     *
      * @throws BadMethodCallException
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value)
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -90,11 +83,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $offset
-     *
      * @throws BadMethodCallException
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset)
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -128,7 +119,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function add($child, string $type = null, array $options = [])
+    public function add(string|FormInterface $child, string $type = null, array $options = [])
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -188,11 +179,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $modelData
-     *
      * @return $this
      */
-    public function setData($modelData)
+    public function setData(mixed $modelData)
     {
         // no-op, called during initialization of the form tree
         return $this;
@@ -353,11 +342,9 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @param mixed $request
-     *
      * @throws BadMethodCallException
      */
-    public function handleRequest($request = null)
+    public function handleRequest(mixed $request = null)
     {
         throw new BadMethodCallException('Buttons cannot handle requests. Call handleRequest() on the root form instead.');
     }
@@ -365,14 +352,11 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Submits data to the button.
      *
-     * @param string|null $submittedData Not used
-     * @param bool        $clearMissing  Not used
-     *
      * @return $this
      *
      * @throws Exception\AlreadySubmittedException if the button has already been submitted
      */
-    public function submit($submittedData, bool $clearMissing = true)
+    public function submit(array|string|null $submittedData, bool $clearMissing = true)
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once.');

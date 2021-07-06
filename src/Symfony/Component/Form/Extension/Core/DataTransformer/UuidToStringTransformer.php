@@ -31,7 +31,7 @@ class UuidToStringTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException If the given value is not a Uuid object
      */
-    public function transform($value)
+    public function transform(mixed $value)
     {
         if (null === $value) {
             return null;
@@ -54,7 +54,7 @@ class UuidToStringTransformer implements DataTransformerInterface
      * @throws TransformationFailedException If the given value is not a string,
      *                                       or could not be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value)
     {
         if (null === $value || '' === $value) {
             return null;

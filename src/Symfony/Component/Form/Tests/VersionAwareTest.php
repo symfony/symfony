@@ -15,10 +15,7 @@ trait VersionAwareTest
 {
     protected static $supportedFeatureSetVersion = 404;
 
-    /**
-     * @param int $requiredFeatureSetVersion
-     */
-    protected function requiresFeatureSet($requiredFeatureSetVersion)
+    protected function requiresFeatureSet(int $requiredFeatureSetVersion)
     {
         if ($requiredFeatureSetVersion > static::$supportedFeatureSetVersion) {
             $this->markTestSkipped(sprintf('Test requires features from symfony/form %.2f but only version %.2f is supported.', $requiredFeatureSetVersion / 100, static::$supportedFeatureSetVersion / 100));

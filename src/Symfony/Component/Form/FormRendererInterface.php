@@ -34,7 +34,7 @@ interface FormRendererInterface
      * @param bool     $useDefaultThemes If true, will use default themes specified
      *                                   in the renderer
      */
-    public function setTheme(FormView $view, $themes, bool $useDefaultThemes = true);
+    public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true);
 
     /**
      * Renders a named block of the form theme.

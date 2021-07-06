@@ -54,12 +54,6 @@ class FormBuilderTest extends TestCase
         $this->assertFalse(method_exists($this->builder, 'setName'));
     }
 
-    public function testAddNameNoStringAndNoInteger()
-    {
-        $this->expectException(UnexpectedTypeException::class);
-        $this->builder->add(true);
-    }
-
     public function testAddWithGuessFluent()
     {
         $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);

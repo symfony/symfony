@@ -304,7 +304,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function setData($modelData)
+    public function setData(mixed $modelData)
     {
         // If the form is submitted while disabled, it is set to submitted, but the data is not
         // changed. In such cases (i.e. when the form is not initialized yet) don't
@@ -485,7 +485,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function handleRequest($request = null)
+    public function handleRequest(mixed $request = null)
     {
         $this->config->getRequestHandler()->handleRequest($this, $request);
 
@@ -495,7 +495,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function submit($submittedData, bool $clearMissing = true)
+    public function submit(mixed $submittedData, bool $clearMissing = true)
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once.');
@@ -831,7 +831,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function add($child, string $type = null, array $options = [])
+    public function add(FormInterface|string $child, string $type = null, array $options = [])
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot add children to a submitted form.');
@@ -946,7 +946,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @return bool
      */
-    public function offsetExists($name)
+    public function offsetExists(mixed $name)
     {
         return $this->has($name);
     }
@@ -960,7 +960,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @throws OutOfBoundsException if the named child does not exist
      */
-    public function offsetGet($name)
+    public function offsetGet(mixed $name)
     {
         return $this->get($name);
     }
@@ -976,7 +976,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @see self::add()
      */
-    public function offsetSet($name, $child)
+    public function offsetSet(mixed $name, mixed $child)
     {
         $this->add($child);
     }
@@ -988,7 +988,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @throws AlreadySubmittedException if the form has already been submitted
      */
-    public function offsetUnset($name)
+    public function offsetUnset(mixed $name)
     {
         $this->remove($name);
     }
@@ -1075,7 +1075,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @throws TransformationFailedException If the underlying data cannot be transformed to "normalized" format
      */
-    private function modelToNorm($value)
+    private function modelToNorm(mixed $value)
     {
         try {
             foreach ($this->config->getModelTransformers() as $transformer) {
@@ -1095,7 +1095,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @throws TransformationFailedException If the value cannot be transformed to "model" format
      */
-    private function normToModel($value)
+    private function normToModel(mixed $value)
     {
         try {
             $transformers = $this->config->getModelTransformers();
@@ -1117,7 +1117,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @throws TransformationFailedException If the normalized value cannot be transformed to "view" format
      */
-    private function normToView($value)
+    private function normToView(mixed $value)
     {
         // Scalar values should  be converted to strings to
         // facilitate differentiation between empty ("") and zero (0).
@@ -1146,7 +1146,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @throws TransformationFailedException If the submitted value cannot be transformed to "normalized" format
      */
-    private function viewToNorm($value)
+    private function viewToNorm(mixed $value)
     {
         if (!$transformers = $this->config->getViewTransformers()) {
             return '' === $value ? null : $value;

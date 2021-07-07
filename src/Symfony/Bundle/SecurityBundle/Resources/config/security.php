@@ -87,10 +87,17 @@ return static function (ContainerConfigurator $container) {
         ->set('security.untracked_token_storage', TokenStorage::class)
 
         ->set('security.helper', Security::class)
-            ->args([service_locator([
-                'security.token_storage' => service('security.token_storage'),
-                'security.authorization_checker' => service('security.authorization_checker'),
-            ])])
+            ->args([
+                abstract_arg('authenticators'),
+                service_locator([
+                    'security.token_storage' => service('security.token_storage'),
+                    'security.authorization_checker' => service('security.authorization_checker'),
+                    'security.user_authenticator' => service('security.user_authenticator'),
+                    'request_stack' => service('request_stack'),
+                    'security.firewall.map' => service('security.firewall.map'),
+                    'security.user_checker' => service('security.user_checker'),
+                ]),
+            ])
         ->alias(Security::class, 'security.helper')
 
         ->set('security.user_value_resolver', UserValueResolver::class)

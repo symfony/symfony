@@ -182,8 +182,10 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression, $cacheItemMock) {
                 $savedParsedExpression = $parsedExpression;
+
+                return $cacheItemMock;
             })
         ;
 
@@ -191,6 +193,7 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('save')
             ->with($cacheItemMock)
+            ->willReturn(true)
         ;
 
         $expression = 'a + b';

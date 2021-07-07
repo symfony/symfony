@@ -47,9 +47,9 @@ trait RedisTrait
     private $marshaller;
 
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redisClient
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis
      */
-    private function init($redisClient, string $namespace, int $defaultLifetime, ?MarshallerInterface $marshaller)
+    private function init($redis, string $namespace, int $defaultLifetime, ?MarshallerInterface $marshaller)
     {
         parent::__construct($namespace, $defaultLifetime);
 
@@ -57,17 +57,17 @@ trait RedisTrait
             throw new InvalidArgumentException(sprintf('RedisAdapter namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
         }
 
-        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\ClientInterface && !$redisClient instanceof RedisProxy && !$redisClient instanceof RedisClusterProxy) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, \is_object($redisClient) ? \get_class($redisClient) : \gettype($redisClient)));
+        if (!$redis instanceof \Redis && !$redis instanceof \RedisArray && !$redis instanceof \RedisCluster && !$redis instanceof \Predis\ClientInterface && !$redis instanceof RedisProxy && !$redis instanceof RedisClusterProxy) {
+            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, \is_object($redis) ? \get_class($redis) : \gettype($redis)));
         }
 
-        if ($redisClient instanceof \Predis\ClientInterface && $redisClient->getOptions()->exceptions) {
-            $options = clone $redisClient->getOptions();
+        if ($redis instanceof \Predis\ClientInterface && $redis->getOptions()->exceptions) {
+            $options = clone $redis->getOptions();
             \Closure::bind(function () { $this->options['exceptions'] = false; }, $options, $options)();
-            $redisClient = new $redisClient($redisClient->getConnection(), $options);
+            $redis = new $redis($redis->getConnection(), $options);
         }
 
-        $this->redis = $redisClient;
+        $this->redis = $redis;
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
     }
 

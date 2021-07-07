@@ -112,7 +112,7 @@ if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class)) {
             return $this->driver->getSchemaManager($conn, $platform);
         }
 
-        public function getExceptionConverter(): \Doctrine\DBAL\Driver\API\ExceptionConverter
+        public function getExceptionConverter(): Driver\API\ExceptionConverter
         {
             return $this->driver->getExceptionConverter();
         }

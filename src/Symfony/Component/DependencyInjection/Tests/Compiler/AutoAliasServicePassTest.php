@@ -63,6 +63,7 @@ class AutoAliasServicePassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('example', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassDefault')
+            ->setPublic(false)
             ->addTag('auto_alias', ['format' => '%existing%.example']);
 
         $container->register('mysql.example', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMysql');
@@ -74,6 +75,31 @@ class AutoAliasServicePassTest extends TestCase
         $this->assertTrue($container->hasAlias('example'));
         $this->assertEquals('mysql.example', $container->getAlias('example'));
         $this->assertSame('Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMysql', $container->getDefinition('mysql.example')->getClass());
+    }
+
+    public function testProcessWithPublicAttribute()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('example-private', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassDefault')
+            ->setPublic(false)
+            ->addTag('auto_alias', ['format' => '%existing%.example']);
+
+        $container->register('example-public', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassDefault')
+            ->setPublic(true)
+            ->addTag('auto_alias', ['format' => '%existing%.example']);
+
+        $container->register('mysql.example', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMysql');
+        $container->setParameter('existing', 'mysql');
+
+        $pass = new AutoAliasServicePass();
+        $pass->process($container);
+
+        $this->assertTrue($container->hasAlias('example-private'));
+        $this->assertFalse($container->getAlias('example-private')->isPublic());
+
+        $this->assertTrue($container->hasAlias('example-public'));
+        $this->assertTrue($container->getAlias('example-public')->isPublic());
     }
 
     public function testProcessWithManualAlias()

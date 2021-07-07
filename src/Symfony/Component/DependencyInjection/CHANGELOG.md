@@ -18,6 +18,8 @@ CHANGELOG
  * Add support for `ConfigBuilder` in the `PhpFileLoader`
  * Add `ContainerConfigurator::env()` to get the current environment
  * Add `#[Target]` to tell how a dependency is used and hint named autowiring aliases
+ * Add inheriting of the `public` option when creating aliases with the `auto_alias` tag
+ * Deprecate aliases created with the `auto_alias` tag being `public` by default
 
 5.2.0
 -----

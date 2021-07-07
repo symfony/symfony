@@ -19,6 +19,7 @@ use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessH
 use Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\EntryPoint\RetryAuthenticationEntryPoint;
+use Symfony\Component\Security\Http\EntryPoint\RouteAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\EventListener\CookieClearingLogoutListener;
 use Symfony\Component\Security\Http\EventListener\DefaultLogoutListener;
 use Symfony\Component\Security\Http\EventListener\SessionLogoutListener;
@@ -87,6 +88,13 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 service('http_kernel'),
+            ])
+
+        ->set('security.authentication.route_entry_point', RouteAuthenticationEntryPoint::class)
+            ->abstract()
+            ->args([
+                service('security.http_utils'),
+                abstract_arg('entry_point_path'),
             ])
 
         ->set('security.authentication.listener.abstract')

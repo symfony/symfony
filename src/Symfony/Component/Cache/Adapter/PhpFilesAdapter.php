@@ -29,13 +29,13 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         doDelete as private doCommonDelete;
     }
 
-    private $includeHandler;
-    private $appendOnly;
-    private $values = [];
-    private $files = [];
+    private \Closure $includeHandler;
+    private bool $appendOnly;
+    private array $values = [];
+    private array $files = [];
 
-    private static $startTime;
-    private static $valuesCache = [];
+    private static int $startTime;
+    private static array $valuesCache = [];
 
     /**
      * @param $appendOnly Set to `true` to gain extra performance when the items stored in this pool never expire.

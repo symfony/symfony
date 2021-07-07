@@ -28,7 +28,7 @@ use Symfony\Contracts\Service\ResetInterface;
 class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
     protected $pool;
-    private $calls = [];
+    private array $calls = [];
 
     public function __construct(AdapterInterface $pool)
     {

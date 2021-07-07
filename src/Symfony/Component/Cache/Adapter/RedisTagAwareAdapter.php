@@ -54,9 +54,9 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     private const DEFAULT_CACHE_TTL = 8640000;
 
     /**
-     * @var string|null detected eviction policy used on Redis server
+     * detected eviction policy used on Redis server
      */
-    private $redisEvictionPolicy;
+    private string $redisEvictionPolicy;
 
     public function __construct(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
@@ -268,7 +268,7 @@ EOLUA;
 
     private function getRedisEvictionPolicy(): string
     {
-        if (null !== $this->redisEvictionPolicy) {
+        if (isset($this->redisEvictionPolicy)) {
             return $this->redisEvictionPolicy;
         }
 

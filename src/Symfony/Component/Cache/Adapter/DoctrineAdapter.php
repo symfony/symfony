@@ -18,7 +18,7 @@ use Doctrine\Common\Cache\CacheProvider;
  */
 class DoctrineAdapter extends AbstractAdapter
 {
-    private $provider;
+    private CacheProvider $provider;
 
     public function __construct(CacheProvider $provider, string $namespace = '', int $defaultLifetime = 0)
     {

@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Exception\CacheException;
  */
 class DefaultMarshaller implements MarshallerInterface
 {
-    private $useIgbinarySerialize = true;
+    private bool $useIgbinarySerialize = true;
 
     public function __construct(bool $useIgbinarySerialize = null)
     {

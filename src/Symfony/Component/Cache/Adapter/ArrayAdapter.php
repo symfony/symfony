@@ -30,14 +30,14 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 {
     use LoggerAwareTrait;
 
-    private $storeSerialized;
-    private $values = [];
-    private $expiries = [];
-    private $defaultLifetime;
-    private $maxLifetime;
-    private $maxItems;
+    private bool $storeSerialized;
+    private array $values = [];
+    private array $expiries = [];
+    private int $defaultLifetime;
+    private float $maxLifetime;
+    private int $maxItems;
 
-    private static $createCacheItem;
+    private static \Closure $createCacheItem;
 
     /**
      * @param bool $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise

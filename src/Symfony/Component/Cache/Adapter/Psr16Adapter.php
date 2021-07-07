@@ -30,7 +30,7 @@ class Psr16Adapter extends AbstractAdapter implements PruneableInterface, Resett
      */
     protected const NS_SEPARATOR = '_';
 
-    private $miss;
+    private object $miss;
 
     public function __construct(CacheInterface $pool, string $namespace = '', int $defaultLifetime = 0)
     {

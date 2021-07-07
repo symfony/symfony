@@ -20,8 +20,8 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
  */
 class EarlyExpirationHandler implements MessageHandlerInterface
 {
-    private $reverseContainer;
-    private $processedNonces = [];
+    private ReverseContainer $reverseContainer;
+    private array $processedNonces = [];
 
     public function __construct(ReverseContainer $reverseContainer)
     {

@@ -31,8 +31,8 @@ trait ContractsTrait
         doGet as private contractsGet;
     }
 
-    private $callbackWrapper = [LockRegistry::class, 'compute'];
-    private $computing = [];
+    private \Closure $callbackWrapper;
+    private array $computing = [];
 
     /**
      * Wraps the callback passed to ->get() in a callable.
@@ -41,7 +41,11 @@ trait ContractsTrait
      */
     public function setCallbackWrapper(?callable $callbackWrapper): callable
     {
-        $previousWrapper = $this->callbackWrapper;
+        $previousWrapper = $this->callbackWrapper ??= \Closure::fromCallable([LockRegistry::class, 'compute']);
+        if ($callbackWrapper !== null && !$callbackWrapper instanceof \Closure) {
+            $callbackWrapper = \Closure::fromCallable($callbackWrapper);
+        }
+
         $this->callbackWrapper = $callbackWrapper ?? function (callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger) {
             return $callback($item, $save);
         };
@@ -69,6 +73,8 @@ trait ContractsTrait
             null,
             CacheItem::class
         );
+
+        $this->callbackWrapper ??= \Closure::fromCallable([LockRegistry::class, 'compute']);
 
         return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata, &$metadata, $key) {
             // don't wrap nor save recursive calls

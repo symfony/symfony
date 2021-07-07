@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 trait ProxyTrait
 {
-    private $pool;
+    private object $pool;
 
     /**
      * {@inheritdoc}

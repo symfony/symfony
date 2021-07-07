@@ -40,9 +40,9 @@ This conversation was marked as resolved by lstrojny
         \Memcached::OPT_SERIALIZER => \Memcached::SERIALIZER_PHP,
     ];
 
-    private $marshaller;
-    private $client;
-    private $lazyClient;
+    private MarshallerInterface $marshaller;
+    private \Memcached $client;
+    private \Memcached $lazyClient;
 
     /**
      * Using a MemcachedAdapter with a TagAwareAdapter for storing tags is discouraged.
@@ -327,7 +327,7 @@ This conversation was marked as resolved by lstrojny
 
     private function getClient(): \Memcached
     {
-        if ($this->client) {
+        if (isset($this->client)) {
             return $this->client;
         }
 

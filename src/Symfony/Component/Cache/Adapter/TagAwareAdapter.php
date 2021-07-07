@@ -33,20 +33,20 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
 
     public const TAGS_PREFIX = "\0tags\0";
 
-    private $deferred = [];
-    private $tags;
-    private $knownTagVersions = [];
-    private $knownTagVersionsTtl;
+    private array $deferred = [];
+    private AdapterInterface $tags;
+    private array $knownTagVersions = [];
+    private float $knownTagVersionsTtl;
 
-    private static $createCacheItem;
-    private static $setCacheItemTags;
-    private static $getTagsByKey;
-    private static $invalidateTags;
+    private static \Closure $createCacheItem;
+    private static \Closure $setCacheItemTags;
+    private static \Closure $getTagsByKey;
+    private static \Closure $invalidateTags;
 
     public function __construct(AdapterInterface $itemsPool, AdapterInterface $tagsPool = null, float $knownTagVersionsTtl = 0.15)
     {
         $this->pool = $itemsPool;
-        $this->tags = $tagsPool ?: $itemsPool;
+        $this->tags = $tagsPool ?? $itemsPool;
         $this->knownTagVersionsTtl = $knownTagVersionsTtl;
         self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
             static function ($key, $value, CacheItem $protoItem) {

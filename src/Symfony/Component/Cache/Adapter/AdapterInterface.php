@@ -26,22 +26,18 @@ interface AdapterInterface extends CacheItemPoolInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @return CacheItem
      */
-    public function getItem($key);
+    public function getItem($key): CacheItem;
 
     /**
      * {@inheritdoc}
      *
-     * @return \Traversable|CacheItem[]
+     * @return iterable<CacheItem>
      */
-    public function getItems(array $keys = []);
+    public function getItems(array $keys = []): iterable;
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function clear(string $prefix = '');
+    public function clear(string $prefix = ''): bool;
 }

@@ -70,7 +70,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     /**
      * {@inheritdoc}
      */
-    public function getItem($key)
+    public function getItem($key): CacheItem
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -89,10 +89,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function hasItem($key)
+    public function hasItem($key): bool
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -104,10 +102,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function deleteItem($key)
+    public function deleteItem($key): bool
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -119,10 +115,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -134,10 +128,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item): bool
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -150,7 +142,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = [])
+    public function getItems(array $keys = []): iterable
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -175,10 +167,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function clear(string $prefix = '')
+    public function clear(string $prefix = ''): bool
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -194,10 +184,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys): bool
     {
         $event = $this->start(__FUNCTION__);
         $event->result['keys'] = $keys;
@@ -210,10 +198,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function commit()
+    public function commit(): bool
     {
         $event = $this->start(__FUNCTION__);
         try {

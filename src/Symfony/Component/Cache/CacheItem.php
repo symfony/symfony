@@ -74,15 +74,9 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function expiresAt($expiration): static
+    public function expiresAt(?\DateTimeInterface $expiration): static
     {
-        if (null === $expiration) {
-            $this->expiry = null;
-        } elseif ($expiration instanceof \DateTimeInterface) {
-            $this->expiry = (float) $expiration->format('U.u');
-        } else {
-            throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given.', get_debug_type($expiration)));
-        }
+        $this->expiry = null !== $expiration ? (float) $expiration->format('U.u') : null;
 
         return $this;
     }
@@ -92,7 +86,7 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function expiresAfter($time): static
+    public function expiresAfter(mixed $time): static
     {
         if (null === $time) {
             $this->expiry = null;

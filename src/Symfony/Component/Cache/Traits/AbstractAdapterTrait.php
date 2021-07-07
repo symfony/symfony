@@ -96,7 +96,7 @@ trait AbstractAdapterTrait
     /**
      * {@inheritdoc}
      */
-    public function hasItem($key): bool
+    public function hasItem(mixed $key): bool
     {
         $id = $this->getId($key);
 
@@ -152,7 +152,7 @@ trait AbstractAdapterTrait
     /**
      * {@inheritdoc}
      */
-    public function deleteItem($key): bool
+    public function deleteItem(mixed $key): bool
     {
         return $this->deleteItems([$key]);
     }
@@ -198,7 +198,7 @@ trait AbstractAdapterTrait
     /**
      * {@inheritdoc}
      */
-    public function getItem($key): CacheItem
+    public function getItem(mixed $key): CacheItem
     {
         if ($this->deferred) {
             $this->commit();
@@ -281,7 +281,7 @@ trait AbstractAdapterTrait
      *
      * @return bool the previous state of versioning
      */
-    public function enableVersioning(bool $enable = true)
+    public function enableVersioning(bool $enable = true): bool
     {
         $wasEnabled = $this->versioningIsEnabled;
         $this->versioningIsEnabled = $enable;
@@ -342,7 +342,7 @@ trait AbstractAdapterTrait
         }
     }
 
-    private function getId($key)
+    private function getId(mixed $key)
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->ids = [];

@@ -54,10 +54,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
     }
 
-    /**
-     * @param array|string $servers
-     */
-    public static function createConnection($servers, array $options = []): \CouchbaseBucket
+    public static function createConnection(array|string $servers, array $options = []): \CouchbaseBucket
     {
         if (\is_string($servers)) {
             $servers = [$servers];

@@ -96,7 +96,7 @@ This conversation was marked as resolved by lstrojny
      *
      * @throws \ErrorException When invalid options or servers are provided
      */
-    public static function createConnection($servers, array $options = [])
+    public static function createConnection(array|string $servers, array $options = [])
     {
         if (\is_string($servers)) {
             $servers = [$servers];
@@ -314,7 +314,7 @@ This conversation was marked as resolved by lstrojny
         return '' === $namespace && $this->getClient()->flush();
     }
 
-    private function checkResultCode($result)
+    private function checkResultCode(mixed $result)
     {
         $code = $this->client->getResultCode();
 

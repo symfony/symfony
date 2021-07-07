@@ -83,7 +83,7 @@ trait FilesystemCommonTrait
         return $ok;
     }
 
-    protected function doUnlink($file)
+    protected function doUnlink(string $file)
     {
         return @unlink($file);
     }
@@ -166,7 +166,7 @@ trait FilesystemCommonTrait
     /**
      * @internal
      */
-    public static function throwError($type, $message, $file, $line)
+    public static function throwError(int $type, string $message, string $file, int $line)
     {
         throw new \ErrorException($message, 0, $type, $file, $line);
     }

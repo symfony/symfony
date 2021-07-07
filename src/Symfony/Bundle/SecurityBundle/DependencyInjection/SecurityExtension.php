@@ -293,6 +293,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
+        if ($this->authenticatorManagerEnabled = $config['enable_authenticator_manager']) {
+            $firewallUserAuthenticatorDef = $container->getDefinition('security.firewall_user_authenticator');
+        }
         $map = $authenticationProviders = $contextRefs = [];
         foreach ($firewalls as $name => $firewall) {
             if (isset($firewall['user_checker']) && 'security.user_checker' !== $firewall['user_checker']) {
@@ -322,6 +325,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $mapDef->replaceArgument(0, new Reference('security.firewall.context_locator'));
         $mapDef->replaceArgument(1, new IteratorArgument($map));
+        if ($this->authenticatorManagerEnabled = $config['enable_authenticator_manager']) {
+            $firewallUserAuthenticatorDef->replaceArgument(0, ServiceLocatorTagPass::register($container, $contextRefs));
+        }
 
         if (!$this->authenticatorManagerEnabled) {
             // add authentication providers to authentication manager

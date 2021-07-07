@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bundle\SecurityBundle\Security\FirewallUserAuthenticator;
 use Symfony\Bundle\SecurityBundle\Security\UserAuthenticator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
@@ -59,6 +60,13 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
             ])
         ->alias(UserAuthenticatorInterface::class, 'security.user_authenticator')
+
+        ->set('security.firewall_user_authenticator', FirewallUserAuthenticator::class)
+            ->args([
+                abstract_arg('Firewall context locator'),
+                service('event_dispatcher'),
+            ])
+        ->alias(FirewallUserAuthenticator::class, 'security.firewall_user_authenticator')
 
         ->set('security.authentication.manager', NoopAuthenticationManager::class)
         ->alias(AuthenticationManagerInterface::class, 'security.authentication.manager')

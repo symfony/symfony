@@ -29,9 +29,9 @@ class RedisStore implements PersistingStoreInterface
 {
     private $redis;
 
-    public function __construct(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redisClient)
+    public function __construct(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis)
     {
-        $this->redis = $redisClient;
+        $this->redis = $redis;
     }
 
     /**

@@ -38,7 +38,7 @@ class RedisStore implements SharedLockStoreInterface
     /**
      * @param float $initialTtl The expiration delay of locks in seconds
      */
-    public function __construct(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redisClient, float $initialTtl = 300.0)
+    public function __construct(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis, float $initialTtl = 300.0)
     {
         if ($initialTtl <= 0) {
             throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL. Got %d.', __METHOD__, $initialTtl));

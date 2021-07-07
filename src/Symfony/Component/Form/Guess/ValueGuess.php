@@ -21,11 +21,9 @@ class ValueGuess extends Guess
     private $value;
 
     /**
-     * @param string|int|bool|null $value      The guessed value
-     * @param int                  $confidence The confidence that the guessed class name
-     *                                         is correct
+     * @param int $confidence The confidence that the guessed class name is correct
      */
-    public function __construct($value, int $confidence)
+    public function __construct(string|int|bool|null $value, int $confidence)
     {
         parent::__construct($confidence);
 

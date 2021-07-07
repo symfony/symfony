@@ -259,7 +259,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return Guess|null The guessed value with the highest confidence
      */
-    protected function guess(string $class, string $property, \Closure $closure, $defaultValue = null)
+    protected function guess(string $class, string $property, \Closure $closure, mixed $defaultValue = null)
     {
         $guesses = [];
         $classMetadata = $this->metadataFactory->getMetadataFor($class);

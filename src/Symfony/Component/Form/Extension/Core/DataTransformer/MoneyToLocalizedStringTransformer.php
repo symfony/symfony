@@ -52,7 +52,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      * @throws TransformationFailedException if the given value is not numeric or
      *                                       if the value can not be transformed
      */
-    public function transform($value)
+    public function transform(mixed $value)
     {
         if (null !== $value && 1 !== $this->divisor) {
             if (!is_numeric($value)) {
@@ -74,7 +74,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      * @throws TransformationFailedException if the given value is not a string
      *                                       or if the value can not be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value)
     {
         $value = parent::reverseTransform($value);
         if (null !== $value && 1 !== $this->divisor) {

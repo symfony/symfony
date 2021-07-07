@@ -34,16 +34,11 @@ abstract class AbstractStaticOption
     private $option;
 
     /**
-     * @param FormTypeInterface|FormTypeExtensionInterface $formType A form type or type extension configuring a cacheable choice list
-     * @param mixed                                        $option   Any pseudo callable, array, string or bool to define a choice list option
-     * @param mixed|null                                   $vary     Dynamic data used to compute a unique hash when caching the option
+     * @param mixed $option Any pseudo callable, array, string or bool to define a choice list option
+     * @param mixed $vary   Dynamic data used to compute a unique hash when caching the option
      */
-    final public function __construct($formType, $option, $vary = null)
+    final public function __construct(FormTypeInterface|FormTypeExtensionInterface $formType, mixed $option, mixed $vary = null)
     {
-        if (!$formType instanceof FormTypeInterface && !$formType instanceof FormTypeExtensionInterface) {
-            throw new \TypeError(sprintf('Expected an instance of "%s" or "%s", but got "%s".', FormTypeInterface::class, FormTypeExtensionInterface::class, get_debug_type($formType)));
-        }
-
         $hash = CachingFactoryDecorator::generateHash([static::class, $formType, $vary]);
 
         $this->option = self::$options[$hash] ?? self::$options[$hash] = $option;

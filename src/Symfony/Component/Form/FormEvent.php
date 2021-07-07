@@ -21,10 +21,7 @@ class FormEvent extends Event
     private $form;
     protected $data;
 
-    /**
-     * @param mixed $data The data
-     */
-    public function __construct(FormInterface $form, $data)
+    public function __construct(FormInterface $form, mixed $data)
     {
         $this->form = $form;
         $this->data = $data;
@@ -52,10 +49,8 @@ class FormEvent extends Event
 
     /**
      * Allows updating with some filtered data.
-     *
-     * @param mixed $data
      */
-    public function setData($data)
+    public function setData(mixed $data)
     {
         $this->data = $data;
     }

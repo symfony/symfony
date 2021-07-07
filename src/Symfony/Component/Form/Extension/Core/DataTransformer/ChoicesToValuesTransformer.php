@@ -32,7 +32,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException if the given value is not an array
      */
-    public function transform($array)
+    public function transform(mixed $array)
     {
         if (null === $array) {
             return [];
@@ -52,7 +52,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
      *                                       or if no matching choice could be
      *                                       found for some given value
      */
-    public function reverseTransform($array)
+    public function reverseTransform(mixed $array)
     {
         if (null === $array) {
             return [];

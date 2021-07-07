@@ -61,10 +61,8 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param array|callable $labelTranslationParameters The parameters used to translate the choice labels
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null, $labelTranslationParameters = [])
+    public function createView(ChoiceListInterface $list, array|callable $preferredChoices = null, callable|false $label = null, callable $index = null, callable $groupBy = null, array|callable $attr = null, array|callable $labelTranslationParameters = [])
     {
         $preferredViews = [];
         $preferredViewsOrder = [];

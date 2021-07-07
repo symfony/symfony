@@ -38,7 +38,7 @@ class DataMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapDataToForms($data, \Traversable $forms): void
+    public function mapDataToForms(mixed $data, \Traversable $forms): void
     {
         $empty = null === $data || [] === $data;
 

@@ -53,7 +53,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @throws Exception\LogicException            when trying to add a child to a non-compound form
      * @throws Exception\UnexpectedTypeException   if $child or $type has an unexpected type
      */
-    public function add($child, string $type = null, array $options = []);
+    public function add(FormInterface|string $child, string $type = null, array $options = []);
 
     /**
      * Returns the child with the given name.
@@ -113,7 +113,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *                                                 the form inherits data from its parent
      * @throws Exception\TransformationFailedException if the synchronization failed
      */
-    public function setData($modelData);
+    public function setData(mixed $modelData);
 
     /**
      * Returns the model data in the format needed for the underlying object.
@@ -284,11 +284,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * {@link RequestHandlerInterface} instance, which determines whether to
      * submit the form or not.
      *
-     * @param mixed $request The request to handle
-     *
      * @return $this
      */
-    public function handleRequest($request = null);
+    public function handleRequest(mixed $request = null);
 
     /**
      * Submits data to the form.
@@ -303,7 +301,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @throws Exception\AlreadySubmittedException if the form has already been submitted
      */
-    public function submit($submittedData, bool $clearMissing = true);
+    public function submit(string|array|null $submittedData, bool $clearMissing = true);
 
     /**
      * Returns the root of the form tree.

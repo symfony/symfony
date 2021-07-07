@@ -41,7 +41,7 @@ class OptionsResolverWrapper extends OptionsResolver
     /**
      * @return $this
      */
-    public function setAllowedValues(string $option, $allowedValues): self
+    public function setAllowedValues(string $option, mixed $allowedValues): self
     {
         try {
             parent::setAllowedValues($option, $allowedValues);
@@ -55,7 +55,7 @@ class OptionsResolverWrapper extends OptionsResolver
     /**
      * @return $this
      */
-    public function addAllowedValues(string $option, $allowedValues): self
+    public function addAllowedValues(string $option, mixed $allowedValues): self
     {
         try {
             parent::addAllowedValues($option, $allowedValues);
@@ -67,6 +67,8 @@ class OptionsResolverWrapper extends OptionsResolver
     }
 
     /**
+     * @param string|array $allowedTypes
+     *
      * @return $this
      */
     public function setAllowedTypes(string $option, $allowedTypes): self
@@ -81,6 +83,8 @@ class OptionsResolverWrapper extends OptionsResolver
     }
 
     /**
+     * @param string|array $allowedTypes
+     *
      * @return $this
      */
     public function addAllowedTypes(string $option, $allowedTypes): self

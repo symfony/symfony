@@ -28,7 +28,7 @@ final class DateTimeImmutableToDateTimeTransformer implements DataTransformerInt
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeImmutable
      */
-    public function transform($value): ?\DateTime
+    public function transform(mixed $value): ?\DateTime
     {
         if (null === $value) {
             return null;
@@ -48,7 +48,7 @@ final class DateTimeImmutableToDateTimeTransformer implements DataTransformerInt
      *
      * @throws TransformationFailedException If the given value is not a \DateTime
      */
-    public function reverseTransform($value): ?\DateTimeImmutable
+    public function reverseTransform(mixed $value): ?\DateTimeImmutable
     {
         if (null === $value) {
             return null;

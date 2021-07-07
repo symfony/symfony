@@ -43,7 +43,7 @@ class ChoiceView
      * @param array                            $attr                       Additional attributes for the HTML tag
      * @param array                            $labelTranslationParameters Additional parameters used to translate the label
      */
-    public function __construct($data, string $value, $label, array $attr = [], array $labelTranslationParameters = [])
+    public function __construct(mixed $data, string $value, string|TranslatableMessage|false $label, array $attr = [], array $labelTranslationParameters = [])
     {
         $this->data = $data;
         $this->value = $value;

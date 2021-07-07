@@ -48,7 +48,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException if the given value is not a Boolean
      */
-    public function transform($value)
+    public function transform(mixed $value)
     {
         if (null === $value) {
             return null;
@@ -70,7 +70,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException if the given value is not a string
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value)
     {
         if (\in_array($value, $this->falseValues, true)) {
             return false;

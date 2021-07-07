@@ -76,7 +76,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      * @throws TransformationFailedException if the given value is not numeric or
      *                                       if the value could not be transformed
      */
-    public function transform($value)
+    public function transform(mixed $value)
     {
         if (null === $value) {
             return '';
@@ -111,7 +111,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      * @throws TransformationFailedException if the given value is not a string or
      *                                       if the value could not be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value)
     {
         if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');

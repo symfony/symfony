@@ -86,7 +86,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return $this The configuration object
      */
-    public function setAttribute(string $name, $value);
+    public function setAttribute(string $name, mixed $value);
 
     /**
      * Sets the attributes.
@@ -116,7 +116,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return $this The configuration object
      */
-    public function setEmptyData($emptyData);
+    public function setEmptyData(mixed $emptyData);
 
     /**
      * Sets whether errors bubble up to the parent.
@@ -140,7 +140,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return $this The configuration object
      */
-    public function setPropertyPath($propertyPath);
+    public function setPropertyPath(string|PropertyPathInterface|null $propertyPath);
 
     /**
      * Sets whether the form should be mapped to an element of its
@@ -187,7 +187,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return $this The configuration object
      */
-    public function setData($data);
+    public function setData(mixed $data);
 
     /**
      * Locks the form's data to the data passed in the configuration.

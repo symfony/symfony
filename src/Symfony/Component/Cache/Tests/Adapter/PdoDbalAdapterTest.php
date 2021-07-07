@@ -14,7 +14,6 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
-use Doctrine\DBAL\Driver\API\ExceptionConverter;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use PHPUnit\Framework\SkippedTestSuiteError;

@@ -52,7 +52,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
     public function testConfigureSchemaDecoratedDbalDriver()
     {
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
-        if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class, false)) {
+        if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class)) {
             $middleware = $this->createMock(\Doctrine\DBAL\Driver\Middleware::class);
             $middleware
                 ->method('wrap')
@@ -78,7 +78,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
     }
 }
 
-if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class, false)) {
+if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class)) {
     class DriverWrapperV3 implements Driver
     {
         /** @var Driver */
@@ -116,7 +116,7 @@ if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class, false)) {
         /**
          * @return \Doctrine\DBAL\Driver\API\ExceptionConverter
          */
-        public function getExceptionConverter(): \Doctrine\DBAL\Driver\API\ExceptionConverter
+        public function getExceptionConverter()
         {
             return $this->driver->getExceptionConverter();
         }

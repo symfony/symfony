@@ -14,7 +14,9 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Driver\API\ExceptionConverter;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
@@ -54,7 +56,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
             $middleware = $this->createMock(\Doctrine\DBAL\Driver\Middleware::class);
             $middleware
                 ->method('wrap')
-                ->willReturn(new DriverWrapper($connection->getDriver()));
+                ->willReturn(new DriverWrapperV3($connection->getDriver()));
 
             $config = new Configuration();
             $config->setMiddlewares([$middleware]);
@@ -63,7 +65,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
         } else {
             $reflectionProperty = new \ReflectionProperty($connection, '_driver');
             $reflectionProperty->setAccessible(true);
-            $reflectionProperty->setValue($connection, new DriverWrapper($reflectionProperty->getValue($connection)));
+            $reflectionProperty->setValue($connection, new DriverWrapperV2($reflectionProperty->getValue($connection)));
             $reflectionProperty->setAccessible(false);
         }
 
@@ -76,53 +78,98 @@ class PdoDbalAdapterTest extends AdapterTestCase
     }
 }
 
-class DriverWrapper implements Driver
-{
-    /** @var Driver */
-    private $driver;
-
-    public function __construct(Driver $driver)
+if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class, false)) {
+    class DriverWrapperV3 implements Driver
     {
-        $this->driver = $driver;
+        /** @var Driver */
+        private $driver;
+
+        public function __construct(Driver $driver)
+        {
+            $this->driver = $driver;
+        }
+
+        /**
+         * @return Driver\Connection
+         */
+        public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
+        {
+            return $this->driver->connect($params, $username, $password, $driverOptions);
+        }
+
+        /**
+         * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+         */
+        public function getDatabasePlatform()
+        {
+            return $this->driver->getDatabasePlatform();
+        }
+
+        /**
+         * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
+         */
+        public function getSchemaManager(Connection $conn, AbstractPlatform $platform)
+        {
+            return $this->driver->getSchemaManager($conn, $platform);
+        }
+
+        /**
+         * @return \Doctrine\DBAL\Driver\API\ExceptionConverter
+         */
+        public function getExceptionConverter(): \Doctrine\DBAL\Driver\API\ExceptionConverter
+        {
+            return $this->driver->getExceptionConverter();
+        }
     }
-
-    /**
-     * @return Driver\Connection
-     */
-    public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
+} else {
+    class DriverWrapperV2 implements Driver
     {
-        return $this->driver->connect($params, $username, $password, $driverOptions);
-    }
+        /** @var Driver */
+        private $driver;
 
-    /**
-     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
-     */
-    public function getDatabasePlatform()
-    {
-        return $this->driver->getDatabasePlatform();
-    }
+        public function __construct(Driver $driver)
+        {
+            $this->driver = $driver;
+        }
 
-    /**
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
-     */
-    public function getSchemaManager(Connection $conn)
-    {
-        return $this->driver->getSchemaManager($conn);
-    }
+        /**
+         * @return Driver\Connection
+         */
+        public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
+        {
+            return $this->driver->connect($params, $username, $password, $driverOptions);
+        }
 
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->driver->getName();
-    }
+        /**
+         * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+         */
+        public function getDatabasePlatform()
+        {
+            return $this->driver->getDatabasePlatform();
+        }
 
-    /**
-     * @return string
-     */
-    public function getDatabase(Connection $conn)
-    {
-        return $this->driver->getDatabase($conn);
+        /**
+         * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
+         */
+        public function getSchemaManager(Connection $conn)
+        {
+            return $this->driver->getSchemaManager($conn);
+        }
+
+        /**
+         * @return string
+         */
+        public function getName()
+        {
+            return $this->driver->getName();
+        }
+
+        /**
+         * @return string
+         */
+        public function getDatabase(Connection $conn)
+        {
+            return $this->driver->getDatabase($conn);
+        }
     }
 }

@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-19T16:07:47Z
+
+Hey!
+
+But you have made this PR towards a branch that is not maintained anymore. :/
+Could you update the [PR base branch](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request) to target one of these branches instead? 4.4, 5.2.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-20T08:43:25Z
+
+> Before merging, and as much as I want this to be merged, let's take this PR as an opportunity to put our plan in practice: adding any return types in 6.0 must first issue a deprecation notice in 5.4.
+
+Indeed. Shall we resurrect #33228?
+
+> There is a direct link with https://wiki.php.net/rfc/internal_method_return_types also, which we should account for/rely on by eg reusing the attribute.
+
+Is there a list of methods anywhere that are affected by the RFC? We should make sure that *if* we override/polyfill any of those they should have the correct return type in 6.0
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-20T08:53:24Z
+
+> Indeed. Shall we resurrect #33228?
+
+why not, if you think we need an issue for that :)
+to me the plan is clear and is very similar to https://wiki.php.net/rfc/internal_method_return_types
+
+> Is there a list of methods anywhere that are affected by the RFC
+
+not really, that maybe: https://github.com/php/php-src/pull/6548/files?file-filters%5B%5D=.h
+
+---------------------------------------------------------------------------
+
+by stof at 2021-05-20T09:06:36Z
+
+> to me the plan is clear and is very similar to https://wiki.php.net/rfc/internal_method_return_types
+
+I think the DebugClassLoader should be improved to require an opt-in from the class to decide that its next major version will add a return type instead of just relying on the presence of `@return`. Adding a `@return` in a phpdoc does not automatically mean that the next major version will turn it into a native return type.
+And supporting the `ReturnTypeWillChange` attribute as a way for the child class to opt-out from the warning would be great (as that would reuse the PHP feature doing the opt out)
+
+The ideal solution would of course be that PHP exposes the tentative return type to userland instead of reserving it for internal classes.
+
+but anyway, this discussion probably deserves its own issue
+
+---------------------------------------------------------------------------
+
+by stof at 2021-05-20T09:08:49Z
+
+btw, the explicit opt-in for parent classes would allow us to activate that behavior by default in DebugClassLoader. As long as it requires projects to run the DebugClassLoader in a special mode, we **don't** have a graceful migration path for our users, as they won't get the warnings (because they won't even know that this special mode exists).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-20T10:04:54Z
+
+Adding the parameter types is lot more fun because the integration tests are not ready for that. 🙈 Will do that in a separate PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-08T15:59:51Z
+
+Should be updated with argument types, taking some changes from #41424

@@ -21,20 +21,29 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
  */
 class Crawler implements \Countable, \IteratorAggregate
 {
+    /**
+     * @var string|null
+     */
     protected $uri;
 
     /**
-     * @var string The default namespace prefix to be used with XPath and CSS expressions
+     * The default namespace prefix to be used with XPath and CSS expressions.
+     *
+     * @var string
      */
     private $defaultNamespacePrefix = 'default';
 
     /**
-     * @var array A map of manually registered namespaces
+     * A map of manually registered namespaces.
+     *
+     * @var array<string, string>
      */
     private $namespaces = [];
 
     /**
-     * @var string The base href value
+     * The base href value.
+     *
+     * @var string|null
      */
     private $baseHref;
 
@@ -75,7 +84,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the current URI.
      *
-     * @return string
+     * @return string|null
      */
     public function getUri()
     {
@@ -85,7 +94,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns base href.
      *
-     * @return string
+     * @return string|null
      */
     public function getBaseHref()
     {

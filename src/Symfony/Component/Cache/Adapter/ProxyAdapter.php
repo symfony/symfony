@@ -244,7 +244,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $this->pool->$method($innerItem);
     }
 
-    private function generateItems(iterable $items)
+    private function generateItems(iterable $items): \Generator
     {
         $f = $this->createCacheItem;
 

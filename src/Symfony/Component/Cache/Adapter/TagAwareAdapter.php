@@ -329,7 +329,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         $this->commit();
     }
 
-    private function generateItems(iterable $items, array $tagKeys)
+    private function generateItems(iterable $items, array $tagKeys): \Generator
     {
         $bufferedItems = $itemTags = [];
         $f = $this->setCacheItemTags;

@@ -147,7 +147,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $this->generateItems($this->adapters[0]->getItems($keys), 0);
     }
 
-    private function generateItems(iterable $items, int $adapterIndex)
+    private function generateItems(iterable $items, int $adapterIndex): \Generator
     {
         $missing = [];
         $misses = [];

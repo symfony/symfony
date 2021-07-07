@@ -318,6 +318,21 @@ Security
 SecurityBundle
 --------------
 
+ * Remove `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of
+   `AuthenticatorFactoryInterface` and `SecurityExtension::addAuthenticatorFactory()`
+ * Add `AuthenticatorFactoryInterface::getPriority()` which replaces `SecurityFactoryInterface::getPosition()`.
+   Previous positions are mapped to the following priorities:
+
+    | Position    | Constant                                              | Priority |
+    | ----------- | ----------------------------------------------------- | -------- |
+    | pre_auth    | `RemoteUserFactory::PRIORITY`/`X509Factory::PRIORITY` | -10      |
+    | form        | `FormLoginFactory::PRIORITY`                          | -30      |
+    | http        | `HttpBasicFactory::PRIORITY`                          | -50      |
+    | remember_me | `RememberMeFactory::PRIORITY`                         | -60      |
+    | anonymous   | n/a                                                   | -70      |
+
+ * Remove passing an array of arrays as 1st argument to `MainConfiguration`, pass a sorted flat array of
+   factories instead.
  * Remove the `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
    use `UserPasswordHashCommand` and `user:hash-password` instead
  * Remove the `security.encoder_factory.generic` service, the `security.encoder_factory` and `Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface` aliases,

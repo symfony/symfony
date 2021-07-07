@@ -34,6 +34,12 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
         throw new \LogicException('Login throttling is not supported when "security.enable_authenticator_manager" is not set to true.');
     }
 
+    public function getPriority(): int
+    {
+        // this factory doesn't register any authenticators, this priority doesn't matter
+        return 0;
+    }
+
     public function getPosition(): string
     {
         // this factory doesn't register any authenticators, this position doesn't matter

@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Deprecate `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of
+   `AuthenticatorFactoryInterface` and `SecurityExtension::addAuthenticatorFactory()`
+ * Add `AuthenticatorFactoryInterface::getPriority()` which replaces `SecurityFactoryInterface::getPosition()`
+ * Deprecate passing an array of arrays as 1st argument to `MainConfiguration`, pass a sorted flat array of
+   factories instead.
+
 5.3
 ---
 

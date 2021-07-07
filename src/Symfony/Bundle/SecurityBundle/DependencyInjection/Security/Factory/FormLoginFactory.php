@@ -27,6 +27,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {
+    public const PRIORITY = -30;
+
     public function __construct()
     {
         $this->addOption('username_parameter', '_username');
@@ -35,6 +37,11 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         $this->addOption('csrf_token_id', 'authenticate');
         $this->addOption('enable_csrf', false);
         $this->addOption('post_only', true);
+    }
+
+    public function getPriority(): int
+    {
+        return self::PRIORITY;
     }
 
     public function getPosition()

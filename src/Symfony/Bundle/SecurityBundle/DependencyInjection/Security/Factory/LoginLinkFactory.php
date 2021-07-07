@@ -27,6 +27,8 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
  */
 class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {
+    public const PRIORITY = -20;
+
     public function addConfiguration(NodeDefinition $node)
     {
         /** @var NodeBuilder $builder */
@@ -145,6 +147,11 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
             ]);
 
         return $authenticatorId;
+    }
+
+    public function getPriority(): int
+    {
+        return self::PRIORITY;
     }
 
     public function getPosition()

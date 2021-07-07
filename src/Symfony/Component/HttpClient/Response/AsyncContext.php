@@ -31,7 +31,7 @@ final class AsyncContext
     private $content;
     private $offset;
 
-    public function __construct(&$passthru, HttpClientInterface $client, ResponseInterface &$response, array &$info, $content, int $offset)
+    public function __construct(?callable &$passthru, HttpClientInterface $client, ResponseInterface &$response, array &$info, $content, int $offset)
     {
         $this->passthru = &$passthru;
         $this->client = $client;
@@ -122,7 +122,7 @@ final class AsyncContext
     /**
      * Attaches an info to the response.
      */
-    public function setInfo(string $type, $value): self
+    public function setInfo(string $type, mixed $value): self
     {
         if ('canceled' === $type && $value !== $this->info['canceled']) {
             throw new \LogicException('You cannot set the "canceled" info directly.');

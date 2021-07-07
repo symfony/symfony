@@ -60,7 +60,7 @@ class DataMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapFormsToData(\Traversable $forms, &$data): void
+    public function mapFormsToData(\Traversable $forms, mixed &$data): void
     {
         if (null === $data) {
             return;

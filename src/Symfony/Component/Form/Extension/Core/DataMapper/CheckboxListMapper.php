@@ -47,7 +47,7 @@ class CheckboxListMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapFormsToData(\Traversable $checkboxes, &$choices)
+    public function mapFormsToData(\Traversable $checkboxes, mixed &$choices)
     {
         if (!\is_array($choices)) {
             throw new UnexpectedTypeException($choices, 'array');

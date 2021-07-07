@@ -43,7 +43,7 @@ class RadioListMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapFormsToData(\Traversable $radios, &$choice)
+    public function mapFormsToData(\Traversable $radios, mixed &$choice)
     {
         if (null !== $choice && !\is_string($choice)) {
             throw new UnexpectedTypeException($choice, 'null or string');

@@ -145,7 +145,7 @@ class TwigRendererEngine extends AbstractRendererEngine
      *                     this variable will be kept and be available upon
      *                     further calls to this method using the same theme.
      */
-    protected function loadResourcesFromTheme(string $cacheKey, &$theme)
+    protected function loadResourcesFromTheme(string $cacheKey, mixed &$theme)
     {
         if (!$theme instanceof Template) {
             /* @var Template $theme */

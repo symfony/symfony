@@ -27,6 +27,7 @@ class GeneratedConfigTest extends TestCase
             'VariableType' => 'variable_type',
             'AddToList' => 'add_to_list',
             'NodeInitialValues' => 'node_initial_values',
+            'ArrayExtraKeys' => 'array_extra_keys',
         ];
 
         foreach ($array as $name => $alias) {
@@ -103,6 +104,15 @@ class GeneratedConfigTest extends TestCase
         $configBuilder = $this->generateConfigBuilder(NodeInitialValues::class);
         $this->expectException(InvalidConfigurationException::class);
         $configBuilder->someCleverName(['not_exists' => 'foo']);
+    }
+
+    public function testSetExtraKeyMethodIsNotGeneratedWhenAllowExtraKeysIsFalse()
+    {
+        /** @var AddToListConfig $configBuilder */
+        $configBuilder = $this->generateConfigBuilder(AddToList::class);
+
+        $this->assertFalse(method_exists($configBuilder->translator(), 'set'));
+        $this->assertFalse(method_exists($configBuilder->messenger()->receiving(), 'set'));
     }
 
     /**

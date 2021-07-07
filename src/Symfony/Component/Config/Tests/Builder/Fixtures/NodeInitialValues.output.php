@@ -8,13 +8,13 @@ return [
     'messenger' => [
         'transports' => [
             'fast_queue' => [
-                'dsn'=>'sync://',
-                'serializer'=>'acme',
+                'dsn' => 'sync://',
+                'serializer' => 'acme',
             ],
             'slow_queue' => [
-                'dsn'=>'doctrine://',
-                'options'=>['table'=>'my_messages'],
-            ]
-        ]
-    ]
+                'dsn' => 'doctrine://',
+                'options' => ['table' => 'my_messages'],
+            ],
+        ],
+    ],
 ];

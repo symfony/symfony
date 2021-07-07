@@ -141,6 +141,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
+     * Returns true when extra keys should be ignored without an exception.
+     */
+    public function shouldIgnoreExtraKeys(): bool
+    {
+        return $this->ignoreExtraKeys;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setName(string $name)

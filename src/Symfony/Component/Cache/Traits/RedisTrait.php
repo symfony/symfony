@@ -84,9 +84,9 @@ trait RedisTrait
      *
      * @param array $options See self::$defaultConnectionOptions
      *
-     * @throws InvalidArgumentException when the DSN is invalid
-     *
      * @return \Redis|\RedisCluster|RedisClusterProxy|RedisProxy|\Predis\ClientInterface According to the "class" option
+     *
+     * @throws InvalidArgumentException when the DSN is invalid
      */
     public static function createConnection(string $dsn, array $options = [])
     {

@@ -76,9 +76,15 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function expiresAt(?\DateTimeInterface $expiration): self
+    public function expiresAt($expiration): self
     {
-        $this->expiry = null !== $expiration ? (float) $expiration->format('U.u') : null;
+        if (null === $expiration) {
+            $this->expiry = null;
+        } elseif ($expiration instanceof \DateTimeInterface) {
+            $this->expiry = (float) $expiration->format('U.u');
+        } else {
+            throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given.', get_debug_type($expiration)));
+        }
 
         return $this;
     }

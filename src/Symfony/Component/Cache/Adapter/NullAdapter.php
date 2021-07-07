@@ -141,7 +141,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
         return $this->deleteItem($key);
     }
 
-    private function generateItems(array $keys)
+    private function generateItems(array $keys): \Generator
     {
         $f = self::$createCacheItem;
 

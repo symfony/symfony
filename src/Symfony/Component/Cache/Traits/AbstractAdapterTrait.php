@@ -332,7 +332,7 @@ trait AbstractAdapterTrait
         }
     }
 
-    private function generateItems(iterable $items, array &$keys): iterable
+    private function generateItems(iterable $items, array &$keys): \Generator
     {
         $f = self::$createCacheItem;
 

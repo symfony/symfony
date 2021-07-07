@@ -84,10 +84,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      *
-     * @param callable|Cache\ChoiceValue|null  $value  The callable or static option for
-     *                                                 generating the choice values
-     * @param callable|Cache\ChoiceFilter|null $filter The callable or static option for
-     *                                                 filtering the choices
+     * @param mixed $value
+     * @param mixed $filter
      */
     public function createListFromChoices(iterable $choices, $value = null/*, $filter = null*/)
     {
@@ -127,12 +125,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      *
-     * @param ChoiceLoaderInterface|Cache\ChoiceLoader $loader The loader or static loader to load
-     *                                                         the choices lazily
-     * @param callable|Cache\ChoiceValue|null          $value  The callable or static option for
-     *                                                         generating the choice values
-     * @param callable|Cache\ChoiceFilter|null         $filter The callable or static option for
-     *                                                         filtering the choices
+     * @param mixed $value
+     * @param mixed $filter
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null/*, $filter = null*/)
     {
@@ -174,11 +168,11 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      *
-     * @param array|callable|Cache\PreferredChoice|null $preferredChoices The preferred choices
-     * @param callable|false|Cache\ChoiceLabel|null     $label            The option or static option generating the choice labels
-     * @param callable|Cache\ChoiceFieldName|null       $index            The option or static option generating the view indices
-     * @param callable|Cache\GroupBy|null               $groupBy          The option or static option generating the group names
-     * @param array|callable|Cache\ChoiceAttr|null      $attr             The option or static option generating the HTML attributes
+     * @param mixed $preferredChoices
+     * @param mixed $label
+     * @param mixed $index
+     * @param mixed $groupBy
+     * @param mixed $attr
      */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
     {

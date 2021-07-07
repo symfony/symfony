@@ -18,6 +18,7 @@ use Symfony\Component\PropertyAccess\Exception\AccessException as PropertyAccess
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Writes and reads values to/from an object or array using property path.
@@ -84,7 +85,7 @@ class PropertyPathAccessor implements DataAccessorInterface
         return null !== $form->getPropertyPath();
     }
 
-    private function getPropertyValue($data, $propertyPath)
+    private function getPropertyValue($data, PropertyPathInterface $propertyPath)
     {
         try {
             return $this->propertyAccessor->getValue($data, $propertyPath);

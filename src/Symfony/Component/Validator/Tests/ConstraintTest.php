@@ -216,6 +216,11 @@ class ConstraintTest extends TestCase
         Constraint::getErrorName(1);
     }
 
+    public function testGetErrorNames()
+    {
+        $this->assertIsArray(Constraint::getErrorNames());
+    }
+
     public function testOptionsAsDefaultOption()
     {
         $constraint = new ConstraintA($options = ['value1']);

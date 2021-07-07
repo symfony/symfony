@@ -32,15 +32,15 @@ class RedisStore implements PersistingStoreInterface
     private $redis;
 
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\RedisClusterProxy|\Predis\ClientInterface $redisClient
+     * @param \Redis|\RedisArray|\RedisCluster|\RedisClusterProxy|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis
      */
-    public function __construct($redisClient)
+    public function __construct($redis)
     {
-        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\ClientInterface && !$redisClient instanceof RedisProxy && !$redisClient instanceof RedisClusterProxy) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster, RedisProxy, RedisClusterProxy or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redisClient)));
+        if (!$redis instanceof \Redis && !$redis instanceof \RedisArray && !$redis instanceof \RedisCluster && !$redis instanceof \Predis\ClientInterface && !$redis instanceof RedisProxy && !$redis instanceof RedisClusterProxy) {
+            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster, RedisProxy, RedisClusterProxy or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redis)));
         }
 
-        $this->redis = $redisClient;
+        $this->redis = $redis;
     }
 
     /**

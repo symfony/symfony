@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**
  * Helper class for commonly-needed security tasks.
@@ -68,5 +69,16 @@ class Security implements AuthorizationCheckerInterface
     public function getToken(): ?TokenInterface
     {
         return $this->container->get('security.token_storage')->getToken();
+    }
+
+    /**
+     * Logout the current user automatically. Dispatch the logout event.
+     */
+    public function autoLogout(): void
+    {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $logoutEvent = new LogoutEvent($request, $this->container->get('security.token_storage')->getToken());
+        $this->container->get('event_dispatcher')->dispatch($logoutEvent);
+        $this->container->get('security.token_storage')->setToken();
     }
 }

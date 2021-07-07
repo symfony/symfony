@@ -48,9 +48,9 @@ trait RedisTrait
     private $marshaller;
 
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redisClient
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis
      */
-    private function init($redisClient, string $namespace, int $defaultLifetime, ?MarshallerInterface $marshaller)
+    private function init($redis, string $namespace, int $defaultLifetime, ?MarshallerInterface $marshaller)
     {
         parent::__construct($namespace, $defaultLifetime);
 
@@ -58,17 +58,17 @@ trait RedisTrait
             throw new InvalidArgumentException(sprintf('RedisAdapter namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
         }
 
-        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\ClientInterface && !$redisClient instanceof RedisProxy && !$redisClient instanceof RedisClusterProxy) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redisClient)));
+        if (!$redis instanceof \Redis && !$redis instanceof \RedisArray && !$redis instanceof \RedisCluster && !$redis instanceof \Predis\ClientInterface && !$redis instanceof RedisProxy && !$redis instanceof RedisClusterProxy) {
+            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redis)));
         }
 
-        if ($redisClient instanceof \Predis\ClientInterface && $redisClient->getOptions()->exceptions) {
-            $options = clone $redisClient->getOptions();
+        if ($redis instanceof \Predis\ClientInterface && $redis->getOptions()->exceptions) {
+            $options = clone $redis->getOptions();
             \Closure::bind(function () { $this->options['exceptions'] = false; }, $options, $options)();
-            $redisClient = new $redisClient($redisClient->getConnection(), $options);
+            $redis = new $redis($redis->getConnection(), $options);
         }
 
-        $this->redis = $redisClient;
+        $this->redis = $redis;
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
     }
 
@@ -82,14 +82,13 @@ trait RedisTrait
      *   - redis:///var/run/redis.sock
      *   - redis://secret@/var/run/redis.sock/13
      *
-     * @param string $dsn
-     * @param array  $options See self::$defaultConnectionOptions
+     * @param array $options See self::$defaultConnectionOptions
      *
      * @throws InvalidArgumentException when the DSN is invalid
      *
      * @return \Redis|\RedisCluster|RedisClusterProxy|RedisProxy|\Predis\ClientInterface According to the "class" option
      */
-    public static function createConnection($dsn, array $options = [])
+    public static function createConnection(string $dsn, array $options = [])
     {
         if (0 === strpos($dsn, 'redis:')) {
             $scheme = 'redis';
@@ -498,7 +497,7 @@ trait RedisTrait
         return $failed;
     }
 
-    private function pipeline(\Closure $generator, $redis = null): \Generator
+    private function pipeline(\Closure $generator, object $redis = null): \Generator
     {
         $ids = [];
         $redis = $redis ?? $this->redis;

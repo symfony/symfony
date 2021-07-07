@@ -41,7 +41,9 @@ class Crawler implements \Countable, \IteratorAggregate
     private $namespaces = [];
 
     /**
-     * @var \ArrayObject A map of cached namespaces
+     * A map of cached namespaces.
+     *
+     * @var \ArrayObject
      */
     private $cachedNamespaces;
 

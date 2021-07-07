@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-06-22T13:52:01Z
+
+should we change default names in a patch release?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-06-22T13:53:44Z
+
+This will break all URL generation that uses the existing names. So it might indeed be dangerous in a patch release
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-06-22T13:55:58Z
+
+also, from my experience, dereferencing virtual route names is pure pain :D
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-22T20:34:26Z
+
+> This will break all URL generation that uses the existing names. So it might indeed be dangerous in a patch release
+
+Only when an action method doesn't end with `Action` nor `_action`, but still ends with `action`, in a case-sensitive way.
+
+I'm fine doing this on 5.4...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-23T18:45:03Z
+
+Now targetting 5.4
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-06T07:52:46Z
+
+@Tobion comments addressed, thanks for the review!

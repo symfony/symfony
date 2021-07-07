@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\PropertyInfo\Extractor\ConstructorExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -61,6 +63,28 @@ class ErrorDetailsStampTest extends TestCase
                 new ArrayDenormalizer(),
                 new FlattenExceptionNormalizer(),
                 new ObjectNormalizer(),
+            ], [new JsonEncoder()])
+        );
+
+        $deserializedEnvelope = $serializer->decode($serializer->encode(new Envelope(new \stdClass(), [$stamp])));
+
+        $deserializedStamp = $deserializedEnvelope->last(ErrorDetailsStamp::class);
+        $this->assertInstanceOf(ErrorDetailsStamp::class, $deserializedStamp);
+        $this->assertEquals($stamp, $deserializedStamp);
+    }
+
+    public function testDeserializationWithStringExceptionCode()
+    {
+        $exception = new StringErrorCodeException('exception message', 'some code');
+        $stamp = ErrorDetailsStamp::create($exception);
+        $extractor = new ConstructorExtractor([
+            new ReflectionExtractor(),
+        ]);
+        $serializer = new Serializer(
+            new SymfonySerializer([
+                new ArrayDenormalizer(),
+                new FlattenExceptionNormalizer(),
+                new ObjectNormalizer(null, null, null, $extractor, null, null, []),
             ], [new JsonEncoder()])
         );
 

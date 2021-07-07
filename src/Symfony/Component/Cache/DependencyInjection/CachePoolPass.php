@@ -238,7 +238,7 @@ class CachePoolPass implements CompilerPassInterface
     /**
      * @internal
      */
-    public static function getServiceProvider(ContainerBuilder $container, $name)
+    public static function getServiceProvider(ContainerBuilder $container, string $name)
     {
         $container->resolveEnvPlaceholders($name, null, $usedEnvs);
 

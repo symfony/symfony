@@ -312,7 +312,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         $this->clear();
     }
 
-    private function generateItems(array $keys, $now, $f)
+    private function generateItems(array $keys, float $now, \Closure $f)
     {
         foreach ($keys as $i => $key) {
             if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] > $now || !$this->deleteItem($key))) {
@@ -342,7 +342,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         }
     }
 
-    private function freeze($value, $key)
+    private function freeze($value, string $key)
     {
         if (null === $value) {
             return 'N;';

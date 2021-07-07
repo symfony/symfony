@@ -56,7 +56,7 @@ class GroupSequence
     /**
      * The groups in the sequence.
      *
-     * @var string[]|string[][]|GroupSequence[]
+     * @var array<string|string[]|GroupSequence>
      */
     public $groups;
 
@@ -79,7 +79,7 @@ class GroupSequence
     /**
      * Creates a new group sequence.
      *
-     * @param string[] $groups The groups in the sequence
+     * @param array<string|string[]|GroupSequence> $groups The groups in the sequence
      */
     public function __construct(array $groups)
     {

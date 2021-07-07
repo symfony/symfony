@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-06T16:24:24Z
+
+I would appreciate a closer review on this one:
+- the first commit does what the phpdoc says
+- the second commit diverges from the phpdoc and makes tests green.
+
+I'd like a closer check on this second commit please.
+
+/cc @HeahDude in case you're around, since this touches ChoiceType :)

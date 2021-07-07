@@ -78,7 +78,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             $this->ldap->bind($this->searchDn, $this->searchPassword);
             $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
             $query = str_replace(['{username}', '{user_identifier}'], $identifier, $this->defaultSearch);
-            $search = $this->ldap->query($this->baseDn, $query);
+            $search = $this->ldap->query($this->baseDn, $query, ['filter' => 0 == \count($this->extraFields) ? '*' : $this->extraFields]);
         } catch (ConnectionException $e) {
             $e = new UserNotFoundException(sprintf('User "%s" not found.', $identifier), 0, $e);
             $e->setUserIdentifier($identifier);

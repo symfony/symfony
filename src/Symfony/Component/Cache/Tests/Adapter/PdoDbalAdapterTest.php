@@ -78,7 +78,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
 class DriverWrapper implements Driver
 {
-    /** @var Driver $driver */
+    /** @var Driver */
     private $driver;
 
     public function __construct(Driver $driver)
@@ -86,26 +86,41 @@ class DriverWrapper implements Driver
         $this->driver = $driver;
     }
 
+    /**
+     * @return Driver\Connection
+     */
     public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
     {
         return $this->driver->connect($params, $username, $password, $driverOptions);
     }
 
+    /**
+     * @return \Doctrine\DBAL\Platforms\AbstractPlatform
+     */
     public function getDatabasePlatform()
     {
         return $this->driver->getDatabasePlatform();
     }
 
+    /**
+     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
+     */
     public function getSchemaManager(Connection $conn)
     {
         return $this->driver->getSchemaManager($conn);
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->driver->getName();
     }
 
+    /**
+     * @return string
+     */
     public function getDatabase(Connection $conn)
     {
         return $this->driver->getDatabase($conn);

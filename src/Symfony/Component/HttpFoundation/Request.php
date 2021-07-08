@@ -186,7 +186,7 @@ class Request
     protected $format;
 
     /**
-     * @var SessionInterface|callable
+     * @var SessionInterface|callable(): SessionInterface
      */
     protected $session;
 
@@ -430,6 +430,8 @@ class Request
      * This is mainly useful when you need to override the Request class
      * to keep BC with an existing system. It should not be used for any
      * other purpose.
+     *
+     * @param callable():SessionInterface|null $callable A PHP callable
      */
     public static function setFactory(?callable $callable)
     {
@@ -731,6 +733,14 @@ class Request
         $session = $this->session;
         if (!$session instanceof SessionInterface && null !== $session) {
             $this->setSession($session = $session());
+            /*
+             * For supporting sessions in php runtime with runners like roadrunner or swoole the session
+             * cookie need read from the cookie bag and set on the session storage.
+             */
+            if (!$session->isStarted()) {
+                $sessionId = $this->cookies->get($session->getName(), '');
+                $session->setId($sessionId);
+            }
         }
 
         if (null === $session) {
@@ -773,6 +783,8 @@ class Request
 
     /**
      * @internal
+     *
+     * @param callable(): SessionInterface $factory
      */
     public function setSessionFactory(callable $factory)
     {

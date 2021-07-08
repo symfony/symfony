@@ -29,11 +29,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class SessionListener extends AbstractSessionListener
 {
-    public function __construct(ContainerInterface $container, bool $debug = false)
-    {
-        parent::__construct($container, $debug);
-    }
-
     public function onKernelRequest(RequestEvent $event)
     {
         parent::onKernelRequest($event);

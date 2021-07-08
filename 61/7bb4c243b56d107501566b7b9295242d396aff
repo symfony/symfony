@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-05T17:35:57Z
+
+Hey!
+
+I think @fancyweb has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-06T08:04:41Z
+
+WDYT of psalm reports?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-07-06T08:29:47Z
+
+For `getBaseHref`, it should indeed be documented as `@return string|null` (in 4.4). That's a phpdoc mistake.
+
+for the `createSubcrawler` report, this would be solved by keeping the phpdoc `@var \DOMNode[]` on the `$nodes` property, which is more precise than the `array` type.
+And for `getText`, I think it might be fixed by that phpdoc too (but not sure)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-07T15:34:57Z
+
+> For `getBaseHref`, it should indeed be documented as `@return string|null` (in 4.4). That's a phpdoc mistake.
+
+Same for `getUri()` btw. I'm going to backport those fixes.
+
+> for the `createSubcrawler` report, this would be solved by keeping the phpdoc `@var \DOMNode[]` on the `$nodes` property, which is more precise than the `array` type.
+
+Yes, I shouldn't have removed that.
+
+> And for `getText`, I think it might be fixed by that phpdoc too (but not sure)
+
+That error is gone now as well. It might have been caused by the type removal from `$nodes` as well. 🤷🏻‍♂️
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-07T18:26:00Z
+
+Backports have been merged up and this PR is ready again.

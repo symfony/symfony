@@ -199,6 +199,8 @@ Routing
 Security
 --------
 
+ * Remove the 4th and 5th argument of `AuthorizationChecker`
+ * Remove the 5th argument of `AccessListener`
  * Remove class `User`, use `InMemoryUser` or your own implementation instead.
    If you are using the `isAccountNonLocked()`, `isAccountNonExpired()` or `isCredentialsNonExpired()` method, consider re-implementing them
    in your own user class as they are not part of the `InMemoryUser` API
@@ -318,6 +320,7 @@ Security
 SecurityBundle
 --------------
 
+ * Remove the `always_authenticate_before_granting` option
  * Remove the `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
    use `UserPasswordHashCommand` and `user:hash-password` instead
  * Remove the `security.encoder_factory.generic` service, the `security.encoder_factory` and `Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface` aliases,

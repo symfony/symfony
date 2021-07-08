@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Deprecate the `always_authenticate_before_granting` option
+
 5.3
 ---
 

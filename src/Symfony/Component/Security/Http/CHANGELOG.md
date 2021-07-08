@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Deprecate not setting the 5th argument (`$exceptionOnNoToken`) of `AccessListener` to `false`
+
 5.3
 ---
 

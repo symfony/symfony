@@ -20,22 +20,10 @@ namespace Symfony\Component\DomCrawler\Field;
  */
 class ChoiceFormField extends FormField
 {
-    /**
-     * @var string
-     */
-    private $type;
-    /**
-     * @var bool
-     */
-    private $multiple;
-    /**
-     * @var array
-     */
-    private $options;
-    /**
-     * @var bool
-     */
-    private $validationDisabled = false;
+    private string $type;
+    private bool $multiple;
+    private array $options;
+    private bool $validationDisabled = false;
 
     /**
      * Returns true if the field should be included in the submitted values.

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by duboiss at 2021-07-07T08:31:27Z
+
+I don't feel that this is fixing #41942 after testing on my local project ([duboiss/sfcommand](https://github.com/duboiss/sfcommand), php8 branch) your modifications.
+
+---------------------------------------------------------------------------
+
+by a1812 at 2021-07-07T09:13:06Z
+
+> I don't feel that this is fixing #41942 after testing on my local project ([duboiss/sfcommand](https://github.com/duboiss/sfcommand), php8 branch) your modifications.
+
+and nevertheless my test shows that everything is in order :)
+![image](https://user-images.githubusercontent.com/42714329/124732480-e68c5680-df1b-11eb-926a-ce58b47fe411.png)
+
+---------------------------------------------------------------------------
+
+by duboiss at 2021-07-07T20:01:19Z
+
+My bad, I think I made a mistake between two `git clone`. It's ok from my side too, nice job!

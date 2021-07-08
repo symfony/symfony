@@ -50,7 +50,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
     public function testConfigureSchemaDecoratedDbalDriver()
     {
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
-        if (! interface_exists(Middleware::class)) {
+        if (!interface_exists(Middleware::class)) {
             $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
         }
 

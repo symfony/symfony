@@ -186,7 +186,7 @@ class Request
     protected $format;
 
     /**
-     * @var SessionInterface|callable
+     * @var SessionInterface|callable(): SessionInterface
      */
     protected $session;
 
@@ -775,6 +775,8 @@ class Request
 
     /**
      * @internal
+     *
+     * @param callable(): SessionInterface $factory
      */
     public function setSessionFactory(callable $factory)
     {

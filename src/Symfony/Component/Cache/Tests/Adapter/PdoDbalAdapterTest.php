@@ -12,13 +12,12 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Driver\Middleware;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\DriverWrapper;
 
 /**
  * @group time-sensitive
@@ -51,22 +50,19 @@ class PdoDbalAdapterTest extends AdapterTestCase
     public function testConfigureSchemaDecoratedDbalDriver()
     {
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
-        if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class)) {
-            $middleware = $this->createMock(\Doctrine\DBAL\Driver\Middleware::class);
-            $middleware
-                ->method('wrap')
-                ->willReturn(new DriverWrapperV3($connection->getDriver()));
-
-            $config = new Configuration();
-            $config->setMiddlewares([$middleware]);
-
-            $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config);
-        } else {
-            $reflectionProperty = new \ReflectionProperty($connection, '_driver');
-            $reflectionProperty->setAccessible(true);
-            $reflectionProperty->setValue($connection, new DriverWrapperV2($reflectionProperty->getValue($connection)));
-            $reflectionProperty->setAccessible(false);
+        if (! interface_exists(Middleware::class)) {
+            $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
         }
+
+        $middleware = $this->createMock(Middleware::class);
+        $middleware
+            ->method('wrap')
+            ->willReturn(new DriverWrapper($connection->getDriver()));
+
+        $config = new Configuration();
+        $config->setMiddlewares([$middleware]);
+
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config);
 
         $adapter = new PdoAdapter($connection);
         $adapter->createTable();
@@ -74,98 +70,5 @@ class PdoDbalAdapterTest extends AdapterTestCase
         $item = $adapter->getItem('key');
         $item->set('value');
         $this->assertTrue($adapter->save($item));
-    }
-}
-
-if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class)) {
-    class DriverWrapperV3 implements Driver
-    {
-        /** @var Driver */
-        private $driver;
-
-        public function __construct(Driver $driver)
-        {
-            $this->driver = $driver;
-        }
-
-        /**
-         * @return Driver\Connection
-         */
-        public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
-        {
-            return $this->driver->connect($params, $username, $password, $driverOptions);
-        }
-
-        /**
-         * @return \Doctrine\DBAL\Platforms\AbstractPlatform
-         */
-        public function getDatabasePlatform()
-        {
-            return $this->driver->getDatabasePlatform();
-        }
-
-        /**
-         * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
-         */
-        public function getSchemaManager(Connection $conn, AbstractPlatform $platform)
-        {
-            return $this->driver->getSchemaManager($conn, $platform);
-        }
-
-        public function getExceptionConverter(): Driver\API\ExceptionConverter
-        {
-            return $this->driver->getExceptionConverter();
-        }
-    }
-} else {
-    class DriverWrapperV2 implements Driver
-    {
-        /** @var Driver */
-        private $driver;
-
-        public function __construct(Driver $driver)
-        {
-            $this->driver = $driver;
-        }
-
-        /**
-         * @return Driver\Connection
-         */
-        public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
-        {
-            return $this->driver->connect($params, $username, $password, $driverOptions);
-        }
-
-        /**
-         * @return \Doctrine\DBAL\Platforms\AbstractPlatform
-         */
-        public function getDatabasePlatform()
-        {
-            return $this->driver->getDatabasePlatform();
-        }
-
-        /**
-         * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
-         */
-        public function getSchemaManager(Connection $conn)
-        {
-            return $this->driver->getSchemaManager($conn);
-        }
-
-        /**
-         * @return string
-         */
-        public function getName()
-        {
-            return $this->driver->getName();
-        }
-
-        /**
-         * @return string
-         */
-        public function getDatabase(Connection $conn)
-        {
-            return $this->driver->getDatabase($conn);
-        }
     }
 }

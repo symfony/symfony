@@ -1147,7 +1147,7 @@ class Application implements ResetInterface
      */
     public function setDefaultCommand(string $commandName, bool $isSingleCommand = false)
     {
-        $this->defaultCommand = $commandName;
+        $this->defaultCommand = explode('|', ltrim($commandName, '|'))[0];
 
         if ($isSingleCommand) {
             // Ensure the command exist

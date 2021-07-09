@@ -291,7 +291,7 @@ class RegisterListenersPassTest extends TestCase
         }
 
         $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass $reflectionClass, ?\ReflectionMethod $reflectionMethod = null): void {
+        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass $reflectionClass, \ReflectionMethod $reflectionMethod = null): void {
             $tagAttributes = get_object_vars($attribute);
             if ($reflectionMethod) {
                 $tagAttributes['method'] = $reflectionMethod->getName();

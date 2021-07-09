@@ -12,6 +12,8 @@
 namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
+use Reflector;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
@@ -291,8 +293,12 @@ class RegisterListenersPassTest extends TestCase
         }
 
         $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute): void {
-            $definition->addTag('kernel.event_listener', get_object_vars($attribute));
+        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, Reflector $reflector): void {
+            $tagAttributes = get_object_vars($attribute);
+            if ($reflector instanceof ReflectionMethod) {
+                $tagAttributes['method'] = $reflector->getName();
+            }
+            $definition->addTag('kernel.event_listener', $tagAttributes);
         });
         $container->register('foo', TaggedMultiListener::class)->setAutoconfigured(true);
         $container->register('event_dispatcher', \stdClass::class);
@@ -324,6 +330,14 @@ class RegisterListenersPassTest extends TestCase
                 [
                     'bar',
                     [new ServiceClosureArgument(new Reference('foo')), 'onBarEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'baz',
+                    [new ServiceClosureArgument(new Reference('foo')), 'onBazEvent'],
                     0,
                 ],
             ],

@@ -26,13 +26,17 @@ class SaveSessionListenerTest extends TestCase
 {
     public function testOnlyTriggeredOnMasterRequest()
     {
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->never())->method('save');
+        $session->expects($this->any())->method('isStarted')->willReturn(true);
+
+        $request = new Request();
+        $request->setSession($session);
+
         $listener = new SaveSessionListener();
-        $event = $this->createMock(ResponseEvent::class);
-        $event->expects($this->once())->method('isMasterRequest')->willReturn(false);
-        $event->expects($this->never())->method('getRequest');
 
         // sub request
-        $listener->onKernelResponse($event);
+        $listener->onKernelResponse(new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::SUB_REQUEST, new Response()));
     }
 
     public function testSessionSaved()

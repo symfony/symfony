@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-09T04:01:07Z
+
+Hey!
+
+I think @fancyweb has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2021-07-09T13:52:22Z
+
+Why does Psalm report that `PdoAdapter::doSave` returns null in some cases ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-09T15:09:44Z
+
+> Why does Psalm report that PdoAdapter::doSave returns null in some cases ?
+
+because it doesn't know that the code is always going to enter a foreach.

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -24,6 +25,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAutoconfiguration;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomMethodAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
@@ -36,6 +38,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3Configurator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService4;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -695,6 +698,39 @@ class IntegrationTest extends TestCase
         self::assertSame([
             'two' => [
                 ['someAttribute' => 'prio 100', 'priority' => 100],
+            ],
+        ], $collector->collectedTags);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTagsViaAttributeOnMethods()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(
+            CustomMethodAttribute::class,
+            static function (ChildDefinition $definition, CustomMethodAttribute $attribute, ReflectionMethod $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+                $tagAttributes['method'] = $reflector->getName();
+
+                $definition->addTag('app.custom_tag', $tagAttributes);
+            }
+        );
+
+        $container->register(TaggedService4::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+
+        $collector = new TagCollector();
+        $container->addCompilerPass($collector);
+
+        $container->compile();
+
+        self::assertSame([
+            TaggedService4::class => [
+                ['someAttribute' => 'baz', 'priority' => 0, 'method' => 'fooAction'],
+                ['someAttribute' => 'foo', 'priority' => 0, 'method' => 'barAction'],
             ],
         ], $collector->collectedTags);
     }

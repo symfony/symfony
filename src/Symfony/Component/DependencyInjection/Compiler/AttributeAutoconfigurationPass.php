@@ -48,6 +48,13 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
                 $configurator($conditionals, $attribute->newInstance(), $reflector);
             }
         }
+        foreach ($reflector->getMethods() as $method) {
+            foreach ($method->getAttributes() as $attribute) {
+                if ($configurator = $autoconfiguredAttributes[$attribute->getName()] ?? null) {
+                    $configurator($conditionals, $attribute->newInstance(), $method);
+                }
+            }
+        }
         if (!isset($instanceof[$reflector->getName()]) && new ChildDefinition('') != $conditionals) {
             $instanceof[$reflector->getName()] = $conditionals;
             $value->setInstanceofConditionals($instanceof);

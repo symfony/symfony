@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -710,9 +709,9 @@ class IntegrationTest extends TestCase
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(
             CustomMethodAttribute::class,
-            static function (ChildDefinition $definition, CustomMethodAttribute $attribute, ReflectionMethod $reflector) {
+            static function (ChildDefinition $definition, CustomMethodAttribute $attribute, \ReflectionClass $reflectionClass, \ReflectionMethod $reflectionMethod) {
                 $tagAttributes = get_object_vars($attribute);
-                $tagAttributes['method'] = $reflector->getName();
+                $tagAttributes['method'] = $reflectionMethod->getName();
 
                 $definition->addTag('app.custom_tag', $tagAttributes);
             }

@@ -20,8 +20,6 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
-use ReflectionMethod;
-use Reflector;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -553,10 +551,10 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', [new Reference('logger')]);
 
-        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, Reflector $reflector): void {
+        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass $reflectionClass, ?\ReflectionMethod $reflectionMethod): void {
             $tagAttributes = get_object_vars($attribute);
-            if ($reflector instanceof ReflectionMethod) {
-                $tagAttributes['method'] = $reflector->getName();
+            if ($reflectionMethod) {
+                $tagAttributes['method'] = $reflectionMethod->getName();
             }
             $definition->addTag('kernel.event_listener', $tagAttributes);
         });

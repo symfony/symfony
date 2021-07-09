@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
 use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -273,14 +274,18 @@ abstract class AbstractToken implements TokenInterface, \Serializable
             return !(bool) $this->user->isEqualTo($user);
         }
 
-        // @deprecated since Symfony 5.3, check for PasswordAuthenticatedUserInterface on both user objects before comparing passwords
-        if ($this->user->getPassword() !== $user->getPassword()) {
-            return true;
-        }
+        if ($this->user instanceof PasswordAuthenticatedUserInterface || $user instanceof PasswordAuthenticatedUserInterface) {
+            if (!$this->user instanceof PasswordAuthenticatedUserInterface || !$user instanceof PasswordAuthenticatedUserInterface || $this->user->getPassword() !== $user->getPassword()) {
+                return true;
+            }
 
-        // @deprecated since Symfony 5.3, check for LegacyPasswordAuthenticatedUserInterface on both user objects before comparing salts
-        if ($this->user->getSalt() !== $user->getSalt()) {
-            return true;
+            if ($this->user instanceof LegacyPasswordAuthenticatedUserInterface xor $user instanceof LegacyPasswordAuthenticatedUserInterface) {
+                return true;
+            }
+
+            if ($this->user instanceof LegacyPasswordAuthenticatedUserInterface && $user instanceof LegacyPasswordAuthenticatedUserInterface && $this->user->getSalt() !== $user->getSalt()) {
+                return true;
+            }
         }
 
         $userRoles = array_map('strval', (array) $user->getRoles());

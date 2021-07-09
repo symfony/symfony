@@ -133,7 +133,8 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
             throw new BadCredentialsException(sprintf('Authentication failed because "%s::checkCredentials()" did not return true.', get_debug_type($guardAuthenticator)));
         }
-        if ($this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordHasher && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && $this->passwordHasher->needsRehash($user)) {
+
+        if ($user instanceof PasswordAuthenticatedUserInterface && $this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordHasher && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && $this->passwordHasher->needsRehash($user)) {
             $this->userProvider->upgradePassword($user, $this->passwordHasher->hashPassword($user, $password));
         }
         $this->userChecker->checkPostAuth($user);

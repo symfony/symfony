@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -23,6 +24,8 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
@@ -858,6 +861,51 @@ class FormTypeTest extends BaseTypeTest
             'child3',
         ];
         $this->assertSame($expected, array_keys($view->children));
+    }
+
+    public function testSetDataEventsDispatchedToChildrenWithInheritDataConfigured()
+    {
+        $data = ['child' => 'child_value'];
+        $calledEvents = [];
+        $form = $this->factory->createNamedBuilder('form', self::TESTED_TYPE, $data)
+            ->add(
+                $this->factory->createNamedBuilder('inherit_data_type', self::TESTED_TYPE, null, [
+                    'inherit_data' => true,
+                ])
+                    ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use (&$calledEvents) {
+                        $calledEvents[] = FormEvents::PRE_SET_DATA;
+                        $event->getForm()->add('child', self::TESTED_TYPE);
+                    })
+                    ->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use (&$calledEvents) {
+                        $calledEvents[] = FormEvents::POST_SET_DATA;
+                        $event->getForm()->add('child2', self::TESTED_TYPE, ['data' => $event->getData()['child']]);
+                    })
+                    ->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use (&$calledEvents) {
+                        $calledEvents[] = FormEvents::PRE_SUBMIT;
+                        $this->assertSame($event->getData(), $event->getForm()->getData());
+                    })
+                    ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use (&$calledEvents) {
+                        $calledEvents[] = FormEvents::SUBMIT;
+                        $this->assertNotNull($event->getData());
+                    })
+                    ->addEventListener(FormEvents::POST_SUBMIT, function (PostSubmitEvent $event) use (&$calledEvents) {
+                        $calledEvents[] = FormEvents::POST_SUBMIT;
+                        $this->assertNotNull($event->getData());
+                    })
+            )
+            ->getForm();
+        $this->assertTrue($form->get('inherit_data_type')->has('child'));
+        $this->assertTrue($form->get('inherit_data_type')->has('child2'));
+        $this->assertSame('child_value', $form->get('inherit_data_type')->get('child')->getData());
+        $this->assertSame('child_value', $form->get('inherit_data_type')->get('child2')->getData());
+        $errorMessage = '"%s" event has not been called on form child with "inherit_data" option.';
+        $form->submit($data);
+        $this->assertContains(FormEvents::PRE_SET_DATA, $calledEvents, sprintf($errorMessage, FormEvents::PRE_SET_DATA));
+        $this->assertContains(FormEvents::POST_SET_DATA, $calledEvents, sprintf($errorMessage, FormEvents::POST_SET_DATA));
+        $this->assertContains(FormEvents::PRE_SUBMIT, $calledEvents, sprintf($errorMessage, FormEvents::PRE_SUBMIT));
+        $this->assertContains(FormEvents::SUBMIT, $calledEvents, sprintf($errorMessage, FormEvents::SUBMIT));
+        $this->assertContains(FormEvents::POST_SUBMIT, $calledEvents, sprintf($errorMessage, FormEvents::POST_SUBMIT));
+        $this->assertCount(5, $calledEvents);
     }
 }
 

@@ -735,15 +735,6 @@ class Request
             $this->setSession($session = $session());
         }
 
-        /*
-         * For supporting sessions in php runtime with runners like roadrunner or swoole the session
-         * cookie need read from the cookie bag and set on the session storage.
-         */
-        if ($session && !$session->isStarted()) {
-            $sessionId = $this->cookies->get($session->getName(), '');
-            $session->setId($sessionId);
-        }
-
         if (null === $session) {
             throw new SessionNotFoundException('Session has not been set.');
         }

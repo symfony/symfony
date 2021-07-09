@@ -69,7 +69,22 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         if (!$request->hasSession()) {
             // This variable prevents calling `$this->getSession()` twice in case the Request (and the below factory) is cloned
             $sess = null;
-            $request->setSessionFactory(function () use (&$sess) { return $sess ?? $sess = $this->getSession(); });
+            $request->setSessionFactory(function () use (&$sess, $request) {
+                if (!$sess) {
+                    $sess = $this->getSession();
+                }
+
+                /*
+                 * For supporting sessions in php runtime with runners like roadrunner or swoole the session
+                 * cookie need read from the cookie bag and set on the session storage.
+                 */
+                if ($sess && !$sess->isStarted()) {
+                    $sessionId = $request->cookies->get($sess->getName(), '');
+                    $sess->setId($sessionId);
+                }
+
+                return $sess;
+            });
         }
 
         $session = $this->container && $this->container->has('initialized_session') ? $this->container->get('initialized_session') : null;

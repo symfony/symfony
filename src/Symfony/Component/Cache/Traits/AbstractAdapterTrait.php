@@ -26,21 +26,21 @@ trait AbstractAdapterTrait
     use LoggerAwareTrait;
 
     /**
-     * @var \Closure needs to be set by class, signature is function(string <key>, mixed <value>, bool <isHit>)
+     * needs to be set by class, signature is function(string <key>, mixed <value>, bool <isHit>)
      */
-    private static $createCacheItem;
+    private static \Closure $createCacheItem;
 
     /**
-     * @var \Closure needs to be set by class, signature is function(array <deferred>, string <namespace>, array <&expiredIds>)
+     * needs to be set by class, signature is function(array <deferred>, string <namespace>, array <&expiredIds>)
      */
-    private static $mergeByLifetime;
+    private static \Closure $mergeByLifetime;
 
-    private $namespace = '';
-    private $defaultLifetime;
-    private $namespaceVersion = '';
-    private $versioningIsEnabled = false;
-    private $deferred = [];
-    private $ids = [];
+    private string $namespace = '';
+    private int $defaultLifetime;
+    private string $namespaceVersion = '';
+    private bool $versioningIsEnabled = false;
+    private array $deferred = [];
+    private array $ids = [];
 
     /**
      * @var int|null The maximum length to enforce for identifiers or null when no limit applies

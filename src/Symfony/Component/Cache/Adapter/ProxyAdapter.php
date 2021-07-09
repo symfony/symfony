@@ -28,18 +28,18 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     use ContractsTrait;
     use ProxyTrait;
 
-    private $namespace = '';
-    private $namespaceLen;
-    private $poolHash;
-    private $defaultLifetime;
+    private string $namespace = '';
+    private int $namespaceLen;
+    private string $poolHash;
+    private int $defaultLifetime;
 
-    private static $createCacheItem;
-    private static $setInnerItem;
+    private static \Closure $createCacheItem;
+    private static \Closure $setInnerItem;
 
     public function __construct(CacheItemPoolInterface $pool, string $namespace = '', int $defaultLifetime = 0)
     {
         $this->pool = $pool;
-        $this->poolHash = $poolHash = spl_object_hash($pool);
+        $this->poolHash = spl_object_hash($pool);
         if ('' !== $namespace) {
             \assert('' !== CacheItem::validateKey($namespace));
             $this->namespace = $namespace;

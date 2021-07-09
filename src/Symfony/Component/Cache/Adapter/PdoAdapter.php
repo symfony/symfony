@@ -27,20 +27,20 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 {
     protected $maxIdLength = 255;
 
-    private $marshaller;
-    private $conn;
-    private $dsn;
-    private $driver;
-    private $serverVersion;
-    private $table = 'cache_items';
-    private $idCol = 'item_id';
-    private $dataCol = 'item_data';
-    private $lifetimeCol = 'item_lifetime';
-    private $timeCol = 'item_time';
-    private $username = '';
-    private $password = '';
-    private $connectionOptions = [];
-    private $namespace;
+    private MarshallerInterface $marshaller;
+    private \PDO|Connection $conn;
+    private string $dsn;
+    private string $driver;
+    private string $serverVersion;
+    private mixed $table = 'cache_items';
+    private mixed $idCol = 'item_id';
+    private mixed $dataCol = 'item_data';
+    private mixed $lifetimeCol = 'item_lifetime';
+    private mixed $timeCol = 'item_time';
+    private mixed $username = '';
+    private mixed $password = '';
+    private mixed $connectionOptions = [];
+    private string $namespace;
 
     /**
      * You can either pass an existing database connection as PDO instance or
@@ -425,12 +425,9 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return $failed;
     }
 
-    /**
-     * @return \PDO|Connection
-     */
-    private function getConnection(): object
+    private function getConnection(): \PDO|Connection
     {
-        if (null === $this->conn) {
+        if (!isset($this->conn)) {
             if (strpos($this->dsn, '://')) {
                 if (!class_exists(DriverManager::class)) {
                     throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $this->dsn));
@@ -441,7 +438,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                 $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             }
         }
-        if (null === $this->driver) {
+        if (!isset($this->driver)) {
             if ($this->conn instanceof \PDO) {
                 $this->driver = $this->conn->getAttribute(\PDO::ATTR_DRIVER_NAME);
             } else {
@@ -483,7 +480,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 
     private function getServerVersion(): string
     {
-        if (null === $this->serverVersion) {
+        if (!isset($this->serverVersion)) {
             $conn = $this->conn instanceof \PDO ? $this->conn : $this->conn->getWrappedConnection();
             if ($conn instanceof \PDO) {
                 $this->serverVersion = $conn->getAttribute(\PDO::ATTR_SERVER_VERSION);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -23,7 +24,7 @@ trait FilesystemTrait
 {
     use FilesystemCommonTrait;
 
-    private $marshaller;
+    private MarshallerInterface $marshaller;
 
     /**
      * @return bool

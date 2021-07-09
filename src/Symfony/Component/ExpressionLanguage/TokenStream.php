@@ -20,9 +20,9 @@ class TokenStream
 {
     public $current;
 
-    private $tokens;
-    private $position = 0;
-    private $expression;
+    private array $tokens;
+    private int $position = 0;
+    private string $expression;
 
     public function __construct(array $tokens, string $expression = '')
     {

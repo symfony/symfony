@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -110,12 +111,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
 
         $this->request = new Request([], [], [], [], [], []);
 
-        $this->event = $this->createMock(RequestEvent::class);
-        $this->event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($this->request)
-        ;
+        $this->event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

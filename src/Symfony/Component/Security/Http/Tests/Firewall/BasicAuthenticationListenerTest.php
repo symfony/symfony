@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
@@ -64,14 +65,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $this->createMock(AuthenticationEntryPointInterface::class)
         );
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function testHandleWhenAuthenticationFails()
@@ -109,19 +103,11 @@ class BasicAuthenticationListenerTest extends TestCase
             $authenticationEntryPoint
         );
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-        $event
-            ->expects($this->once())
-            ->method('setResponse')
-            ->with($this->equalTo($response))
-        ;
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
 
         $listener($event);
+
+        $this->assertSame($response, $event->getResponse());
     }
 
     public function testHandleWithNoUsernameServerParameter()
@@ -141,14 +127,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $this->createMock(AuthenticationEntryPointInterface::class)
         );
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function testHandleWithASimilarAuthenticatedToken()
@@ -177,14 +156,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $this->createMock(AuthenticationEntryPointInterface::class)
         );
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function testItRequiresProviderKey()
@@ -236,18 +208,10 @@ class BasicAuthenticationListenerTest extends TestCase
             $authenticationEntryPoint
         );
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-        $event
-            ->expects($this->once())
-            ->method('setResponse')
-            ->with($this->equalTo($response))
-        ;
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
 
         $listener($event);
+
+        $this->assertSame($response, $event->getResponse());
     }
 }

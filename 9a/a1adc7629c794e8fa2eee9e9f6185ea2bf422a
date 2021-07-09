@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-05T18:46:05Z
+
+Hey!
+
+I think @qurben has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-06T09:25:52Z
+
+`high-deps` build should be fixed when merging. PR ready
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-06T09:55:36Z
+
+> high-deps build should be fixed when merging. PR ready
+
+Actually not: the `^` after the name of the component is a reminder that this is a flipped test: checkout 5.4 and use with patched 6.0 deps.
+
+Merging as is would break 5.4, that's what this tells.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-06T09:56:33Z
+
+Thanks, on it.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-06T12:17:32Z
+
+Should be ok with #42001.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-06T21:20:24Z
+
+Now green
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-07T09:00:47Z
+
+Comments addressed, thanks for the reviews.

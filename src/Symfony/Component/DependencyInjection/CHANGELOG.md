@@ -4,7 +4,8 @@ CHANGELOG
 5.4
 ---
 
-* Add `service_closure()` to the PHP-DSL
+ * Add `service_closure()` to the PHP-DSL
+ * Add support for autoconfigurable attributes on methods, properties and parameters
 
 5.3
 ---

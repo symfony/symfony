@@ -1088,6 +1088,24 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
+    public function testFileLabelIdNotDuplicated()
+    {
+        $form = $this->factory->createNamed('name', FileType::class);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'n/a', 'attr' => ['class' => 'my&class form-control-file'], 'label_attr' => ['id' => 'label-id']],
+'/div
+    [@class="custom-file"]
+    [
+        ./input
+            [@type="file"]
+            [@name="name"]
+        /following-sibling::label
+            [@for="name"][not(@id)]
+    ]
+'
+        );
+    }
+
     public function testFileWithPlaceholder()
     {
         $form = $this->factory->createNamed('name', FileType::class);

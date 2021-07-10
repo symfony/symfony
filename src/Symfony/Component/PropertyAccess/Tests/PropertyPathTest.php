@@ -98,6 +98,13 @@ class PropertyPathTest extends TestCase
         $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
     }
 
+    public function testGetParentWithDotInIndex()
+    {
+        $propertyPath = new PropertyPath('grandpa.parent[child-2.0]');
+
+        $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
+    }
+
     public function testGetParentWhenThereIsNoParent()
     {
         $propertyPath = new PropertyPath('path');

@@ -68,7 +68,7 @@ final class SmsapiTransport extends AbstractTransport
         $responseContent = $response->toArray(false);
 
         if ((isset($responseContent['error']) && null !== $responseContent['error']) || (200 !== $response->getStatusCode())) {
-            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $responseContent['message']), $response);
+            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $responseContent['message'] ?? 'unknown error'), $response);
         }
 
         return new SentMessage($message, (string) $this);

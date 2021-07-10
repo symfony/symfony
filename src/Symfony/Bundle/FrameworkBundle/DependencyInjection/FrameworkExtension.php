@@ -551,10 +551,14 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', [new Reference('logger')]);
 
-        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass $reflectionClass, ?\ReflectionMethod $reflectionMethod): void {
+        // @todo this will produce a fatal error on PHP 7.4 because it doesn't understand unions
+        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
             $tagAttributes = get_object_vars($attribute);
-            if ($reflectionMethod) {
-                $tagAttributes['method'] = $reflectionMethod->getName();
+            if ($reflector instanceof \ReflectionMethod) {
+                if (isset($tagAttributes['method'])) {
+                    throw new LogicException('Cannot set "method" when using AsEventListener on method.');
+                }
+                $tagAttributes['method'] = $reflector->getName();
             }
             $definition->addTag('kernel.event_listener', $tagAttributes);
         });

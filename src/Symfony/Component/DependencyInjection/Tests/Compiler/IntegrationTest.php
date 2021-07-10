@@ -709,7 +709,7 @@ class IntegrationTest extends TestCase
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(
             CustomMethodAttribute::class,
-            static function (ChildDefinition $definition, CustomMethodAttribute $attribute, \ReflectionClass $reflectionClass, \ReflectionMethod $reflectionMethod) {
+            static function (ChildDefinition $definition, CustomMethodAttribute $attribute, \ReflectionMethod $reflectionMethod) {
                 $tagAttributes = get_object_vars($attribute);
                 $tagAttributes['method'] = $reflectionMethod->getName();
 

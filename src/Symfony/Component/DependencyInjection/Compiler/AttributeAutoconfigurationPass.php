@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use LogicException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -20,10 +21,48 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 {
+    private $classAttributes = [];
+    private $methodAttributes = [];
+    private $propertyAttributes = [];
+
     public function process(ContainerBuilder $container): void
     {
         if (80000 > \PHP_VERSION_ID || !$container->getAutoconfiguredAttributes()) {
             return;
+        }
+
+        foreach ($container->getAutoconfiguredAttributes() as $attributeName => $callable) {
+            $callableReflector = new \ReflectionFunction(\Closure::fromCallable($callable));
+            if ($callableReflector->getNumberOfParameters() <= 2) {
+                $this->classAttributes[$attributeName] = $callable;
+                continue;
+            }
+
+            $reflectorParameter = $callableReflector->getParameters()[2];
+            $parameterType = $reflectorParameter->getType();
+            $types = [];
+            if ($parameterType instanceof \ReflectionUnionType) {
+                foreach ($parameterType->getTypes() as $type) {
+                    $types[] = $type->getName();
+                }
+            } else {
+                if ($parameterType === null) {
+                    throw new LogicException('Callable parameter 3 should have a type.');
+                }
+                $types[] = $parameterType->getName();
+            }
+
+            if (in_array(\ReflectionClass::class, $types, true)) {
+                $this->classAttributes[$attributeName] = $callable;
+            }
+
+            if (in_array(\ReflectionMethod::class, $types, true)) {
+                $this->methodAttributes[$attributeName] = $callable;
+            }
+
+            if (in_array(\ReflectionProperty::class, $types, true)) {
+                $this->propertyAttributes[$attributeName] = $callable;
+            }
         }
 
         parent::process($container);
@@ -35,28 +74,46 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
             || !$value->isAutoconfigured()
             || $value->isAbstract()
             || $value->hasTag('container.ignore_attributes')
-            || !($reflector = $this->container->getReflectionClass($value->getClass(), false))
+            || !($classReflector = $this->container->getReflectionClass($value->getClass(), false))
         ) {
             return parent::processValue($value, $isRoot);
         }
 
-        $autoconfiguredAttributes = $this->container->getAutoconfiguredAttributes();
         $instanceof = $value->getInstanceofConditionals();
-        $conditionals = $instanceof[$reflector->getName()] ?? new ChildDefinition('');
-        foreach ($reflector->getAttributes() as $attribute) {
-            if ($configurator = $autoconfiguredAttributes[$attribute->getName()] ?? null) {
-                $configurator($conditionals, $attribute->newInstance(), $reflector);
-            }
-        }
-        foreach ($reflector->getMethods() as $method) {
-            foreach ($method->getAttributes() as $attribute) {
-                if ($configurator = $autoconfiguredAttributes[$attribute->getName()] ?? null) {
-                    $configurator($conditionals, $attribute->newInstance(), $reflector, $method);
+        $conditionals = $instanceof[$classReflector->getName()] ?? new ChildDefinition('');
+
+        if (count($this->classAttributes) > 0) {
+            foreach ($classReflector->getAttributes() as $attribute) {
+                if ($configurator = $this->classAttributes[$attribute->getName()] ?? null) {
+                    $configurator($conditionals, $attribute->newInstance(), $classReflector);
                 }
             }
         }
-        if (!isset($instanceof[$reflector->getName()]) && new ChildDefinition('') != $conditionals) {
-            $instanceof[$reflector->getName()] = $conditionals;
+
+        if (count($this->methodAttributes) > 0) {
+            foreach ($classReflector->getMethods(\ReflectionMethod::IS_PUBLIC & ~\ReflectionMethod::IS_STATIC) as $methodReflector) {
+                foreach ($methodReflector->getAttributes() as $attribute) {
+                    if ($configurator = $this->methodAttributes[$attribute->getName()] ?? null) {
+                        $configurator($conditionals, $attribute->newInstance(), $methodReflector);
+                    }
+                }
+            }
+        }
+
+        if (count($this->propertyAttributes) > 0) {
+            foreach ($classReflector->getProperties(~\ReflectionProperty::IS_STATIC) as $propertyReflector) {
+                foreach ($propertyReflector->getAttributes() as $attribute) {
+                    if ($configurator = $this->propertyAttributes[$attribute->getName()] ?? null) {
+                        $configurator($conditionals, $attribute->newInstance(), $propertyReflector);
+                    }
+                }
+            }
+        }
+
+        // @todo parameters... on what? Constructor or all methods?
+
+        if (!isset($instanceof[$classReflector->getName()]) && new ChildDefinition('') != $conditionals) {
+            $instanceof[$classReflector->getName()] = $conditionals;
             $value->setInstanceofConditionals($instanceof);
         }
 

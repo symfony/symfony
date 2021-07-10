@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use LogicException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -21,9 +20,10 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 {
-    private $classAttributes = [];
-    private $methodAttributes = [];
-    private $propertyAttributes = [];
+    private $classAttributeConfigurators = [];
+    private $methodAttributeConfigurators = [];
+    private $propertyAttributeConfigurators = [];
+    private $parameterAttributeConfigurators = [];
 
     public function process(ContainerBuilder $container): void
     {
@@ -34,7 +34,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         foreach ($container->getAutoconfiguredAttributes() as $attributeName => $callable) {
             $callableReflector = new \ReflectionFunction(\Closure::fromCallable($callable));
             if ($callableReflector->getNumberOfParameters() <= 2) {
-                $this->classAttributes[$attributeName] = $callable;
+                $this->classAttributeConfigurators[$attributeName] = $callable;
                 continue;
             }
 
@@ -45,23 +45,31 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
                 foreach ($parameterType->getTypes() as $type) {
                     $types[] = $type->getName();
                 }
-            } else {
-                if ($parameterType === null) {
-                    throw new LogicException('Callable parameter 3 should have a type.');
-                }
+            } elseif($parameterType instanceof \ReflectionNamedType) {
                 $types[] = $parameterType->getName();
+            } else {
+                $types = [
+                    \ReflectionClass::class,
+                    \ReflectionMethod::class,
+                    \ReflectionProperty::class,
+                    \ReflectionParameter::class,
+                ];
             }
 
             if (in_array(\ReflectionClass::class, $types, true)) {
-                $this->classAttributes[$attributeName] = $callable;
+                $this->classAttributeConfigurators[$attributeName] = $callable;
             }
 
             if (in_array(\ReflectionMethod::class, $types, true)) {
-                $this->methodAttributes[$attributeName] = $callable;
+                $this->methodAttributeConfigurators[$attributeName] = $callable;
             }
 
             if (in_array(\ReflectionProperty::class, $types, true)) {
-                $this->propertyAttributes[$attributeName] = $callable;
+                $this->propertyAttributeConfigurators[$attributeName] = $callable;
+            }
+
+            if (in_array(\ReflectionParameter::class, $types, true)) {
+                $this->parameterAttributeConfigurators[$attributeName] = $callable;
             }
         }
 
@@ -82,35 +90,70 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         $instanceof = $value->getInstanceofConditionals();
         $conditionals = $instanceof[$classReflector->getName()] ?? new ChildDefinition('');
 
-        if (count($this->classAttributes) > 0) {
+        if ($this->classAttributeConfigurators) {
             foreach ($classReflector->getAttributes() as $attribute) {
-                if ($configurator = $this->classAttributes[$attribute->getName()] ?? null) {
+                if ($configurator = $this->classAttributeConfigurators[$attribute->getName()] ?? null) {
                     $configurator($conditionals, $attribute->newInstance(), $classReflector);
                 }
             }
         }
 
-        if (count($this->methodAttributes) > 0) {
-            foreach ($classReflector->getMethods(\ReflectionMethod::IS_PUBLIC & ~\ReflectionMethod::IS_STATIC) as $methodReflector) {
+        if ($this->methodAttributeConfigurators || $this->parameterAttributeConfigurators) {
+            foreach ($classReflector->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodReflector) {
+                if ($methodReflector->isStatic() || $methodReflector->isConstructor() || $methodReflector->isDestructor()) {
+                    continue;
+                }
+
                 foreach ($methodReflector->getAttributes() as $attribute) {
-                    if ($configurator = $this->methodAttributes[$attribute->getName()] ?? null) {
+                    if ($configurator = $this->methodAttributeConfigurators[$attribute->getName()] ?? null) {
                         $configurator($conditionals, $attribute->newInstance(), $methodReflector);
+                    }
+                }
+
+                if ($this->parameterAttributeConfigurators) {
+                    foreach($methodReflector->getParameters() as $parameterReflector) {
+                        foreach ($parameterReflector->getAttributes() as $attribute) {
+                            if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
+                                $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
+                            }
+                        }
+                    }
+                }
+            }
+
+            $constructorReflector = $this->getConstructor($value, false);
+            if ($constructorReflector) {
+                foreach ($constructorReflector->getAttributes() as $attribute) {
+                    if ($configurator = $this->methodAttributeConfigurators[$attribute->getName()] ?? null) {
+                        $configurator($conditionals, $attribute->newInstance(), $constructorReflector);
+                    }
+                }
+
+                if ($this->parameterAttributeConfigurators) {
+                    foreach($constructorReflector->getParameters() as $parameterReflector) {
+                        foreach ($parameterReflector->getAttributes() as $attribute) {
+                            if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
+                                $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
+                            }
+                        }
                     }
                 }
             }
         }
 
-        if (count($this->propertyAttributes) > 0) {
-            foreach ($classReflector->getProperties(~\ReflectionProperty::IS_STATIC) as $propertyReflector) {
+        if ($this->propertyAttributeConfigurators) {
+            foreach ($classReflector->getProperties(\ReflectionProperty::IS_PUBLIC) as $propertyReflector) {
+                if ($propertyReflector->isStatic()) {
+                    continue;
+                }
+
                 foreach ($propertyReflector->getAttributes() as $attribute) {
-                    if ($configurator = $this->propertyAttributes[$attribute->getName()] ?? null) {
+                    if ($configurator = $this->propertyAttributeConfigurators[$attribute->getName()] ?? null) {
                         $configurator($conditionals, $attribute->newInstance(), $propertyReflector);
                     }
                 }
             }
         }
-
-        // @todo parameters... on what? Constructor or all methods?
 
         if (!isset($instanceof[$classReflector->getName()]) && new ChildDefinition('') != $conditionals) {
             $instanceof[$classReflector->getName()] = $conditionals;

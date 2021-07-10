@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER|\Attribute::TARGET_PROPERTY)]
+#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 final class Target
 {
     /**
@@ -31,7 +31,7 @@ final class Target
         $this->name = lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $name))));
     }
 
-    public static function parseName(\ReflectionParameter|\ReflectionProperty $reflector): string
+    public static function parseName(\ReflectionParameter | \ReflectionProperty $reflector): string
     {
         if (80000 > \PHP_VERSION_ID || !$target = $reflector->getAttributes(self::class)[0] ?? null) {
             return $reflector->name;

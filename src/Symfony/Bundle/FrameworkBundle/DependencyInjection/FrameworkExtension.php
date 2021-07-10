@@ -554,11 +554,11 @@ class FrameworkExtension extends Extension
         if (\PHP_VERSION_ID >= 80000) {
             $container->registerAttributeForAutoconfiguration(AsEventListener::class, eval(
                 <<<'PHP'
-                return static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+                return static function (\Symfony\Component\DependencyInjection\ChildDefinition $definition, \Symfony\Component\EventDispatcher\Attribute\AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
                     $tagAttributes = get_object_vars($attribute);
                     if ($reflector instanceof \ReflectionMethod) {
                         if (isset($tagAttributes['method'])) {
-                            throw new LogicException(sprintf('You should not set method when using AsEventListener attribute on method "%s" in "%s".', $reflector->getName(), $definition->getClass()));
+                            throw new \LogicException(sprintf('You should not set method when using AsEventListener attribute on method "%s" in "%s".', $reflector->getName(), $definition->getClass()));
                         }
                         $tagAttributes['method'] = $reflector->getName();
                     }

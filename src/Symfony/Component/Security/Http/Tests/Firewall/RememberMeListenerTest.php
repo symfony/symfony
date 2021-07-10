@@ -48,7 +48,7 @@ class RememberMeListenerTest extends TestCase
             ->method('setToken')
         ;
 
-        $this->assertNull($listener($this->getRequestEvent()));
+        $this->assertNull($listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST)));
     }
 
     public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
@@ -67,9 +67,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn(null)
         ;
 
-        $event = $this->getRequestEvent();
-
-        $this->assertNull($listener($event));
+        $this->assertNull($listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST)));
     }
 
     public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
@@ -102,9 +100,7 @@ class RememberMeListenerTest extends TestCase
             ->willThrowException($exception)
         ;
 
-        $event = $this->getRequestEvent($request);
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation()
@@ -137,9 +133,7 @@ class RememberMeListenerTest extends TestCase
             ->willThrowException($exception)
         ;
 
-        $event = $this->getRequestEvent();
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function testOnCoreSecurityAuthenticationExceptionDuringAutoLoginTriggersLoginFail()
@@ -169,9 +163,7 @@ class RememberMeListenerTest extends TestCase
             ->method('authenticate')
         ;
 
-        $event = $this->getRequestEvent();
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function testOnCoreSecurity()
@@ -203,9 +195,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        $event = $this->getRequestEvent();
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function testSessionStrategy()
@@ -247,15 +237,13 @@ class RememberMeListenerTest extends TestCase
         $request = new Request();
         $request->setSession($session);
 
-        $event = $this->getRequestEvent($request);
-
         $sessionStrategy
             ->expects($this->once())
             ->method('onAuthentication')
             ->willReturn(null)
         ;
 
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function testSessionIsMigratedByDefault()
@@ -301,9 +289,7 @@ class RememberMeListenerTest extends TestCase
         $request = new Request();
         $request->setSession($session);
 
-        $event = $this->getRequestEvent($request);
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function testOnCoreSecurityInteractiveLoginEventIsDispatchedIfDispatcherIsPresent()
@@ -335,8 +321,6 @@ class RememberMeListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        $event = $this->getRequestEvent();
-
         $dispatcher
             ->expects($this->once())
             ->method('dispatch')
@@ -346,23 +330,7 @@ class RememberMeListenerTest extends TestCase
             )
         ;
 
-        $listener($event);
-    }
-
-    protected function getRequestEvent(Request $request = null): RequestEvent
-    {
-        $request = $request ?? new Request();
-
-        $event = $this->getMockBuilder(RequestEvent::class)
-            ->setConstructorArgs([$this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST])
-            ->getMock();
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-
-        return $event;
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 
     protected function getListener($withDispatcher = false, $catchExceptions = true, $withSessionStrategy = false)

@@ -48,12 +48,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
             } elseif ($parameterType instanceof \ReflectionNamedType) {
                 $types[] = $parameterType->getName();
             } else {
-                $types = [
-                    \ReflectionClass::class,
-                    \ReflectionMethod::class,
-                    \ReflectionProperty::class,
-                    \ReflectionParameter::class,
-                ];
+                throw new \LogicException('Callable passed to registerAttributeForAutoconfiguration() should have a type for parameter #3. Use one or more of the following types: \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter.');
             }
 
             if (\in_array(\ReflectionClass::class, $types, true)) {
@@ -101,12 +96,6 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         if ($this->methodAttributeConfigurators || $this->parameterAttributeConfigurators) {
             $constructorReflector = $this->getConstructor($value, false);
             if ($constructorReflector) {
-                foreach ($constructorReflector->getAttributes() as $attribute) {
-                    if ($configurator = $this->methodAttributeConfigurators[$attribute->getName()] ?? null) {
-                        $configurator($conditionals, $attribute->newInstance(), $constructorReflector);
-                    }
-                }
-
                 if ($this->parameterAttributeConfigurators) {
                     foreach ($constructorReflector->getParameters() as $parameterReflector) {
                         foreach ($parameterReflector->getAttributes() as $attribute) {
@@ -123,9 +112,11 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
                     continue;
                 }
 
-                foreach ($methodReflector->getAttributes() as $attribute) {
-                    if ($configurator = $this->methodAttributeConfigurators[$attribute->getName()] ?? null) {
-                        $configurator($conditionals, $attribute->newInstance(), $methodReflector);
+                if ($this->methodAttributeConfigurators) {
+                    foreach ($methodReflector->getAttributes() as $attribute) {
+                        if ($configurator = $this->methodAttributeConfigurators[$attribute->getName()] ?? null) {
+                            $configurator($conditionals, $attribute->newInstance(), $methodReflector);
+                        }
                     }
                 }
 

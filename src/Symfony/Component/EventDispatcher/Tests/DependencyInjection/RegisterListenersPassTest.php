@@ -290,7 +290,7 @@ class RegisterListenersPassTest extends TestCase
             self::markTestSkipped('This test requires Symfony DependencyInjection >= 5.3');
         }
 
-    $container = new ContainerBuilder();
+        $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(AsEventListener::class, eval(<<<'PHP'
             return static function (\Symfony\Component\DependencyInjection\ChildDefinition $definition, \Symfony\Component\EventDispatcher\Attribute\AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
                 $tagAttributes = get_object_vars($attribute);

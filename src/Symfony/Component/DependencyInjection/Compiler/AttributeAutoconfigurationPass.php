@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * @author Alexander M. Turek <me@derrabus.de>
@@ -48,7 +49,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
             } elseif ($parameterType instanceof \ReflectionNamedType) {
                 $types[] = $parameterType->getName();
             } else {
-                throw new \LogicException('Callable passed to registerAttributeForAutoconfiguration() should have a type for parameter #3. Use one or more of the following types: \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter.');
+                throw new LogicException('Callable passed to registerAttributeForAutoconfiguration() should have a type for parameter #3. Use one or more of the following types: \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter.');
             }
 
             if (\in_array(\ReflectionClass::class, $types, true)) {
@@ -93,20 +94,17 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
             }
         }
 
-        if ($this->methodAttributeConfigurators || $this->parameterAttributeConfigurators) {
-            $constructorReflector = $this->getConstructor($value, false);
-            if ($constructorReflector) {
-                if ($this->parameterAttributeConfigurators) {
-                    foreach ($constructorReflector->getParameters() as $parameterReflector) {
-                        foreach ($parameterReflector->getAttributes() as $attribute) {
-                            if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
-                                $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
-                            }
-                        }
+        if ($this->parameterAttributeConfigurators && $constructorReflector = $this->getConstructor($value, false)) {
+            foreach ($constructorReflector->getParameters() as $parameterReflector) {
+                foreach ($parameterReflector->getAttributes() as $attribute) {
+                    if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
+                        $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
                     }
                 }
             }
+        }
 
+        if ($this->methodAttributeConfigurators || $this->parameterAttributeConfigurators) {
             foreach ($classReflector->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodReflector) {
                 if ($methodReflector->isStatic() || $methodReflector->isConstructor() || $methodReflector->isDestructor()) {
                     continue;

@@ -1,0 +1,4 @@
+main:
+    path: /
+    defaults:
+        _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\NotFoundAccessDeniedController

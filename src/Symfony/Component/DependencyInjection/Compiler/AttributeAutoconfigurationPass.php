@@ -99,6 +99,25 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         }
 
         if ($this->methodAttributeConfigurators || $this->parameterAttributeConfigurators) {
+            $constructorReflector = $this->getConstructor($value, false);
+            if ($constructorReflector) {
+                foreach ($constructorReflector->getAttributes() as $attribute) {
+                    if ($configurator = $this->methodAttributeConfigurators[$attribute->getName()] ?? null) {
+                        $configurator($conditionals, $attribute->newInstance(), $constructorReflector);
+                    }
+                }
+
+                if ($this->parameterAttributeConfigurators) {
+                    foreach ($constructorReflector->getParameters() as $parameterReflector) {
+                        foreach ($parameterReflector->getAttributes() as $attribute) {
+                            if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
+                                $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
+                            }
+                        }
+                    }
+                }
+            }
+
             foreach ($classReflector->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodReflector) {
                 if ($methodReflector->isStatic() || $methodReflector->isConstructor() || $methodReflector->isDestructor()) {
                     continue;
@@ -112,25 +131,6 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 
                 if ($this->parameterAttributeConfigurators) {
                     foreach ($methodReflector->getParameters() as $parameterReflector) {
-                        foreach ($parameterReflector->getAttributes() as $attribute) {
-                            if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
-                                $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
-                            }
-                        }
-                    }
-                }
-            }
-
-            $constructorReflector = $this->getConstructor($value, false);
-            if ($constructorReflector) {
-                foreach ($constructorReflector->getAttributes() as $attribute) {
-                    if ($configurator = $this->methodAttributeConfigurators[$attribute->getName()] ?? null) {
-                        $configurator($conditionals, $attribute->newInstance(), $constructorReflector);
-                    }
-                }
-
-                if ($this->parameterAttributeConfigurators) {
-                    foreach ($constructorReflector->getParameters() as $parameterReflector) {
                         foreach ($parameterReflector->getAttributes() as $attribute) {
                             if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
                                 $configurator($conditionals, $attribute->newInstance(), $parameterReflector);

@@ -194,7 +194,7 @@ class ResponseTest extends ResponseTestCase
         $etagTwo = 'randomly_generated_etag_2';
 
         $request = new Request();
-        $request->headers->set('if_none_match', sprintf('%s, %s, %s', $etagOne, $etagTwo, 'etagThree'));
+        $request->headers->set('If-None-Match', sprintf('%s, %s, %s', $etagOne, $etagTwo, 'etagThree'));
 
         $response = new Response();
 
@@ -206,6 +206,38 @@ class ResponseTest extends ResponseTestCase
 
         $response->headers->set('ETag', '');
         $this->assertFalse($response->isNotModified($request));
+
+        // Test wildcard
+        $request = new Request();
+        $request->headers->set('If-None-Match', '*');
+
+        $response->headers->set('ETag', $etagOne);
+        $this->assertTrue($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedWeakEtag()
+    {
+        $etag = 'randomly_generated_etag';
+        $weakEtag = 'W/randomly_generated_etag';
+
+        $request = new Request();
+        $request->headers->set('If-None-Match', $etag);
+        $response = new Response();
+
+        $response->headers->set('ETag', $etag);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', $weakEtag);
+        $this->assertTrue($response->isNotModified($request));
+
+        $request->headers->set('If-None-Match', $weakEtag);
+        $response = new Response();
+
+        $response->headers->set('ETag', $etag);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', $weakEtag);
+        $this->assertTrue($response->isNotModified($request));
     }
 
     public function testIsNotModifiedLastModifiedAndEtag()
@@ -216,14 +248,14 @@ class ResponseTest extends ResponseTestCase
         $etag = 'randomly_generated_etag';
 
         $request = new Request();
-        $request->headers->set('if_none_match', sprintf('%s, %s', $etag, 'etagThree'));
+        $request->headers->set('If-None-Match', sprintf('%s, %s', $etag, 'etagThree'));
         $request->headers->set('If-Modified-Since', $modified);
 
         $response = new Response();
 
         $response->headers->set('ETag', $etag);
         $response->headers->set('Last-Modified', $after);
-        $this->assertFalse($response->isNotModified($request));
+        $this->assertTrue($response->isNotModified($request));
 
         $response->headers->set('ETag', 'non-existent-etag');
         $response->headers->set('Last-Modified', $before);
@@ -240,7 +272,7 @@ class ResponseTest extends ResponseTestCase
         $etag = 'randomly_generated_etag';
 
         $request = new Request();
-        $request->headers->set('if_none_match', sprintf('%s, %s', $etag, 'etagThree'));
+        $request->headers->set('If-None-Match', sprintf('%s, %s', $etag, 'etagThree'));
         $request->headers->set('If-Modified-Since', $modified);
 
         $response = new Response();

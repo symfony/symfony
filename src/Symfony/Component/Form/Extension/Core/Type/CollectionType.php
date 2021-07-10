@@ -45,7 +45,8 @@ class CollectionType extends AbstractType
             $options['entry_options'],
             $options['allow_add'],
             $options['allow_delete'],
-            $options['delete_empty']
+            $options['delete_empty'],
+            $options['keep_as_list']
         );
 
         $builder->addEventSubscriber($resizeListener);
@@ -126,10 +127,12 @@ class CollectionType extends AbstractType
                     ? $previousValue
                     : 'The collection is invalid.';
             },
+            'keep_as_list' => false,
         ]);
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
         $resolver->setAllowedTypes('delete_empty', ['bool', 'callable']);
+        $resolver->setAllowedTypes('keep_as_list', ['bool']);
     }
 
     /**

@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetOnPromotedProperty;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
@@ -197,6 +198,21 @@ class ResolveBindingsPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('with_target', WithTarget::class)
+            ->setBindings([BarInterface::class.' $imageStorage' => new Reference('bar')]);
+
+        (new ResolveBindingsPass())->process($container);
+
+        $this->assertSame('bar', (string) $container->getDefinition('with_target')->getArgument(0));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testBindWithTargetOnPromotedProperty()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('with_target', WithTargetOnPromotedProperty::class)
             ->setBindings([BarInterface::class.' $imageStorage' => new Reference('bar')]);
 
         (new ResolveBindingsPass())->process($container);

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Allow `#[Target]` to be used with constructor property promotion
+
 5.3
 ---
 

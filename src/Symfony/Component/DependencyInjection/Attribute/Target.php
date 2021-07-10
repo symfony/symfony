@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PARAMETER|\Attribute::TARGET_PROPERTY)]
 final class Target
 {
     /**
@@ -31,22 +31,22 @@ final class Target
         $this->name = lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $name))));
     }
 
-    public static function parseName(\ReflectionParameter $parameter): string
+    public static function parseName(\ReflectionParameter|\ReflectionProperty $reflector): string
     {
-        if (80000 > \PHP_VERSION_ID || !$target = $parameter->getAttributes(self::class)[0] ?? null) {
-            return $parameter->name;
+        if (80000 > \PHP_VERSION_ID || !$target = $reflector->getAttributes(self::class)[0] ?? null) {
+            return $reflector->name;
         }
 
         $name = $target->newInstance()->name;
 
         if (!preg_match('/^[a-zA-Z_\x7f-\xff]/', $name)) {
-            if (($function = $parameter->getDeclaringFunction()) instanceof \ReflectionMethod) {
+            if (($function = $reflector->getDeclaringFunction()) instanceof \ReflectionMethod) {
                 $function = $function->class.'::'.$function->name;
             } else {
                 $function = $function->name;
             }
 
-            throw new InvalidArgumentException(sprintf('Invalid #[Target] name "%s" on parameter "$%s" of "%s()": the first character must be a letter.', $name, $parameter->name, $function));
+            throw new InvalidArgumentException(sprintf('Invalid #[Target] name "%s" on parameter "$%s" of "%s()": the first character must be a letter.', $name, $reflector->name, $function));
         }
 
         return $name;

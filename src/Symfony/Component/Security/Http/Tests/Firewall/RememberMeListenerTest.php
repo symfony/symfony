@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -361,11 +360,6 @@ class RememberMeListenerTest extends TestCase
         ;
 
         return $event;
-    }
-
-    protected function getResponseEvent(): ResponseEvent
-    {
-        return $this->createMock(ResponseEvent::class);
     }
 
     protected function getListener($withDispatcher = false, $catchExceptions = true, $withSessionStrategy = false)

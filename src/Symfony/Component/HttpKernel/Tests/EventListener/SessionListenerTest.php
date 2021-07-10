@@ -61,9 +61,7 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $listener = new SessionListener($container);
 
-        $event = $this->createMock(RequestEvent::class);
-        $event->expects($this->exactly(2))->method('isMasterRequest')->willReturn(true);
-        $event->expects($this->once())->method('getRequest')->willReturn($request);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
 
         $listener->onKernelRequest($event);
 

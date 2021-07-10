@@ -78,14 +78,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             ['require_previous_session' => false]
         );
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     /**

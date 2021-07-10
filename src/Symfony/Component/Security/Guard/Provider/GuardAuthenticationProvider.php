@@ -93,7 +93,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
             // this should never happen - but technically, the token is
             // authenticated... so it could just be returned
-            if ($token->isAuthenticated()) {
+            if ($token->isAuthenticated(false)) {
                 return $token;
             }
 

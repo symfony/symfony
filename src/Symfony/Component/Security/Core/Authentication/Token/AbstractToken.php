@@ -99,7 +99,12 @@ abstract class AbstractToken implements TokenInterface
             throw new \InvalidArgumentException('$user must be an instanceof UserInterface, an object implementing a __toString method, or a primitive string.');
         }
 
-        if (null === $this->user) {
+        // @deprecated since Symfony 5.4, remove the whole block if/elseif/else block in 6.0
+        if (1 < \func_num_args() && !func_get_arg(1)) {
+            // ContextListener checks if the user has changed on its own and calls `setAuthenticated()` subsequently,
+            // avoid doing the same checks twice
+            $changed = false;
+        } elseif (null === $this->user) {
             $changed = false;
         } elseif ($this->user instanceof UserInterface) {
             if (!$user instanceof UserInterface) {
@@ -113,8 +118,9 @@ abstract class AbstractToken implements TokenInterface
             $changed = (string) $this->user !== (string) $user;
         }
 
+        // @deprecated since Symfony 5.4
         if ($changed) {
-            $this->setAuthenticated(false);
+            $this->setAuthenticated(false, false);
         }
 
         $this->user = $user;
@@ -122,9 +128,15 @@ abstract class AbstractToken implements TokenInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since Symfony 5.4
      */
     public function isAuthenticated()
     {
+        if (1 > \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/security-core', '5.4', 'Method "%s()" is deprecated. In version 6.0, security tokens won\'t have an "authenticated" flag anymore and will always be considered authenticated.', __METHOD__);
+        }
+
         return $this->authenticated;
     }
 
@@ -133,6 +145,10 @@ abstract class AbstractToken implements TokenInterface
      */
     public function setAuthenticated(bool $authenticated)
     {
+        if (2 > \func_num_args() || func_get_arg(1)) {
+            trigger_deprecation('symfony/security-core', '5.4', 'Method "%s()" is deprecated. In version 6.0, security tokens won\'t have an "authenticated" state anymore and will always be considered as authenticated.', __METHOD__);
+        }
+
         $this->authenticated = $authenticated;
     }
 
@@ -275,6 +291,9 @@ abstract class AbstractToken implements TokenInterface
         $this->__unserialize(\is_array($serialized) ? $serialized : unserialize($serialized));
     }
 
+    /**
+     * @deprecated since Symfony 5.4
+     */
     private function hasUserChanged(UserInterface $user): bool
     {
         if (!($this->user instanceof UserInterface)) {

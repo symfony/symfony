@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -45,12 +46,16 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $token = $this->createMock(TokenInterface::class);
-        $token
-            ->expects($this->any())
-            ->method('isAuthenticated')
-            ->willReturn(true)
-        ;
+        $token = new class extends AbstractToken {
+            public function isAuthenticated(): bool
+            {
+                return true;
+            }
+
+            public function getCredentials()
+            {
+            }
+        };
 
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage
@@ -79,6 +84,9 @@ class AccessListenerTest extends TestCase
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
+    /**
+     * @group legacy
+     */
     public function testHandleWhenTheTokenIsNotAuthenticated()
     {
         $request = new Request();

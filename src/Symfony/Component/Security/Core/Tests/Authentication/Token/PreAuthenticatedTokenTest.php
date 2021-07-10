@@ -18,11 +18,7 @@ class PreAuthenticatedTokenTest extends TestCase
 {
     public function testConstructor()
     {
-        $token = new PreAuthenticatedToken('foo', 'bar', 'key');
-        $this->assertFalse($token->isAuthenticated());
-
         $token = new PreAuthenticatedToken('foo', 'bar', 'key', ['ROLE_FOO']);
-        $this->assertTrue($token->isAuthenticated());
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertEquals('key', $token->getFirewallName());
     }
@@ -44,5 +40,14 @@ class PreAuthenticatedTokenTest extends TestCase
         $token = new PreAuthenticatedToken('foo', 'bar', 'key');
         $token->eraseCredentials();
         $this->assertEquals('', $token->getCredentials());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testIsAuthenticated()
+    {
+        $token = new PreAuthenticatedToken('foo', 'bar', 'key');
+        $this->assertFalse($token->isAuthenticated());
     }
 }

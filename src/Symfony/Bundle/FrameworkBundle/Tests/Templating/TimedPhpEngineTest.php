@@ -16,7 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Component\Stopwatch\StopwatchEvent;
 use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\TemplateNameParserInterface;
@@ -34,18 +33,15 @@ class TimedPhpEngineTest extends TestCase
         $globalVariables = $this->getGlobalVariables();
         $loader = $this->getLoader($this->getStorage());
 
-        $stopwatch = $this->getStopwatch();
-        $stopwatchEvent = $this->getStopwatchEvent();
-
-        $stopwatch->expects($this->once())
-            ->method('start')
-            ->with('template.php (index.php)', 'template')
-            ->willReturn($stopwatchEvent);
-
-        $stopwatchEvent->expects($this->once())->method('stop');
+        $stopwatch = new Stopwatch();
 
         $engine = new TimedPhpEngine($templateNameParser, $container, $loader, $stopwatch, $globalVariables);
         $engine->render('index.php');
+
+        $sections = $stopwatch->getSections();
+
+        $this->assertCount(1, $sections);
+        $this->assertCount(1, reset($sections)->getEvents());
     }
 
     private function getTemplateNameParser(): TemplateNameParserInterface
@@ -82,15 +78,5 @@ class TimedPhpEngineTest extends TestCase
             ->willReturn($storage);
 
         return $loader;
-    }
-
-    private function getStopwatchEvent(): StopwatchEvent
-    {
-        return $this->createMock(StopwatchEvent::class);
-    }
-
-    private function getStopwatch(): Stopwatch
-    {
-        return $this->createMock(Stopwatch::class);
     }
 }

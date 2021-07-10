@@ -558,7 +558,7 @@ class FrameworkExtension extends Extension
                     $tagAttributes = get_object_vars($attribute);
                     if ($reflector instanceof \ReflectionMethod) {
                         if (isset($tagAttributes['method'])) {
-                            throw new LogicException('Cannot set "method" when using AsEventListener on method.');
+                            throw new LogicException(sprintf('You should not set method when using AsEventListener attribute on method "%s" in "%s".', $reflector->getName(), $definition->getClass()));
                         }
                         $tagAttributes['method'] = $reflector->getName();
                     }

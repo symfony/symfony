@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\ProcessStream;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -99,6 +100,18 @@ class SendmailTransport extends AbstractTransport
 
         $this->stream->setCommand($command);
         $this->stream->initialize();
+        if (false !== strpos($command, ' -t')) {
+            $email = $message->getOriginalMessage();
+            if ($email instanceof Email) {
+                foreach ($email->getBcc() as $recipient) {
+                    $this->stream->write('Bcc:'.$recipient->toString()."\n");
+                }
+            } else {
+                foreach ($message->getEnvelope()->getRecipients() as $recipient) {
+                    $this->stream->write('Bcc:'.$recipient->toString()."\n");
+                }
+            }
+        }
         foreach ($chunks as $chunk) {
             $this->stream->write($chunk);
         }

@@ -494,7 +494,7 @@ YAML;
         $data = [
             'foo' => new TaggedValue('bar', "foo\nline with trailing spaces:\n  \nbar\ninteger like line:\n123456789\nempty line:\n\nbaz"),
         ];
-        $expected = "foo: !bar |\n".
+        $expected = "foo: !bar |-\n".
             "    foo\n".
             "    line with trailing spaces:\n".
             "      \n".
@@ -502,7 +502,7 @@ YAML;
             "    integer like line:\n".
             "    123456789\n".
             "    empty line:\n".
-            "    \n".
+            "\n".
             '    baz';
 
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
@@ -553,6 +553,21 @@ YAML;
         $this->assertSame("- \"a\\r\\nb\\nc\"\n", $this->dumper->dump(["a\r\nb\nc"], 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
+    public function testCarriageReturnNotFollowedByNewlineIsPreservedWhenDumpingTaggedValueAsMultiLineLiteralBlock()
+    {
+        $expected = <<<'YAML'
+parent:
+    foo: !my-tag "bar\n\rbaz: qux"
+
+YAML;
+
+        $this->assertSame($expected, $this->dumper->dump([
+            'parent' => [
+                'foo' => new TaggedValue('my-tag', "bar\n\rbaz: qux"),
+            ],
+        ], 4, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+
     public function testCarriageReturnNotFollowedByNewlineIsPreservedWhenDumpingAsMultiLineLiteralBlock()
     {
         $expected = <<<'YAML'
@@ -580,15 +595,37 @@ YAML;
         $this->assertSame($data, Yaml::parse($yaml));
     }
 
+    public function testDumpTrailingNewlineInMultiLineLiteralBlocksForTaggedValues()
+    {
+        $data = [
+            'clip 1' => new TaggedValue('my-tag', "one\ntwo\n"),
+            'keep 1' => new TaggedValue('my-tag', "one\ntwo\n\n"),
+            'strip 1' => new TaggedValue('my-tag', "one\ntwo"),
+        ];
+        $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        $expected = <<<YAML
+'clip 1': !my-tag |
+    one
+    two
+'keep 1': !my-tag |+
+    one
+    two
+
+'strip 1': !my-tag |-
+    one
+    two
+YAML;
+
+        $this->assertSame($expected, $yaml);
+    }
+
     public function testDumpTrailingNewlineInMultiLineLiteralBlocks()
     {
         $data = [
             'clip 1' => "one\ntwo\n",
-            'clip 2' => "one\ntwo\n",
-            'keep 1' => "one\ntwo\n",
-            'keep 2' => "one\ntwo\n\n",
+            'keep 1' => "one\ntwo\n\n",
             'strip 1' => "one\ntwo",
-            'strip 2' => "one\ntwo",
         ];
         $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 
@@ -596,20 +633,11 @@ YAML;
 'clip 1': |
     one
     two
-'clip 2': |
-    one
-    two
-'keep 1': |
-    one
-    two
-'keep 2': |+
+'keep 1': |+
     one
     two
 
 'strip 1': |-
-    one
-    two
-'strip 2': |-
     one
     two
 YAML;

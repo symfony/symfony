@@ -77,7 +77,9 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         $managerDefs = [];
         foreach ($taggedSubscribers as $taggedSubscriber) {
             [$id, $tag] = $taggedSubscriber;
-            $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
+            $connections = isset($tag['connection'])
+                ? [$container->getParameterBag()->resolveValue($tag['connection'])]
+                : array_keys($this->connections);
             foreach ($connections as $con) {
                 if (!isset($this->connections[$con])) {
                     throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: "%s".', $con, $id, implode('", "', array_keys($this->connections))));
@@ -117,7 +119,9 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
             }
 
-            $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
+            $connections = isset($tag['connection'])
+                ? [$container->getParameterBag()->resolveValue($tag['connection'])]
+                : array_keys($this->connections);
             foreach ($connections as $con) {
                 if (!isset($this->connections[$con])) {
                     throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: "%s".', $con, $id, implode('", "', array_keys($this->connections))));

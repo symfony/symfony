@@ -168,13 +168,13 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
     {
         $envelope = new Envelope(new DummyMessage('original envelope'));
 
+        $sender1 = $this->createMock(SenderInterface::class);
+        $sender2 = $this->createMock(SenderInterface::class);
+
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(new SendMessageToTransportsEvent($envelope));
-
-        $sender1 = $this->createMock(SenderInterface::class);
-        $sender2 = $this->createMock(SenderInterface::class);
+            ->with(new SendMessageToTransportsEvent($envelope->with(new SentStamp(\get_class($sender1), 'foo'))));
 
         $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['foo', 'bar']], ['foo' => $sender1, 'bar' => $sender2]);
         $middleware = new SendMessageMiddleware($sendersLocator, $dispatcher);

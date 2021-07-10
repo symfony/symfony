@@ -58,6 +58,7 @@ class SendMessageMiddleware implements MiddlewareInterface
         } else {
             $shouldDispatchEvent = true;
             foreach ($this->sendersLocator->getSenders($envelope) as $alias => $sender) {
+                $envelope = $envelope->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null));
                 if (null !== $this->eventDispatcher && $shouldDispatchEvent) {
                     $event = new SendMessageToTransportsEvent($envelope);
                     $this->eventDispatcher->dispatch($event);
@@ -66,7 +67,7 @@ class SendMessageMiddleware implements MiddlewareInterface
                 }
 
                 $this->logger->info('Sending message {class} with {alias} sender using {sender}', $context + ['alias' => $alias, 'sender' => \get_class($sender)]);
-                $envelope = $sender->send($envelope->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null)));
+                $envelope = $sender->send($envelope);
             }
         }
 

@@ -44,7 +44,7 @@ class RememberMeToken extends AbstractToken
         $this->secret = $secret;
 
         $this->setUser($user);
-        parent::setAuthenticated(true);
+        parent::setAuthenticated(true, false);
     }
 
     /**
@@ -56,7 +56,7 @@ class RememberMeToken extends AbstractToken
             throw new \LogicException('You cannot set this token to authenticated after creation.');
         }
 
-        parent::setAuthenticated(false);
+        parent::setAuthenticated(false, false);
     }
 
     /**

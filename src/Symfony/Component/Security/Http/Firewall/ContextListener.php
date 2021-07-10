@@ -28,6 +28,7 @@ use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
@@ -135,6 +136,10 @@ class ContextListener extends AbstractListener
             $token = $this->refreshUser($token);
 
             if (!$token) {
+                if ($this->logger) {
+                    $this->logger->debug('Token was deauthenticated after trying to refresh it.');
+                }
+
                 if ($this->dispatcher) {
                     $this->dispatcher->dispatch(new TokenDeauthenticatedEvent($originalToken, $request));
                 }
@@ -227,11 +232,13 @@ class ContextListener extends AbstractListener
             try {
                 $refreshedUser = $provider->refreshUser($user);
                 $newToken = clone $token;
-                $newToken->setUser($refreshedUser);
+                $newToken->setUser($refreshedUser, false);
 
                 // tokens can be deauthenticated if the user has been changed.
-                if (!$newToken->isAuthenticated()) {
+                if ($this->hasUserChanged($user, $newToken)) {
                     $userDeauthenticated = true;
+                    // @deprecated since Symfony 5.4
+                    $newToken->setAuthenticated(false, false);
 
                     if (null !== $this->logger) {
                         // @deprecated since 5.3, change to $refreshedUser->getUserIdentifier() in 6.0
@@ -268,12 +275,9 @@ class ContextListener extends AbstractListener
         }
 
         if ($userDeauthenticated) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Token was deauthenticated after trying to refresh it.');
-            }
-
+            // @deprecated since Symfony 5.4
             if ($this->dispatcher) {
-                $this->dispatcher->dispatch(new DeauthenticatedEvent($token, $newToken), DeauthenticatedEvent::class);
+                $this->dispatcher->dispatch(new DeauthenticatedEvent($token, $newToken, false), DeauthenticatedEvent::class);
             }
 
             return null;
@@ -314,6 +318,63 @@ class ContextListener extends AbstractListener
         }
 
         return $token;
+    }
+
+    /**
+     * @param string|\Stringable|UserInterface $originalUser
+     */
+    private static function hasUserChanged($originalUser, TokenInterface $refreshedToken): bool
+    {
+        $refreshedUser = $refreshedToken->getUser();
+
+        if ($originalUser instanceof UserInterface) {
+            if (!$refreshedUser instanceof UserInterface) {
+                return true;
+            } else {
+                // noop
+            }
+        } elseif ($refreshedUser instanceof UserInterface) {
+            return true;
+        } else {
+            return (string) $originalUser !== (string) $refreshedUser;
+        }
+
+        if ($originalUser instanceof EquatableInterface) {
+            return !(bool) $originalUser->isEqualTo($refreshedUser);
+        }
+
+        // @deprecated since Symfony 5.3, check for PasswordAuthenticatedUserInterface on both user objects before comparing passwords
+        if ($originalUser->getPassword() !== $refreshedUser->getPassword()) {
+            return true;
+        }
+
+        // @deprecated since Symfony 5.3, check for LegacyPasswordAuthenticatedUserInterface on both user objects before comparing salts
+        if ($originalUser->getSalt() !== $refreshedUser->getSalt()) {
+            return true;
+        }
+
+        $userRoles = array_map('strval', (array) $refreshedUser->getRoles());
+
+        if ($refreshedToken instanceof SwitchUserToken) {
+            $userRoles[] = 'ROLE_PREVIOUS_ADMIN';
+        }
+
+        if (
+            \count($userRoles) !== \count($refreshedToken->getRoleNames()) ||
+            \count($userRoles) !== \count(array_intersect($userRoles, $refreshedToken->getRoleNames()))
+        ) {
+            return true;
+        }
+
+        // @deprecated since Symfony 5.3, drop getUsername() in 6.0
+        $userIdentifier = function ($refreshedUser) {
+            return method_exists($refreshedUser, 'getUserIdentifier') ? $refreshedUser->getUserIdentifier() : $refreshedUser->getUsername();
+        };
+        if ($userIdentifier($originalUser) !== $userIdentifier($refreshedUser)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

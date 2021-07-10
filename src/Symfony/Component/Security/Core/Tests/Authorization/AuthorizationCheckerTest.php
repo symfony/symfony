@@ -42,6 +42,9 @@ class AuthorizationCheckerTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testVoteAuthenticatesTokenIfNecessary()
     {
         $token = new UsernamePasswordToken('username', 'password', 'provider');

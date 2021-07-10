@@ -23,8 +23,6 @@ final class TaggedService4
     #[CustomPropertyAttribute(someAttribute: "on name")]
     public string $name;
 
-    #[CustomAnyAttribute]
-    #[CustomMethodAttribute(someAttribute: "on constructor")]
     public function __construct(
         #[CustomAnyAttribute]
         #[CustomParameterAttribute(someAttribute: "on param1 in constructor")]

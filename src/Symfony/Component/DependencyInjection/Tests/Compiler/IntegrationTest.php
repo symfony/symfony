@@ -769,8 +769,6 @@ PHP
         self::assertSame([
             TaggedService4::class => [
                 ['class' => TaggedService4::class],
-                ['method' => '__construct'],
-                ['someAttribute' => 'on constructor', 'priority' => 0, 'method' => '__construct'],
                 ['parameter' => 'param1'],
                 ['someAttribute' => 'on param1 in constructor', 'priority' => 0, 'parameter' => 'param1'],
                 ['parameter' => 'param2'],

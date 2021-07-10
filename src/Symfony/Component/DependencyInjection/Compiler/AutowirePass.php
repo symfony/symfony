@@ -218,7 +218,7 @@ class AutowirePass extends AbstractRecursivePass
 
                     if (TaggedLocator::class === $attribute->getName()) {
                         $attribute = $attribute->newInstance();
-                        $arguments[$index] = new ServiceLocatorArgument(new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute));
+                        $arguments[$index] = new ServiceLocatorArgument(new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute, null, true));
                         break;
                     }
                 }

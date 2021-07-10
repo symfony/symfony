@@ -422,6 +422,25 @@ class CommandTest extends TestCase
         $this->assertTrue($command->isHidden());
         $this->assertSame(['f'], $command->getAliases());
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testDefaultCommand()
+    {
+        $apl = new Application();
+        $apl->setDefaultCommand(Php8Command::getDefaultName());
+        $property = new \ReflectionProperty($apl, 'defaultCommand');
+        $property->setAccessible(true);
+
+        $this->assertEquals('foo', $property->getValue($apl));
+
+        $apl->setDefaultCommand(Php8Command2::getDefaultName());
+        $property = new \ReflectionProperty($apl, 'defaultCommand');
+        $property->setAccessible(true);
+
+        $this->assertEquals('foo2', $property->getValue($apl));
+    }
 }
 
 // In order to get an unbound closure, we should create it outside a class
@@ -435,5 +454,10 @@ function createClosure()
 
 #[AsCommand(name: 'foo', description: 'desc', hidden: true, aliases: ['f'])]
 class Php8Command extends Command
+{
+}
+
+#[AsCommand(name: 'foo2', description: 'desc2', hidden: true)]
+class Php8Command2 extends Command
 {
 }

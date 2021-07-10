@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -323,14 +324,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $this->guardAuthenticatorHandler = $this->createMock(GuardAuthenticatorHandler::class);
         $this->request = new Request([], [], [], [], [], []);
 
-        $this->event = $this->getMockBuilder(RequestEvent::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getRequest'])
-            ->getMock();
-        $this->event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($this->request);
+        $this->event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->rememberMeServices = $this->createMock(RememberMeServicesInterface::class);

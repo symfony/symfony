@@ -743,7 +743,8 @@ class IntegrationTest extends TestCase
         );
         $container->registerAttributeForAutoconfiguration(
             CustomAnyAttribute::class,
-            static function (ChildDefinition $definition, CustomAnyAttribute $attribute, \ReflectionClass | \ReflectionMethod | \ReflectionProperty | \ReflectionParameter $reflector) {
+            <<<'PHP'
+            return static function (ChildDefinition $definition, CustomAnyAttribute $attribute, \ReflectionClass | \ReflectionMethod | \ReflectionProperty | \ReflectionParameter $reflector) {
                 $tagAttributes = get_object_vars($attribute);
                 if ($reflector instanceof ReflectionClass) {
                     $tagAttributes['class'] = $reflector->getName();
@@ -756,7 +757,8 @@ class IntegrationTest extends TestCase
                 }
 
                 $definition->addTag('app.custom_tag', $tagAttributes);
-            }
+            };
+PHP
         );
 
         $container->register(TaggedService4::class)

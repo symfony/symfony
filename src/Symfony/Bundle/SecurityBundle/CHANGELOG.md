@@ -12,6 +12,12 @@ CHANGELOG
  * Remove the `security.user_password_encoder.generic` service, the `security.password_encoder` and the `Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface` aliases,
    use `security.user_password_hasher`, `security.password_hasher` and `Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface` instead
 
+5.4
+---
+
+ * Deprecate the `always_authenticate_before_granting` option
+
+
 5.3
 ---
 

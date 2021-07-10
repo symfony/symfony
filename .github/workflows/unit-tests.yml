@@ -183,10 +183,12 @@ jobs:
           # matrix.mode = high-deps
           echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} 'cd {} && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
 
+          # get a list of the patched components (relies on .github/build-packages.php being called in the previous step)
           (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
-          COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
+          PATCHED_COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
-          if [[ $COMPONENTS && $SYMFONY_VERSION = *.4 ]]; then
+          # for x.4 branches, checkout and test previous major with the patched components (only for patched components)
+          if [[ $PATCHED_COMPONENTS && $SYMFONY_VERSION = *.4 ]]; then
               export FLIP='^'
               SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
               echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
@@ -194,13 +196,13 @@ jobs:
               export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
               git fetch --depth=2 origin $SYMFONY_VERSION
               git checkout -m FETCH_HEAD
-              COMPONENTS=$(echo "$COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort || true)
+              PATCHED_COMPONENTS=$(echo "$PATCHED_COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort || true)
               (cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
-              if [[ $COMPONENTS ]]; then
+              if [[ $PATCHED_COMPONENTS ]]; then
                 echo "::group::install phpunit"
                 ./phpunit install
                 echo "::endgroup::"
-                echo "$COMPONENTS" | parallel -j +3 "_run_tests {} 'cd {} && rm composer.lock vendor/ -Rf && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
+                echo "$PATCHED_COMPONENTS" | parallel -j +3 "_run_tests {} 'cd {} && rm composer.lock vendor/ -Rf && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
               fi
           fi
 

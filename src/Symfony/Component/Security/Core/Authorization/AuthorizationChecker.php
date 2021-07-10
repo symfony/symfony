@@ -34,6 +34,13 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 
     public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, bool $alwaysAuthenticate = false, bool $exceptionOnNoToken = true)
     {
+        if (false !== $alwaysAuthenticate) {
+            trigger_deprecation('symfony/security-core', '5.4', 'Not setting the 4th argument of "%s" to "false" is deprecated.', __METHOD__);
+        }
+        if (false !== $exceptionOnNoToken) {
+            trigger_deprecation('symfony/security-core', '5.4', 'Not setting the 5th argument of "%s" to "false" is deprecated.', __METHOD__);
+        }
+
         $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
         $this->accessDecisionManager = $accessDecisionManager;

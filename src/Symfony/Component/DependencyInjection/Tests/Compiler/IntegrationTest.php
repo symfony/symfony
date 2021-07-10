@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\IteratorConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerFactory;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithoutIndex;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
@@ -397,6 +398,38 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo'));
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedLocatorConfiguredViaAttributeWithoutIndex()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(LocatorConsumerWithoutIndex::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumerWithoutIndex $s */
+        $s = $container->get(LocatorConsumerWithoutIndex::class);
+
+        $locator = $s->getLocator();
+        self::assertSame($container->get(BarTagClass::class), $locator->get(BarTagClass::class));
+        self::assertSame($container->get(FooTagClass::class), $locator->get(FooTagClass::class));
+    }
+
+    /**
+     * @requires PHP 8
+     */
     public function testNestedDefinitionWithAutoconfiguredConstructorArgument()
     {
         $container = new ContainerBuilder();

@@ -368,7 +368,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
             }
 
-            $value = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $attributeContext);
+            $types = $this->getTypes($resolvedClass, $attribute);
+
+            if (null !== $types) {
+                $value = $this->validateAndDenormalize($types, $resolvedClass, $attribute, $value, $format, $attributeContext);
+            }
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $attributeContext);
             } catch (InvalidArgumentException $e) {
@@ -391,15 +395,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Validates the submitted data and denormalizes it.
      *
+     * @param Type[] $types
+     *
      * @throws NotNormalizableValueException
      * @throws LogicException
      */
-    private function validateAndDenormalize(string $currentClass, string $attribute, mixed $data, ?string $format, array $context): mixed
+    private function validateAndDenormalize(array $types, string $currentClass, string $attribute, mixed $data, ?string $format, array $context): mixed
     {
-        if (null === $types = $this->getTypes($currentClass, $attribute)) {
-            return $data;
-        }
-
         $expectedTypes = [];
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
@@ -532,11 +534,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, mixed $parameterData, array $context, string $format = null): mixed
     {
-        if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $this->propertyTypeExtractor->getTypes($class->getName(), $parameterName)) {
+        if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $types = $this->getTypes($class->getName(), $parameterName)) {
             return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
         }
 
-        return $this->validateAndDenormalize($class->getName(), $parameterName, $parameterData, $format, $context);
+        return $this->validateAndDenormalize($types, $class->getName(), $parameterName, $parameterData, $format, $context);
     }
 
     /**

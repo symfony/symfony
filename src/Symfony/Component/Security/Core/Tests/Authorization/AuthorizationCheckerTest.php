@@ -36,7 +36,9 @@ class AuthorizationCheckerTest extends TestCase
         $this->authorizationChecker = new AuthorizationChecker(
             $this->tokenStorage,
             $this->authenticationManager,
-            $this->accessDecisionManager
+            $this->accessDecisionManager,
+            false,
+            false
         );
     }
 
@@ -71,13 +73,23 @@ class AuthorizationCheckerTest extends TestCase
         $this->assertSame($newToken, $this->tokenStorage->getToken());
     }
 
-    public function testVoteWithoutAuthenticationToken()
+    /**
+     * @group legacy
+     */
+    public function testLegacyVoteWithoutAuthenticationToken()
     {
+        $authorizationChecker = new AuthorizationChecker(
+            $this->tokenStorage,
+            $this->authenticationManager,
+            $this->accessDecisionManager
+        );
+
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
-        $this->authorizationChecker->isGranted('ROLE_FOO');
+
+        $authorizationChecker->isGranted('ROLE_FOO');
     }
 
-    public function testVoteWithoutAuthenticationTokenAndExceptionOnNoTokenIsFalse()
+    public function testVoteWithoutAuthenticationToken()
     {
         $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->authenticationManager, $this->accessDecisionManager, false, false);
 

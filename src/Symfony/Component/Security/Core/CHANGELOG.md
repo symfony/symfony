@@ -9,6 +9,12 @@ CHANGELOG
  * Remove methods `getPassword()` and `getSalt()` from `UserInterface`, use `PasswordAuthenticatedUserInterface`
    or `LegacyPasswordAuthenticatedUserInterface` instead
 
+5.4
+---
+
+ * Deprecate setting the 4th argument (`$alwaysAuthenticate`) to `true` and not setting the
+   5th argument (`$exceptionOnNoToken`) to `false` of `AuthorizationChecker`
+
 5.3
 ---
 

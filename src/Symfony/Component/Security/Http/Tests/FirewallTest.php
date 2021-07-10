@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Http\Firewall;
@@ -68,20 +69,8 @@ class FirewallTest extends TestCase
             ->willReturn([[$first, $second], null, null])
         ;
 
-        $event = $this->getMockBuilder(RequestEvent::class)
-            ->setMethods(['hasResponse'])
-            ->setConstructorArgs([
-                $this->createMock(HttpKernelInterface::class),
-                $this->createMock(Request::class),
-                HttpKernelInterface::MAIN_REQUEST,
-            ])
-            ->getMock()
-        ;
-        $event
-            ->expects($this->once())
-            ->method('hasResponse')
-            ->willReturn(true)
-        ;
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST);
+        $event->setResponse(new Response());
 
         $firewall = new Firewall($map, $this->createMock(EventDispatcherInterface::class));
         $firewall->onKernelRequest($event);

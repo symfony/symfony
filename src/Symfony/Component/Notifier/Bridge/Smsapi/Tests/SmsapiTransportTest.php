@@ -63,7 +63,7 @@ final class SmsapiTransportTest extends TransportTestCase
     /**
      * @dataProvider responseProvider
      */
-    public function testThrowExceptionWhenMessageWasNotSent(int $statusCode, array $content): void
+    public function testThrowExceptionWhenMessageWasNotSent(int $statusCode, array $content)
     {
         $response = $this->createMock(ResponseInterface::class);
         $response

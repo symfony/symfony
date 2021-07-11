@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-31T06:40:50Z
+
+Excuse me Carson?
+I do want to have the `Messenger` label..
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-31T06:56:22Z
+
+Hm.. I should fix the tests on Travis. They fail because we have not installed the PHP extensions
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-31T16:19:08Z
+
+~Don't miss removing the `@requires extension amqp|redis` annotations and/or making tests pass (or skip)~
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-11T16:51:08Z
+
+Thank you for the feedback. This PR is ready for review.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-11T18:28:12Z
+
+Redis 5.3.2 is the first version with proper PHP8 support.
+
+It is not really possible to use Redis 4.3 with PHP8, that is why I removed that requirement from the annotations.

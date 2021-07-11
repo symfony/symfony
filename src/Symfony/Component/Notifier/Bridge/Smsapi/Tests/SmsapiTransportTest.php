@@ -47,23 +47,7 @@ final class SmsapiTransportTest extends TransportTestCase
         yield [$this->createMock(MessageInterface::class)];
     }
 
-    public function responseProvider(): iterable
-    {
-        $responses = [
-            ['status' => 200, 'content' => '{"error":101,"message":"Authorization failed"}'],
-            ['status' => 500, 'content' => '{}'],
-            ['status' => 500, 'content' => '{"error":null,"message":"Unknown"}'],
-        ];
-
-        foreach ($responses as $response) {
-            yield [$response['status'], json_decode($response['content'], true)];
-        }
-    }
-
-    /**
-     * @dataProvider responseProvider
-     */
-    public function testThrowExceptionWhenMessageWasNotSent(int $statusCode, array $content)
+    public function createClient(int $statusCode, array $content): HttpClientInterface
     {
         $response = $this->createMock(ResponseInterface::class);
         $response
@@ -79,11 +63,50 @@ final class SmsapiTransportTest extends TransportTestCase
             ->method('request')
             ->willReturn($response);
 
+        return $client;
+    }
+
+    public function responseProvider(): iterable
+    {
+        $responses = [
+            ['status' => 200, 'content' => '{"error":101,"message":"Authorization failed"}'],
+            ['status' => 500, 'content' => '{}'],
+            ['status' => 500, 'content' => '{"error":null,"message":"Unknown"}'],
+            ['status' => 500, 'content' => '{"error":null,"message":null}'],
+        ];
+
+        foreach ($responses as $response) {
+            yield [$response['status'], json_decode($response['content'], true)];
+        }
+    }
+
+    /**
+     * @dataProvider responseProvider
+     */
+    public function testThrowExceptionWhenMessageWasNotSent(int $statusCode, array $content)
+    {
+        $client = $this->createClient($statusCode, $content);
         $transport = $this->createTransport($client);
         $message = new SmsMessage('0611223344', 'Hello!');
 
         $this->expectException(TransportException::class);
 
         $transport->send($message);
+    }
+
+    /**
+     * @dataProvider responseProvider
+     */
+    public function testTransportExceptionMessage(int $statusCode, array $content)
+    {
+        $client = $this->createClient($statusCode, $content);
+        $transport = $this->createTransport($client);
+        $message = new SmsMessage('0611223344', 'Hello!');
+
+        try {
+            $transport->send($message);
+        } catch (TransportException $exception) {
+            $this->assertEquals(sprintf('Unable to send the SMS: "%s".', $content['message'] ?? 'unknown error'), $exception->getMessage());
+        }
     }
 }

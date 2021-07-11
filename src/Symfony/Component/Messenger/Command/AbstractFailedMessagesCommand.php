@@ -83,7 +83,6 @@ abstract class AbstractFailedMessagesCommand extends Command
         $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
         /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
         $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
-        $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope, true);
 
         $rows = [
             ['Class', \get_class($envelope->getMessage())],
@@ -109,12 +108,6 @@ abstract class AbstractFailedMessagesCommand extends Command
                 $errorMessage = $lastErrorDetailsStamp->getExceptionMessage();
                 $errorCode = $lastErrorDetailsStamp->getExceptionCode();
                 $errorClass = $lastErrorDetailsStamp->getExceptionClass();
-            } elseif (null !== $lastRedeliveryStampWithException) {
-                // Try reading the errorMessage for messages that are still in the queue without the new ErrorDetailStamps.
-                $errorMessage = $lastRedeliveryStampWithException->getExceptionMessage();
-                if (null !== $lastRedeliveryStampWithException->getFlattenException()) {
-                    $errorClass = $lastRedeliveryStampWithException->getFlattenException()->getClass();
-                }
             }
 
             $rows = array_merge($rows, [
@@ -144,8 +137,6 @@ abstract class AbstractFailedMessagesCommand extends Command
             $flattenException = null;
             if (null !== $lastErrorDetailsStamp) {
                 $flattenException = $lastErrorDetailsStamp->getFlattenException();
-            } elseif (null !== $lastRedeliveryStampWithException) {
-                $flattenException = $lastRedeliveryStampWithException->getFlattenException();
             }
             $io->writeln(null === $flattenException ? '(no data)' : $dump($flattenException));
         } else {
@@ -175,27 +166,6 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
 
         return $this->failureTransports->get($name);
-    }
-
-    protected function getLastRedeliveryStampWithException(Envelope $envelope): ?RedeliveryStamp
-    {
-        if (null === \func_get_args()[1]) {
-            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "getLastRedeliveryStampWithException" method in the "%s" class is deprecated, use the "Envelope::last(%s)" instead.', self::class, ErrorDetailsStamp::class));
-        }
-
-        // Use ErrorDetailsStamp instead if it is available
-        if (null !== $envelope->last(ErrorDetailsStamp::class)) {
-            return null;
-        }
-
-        /** @var RedeliveryStamp $stamp */
-        foreach (array_reverse($envelope->all(RedeliveryStamp::class)) as $stamp) {
-            if (null !== $stamp->getExceptionMessage()) {
-                return $stamp;
-            }
-        }
-
-        return null;
     }
 
     private function createCloner(): ?ClonerInterface

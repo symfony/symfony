@@ -25,7 +25,7 @@ class RedeliveryStampTest extends TestCase
 
     public function testSerialization()
     {
-        $stamp = new RedeliveryStamp(10, null, null, \DateTimeImmutable::createFromFormat(\DateTimeInterface::ISO8601, '2005-08-15T15:52:01+0000'));
+        $stamp = new RedeliveryStamp(10, \DateTimeImmutable::createFromFormat(\DateTimeInterface::ISO8601, '2005-08-15T15:52:01+0000'));
         $this->assertSame('2005-08-15T15:52:01+0000', $stamp->getRedeliveredAt()->format(\DateTimeInterface::ISO8601));
     }
 }

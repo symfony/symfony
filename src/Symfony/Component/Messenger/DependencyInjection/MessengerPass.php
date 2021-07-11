@@ -30,28 +30,13 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
  */
 class MessengerPass implements CompilerPassInterface
 {
-    private $handlerTag;
-    private $busTag;
-    private $receiverTag;
-
-    public function __construct(string $handlerTag = 'messenger.message_handler', string $busTag = 'messenger.bus', string $receiverTag = 'messenger.receiver')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/messenger', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->handlerTag = $handlerTag;
-        $this->busTag = $busTag;
-        $this->receiverTag = $receiverTag;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
         $busIds = [];
-        foreach ($container->findTaggedServiceIds($this->busTag) as $busId => $tags) {
+        foreach ($container->findTaggedServiceIds('messenger.bus') as $busId => $tags) {
             $busIds[] = $busId;
             if ($container->hasParameter($busMiddlewareParameter = $busId.'.middleware')) {
                 $this->registerBusMiddleware($container, $busId, $container->getParameter($busMiddlewareParameter));
@@ -76,10 +61,10 @@ class MessengerPass implements CompilerPassInterface
         $handlersByBusAndMessage = [];
         $handlerToOriginalServiceIdMapping = [];
 
-        foreach ($container->findTaggedServiceIds($this->handlerTag, true) as $serviceId => $tags) {
+        foreach ($container->findTaggedServiceIds('messenger.message_handler', true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
                 if (isset($tag['bus']) && !\in_array($tag['bus'], $busIds, true)) {
-                    throw new RuntimeException(sprintf('Invalid handler service "%s": bus "%s" specified on the tag "%s" does not exist (known ones are: "%s").', $serviceId, $tag['bus'], $this->handlerTag, implode('", "', $busIds)));
+                    throw new RuntimeException(sprintf('Invalid handler service "%s": bus "%s" specified on the tag "messenger.message_handler" does not exist (known ones are: "%s").', $serviceId, $tag['bus'], implode('", "', $busIds)));
                 }
 
                 $className = $this->getServiceClass($container, $serviceId);
@@ -268,7 +253,7 @@ class MessengerPass implements CompilerPassInterface
             }
         }
 
-        foreach ($container->findTaggedServiceIds($this->receiverTag) as $id => $tags) {
+        foreach ($container->findTaggedServiceIds('messenger.receiver') as $id => $tags) {
             $receiverClass = $this->getServiceClass($container, $id);
             if (!is_subclass_of($receiverClass, ReceiverInterface::class)) {
                 throw new RuntimeException(sprintf('Invalid receiver "%s": class "%s" must implement interface "%s".', $id, $receiverClass, ReceiverInterface::class));

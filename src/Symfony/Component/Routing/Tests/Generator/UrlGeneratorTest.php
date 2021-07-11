@@ -132,20 +132,30 @@ class UrlGeneratorTest extends TestCase
     {
         $stringableObject = new StringableObject();
 
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
+        $url = $this->getGenerator($routes)->generate('test', ['foo' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $this->assertEquals('/app.php/testing/bar', $url);
+    }
+
+    public function testRelativeUrlWithStringableObjectExtraParameter()
+    {
+        $stringableObject = new StringableObject();
+
         $routes = $this->getRoutes('test', new Route('/testing'));
         $url = $this->getGenerator($routes)->generate('test', ['stringable' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $this->assertEquals('/app.php/testing?stringable=foo', $url);
+        $this->assertEquals('/app.php/testing?stringable=bar', $url);
     }
 
-    public function testAbsoluteUrlWithStringableObjectParameter()
+    public function testAbsoluteUrlWithStringableObjectExtraParameter()
     {
         $stringableObject = new StringableObject();
 
         $routes = $this->getRoutes('test', new Route('/testing'));
         $url = $this->getGenerator($routes)->generate('test', ['stringable' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $this->assertEquals('http://localhost/app.php/testing?stringable=foo', $url);
+        $this->assertEquals('http://localhost/app.php/testing?stringable=bar', $url);
     }
 
     public function testUrlWithExtraParametersFromGlobals()
@@ -923,6 +933,6 @@ class StringableObject
 {
     public function __toString()
     {
-        return 'foo';
+        return 'bar';
     }
 }

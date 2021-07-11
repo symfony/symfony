@@ -291,27 +291,26 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         // add a query string if needed
-        $extras = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, function ($a, $b) {
+        $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, function ($a, $b) {
             return $a == $b ? 0 : 1;
         });
 
-        foreach ($extras as $param => $value) {
-            if (null === $value || \is_array($value)) {
-                continue;
+        array_walk_recursive($extra, static function ($value) {
+            if (is_object($value) && method_exists($value, '__toString')) {
+                return (string) $value;
             }
-
-            $extras[$param] = (string) $value;
-        }
+            return $value;
+        });
 
         // extract fragment
         $fragment = $defaults['_fragment'] ?? '';
 
-        if (isset($extras['_fragment'])) {
-            $fragment = $extras['_fragment'];
-            unset($extras['_fragment']);
+        if (isset($extra['_fragment'])) {
+            $fragment = $extra['_fragment'];
+            unset($extra['_fragment']);
         }
 
-        if ($extras && $query = http_build_query($extras, '', '&', \PHP_QUERY_RFC3986)) {
+        if ($extra && $query = http_build_query($extra, '', '&', \PHP_QUERY_RFC3986)) {
             $url .= '?'.strtr($query, self::QUERY_FRAGMENT_DECODED);
         }
 

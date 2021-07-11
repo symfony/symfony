@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
- * @requires extension redis >= 4.3.0
+ * @requires extension redis
  * @group integration
  */
 class ConnectionTest extends TestCase

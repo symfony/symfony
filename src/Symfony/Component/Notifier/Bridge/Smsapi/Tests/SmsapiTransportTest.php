@@ -90,23 +90,8 @@ final class SmsapiTransportTest extends TransportTestCase
         $message = new SmsMessage('0611223344', 'Hello!');
 
         $this->expectException(TransportException::class);
+        $this->expectExceptionMessage(sprintf('Unable to send the SMS: "%s".', $content['message'] ?? 'unknown error'));
 
         $transport->send($message);
-    }
-
-    /**
-     * @dataProvider responseProvider
-     */
-    public function testTransportExceptionMessage(int $statusCode, array $content)
-    {
-        $client = $this->createClient($statusCode, $content);
-        $transport = $this->createTransport($client);
-        $message = new SmsMessage('0611223344', 'Hello!');
-
-        try {
-            $transport->send($message);
-        } catch (TransportException $exception) {
-            $this->assertEquals(sprintf('Unable to send the SMS: "%s".', $content['message'] ?? 'unknown error'), $exception->getMessage());
-        }
     }
 }

@@ -131,30 +131,24 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('http://localhost/app.php/testing', $url);
     }
 
-    public function testRelativeUrlWithUidParameters()
+    public function testRelativeUrlWithStrinableObjectParameter()
     {
-        $ulid = new Ulid();
-        $uuid = new UuidV4();
+        $stringableObject = new StringableObject();
 
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['ulid' => $ulid, 'uuid' => $uuid], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $url = $this->getGenerator($routes)->generate('test', ['stringable' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $expected = sprintf('/app.php/testing?ulid=%s&uuid=%s', $ulid->__toString(), $uuid->__toString());
-
-        $this->assertEquals($expected, $url);
+        $this->assertEquals('/app.php/testing?stringable=foo', $url);
     }
 
-    public function testAbsoluteUrlWithUidParameters()
+    public function testAbsoluteUrlWithStringableOBjectParameter()
     {
-        $ulid = new Ulid();
-        $uuid = new UuidV4();
+        $stringableObject = new StringableObject();
 
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['ulid' => $ulid, 'uuid' => $uuid], UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->getGenerator($routes)->generate('test', ['stringable' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $expected =  sprintf('http://localhost/app.php/testing?ulid=%s&uuid=%s', $ulid->__toString(), $uuid->__toString());
-
-        $this->assertEquals($expected, $url);
+        $this->assertEquals('http://localhost/app.php/testing?stringable=foo', $url);
     }
 
     public function testUrlWithExtraParametersFromGlobals()
@@ -925,5 +919,13 @@ class UrlGeneratorTest extends TestCase
         $routes->add($name, $route);
 
         return $routes;
+    }
+}
+
+class StringableObject
+{
+    public function __toString()
+    {
+        return 'foo';
     }
 }

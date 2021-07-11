@@ -295,11 +295,10 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             return $a == $b ? 0 : 1;
         });
 
-        array_walk_recursive($extra, static function ($value) {
-            if (is_object($value) && method_exists($value, '__toString')) {
-                return (string) $value;
+        array_walk_recursive($extra, static function (&$value) {
+            if (null !== $value) {
+                $value = (string) $value;
             }
-            return $value;
         });
 
         // extract fragment

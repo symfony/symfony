@@ -143,4 +143,9 @@ class NonStringInput extends Input
     public function parse()
     {
     }
+
+    public function __toString(): string
+    {
+        return '';
+    }
 }

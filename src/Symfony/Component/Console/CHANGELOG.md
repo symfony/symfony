@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add method `__toString()` to `InputInterface`
+
 6.0
 ---
 

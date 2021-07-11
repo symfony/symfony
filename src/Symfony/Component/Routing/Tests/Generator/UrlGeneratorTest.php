@@ -131,7 +131,7 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('http://localhost/app.php/testing', $url);
     }
 
-    public function testRelativeUrlWithStrinableObjectParameter()
+    public function testRelativeUrlWithStringableObjectParameter()
     {
         $stringableObject = new StringableObject();
 
@@ -141,7 +141,7 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('/app.php/testing?stringable=foo', $url);
     }
 
-    public function testAbsoluteUrlWithStringableOBjectParameter()
+    public function testAbsoluteUrlWithStringableObjectParameter()
     {
         $stringableObject = new StringableObject();
 

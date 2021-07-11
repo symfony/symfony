@@ -296,7 +296,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         });
 
         foreach ($extras as $param => $value) {
-            if ($value === null || is_array($value)) {
+            if (null === $value || \is_array($value)) {
                 continue;
             }
 

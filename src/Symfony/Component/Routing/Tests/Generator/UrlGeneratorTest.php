@@ -21,9 +21,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Uid\Ulid;
-use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Uid\UuidV4;
 
 class UrlGeneratorTest extends TestCase
 {

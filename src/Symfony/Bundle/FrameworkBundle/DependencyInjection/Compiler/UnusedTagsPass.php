@@ -44,6 +44,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'controller.argument_value_resolver',
         'controller.service_arguments',
         'data_collector',
+        'debug.normalizer',
         'event_dispatcher.dispatcher',
         'form.type',
         'form.type_extension',

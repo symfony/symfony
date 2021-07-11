@@ -158,6 +158,16 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('http://localhost/app.php/testing?stringable=bar', $url);
     }
 
+    public function testAbsoluteUrlWithStringableObjectExtraParameterInArray()
+    {
+        $stringableObject = new StringableObject();
+
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', ['key' => ['stringable' => $stringableObject]], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $this->assertSame('http://localhost/app.php/testing?key%5Bstringable%5D=bar', $url);
+    }
+
     public function testUrlWithExtraParametersFromGlobals()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));

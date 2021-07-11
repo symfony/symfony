@@ -22,7 +22,10 @@ class RepeatedTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     protected function createForm(array $options = [])
     {
-        return $this->factory->create(RepeatedType::class, null, $options);
+        return $this->factory->create(RepeatedType::class, null, [
+            'first_options' => ['empty_data' => null],
+            'second_options' => ['empty_data' => null],
+        ] + $options);
     }
 
     public function testInvalidMessage()

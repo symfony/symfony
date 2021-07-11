@@ -77,6 +77,7 @@ Form
  * Changed `$checkboxes` parameter type of the `CheckboxListMapper::mapFormsToData()` method from `iterable` to `\Traversable`.
  * Changed `$radios` parameter type of the `RadioListMapper::mapDataToForms()` method from `iterable` to `\Traversable`.
  * Changed `$radios` parameter type of the `RadioListMapper::mapFormsToData()` method from `iterable` to `\Traversable`.
+ * The default value of the `empty_data` option of the `TextType` has been changed to empty string.
 
 FrameworkBundle
 ---------------

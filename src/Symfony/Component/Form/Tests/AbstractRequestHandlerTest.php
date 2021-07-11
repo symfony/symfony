@@ -329,7 +329,10 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $this->serverParams->contentLength = $contentLength;
         $this->serverParams->postMaxSize = $iniMax;
 
-        $options = ['post_max_size_message' => 'Max {{ max }}!'];
+        $options = [
+            'empty_data' => null,
+            'post_max_size_message' => 'Max {{ max }}!',
+        ];
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);
         $this->setRequestData('POST', [], []);
 

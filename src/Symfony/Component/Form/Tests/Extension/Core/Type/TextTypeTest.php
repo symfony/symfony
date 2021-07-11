@@ -14,6 +14,9 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 class TextTypeTest extends BaseTypeTest
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TextType';
+    public const TESTED_TYPE_OPTIONS = [
+        'empty_data' => null,
+    ];
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
@@ -22,7 +25,7 @@ class TextTypeTest extends BaseTypeTest
 
     public function testSubmitNullReturnsNullWithEmptyDataAsString()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, 'name', [
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => '',
         ]);
 
@@ -48,7 +51,7 @@ class TextTypeTest extends BaseTypeTest
      */
     public function testSetDataThroughParamsWithZero($data, $dataAsString)
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
+        $form = $this->factory->create(static::TESTED_TYPE, null, $this->getTestedTypeOptions() + [
             'data' => $data,
         ]);
         $view = $form->createView();

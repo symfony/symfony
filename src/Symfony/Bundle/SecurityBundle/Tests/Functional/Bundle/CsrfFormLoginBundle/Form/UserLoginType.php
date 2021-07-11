@@ -42,8 +42,12 @@ class UserLoginType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('username', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('password', 'Symfony\Component\Form\Extension\Core\Type\PasswordType')
+            ->add('username', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+            ])
+            ->add('password', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', [
+                'empty_data' => null,
+            ])
             ->add('_target_path', 'Symfony\Component\Form\Extension\Core\Type\HiddenType')
         ;
 

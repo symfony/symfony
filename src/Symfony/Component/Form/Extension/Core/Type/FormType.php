@@ -31,6 +31,13 @@ class FormType extends BaseType
 {
     private $dataMapper;
 
+    /**
+     * @internal
+     *
+     * @deprecated Don't use this property. It will be removed in symfony/form 6.0
+     */
+    public static $emptyData = null;
+
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->dataMapper = new DataMapper(new ChainAccessor([
@@ -159,19 +166,21 @@ class FormType extends BaseType
         };
 
         // Derive "empty_data" closure from "data_class" option
-        $emptyData = function (Options $options) {
-            $class = $options['data_class'];
+        if (null === self::$emptyData) {
+            self::$emptyData = function (Options $options) {
+                $class = $options['data_class'];
 
-            if (null !== $class) {
-                return function (FormInterface $form) use ($class) {
-                    return $form->isEmpty() && !$form->isRequired() ? null : new $class();
+                if (null !== $class) {
+                    return function (FormInterface $form) use ($class) {
+                        return $form->isEmpty() && !$form->isRequired() ? null : new $class();
+                    };
+                }
+
+                return function (FormInterface $form) {
+                    return $form->getConfig()->getCompound() ? [] : '';
                 };
-            }
-
-            return function (FormInterface $form) {
-                return $form->getConfig()->getCompound() ? [] : '';
             };
-        };
+        }
 
         // Wrap "post_max_size_message" in a closure to translate it lazily
         $uploadMaxSizeMessage = function (Options $options) {
@@ -194,7 +203,7 @@ class FormType extends BaseType
 
         $resolver->setDefaults([
             'data_class' => $dataClass,
-            'empty_data' => $emptyData,
+            'empty_data' => self::$emptyData,
             'trim' => true,
             'required' => true,
             'property_path' => null,

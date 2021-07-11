@@ -213,7 +213,7 @@ class Request
         self::HEADER_X_FORWARDED_FOR => 'for',
         self::HEADER_X_FORWARDED_HOST => 'host',
         self::HEADER_X_FORWARDED_PROTO => 'proto',
-        self::HEADER_X_FORWARDED_PORT => 'host',
+        self::HEADER_X_FORWARDED_PORT => 'by',
     ];
 
     /**

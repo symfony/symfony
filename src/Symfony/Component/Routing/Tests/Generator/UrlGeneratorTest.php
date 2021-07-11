@@ -21,6 +21,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV4;
 
 class UrlGeneratorTest extends TestCase
 {
@@ -126,6 +129,32 @@ class UrlGeneratorTest extends TestCase
         $url = $this->getGenerator($routes)->generate('test', ['foo' => null], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $this->assertEquals('http://localhost/app.php/testing', $url);
+    }
+
+    public function testRelativeUrlWithUidParameters()
+    {
+        $ulid = new Ulid();
+        $uuid = new UuidV4();
+
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', ['ulid' => $ulid, 'uuid' => $uuid], UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $expected = sprintf('/app.php/testing?ulid=%s&uuid=%s', $ulid->__toString(), $uuid->__toString());
+
+        $this->assertEquals($expected, $url);
+    }
+
+    public function testAbsoluteUrlWithUidParameters()
+    {
+        $ulid = new Ulid();
+        $uuid = new UuidV4();
+
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', ['ulid' => $ulid, 'uuid' => $uuid], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $expected =  sprintf('http://localhost/app.php/testing?ulid=%s&uuid=%s', $ulid->__toString(), $uuid->__toString());
+
+        $this->assertEquals($expected, $url);
     }
 
     public function testUrlWithExtraParametersFromGlobals()

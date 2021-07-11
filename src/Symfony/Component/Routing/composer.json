@@ -26,6 +26,7 @@
         "symfony/yaml": "^4.4|^5.0|^6.0",
         "symfony/expression-language": "^4.4|^5.0|^6.0",
         "symfony/dependency-injection": "^4.4|^5.0|^6.0",
+        "symfony/uid": "^5.3|^6.0",
         "doctrine/annotations": "^1.12",
         "psr/log": "~1.0"
     },

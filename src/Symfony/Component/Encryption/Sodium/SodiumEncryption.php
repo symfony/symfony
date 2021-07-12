@@ -66,24 +66,7 @@ final class SodiumEncryption implements EncryptionInterface
         return Ciphertext::create('sodium_crypto_box_seal', $ciphertext, random_bytes(\SODIUM_CRYPTO_BOX_NONCEBYTES))->getString();
     }
 
-    public function encryptForAndSign(string $message, KeyInterface $recipientKey, KeyInterface $senderKey): string
-    {
-        if (!$recipientKey instanceof SodiumKey || !$senderKey instanceof SodiumKey) {
-            throw new InvalidKeyException(sprintf('Class "%s" will only accept key objects of class "%s".', self::class, SodiumKey::class));
-        }
-
-        try {
-            $nonce = random_bytes(\SODIUM_CRYPTO_BOX_NONCEBYTES);
-            $keypair = sodium_crypto_box_keypair_from_secretkey_and_publickey($senderKey->getPrivateKey(), $recipientKey->getPublicKey());
-            $ciphertext = sodium_crypto_box($message, $nonce, $keypair);
-        } catch (\SodiumException $exception) {
-            throw new EncryptionException('Failed to encrypt message.', $exception);
-        }
-
-        return Ciphertext::create('sodium_crypto_box', $ciphertext, $nonce)->getString();
-    }
-
-    public function decrypt(string $message, KeyInterface $key, KeyInterface $senderPublicKey = null): string
+    public function decrypt(string $message, KeyInterface $key): string
     {
         if (!$key instanceof SodiumKey) {
             throw new InvalidKeyException(sprintf('Class "%s" will only accept key objects of class "%s".', self::class, SodiumKey::class));
@@ -94,19 +77,9 @@ final class SodiumEncryption implements EncryptionInterface
         $payload = $ciphertext->getPayload();
         $nonce = $ciphertext->getNonce();
 
-        if (null !== $senderPublicKey && 'sodium_crypto_box' !== $algorithm) {
-            throw new UnableToVerifySignatureException();
-        }
-
         try {
             if ('sodium_crypto_box_seal' === $algorithm) {
                 $output = sodium_crypto_box_seal_open($payload, $key->getKeypair());
-            } elseif ('sodium_crypto_box' === $algorithm) {
-                if (null === $senderPublicKey) {
-                    throw new SignatureVerificationRequiredException();
-                }
-                $keypair = sodium_crypto_box_keypair_from_secretkey_and_publickey($key->getPrivateKey(), $senderPublicKey->getPublicKey());
-                $output = sodium_crypto_box_open($payload, $nonce, $keypair);
             } elseif ('sodium_secretbox' === $algorithm) {
                 $output = sodium_crypto_secretbox_open($payload, $nonce, $key->getSecret());
             } else {

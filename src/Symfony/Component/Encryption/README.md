@@ -2,7 +2,7 @@ Encryption Component
 ====================
 
 The Encryption Component is an opinionated, high level abstraction over PHP's Sodium
-extension. Encryption should be understandable without an degree in Cryptography.
+extension. Encryption should be understandable without a degree in Cryptography.
 
 **This Component is experimental**.
 [Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)

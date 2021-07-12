@@ -57,8 +57,8 @@ class InputTest extends TestCase
         $this->assertTrue($input->getOption('no-name'));
 
         $input = new ArrayInput([], new InputDefinition([new InputOption('name', null, InputOption::VALUE_NEGATABLE)]));
-        $this->assertNull($input->getOption('name'));
-        $this->assertNull($input->getOption('no-name'));
+        $this->assertFalse($input->getOption('name'));
+        $this->assertFalse($input->getOption('no-name'));
     }
 
     public function testSetInvalidOption()

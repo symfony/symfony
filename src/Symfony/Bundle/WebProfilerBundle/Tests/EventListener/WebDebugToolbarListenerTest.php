@@ -41,7 +41,7 @@ class WebDebugToolbarListenerTest extends TestCase
     public function getInjectToolbarTests()
     {
         return [
-            ['<html><head></head><body></body></html>', "<html><head></head><body>\nWDT\n</body></html>"],
+            ['<html><head></head><body></body></html>', "<html><head>WDT</head><body>\nWDT\n</body></html>"],
             ['<html>
             <head></head>
             <body>
@@ -50,7 +50,7 @@ class WebDebugToolbarListenerTest extends TestCase
             </html>', "<html>
             <head></head>
             <body>
-            <textarea><html><head></head><body></body></html></textarea>
+            <textarea><html><head>WDT</head><body></body></html></textarea>
             \nWDT\n</body>
             </html>"],
         ];
@@ -95,7 +95,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
+        $this->assertEquals("<html><head>WDT</head><body>\nWDT\n</body></html>", $response->getContent());
     }
 
     /**

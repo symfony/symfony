@@ -21,37 +21,37 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 class AppCustomAuthenticator extends AbstractGuardAuthenticator
 {
-    public function supports(Request $request)
+    public function supports(Request $request): bool
     {
         return false;
     }
 
-    public function getCredentials(Request $request)
+    public function getCredentials(Request $request): mixed
     {
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
     {
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials($credentials, UserInterface $user): bool
     {
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null): Response
     {
         return new Response($authException->getMessage(), Response::HTTP_UNAUTHORIZED);
     }
 
-    public function supportsRememberMe()
+    public function supportsRememberMe(): bool
     {
     }
 }

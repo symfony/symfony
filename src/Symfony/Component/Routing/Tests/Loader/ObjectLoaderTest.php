@@ -103,7 +103,7 @@ class TestObjectLoader extends ObjectLoader
         return 'service';
     }
 
-    protected function getObject(string $id)
+    protected function getObject(string $id): object
     {
         return $this->loaderMap[$id] ?? null;
     }

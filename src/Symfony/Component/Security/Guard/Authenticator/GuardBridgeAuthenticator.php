@@ -55,7 +55,7 @@ class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, Aut
         $this->userProvider = $userProvider;
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null): Response
     {
         return $this->guard->start($request, $authException);
     }

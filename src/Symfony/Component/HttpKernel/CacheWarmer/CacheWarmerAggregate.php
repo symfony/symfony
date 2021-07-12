@@ -48,7 +48,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
      *
      * @return string[] A list of classes or files to preload on PHP 7.4+
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
             $collectedLogs = [];
@@ -114,9 +114,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     }
 
     /**
-     * Checks whether this warmer is optional or not.
-     *
-     * @return bool always false
+     * {@inheritdoc}
      */
     public function isOptional(): bool
     {

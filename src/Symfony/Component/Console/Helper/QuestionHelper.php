@@ -99,11 +99,9 @@ class QuestionHelper extends Helper
     /**
      * Asks the question to the user.
      *
-     * @return mixed
-     *
      * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
-    private function doAsk(OutputInterface $output, Question $question)
+    private function doAsk(OutputInterface $output, Question $question): mixed
     {
         $this->writePrompt($output, $question);
 
@@ -150,10 +148,7 @@ class QuestionHelper extends Helper
         return $ret;
     }
 
-    /**
-     * @return mixed
-     */
-    private function getDefaultAnswer(Question $question)
+    private function getDefaultAnswer(Question $question): mixed
     {
         $default = $question->getDefault();
 
@@ -446,11 +441,9 @@ class QuestionHelper extends Helper
      *
      * @param callable $interviewer A callable that will ask for a question and return the result
      *
-     * @return mixed The validated response
-     *
      * @throws \Exception In case the max number of attempts has been reached and no valid response has been given
      */
-    private function validateAttempts(callable $interviewer, OutputInterface $output, Question $question)
+    private function validateAttempts(callable $interviewer, OutputInterface $output, Question $question): mixed
     {
         $error = null;
         $attempts = $question->getMaxAttempts();
@@ -532,11 +525,6 @@ class QuestionHelper extends Helper
         return $this->resetIOCodepage($cp, $ret);
     }
 
-    /**
-     * Sets console I/O to the host code page.
-     *
-     * @return int Previous code page in IBM/EBCDIC format
-     */
     private function setIOCodepage(): int
     {
         if (\function_exists('sapi_windows_cp_set')) {

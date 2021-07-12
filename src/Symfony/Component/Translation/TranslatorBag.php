@@ -38,7 +38,7 @@ final class TranslatorBag implements TranslatorBagInterface
     /**
      * {@inheritdoc}
      */
-    public function getCatalogue(string $locale = null)
+    public function getCatalogue(string $locale = null): MessageCatalogueInterface
     {
         if (null === $locale || !isset($this->catalogues[$locale])) {
             $this->catalogues[$locale] = new MessageCatalogue($locale);

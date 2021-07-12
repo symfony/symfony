@@ -165,10 +165,8 @@ trait MicroKernelTrait
 
     /**
      * @internal
-     *
-     * @return RouteCollection
      */
-    public function loadRoutes(LoaderInterface $loader)
+    public function loadRoutes(LoaderInterface $loader): RouteCollection
     {
         $file = (new \ReflectionObject($this))->getFileName();
         /* @var RoutingPhpFileLoader $kernelLoader */

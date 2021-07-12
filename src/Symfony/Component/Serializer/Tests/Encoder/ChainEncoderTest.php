@@ -95,7 +95,7 @@ class NormalizationAwareEncoder implements EncoderInterface, NormalizationAwareI
         return true;
     }
 
-    public function encode($data, string $format, array $context = [])
+    public function encode($data, string $format, array $context = []): string
     {
     }
 }

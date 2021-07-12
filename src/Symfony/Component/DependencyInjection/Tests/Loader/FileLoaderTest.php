@@ -274,7 +274,7 @@ class TestFileLoader extends FileLoader
 {
     public $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
-    public function load(mixed $resource, string $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
         return $resource;
     }

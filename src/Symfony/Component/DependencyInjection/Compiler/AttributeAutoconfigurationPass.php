@@ -29,7 +29,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         parent::process($container);
     }
 
-    protected function processValue(mixed $value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Definition
             || !$value->isAutoconfigured()

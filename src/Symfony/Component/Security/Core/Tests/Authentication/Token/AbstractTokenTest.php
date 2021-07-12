@@ -247,7 +247,7 @@ class SerializableUser implements UserInterface
         $this->roles = $roles;
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->name;
     }
@@ -262,7 +262,7 @@ class SerializableUser implements UserInterface
         return '***';
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         if (empty($this->roles)) {
             return ['ROLE_USER'];
@@ -305,7 +305,7 @@ class ConcreteToken extends AbstractToken
         parent::__unserialize($parentState);
     }
 
-    public function getCredentials()
+    public function getCredentials(): mixed
     {
     }
 }

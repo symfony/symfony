@@ -373,11 +373,7 @@ class MockPdo extends \PDO
         $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;
     }
 
-    /**
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function getAttribute($attribute)
+    public function getAttribute($attribute): mixed
     {
         if (\PDO::ATTR_ERRMODE === $attribute) {
             return $this->errorMode;

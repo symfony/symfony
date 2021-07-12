@@ -137,12 +137,12 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
     /**
      * {@inheritdoc}
      */
-    public function getInfo(string $type = null)
+    public function getInfo(string $type = null): mixed
     {
         return null !== $type ? $this->info[$type] ?? null : $this->info;
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }

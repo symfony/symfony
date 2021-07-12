@@ -106,7 +106,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         return $parameters;
     }
 
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('foo');
         $rootNode = $treeBuilder->getRootNode();
@@ -119,7 +119,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
     {
     }
 
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return '';
     }
@@ -129,7 +129,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         return false;
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'foo';
     }

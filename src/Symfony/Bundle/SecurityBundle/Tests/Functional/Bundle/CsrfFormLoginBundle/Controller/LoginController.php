@@ -54,7 +54,7 @@ class LoginController implements ServiceSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'form.factory' => FormFactoryInterface::class,

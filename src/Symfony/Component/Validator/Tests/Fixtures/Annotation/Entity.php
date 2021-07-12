@@ -119,7 +119,7 @@ class Entity extends EntityParent implements EntityInterfaceB
     /**
      * @return mixed
      */
-    public function getChildA()
+    public function getChildA(): mixed
     {
         return $this->childA;
     }
@@ -135,7 +135,7 @@ class Entity extends EntityParent implements EntityInterfaceB
     /**
      * @return mixed
      */
-    public function getChildB()
+    public function getChildB(): mixed
     {
         return $this->childB;
     }

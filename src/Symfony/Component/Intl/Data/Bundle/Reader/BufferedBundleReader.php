@@ -23,11 +23,6 @@ class BufferedBundleReader implements BundleReaderInterface
     private $reader;
     private $buffer;
 
-    /**
-     * Buffers a given reader.
-     *
-     * @param int $bufferSize The number of entries to store in the buffer
-     */
     public function __construct(BundleReaderInterface $reader, int $bufferSize)
     {
         $this->reader = $reader;
@@ -37,7 +32,7 @@ class BufferedBundleReader implements BundleReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function read(string $path, string $locale)
+    public function read(string $path, string $locale): mixed
     {
         $hash = $path.'//'.$locale;
 

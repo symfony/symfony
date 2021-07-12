@@ -36,23 +36,6 @@ class DaoAuthenticationProviderTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    public function testRetrieveUserWhenProviderDoesNotReturnAnUserInterface()
-    {
-        $this->expectException(AuthenticationServiceException::class);
-        $userProvider = $this->createMock(DaoAuthenticationProviderTest_UserProvider::class);
-        $userProvider->expects($this->once())
-                     ->method('loadUserByUsername')
-                     ->willReturn('fabien')
-        ;
-        $provider = $this->getProvider(null, null, null, $userProvider);
-        $method = new \ReflectionMethod($provider, 'retrieveUser');
-        $method->setAccessible(true);
-
-        $this->expectDeprecation('Since symfony/security-core 5.3: Not implementing method "loadUserByIdentifier()" in user provider "'.get_debug_type($userProvider).'" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.');
-
-        $method->invoke($provider, 'fabien', $this->getSupportedToken());
-    }
-
     public function testRetrieveUserWhenUsernameIsNotFound()
     {
         $this->expectException(UserNotFoundException::class);
@@ -374,5 +357,5 @@ interface PasswordUpgraderProvider extends UserProviderInterface, PasswordUpgrad
 
 interface DaoAuthenticationProviderTest_UserProvider extends UserProviderInterface
 {
-    public function loadUserByUsername($username);
+    public function loadUserByUsername($username): UserInterface;
 }

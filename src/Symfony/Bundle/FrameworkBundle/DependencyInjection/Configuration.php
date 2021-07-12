@@ -1041,7 +1041,7 @@ class Configuration implements ConfigurationInterface
                             ->info('System related cache pools configuration')
                             ->defaultValue('cache.adapter.system')
                         ->end()
-                        ->scalarNode('directory')->defaultValue('%kernel.cache_dir%/pools')->end()
+                        ->scalarNode('directory')->defaultValue('%kernel.cache_dir%/pools/app')->end()
                         ->scalarNode('default_doctrine_provider')->end()
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()

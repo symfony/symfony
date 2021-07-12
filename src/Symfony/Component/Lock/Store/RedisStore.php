@@ -275,16 +275,14 @@ class RedisStore implements SharedLockStoreInterface
             }
 
             return $result;
-
-            return $this->redis->_instance($this->redis->_target($resource))->eval($script, array_merge([$resource], $args), 1);
         }
 
-        if ($this->redis instanceof \Predis\ClientInterface) {
-            try {
-                return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
-            } catch (ServerException $e) {
-                throw new LockStorageException($e->getMessage(), $e->getCode(), $e);
-            }
+        \assert($this->redis instanceof \Predis\ClientInterface);
+
+        try {
+            return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
+        } catch (ServerException $e) {
+            throw new LockStorageException($e->getMessage(), $e->getCode(), $e);
         }
     }
 

@@ -892,6 +892,11 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         );
     }
 
+    public function testFileLabelIdNotDuplicated()
+    {
+        $this->markTestSkipped('The Bootstrap 5 form theme does not use the file widget shipped with the Bootstrap 4 theme.');
+    }
+
     public function testFileWithGroup()
     {
         $form = $this->factory->createNamed('name', FileType::class);

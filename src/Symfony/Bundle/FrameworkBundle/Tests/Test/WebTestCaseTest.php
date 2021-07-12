@@ -183,7 +183,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Bar');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "body > h1" and does not have a node matching selector "body > h1" with content containing "Foo".');
+        $this->expectExceptionMessage('matches selector "body > h1" and the text "Foo" of the node matching selector "body > h1" does not contain "Foo".');
         $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Foo');
     }
 
@@ -199,7 +199,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<html><head><title>Foobar'))->assertPageTitleContains('Foo');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "title" and has a node matching selector "title" with content containing "Bar".');
+        $this->expectExceptionMessage('matches selector "title" and the text "Foo" of the node matching selector "title" contains "Bar".');
         $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleContains('Bar');
     }
 

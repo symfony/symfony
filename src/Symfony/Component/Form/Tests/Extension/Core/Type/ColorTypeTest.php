@@ -82,7 +82,7 @@ final class ColorTypeTest extends BaseTypeTest
         ];
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = '', $norm = '', $view = '')
     {
         parent::testSubmitNull($expected, $norm, '');
     }

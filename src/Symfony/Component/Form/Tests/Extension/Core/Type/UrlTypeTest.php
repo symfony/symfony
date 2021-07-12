@@ -47,7 +47,7 @@ class UrlTypeTest extends TextTypeTest
 
         $form->submit('');
 
-        $this->assertNull($form->getData());
+        $this->assertSame('', $form->getData());
         $this->assertSame('', $form->getViewData());
     }
 
@@ -59,7 +59,7 @@ class UrlTypeTest extends TextTypeTest
 
         $form->submit(null);
 
-        $this->assertNull($form->getData());
+        $this->assertSame('', $form->getData());
         $this->assertSame('', $form->getViewData());
     }
 

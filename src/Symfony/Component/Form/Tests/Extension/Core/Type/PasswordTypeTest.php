@@ -47,7 +47,7 @@ class PasswordTypeTest extends BaseTypeTest
         $this->assertSame(' pAs5w0rd ', $form->getData());
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = '', $norm = '', $view = '')
     {
         parent::testSubmitNull($expected, $norm, '');
     }

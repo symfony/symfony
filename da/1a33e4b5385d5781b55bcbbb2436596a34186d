@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-06-10T16:18:49Z
+
+i'd be curious if `DataCollector implements TemplateAwareDataCollectorInterface` in the component is feasible
+
+---------------------------------------------------------------------------
+
+by IonBazan at 2021-06-11T04:42:54Z
+
+@ro0NL `TemplateAwareDataCollectorInterface` is in `FrameworkBundle` namespace so it shouldn't be used in the component itself. Plus introducing a new interface to the component would be a breaking change.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-06-11T06:27:31Z
+
+I know. But requiring fw bundle for a better base class is questionable IMHO

@@ -24,6 +24,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\Encryption\EncryptionInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -149,6 +150,7 @@ class Configuration implements ConfigurationInterface
         $this->addNotifierSection($rootNode, $enableIfStandalone);
         $this->addRateLimiterSection($rootNode, $enableIfStandalone);
         $this->addUidSection($rootNode, $enableIfStandalone);
+        $this->addEncryptionSection($rootNode, $enableIfStandalone);
 
         return $treeBuilder;
     }
@@ -1971,6 +1973,18 @@ class Configuration implements ConfigurationInterface
                             ->cannotBeEmpty()
                         ->end()
                     ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addEncryptionSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('encryption')
+                    ->info('Encryption configuration')
+                    ->{$enableIfStandalone('symfony/encryption', EncryptionInterface::class)}()
                 ->end()
             ->end()
         ;

@@ -7,7 +7,7 @@
         {% set is_authenticated = collector.enabled and collector.authenticated  %}
         {% set color_code = is_authenticated ? '' : 'yellow' %}
     {% else %}
-        {% set color_code = collector.enabled ? 'red' : '' %}
+        {% set color_code = collector.enabled ? 'red' %}
     {% endif %}
 
     {% set icon %}

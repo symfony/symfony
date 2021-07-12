@@ -4,7 +4,7 @@
 
 {% block toolbar %}
     {% if collector.data.nb_errors > 0 or collector.data.forms|length %}
-        {% set status_color = collector.data.nb_errors ? 'red' : '' %}
+        {% set status_color = collector.data.nb_errors ? 'red' %}
         {% set icon %}
             {{ include('@WebProfiler/Icon/form.svg') }}
             <span class="sf-toolbar-value">

@@ -205,7 +205,7 @@
                     : log.priorityName in ['CRITICAL', 'ERROR', 'ALERT', 'EMERGENCY'] ? 'status-error'
                     : log.priorityName == 'WARNING' ? 'status-warning'
                 %}
-                <tr class="{{ css_class }}"{% if show_level %} data-filter-level="{{ log.priorityName|lower }}"{% endif %}{% if channel_is_defined %} data-filter-channel="{{ log.channel is not null ? log.channel : '' }}"{% endif %}>
+                <tr class="{{ css_class }}"{% if show_level %} data-filter-level="{{ log.priorityName|lower }}"{% endif %}{% if channel_is_defined %} data-filter-channel="{{ log.channel }}"{% endif %}>
                     <td class="font-normal text-small" nowrap>
                         {% if show_level %}
                             <span class="colored text-bold">{{ log.priorityName }}</span>

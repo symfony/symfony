@@ -122,6 +122,7 @@
         "amphp/http-tunnel": "^1.0",
         "async-aws/ses": "^1.0",
         "async-aws/sqs": "^1.0",
+        "async-aws/sns": "^1.0",
         "cache/integration-tests": "dev-master",
         "composer/package-versions-deprecated": "^1.8",
         "doctrine/annotations": "^1.12",

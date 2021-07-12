@@ -294,6 +294,15 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             return $a == $b ? 0 : 1;
         });
 
+        array_walk_recursive($extra, $caster = static function (&$v) use (&$caster) {
+            if ($v instanceof \stdClass) {
+                $v = (array) $v;
+                array_walk_recursive($v, $caster);
+            } elseif (null !== $v) {
+                $v = (string) $v;
+            }
+        });
+
         // extract fragment
         $fragment = $defaults['_fragment'] ?? '';
 

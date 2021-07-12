@@ -128,6 +128,46 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('http://localhost/app.php/testing', $url);
     }
 
+    public function testRelativeUrlWithStringableObjectParameter()
+    {
+        $stringableObject = new StringableObject();
+
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
+        $url = $this->getGenerator($routes)->generate('test', ['foo' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $this->assertSame('/app.php/testing/bar', $url);
+    }
+
+    public function testRelativeUrlWithStringableObjectExtraParameter()
+    {
+        $stringableObject = new StringableObject();
+
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', ['stringable' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $this->assertSame('/app.php/testing?stringable=bar', $url);
+    }
+
+    public function testAbsoluteUrlWithStringableObjectExtraParameter()
+    {
+        $stringableObject = new StringableObject();
+
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', ['stringable' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $this->assertSame('http://localhost/app.php/testing?stringable=bar', $url);
+    }
+
+    public function testAbsoluteUrlWithStringableObjectExtraParameterInArray()
+    {
+        $stringableObject = new StringableObject();
+
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', ['key' => ['stringable' => $stringableObject]], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $this->assertSame('http://localhost/app.php/testing?key%5Bstringable%5D=bar', $url);
+    }
+
     public function testUrlWithExtraParametersFromGlobals()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
@@ -890,5 +930,13 @@ class UrlGeneratorTest extends TestCase
         $routes->add($name, $route);
 
         return $routes;
+    }
+}
+
+class StringableObject
+{
+    public function __toString()
+    {
+        return 'bar';
     }
 }

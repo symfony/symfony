@@ -12,7 +12,6 @@ jobs:
 
   tests:
     name: Tests
-    runs-on: Ubuntu-20.04
 
     env:
       extensions: amqp,apcu,igbinary,intl,mbstring,memcached,mongodb,redis
@@ -21,14 +20,23 @@ jobs:
       matrix:
         include:
           - php: '7.2'
+            os: ubuntu-20.04
           - php: '8.0'
+            os: ubuntu-20.04
           - php: '7.4'
+            os: macos-11
+          - php: '7.4'
+            os: ubuntu-20.04
             mode: high-deps
           - php: '8.0'
+            os: ubuntu-20.04
             mode: low-deps
           - php: '8.1'
+            os: ubuntu-20.04
             mode: experimental
       fail-fast: false
+
+    runs-on: "${{ matrix.os }}"
 
     steps:
       - name: Checkout
@@ -136,7 +144,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Patch return types
-        if: "${{ matrix.php == '8.0' && ! matrix.mode }}"
+        if: "${{ matrix.php == '8.0' && ! matrix.mode && matrix.os == 'ubuntu-20.04' }}"
         run: |
           sed -i 's/"\*\*\/Tests\/"//' composer.json
           composer install --optimize-autoloader

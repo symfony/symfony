@@ -25,6 +25,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file = realpath($file), '/vendor/'):
         case false !== strpos($file, '/src/Symfony/Bridge/PhpUnit/'):
         case false !== strpos($file, '/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Validation/Article.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Cache/Tests/Fixtures/DriverWrapper.php'):
         case false !== strpos($file, '/src/Symfony/Component/Config/Tests/Fixtures/BadFileName.php'):
         case false !== strpos($file, '/src/Symfony/Component/Config/Tests/Fixtures/BadParent.php'):
         case false !== strpos($file, '/src/Symfony/Component/Config/Tests/Fixtures/ParseError.php'):

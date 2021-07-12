@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Transport;
 
+use Pheanstalk\Contract\PheanstalkInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\PriorityStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -42,8 +44,26 @@ class BeanstalkdSender implements SenderInterface
         $delayStamp = $envelope->last(DelayStamp::class);
         $delayInMs = null !== $delayStamp ? $delayStamp->getDelay() : 0;
 
-        $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delayInMs);
+        /** @var PriorityStamp|null $priorityStamp */
+        $priorityStamp = $envelope->last(PriorityStamp::class);
+        $priority = $this->getPheanstalkPriority($priorityStamp);
+
+        $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delayInMs, $priority);
 
         return $envelope;
+    }
+
+    /**
+     * Beanstalkd supports u32 priorities (0 to 2^32 - 1), with 0 being the highest.
+     * RabbitMQ supports u8 priorities (0 to 255), with 255 being the highest.
+     * To provide interoperability, use RabbitMQ model.
+     */
+    private function getPheanstalkPriority(?PriorityStamp $stamp): int
+    {
+        if (null !== $stamp) {
+            return PriorityStamp::MAX_PRIORITY - $stamp->getPriority();
+        }
+
+        return PheanstalkInterface::DEFAULT_PRIORITY;
     }
 }

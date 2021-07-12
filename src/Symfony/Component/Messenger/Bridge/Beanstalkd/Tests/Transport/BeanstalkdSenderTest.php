@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Transport;
 
+use Pheanstalk\Contract\PheanstalkInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdSender;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\PriorityStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 final class BeanstalkdSenderTest extends TestCase
@@ -27,7 +29,7 @@ final class BeanstalkdSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 0);
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 0, PheanstalkInterface::DEFAULT_PRIORITY);
 
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
@@ -42,7 +44,22 @@ final class BeanstalkdSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 500);
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 500, PheanstalkInterface::DEFAULT_PRIORITY);
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+
+        $sender = new BeanstalkdSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    public function testSendWithPriority()
+    {
+        $envelope = (new Envelope(new DummyMessage('Oy')))->with(new PriorityStamp(255));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 0, 0);
 
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);

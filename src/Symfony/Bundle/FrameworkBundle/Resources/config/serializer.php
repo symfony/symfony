@@ -78,7 +78,7 @@ return static function (ContainerConfigurator $container) {
 
         // Normalizer
         ->set('serializer.normalizer.constraint_violation_list', ConstraintViolationListNormalizer::class)
-            ->args([[], service('serializer.name_converter.metadata_aware')])
+            ->args(['%serializer.default_context%', service('serializer.name_converter.metadata_aware')])
             ->tag('serializer.normalizer', ['priority' => -915])
 
         ->set('serializer.normalizer.mime_message', MimeMessageNormalizer::class)
@@ -123,7 +123,7 @@ return static function (ContainerConfigurator $container) {
                 service('property_info')->ignoreOnInvalid(),
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
-                [],
+                '%serializer.default_context%',
             ])
             ->tag('serializer.normalizer', ['priority' => -1000])
 
@@ -136,7 +136,7 @@ return static function (ContainerConfigurator $container) {
                 service('property_info')->ignoreOnInvalid(),
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
-                [],
+                '%serializer.default_context%',
             ])
 
         ->alias(PropertyNormalizer::class, 'serializer.normalizer.property')
@@ -146,7 +146,7 @@ return static function (ContainerConfigurator $container) {
 
         // Loader
         ->set('serializer.mapping.chain_loader', LoaderChain::class)
-            ->args([[]])
+            ->args(['%serializer.default_context%'])
 
         // Class Metadata Factory
         ->set('serializer.mapping.class_metadata_factory', ClassMetadataFactory::class)

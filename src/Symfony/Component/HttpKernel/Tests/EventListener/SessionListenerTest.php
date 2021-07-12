@@ -142,6 +142,32 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
+    public function testSessionSaveAndResponseHasSessionCookie()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->exactly(1))->method('getId')->willReturn('123456');
+        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
+        $session->expects($this->exactly(1))->method('save');
+        $session->expects($this->exactly(1))->method('isStarted')->willReturn(true);
+
+        $container = new Container();
+        $container->set('initialized_session', $session);
+
+        $listener = new SessionListener($container);
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+
+        $request = new Request();
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
+
+        $response = new Response();
+        $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response));
+
+        $cookies = $response->headers->getCookies();
+        $this->assertSame('PHPSESSID', $cookies[0]->getName());
+        $this->assertSame('123456', $cookies[0]->getValue());
+    }
+
     public function testUninitializedSession()
     {
         $kernel = $this->createMock(HttpKernelInterface::class);

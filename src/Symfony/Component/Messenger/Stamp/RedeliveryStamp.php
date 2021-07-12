@@ -24,15 +24,27 @@ final class RedeliveryStamp implements StampInterface
     private $exceptionMessage;
     private $flattenException;
 
-    public function __construct(int $retryCount, string $exceptionMessage = null, FlattenException $flattenException = null, \DateTimeInterface $redeliveredAt = null)
+    /**
+     * @param \DateTimeInterface|null $exceptionMessage
+     */
+    public function __construct(int $retryCount, $exceptionMessage = null, FlattenException $flattenException = null, \DateTimeInterface $redeliveredAt = null)
     {
         $this->retryCount = $retryCount;
         $this->redeliveredAt = $redeliveredAt ?? new \DateTimeImmutable();
-
-        if (null !== $exceptionMessage) {
-            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "$exceptionMessage" parameter in the "%s" class is deprecated, use the "%s" class instead.', self::class, ErrorDetailsStamp::class));
+        if (null !== $redeliveredAt) {
+            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "$redeliveredAt" as 4th argument of the "%s::__construct()" is deprecated, pass "$redeliveredAt" as second argument instead.', self::class));
         }
-        $this->exceptionMessage = $exceptionMessage;
+
+        if ($exceptionMessage instanceof \DateTimeInterface) {
+            // In Symfony 6.0, the second argument will be $redeliveredAt
+            $this->redeliveredAt = $exceptionMessage;
+            if (null !== $redeliveredAt) {
+                throw new \LogicException('It is deprecated to specify a redeliveredAt as 4th argument. The correct way is to specify redeliveredAt as the second argument. Using both is not allowed.');
+            }
+        } elseif (null !== $exceptionMessage) {
+            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "$exceptionMessage" parameter in the "%s" class is deprecated, use the "%s" class instead.', self::class, ErrorDetailsStamp::class));
+            $this->exceptionMessage = $exceptionMessage;
+        }
 
         if (null !== $flattenException) {
             trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "$flattenException" parameter in the "%s" class is deprecated, use the "%s" class instead.', self::class, ErrorDetailsStamp::class));

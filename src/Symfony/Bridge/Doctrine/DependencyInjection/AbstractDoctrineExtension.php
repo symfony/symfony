@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection;
 
+use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -87,6 +88,25 @@ abstract class AbstractDoctrineExtension extends Extension
                 $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container);
                 if (!$mappingConfig) {
                     continue;
+                }
+            } elseif (!$mappingConfig['type'] && \PHP_VERSION_ID < 80000) {
+                $mappingConfig['type'] = 'annotation';
+            } elseif (!$mappingConfig['type']) {
+                $mappingConfig['type'] = 'attribute';
+
+                $glob = new GlobResource($mappingConfig['dir'], '*', true);
+                $container->addResource($glob);
+
+                foreach ($glob as $file) {
+                    $content = file_get_contents($file);
+
+                    if (preg_match('/^#\[.*Entity\b/m', $content)) {
+                        break;
+                    }
+                    if (preg_match('/^ \* @.*Entity\b/m', $content)) {
+                        $mappingConfig['type'] = 'annotation';
+                        break;
+                    }
                 }
             }
 

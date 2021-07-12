@@ -29,8 +29,6 @@ interface EncryptionInterface
      *
      * @param string|null $secret A secret to be used in symmetric encryption. A
      *                            new secret is generated if none is provided.
-     *
-     * @throws EncryptionException
      */
     public function generateKey(string $secret = null): KeyInterface;
 
@@ -56,7 +54,7 @@ interface EncryptionInterface
      * @param string       $message Plain text version of the message
      * @param KeyInterface $key     A key that holds a string secret
      *
-     * @return string Output formatted by Ciphertext
+     * @return string formatted as a Symfony Encryption Token
      *
      * @throws EncryptionException
      * @throws InvalidKeyException
@@ -92,7 +90,7 @@ interface EncryptionInterface
      * @param string       $message      Plain text version of the message
      * @param KeyInterface $recipientKey Key with a public key of the recipient
      *
-     * @return string Output formatted by Ciphertext
+     * @return string formatted as a Symfony Encryption Token
      *
      * @throws EncryptionException
      * @throws InvalidKeyException
@@ -102,8 +100,8 @@ interface EncryptionInterface
     /**
      * Gets a plain text version of the encrypted message.
      *
-     * @param string            $message         Encrypted version of the message
-     * @param KeyInterface      $key             Key of the recipient, it should contain a private key
+     * @param string       $message formatted in the Symfony Encryption Token format
+     * @param KeyInterface $key     Key of the recipient, it should contain a private key
      *
      * @throws DecryptionException
      * @throws InvalidKeyException

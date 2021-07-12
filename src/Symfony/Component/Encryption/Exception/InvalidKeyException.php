@@ -12,7 +12,7 @@
 namespace Symfony\Component\Encryption\Exception;
 
 /**
- * Thrown when a message cannot be encrypted.
+ * Thrown when there is an issue with the Key.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  *

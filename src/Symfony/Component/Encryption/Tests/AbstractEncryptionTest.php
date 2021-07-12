@@ -12,13 +12,11 @@
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Encryption\Ciphertext;
 use Symfony\Component\Encryption\EncryptionInterface;
-use Symfony\Component\Encryption\Exception\DecryptionException;
 use Symfony\Component\Encryption\Exception\MalformedCipherException;
-use Symfony\Component\Encryption\Exception\SignatureVerificationRequiredException;
 use Symfony\Component\Encryption\Exception\UnsupportedAlgorithmException;
 use Symfony\Component\Encryption\KeyInterface;
+use Symfony\Component\Encryption\SymfonyEncryptionToken;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
@@ -75,7 +73,7 @@ abstract class AbstractEncryptionTest extends TestCase
         $key = $cipher->generateKey();
 
         $this->expectException(UnsupportedAlgorithmException::class);
-        $cipher->decrypt(Ciphertext::create('foo', 'bar')->getString(), $key);
+        $cipher->decrypt(SymfonyEncryptionToken::create('foo', 'bar')->getString(), $key);
     }
 
     public function testEncryptFor()

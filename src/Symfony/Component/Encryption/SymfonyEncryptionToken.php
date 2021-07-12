@@ -15,20 +15,20 @@ use Symfony\Component\Encryption\Exception\DecryptionException;
 use Symfony\Component\Encryption\Exception\MalformedCipherException;
 
 /**
- * This class is responsible for the payload API.
+ * This class is responsible for creating and parsing Symfony Encryption Tokens.
+ * It is an helper class for the EncryptionInterface implementations. In all common
+ * scenarios, one does not need to interact with this class directly.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * @internal
  */
-class Ciphertext implements \Stringable
+class SymfonyEncryptionToken implements \Stringable
 {
     /**
      * Algorithm used to encrypt the message.
      */
     private string $algorithm;
     private string $version;
-    private string $payload;
+    private string $ciphertext;
 
     /**
      * @var array<string, string>
@@ -40,13 +40,13 @@ class Ciphertext implements \Stringable
     }
 
     /**
-     * @param array<string, string> $headers
+     * @param array<string, string> $headers keys MUST be ascii values only
      */
     public static function create(string $algorithm, string $ciphertext, array $headers = []): self
     {
         $model = new self();
         $model->algorithm = $algorithm;
-        $model->payload = $ciphertext;
+        $model->ciphertext = $ciphertext;
         $model->headers = $headers;
 
         return $model;
@@ -64,14 +64,14 @@ class Ciphertext implements \Stringable
             throw new MalformedCipherException();
         }
 
-        [$headersString, $payload, $hashSignature] = $parts;
+        [$headersString, $ciphertext, $hashSignature] = $parts;
 
         $headersString = self::base64UrlDecode($headersString);
-        $payload = self::base64UrlDecode($payload);
+        $ciphertext = self::base64UrlDecode($ciphertext);
         $hashSignature = self::base64UrlDecode($hashSignature);
 
         // Check if data has been modified
-        $hash = hash('sha256', $headersString.$payload);
+        $hash = hash('sha256', $headersString.$ciphertext);
         if (!hash_equals($hash, $hashSignature)) {
             throw new MalformedCipherException();
         }
@@ -91,7 +91,7 @@ class Ciphertext implements \Stringable
         $model->version = $headers['ver'];
         unset($headers['ver']);
         $model->headers = $headers;
-        $model->payload = $payload;
+        $model->ciphertext = $ciphertext;
 
         return $model;
     }
@@ -113,8 +113,8 @@ class Ciphertext implements \Stringable
 
         return sprintf('%s.%s.%s',
             self::base64UrlEncode($headers),
-            self::base64UrlEncode($this->payload),
-            self::base64UrlEncode(hash('sha256', $headers.$this->payload))
+            self::base64UrlEncode($this->ciphertext),
+            self::base64UrlEncode(hash('sha256', $headers.$this->ciphertext))
         );
     }
 
@@ -128,9 +128,9 @@ class Ciphertext implements \Stringable
         return $this->version;
     }
 
-    public function getPayload(): string
+    public function getCiphertext(): string
     {
-        return $this->payload;
+        return $this->ciphertext;
     }
 
     public function hasHeader(string $name): bool

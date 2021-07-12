@@ -11,15 +11,13 @@
 
 namespace Symfony\Component\Encryption\Sodium;
 
-use Symfony\Component\Encryption\Ciphertext;
 use Symfony\Component\Encryption\EncryptionInterface;
 use Symfony\Component\Encryption\Exception\DecryptionException;
 use Symfony\Component\Encryption\Exception\EncryptionException;
 use Symfony\Component\Encryption\Exception\InvalidKeyException;
-use Symfony\Component\Encryption\Exception\SignatureVerificationRequiredException;
-use Symfony\Component\Encryption\Exception\UnableToVerifySignatureException;
 use Symfony\Component\Encryption\Exception\UnsupportedAlgorithmException;
 use Symfony\Component\Encryption\KeyInterface;
+use Symfony\Component\Encryption\SymfonyEncryptionToken;
 
 /**
  * Using the Sodium extension to safely encrypt your data.
@@ -48,7 +46,7 @@ final class SodiumEncryption implements EncryptionInterface
             throw new EncryptionException('Failed to encrypt message.', $exception);
         }
 
-        return Ciphertext::create('sodium_secretbox', $ciphertext, ['nonce'=>$nonce])->getString();
+        return SymfonyEncryptionToken::create('sodium_secretbox', $ciphertext, ['nonce' => $nonce])->getString();
     }
 
     public function encryptFor(string $message, KeyInterface $recipientKey): string
@@ -63,7 +61,7 @@ final class SodiumEncryption implements EncryptionInterface
             throw new EncryptionException('Failed to encrypt message.', $exception);
         }
 
-        return Ciphertext::create('sodium_crypto_box_seal', $ciphertext)->getString();
+        return SymfonyEncryptionToken::create('sodium_crypto_box_seal', $ciphertext)->getString();
     }
 
     public function decrypt(string $message, KeyInterface $key): string
@@ -72,16 +70,16 @@ final class SodiumEncryption implements EncryptionInterface
             throw new InvalidKeyException(sprintf('Class "%s" will only accept key objects of class "%s".', self::class, SodiumKey::class));
         }
 
-        $ciphertext = Ciphertext::parse($message);
-        $algorithm = $ciphertext->getAlgorithm();
-        $payload = $ciphertext->getPayload();
+        $encryptionToken = SymfonyEncryptionToken::parse($message);
+        $algorithm = $encryptionToken->getAlgorithm();
+        $ciphertext = $encryptionToken->getCiphertext();
 
         try {
             if ('sodium_crypto_box_seal' === $algorithm) {
-                $output = sodium_crypto_box_seal_open($payload, $key->getKeypair());
+                $output = sodium_crypto_box_seal_open($ciphertext, $key->getKeypair());
             } elseif ('sodium_secretbox' === $algorithm) {
-                $nonce = $ciphertext->getHeader('nonce');
-                $output = sodium_crypto_secretbox_open($payload, $nonce, $key->getSecret());
+                $nonce = $encryptionToken->getHeader('nonce');
+                $output = sodium_crypto_secretbox_open($ciphertext, $nonce, $key->getSecret());
             } else {
                 throw new UnsupportedAlgorithmException($algorithm);
             }

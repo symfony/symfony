@@ -108,11 +108,7 @@ final class SodiumKey implements KeyInterface
 
     public function getSecret(): string
     {
-        if (null === $this->secret) {
-            throw new InvalidKeyException('This key does not have a secret.');
-        }
-
-        return $this->secret;
+        return $this->secret ?? throw new InvalidKeyException('This key does not have a secret.');
     }
 
     public function getPrivateKey(): string

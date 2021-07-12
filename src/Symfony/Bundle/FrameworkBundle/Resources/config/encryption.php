@@ -16,7 +16,7 @@ use Symfony\Component\Encryption\Sodium\SodiumEncryption;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('security.encryption.sodium', SodiumEncryption::class)
+        ->set('encryption.sodium', SodiumEncryption::class)
         ->alias(EncryptionInterface::class, 'security.encryption.sodium')
         ;
 };

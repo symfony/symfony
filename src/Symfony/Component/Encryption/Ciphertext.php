@@ -77,7 +77,7 @@ class Ciphertext implements \Stringable
         $nonce = self::base64UrlDecode($nonce);
         $hashSignature = self::base64UrlDecode($hashSignature);
 
-        // Check if integrity hash is valid
+        // Check if data has been modified
         $hash = hash('sha256', $headersString.$payload.$nonce);
         if (!hash_equals($hash, $hashSignature)) {
             throw new MalformedCipherException();

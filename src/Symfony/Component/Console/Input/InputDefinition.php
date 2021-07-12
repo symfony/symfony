@@ -231,7 +231,7 @@ class InputDefinition
         if (isset($this->options[$option->getName()]) && !$option->equals($this->options[$option->getName()])) {
             throw new LogicException(sprintf('An option named "%s" already exists.', $option->getName()));
         }
-        if (isset($this->negations[$option->getName()])) {
+        if (isset($this->negations[$option->getName()]) && !$option->equals($this->options[$this->negations[$option->getName()]])) {
             throw new LogicException(sprintf('An option named "%s" already exists.', $option->getName()));
         }
 
@@ -252,7 +252,7 @@ class InputDefinition
 
         if ($option->isNegatable()) {
             $negatedName = 'no-'.$option->getName();
-            if (isset($this->options[$negatedName])) {
+            if (isset($this->options[$negatedName]) && !$option->equals($this->options[$negatedName])) {
                 throw new LogicException(sprintf('An option named "%s" already exists.', $negatedName));
             }
             $this->negations[$negatedName] = $option->getName();

@@ -43,7 +43,7 @@ class PluralizationRules
             $locale = 'xbr';
         }
 
-        if (\strlen($locale) > 3) {
+        if ('en_US_POSIX' !== $locale && \strlen($locale) > 3) {
             $locale = substr($locale, 0, -\strlen(strrchr($locale, '_')));
         }
 
@@ -88,6 +88,7 @@ class PluralizationRules
             case 'de':
             case 'el':
             case 'en':
+            case 'en_US_POSIX':
             case 'eo':
             case 'es':
             case 'et':

@@ -371,8 +371,8 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Submits data to the button.
      *
-     * @param string|null $submittedData Not used
-     * @param bool        $clearMissing  Not used
+     * @param array|string|null $submittedData Not used
+     * @param bool              $clearMissing  Not used
      *
      * @return $this
      *

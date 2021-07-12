@@ -95,14 +95,24 @@ Display this application version
 * Is negatable: no
 * Default: `false`
 
-#### `--ansi|--no-ansi`
+#### `--ansi`
 
-Force (or disable --no-ansi) ANSI output
+Force ANSI output
 
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Is negatable: yes
+* Is negatable: no
+* Default: `false`
+
+#### `--no-ansi`
+
+Disable ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--no-interaction|-n`
@@ -222,14 +232,24 @@ Display this application version
 * Is negatable: no
 * Default: `false`
 
-#### `--ansi|--no-ansi`
+#### `--ansi`
 
-Force (or disable --no-ansi) ANSI output
+Force ANSI output
 
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Is negatable: yes
+* Is negatable: no
+* Default: `false`
+
+#### `--no-ansi`
+
+Disable ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--no-interaction|-n`

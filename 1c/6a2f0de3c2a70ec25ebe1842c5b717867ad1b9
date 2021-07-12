@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-12T07:23:12Z
+
+For the record, the app directory can be configured via configuration:
+```yaml
+framework:
+    cache:
+        directory: /whatever
+```
+
+(The system directory is kinda hardcoded to `%kernel.cache_dir%/pools`)
+
+But still it's a nice idea to split them by default.

@@ -24,14 +24,14 @@ use Symfony\Component\Encryption\Exception\MalformedCipherException;
 class Ciphertext implements \Stringable
 {
     /**
-     * Algorithm used to encrypt the message
+     * Algorithm used to encrypt the message.
      */
     private string $algorithm;
     private string $version;
     private string $payload;
 
     /**
-     * Nonce used with the algorithm
+     * Nonce used with the algorithm.
      */
     private string $nonce;
 

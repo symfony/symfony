@@ -46,15 +46,24 @@ return static function (ContainerConfigurator $container) {
             ->tag('notifier.channel', ['channel' => 'browser'])
 
         ->set('notifier.channel.chat', ChatChannel::class)
-            ->args([service('chatter.transports'), service('messenger.default_bus')->ignoreOnInvalid()])
+            ->args([
+                service('chatter.transports'),
+                abstract_arg('message bus'),
+            ])
             ->tag('notifier.channel', ['channel' => 'chat'])
 
         ->set('notifier.channel.sms', SmsChannel::class)
-            ->args([service('texter.transports'), service('messenger.default_bus')->ignoreOnInvalid()])
+            ->args([
+                service('texter.transports'),
+                abstract_arg('message bus'),
+            ])
             ->tag('notifier.channel', ['channel' => 'sms'])
 
         ->set('notifier.channel.email', EmailChannel::class)
-            ->args([service('mailer.transports'), service('messenger.default_bus')->ignoreOnInvalid()])
+            ->args([
+                service('mailer.transports'),
+                abstract_arg('message bus'),
+            ])
             ->tag('notifier.channel', ['channel' => 'email'])
 
         ->set('notifier.monolog_handler', NotifierHandler::class)
@@ -66,7 +75,7 @@ return static function (ContainerConfigurator $container) {
         ->set('chatter', Chatter::class)
             ->args([
                 service('chatter.transports'),
-                service('messenger.default_bus')->ignoreOnInvalid(),
+                abstract_arg('message bus'),
                 service('event_dispatcher')->ignoreOnInvalid(),
             ])
 
@@ -86,7 +95,7 @@ return static function (ContainerConfigurator $container) {
         ->set('texter', Texter::class)
             ->args([
                 service('texter.transports'),
-                service('messenger.default_bus')->ignoreOnInvalid(),
+                abstract_arg('message bus'),
                 service('event_dispatcher')->ignoreOnInvalid(),
             ])
 

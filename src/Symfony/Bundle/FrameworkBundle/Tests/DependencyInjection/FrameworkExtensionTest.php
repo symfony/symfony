@@ -1888,6 +1888,34 @@ abstract class FrameworkExtensionTest extends TestCase
         }
     }
 
+    public function testNotifierWithDisabledMessageBus()
+    {
+        $container = $this->createContainerFromFile('notifier_with_disabled_message_bus');
+
+        $this->assertNull($container->getDefinition('chatter')->getArgument(1));
+        $this->assertNull($container->getDefinition('texter')->getArgument(1));
+        $this->assertNull($container->getDefinition('notifier.channel.chat')->getArgument(1));
+        $this->assertNull($container->getDefinition('notifier.channel.email')->getArgument(1));
+        $this->assertNull($container->getDefinition('notifier.channel.sms')->getArgument(1));
+    }
+
+    public function testNotifierWithSpecificMessageBus()
+    {
+        $container = $this->createContainerFromFile('notifier_with_specific_message_bus');
+
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('chatter')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('texter')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.chat')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.email')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.sms')->getArgument(1));
+
+        $this->assertNull($container->getDefinition('chatter')->getArgument(0));
+        $this->assertNull($container->getDefinition('texter')->getArgument(0));
+        $this->assertNull($container->getDefinition('notifier.channel.chat')->getArgument(0));
+        $this->assertNull($container->getDefinition('notifier.channel.email')->getArgument(0));
+        $this->assertNull($container->getDefinition('notifier.channel.sms')->getArgument(0));
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([

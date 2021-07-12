@@ -548,6 +548,7 @@ class ConfigurationTest extends TestCase
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
+                'message_bus' => null,
                 'chatter_transports' => [],
                 'texter_transports' => [],
                 'channel_policy' => [],

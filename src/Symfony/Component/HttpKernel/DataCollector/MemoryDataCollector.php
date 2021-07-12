@@ -60,7 +60,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return int The memory
      */
-    public function getMemory()
+    public function getMemory(): int
     {
         return $this->data['memory'];
     }
@@ -70,7 +70,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return int The memory limit
      */
-    public function getMemoryLimit()
+    public function getMemoryLimit(): int
     {
         return $this->data['memory_limit'];
     }
@@ -86,7 +86,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'memory';
     }

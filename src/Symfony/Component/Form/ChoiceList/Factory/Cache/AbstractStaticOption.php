@@ -47,7 +47,7 @@ abstract class AbstractStaticOption
     /**
      * @return mixed
      */
-    final public function getOption()
+    final public function getOption(): mixed
     {
         return $this->option;
     }

@@ -103,7 +103,7 @@ class QuestionHelper extends Helper
      *
      * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
-    private function doAsk(OutputInterface $output, Question $question)
+    private function doAsk(OutputInterface $output, Question $question): mixed
     {
         $this->writePrompt($output, $question);
 
@@ -153,7 +153,7 @@ class QuestionHelper extends Helper
     /**
      * @return mixed
      */
-    private function getDefaultAnswer(Question $question)
+    private function getDefaultAnswer(Question $question): mixed
     {
         $default = $question->getDefault();
 
@@ -450,7 +450,7 @@ class QuestionHelper extends Helper
      *
      * @throws \Exception In case the max number of attempts has been reached and no valid response has been given
      */
-    private function validateAttempts(callable $interviewer, OutputInterface $output, Question $question)
+    private function validateAttempts(callable $interviewer, OutputInterface $output, Question $question): mixed
     {
         $error = null;
         $attempts = $question->getMaxAttempts();

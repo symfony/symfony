@@ -103,7 +103,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
      *
      * @return mixed
      */
-    private function extract(iterable $extractors, string $method, array $arguments)
+    private function extract(iterable $extractors, string $method, array $arguments): mixed
     {
         foreach ($extractors as $extractor) {
             if (null !== $value = $extractor->{$method}(...$arguments)) {

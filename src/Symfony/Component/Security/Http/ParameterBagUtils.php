@@ -33,7 +33,7 @@ final class ParameterBagUtils
      *
      * @throws InvalidArgumentException when the given path is malformed
      */
-    public static function getParameterBagValue(ParameterBag $parameters, string $path)
+    public static function getParameterBagValue(ParameterBag $parameters, string $path): mixed
     {
         if (false === $pos = strpos($path, '[')) {
             return $parameters->all()[$path] ?? null;
@@ -65,7 +65,7 @@ final class ParameterBagUtils
      *
      * @throws InvalidArgumentException when the given path is malformed
      */
-    public static function getRequestParameterValue(Request $request, string $path)
+    public static function getRequestParameterValue(Request $request, string $path): mixed
     {
         if (false === $pos = strpos($path, '[')) {
             return $request->get($path);

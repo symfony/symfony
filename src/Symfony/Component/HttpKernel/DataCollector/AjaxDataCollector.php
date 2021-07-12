@@ -33,7 +33,7 @@ class AjaxDataCollector extends DataCollector
         // all collecting is done client side
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'ajax';
     }

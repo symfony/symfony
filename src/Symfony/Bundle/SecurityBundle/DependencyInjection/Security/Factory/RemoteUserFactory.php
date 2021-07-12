@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RemoteUserFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $providerId = 'security.authentication.provider.pre_authenticated.'.$id;
         $container
@@ -58,12 +58,12 @@ class RemoteUserFactory implements SecurityFactoryInterface, AuthenticatorFactor
         return $authenticatorId;
     }
 
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'pre_auth';
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'remote-user';
     }

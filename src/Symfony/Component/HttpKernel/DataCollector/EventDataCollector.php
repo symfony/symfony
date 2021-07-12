@@ -89,7 +89,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      *
      * @see TraceableEventDispatcher
      */
-    public function getCalledListeners()
+    public function getCalledListeners(): array
     {
         return $this->data['called_listeners'];
     }
@@ -111,7 +111,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      *
      * @see TraceableEventDispatcher
      */
-    public function getNotCalledListeners()
+    public function getNotCalledListeners(): array
     {
         return $this->data['not_called_listeners'];
     }
@@ -135,7 +135,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      *
      * @see TraceableEventDispatcher
      */
-    public function getOrphanedEvents()
+    public function getOrphanedEvents(): array
     {
         return $this->data['orphaned_events'];
     }
@@ -143,7 +143,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'events';
     }

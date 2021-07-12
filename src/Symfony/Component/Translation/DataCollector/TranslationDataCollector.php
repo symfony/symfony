@@ -73,7 +73,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     /**
      * @return int
      */
-    public function getCountMissings()
+    public function getCountMissings(): int
     {
         return $this->data[DataCollectorTranslator::MESSAGE_MISSING] ?? 0;
     }
@@ -81,7 +81,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     /**
      * @return int
      */
-    public function getCountFallbacks()
+    public function getCountFallbacks(): int
     {
         return $this->data[DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK] ?? 0;
     }
@@ -89,7 +89,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     /**
      * @return int
      */
-    public function getCountDefines()
+    public function getCountDefines(): int
     {
         return $this->data[DataCollectorTranslator::MESSAGE_DEFINED] ?? 0;
     }
@@ -110,7 +110,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'translation';
     }

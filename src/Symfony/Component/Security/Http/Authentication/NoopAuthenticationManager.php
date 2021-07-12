@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class NoopAuthenticationManager implements AuthenticationManagerInterface
 {
-    public function authenticate(TokenInterface $token)
+    public function authenticate(TokenInterface $token): TokenInterface
     {
         return $token;
     }

@@ -67,7 +67,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'cache';
     }
@@ -77,7 +77,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
      *
      * @return array
      */
-    public function getStatistics()
+    public function getStatistics(): array
     {
         return $this->data['instances']['statistics'];
     }
@@ -87,7 +87,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
      *
      * @return array
      */
-    public function getTotals()
+    public function getTotals(): array
     {
         return $this->data['total']['statistics'];
     }
@@ -97,7 +97,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
      *
      * @return mixed
      */
-    public function getCalls()
+    public function getCalls(): mixed
     {
         return $this->data['instances']['calls'];
     }

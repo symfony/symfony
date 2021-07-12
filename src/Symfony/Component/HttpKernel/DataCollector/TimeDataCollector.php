@@ -94,7 +94,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
      *
      * @return StopwatchEvent[] The request events
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         return $this->data['events'];
     }
@@ -104,7 +104,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
      *
      * @return float The elapsed time
      */
-    public function getDuration()
+    public function getDuration(): float
     {
         if (!isset($this->data['events']['__section__'])) {
             return 0;
@@ -122,7 +122,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
      *
      * @return float The elapsed time
      */
-    public function getInitTime()
+    public function getInitTime(): float
     {
         if (!isset($this->data['events']['__section__'])) {
             return 0;
@@ -136,7 +136,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
      *
      * @return float
      */
-    public function getStartTime()
+    public function getStartTime(): float
     {
         return $this->data['start_time'];
     }
@@ -144,7 +144,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * @return bool whether or not the stopwatch component is installed
      */
-    public function isStopwatchInstalled()
+    public function isStopwatchInstalled(): bool
     {
         return $this->data['stopwatch_installed'];
     }
@@ -152,7 +152,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'time';
     }

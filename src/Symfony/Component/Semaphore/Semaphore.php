@@ -46,7 +46,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }

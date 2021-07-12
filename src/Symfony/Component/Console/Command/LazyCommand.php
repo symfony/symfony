@@ -180,7 +180,7 @@ final class LazyCommand extends Command
     /**
      * @return mixed
      */
-    public function getHelper(string $name)
+    public function getHelper(string $name): mixed
     {
         return $this->getCommand()->getHelper($name);
     }

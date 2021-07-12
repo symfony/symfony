@@ -40,7 +40,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof \BackedEnum;
     }
@@ -50,7 +50,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, $type, $format = null, array $context = []): mixed
     {
         if (!is_subclass_of($type, \BackedEnum::class)) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
@@ -70,7 +70,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         return is_subclass_of($type, \BackedEnum::class);
     }

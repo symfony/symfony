@@ -86,7 +86,7 @@ class IdReader
      *
      * @return string The ID value
      */
-    public function getIdValue(object $object = null)
+    public function getIdValue(object $object = null): string
     {
         if (!$object) {
             return '';

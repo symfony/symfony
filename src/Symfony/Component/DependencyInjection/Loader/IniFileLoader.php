@@ -75,7 +75,7 @@ class IniFileLoader extends FileLoader
      *
      * @return mixed
      */
-    private function phpize(string $value)
+    private function phpize(string $value): mixed
     {
         // trim on the right as comments removal keep whitespaces
         if ($value !== $v = rtrim($value)) {

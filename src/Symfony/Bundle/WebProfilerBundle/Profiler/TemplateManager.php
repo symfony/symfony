@@ -44,7 +44,7 @@ class TemplateManager
      *
      * @throws NotFoundHttpException
      */
-    public function getName(Profile $profile, string $panel)
+    public function getName(Profile $profile, string $panel): mixed
     {
         $templates = $this->getNames($profile);
 
@@ -62,7 +62,7 @@ class TemplateManager
      *
      * @throws \UnexpectedValueException
      */
-    public function getNames(Profile $profile)
+    public function getNames(Profile $profile): array
     {
         $loader = $this->twig->getLoader();
         $templates = [];

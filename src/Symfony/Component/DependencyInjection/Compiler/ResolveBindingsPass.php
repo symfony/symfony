@@ -229,7 +229,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
     /**
      * @return mixed
      */
-    private function getBindingValue(BoundArgument $binding)
+    private function getBindingValue(BoundArgument $binding): mixed
     {
         [$bindingValue, $bindingId] = $binding->getValues();
 

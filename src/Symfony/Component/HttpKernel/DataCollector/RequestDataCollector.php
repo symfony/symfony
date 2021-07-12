@@ -318,7 +318,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      *
      * @return string The route
      */
-    public function getRoute()
+    public function getRoute(): string
     {
         return $this->data['route'];
     }
@@ -335,7 +335,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      *
      * @return array The parameters
      */
-    public function getRouteParams()
+    public function getRouteParams(): array
     {
         return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params']->getValue() : [];
     }
@@ -383,7 +383,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => 'onKernelController',
@@ -394,7 +394,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'request';
     }

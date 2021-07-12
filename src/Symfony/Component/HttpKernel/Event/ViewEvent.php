@@ -42,7 +42,7 @@ final class ViewEvent extends RequestEvent
      *
      * @return mixed The controller return value
      */
-    public function getControllerResult()
+    public function getControllerResult(): mixed
     {
         return $this->controllerResult;
     }

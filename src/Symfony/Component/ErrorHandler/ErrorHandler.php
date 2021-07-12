@@ -162,7 +162,7 @@ class ErrorHandler
      *
      * @throws \ErrorException When $function(...$arguments) triggers a PHP error
      */
-    public static function call(callable $function, mixed ...$arguments)
+    public static function call(callable $function, mixed ...$arguments): mixed
     {
         set_error_handler(static function (int $type, string $message, string $file, int $line) {
             if (__FILE__ === $file) {

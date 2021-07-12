@@ -35,7 +35,7 @@ final class PostgreSqlConnection extends Connection
 
     private $listening = false;
 
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }

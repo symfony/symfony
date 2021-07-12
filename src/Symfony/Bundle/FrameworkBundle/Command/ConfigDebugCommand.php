@@ -152,7 +152,7 @@ EOF
      *
      * @return mixed
      */
-    private function getConfigForPath(array $config, string $path, string $alias)
+    private function getConfigForPath(array $config, string $path, string $alias): mixed
     {
         $steps = explode('.', $path);
 

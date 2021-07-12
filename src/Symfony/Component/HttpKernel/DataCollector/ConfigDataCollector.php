@@ -96,7 +96,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string|null The token
      */
-    public function getToken()
+    public function getToken(): ?string
     {
         return $this->data['token'];
     }
@@ -106,7 +106,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string The Symfony version
      */
-    public function getSymfonyVersion()
+    public function getSymfonyVersion(): string
     {
         return $this->data['symfony_version'];
     }
@@ -116,7 +116,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string One of: unknown, dev, stable, eom, eol
      */
-    public function getSymfonyState()
+    public function getSymfonyState(): string
     {
         return $this->data['symfony_state'];
     }
@@ -127,7 +127,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string
      */
-    public function getSymfonyMinorVersion()
+    public function getSymfonyMinorVersion(): string
     {
         return $this->data['symfony_minor_version'];
     }
@@ -146,7 +146,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string
      */
-    public function getSymfonyEom()
+    public function getSymfonyEom(): string
     {
         return $this->data['symfony_eom'];
     }
@@ -157,7 +157,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string
      */
-    public function getSymfonyEol()
+    public function getSymfonyEol(): string
     {
         return $this->data['symfony_eol'];
     }
@@ -167,7 +167,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string The PHP version
      */
-    public function getPhpVersion()
+    public function getPhpVersion(): string
     {
         return $this->data['php_version'];
     }
@@ -177,7 +177,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string|null The extra part
      */
-    public function getPhpVersionExtra()
+    public function getPhpVersionExtra(): ?string
     {
         return $this->data['php_version_extra'] ?? null;
     }
@@ -185,7 +185,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * @return int The PHP architecture as number of bits (e.g. 32 or 64)
      */
-    public function getPhpArchitecture()
+    public function getPhpArchitecture(): int
     {
         return $this->data['php_architecture'];
     }
@@ -193,7 +193,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * @return string
      */
-    public function getPhpIntlLocale()
+    public function getPhpIntlLocale(): string
     {
         return $this->data['php_intl_locale'];
     }
@@ -201,7 +201,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * @return string
      */
-    public function getPhpTimezone()
+    public function getPhpTimezone(): string
     {
         return $this->data['php_timezone'];
     }
@@ -211,7 +211,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string The environment
      */
-    public function getEnv()
+    public function getEnv(): string
     {
         return $this->data['env'];
     }
@@ -231,7 +231,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return bool true if XDebug is enabled, false otherwise
      */
-    public function hasXDebug()
+    public function hasXDebug(): bool
     {
         return $this->data['xdebug_enabled'];
     }
@@ -241,7 +241,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return bool true if APCu is enabled, false otherwise
      */
-    public function hasApcu()
+    public function hasApcu(): bool
     {
         return $this->data['apcu_enabled'];
     }
@@ -251,7 +251,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return bool true if Zend OPcache is enabled, false otherwise
      */
-    public function hasZendOpcache()
+    public function hasZendOpcache(): bool
     {
         return $this->data['zend_opcache_enabled'];
     }
@@ -266,7 +266,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string The environment
      */
-    public function getSapiName()
+    public function getSapiName(): string
     {
         return $this->data['sapi_name'];
     }
@@ -274,7 +274,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'config';
     }

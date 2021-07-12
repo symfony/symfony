@@ -123,7 +123,7 @@ trait CommonResponseTrait
         return $stream;
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }

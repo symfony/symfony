@@ -192,7 +192,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * @return mixed
      */
-    private static function fixPhpFilesArray(mixed $data)
+    private static function fixPhpFilesArray(mixed $data): mixed
     {
         if (!\is_array($data)) {
             return $data;
@@ -228,7 +228,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * @return mixed Returns the stripped upload data
      */
-    private static function stripEmptyFiles(mixed $data)
+    private static function stripEmptyFiles(mixed $data): mixed
     {
         if (!\is_array($data)) {
             return $data;

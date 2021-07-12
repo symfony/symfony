@@ -340,7 +340,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @return mixed The prototype instance
      */
-    private function getPrototypeForChild(string $key)
+    private function getPrototypeForChild(string $key): mixed
     {
         $prototype = $this->valuePrototypes[$key] ?? $this->prototype;
         $prototype->setName($key);

@@ -35,12 +35,12 @@ abstract class Compound extends Composite
         parent::__construct($options);
     }
 
-    final protected function getCompositeOption()
+    final protected function getCompositeOption(): string
     {
         return 'constraints';
     }
 
-    final public function validatedBy()
+    final public function validatedBy(): string
     {
         return CompoundValidator::class;
     }

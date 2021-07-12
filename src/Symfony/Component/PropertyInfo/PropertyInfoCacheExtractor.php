@@ -93,7 +93,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
      *
      * @return mixed
      */
-    private function extract(string $method, array $arguments)
+    private function extract(string $method, array $arguments): mixed
     {
         try {
             $serializedArguments = serialize($arguments);

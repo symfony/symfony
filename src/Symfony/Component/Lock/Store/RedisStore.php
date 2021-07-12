@@ -249,7 +249,7 @@ class RedisStore implements SharedLockStoreInterface
      *
      * @return mixed
      */
-    private function evaluate(string $script, string $resource, array $args)
+    private function evaluate(string $script, string $resource, array $args): mixed
     {
         if (
             $this->redis instanceof \Redis ||

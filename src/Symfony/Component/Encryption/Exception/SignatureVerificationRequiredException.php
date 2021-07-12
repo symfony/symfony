@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Encryption\Exception;
 
+use Symfony\Component\Encryption\EncryptionInterface;
+
 /**
  * The sender requires you to verify the signature. You should pass both your
  * private key and the sender's public key to the decrypt() method.
@@ -23,6 +25,6 @@ class SignatureVerificationRequiredException extends DecryptionException
 {
     public function __construct(\Throwable $previous = null)
     {
-        parent::__construct('The sender requires you to verify the signature.');
+        parent::__construct(sprintf('The sender requires you to verify the signature. Please pass the sender\'s public key to the %s::decrypt()', EncryptionInterface::class), $previous);
     }
 }

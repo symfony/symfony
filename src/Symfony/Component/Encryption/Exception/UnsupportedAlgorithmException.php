@@ -20,6 +20,6 @@ class UnsupportedAlgorithmException extends DecryptionException
 {
     public function __construct(string $algorithm, \Throwable $previous = null)
     {
-        parent::__construct(sprintf('The ciphertext is encrypted with "%s" algorithm. Decryption of that algorithm is not supported.', $algorithm));
+        parent::__construct(sprintf('The ciphertext is encrypted with "%s" algorithm. Decryption of that algorithm is not supported.', $algorithm), $previous);
     }
 }

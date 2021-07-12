@@ -21,6 +21,7 @@ use Symfony\Bridge\Twig\Extension\ExpressionExtension;
 use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
+use Symfony\Bridge\Twig\Extension\IntlExtension;
 use Symfony\Bridge\Twig\Extension\ProfilerExtension;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Bridge\Twig\Extension\SerializerExtension;
@@ -167,5 +168,9 @@ return static function (ContainerConfigurator $container) {
             ->args([service('serializer')])
 
         ->set('twig.extension.serializer', SerializerExtension::class)
+
+        ->set('twig.extension.intl', IntlExtension::class)
+            ->args([service('intl.date_interval_formatter')->nullOnInvalid()])
+            ->tag('twig.extension')
     ;
 };

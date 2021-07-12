@@ -31,7 +31,7 @@
         "symfony/form": "^5.3|^6.0",
         "symfony/http-foundation": "^5.3|^6.0",
         "symfony/http-kernel": "^4.4|^5.0|^6.0",
-        "symfony/intl": "^4.4|^5.0|^6.0",
+        "symfony/intl": "^5.4|^6.0",
         "symfony/mime": "^5.2|^6.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/property-info": "^4.4|^5.1|^6.0",

@@ -14,6 +14,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Intl\DateIntervalFormatter\DateIntervalFormatter;
+use Symfony\Component\Intl\DateIntervalFormatter\DateIntervalFormatterInterface;
 use Symfony\Component\Translation\Dumper\CsvFileDumper;
 use Symfony\Component\Translation\Dumper\IcuResFileDumper;
 use Symfony\Component\Translation\Dumper\IniFileDumper;
@@ -158,5 +160,8 @@ return static function (ContainerConfigurator $container) {
             ->args([service(ContainerInterface::class)])
             ->tag('container.service_subscriber', ['id' => 'translator'])
             ->tag('kernel.cache_warmer')
+
+        ->set('translation.formatter.date_interval', DateIntervalFormatter::class)
+            ->alias(DateIntervalFormatterInterface::class, 'translation.formatter.date_interval')
     ;
 };

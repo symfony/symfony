@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+* Add `DateIntervalFormatter` to humanize a `DateInterval` or a difference between two `DateTimeInterface` objects
+
 5.3
 ---
 

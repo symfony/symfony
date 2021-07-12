@@ -21,27 +21,14 @@ use Symfony\Component\Encryption\KeyInterface;
  */
 final class SodiumKey implements KeyInterface
 {
-    /**
-     * @var string|null
-     */
-    private $secret;
-
-    /**
-     * @var string|null
-     */
-    private $privateKey;
-
-    /**
-     * @var string|null
-     */
-    private $publicKey;
+    private ?string $secret;
+    private ?string $privateKey;
+    private ?string $publicKey;
 
     /**
      * A keypair can only be created from a public and private key.
-     *
-     * @var string|null
      */
-    private $keypair;
+    private ?string $keypair;
 
     public static function create(string $secret, string $keypair): self
     {

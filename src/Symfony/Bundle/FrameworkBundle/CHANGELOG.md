@@ -7,6 +7,7 @@ CHANGELOG
  * Add autowiring alias for `HttpCache\StoreInterface`
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private
+ * Add `MicroKernelTrait::getBundlesPath` method to get bundles config path
 
 5.3
 ---

@@ -113,20 +113,12 @@ final class SodiumKey implements KeyInterface
 
     public function getPrivateKey(): string
     {
-        if (null === $this->privateKey) {
-            throw new InvalidKeyException('This key does not have a private key.');
-        }
-
-        return $this->privateKey;
+        return $this->privateKey ?? throw new InvalidKeyException('This key does not have a private key.');
     }
 
     public function getPublicKey(): string
     {
-        if (null === $this->publicKey) {
-            throw new InvalidKeyException('This key does not have a public key.');
-        }
-
-        return $this->publicKey;
+        return $this->publicKey ?? throw new InvalidKeyException('This key does not have a public key.');
     }
 
     public function getKeypair(): string

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add support for autoconfigurable attributes on methods
+
 5.3
 ---
 

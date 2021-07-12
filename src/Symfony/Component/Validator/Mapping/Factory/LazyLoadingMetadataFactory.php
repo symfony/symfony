@@ -97,6 +97,9 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
 
         $metadata = new ClassMetadata($class);
 
+        // Include constraints from the parent class
+        $this->mergeConstraints($metadata);
+
         if (null !== $this->loader) {
             $this->loader->loadClassMetadata($metadata);
         }
@@ -104,9 +107,6 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
         if (null !== $cacheItem) {
             $this->cache->save($cacheItem->set($metadata));
         }
-
-        // Include constraints from the parent class
-        $this->mergeConstraints($metadata);
 
         return $this->loadedClasses[$class] = $metadata;
     }

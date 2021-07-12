@@ -33,44 +33,9 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
-    {
-        return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, $type, $format = null)
-    {
-        return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;
-    }
-
-    /**
-     * Checks if the given class has any non-static property.
-     */
-    private function supports(string $class): bool
-    {
-        $class = new \ReflectionClass($class);
-
-        // We look for at least one non-static property
-        do {
-            foreach ($class->getProperties() as $property) {
-                if (!$property->isStatic()) {
-                    return true;
-                }
-            }
-        } while ($class = $class->getParentClass());
-
-        return false;
     }
 
     /**

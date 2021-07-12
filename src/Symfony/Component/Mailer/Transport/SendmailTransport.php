@@ -89,6 +89,20 @@ class SendmailTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
+        
+        $originalMessage = $message->getOriginalMessage();
+        $envelope = $message->getEnvelope();
+
+        foreach ($envelope->getRecipients() as $key => $recipient) {
+            if($key === 0) {
+                $originalMessage->to($recipient->getAddress());
+            }else{
+                $originalMessage->addto($recipient->getAddress());
+            }
+        }
+
+        $message = new SentMessage($originalMessage, $envelope);
+        
         $this->getLogger()->debug(sprintf('Email transport "%s" starting', __CLASS__));
 
         $command = $this->command;

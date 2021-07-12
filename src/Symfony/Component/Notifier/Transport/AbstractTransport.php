@@ -14,7 +14,9 @@ namespace Symfony\Component\Notifier\Transport;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Notifier\Event\FailedMessageEvent;
 use Symfony\Component\Notifier\Event\MessageEvent;
+use Symfony\Component\Notifier\Event\SentMessageEvent;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -74,7 +76,21 @@ abstract class AbstractTransport implements TransportInterface
             $this->dispatcher->dispatch(new MessageEvent($message));
         }
 
-        return $this->doSend($message);
+        try {
+            $sentMessage = $this->doSend($message);
+        } catch (\Throwable $error) {
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(new FailedMessageEvent($message, $error));
+            }
+
+            throw $error;
+        }
+
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(new SentMessageEvent($sentMessage));
+        }
+
+        return $sentMessage;
     }
 
     abstract protected function doSend(MessageInterface $message): SentMessage;

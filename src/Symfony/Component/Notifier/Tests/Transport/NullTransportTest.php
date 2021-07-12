@@ -31,7 +31,7 @@ class NullTransportTest extends TestCase
             $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class)
         );
 
-        $eventDispatcherMock->expects($this->once())->method('dispatch');
+        $eventDispatcherMock->expects($this->exactly(2))->method('dispatch');
         $nullTransport->send(new DummyMessage());
     }
 }

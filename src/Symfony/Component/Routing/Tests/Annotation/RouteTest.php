@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Annotation;
 
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
@@ -87,6 +88,13 @@ class RouteTest extends TestCase
     {
         $route = $this->getMethodAnnotation($methodName, false);
         $this->assertEquals($route->$getter(), $expectedReturn);
+    }
+
+    public function testLoadFromDoctrineAnnotationInClassDocblock()
+    {
+        $annotations = (new AnnotationReader())->getClassAnnotations(new \ReflectionClass(Route::class));
+        $this->assertNotEmpty($annotations);
+        $this->assertInstanceOf(NamedArgumentConstructor::class, $annotations[1]);
     }
 
     public function getValidParameters(): iterable

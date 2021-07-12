@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add options "env_var_names" to `GenericRuntime` and `SymfonyRuntime`
+
 5.3.0
 -----
 

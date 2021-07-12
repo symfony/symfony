@@ -467,8 +467,7 @@ class ConfigurationTest extends TestCase
             ],
             'session' => [
                 'enabled' => false,
-                'storage_id' => 'session.storage.native',
-                'storage_factory_id' => null,
+                'storage_factory_id' => 'session.storage.factory.native',
                 'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
                 'cookie_samesite' => null,

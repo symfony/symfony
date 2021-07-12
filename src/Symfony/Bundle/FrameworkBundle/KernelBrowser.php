@@ -128,11 +128,11 @@ class KernelBrowser extends HttpKernelBrowser
         $container = $this->getContainer();
         $container->get('security.untracked_token_storage')->setToken($token);
 
-        if (!$container->has('session') && !$container->has('session_factory')) {
+        if (!$container->has('session.factory')) {
             return $this;
         }
 
-        $session = $container->get($container->has('session') ? 'session' : 'session_factory');
+        $session = $container->get('session.factory')->createSession();
         $session->set('_security_'.$firewallContext, serialize($token));
         $session->save();
 

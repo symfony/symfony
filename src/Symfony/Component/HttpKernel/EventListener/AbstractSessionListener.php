@@ -41,7 +41,6 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
     public const NO_AUTO_CACHE_CONTROL_HEADER = 'Symfony-Session-NoAutoCacheControl';
 
     protected $container;
-    private $sessionUsageStack = [];
     private $debug;
 
     public function __construct(ContainerInterface $container = null, bool $debug = false)
@@ -62,9 +61,6 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             $sess = null;
             $request->setSessionFactory(function () use (&$sess) { return $sess ?? $sess = $this->getSession(); });
         }
-
-        $session = $this->container && $this->container->has('initialized_session') ? $this->container->get('initialized_session') : null;
-        $this->sessionUsageStack[] = $session instanceof Session ? $session->getUsageIndex() : 0;
     }
 
     public function onKernelResponse(ResponseEvent $event)
@@ -78,9 +74,10 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         // Always remove the internal header if present
         $response->headers->remove(self::NO_AUTO_CACHE_CONTROL_HEADER);
 
-        if (!$session = $this->container && $this->container->has('initialized_session') ? $this->container->get('initialized_session') : $event->getRequest()->getSession()) {
+        if (!$event->getRequest()->hasSession()) {
             return;
         }
+        $session = $event->getRequest()->getSession();
 
         if ($session->isStarted()) {
             /*
@@ -111,7 +108,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             $session->save();
         }
 
-        if ($session instanceof Session ? $session->getUsageIndex() === end($this->sessionUsageStack) : !$session->isStarted()) {
+        if ($session instanceof Session ? $session->getUsageIndex() === 0 : !$session->isStarted()) {
             return;
         }
 
@@ -133,13 +130,6 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
 
         if ($this->container->has('logger')) {
             $this->container->get('logger')->warning('Session was used while the request was declared stateless.');
-        }
-    }
-
-    public function onFinishRequest(FinishRequestEvent $event)
-    {
-        if ($event->isMainRequest()) {
-            array_pop($this->sessionUsageStack);
         }
     }
 
@@ -167,7 +157,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$session = $this->container && $this->container->has('initialized_session') ? $this->container->get('initialized_session') : $requestStack->getCurrentRequest()->getSession()) {
+        if (!$session = $requestStack->getCurrentRequest()->getSession()) {
             return;
         }
 
@@ -184,7 +174,6 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             KernelEvents::REQUEST => ['onKernelRequest', 128],
             // low priority to come after regular response listeners, but higher than StreamedResponseListener
             KernelEvents::RESPONSE => ['onKernelResponse', -1000],
-            KernelEvents::FINISH_REQUEST => ['onFinishRequest'],
         ];
     }
 

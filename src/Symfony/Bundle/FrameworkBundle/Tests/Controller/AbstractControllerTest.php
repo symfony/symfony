@@ -68,7 +68,6 @@ class AbstractControllerTest extends TestCase
             'request_stack' => '?Symfony\\Component\\HttpFoundation\\RequestStack',
             'http_kernel' => '?Symfony\\Component\\HttpKernel\\HttpKernelInterface',
             'serializer' => '?Symfony\\Component\\Serializer\\SerializerInterface',
-            'session' => '?Symfony\\Component\\HttpFoundation\\Session\\SessionInterface',
             'security.authorization_checker' => '?Symfony\\Component\\Security\\Core\\Authorization\\AuthorizationCheckerInterface',
             'twig' => '?Twig\\Environment',
             'doctrine' => '?Doctrine\\Persistence\\ManagerRegistry',
@@ -503,7 +502,6 @@ class AbstractControllerTest extends TestCase
         $requestStack->push($request);
 
         $container = new Container();
-        $container->set('session', $session);
         $container->set('request_stack', $requestStack);
 
         $controller = $this->createController();

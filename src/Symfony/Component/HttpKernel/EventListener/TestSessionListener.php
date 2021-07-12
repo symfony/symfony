@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Sets the session in the request.
@@ -23,25 +22,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class TestSessionListener extends AbstractTestSessionListener
 {
-    private $container;
-
     public function __construct(ContainerInterface $container, array $sessionOptions = [])
     {
-        $this->container = $container;
         parent::__construct($sessionOptions);
-    }
-
-    /**
-     * @deprecated since Symfony 5.4, will be removed in 6.0.
-     */
-    protected function getSession(): ?SessionInterface
-    {
-        trigger_deprecation('symfony/http-kernel', '5.4', '"%s" is deprecated and will be removed in 6.0, inject a session in the request instead.', __METHOD__);
-
-        if ($this->container->has('session')) {
-            return $this->container->get('session');
-        }
-
-        return null;
     }
 }

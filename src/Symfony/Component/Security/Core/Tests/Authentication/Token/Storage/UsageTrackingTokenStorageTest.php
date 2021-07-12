@@ -68,22 +68,4 @@ class UsageTrackingTokenStorageTest extends TestCase
         $this->assertSame($token, $trackingStorage->getToken());
         $this->assertSame(1, $sessionAccess);
     }
-
-    /**
-     * @group legacy
-     */
-    public function testWithoutMainRequest()
-    {
-        $locator = new class(['request_stack' => function () {
-            return new RequestStack();
-        }]) implements ContainerInterface {
-            use ServiceLocatorTrait;
-        };
-        $tokenStorage = new TokenStorage();
-        $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $locator);
-        $trackingStorage->enableUsageTracking();
-
-        $this->expectDeprecation('Since symfony/security-core 5.3: Using "%s" (service ID: "security.token_storage") outside the request-response cycle is deprecated, use the "%s" class (service ID: "security.untracked_token_storage") instead or disable usage tracking using "disableUsageTracking()".');
-        $trackingStorage->getToken();
-    }
 }

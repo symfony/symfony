@@ -79,33 +79,11 @@ final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceS
 
     private function getSession(): SessionInterface
     {
-        // BC for symfony/security-bundle < 5.3
-        if ($this->container->has('session')) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Injecting the "session" in "%s" is deprecated, inject the "request_stack" instead.', __CLASS__);
-
-            return $this->container->get('session');
-        }
-
         return $this->container->get('request_stack')->getSession();
     }
 
     private function shouldTrackUsage(): bool
     {
-        if (!$this->enableUsageTracking) {
-            return false;
-        }
-
-        // BC for symfony/security-bundle < 5.3
-        if ($this->container->has('session')) {
-            return true;
-        }
-
-        if (!$this->container->get('request_stack')->getMainRequest()) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Using "%s" (service ID: "security.token_storage") outside the request-response cycle is deprecated, use the "%s" class (service ID: "security.untracked_token_storage") instead or disable usage tracking using "disableUsageTracking()".', __CLASS__, TokenStorage::class);
-
-            return false;
-        }
-
-        return true;
+        return $this->enableUsageTracking;
     }
 }

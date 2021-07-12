@@ -35,14 +35,6 @@ return static function (ContainerConfigurator $container) {
         ->set('test.client.history', History::class)->share(false)
         ->set('test.client.cookiejar', CookieJar::class)->share(false)
 
-        ->set('test.session.listener', TestSessionListener::class)
-            ->args([
-                service_locator([
-                    'session' => service('.session.do-not-use')->ignoreOnInvalid(),
-                ]),
-            ])
-            ->tag('kernel.event_subscriber')
-
         ->set('test.service_container', TestContainer::class)
             ->args([
                 service('kernel'),
@@ -53,5 +45,11 @@ return static function (ContainerConfigurator $container) {
         ->set('test.private_services_locator', ServiceLocator::class)
             ->args([abstract_arg('callable collection')])
             ->public()
+    ;
+
+    $container->services()
+        ->set('test.session.listener', TestSessionListener::class)
+            ->args([service_locator([])])
+            ->tag('kernel.event_subscriber')
     ;
 };

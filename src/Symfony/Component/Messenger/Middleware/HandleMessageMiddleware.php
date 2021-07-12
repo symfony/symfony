@@ -60,7 +60,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
             try {
                 $handler = $handlerDescriptor->getHandler();
-                $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $handler($message));
+                $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $handler($message, $envelope));
                 $envelope = $envelope->with($handledStamp);
                 $this->logger->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
             } catch (\Throwable $e) {

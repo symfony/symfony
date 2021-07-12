@@ -47,9 +47,9 @@ class Expression extends Constraint
         string $message = null,
         array $values = null,
         array $groups = null,
-        string $errorPath = null,
         $payload = null,
-        array $options = []
+        array $options = [],
+        string $errorPath = null
     ) {
         if (!class_exists(ExpressionLanguage::class)) {
             throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint.', __CLASS__));

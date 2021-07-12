@@ -31,12 +31,7 @@ class Ciphertext implements \Stringable
     private string $payload;
 
     /**
-     * Nonce used with the algorithm.
-     */
-    private string $nonce;
-
-    /**
-     * @var array<string, string> additional headers
+     * @var array<string, string>
      */
     private array $headers = [];
 
@@ -45,14 +40,13 @@ class Ciphertext implements \Stringable
     }
 
     /**
-     * @param array<string, string> $headers with ascii keys and values
+     * @param array<string, string> $headers
      */
-    public static function create(string $algorithm, string $ciphertext, string $nonce, array $headers = []): self
+    public static function create(string $algorithm, string $ciphertext, array $headers = []): self
     {
         $model = new self();
         $model->algorithm = $algorithm;
         $model->payload = $ciphertext;
-        $model->nonce = $nonce;
         $model->headers = $headers;
 
         return $model;
@@ -66,26 +60,29 @@ class Ciphertext implements \Stringable
     public static function parse(string $input): self
     {
         $parts = explode('.', $input);
-        if (!\is_array($parts) || 4 !== \count($parts)) {
+        if (!\is_array($parts) || 3 !== \count($parts)) {
             throw new MalformedCipherException();
         }
 
-        [$headersString, $payload, $nonce, $hashSignature] = $parts;
+        [$headersString, $payload, $hashSignature] = $parts;
 
         $headersString = self::base64UrlDecode($headersString);
         $payload = self::base64UrlDecode($payload);
-        $nonce = self::base64UrlDecode($nonce);
         $hashSignature = self::base64UrlDecode($hashSignature);
 
         // Check if data has been modified
-        $hash = hash('sha256', $headersString.$payload.$nonce);
+        $hash = hash('sha256', $headersString.$payload);
         if (!hash_equals($hash, $hashSignature)) {
             throw new MalformedCipherException();
         }
 
         $headers = json_decode($headersString, true);
-        if (!\is_array($headers) || !\array_key_exists('alg', $headers) || !\array_key_exists('ver', $headers) || '1' !== $headers['ver']) {
+        if (!\is_array($headers) || !\array_key_exists('alg', $headers) || !\array_key_exists('ver', $headers)) {
             throw new MalformedCipherException();
+        }
+
+        foreach ($headers as $name => $value) {
+            $headers[$name] = self::base64UrlDecode($value);
         }
 
         $model = new self();
@@ -94,7 +91,6 @@ class Ciphertext implements \Stringable
         $model->version = $headers['ver'];
         unset($headers['ver']);
         $model->headers = $headers;
-        $model->nonce = $nonce;
         $model->payload = $payload;
 
         return $model;
@@ -110,13 +106,15 @@ class Ciphertext implements \Stringable
         $headers = $this->headers;
         $headers['alg'] = $this->algorithm;
         $headers['ver'] = (isset($headers['ver']) && '' !== $headers['ver']) ? $headers['ver'] : '1';
+        foreach ($headers as $name => $value) {
+            $headers[$name] = self::base64UrlEncode($value);
+        }
         $headers = json_encode($headers);
 
-        return sprintf('%s.%s.%s.%s',
+        return sprintf('%s.%s.%s',
             self::base64UrlEncode($headers),
             self::base64UrlEncode($this->payload),
-            self::base64UrlEncode($this->nonce),
-            self::base64UrlEncode(hash('sha256', $headers.$this->payload.$this->nonce))
+            self::base64UrlEncode(hash('sha256', $headers.$this->payload))
         );
     }
 
@@ -133,11 +131,6 @@ class Ciphertext implements \Stringable
     public function getPayload(): string
     {
         return $this->payload;
-    }
-
-    public function getNonce(): string
-    {
-        return $this->nonce;
     }
 
     public function hasHeader(string $name): bool

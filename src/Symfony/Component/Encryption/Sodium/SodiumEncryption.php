@@ -48,7 +48,7 @@ final class SodiumEncryption implements EncryptionInterface
             throw new EncryptionException('Failed to encrypt message.', $exception);
         }
 
-        return Ciphertext::create('sodium_secretbox', $ciphertext, $nonce)->getString();
+        return Ciphertext::create('sodium_secretbox', $ciphertext, ['nonce'=>$nonce])->getString();
     }
 
     public function encryptFor(string $message, KeyInterface $recipientKey): string
@@ -63,7 +63,7 @@ final class SodiumEncryption implements EncryptionInterface
             throw new EncryptionException('Failed to encrypt message.', $exception);
         }
 
-        return Ciphertext::create('sodium_crypto_box_seal', $ciphertext, random_bytes(\SODIUM_CRYPTO_BOX_NONCEBYTES))->getString();
+        return Ciphertext::create('sodium_crypto_box_seal', $ciphertext)->getString();
     }
 
     public function decrypt(string $message, KeyInterface $key): string
@@ -75,12 +75,12 @@ final class SodiumEncryption implements EncryptionInterface
         $ciphertext = Ciphertext::parse($message);
         $algorithm = $ciphertext->getAlgorithm();
         $payload = $ciphertext->getPayload();
-        $nonce = $ciphertext->getNonce();
 
         try {
             if ('sodium_crypto_box_seal' === $algorithm) {
                 $output = sodium_crypto_box_seal_open($payload, $key->getKeypair());
             } elseif ('sodium_secretbox' === $algorithm) {
+                $nonce = $ciphertext->getHeader('nonce');
                 $output = sodium_crypto_secretbox_open($payload, $nonce, $key->getSecret());
             } else {
                 throw new UnsupportedAlgorithmException($algorithm);

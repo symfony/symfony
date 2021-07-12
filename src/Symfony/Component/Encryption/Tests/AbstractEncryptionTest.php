@@ -75,7 +75,7 @@ abstract class AbstractEncryptionTest extends TestCase
         $key = $cipher->generateKey();
 
         $this->expectException(UnsupportedAlgorithmException::class);
-        $cipher->decrypt(Ciphertext::create('foo', 'bar', 'baz')->getString(), $key);
+        $cipher->decrypt(Ciphertext::create('foo', 'bar')->getString(), $key);
     }
 
     public function testEncryptFor()

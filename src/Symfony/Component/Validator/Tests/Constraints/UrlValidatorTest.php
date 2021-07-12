@@ -169,6 +169,8 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://symfony.com/#fragment'],
             ['http://symfony.com/#one_more%20test'],
             ['http://example.com/exploit.html?hello[0]=test'],
+            ['http://example.com/exploit.html?hello{0}=test'],
+            ['http://example.com/exploit.html?hello=`test`'],
         ];
     }
 

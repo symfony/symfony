@@ -315,8 +315,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * Gets the route name.
      *
      * The _route request attributes is automatically set by the Router Matcher.
-     *
-     * @return string The route
      */
     public function getRoute(): string
     {
@@ -332,8 +330,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * Gets the route parameters.
      *
      * The _route_params request attributes is automatically set by the RouterListener.
-     *
-     * @return array The parameters
      */
     public function getRouteParams(): array
     {

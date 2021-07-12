@@ -1071,8 +1071,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Normalizes the underlying data if a model transformer is set.
      *
-     * @return mixed
-     *
      * @throws TransformationFailedException If the underlying data cannot be transformed to "normalized" format
      */
     private function modelToNorm(mixed $value): mixed
@@ -1090,8 +1088,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * Reverse transforms a value if a model transformer is set.
-     *
-     * @return mixed
      *
      * @throws TransformationFailedException If the value cannot be transformed to "model" format
      */
@@ -1112,8 +1108,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * Transforms the value if a view transformer is set.
-     *
-     * @return mixed
      *
      * @throws TransformationFailedException If the normalized value cannot be transformed to "view" format
      */
@@ -1141,8 +1135,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * Reverse transforms a value if a view transformer is set.
-     *
-     * @return mixed
      *
      * @throws TransformationFailedException If the submitted value cannot be transformed to "normalized" format
      */

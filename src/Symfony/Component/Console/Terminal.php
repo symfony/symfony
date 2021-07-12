@@ -57,8 +57,6 @@ class Terminal
 
     /**
      * @internal
-     *
-     * @return bool
      */
     public static function hasSttyAvailable(): bool
     {

@@ -74,8 +74,6 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * Method returns amount of logged Cache reads: "get" calls.
-     *
-     * @return array
      */
     public function getStatistics(): array
     {
@@ -84,8 +82,6 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * Method returns the statistic totals.
-     *
-     * @return array
      */
     public function getTotals(): array
     {
@@ -94,8 +90,6 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * Method returns all logged Cache call objects.
-     *
-     * @return mixed
      */
     public function getCalls(): mixed
     {

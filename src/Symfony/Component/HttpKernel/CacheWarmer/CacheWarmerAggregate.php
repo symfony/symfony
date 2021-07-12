@@ -114,9 +114,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     }
 
     /**
-     * Checks whether this warmer is optional or not.
-     *
-     * @return bool always false
+     * {@inheritdoc}
      */
     public function isOptional(): bool
     {

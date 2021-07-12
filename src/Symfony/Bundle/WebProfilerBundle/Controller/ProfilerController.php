@@ -52,8 +52,6 @@ class ProfilerController
     /**
      * Redirects to the last profiles.
      *
-     * @return RedirectResponse A RedirectResponse instance
-     *
      * @throws NotFoundHttpException
      */
     public function homeAction(): RedirectResponse
@@ -65,8 +63,6 @@ class ProfilerController
 
     /**
      * Renders a profiler panel for the given token.
-     *
-     * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
@@ -125,8 +121,6 @@ class ProfilerController
     /**
      * Renders the Web Debug Toolbar.
      *
-     * @return Response A Response instance
-     *
      * @throws NotFoundHttpException
      */
     public function toolbarAction(Request $request, string $token = null): Response
@@ -169,8 +163,6 @@ class ProfilerController
 
     /**
      * Renders the profiler search bar.
-     *
-     * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
@@ -224,8 +216,6 @@ class ProfilerController
     /**
      * Renders the search results.
      *
-     * @return Response A Response instance
-     *
      * @throws NotFoundHttpException
      */
     public function searchResultsAction(Request $request, string $token): Response
@@ -264,8 +254,6 @@ class ProfilerController
 
     /**
      * Narrows the search bar.
-     *
-     * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
@@ -316,8 +304,6 @@ class ProfilerController
     /**
      * Displays the PHP info.
      *
-     * @return Response A Response instance
-     *
      * @throws NotFoundHttpException
      */
     public function phpinfoAction(): Response
@@ -337,8 +323,6 @@ class ProfilerController
 
     /**
      * Displays the source of a file.
-     *
-     * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
@@ -368,11 +352,6 @@ class ProfilerController
          ]), 200, ['Content-Type' => 'text/html']);
     }
 
-    /**
-     * Gets the Template Manager.
-     *
-     * @return TemplateManager The Template Manager
-     */
     protected function getTemplateManager(): TemplateManager
     {
         if (null === $this->templateManager) {

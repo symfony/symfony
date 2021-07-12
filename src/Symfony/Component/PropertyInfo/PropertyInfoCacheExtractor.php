@@ -90,8 +90,6 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
 
     /**
      * Retrieves the cached data if applicable or delegates to the decorated extractor.
-     *
-     * @return mixed
      */
     private function extract(string $method, array $arguments): mixed
     {

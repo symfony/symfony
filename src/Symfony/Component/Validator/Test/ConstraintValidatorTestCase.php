@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Test;
 
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Constraint\IsIdentical;
 use PHPUnit\Framework\Constraint\IsInstanceOf;
@@ -27,6 +26,7 @@ use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -447,6 +447,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
 
     public function atPath(string $path): static
     {
+        throw new \BadMethodCallException();
     }
 
     public function doAtPath(string $path)
@@ -464,6 +465,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
 
     public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null): static
     {
+        throw new \BadMethodCallException();
     }
 
     public function doValidate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null)
@@ -489,6 +491,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
 
     public function validateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null): static
     {
+        throw new \BadMethodCallException();
     }
 
     public function doValidateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null)
@@ -498,6 +501,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
 
     public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null): static
     {
+        throw new \BadMethodCallException();
     }
 
     public function doValidatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null)
@@ -507,6 +511,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
 
     public function getViolations(): ConstraintViolationListInterface
     {
+        throw new \BadMethodCallException();
     }
 
     public function doGetViolations()

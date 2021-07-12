@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PropertyInfo\Extractor;
 
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 
 /**

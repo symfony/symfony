@@ -41,8 +41,6 @@ class OptionsResolverIntrospector
     }
 
     /**
-     * @return mixed
-     *
      * @throws NoConfigurationException on no configured value
      */
     public function getDefault(string $option): mixed

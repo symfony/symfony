@@ -44,9 +44,6 @@ abstract class AbstractStaticOption
         $this->option = self::$options[$hash] ?? self::$options[$hash] = $option;
     }
 
-    /**
-     * @return mixed
-     */
     final public function getOption(): mixed
     {
         return $this->option;

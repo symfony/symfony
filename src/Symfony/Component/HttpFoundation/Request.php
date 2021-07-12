@@ -507,9 +507,6 @@ class Request
         $this->headers = clone $this->headers;
     }
 
-    /**
-     * Returns the request as a string.
-     */
     public function __toString(): string
     {
         $content = $this->getContent();
@@ -2007,7 +2004,7 @@ class Request
         return null;
     }
 
-    private static function createRequestFromFactory(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): self
+    private static function createRequestFromFactory(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): static
     {
         if (self::$requestFactory) {
             $request = (self::$requestFactory)($query, $request, $attributes, $cookies, $files, $server, $content);

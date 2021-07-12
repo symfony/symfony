@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Serializer\Mapping\Factory;
 
-use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>

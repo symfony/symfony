@@ -90,20 +90,13 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     }
 
     /**
-     * Gets the request events.
-     *
-     * @return StopwatchEvent[] The request events
+     * @return StopwatchEvent[]
      */
     public function getEvents(): array
     {
         return $this->data['events'];
     }
 
-    /**
-     * Gets the request elapsed time.
-     *
-     * @return float The elapsed time
-     */
     public function getDuration(): float
     {
         if (!isset($this->data['events']['__section__'])) {
@@ -119,8 +112,6 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
      * Gets the initialization time.
      *
      * This is the time spent until the beginning of the request handling.
-     *
-     * @return float The elapsed time
      */
     public function getInitTime(): float
     {
@@ -131,19 +122,11 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
         return $this->data['events']['__section__']->getOrigin() - $this->getStartTime();
     }
 
-    /**
-     * Gets the request time.
-     *
-     * @return float
-     */
     public function getStartTime(): float
     {
         return $this->data['start_time'];
     }
 
-    /**
-     * @return bool whether or not the stopwatch component is installed
-     */
     public function isStopwatchInstalled(): bool
     {
         return $this->data['stopwatch_installed'];

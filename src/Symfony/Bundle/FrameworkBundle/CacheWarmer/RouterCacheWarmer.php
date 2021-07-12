@@ -51,9 +51,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
     }
 
     /**
-     * Checks whether this warmer is optional or not.
-     *
-     * @return bool always true
+     * {@inheritdoc}
      */
     public function isOptional(): bool
     {

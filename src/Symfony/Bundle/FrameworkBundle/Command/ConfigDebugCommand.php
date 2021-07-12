@@ -149,8 +149,6 @@ EOF
      * Iterate over configuration until the last step of the given path.
      *
      * @throws LogicException If the configuration does not exist
-     *
-     * @return mixed
      */
     private function getConfigForPath(array $config, string $path, string $alias): mixed
     {

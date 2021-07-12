@@ -29,8 +29,6 @@ final class ParameterBagUtils
      *
      * Paths like foo[bar] will be evaluated to find deeper items in nested data structures.
      *
-     * @return mixed
-     *
      * @throws InvalidArgumentException when the given path is malformed
      */
     public static function getParameterBagValue(ParameterBag $parameters, string $path): mixed
@@ -60,8 +58,6 @@ final class ParameterBagUtils
      * Returns a request "parameter" value.
      *
      * Paths like foo[bar] will be evaluated to find deeper items in nested data structures.
-     *
-     * @return mixed
      *
      * @throws InvalidArgumentException when the given path is malformed
      */

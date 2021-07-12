@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `TesterTrait::assertCommandIsSuccessful()` to test command
+ * Add `InputInterface::__toString()` method annotation. This will be replaced by the extension of the `Stringable` interface in 6.0.
 
 5.3
 ---

@@ -11,6 +11,7 @@ CHANGELOG
 
  * Add the `normalizer` option to the `Unique` constraint
  * Add `Validation::createIsValidCallable()` that returns true/false instead of throwing exceptions
+ * Add optional `condition` to the `Count` constraint to count only items matching the given symfony expression language
 
 5.2.0
 -----

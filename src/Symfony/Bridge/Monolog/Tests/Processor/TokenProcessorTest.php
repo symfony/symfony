@@ -39,7 +39,6 @@ class TokenProcessorTest extends TestCase
 
         $this->assertArrayHasKey('token', $record['extra']);
         $this->assertEquals($token->getUsername(), $record['extra']['token']['username']);
-        $this->assertEquals($token->isAuthenticated(), $record['extra']['token']['authenticated']);
         $this->assertEquals(['ROLE_USER'], $record['extra']['token']['roles']);
     }
 
@@ -59,7 +58,6 @@ class TokenProcessorTest extends TestCase
 
         $this->assertArrayHasKey('token', $record['extra']);
         $this->assertEquals($token->getUserIdentifier(), $record['extra']['token']['user_identifier']);
-        $this->assertEquals($token->isAuthenticated(), $record['extra']['token']['authenticated']);
         $this->assertEquals(['ROLE_USER'], $record['extra']['token']['roles']);
     }
 }

@@ -22,25 +22,35 @@ use Symfony\Contracts\EventDispatcher\Event;
  * a session is deauthenticated.
  *
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
+ *
+ * @deprecated since Symfony 5.4, use TokenDeauthenticatedEvent instead
  */
 final class DeauthenticatedEvent extends Event
 {
     private $originalToken;
     private $refreshedToken;
 
-    public function __construct(TokenInterface $originalToken, TokenInterface $refreshedToken)
+    public function __construct(TokenInterface $originalToken, TokenInterface $refreshedToken, bool $triggerDeprecation = true)
     {
+        if ($triggerDeprecation) {
+            @trigger_deprecation('symfony/security-http', '5.4', 'Class "%s" is deprecated, use "%s" instead.', __CLASS__, TokenDeauthenticatedEvent::class);
+        }
+
         $this->originalToken = $originalToken;
         $this->refreshedToken = $refreshedToken;
     }
 
     public function getRefreshedToken(): TokenInterface
     {
+        @trigger_deprecation('symfony/security-http', '5.4', 'Class "%s" is deprecated, use "%s" instead.', __CLASS__, TokenDeauthenticatedEvent::class);
+
         return $this->refreshedToken;
     }
 
     public function getOriginalToken(): TokenInterface
     {
+        @trigger_deprecation('symfony/security-http', '5.4', 'Class "%s" is deprecated, use "%s" instead.', __CLASS__, TokenDeauthenticatedEvent::class);
+
         return $this->originalToken;
     }
 }

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Tests\Authentication\Token\Fixtures\CustomUser;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SwitchUserTokenTest extends TestCase
@@ -42,6 +43,9 @@ class SwitchUserTokenTest extends TestCase
         $this->assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
     }
 
+    /**
+     * @group legacy
+     */
     public function testSetUserDoesNotDeauthenticate()
     {
         $impersonated = new class() implements UserInterface {
@@ -75,7 +79,7 @@ class SwitchUserTokenTest extends TestCase
             }
         };
 
-        $originalToken = new UsernamePasswordToken('impersonator', 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('impersonator', '', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']), 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
         $token = new SwitchUserToken($impersonated, 'bar', 'provider-key', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
         $token->setUser($impersonated);
         $this->assertTrue($token->isAuthenticated());

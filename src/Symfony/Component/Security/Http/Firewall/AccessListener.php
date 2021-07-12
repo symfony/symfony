@@ -95,7 +95,9 @@ class AccessListener extends AbstractListener
             $token = new NullToken();
         }
 
-        if (!$token->isAuthenticated()) {
+        // @deprecated since Symfony 5.4
+        if (!$token->isAuthenticated(false)) {
+            trigger_deprecation('symfony/core', '5.4', 'Returning false from "%s()" is deprecated and won\'t have any effect in Symfony 6.0 as security tokens will always be considered authenticated.');
             $token = $this->authManager->authenticate($token);
             $this->tokenStorage->setToken($token);
         }

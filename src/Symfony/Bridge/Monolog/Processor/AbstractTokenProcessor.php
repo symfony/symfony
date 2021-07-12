@@ -42,7 +42,7 @@ abstract class AbstractTokenProcessor
 
         if (null !== $token = $this->getToken()) {
             $record['extra'][$this->getKey()] = [
-                'authenticated' => $token->isAuthenticated(),
+                'authenticated' => $token->isAuthenticated(false), // @deprecated since Symfony 5.4, always true in 6.0
                 'roles' => $token->getRoleNames(),
             ];
 

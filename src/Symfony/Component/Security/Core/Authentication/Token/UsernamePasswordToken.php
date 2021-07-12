@@ -42,7 +42,7 @@ class UsernamePasswordToken extends AbstractToken
         $this->credentials = $credentials;
         $this->firewallName = $firewallName;
 
-        parent::setAuthenticated(\count($roles) > 0);
+        parent::setAuthenticated(\count($roles) > 0, false);
     }
 
     /**
@@ -54,7 +54,7 @@ class UsernamePasswordToken extends AbstractToken
             throw new \LogicException('Cannot set this token to trusted after instantiation.');
         }
 
-        parent::setAuthenticated(false);
+        parent::setAuthenticated(false, false);
     }
 
     /**

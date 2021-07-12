@@ -1360,24 +1360,30 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        $locales = $config['enabled_locales'] ?? [];
+
         foreach ($config['providers'] as $name => $provider) {
-            if (!$config['enabled_locales'] && !$provider['locales']) {
-                throw new LogicException(sprintf('You must specify one of "framework.translator.enabled_locales" or "framework.translator.providers.%s.locales" in order to use translation providers.', $name));
+            if (!$config['enabled_locales']) {
+                if (!$provider['locales']) {
+                    throw new LogicException(sprintf('You must specify one of "framework.translator.enabled_locales" or "framework.translator.providers.%s.locales" in order to use translation providers.', $name));
+                }
+
+                $locales = array_merge($locales, $provider['locales']);
             }
         }
 
         $container->getDefinition('console.command.translation_pull')
             ->replaceArgument(4, array_merge($transPaths, [$config['default_path']]))
-            ->replaceArgument(5, $config['enabled_locales'])
+            ->replaceArgument(5, $locales)
         ;
 
         $container->getDefinition('console.command.translation_push')
             ->replaceArgument(2, array_merge($transPaths, [$config['default_path']]))
-            ->replaceArgument(3, $config['enabled_locales'])
+            ->replaceArgument(3, $locales)
         ;
 
         $container->getDefinition('translation.provider_collection_factory')
-            ->replaceArgument(1, $config['enabled_locales'])
+            ->replaceArgument(1, $locales)
         ;
 
         $container->getDefinition('translation.provider_collection')->setArgument(0, $config['providers']);

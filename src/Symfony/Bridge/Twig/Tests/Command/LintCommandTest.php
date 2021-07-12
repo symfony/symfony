@@ -107,6 +107,33 @@ class LintCommandTest extends TestCase
         self::assertStringContainsString('OK in', trim($tester->getDisplay()));
     }
 
+    public function testLintIncorrectFileWithGithubFormat()
+    {
+        $filename = $this->createFile('{{ foo');
+        $tester = $this->createCommandTester();
+        $tester->execute(['filename' => [$filename], '--format' => 'github'], ['decorated' => false]);
+        self::assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
+        self::assertStringMatchesFormat('%A::error file=%s,line=1,col=0::Unexpected token "end of template" ("end of print statement" expected).%A', trim($tester->getDisplay()));
+    }
+
+    public function testLintAutodetectsGithubActionEnvironment()
+    {
+        $prev = getenv('GITHUB_ACTIONS');
+        putenv('GITHUB_ACTIONS');
+
+        try {
+            putenv('GITHUB_ACTIONS=1');
+
+            $filename = $this->createFile('{{ foo');
+            $tester = $this->createCommandTester();
+
+            $tester->execute(['filename' => [$filename]], ['decorated' => false]);
+            self::assertStringMatchesFormat('%A::error file=%s,line=1,col=0::Unexpected token "end of template" ("end of print statement" expected).%A', trim($tester->getDisplay()));
+        } finally {
+            putenv('GITHUB_ACTIONS'.($prev ? "=$prev" : ''));
+        }
+    }
+
     private function createCommandTester(): CommandTester
     {
         $environment = new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/'));

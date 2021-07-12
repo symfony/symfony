@@ -158,11 +158,9 @@ class ErrorHandler
     /**
      * Calls a function and turns any PHP error into \ErrorException.
      *
-     * @return mixed What $function(...$arguments) returns
-     *
      * @throws \ErrorException When $function(...$arguments) triggers a PHP error
      */
-    public static function call(callable $function, mixed ...$arguments)
+    public static function call(callable $function, mixed ...$arguments): mixed
     {
         set_error_handler(static function (int $type, string $message, string $file, int $line) {
             if (__FILE__ === $file) {
@@ -235,8 +233,6 @@ class ErrorHandler
      *
      * @param array $loggers Error levels to [LoggerInterface|null, LogLevel::*] map
      *
-     * @return array The previous map
-     *
      * @throws \InvalidArgumentException
      */
     public function setLoggers(array $loggers): array
@@ -283,13 +279,6 @@ class ErrorHandler
         return $prev;
     }
 
-    /**
-     * Sets a user exception handler.
-     *
-     * @param callable(\Throwable $e)|null $handler
-     *
-     * @return callable|null The previous exception handler
-     */
     public function setExceptionHandler(?callable $handler): ?callable
     {
         $prev = $this->exceptionHandler;
@@ -303,8 +292,6 @@ class ErrorHandler
      *
      * @param int  $levels  A bit field of E_* constants for thrown errors
      * @param bool $replace Replace or amend the previous value
-     *
-     * @return int The previous value
      */
     public function throwAt(int $levels, bool $replace = false): int
     {
@@ -323,8 +310,6 @@ class ErrorHandler
      *
      * @param int  $levels  A bit field of E_* constants for scoped errors
      * @param bool $replace Replace or amend the previous value
-     *
-     * @return int The previous value
      */
     public function scopeAt(int $levels, bool $replace = false): int
     {
@@ -342,8 +327,6 @@ class ErrorHandler
      *
      * @param int  $levels  A bit field of E_* constants for traced errors
      * @param bool $replace Replace or amend the previous value
-     *
-     * @return int The previous value
      */
     public function traceAt(int $levels, bool $replace = false): int
     {
@@ -361,8 +344,6 @@ class ErrorHandler
      *
      * @param int  $levels  A bit field of E_* constants for screamed errors
      * @param bool $replace Replace or amend the previous value
-     *
-     * @return int The previous value
      */
     public function screamAt(int $levels, bool $replace = false): int
     {

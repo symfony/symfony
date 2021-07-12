@@ -61,7 +61,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function read(string $path, string $locale)
+    public function read(string $path, string $locale): mixed
     {
         return $this->reader->read($path, $locale);
     }
@@ -69,7 +69,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function readEntry(string $path, string $locale, array $indices, bool $fallback = true)
+    public function readEntry(string $path, string $locale, array $indices, bool $fallback = true): mixed
     {
         $entry = null;
         $isMultiValued = false;

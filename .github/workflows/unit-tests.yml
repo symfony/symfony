@@ -134,15 +134,6 @@ jobs:
           ./phpunit install
           echo "::endgroup::"
 
-      - name: Patch return types
-        if: "${{ matrix.php == '8.0' && ! matrix.mode }}"
-        run: |
-          sed -i 's/"\*\*\/Tests\/"//' composer.json
-          composer install --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php # ensure the script is idempotent
-          echo PHPUNIT="$PHPUNIT,legacy" >> $GITHUB_ENV
-
       - name: Run tests
         run: |
           _run_tests() {

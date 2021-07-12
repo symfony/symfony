@@ -30,7 +30,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
 {
     use LdapFactoryTrait;
 
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $provider = 'security.authentication.provider.ldap_bind.'.$id;
         $definition = $container
@@ -85,7 +85,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
         ;
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'http-basic-ldap';
     }

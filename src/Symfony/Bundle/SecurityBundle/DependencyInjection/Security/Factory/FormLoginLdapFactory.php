@@ -29,7 +29,7 @@ class FormLoginLdapFactory extends FormLoginFactory
 {
     use LdapFactoryTrait;
 
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
+    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
     {
         $provider = 'security.authentication.provider.ldap_bind.'.$id;
         $definition = $container
@@ -68,7 +68,7 @@ class FormLoginLdapFactory extends FormLoginFactory
         ;
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'form-login-ldap';
     }

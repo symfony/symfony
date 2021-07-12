@@ -37,12 +37,12 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         $this->addOption('post_only', true);
     }
 
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'form';
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'form-login';
     }
@@ -58,12 +58,12 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         ;
     }
 
-    protected function getListenerId()
+    protected function getListenerId(): string
     {
         return 'security.authentication.listener.form';
     }
 
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
+    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
     {
         if ($config['enable_csrf'] ?? false) {
             throw new InvalidConfigurationException('The "enable_csrf" option of "form_login" is only available when "security.enable_authenticator_manager" is set to "true", use "csrf_token_generator" instead.');
@@ -92,7 +92,7 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return $listenerId;
     }
 
-    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
+    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId): ?string
     {
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container

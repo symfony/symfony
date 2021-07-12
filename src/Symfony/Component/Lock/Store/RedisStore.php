@@ -244,12 +244,7 @@ class RedisStore implements SharedLockStoreInterface
         return (bool) $this->evaluate($script, (string) $key, [microtime(true), $this->getUniqueToken($key)]);
     }
 
-    /**
-     * Evaluates a script in the corresponding redis client.
-     *
-     * @return mixed
-     */
-    private function evaluate(string $script, string $resource, array $args)
+    private function evaluate(string $script, string $resource, array $args): mixed
     {
         if (
             $this->redis instanceof \Redis ||

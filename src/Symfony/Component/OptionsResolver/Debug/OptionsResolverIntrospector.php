@@ -41,11 +41,9 @@ class OptionsResolverIntrospector
     }
 
     /**
-     * @return mixed
-     *
      * @throws NoConfigurationException on no configured value
      */
-    public function getDefault(string $option)
+    public function getDefault(string $option): mixed
     {
         return ($this->get)('defaults', $option, sprintf('No default value was set for the "%s" option.', $option));
     }

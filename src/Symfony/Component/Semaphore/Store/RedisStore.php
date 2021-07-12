@@ -171,12 +171,7 @@ class RedisStore implements PersistingStoreInterface
         return (bool) $this->redis->zScore(sprintf('{%s}:weight', $key), $this->getUniqueToken($key));
     }
 
-    /**
-     * Evaluates a script in the corresponding redis client.
-     *
-     * @return mixed
-     */
-    private function evaluate(string $script, string $resource, array $args)
+    private function evaluate(string $script, string $resource, array $args): mixed
     {
         if (
             $this->redis instanceof \Redis ||

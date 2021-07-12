@@ -295,7 +295,7 @@ abstract class Constraint
      *
      * @internal
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         // Initialize "groups" option if it is not set
         $this->groups;

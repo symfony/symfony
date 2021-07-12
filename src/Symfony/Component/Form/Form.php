@@ -1071,11 +1071,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Normalizes the underlying data if a model transformer is set.
      *
-     * @return mixed
-     *
      * @throws TransformationFailedException If the underlying data cannot be transformed to "normalized" format
      */
-    private function modelToNorm(mixed $value)
+    private function modelToNorm(mixed $value): mixed
     {
         try {
             foreach ($this->config->getModelTransformers() as $transformer) {
@@ -1091,11 +1089,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Reverse transforms a value if a model transformer is set.
      *
-     * @return mixed
-     *
      * @throws TransformationFailedException If the value cannot be transformed to "model" format
      */
-    private function normToModel(mixed $value)
+    private function normToModel(mixed $value): mixed
     {
         try {
             $transformers = $this->config->getModelTransformers();
@@ -1113,11 +1109,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Transforms the value if a view transformer is set.
      *
-     * @return mixed
-     *
      * @throws TransformationFailedException If the normalized value cannot be transformed to "view" format
      */
-    private function normToView(mixed $value)
+    private function normToView(mixed $value): mixed
     {
         // Scalar values should  be converted to strings to
         // facilitate differentiation between empty ("") and zero (0).
@@ -1142,11 +1136,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Reverse transforms a value if a view transformer is set.
      *
-     * @return mixed
-     *
      * @throws TransformationFailedException If the submitted value cannot be transformed to "normalized" format
      */
-    private function viewToNorm(mixed $value)
+    private function viewToNorm(mixed $value): mixed
     {
         if (!$transformers = $this->config->getViewTransformers()) {
             return '' === $value ? null : $value;

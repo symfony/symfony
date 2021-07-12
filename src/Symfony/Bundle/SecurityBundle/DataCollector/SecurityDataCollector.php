@@ -226,22 +226,12 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         $this->data = $this->cloneVar($this->data);
     }
 
-    /**
-     * Checks if security is enabled.
-     *
-     * @return bool true if security is enabled, false otherwise
-     */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->data['enabled'];
     }
 
-    /**
-     * Gets the user.
-     *
-     * @return string The user
-     */
-    public function getUser()
+    public function getUser(): string
     {
         return $this->data['user'];
     }
@@ -269,44 +259,31 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Checks if the data contains information about inherited roles. Still the inherited
      * roles can be an empty array.
-     *
-     * @return bool true if the profile was contains inherited role information
      */
-    public function supportsRoleHierarchy()
+    public function supportsRoleHierarchy(): bool
     {
         return $this->data['supports_role_hierarchy'];
     }
 
     /**
      * Checks if the user is authenticated or not.
-     *
-     * @return bool true if the user is authenticated, false otherwise
      */
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
         return $this->data['authenticated'];
     }
 
-    /**
-     * @return bool
-     */
-    public function isImpersonated()
+    public function isImpersonated(): bool
     {
         return $this->data['impersonated'];
     }
 
-    /**
-     * @return string|null
-     */
-    public function getImpersonatorUser()
+    public function getImpersonatorUser(): ?string
     {
         return $this->data['impersonator_user'];
     }
 
-    /**
-     * @return string|null
-     */
-    public function getImpersonationExitPath()
+    public function getImpersonationExitPath(): ?string
     {
         return $this->data['impersonation_exit_path'];
     }
@@ -321,22 +298,12 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         return $this->data['token_class'];
     }
 
-    /**
-     * Get the full security token class as Data object.
-     *
-     * @return Data|null
-     */
-    public function getToken()
+    public function getToken(): ?Data
     {
         return $this->data['token'];
     }
 
-    /**
-     * Get the logout URL.
-     *
-     * @return string|null The logout URL
-     */
-    public function getLogoutUrl()
+    public function getLogoutUrl(): ?string
     {
         return $this->data['logout_url'];
     }
@@ -351,12 +318,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         return $this->data['voters'];
     }
 
-    /**
-     * Returns the strategy configured for the security voters.
-     *
-     * @return string
-     */
-    public function getVoterStrategy()
+    public function getVoterStrategy(): string
     {
         return $this->data['voter_strategy'];
     }
@@ -392,7 +354,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'security';
     }

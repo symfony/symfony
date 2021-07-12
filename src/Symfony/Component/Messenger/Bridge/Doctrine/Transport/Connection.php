@@ -311,6 +311,11 @@ class Connection implements ResetInterface
         return [];
     }
 
+    public function useAutoSetup(): bool
+    {
+        return $this->autoSetup;
+    }
+
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
         $now = new \DateTime();

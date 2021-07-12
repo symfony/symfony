@@ -46,6 +46,10 @@ final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscribe
                 continue;
             }
 
+            if (!$transport->useAutoSetup()) {
+                continue;
+            }
+
             $transport->configureSchema($event->getSchema(), $dbalConnection);
         }
     }
@@ -61,6 +65,10 @@ final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscribe
 
         foreach ($this->transports as $transport) {
             if (!$transport instanceof DoctrineTransport) {
+                continue;
+            }
+
+            if (!$transport->useAutoSetup()) {
                 continue;
             }
 

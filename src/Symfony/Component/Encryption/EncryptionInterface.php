@@ -23,7 +23,7 @@ use Symfony\Component\Encryption\Exception\InvalidKeyException;
 interface EncryptionInterface
 {
     /**
-     * Generates new a key to be used with encryption.
+     * Generates a new key to be used for encryption.
      *
      * Don't lose your private key and make sure to keep it a secret.
      *
@@ -66,11 +66,11 @@ interface EncryptionInterface
     /**
      * Gets an encrypted version of the message that only the recipient can read.
      *
-     * Asymmetric encryption uses a "key pair" ie a public key and a private key.
-     * It is safe to share your public key, but the private key should always be
+     * Asymmetric encryption uses a "key pair" i.e. a public key and a private key.
+     * It is safe to share the public key, but the private key should always be
      * kept a secret.
      *
-     * When Alice and Bob wants to communicate securely, they share their public keys with
+     * When Alice and Bob want to communicate securely, they share their public keys with
      * each other. Alice will encrypt a message with Bob's public key. When Bob
      * receives the message, he will decrypt it with his private key.
      *
@@ -107,7 +107,7 @@ interface EncryptionInterface
      * It is safe to share your public key, but the private key should always be
      * kept secret.
      *
-     * When Alice and Bob wants to communicate securely, they share their public keys with
+     * When Alice and Bob want to communicate securely, they share their public keys with
      * each other. Alice will encrypt a message with keypair [ alice_private, bob_public ].
      * When Bob receives the message, he will decrypt it with keypair [ bob_private, alice_public ].
      *

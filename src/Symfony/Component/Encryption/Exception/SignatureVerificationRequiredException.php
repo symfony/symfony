@@ -13,7 +13,7 @@ namespace Symfony\Component\Encryption\Exception;
 
 /**
  * The sender requires you to verify the signature. You should pass both your
- * private key and the senders public key to the decrypt() method.
+ * private key and the sender's public key to the decrypt() method.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  *

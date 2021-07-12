@@ -21,7 +21,7 @@ use Symfony\Component\Encryption\Exception\MalformedCipherException;
  *
  * @internal
  */
-class Ciphertext
+class Ciphertext implements \Stringable
 {
     /**
      * @var string algorithm for the encryption
@@ -67,7 +67,7 @@ class Ciphertext
     }
 
     /**
-     * Take a string representation of the chiphertext and parse it into an object.
+     * Take a string representation of the ciphertext and parse it into an object.
      *
      * @throws MalformedCipherException
      */
@@ -108,10 +108,7 @@ class Ciphertext
         return $model;
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getString();
     }

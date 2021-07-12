@@ -474,7 +474,9 @@ class InlineTest extends TestCase
             ["'foo # bar'", 'foo # bar'],
             ["'#cfcfcf'", '#cfcfcf'],
 
-            ["'a \"string\" with ''quoted strings inside'''", 'a "string" with \'quoted strings inside\''],
+            ["\"isn't it a nice single quote\"", "isn't it a nice single quote"],
+            ['\'this is "double quoted"\'', 'this is "double quoted"'],
+            ['"a \"string\" with \'quoted strings inside\'"', 'a "string" with \'quoted strings inside\''],
 
             ["'-dash'", '-dash'],
             ["'-'", '-'],

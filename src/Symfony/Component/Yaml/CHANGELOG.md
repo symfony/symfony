@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Strings containing single quote characters (`'`) will now be always escaped with double quotes.
+
 5.3
 ---
 

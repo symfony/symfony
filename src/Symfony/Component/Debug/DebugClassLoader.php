@@ -61,7 +61,7 @@ class DebugClassLoader
             if (false === $test || false === $i) {
                 // filesystem is case sensitive
                 self::$caseCheck = 0;
-            } elseif (substr($test, -\strlen($file)) === $file) {
+            } elseif (str_ends_with($test, $file)) {
                 // filesystem is case insensitive and realpath() normalizes the case of characters
                 self::$caseCheck = 1;
             } elseif (false !== stripos(\PHP_OS, 'darwin')) {

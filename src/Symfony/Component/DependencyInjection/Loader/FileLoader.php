@@ -91,7 +91,7 @@ abstract class FileLoader extends BaseFileLoader
      */
     public function registerClasses(Definition $prototype, $namespace, $resource, $exclude = null)
     {
-        if ('\\' !== substr($namespace, -1)) {
+        if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));
         }
         if (!preg_match('/^(?:[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+\\\\)++$/', $namespace)) {

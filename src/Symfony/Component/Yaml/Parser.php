@@ -463,7 +463,7 @@ class Parser
                             $value .= ' ';
                         }
 
-                        if ('' !== trim($line) && '\\' === substr($line, -1)) {
+                        if ('' !== trim($line) && str_ends_with($line, '\\')) {
                             $value .= ltrim(substr($line, 0, -1));
                         } elseif ('' !== trim($line)) {
                             $value .= trim($line);
@@ -472,7 +472,7 @@ class Parser
                         if ('' === trim($line)) {
                             $previousLineWasNewline = true;
                             $previousLineWasTerminatedWithBackslash = false;
-                        } elseif ('\\' === substr($line, -1)) {
+                        } elseif (str_ends_with($line, '\\')) {
                             $previousLineWasNewline = false;
                             $previousLineWasTerminatedWithBackslash = true;
                         } else {

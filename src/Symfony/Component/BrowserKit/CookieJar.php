@@ -46,7 +46,7 @@ class CookieJar
         foreach ($this->cookieJar as $cookieDomain => $pathCookies) {
             if ($cookieDomain && $domain) {
                 $cookieDomain = '.'.ltrim($cookieDomain, '.');
-                if ($cookieDomain !== substr('.'.$domain, -\strlen($cookieDomain))) {
+                if (!str_ends_with('.'.$domain, $cookieDomain)) {
                     continue;
                 }
             }

@@ -142,7 +142,7 @@ abstract class AbstractUriElement
             return $path;
         }
 
-        if ('.' === substr($path, -1)) {
+        if (str_ends_with($path, '.')) {
             $path .= '/';
         }
 

@@ -65,7 +65,7 @@ class ClassStub extends ConstStub
                 $s = ReflectionCaster::castFunctionAbstract($r, [], new Stub(), true, Caster::EXCLUDE_VERBOSE);
                 $s = ReflectionCaster::getSignature($s);
 
-                if ('()' === substr($identifier, -2)) {
+                if (str_ends_with($identifier, '()')) {
                     $this->value = substr_replace($identifier, $s, -2);
                 } else {
                     $this->value .= $s;

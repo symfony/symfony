@@ -35,6 +35,7 @@ class Expression extends Constraint
     public $message = 'This value is not valid.';
     public $expression;
     public $values = [];
+    public $errorPath;
 
     /**
      * {@inheritdoc}
@@ -47,7 +48,8 @@ class Expression extends Constraint
         array $values = null,
         array $groups = null,
         $payload = null,
-        array $options = []
+        array $options = [],
+        string $errorPath = null
     ) {
         if (!class_exists(ExpressionLanguage::class)) {
             throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint.', __CLASS__));
@@ -65,6 +67,7 @@ class Expression extends Constraint
 
         $this->message = $message ?? $this->message;
         $this->values = $values ?? $this->values;
+        $this->errorPath = $errorPath ?? $this->errorPath;
     }
 
     /**

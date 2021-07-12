@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for `ConstraintViolationList::createFromMessage()`
+ * Add the `errorPath` option to the `Expression` constraint
 
 5.3
 ---

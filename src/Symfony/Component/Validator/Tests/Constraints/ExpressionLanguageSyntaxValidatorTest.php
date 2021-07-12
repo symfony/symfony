@@ -65,4 +65,46 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
             ->setCode(ExpressionLanguageSyntax::EXPRESSION_LANGUAGE_SYNTAX_ERROR)
             ->assertRaised();
     }
+
+    public function testNullIsValid()
+    {
+        $this->validator->validate(null, new ExpressionLanguageSyntax([
+            'allowNullAndEmptyString' => true,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNullWithoutAllowOptionIsNotValid()
+    {
+        $this->expectExceptionMessage('Expected argument of type "string", "null" given');
+
+        $this->validator->validate(null, new ExpressionLanguageSyntax());
+    }
+
+    public function testEmptyStringIsValid()
+    {
+        $this->validator->validate('', new ExpressionLanguageSyntax([
+            'allowNullAndEmptyString' => true,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testEmptyStringWithoutAllowOptionIsNotValid()
+    {
+        $this->validator->validate('', new ExpressionLanguageSyntax());
+
+        $this->buildViolation('This value should be a valid expression.')
+            ->setParameter('{{ syntax_error }}', '"Unexpected token "end of expression" of value "" around position 1."')
+            ->setInvalidValue('')
+            ->setCode(ExpressionLanguageSyntax::EXPRESSION_LANGUAGE_SYNTAX_ERROR)
+            ->assertRaised();
+    }
 }

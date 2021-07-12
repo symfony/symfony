@@ -917,6 +917,31 @@ class RequestTest extends TestCase
         $this->assertEquals(80, $port, 'With only PROTO set and value is not recognized, getPort() defaults to 80.');
     }
 
+    public function testGetPortWithForwardedHeader()
+    {
+        $request = Request::create('http://example.com', 'GET', [], [], [], [
+            'HTTP_FORWARDED' => 'for=192.0.2.60;proto=https;host=lala.localhost',
+        ]);
+        $port = $request->getPort();
+
+        $this->assertSame(80, $port, 'Without trusted proxies FORWARD is ignored.');
+
+        Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_FORWARDED);
+        $request = Request::create('http://example.com', 'GET', [], [], [], [
+            'HTTP_FORWARDED' => 'for=192.0.2.60;by=1.1.1.1:8443;proto=https;host=lala.localhost',
+        ]);
+        $this->assertSame(80, $request->getPort(), 'With PROTO and PORT on untrusted connection server value takes precedence.');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $this->assertSame(8443, $request->getPort(), 'With PROTO and PORT set PORT takes precedence.');
+
+        $request = Request::create('http://example.com', 'GET', [], [], [], [
+            'HTTP_FORWARDED' => 'for=192.0.2.60;proto=https;host=lala.localhost',
+        ]);
+        $this->assertSame(80, $request->getPort(), 'With only PROTO set getPort() ignores trusted headers on untrusted connection.');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $this->assertSame(443, $request->getPort(), 'With only PROTO set getPort() defaults to 443.');
+    }
+
     public function testGetHostWithFakeHttpHostValue()
     {
         $this->expectException(\RuntimeException::class);
@@ -1935,7 +1960,7 @@ class RequestTest extends TestCase
     {
         $request = Request::create('http://example.com/');
         $request->server->set('REMOTE_ADDR', '3.3.3.3');
-        $request->headers->set('FORWARDED', 'for=1.1.1.1, host=foo.example.com:8080, proto=https, for=2.2.2.2, host=real.example.com:8080');
+        $request->headers->set('FORWARDED', 'for=1.1.1.1; by=2.2.2.2:8080, host=foo.example.com, proto=https, for=2.2.2.2; by=3.3.3.3:8080, host=real.example.com');
 
         // no trusted proxies
         $this->assertEquals('3.3.3.3', $request->getClientIp());

@@ -4,6 +4,7 @@ CHANGELOG
 5.4
 ---
 
+ * Add a `CssColor` constraint to validate hexadecimal colors
  * Add support for `ConstraintViolationList::createFromMessage()`
 
 5.3

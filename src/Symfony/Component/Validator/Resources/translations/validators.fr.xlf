@@ -390,6 +390,10 @@
                 <source>This value should be a valid expression.</source>
                 <target>Cette valeur doit être une expression valide.</target>
             </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid hexadecimal color.</source>
+                <target>Cette valeur n'est pas une couleur hexadécimale valide.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

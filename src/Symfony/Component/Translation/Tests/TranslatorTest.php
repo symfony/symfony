@@ -17,6 +17,7 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Exception\RuntimeException;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Parameter\DateTimeParameter;
 use Symfony\Component\Translation\Translator;
 
 class TranslatorTest extends TestCase
@@ -463,12 +464,11 @@ class TranslatorTest extends TestCase
 
     public function getTransTests()
     {
-        return [
-            ['Symfony est super !', 'Symfony is great!', 'Symfony est super !', [], 'fr', ''],
-            ['Symfony est awesome !', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', ''],
-            ['Symfony est super !', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', ''],
-            ['', null, '', [], 'fr', ''],
-        ];
+        yield ['Symfony est super !', 'Symfony is great!', 'Symfony est super !', [], 'fr', ''];
+        yield ['Symfony est awesome !', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', ''];
+        yield ['Symfony est super !', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', ''];
+        yield ['Symfony 1 a été publié le 22/10/2005', 'Symfony 1 was published on %date%', 'Symfony 1 a été publié le %date%', ['%date%' => DateTimeParameter::date(new \DateTime('2005-10-22', new \DateTimeZone('Europe/Paris')))], 'fr', ''];
+        yield ['', null, '', [], 'fr', ''];
     }
 
     public function getTransICUTests()

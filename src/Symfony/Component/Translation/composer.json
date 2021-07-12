@@ -32,7 +32,8 @@
         "symfony/service-contracts": "^1.1.2|^2",
         "symfony/yaml": "^4.4|^5.0|^6.0",
         "symfony/finder": "^4.4|^5.0|^6.0",
-        "psr/log": "~1.0"
+        "psr/log": "~1.0",
+        "moneyphp/money": "^3.0|^4.0"
     },
     "conflict": {
         "symfony/config": "<4.4",
@@ -47,7 +48,8 @@
     "suggest": {
         "symfony/config": "",
         "symfony/yaml": "",
-        "psr/log-implementation": "To use logging capability in translator"
+        "psr/log-implementation": "To use logging capability in translator",
+        "moneyphp/money":  "To use money capability in translator"
     },
     "autoload": {
         "files": [ "Resources/functions.php" ],

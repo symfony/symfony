@@ -22,6 +22,7 @@ use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Symfony\Contracts\Translation\ParameterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 // Help opcache.preload discover always-needed symbols
@@ -212,15 +213,25 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
             }
         }
 
+        $message = $catalogue->get($id, $domain);
+
+        $parameters = array_map(function ($parameter) use ($locale) {
+            if ($parameter instanceof ParameterInterface) {
+                return $parameter->format($locale);
+            }
+
+            return $parameter;
+        }, $parameters);
+
         $len = \strlen(MessageCatalogue::INTL_DOMAIN_SUFFIX);
         if ($this->hasIntlFormatter
             && ($catalogue->defines($id, $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)
             || (\strlen($domain) > $len && 0 === substr_compare($domain, MessageCatalogue::INTL_DOMAIN_SUFFIX, -$len, $len)))
         ) {
-            return $this->formatter->formatIntl($catalogue->get($id, $domain), $locale, $parameters);
+            return $this->formatter->formatIntl($message, $locale, $parameters);
         }
 
-        return $this->formatter->format($catalogue->get($id, $domain), $locale, $parameters);
+        return $this->formatter->format($message, $locale, $parameters);
     }
 
     /**

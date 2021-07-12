@@ -132,6 +132,7 @@
         "doctrine/orm": "^2.7.3",
         "guzzlehttp/promises": "^1.4",
         "masterminds/html5": "^2.6",
+        "moneyphp/money": "^3.0|^4.0",
         "monolog/monolog": "^1.25.1|^2",
         "nyholm/psr7": "^1.0",
         "paragonie/sodium_compat": "^1.8",

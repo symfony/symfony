@@ -1,8 +1,13 @@
 CHANGELOG
 =========
 
-5.3
----
+5.4.0
+-----
+
+* Add `ParamaterInterface` to format parameters separately as recommended per the ICU with implementation for both DateTime and Money.
+
+5.3.0
+-----
 
  * Add `translation:pull` and `translation:push` commands to manage translations with third-party providers
  * Add `TranslatorBagInterface::getCatalogues` method

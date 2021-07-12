@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add support for `ParameterInterface` with the `trans()` filter
+
 5.3
 ---
 

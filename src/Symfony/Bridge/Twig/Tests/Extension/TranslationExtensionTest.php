@@ -14,6 +14,8 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Parameter\DateTimeParameter;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
@@ -34,16 +36,6 @@ class TranslationExtensionTest extends TestCase
      */
     public function testTrans($template, $expected, array $variables = [])
     {
-        if ($expected != $this->getTemplate($template)->render($variables)) {
-            echo $template."\n";
-            $loader = new TwigArrayLoader(['index' => $template]);
-            $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
-            $twig->addExtension(new TranslationExtension(new Translator('en')));
-
-            echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSourceContext('index'))))."\n\n";
-            $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
-        }
-
         $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
     }
 
@@ -123,7 +115,7 @@ class TranslationExtensionTest extends TestCase
             ['{{ null|trans }}', ''],
             ['{{ foo|trans }}', '', ['foo' => null]],
 
-            // trans object
+            // trans with TranslatableInterface
             ['{{ t("Hello")|trans }}', 'Hello'],
             ['{{ t(name)|trans }}', 'Symfony', ['name' => 'Symfony']],
             ['{{ t(hello, { \'%name%\': \'Symfony\' })|trans }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
@@ -131,9 +123,13 @@ class TranslationExtensionTest extends TestCase
             ['{{ t("Hello")|trans("fr") }}', 'Hello'],
             ['{{ t("Hello")|trans(locale="fr") }}', 'Hello'],
             ['{{ t("Hello", {}, "messages")|trans(locale="fr") }}', 'Hello'],
+            ['{{ hello|trans }}', 'Hello Symfony', ['hello' => new TranslatableMessage('Hello %name%', ['%name%' => 'Symfony'])]],
 
-            // trans object with count
+            // trans with TranslatableInterface with count
             ['{{ t("{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples", {\'%count%\': count})|trans }}', 'There is 5 apples', ['count' => 5]],
+
+            // trans with ParameterInterface
+            ['{% trans into "fr"%}%date%{% endtrans %}', '01/02/2021', ['date' => DateTimeParameter::date(new \DateTime('2021-02-01', new \DateTimeZone('Europe/Paris')))]],
         ];
     }
 

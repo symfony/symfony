@@ -16,6 +16,7 @@ use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\ParameterInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
@@ -106,8 +107,8 @@ final class TranslationExtension extends AbstractExtension
     }
 
     /**
-     * @param string|\Stringable|TranslatableInterface|null $message
-     * @param array|string                                  $arguments Can be the locale as a string when $message is a TranslatableInterface
+     * @param string|ParameterInterface|\Stringable|TranslatableInterface|null $message
+     * @param array|string                                                     $arguments Can be the locale as a string when $message is a ParameterInterface or a TranslatableInterface
      */
     public function trans($message, $arguments = [], string $domain = null, string $locale = null, int $count = null): string
     {
@@ -117,6 +118,14 @@ final class TranslationExtension extends AbstractExtension
             }
 
             return $message->trans($this->getTranslator(), $locale ?? (\is_string($arguments) ? $arguments : null));
+        }
+
+        if ($message instanceof ParameterInterface) {
+            if ([] !== $arguments && !\is_string($arguments)) {
+                throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be a locale passed as a string when the message is a "%s", "%s" given.', __METHOD__, ParameterInterface::class, get_debug_type($arguments)));
+            }
+
+            return $message->format($locale ?? (\is_string($arguments) ? $arguments : null));
         }
 
         if (!\is_array($arguments)) {

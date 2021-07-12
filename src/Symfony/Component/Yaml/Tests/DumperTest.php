@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Exception\DumpException;
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Reference\Anchor;
+use Symfony\Component\Yaml\Reference\Reference;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
 
@@ -650,6 +652,33 @@ YAML;
             'within_string' => 'a　b',
             'regular_space' => 'a b',
         ], 2));
+    }
+
+    public function testDumpReferences()
+    {
+        $expected = <<<YAML
+some_reference: &refname refValue
+referenced_value: *refname
+YAML;
+
+        $this->assertSame($expected, $this->dumper->dump([
+            'some_reference' => new Anchor('refname', 'refValue'),
+            'referenced_value' => new Reference('refname'),
+        ], 2));
+    }
+
+    public function testDumpInlineReference()
+    {
+        $expected = '{ foo: &structure { bar: 1, baz: 1 }, some: { nested: { structure: *structure } } }';
+
+        $this->assertSame(trim($expected), trim($this->dumper->dump([
+            'foo' => new Anchor('structure', ['bar' => 1, 'baz' => 1]),
+            'some' => [
+                'nested' => [
+                    'structure' => new Reference('structure'),
+                ],
+            ],
+        ], 3)));
     }
 }
 

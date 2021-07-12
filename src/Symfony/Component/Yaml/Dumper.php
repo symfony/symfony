@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Yaml;
 
+use Symfony\Component\Yaml\Reference\Anchor;
+use Symfony\Component\Yaml\Reference\Reference;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**
@@ -66,6 +68,15 @@ class Dumper
             foreach ($input as $key => $value) {
                 if ('' !== $output && "\n" !== $output[-1]) {
                     $output .= "\n";
+                }
+
+                $referencePrefix = '';
+                if ($value instanceof Anchor) {
+                    $referencePrefix = ' &'.$value->getName();
+                    $value = $value->getValue();
+                } elseif ($value instanceof Reference) {
+                    $output .= sprintf('%s%s %s', $prefix, $dumpAsMap ? Inline::dump($key, $flags).':' : '-', '*'.$value->getName());
+                    continue;
                 }
 
                 if (Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && \is_string($value) && false !== strpos($value, "\n") && false === strpos($value, "\r")) {
@@ -128,9 +139,10 @@ class Dumper
 
                 $willBeInlined = $inline - 1 <= 0 || !\is_array($value) && $dumpObjectAsInlineMap || empty($value);
 
-                $output .= sprintf('%s%s%s%s',
+                $output .= sprintf('%s%s%s%s%s',
                     $prefix,
                     $dumpAsMap ? Inline::dump($key, $flags).':' : '-',
+                    $referencePrefix,
                     $willBeInlined ? ' ' : "\n",
                     $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + $this->indentation, $flags)
                 ).($willBeInlined ? "\n" : '');

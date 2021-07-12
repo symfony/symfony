@@ -122,6 +122,7 @@ use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Iterable\IterableTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory as MailjetNotifierTransportFactory;
@@ -2430,6 +2431,7 @@ class FrameworkExtension extends Extension
             GitterTransportFactory::class => 'notifier.transport_factory.gitter',
             GoogleChatTransportFactory::class => 'notifier.transport_factory.googlechat',
             InfobipTransportFactory::class => 'notifier.transport_factory.infobip',
+            IterableTransportFactory::class => 'notifier.transport_factory.iterable',
             IqsmsTransportFactory::class => 'notifier.transport_factory.iqsms',
             LightSmsTransportFactory::class => 'notifier.transport_factory.lightsms',
             LinkedInTransportFactory::class => 'notifier.transport_factory.linkedin',
@@ -2464,6 +2466,7 @@ class FrameworkExtension extends Extension
                 case 'fakesms': $package = 'fake-sms'; break;
                 case 'freemobile': $package = 'free-mobile'; break;
                 case 'googlechat': $package = 'google-chat'; break;
+                case 'iterable': $package = 'iterable'; break;
                 case 'lightsms': $package = 'light-sms'; break;
                 case 'linkedin': $package = 'linked-in'; break;
                 case 'messagebird': $package = 'message-bird'; break;

@@ -83,6 +83,17 @@ class TranslatorTest extends TestCase
         $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
     }
 
+    /**
+     * @dataProvider getTransChoiceTests
+     */
+    public function testTransChoiceWithEnUsPosix($expected, $id, $number)
+    {
+        $translator = $this->getTranslator();
+        $translator->setLocale('en_US_POSIX');
+
+        $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
+    }
+
     public function testGetSetLocale()
     {
         $translator = $this->getTranslator();
@@ -311,7 +322,7 @@ class TranslatorTest extends TestCase
     {
         return [
             ['1', ['ay', 'bo', 'cgg', 'dz', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky']],
-            ['2', ['nl', 'fr', 'en', 'de', 'de_GE', 'hy', 'hy_AM']],
+            ['2', ['nl', 'fr', 'en', 'de', 'de_GE', 'hy', 'hy_AM', 'en_US_POSIX']],
             ['3', ['be', 'bs', 'cs', 'hr']],
             ['4', ['cy', 'mt', 'sl']],
             ['6', ['ar']],

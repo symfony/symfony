@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `TesterTrait::assertCommandIsSuccessful()` to test command
+ * `SymfonyStyle` is final since Symfony 5.4 
 
 5.3
 ---

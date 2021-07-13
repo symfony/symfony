@@ -43,6 +43,9 @@ class TranslatorTest extends TestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
+    /**
+     * @return TranslatorInterface
+     */
     public function getTranslator()
     {
         return new class() implements TranslatorInterface {

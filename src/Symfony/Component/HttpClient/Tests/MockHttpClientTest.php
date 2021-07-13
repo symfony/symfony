@@ -400,4 +400,22 @@ class MockHttpClientTest extends HttpClientTestCase
 
         $this->assertSame($expectedBody, $response->getContent());
     }
+
+    public function testStringableBodyParam()
+    {
+        $client = new MockHttpClient();
+
+        $param = new class() {
+            public function __toString()
+            {
+                return 'bar';
+            }
+        };
+
+        $response = $client->request('GET', 'https://example.com', [
+            'body' => ['foo' => $param],
+        ]);
+
+        $this->assertSame('foo=bar', $response->getRequestOptions()['body']);
+    }
 }

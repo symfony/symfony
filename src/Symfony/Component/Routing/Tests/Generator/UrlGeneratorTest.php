@@ -112,7 +112,7 @@ class UrlGeneratorTest extends TestCase
         $routes = $this->getRoutes('test', new Route('/testing'));
         $url = $this->getGenerator($routes)->generate('test', [$parameter => $value], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $this->assertSame(sprintf('/app.php/testing?%s', $expectedQueryString), $url);
+        $this->assertSame(sprintf('/app.php/testing%s', $expectedQueryString), $url);
     }
 
     /**
@@ -123,7 +123,7 @@ class UrlGeneratorTest extends TestCase
         $routes = $this->getRoutes('test', new Route('/testing'));
         $url = $this->getGenerator($routes)->generate('test', [$parameter => $value], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $this->assertSame(sprintf('http://localhost/app.php/testing?%s', $expectedQueryString), $url);
+        $this->assertSame(sprintf('http://localhost/app.php/testing%s', $expectedQueryString), $url);
     }
 
     public function valuesProvider(): array
@@ -135,22 +135,16 @@ class UrlGeneratorTest extends TestCase
         $nestedStdClass->nested = $stdClass;
 
         return [
-            'string' => ['foo=bar', 'foo', 'bar'],
-            'boolean-false' => ['foo=0', 'foo', false],
-            'boolean-true' => ['foo=1', 'foo', true],
-            'object implementing __toString()' => ['foo=bar', 'foo', new StringableObject()],
-            'object implementing __toString() in nested array' => ['foo%5Bbaz%5D=bar', 'foo', ['baz' => new StringableObject()]],
-            'stdClass' => ['foo%5Bbaz%5D=bar', 'foo', $stdClass],
-            'stdClass in nested stdClass' => ['foo%5Bnested%5D%5Bbaz%5D=bar', 'foo', $nestedStdClass],
+            'null' => ['', 'foo', null],
+            'string' => ['?foo=bar', 'foo', 'bar'],
+            'boolean-false' => ['?foo=0', 'foo', false],
+            'boolean-true' => ['?foo=1', 'foo', true],
+            'object implementing __toString()' => ['?foo=bar', 'foo', new StringableObject()],
+            'object implementing __toString() in nested array' => ['?foo%5Bbaz%5D=bar', 'foo', ['baz' => new StringableObject()]],
+            'stdClass' => ['foo%5Bbaz%5D=bar', '?foo', $stdClass],
+            'stdClass in nested stdClass' => ['?foo%5Bnested%5D%5Bbaz%5D=bar', 'foo', $nestedStdClass],
+            'not stringable object' => ['', 'foo', new NotStringableObject()],
         ];
-    }
-
-    public function testUrlWithNullExtraParameters()
-    {
-        $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['foo' => null], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        $this->assertEquals('http://localhost/app.php/testing', $url);
     }
 
     public function testUrlWithExtraParametersFromGlobals()
@@ -924,4 +918,8 @@ class StringableObject
     {
         return 'bar';
     }
+}
+
+class NotStringableObject
+{
 }

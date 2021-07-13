@@ -13,8 +13,6 @@ namespace Symfony\Component\Cache\Traits;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @internal
  */
 class RedisProxy
 {

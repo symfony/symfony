@@ -140,10 +140,13 @@ class UrlGeneratorTest extends TestCase
             'boolean-false' => ['?foo=0', 'foo', false],
             'boolean-true' => ['?foo=1', 'foo', true],
             'object implementing __toString()' => ['?foo=bar', 'foo', new StringableObject()],
+            'object implementing __toString() but has public property' => ['?foo%5Bfoo%5D=property', 'foo', new StringableObjectWithPublicProperty()],
             'object implementing __toString() in nested array' => ['?foo%5Bbaz%5D=bar', 'foo', ['baz' => new StringableObject()]],
-            'stdClass' => ['foo%5Bbaz%5D=bar', '?foo', $stdClass],
+            'object implementing __toString() in nested array but has public property' => ['?foo%5Bbaz%5D%5Bfoo%5D=property', 'foo', ['baz' => new StringableObjectWithPublicProperty()]],
+            'stdClass' => ['?foo%5Bbaz%5D=bar', 'foo', $stdClass],
             'stdClass in nested stdClass' => ['?foo%5Bnested%5D%5Bbaz%5D=bar', 'foo', $nestedStdClass],
-            'not stringable object' => ['', 'foo', new NotStringableObject()],
+            'non stringable object' => ['', 'foo', new NonStringableObject()],
+            'non stringable object but has public property' => ['?foo%5Bfoo%5D=property', 'foo', new NonStringableObjectWithPublicProperty()],
         ];
     }
 
@@ -920,6 +923,21 @@ class StringableObject
     }
 }
 
-class NotStringableObject
+class StringableObjectWithPublicProperty
 {
+    public $foo = 'property';
+
+    public function __toString()
+    {
+        return 'bar';
+    }
+}
+
+class NonStringableObject
+{
+}
+
+class NonStringableObjectWithPublicProperty
+{
+    public $foo = 'property';
 }

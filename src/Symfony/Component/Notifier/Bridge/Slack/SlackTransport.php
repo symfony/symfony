@@ -95,7 +95,9 @@ final class SlackTransport extends AbstractTransport
 
         $result = $response->toArray(false);
         if (!$result['ok']) {
-            throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $result['error']), $response);
+            $errors = isset($result['errors']) ? ' ('.implode('|', $result['errors']).')' : '';
+
+            throw new TransportException(sprintf('Unable to post the Slack message: "%s"%s.', $result['error'], $errors), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

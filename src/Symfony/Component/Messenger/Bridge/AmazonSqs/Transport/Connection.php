@@ -273,7 +273,7 @@ class Connection
         }
 
         if (null !== $this->configuration['account']) {
-            throw new InvalidArgumentException(sprintf('The Amazon SQS queue "%s" does not exists (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
+            throw new InvalidArgumentException(sprintf('The Amazon SQS queue "%s" does not exist (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
         }
 
         $parameters = ['QueueName' => $this->configuration['queue_name']];
@@ -289,7 +289,7 @@ class Connection
         // Blocking call to wait for the queue to be created
         $exists->wait();
         if (!$exists->isSuccess()) {
-            throw new TransportException(sprintf('Failed to crate the Amazon SQS queue "%s".', $this->configuration['queue_name']));
+            throw new TransportException(sprintf('Failed to create the Amazon SQS queue "%s".', $this->configuration['queue_name']));
         }
         $this->queueUrl = null;
     }

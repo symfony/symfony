@@ -6,6 +6,7 @@ CHANGELOG
 
  * Make `LockRegistry` use semaphores when possible
  * Deprecate `DoctrineProvider` because this class has been added to the `doctrine/cache` package
+ * Remove `@internal` from `RedisProxy`
 
 5.3
 ---

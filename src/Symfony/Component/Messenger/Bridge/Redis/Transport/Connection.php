@@ -200,7 +200,7 @@ class Connection
             $connectionCredentials = [
                 'host' => $parsedUrl['host'] ?? '127.0.0.1',
                 'port' => $parsedUrl['port'] ?? 6379,
-                'auth' => $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
+                'auth' => $redisOptions['auth'] ?? $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
             ];
 
             $pathParts = explode('/', rtrim($parsedUrl['path'] ?? '', '/'));

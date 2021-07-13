@@ -169,6 +169,39 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('redis://password@localhost/queue', [], $redis);
     }
 
+    public function testAuthFromOptions()
+    {
+        $redis = $this->createMock(\Redis::class);
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('password')
+            ->willReturn(true);
+
+        Connection::fromDsn('redis://localhost/queue', ['auth' => 'password'], $redis);
+    }
+
+    public function testAuthFromOptionsAndDsn()
+    {
+        $redis = $this->createMock(\Redis::class);
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('password2')
+            ->willReturn(true);
+
+        Connection::fromDsn('redis://password1@localhost/queue', ['auth' => 'password2'], $redis);
+    }
+
+    public function testAuthAsUserInDsn()
+    {
+        $redis = $this->createMock(\Redis::class);
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('password')
+            ->willReturn(true);
+
+        Connection::fromDsn('redis://password:localhost/queue', [], $redis);
+    }
+
     public function testNoAuthWithEmptyPassword()
     {
         $redis = $this->createMock(\Redis::class);

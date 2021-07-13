@@ -711,7 +711,7 @@ class Inline
         $nextOffset += strspn($value, ' ', $nextOffset);
 
         if ('' === $tag && (!isset($value[$nextOffset]) || \in_array($value[$nextOffset], [']', '}', ','], true))) {
-            throw new ParseException(sprintf('Using the unquoted scalar value "!" is not supported. You must quote it.', $value), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
+            throw new ParseException('Using the unquoted scalar value "!" is not supported. You must quote it.', self::$parsedLineNumber + 1, $value, self::$parsedFilename);
         }
 
         // Is followed by a scalar and is a built-in tag

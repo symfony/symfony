@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-12T14:10:55Z
+
+A test case would be nice to prevent regressions
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-07-12T14:12:38Z
+
+@chalasr Sure, I'm on it. I will push it later today
+
+EDIT: sorry for the messy rebase on 5.3
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-07-13T05:55:21Z
+
+As documentation mention "Options defined under options take precedence over ones defined in the DSN." (https://symfony.com/doc/current/messenger.html#transport-configuration), I've updated the code to respect that. Also, I've added test to assert that put the auth value at user or password place in the DSN doesn't matter.

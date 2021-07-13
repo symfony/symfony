@@ -218,7 +218,7 @@ EOT
     {
         $expected = 'Write an essay (press Ctrl+D to continue)';
 
-        if (false !== strpos(\PHP_OS, 'WIN')) {
+        if ('Windows' === \PHP_OS_FAMILY) {
             $expected = 'Write an essay (press Ctrl+Z then Enter to continue)';
         }
 

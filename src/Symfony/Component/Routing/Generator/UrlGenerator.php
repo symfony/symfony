@@ -298,7 +298,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             if ($v instanceof \stdClass) {
                 $v = (array) $v;
                 array_walk_recursive($v, $caster);
-            } elseif (null !== $v) {
+            } elseif (\is_object($v)) {
                 $v = (string) $v;
             }
         });

@@ -104,20 +104,45 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/', $this->getGenerator($routes)->generate('test'));
     }
 
-    public function testRelativeUrlWithExtraParameters()
+    /**
+     * @dataProvider valuesProvider
+     */
+    public function testRelativeUrlWithExtraParameters(string $expectedQueryString, string $parameter, $value)
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['foo' => 'bar'], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $url = $this->getGenerator($routes)->generate('test', [$parameter => $value], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $this->assertEquals('/app.php/testing?foo=bar', $url);
+        $this->assertSame(sprintf('/app.php/testing?%s', $expectedQueryString), $url);
     }
 
-    public function testAbsoluteUrlWithExtraParameters()
+    /**
+     * @dataProvider valuesProvider
+     */
+    public function testAbsoluteUrlWithExtraParameters(string $expectedQueryString, string $parameter, $value)
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['foo' => 'bar'], UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->getGenerator($routes)->generate('test', [$parameter => $value], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $this->assertEquals('http://localhost/app.php/testing?foo=bar', $url);
+        $this->assertSame(sprintf('http://localhost/app.php/testing?%s', $expectedQueryString), $url);
+    }
+
+    public function valuesProvider(): array
+    {
+        $stdClass = new \stdClass();
+        $stdClass->baz = 'bar';
+
+        $nestedStdClass = new \stdClass();
+        $nestedStdClass->nested = $stdClass;
+
+        return [
+            'string' => ['foo=bar', 'foo', 'bar'],
+            'boolean-false' => ['foo=0', 'foo', false],
+            'boolean-true' => ['foo=1', 'foo', true],
+            'object implementing __toString()' => ['foo=bar', 'foo', new StringableObject()],
+            'object implementing __toString() in nested array' => ['foo%5Bbaz%5D=bar', 'foo', ['baz' => new StringableObject()]],
+            'stdClass' => ['foo%5Bbaz%5D=bar', 'foo', $stdClass],
+            'stdClass in nested stdClass' => ['foo%5Bnested%5D%5Bbaz%5D=bar', 'foo', $nestedStdClass],
+        ];
     }
 
     public function testUrlWithNullExtraParameters()
@@ -126,46 +151,6 @@ class UrlGeneratorTest extends TestCase
         $url = $this->getGenerator($routes)->generate('test', ['foo' => null], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $this->assertEquals('http://localhost/app.php/testing', $url);
-    }
-
-    public function testRelativeUrlWithStringableObjectParameter()
-    {
-        $stringableObject = new StringableObject();
-
-        $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
-        $url = $this->getGenerator($routes)->generate('test', ['foo' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_PATH);
-
-        $this->assertSame('/app.php/testing/bar', $url);
-    }
-
-    public function testRelativeUrlWithStringableObjectExtraParameter()
-    {
-        $stringableObject = new StringableObject();
-
-        $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['stringable' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_PATH);
-
-        $this->assertSame('/app.php/testing?stringable=bar', $url);
-    }
-
-    public function testAbsoluteUrlWithStringableObjectExtraParameter()
-    {
-        $stringableObject = new StringableObject();
-
-        $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['stringable' => $stringableObject], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        $this->assertSame('http://localhost/app.php/testing?stringable=bar', $url);
-    }
-
-    public function testAbsoluteUrlWithStringableObjectExtraParameterInArray()
-    {
-        $stringableObject = new StringableObject();
-
-        $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', ['key' => ['stringable' => $stringableObject]], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        $this->assertSame('http://localhost/app.php/testing?key%5Bstringable%5D=bar', $url);
     }
 
     public function testUrlWithExtraParametersFromGlobals()

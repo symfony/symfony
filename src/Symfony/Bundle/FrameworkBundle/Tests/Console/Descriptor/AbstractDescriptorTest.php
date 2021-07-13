@@ -209,7 +209,7 @@ abstract class AbstractDescriptorTest extends TestCase
     }
 
     /** @dataProvider getClassDescriptionTestData */
-    public function testGetClassDecription($object, $expectedDescription)
+    public function testGetClassDescription($object, $expectedDescription)
     {
         $this->assertEquals($expectedDescription, $this->getDescriptor()->getClassDescription($object));
     }

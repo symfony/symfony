@@ -282,7 +282,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     /**
      * {@inheritdoc}
      */
-    public function invalidateTags(array $tags)
+    public function invalidateTags(array $tags): bool
     {
         if (empty($tags)) {
             return false;

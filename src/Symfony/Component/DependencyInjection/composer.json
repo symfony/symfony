@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=8.0.2",
-        "psr/container": "^1.1.1",
-        "symfony/deprecation-contracts": "^2.1",
-        "symfony/service-contracts": "^1.1.6|^2"
+        "psr/container": "^1.1|^2.0",
+        "symfony/deprecation-contracts": "^2.1|^3.0",
+        "symfony/service-contracts": "^1.1.6|^2.0|^3.0"
     },
     "require-dev": {
         "symfony/yaml": "^5.4|^6.0",
@@ -41,8 +41,8 @@
         "symfony/yaml": "<5.4"
     },
     "provide": {
-        "psr/container-implementation": "1.0",
-        "symfony/service-implementation": "1.0|2.0"
+        "psr/container-implementation": "1.1|2.0|3.0",
+        "symfony/service-implementation": "1.1|2.0|3.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },

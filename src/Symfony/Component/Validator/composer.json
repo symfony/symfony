@@ -19,7 +19,7 @@
         "php": ">=8.0.2",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/translation-contracts": "^1.1|^2"
+        "symfony/translation-contracts": "^1.1|^2.0|^3.0"
     },
     "require-dev": {
         "symfony/console": "^5.4|^6.0",

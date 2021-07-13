@@ -86,7 +86,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
         return $this->container->get('parameter_bag')->get($name);
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'router' => '?'.RouterInterface::class,

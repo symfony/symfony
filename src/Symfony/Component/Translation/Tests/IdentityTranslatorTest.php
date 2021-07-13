@@ -33,7 +33,7 @@ class IdentityTranslatorTest extends TranslatorTest
         \Locale::setDefault($this->defaultLocale);
     }
 
-    public function getTranslator()
+    public function getTranslator(): IdentityTranslator
     {
         return new IdentityTranslator();
     }

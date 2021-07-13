@@ -105,5 +105,5 @@ interface ResponseInterface
      * @return mixed An array of all available info, or one of them when $type is
      *               provided, or null when an unsupported type is requested
      */
-    public function getInfo(string $type = null);
+    public function getInfo(string $type = null): mixed;
 }

@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=8.0.2",
-        "symfony/deprecation-contracts": "^2.1",
+        "symfony/deprecation-contracts": "^2.1|^3.0",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/translation-contracts": "^2.3"
+        "symfony/translation-contracts": "^2.3|^3.0"
     },
     "require-dev": {
         "symfony/config": "^5.4|^6.0",
@@ -28,7 +28,7 @@
         "symfony/http-kernel": "^5.4|^6.0",
         "symfony/intl": "^5.4|^6.0",
         "symfony/polyfill-intl-icu": "^1.21",
-        "symfony/service-contracts": "^1.1.2|^2",
+        "symfony/service-contracts": "^1.1.2|^2.0|^3.0",
         "symfony/yaml": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",
         "psr/log": "~1.0"
@@ -41,7 +41,7 @@
         "symfony/yaml": "<5.4"
     },
     "provide": {
-        "symfony/translation-implementation": "2.3"
+        "symfony/translation-implementation": "2.3|3.0"
     },
     "suggest": {
         "symfony/config": "",

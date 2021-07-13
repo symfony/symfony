@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
+use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
@@ -840,39 +841,39 @@ class TestAuthenticator implements AuthenticatorInterface
 
 class NullAuthenticator implements GuardAuthenticatorInterface
 {
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null): Response
     {
     }
 
-    public function supports(Request $request)
+    public function supports(Request $request): bool
     {
     }
 
-    public function getCredentials(Request $request)
+    public function getCredentials(Request $request): mixed
     {
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
     {
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials($credentials, UserInterface $user): bool
     {
     }
 
-    public function createAuthenticatedToken(UserInterface $user, string $providerKey)
+    public function createAuthenticatedToken(UserInterface $user, string $providerKey): GuardTokenInterface
     {
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
     {
     }
 
-    public function supportsRememberMe()
+    public function supportsRememberMe(): bool
     {
     }
 }
@@ -897,7 +898,7 @@ class TestFirewallListenerFactory implements SecurityFactoryInterface, FirewallL
         return ['custom_firewall_listener_id'];
     }
 
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $container->register('provider_id', \stdClass::class);
         $container->register('listener_id', \stdClass::class);
@@ -905,12 +906,12 @@ class TestFirewallListenerFactory implements SecurityFactoryInterface, FirewallL
         return ['provider_id', 'listener_id', $defaultEntryPoint];
     }
 
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'form';
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'custom_listener';
     }

@@ -155,7 +155,7 @@ class TestFileLoader extends FileLoader
 {
     private $supports = true;
 
-    public function load(mixed $resource, string $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
         return $resource;
     }

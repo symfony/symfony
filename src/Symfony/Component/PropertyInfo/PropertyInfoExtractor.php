@@ -100,10 +100,8 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
 
     /**
      * Iterates over registered extractors and return the first value found.
-     *
-     * @return mixed
      */
-    private function extract(iterable $extractors, string $method, array $arguments)
+    private function extract(iterable $extractors, string $method, array $arguments): mixed
     {
         foreach ($extractors as $extractor) {
             if (null !== $value = $extractor->{$method}(...$arguments)) {

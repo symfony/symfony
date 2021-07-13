@@ -29,7 +29,7 @@ class ArrayUserProvider implements UserProviderInterface
         return $this->users[$username];
     }
 
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): UserInterface
     {
         return $this->loadUserByIdentifier($username);
     }
@@ -48,7 +48,7 @@ class ArrayUserProvider implements UserProviderInterface
         return $user;
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof UserInterface) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
@@ -60,7 +60,7 @@ class ArrayUserProvider implements UserProviderInterface
         return new $class($storedUser->getUserIdentifier(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled());
     }
 
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return InMemoryUser::class === $class || UserWithoutEquatable::class === $class;
     }

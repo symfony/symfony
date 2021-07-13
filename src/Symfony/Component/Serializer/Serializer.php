@@ -133,7 +133,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function deserialize(mixed $data, string $type, string $format, array $context = [])
+    final public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
         if (!$this->supportsDecoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Deserialization for the format "%s" is not supported.', $format));
@@ -305,7 +305,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function encode(mixed $data, string $format, array $context = [])
+    final public function encode(mixed $data, string $format, array $context = []): string
     {
         return $this->encoder->encode($data, $format, $context);
     }
@@ -313,7 +313,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function decode(string $data, string $format, array $context = [])
+    final public function decode(string $data, string $format, array $context = []): mixed
     {
         return $this->decoder->decode($data, $format, $context);
     }

@@ -19,9 +19,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * EventDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @see TraceableEventDispatcher
  *
  * @final
  */
@@ -70,72 +70,32 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
         $this->data = $this->cloneVar($this->data);
     }
 
-    /**
-     * Sets the called listeners.
-     *
-     * @param array $listeners An array of called listeners
-     *
-     * @see TraceableEventDispatcher
-     */
     public function setCalledListeners(array $listeners)
     {
         $this->data['called_listeners'] = $listeners;
     }
 
-    /**
-     * Gets the called listeners.
-     *
-     * @return array An array of called listeners
-     *
-     * @see TraceableEventDispatcher
-     */
-    public function getCalledListeners()
+    public function getCalledListeners(): array
     {
         return $this->data['called_listeners'];
     }
 
-    /**
-     * Sets the not called listeners.
-     *
-     * @see TraceableEventDispatcher
-     */
     public function setNotCalledListeners(array $listeners)
     {
         $this->data['not_called_listeners'] = $listeners;
     }
 
-    /**
-     * Gets the not called listeners.
-     *
-     * @return array
-     *
-     * @see TraceableEventDispatcher
-     */
-    public function getNotCalledListeners()
+    public function getNotCalledListeners(): array
     {
         return $this->data['not_called_listeners'];
     }
 
-    /**
-     * Sets the orphaned events.
-     *
-     * @param array $events An array of orphaned events
-     *
-     * @see TraceableEventDispatcher
-     */
     public function setOrphanedEvents(array $events)
     {
         $this->data['orphaned_events'] = $events;
     }
 
-    /**
-     * Gets the orphaned events.
-     *
-     * @return array An array of orphaned events
-     *
-     * @see TraceableEventDispatcher
-     */
-    public function getOrphanedEvents()
+    public function getOrphanedEvents(): array
     {
         return $this->data['orphaned_events'];
     }
@@ -143,7 +103,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'events';
     }

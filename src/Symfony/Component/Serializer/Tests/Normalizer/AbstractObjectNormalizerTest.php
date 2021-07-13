@@ -396,7 +396,7 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
         return [];
     }
 
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
     }
 
@@ -438,7 +438,7 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
     {
     }
 
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
     }
 
@@ -520,11 +520,11 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
     {
     }
 
-    public function deserialize($data, string $type, string $format, array $context = [])
+    public function deserialize($data, string $type, string $format, array $context = []): mixed
     {
     }
 
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = []): mixed
     {
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof DenormalizerInterface && $normalizer->supportsDenormalization($data, $type, $format, $context)) {
@@ -547,7 +547,7 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
     {
     }
 
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
     }
 
@@ -587,7 +587,7 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = []): mixed
     {
         $serializer = $this->serializer;
         $type = substr($type, 0, -2);
@@ -619,7 +619,7 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
 
 class NotSerializable
 {
-    public function __sleep()
+    public function __sleep(): array
     {
         if (class_exists(\Error::class)) {
             throw new \Error('not serializable');

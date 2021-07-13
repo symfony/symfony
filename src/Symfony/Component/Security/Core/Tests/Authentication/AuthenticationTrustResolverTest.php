@@ -139,7 +139,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function getCredentials()
+    public function getCredentials(): mixed
     {
     }
 
@@ -183,7 +183,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function getAttribute(string $name)
+    public function getAttribute(string $name): mixed
     {
     }
 

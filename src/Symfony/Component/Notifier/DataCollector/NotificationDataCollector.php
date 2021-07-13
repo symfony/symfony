@@ -53,7 +53,7 @@ final class NotificationDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'notifier';
     }

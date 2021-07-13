@@ -88,7 +88,7 @@ final class SessionBagProxy implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): mixed
     {
         return $this->bag->clear();
     }

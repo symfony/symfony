@@ -71,7 +71,7 @@ class LocalizedController implements ServiceSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'twig' => Environment::class,

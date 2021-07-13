@@ -30,7 +30,7 @@ final class TestLegacyPasswordAuthenticatedUser implements LegacyPasswordAuthent
         return $this->password;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->roles;
     }
@@ -41,7 +41,7 @@ final class TestLegacyPasswordAuthenticatedUser implements LegacyPasswordAuthent
         return;
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }

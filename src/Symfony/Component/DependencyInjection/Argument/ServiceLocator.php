@@ -34,10 +34,8 @@ class ServiceLocator extends BaseServiceLocator
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function get(string $id)
+    public function get(string $id): mixed
     {
         return isset($this->serviceMap[$id]) ? ($this->factory)(...$this->serviceMap[$id]) : parent::get($id);
     }

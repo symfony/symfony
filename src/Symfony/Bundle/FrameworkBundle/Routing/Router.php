@@ -144,17 +144,12 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
     }
 
     /**
-     * Recursively replaces placeholders with the service container parameters.
-     *
-     * @param mixed $value The source which might contain "%placeholders%"
-     *
-     * @return mixed The source with the placeholders replaced by the container
-     *               parameters. Arrays are resolved recursively.
+     * Recursively replaces %placeholders% with the service container parameters.
      *
      * @throws ParameterNotFoundException When a placeholder does not exist as a container parameter
      * @throws RuntimeException           When a container value is not a string or a numeric value
      */
-    private function resolve(mixed $value)
+    private function resolve(mixed $value): mixed
     {
         if (\is_array($value)) {
             foreach ($value as $key => $val) {

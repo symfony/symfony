@@ -91,10 +91,7 @@ class MailerHandlerTest extends TestCase
         $handler->handle($this->getRecord(Logger::WARNING, 'message'));
     }
 
-    /**
-     * @return array Record
-     */
-    protected function getRecord($level = Logger::WARNING, $message = 'test', $context = [])
+    protected function getRecord($level = Logger::WARNING, $message = 'test', $context = []): array
     {
         return [
             'message' => $message,
@@ -107,10 +104,7 @@ class MailerHandlerTest extends TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getMultipleRecords()
+    protected function getMultipleRecords(): array
     {
         return [
             $this->getRecord(Logger::DEBUG, 'debug message 1'),

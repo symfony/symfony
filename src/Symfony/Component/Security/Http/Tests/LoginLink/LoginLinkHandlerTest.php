@@ -225,12 +225,12 @@ class TestLoginLinkHandlerUserProvider implements UserProviderInterface
         return clone $this->users[$userIdentifier];
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         return $this->users[$username];
     }
 
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return TestLoginLinkHandlerUser::class === $class;
     }
@@ -251,7 +251,7 @@ class TestLoginLinkHandlerUser implements UserInterface
         $this->lastAuthenticatedAt = $lastAuthenticatedAt;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         return [];
     }
@@ -266,7 +266,7 @@ class TestLoginLinkHandlerUser implements UserInterface
         return '';
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }

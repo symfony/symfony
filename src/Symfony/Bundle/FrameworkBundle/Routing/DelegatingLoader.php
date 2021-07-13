@@ -42,7 +42,7 @@ class DelegatingLoader extends BaseDelegatingLoader
     /**
      * {@inheritdoc}
      */
-    public function load(mixed $resource, string $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
         if ($this->loading) {
             // This can happen if a fatal error occurs in parent::load().

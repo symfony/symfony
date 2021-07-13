@@ -147,7 +147,7 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * {@inheritdoc}
      */
-    public function getCredentials(Request $request)
+    public function getCredentials(Request $request): mixed
     {
         return 'credentials';
     }

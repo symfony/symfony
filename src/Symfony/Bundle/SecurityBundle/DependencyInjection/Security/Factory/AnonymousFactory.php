@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Parameter;
  */
 class AnonymousFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint): array
     {
         if (null === $config['secret']) {
             $config['secret'] = new Parameter('container.build_hash');
@@ -52,12 +52,12 @@ class AnonymousFactory implements SecurityFactoryInterface, AuthenticatorFactory
         throw new InvalidConfigurationException(sprintf('The authenticator manager no longer has "anonymous" security. Please remove this option under the "%s" firewall'.($config['lazy'] ? ' and add "lazy: true"' : '').'.', $firewallName));
     }
 
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'anonymous';
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'anonymous';
     }

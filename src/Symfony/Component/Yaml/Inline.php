@@ -54,11 +54,9 @@ class Inline
      * @param int    $flags      A bit field of PARSE_* constants to customize the YAML parser behavior
      * @param array  $references Mapping of variable names to values
      *
-     * @return mixed A PHP value
-     *
      * @throws ParseException
      */
-    public static function parse(string $value = null, int $flags = 0, array &$references = [])
+    public static function parse(string $value = null, int $flags = 0, array &$references = []): mixed
     {
         self::initialize($flags);
 
@@ -111,8 +109,6 @@ class Inline
      *
      * @param mixed $value The PHP variable to convert
      * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
-     *
-     * @return string The YAML string representing the PHP value
      *
      * @throws DumpException When trying to dump PHP resource
      */
@@ -213,8 +209,6 @@ class Inline
      *
      * @param array $value The PHP array to dump
      * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
-     *
-     * @return string The YAML string representing the PHP array
      */
     private static function dumpArray(array $value, int $flags): string
     {
@@ -249,11 +243,9 @@ class Inline
     /**
      * Parses a YAML scalar.
      *
-     * @return mixed
-     *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    public static function parseScalar(string $scalar, int $flags = 0, array $delimiters = null, int &$i = 0, bool $evaluate = true, array &$references = [])
+    public static function parseScalar(string $scalar, int $flags = 0, array $delimiters = null, int &$i = 0, bool $evaluate = true, array &$references = []): mixed
     {
         if (\in_array($scalar[$i], ['"', "'"], true)) {
             // quoted scalar
@@ -540,11 +532,9 @@ class Inline
     /**
      * Evaluates scalars and replaces magic values.
      *
-     * @return mixed The evaluated YAML string
-     *
      * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a reference could not be resolved
      */
-    private static function evaluateScalar(string $scalar, int $flags, array &$references = [])
+    private static function evaluateScalar(string $scalar, int $flags, array &$references = []): mixed
     {
         $scalar = trim($scalar);
 
@@ -743,8 +733,6 @@ class Inline
 
     /**
      * Gets a regex that matches a YAML date.
-     *
-     * @return string The regular expression
      *
      * @see http://www.yaml.org/spec/1.2/spec.html#id2761573
      */

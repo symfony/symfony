@@ -289,7 +289,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    final public function merge(mixed $leftSide, mixed $rightSide)
+    final public function merge(mixed $leftSide, mixed $rightSide): mixed
     {
         if (!$this->allowOverwrite) {
             throw new ForbiddenOverwriteException(sprintf('Configuration path "%s" cannot be overwritten. You have to define all options for this path, and any of its sub-paths in one configuration section.', $this->getPath()));
@@ -330,7 +330,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    final public function normalize(mixed $value)
+    final public function normalize(mixed $value): mixed
     {
         $value = $this->preNormalize($value);
 
@@ -390,7 +390,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    final public function finalize(mixed $value)
+    final public function finalize(mixed $value): mixed
     {
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
             foreach ($placeholders as $placeholder) {

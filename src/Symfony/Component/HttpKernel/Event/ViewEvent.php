@@ -25,9 +25,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 final class ViewEvent extends RequestEvent
 {
-    /**
-     * The return value of the controller.
-     */
     private $controllerResult;
 
     public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, mixed $controllerResult)
@@ -37,19 +34,11 @@ final class ViewEvent extends RequestEvent
         $this->controllerResult = $controllerResult;
     }
 
-    /**
-     * Returns the return value of the controller.
-     *
-     * @return mixed The controller return value
-     */
-    public function getControllerResult()
+    public function getControllerResult(): mixed
     {
         return $this->controllerResult;
     }
 
-    /**
-     * Assigns the return value of the controller.
-     */
     public function setControllerResult(mixed $controllerResult): void
     {
         $this->controllerResult = $controllerResult;

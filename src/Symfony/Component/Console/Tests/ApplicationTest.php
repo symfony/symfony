@@ -1867,21 +1867,11 @@ class ApplicationTest extends TestCase
 
 class CustomApplication extends Application
 {
-    /**
-     * Overwrites the default input definition.
-     *
-     * @return InputDefinition An InputDefinition instance
-     */
     protected function getDefaultInputDefinition(): InputDefinition
     {
         return new InputDefinition([new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.')]);
     }
 
-    /**
-     * Gets the default helper set with the helpers that should always be available.
-     *
-     * @return HelperSet A HelperSet instance
-     */
     protected function getDefaultHelperSet(): HelperSet
     {
         return new HelperSet([new FormatterHelper()]);
@@ -1890,9 +1880,6 @@ class CustomApplication extends Application
 
 class CustomDefaultCommandApplication extends Application
 {
-    /**
-     * Overwrites the constructor in order to set a different default command.
-     */
     public function __construct()
     {
         parent::__construct();
@@ -1938,7 +1925,7 @@ class SignableCommand extends Command implements SignalableCommandInterface
         $this->signaled = true;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         for ($i = 0; $i < $this->loop; ++$i) {
             usleep(100);

@@ -104,7 +104,7 @@ class LoaderTest extends TestCase
 
 class ProjectLoader1 extends Loader
 {
-    public function load(mixed $resource, string $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
     }
 

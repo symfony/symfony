@@ -65,7 +65,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'messenger';
     }
@@ -84,7 +84,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
     /**
      * {@inheritdoc}
      */
-    protected function getCasters()
+    protected function getCasters(): array
     {
         $casters = parent::getCasters();
 

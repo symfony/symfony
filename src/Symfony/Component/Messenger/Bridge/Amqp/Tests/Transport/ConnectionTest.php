@@ -580,7 +580,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body', ['Foo' => 'X'], 0, new AmqpStamp(null, \AMQP_NOPARAM, ['headers' => ['Bar' => 'Y']]));
     }
 
-    public function testAmqpStampDelireryModeIsUsed()
+    public function testAmqpStampDeliveryModeIsUsed()
     {
         $factory = new TestAmqpFactory(
             $this->createMock(\AMQPConnection::class),

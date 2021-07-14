@@ -13,9 +13,8 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
@@ -33,21 +32,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResolvedFormTypeTest extends TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $dispatcher;
-
-    /**
-     * @var MockObject
-     */
-    private $factory;
-
-    /**
-     * @var MockObject
-     */
-    private $dataMapper;
-
     /**
      * @var MockObject|FormTypeInterface
      */
@@ -80,9 +64,6 @@ class ResolvedFormTypeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->factory = $this->createMock(FormFactoryInterface::class);
-        $this->dataMapper = $this->createMock(DataMapperInterface::class);
         $this->parentType = $this->getMockFormType();
         $this->type = $this->getMockFormType();
         $this->extension1 = $this->getMockFormTypeExtension();
@@ -256,7 +237,7 @@ class ResolvedFormTypeTest extends TestCase
 
     public function testCreateView()
     {
-        $form = new Form($this->createMock(FormConfigInterface::class));
+        $form = $this->bootstrapForm();
 
         $view = $this->resolvedType->createView($form);
 
@@ -266,7 +247,7 @@ class ResolvedFormTypeTest extends TestCase
 
     public function testCreateViewWithParent()
     {
-        $form = new Form($this->createMock(FormConfigInterface::class));
+        $form = $this->bootstrapForm();
         $parentView = $this->createMock(FormView::class);
 
         $view = $this->resolvedType->createView($form, $parentView);
@@ -278,7 +259,7 @@ class ResolvedFormTypeTest extends TestCase
     public function testBuildView()
     {
         $options = ['a' => '1', 'b' => '2'];
-        $form = new Form($this->createMock(FormConfigInterface::class));
+        $form = $this->bootstrapForm();
         $view = $this->createMock(FormView::class);
 
         $i = 0;
@@ -320,7 +301,7 @@ class ResolvedFormTypeTest extends TestCase
     public function testFinishView()
     {
         $options = ['a' => '1', 'b' => '2'];
-        $form = new Form($this->createMock(FormConfigInterface::class));
+        $form = $this->bootstrapForm();
         $view = $this->createMock(FormView::class);
 
         $i = 0;
@@ -392,7 +373,7 @@ class ResolvedFormTypeTest extends TestCase
         ];
     }
 
-    private function getMockFormType($typeClass = 'Symfony\Component\Form\AbstractType'): MockObject
+    private function getMockFormType($typeClass = AbstractType::class): MockObject
     {
         return $this->getMockBuilder($typeClass)->setMethods(['getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
     }
@@ -405,5 +386,14 @@ class ResolvedFormTypeTest extends TestCase
     private function getMockFormFactory(): MockObject
     {
         return $this->createMock(FormFactoryInterface::class);
+    }
+
+    private function bootstrapForm(): Form
+    {
+        $config = $this->createMock(FormConfigInterface::class);
+        $config->method('getInheritData')->willReturn(false);
+        $config->method('getName')->willReturn('');
+
+        return new Form($config);
     }
 }

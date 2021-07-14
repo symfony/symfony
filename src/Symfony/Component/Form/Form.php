@@ -23,6 +23,7 @@ use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
@@ -80,12 +81,14 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $parent;
 
     /**
-     * @var FormInterface[]|OrderedHashMap A map of FormInterface instances
+     * A map of FormInterface instances.
+     *
+     * @var FormInterface[]|OrderedHashMap
      */
     private $children;
 
     /**
-     * @var FormError[] An array of FormError instances
+     * @var FormError[]
      */
     private $errors = [];
 
@@ -95,7 +98,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $submitted = false;
 
     /**
-     * @var FormInterface|ClickableInterface|null The button that was used to submit the form
+     * The button that was used to submit the form.
+     *
+     * @var FormInterface|ClickableInterface|null
      */
     private $clickedButton;
 
@@ -115,12 +120,16 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $viewData;
 
     /**
-     * @var array The submitted values that don't belong to any children
+     * The submitted values that don't belong to any children.
+     *
+     * @var array
      */
     private $extraData = [];
 
     /**
-     * @var TransformationFailedException|null The transformation failure generated during submission, if any
+     * The transformation failure generated during submission, if any.
+     *
+     * @var TransformationFailedException|null
      */
     private $transformationFailure;
 
@@ -151,7 +160,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $name = '';
 
     /**
-     * @var bool Whether the form inherits its underlying data from its parent
+     * Whether the form inherits its underlying data from its parent.
+     *
+     * @var bool
      */
     private $inheritData;
 
@@ -857,7 +868,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $options['auto_initialize'] = false;
 
             if (null === $type && null === $this->config->getDataClass()) {
-                $type = 'Symfony\Component\Form\Extension\Core\Type\TextType';
+                $type = TextType::class;
             }
 
             if (null === $type) {

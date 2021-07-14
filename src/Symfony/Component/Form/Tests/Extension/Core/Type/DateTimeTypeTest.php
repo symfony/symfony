@@ -523,7 +523,6 @@ class DateTimeTypeTest extends BaseTypeTest
     public function testSingleTextWidgetWithCustomNonHtml5Format()
     {
         $form = $this->factory->create(static::TESTED_TYPE, new \DateTime('2019-02-13 19:12:13'), [
-            'html5' => false,
             'widget' => 'single_text',
             'date_format' => \IntlDateFormatter::SHORT,
             'format' => null,

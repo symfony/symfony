@@ -20,7 +20,7 @@ use Symfony\Component\Finder\Comparator\NumberComparator;
  */
 class SizeRangeFilterIterator extends \FilterIterator
 {
-    private $comparators = [];
+    private array $comparators = [];
 
     /**
      * @param \Iterator          $iterator    The Iterator to filter

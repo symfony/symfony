@@ -18,10 +18,10 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class ExcludeDirectoryFilterIterator extends \FilterIterator implements \RecursiveIterator
 {
-    private $iterator;
-    private $isRecursive;
-    private $excludedDirs = [];
-    private $excludedPattern;
+    private \Iterator $iterator;
+    private bool $isRecursive;
+    private array $excludedDirs = [];
+    private ?string $excludedPattern = null;
 
     /**
      * @param \Iterator $iterator    The Iterator to filter

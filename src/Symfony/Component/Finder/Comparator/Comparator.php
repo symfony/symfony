@@ -12,14 +12,12 @@
 namespace Symfony\Component\Finder\Comparator;
 
 /**
- * Comparator.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Comparator
 {
-    private $target;
-    private $operator = '==';
+    private string $target;
+    private string $operator = '==';
 
     /**
      * Gets the target value.

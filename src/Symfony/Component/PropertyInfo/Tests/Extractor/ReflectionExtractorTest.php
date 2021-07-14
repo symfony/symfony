@@ -256,11 +256,20 @@ class ReflectionExtractorTest extends TestCase
     }
 
     /**
+     * @dataProvider php81TypesProvider
      * @requires PHP 8.1
      */
-    public function testExtractPhp81Type()
+    public function testExtractPhp81Type($property, array $type = null)
     {
-        $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy', 'nothing', []));
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy', $property, []));
+    }
+
+    public function php81TypesProvider()
+    {
+        return [
+            ['nothing', null],
+            ['collection', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Traversable'), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Countable')]],
+        ];
     }
 
     /**

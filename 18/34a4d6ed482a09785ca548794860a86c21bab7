@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-11T12:36:02Z
+
+Hey!
+
+I think @rfaivre has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-11T19:21:53Z
+
+Once a bundle provides an integration for the new authenticator system (available since 5.1, considered stable since 5.3), it really has no reason to use the API that this PR deprecates.
+Why ? Because unauthenticated tokens do not mean anything in the new system: either the user is authenticated and it has a token in the storage, or it is not authenticated and it has no token at all.
+
+The only way for a bundle to support both the old system and the new one is to provide two distinct implementations:
+1 old authentication listener or guard authenticator that deals with tokens, and 1 new authenticator that deals with passports.
+
+For e.g. scheb/2fa or lexik/jwt-authentication-bundle, the only thing needed to be deprecation-free on both 5.x and 6.x is to replace some  `TokenInterface` mocks in favor of dummy implementations in their test suites.

@@ -27,17 +27,17 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterface
 {
-    private $decoratedFactory;
+    private ChoiceListFactoryInterface $decoratedFactory;
 
     /**
      * @var ChoiceListInterface[]
      */
-    private $lists = [];
+    private array $lists = [];
 
     /**
      * @var ChoiceListView[]
      */
-    private $views = [];
+    private array $views = [];
 
     /**
      * Generates a SHA-256 hash for the given value.

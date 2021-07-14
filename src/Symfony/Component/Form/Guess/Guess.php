@@ -49,10 +49,8 @@ abstract class Guess
      *
      * One of VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE, MEDIUM_CONFIDENCE
      * and LOW_CONFIDENCE.
-     *
-     * @var int
      */
-    private $confidence;
+    private int $confidence;
 
     /**
      * Returns the guess most likely to be correct from a list of guesses.

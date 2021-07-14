@@ -22,7 +22,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DateIntervalToStringTransformer implements DataTransformerInterface
 {
-    private $format;
+    private string $format;
 
     /**
      * Transforms a \DateInterval instance to a string.

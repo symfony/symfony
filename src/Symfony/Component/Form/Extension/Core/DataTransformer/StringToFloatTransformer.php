@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class StringToFloatTransformer implements DataTransformerInterface
 {
-    private $scale;
+    private ?int $scale;
 
     public function __construct(int $scale = null)
     {

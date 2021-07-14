@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class FormValidator extends ConstraintValidator
 {
-    private $resolvedGroups;
+    private \SplObjectStorage $resolvedGroups;
 
     /**
      * {@inheritdoc}

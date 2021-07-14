@@ -26,7 +26,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
     protected $registry;
 
-    private $cache = [];
+    private array $cache = [];
 
     public function __construct(ManagerRegistry $registry)
     {

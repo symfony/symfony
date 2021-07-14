@@ -22,10 +22,10 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 {
-    private $dateFormat;
-    private $timeFormat;
-    private $pattern;
-    private $calendar;
+    private int $dateFormat;
+    private int $timeFormat;
+    private ?string $pattern;
+    private int $calendar;
 
     /**
      * @see BaseDateTimeTransformer::formats for available format options

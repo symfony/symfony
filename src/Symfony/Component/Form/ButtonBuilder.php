@@ -25,30 +25,11 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 {
     protected $locked = false;
 
-    /**
-     * @var bool
-     */
-    private $disabled = false;
-
-    /**
-     * @var ResolvedFormTypeInterface
-     */
-    private $type;
-
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var array
-     */
-    private $attributes = [];
-
-    /**
-     * @var array
-     */
-    private $options;
+    private bool $disabled = false;
+    private ResolvedFormTypeInterface $type;
+    private string $name;
+    private array $attributes = [];
+    private array $options;
 
     /**
      * @throws InvalidArgumentException if the name is empty

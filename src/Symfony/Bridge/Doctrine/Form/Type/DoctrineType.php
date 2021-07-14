@@ -39,12 +39,12 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
     /**
      * @var IdReader[]
      */
-    private $idReaders = [];
+    private array $idReaders = [];
 
     /**
      * @var EntityLoaderInterface[]
      */
-    private $entityLoaders = [];
+    private array $entityLoaders = [];
 
     /**
      * Creates the label for a choice.

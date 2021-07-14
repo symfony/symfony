@@ -26,10 +26,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ValidatorExtension extends AbstractExtension
 {
-    private $validator;
-    private $formRenderer;
-    private $translator;
-    private $legacyErrorMessages;
+    private ValidatorInterface $validator;
+    private ?FormRendererInterface $formRenderer;
+    private ?TranslatorInterface $translator;
+    private bool $legacyErrorMessages;
 
     public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
     {

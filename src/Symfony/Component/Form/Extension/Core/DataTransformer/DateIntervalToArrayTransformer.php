@@ -39,8 +39,8 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         self::SECONDS => 's',
         self::INVERT => 'r',
     ];
-    private $fields;
-    private $pad;
+    private array $fields;
+    private bool $pad;
 
     /**
      * @param string[]|null $fields The date fields

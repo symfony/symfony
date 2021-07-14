@@ -23,25 +23,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResolvedFormType implements ResolvedFormTypeInterface
 {
-    /**
-     * @var FormTypeInterface
-     */
-    private $innerType;
+    private FormTypeInterface $innerType;
 
     /**
      * @var FormTypeExtensionInterface[]
      */
-    private $typeExtensions;
+    private array $typeExtensions;
 
-    /**
-     * @var ResolvedFormTypeInterface|null
-     */
-    private $parent;
+    private ?ResolvedFormTypeInterface $parent;
 
     /**
      * @var OptionsResolver
      */
-    private $optionsResolver;
+    private OptionsResolver $optionsResolver;
 
     /**
      * @param FormTypeExtensionInterface[] $typeExtensions
@@ -173,7 +167,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     public function getOptionsResolver()
     {
-        if (null === $this->optionsResolver) {
+        if (!isset($this->optionsResolver)) {
             if (null !== $this->parent) {
                 $this->optionsResolver = clone $this->parent->getOptionsResolver();
             } else {

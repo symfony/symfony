@@ -28,81 +28,38 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 {
     /**
      * Caches a globally unique {@link NativeRequestHandler} instance.
-     *
-     * @var NativeRequestHandler
      */
-    private static $nativeRequestHandler;
+    private static NativeRequestHandler $nativeRequestHandler;
 
+    /** @var bool */
     protected $locked = false;
-    private $dispatcher;
-    private $name;
 
-    /**
-     * @var PropertyPathInterface|string|null
-     */
-    private $propertyPath;
-
-    private $mapped = true;
-    private $byReference = true;
-    private $inheritData = false;
-    private $compound = false;
-
-    /**
-     * @var ResolvedFormTypeInterface
-     */
-    private $type;
-
-    private $viewTransformers = [];
-    private $modelTransformers = [];
-
-    /**
-     * @var DataMapperInterface|null
-     */
-    private $dataMapper;
-
-    private $required = true;
-    private $disabled = false;
-    private $errorBubbling = false;
-
-    /**
-     * @var mixed
-     */
-    private $emptyData;
-
-    private $attributes = [];
-
-    /**
-     * @var mixed
-     */
-    private $data;
-
-    /**
-     * @var string|null
-     */
-    private $dataClass;
-
-    private $dataLocked = false;
-
-    /**
-     * @var FormFactoryInterface|null
-     */
-    private $formFactory;
-
-    /**
-     * @var string|null
-     */
-    private $action;
-
-    private $method = 'POST';
-
-    /**
-     * @var RequestHandlerInterface|null
-     */
-    private $requestHandler;
-
-    private $autoInitialize = false;
-    private $options;
-    private $isEmptyCallback;
+    private EventDispatcherInterface $dispatcher;
+    private string $name;
+    private ?PropertyPathInterface $propertyPath = null;
+    private bool $mapped = true;
+    private bool $byReference = true;
+    private bool $inheritData = false;
+    private bool $compound = false;
+    private ResolvedFormTypeInterface $type;
+    private array $viewTransformers = [];
+    private array $modelTransformers = [];
+    private ?DataMapperInterface $dataMapper = null;
+    private bool $required = true;
+    private bool $disabled = false;
+    private bool $errorBubbling = false;
+    private mixed $emptyData = null;
+    private array $attributes = [];
+    private mixed $data = null;
+    private ?string $dataClass;
+    private bool $dataLocked = false;
+    private ?FormFactoryInterface $formFactory = null;
+    private ?string $action = null;
+    private string $method = 'POST';
+    private RequestHandlerInterface $requestHandler;
+    private bool $autoInitialize = false;
+    private array $options;
+    private ?\Closure $isEmptyCallback = null;
 
     /**
      * Creates an empty form configuration.
@@ -420,14 +377,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getRequestHandler()
     {
-        if (null === $this->requestHandler) {
-            if (null === self::$nativeRequestHandler) {
-                self::$nativeRequestHandler = new NativeRequestHandler();
-            }
-            $this->requestHandler = self::$nativeRequestHandler;
-        }
-
-        return $this->requestHandler;
+        return $this->requestHandler ??= self::$nativeRequestHandler ??= new NativeRequestHandler();
     }
 
     /**
@@ -775,7 +725,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function setIsEmptyCallback(?callable $isEmptyCallback): static
     {
-        $this->isEmptyCallback = $isEmptyCallback;
+        $this->isEmptyCallback = null === $isEmptyCallback || $isEmptyCallback instanceof \Closure ? $isEmptyCallback : \Closure::fromCallable($isEmptyCallback);
 
         return $this;
     }

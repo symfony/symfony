@@ -29,7 +29,7 @@ class ResizeFormListener implements EventSubscriberInterface
     protected $allowAdd;
     protected $allowDelete;
 
-    private $deleteEmpty;
+    private \Closure|bool $deleteEmpty;
 
     public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, bool|callable $deleteEmpty = false)
     {
@@ -37,7 +37,7 @@ class ResizeFormListener implements EventSubscriberInterface
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
         $this->options = $options;
-        $this->deleteEmpty = $deleteEmpty;
+        $this->deleteEmpty = $deleteEmpty instanceof \Closure || !\is_callable($deleteEmpty) ? $deleteEmpty : \Closure::fromCallable($deleteEmpty);
     }
 
     public static function getSubscribedEvents()

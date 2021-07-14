@@ -18,7 +18,7 @@ namespace Symfony\Component\Form\Guess;
  */
 class ValueGuess extends Guess
 {
-    private $value;
+    private string|int|bool|null $value;
 
     /**
      * @param int $confidence The confidence that the guessed class name is correct

@@ -29,14 +29,12 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      *
      * @var FormBuilderInterface[]
      */
-    private $children = [];
+    private array $children = [];
 
     /**
      * The data of children who haven't been converted to form builders yet.
-     *
-     * @var array
      */
-    private $unresolvedChildren = [];
+    private array $unresolvedChildren = [];
 
     public function __construct(?string $name, ?string $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = [])
     {

@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormInterface;
  */
 class ChainAccessor implements DataAccessorInterface
 {
-    private $accessors;
+    private iterable $accessors;
 
     /**
      * @param DataAccessorInterface[]|iterable $accessors

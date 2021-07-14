@@ -44,12 +44,10 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Rendering happens when either the widget or the row method was called.
      * Row implicitly includes widget, however certain rendering mechanisms
      * have to skip widget rendering when a row is rendered.
-     *
-     * @var bool
      */
-    private $rendered = false;
+    private bool $rendered = false;
 
-    private $methodRendered = false;
+    private bool $methodRendered = false;
 
     public function __construct(self $parent = null)
     {

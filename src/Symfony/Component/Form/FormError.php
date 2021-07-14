@@ -24,15 +24,13 @@ class FormError
     protected $messageParameters;
     protected $messagePluralization;
 
-    private $message;
-    private $cause;
+    private string $message;
+    private mixed $cause;
 
     /**
      * The form that spawned this error.
-     *
-     * @var FormInterface
      */
-    private $origin;
+    private ?FormInterface $origin = null;
 
     /**
      * Any array key in $messageParameters will be used as a placeholder in

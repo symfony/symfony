@@ -46,7 +46,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     /**
      * @var array<array<int|false>>
      */
-    private $resourceHierarchyLevels = [];
+    private array $resourceHierarchyLevels = [];
 
     /**
      * Creates a new renderer engine.

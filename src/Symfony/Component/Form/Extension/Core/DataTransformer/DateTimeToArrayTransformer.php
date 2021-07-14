@@ -21,9 +21,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 {
-    private $pad;
-    private $fields;
-    private $referenceDate;
+    private bool $pad;
+    private array $fields;
+    private \DateTimeInterface $referenceDate;
 
     /**
      * @param string|null   $inputTimezone  The input timezone

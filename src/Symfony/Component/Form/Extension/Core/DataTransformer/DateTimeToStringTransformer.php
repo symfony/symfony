@@ -23,10 +23,8 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 {
     /**
      * Format used for generating strings.
-     *
-     * @var string
      */
-    private $generateFormat;
+    private string $generateFormat;
 
     /**
      * Format used for parsing strings.
@@ -34,10 +32,8 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * Different than the {@link $generateFormat} because formats for parsing
      * support additional characters in PHP that are not supported for
      * generating strings.
-     *
-     * @var string
      */
-    private $parseFormat;
+    private string $parseFormat;
 
     /**
      * Transforms a \DateTime instance to a string.

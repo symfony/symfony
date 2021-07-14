@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {
-    private $metadataFactory;
+    private MetadataFactoryInterface $metadataFactory;
 
     public function __construct(MetadataFactoryInterface $metadataFactory)
     {

@@ -19,7 +19,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ArrayToPartsTransformer implements DataTransformerInterface
 {
-    private $partMapping;
+    private array $partMapping;
 
     public function __construct(array $partMapping)
     {

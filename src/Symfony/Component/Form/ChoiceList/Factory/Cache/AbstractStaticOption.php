@@ -28,10 +28,9 @@ use Symfony\Component\Form\FormTypeInterface;
  */
 abstract class AbstractStaticOption
 {
-    private static $options = [];
+    private static array $options = [];
 
-    /** @var bool|callable|string|array|\Closure|ChoiceLoaderInterface */
-    private $option;
+    private bool|string|array|\Closure|ChoiceLoaderInterface $option;
 
     /**
      * @param mixed $option Any pseudo callable, array, string or bool to define a choice list option
@@ -41,7 +40,7 @@ abstract class AbstractStaticOption
     {
         $hash = CachingFactoryDecorator::generateHash([static::class, $formType, $vary]);
 
-        $this->option = self::$options[$hash] ?? self::$options[$hash] = $option;
+        $this->option = self::$options[$hash] ??= $option instanceof \Closure || !\is_callable($option) ? $option : \Closure::fromCallable($option);
     }
 
     final public function getOption(): mixed

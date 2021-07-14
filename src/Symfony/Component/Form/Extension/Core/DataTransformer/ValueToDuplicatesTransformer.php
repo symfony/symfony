@@ -19,7 +19,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ValueToDuplicatesTransformer implements DataTransformerInterface
 {
-    private $keys;
+    private array $keys;
 
     public function __construct(array $keys)
     {

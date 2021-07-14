@@ -185,5 +185,8 @@ class AnnotationLoaderTest extends TestCase
         if (\PHP_VERSION_ID >= 80000) {
             yield 'attributes' => ['Symfony\Component\Validator\Tests\Fixtures\Attribute'];
         }
+        if (\PHP_VERSION_ID >= 80100) {
+            yield 'composite attributes' => ['Symfony\Component\Validator\Tests\Fixtures\CompositeAttribute'];
+        }
     }
 }

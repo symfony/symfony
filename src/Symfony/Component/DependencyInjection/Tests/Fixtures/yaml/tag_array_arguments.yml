@@ -2,5 +2,5 @@ services:
     foo_service:
         class:    FooClass
         tags:
-          # tag-attribute is not a scalar
+          # tag-attribute is an array
           - { name: foo, bar: { foo: foo, bar: bar } }

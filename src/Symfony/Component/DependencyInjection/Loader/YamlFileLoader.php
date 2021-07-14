@@ -957,7 +957,7 @@ class YamlFileLoader extends FileLoader
     {
         foreach ($attributes as $attribute => $value) {
             if (\is_array($value)) {
-                $this->validateAttributes($message, $attributes, $attribute.'.');
+                $this->validateAttributes($message, $value, $attribute.'.');
             } elseif (!is_scalar($value) && null !== $value) {
                 throw new InvalidArgumentException(sprintf($message, $prefix.$attribute));
             }

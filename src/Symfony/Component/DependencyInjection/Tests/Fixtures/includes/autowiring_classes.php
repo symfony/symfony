@@ -7,6 +7,9 @@ use Psr\Log\LoggerInterface;
 if (\PHP_VERSION_ID >= 80000) {
     require __DIR__.'/uniontype_classes.php';
 }
+if (\PHP_VERSION_ID >= 80100) {
+    require __DIR__.'/intersectiontype_classes.php';
+}
 
 class Foo
 {

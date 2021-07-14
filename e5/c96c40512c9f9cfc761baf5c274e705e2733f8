@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-07T08:33:49Z
+
+Can you provide a test for this change, please? I think we should target 4.4 and file this as a bugfix.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-07-07T12:26:13Z
+
+> Can you provide a test for this change, please? I think we should target 4.4 and file this as a bugfix.
+
+Test added and rebased on 4.4.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-07-08T07:22:21Z
+
+> I don't understand why you didn't use `$this->conn->getDatabasePlatform()->getName()` as you suggested yourself though...
+
+I did though? See [`PdoTrait:458`](https://github.com/symfony/symfony/pull/42011/files#diff-a508f4ce64bb6d2ab3c496c220fb866aade4e777a464817576f4be0bed306b4dR458)
+
+Edit: I see there's a slight difference (`$driver->getDatabasePlatform()->getName()`), but I'm not sure how important that difference is?
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2021-07-08T13:57:45Z
+
+> > I don't understand why you didn't use `$this->conn->getDatabasePlatform()->getName()` as you suggested yourself though...
+>
+> I did though? See [`PdoTrait:458`](https://github.com/symfony/symfony/pull/42011/files#diff-a508f4ce64bb6d2ab3c496c220fb866aade4e777a464817576f4be0bed306b4dR458)
+>
+> Edit: I see there's a slight difference (`$driver->getDatabasePlatform()->getName()`), but I'm not sure how important that difference is?
+
+My suggestion is to change [the whole `switch`](https://github.com/symfony/symfony/pull/42011/files#diff-a508f4ce64bb6d2ab3c496c220fb866aade4e777a464817576f4be0bed306b4dR427) to drive the choice using `$driver->getDatabasePlatform()->getName()`, because the `instaceof` will be broken by wrappers.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-07-12T14:22:00Z
+
+> My suggestion is to change [the whole `switch`](https://github.com/symfony/symfony/pull/42011/files#diff-a508f4ce64bb6d2ab3c496c220fb866aade4e777a464817576f4be0bed306b4dR427) to drive the choice using `$driver->getDatabasePlatform()->getName()`, because the `instaceof` will be broken by wrappers.
+
+That's good feedback 👍 . Though I'd like to get some feedback on that from a Symfony maintainer as well, if possible. They're the ones to approve the PR after all.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2021-07-12T16:36:51Z
+
+> > My suggestion is to change [the whole `switch`](https://github.com/symfony/symfony/pull/42011/files#diff-a508f4ce64bb6d2ab3c496c220fb866aade4e777a464817576f4be0bed306b4dR427) to drive the choice using `$driver->getDatabasePlatform()->getName()`, because the `instaceof` will be broken by wrappers.
+>
+> That's good feedback +1 . Though I'd like to get some feedback on that from a Symfony maintainer as well, if possible. They're the ones to approve the PR after all.
+
+@nicolas-grekas already weighed in in https://github.com/symfony/symfony/issues/42022#issuecomment-876089615, but I'm not sure if he got the full implication of my suggestion.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-12T16:56:18Z
+
+> change the whole switch
+
+That works for me if the resulting code remains compatible with the range of dbal versions we support currently.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-14T17:42:51Z
+
+LGTM, but I'd turn the `@return` annotations of the `DriverWrapper` fixture into proper return types. This way, it does not matter that much if we exclude it from the patch-types script.

@@ -302,7 +302,7 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('The tag name in "_defaults" must be a non-empty string in "%s".', $file));
                 }
 
-                $this->recursiveValidateAttributes(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type in "%s". Check your YAML syntax.', $name, '%s', $file), $tag);
+                $this->validateAttributes(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type in "%s". Check your YAML syntax.', $name, '%s', $file), $tag);
             }
         }
 
@@ -610,7 +610,7 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', $id, $file));
             }
 
-            $this->recursiveValidateAttributes(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in "%s". Check your YAML syntax.', $id, $name, '%s', $file), $tag);
+            $this->validateAttributes(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in "%s". Check your YAML syntax.', $id, $name, '%s', $file), $tag);
 
             $definition->addTag($name, $tag);
         }
@@ -953,11 +953,11 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    private function recursiveValidateAttributes(string $message, array $attributes, string $prefix = ''): void
+    private function validateAttributes(string $message, array $attributes, string $prefix = ''): void
     {
         foreach ($attributes as $attribute => $value) {
             if (\is_array($value)) {
-                $this->recursiveValidateAttributes($message, $attributes, $attribute.'.');
+                $this->validateAttributes($message, $attributes, $attribute.'.');
             } elseif (!is_scalar($value) && null !== $value) {
                 throw new InvalidArgumentException(sprintf($message, $prefix.$attribute));
             }

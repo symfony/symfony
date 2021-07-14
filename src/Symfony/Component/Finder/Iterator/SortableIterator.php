@@ -27,6 +27,10 @@ class SortableIterator implements \IteratorAggregate
     public const SORT_BY_NAME_NATURAL = 6;
 
     private $iterator;
+
+    /**
+     * @var \Closure|null
+     */
     private $sort;
 
     /**
@@ -70,9 +74,11 @@ class SortableIterator implements \IteratorAggregate
                 return $order * ($a->getMTime() - $b->getMTime());
             };
         } elseif (self::SORT_BY_NONE === $sort) {
-            $this->sort = $order;
+            $this->sort = null;
         } elseif (\is_callable($sort)) {
-            $this->sort = $reverseOrder ? static function ($a, $b) use ($sort) { return -$sort($a, $b); } : $sort;
+            $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($sort, $order) {
+                return $order * $sort($a, $b);
+            };
         } else {
             throw new \InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.');
         }
@@ -83,15 +89,8 @@ class SortableIterator implements \IteratorAggregate
      */
     public function getIterator()
     {
-        if (1 === $this->sort) {
-            return $this->iterator;
-        }
-
         $array = iterator_to_array($this->iterator, true);
-
-        if (-1 === $this->sort) {
-            $array = array_reverse($array);
-        } else {
+        if ($this->sort) {
             uasort($array, $this->sort);
         }
 

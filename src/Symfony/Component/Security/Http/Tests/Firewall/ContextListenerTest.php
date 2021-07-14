@@ -289,6 +289,9 @@ class ContextListenerTest extends TestCase
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
     }
 
+    /**
+     * @group legacy
+     */
     public function testDeauthenticatedEvent()
     {
         $tokenStorage = new TokenStorage();

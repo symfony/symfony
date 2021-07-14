@@ -18,15 +18,26 @@ class UsernamePasswordTokenTest extends TestCase
 {
     public function testConstructor()
     {
+        $token = new UsernamePasswordToken('foo', 'bar', 'key', ['ROLE_FOO']);
+        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
+        $this->assertEquals('key', $token->getFirewallName());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testIsAuthenticated()
+    {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $this->assertFalse($token->isAuthenticated());
 
         $token = new UsernamePasswordToken('foo', 'bar', 'key', ['ROLE_FOO']);
-        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertTrue($token->isAuthenticated());
-        $this->assertEquals('key', $token->getFirewallName());
     }
 
+    /**
+     * @group legacy
+     */
     public function testSetAuthenticatedToTrue()
     {
         $this->expectException(\LogicException::class);
@@ -34,6 +45,9 @@ class UsernamePasswordTokenTest extends TestCase
         $token->setAuthenticated(true);
     }
 
+    /**
+     * @group legacy
+     */
     public function testSetAuthenticatedToFalse()
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');

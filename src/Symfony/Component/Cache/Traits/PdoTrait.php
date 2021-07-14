@@ -448,6 +448,15 @@ trait PdoTrait
                     case $driver instanceof \Doctrine\DBAL\Driver\PDO\SQLSrv\Driver:
                         $this->driver = 'sqlsrv';
                         break;
+                    case $driver instanceof \Doctrine\DBAL\Driver:
+                        $this->driver = [
+                                'mssql' => 'sqlsrv',
+                                'oracle' => 'oci',
+                                'postgresql' => 'pgsql',
+                                'sqlite' => 'sqlite',
+                                'mysql' => 'mysql',
+                            ][$driver->getDatabasePlatform()->getName()] ?? \get_class($driver);
+                        break;
                     default:
                         $this->driver = \get_class($driver);
                         break;

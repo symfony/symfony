@@ -67,11 +67,15 @@ interface TokenInterface
      * Returns whether the user is authenticated or not.
      *
      * @return bool true if the token has been authenticated, false otherwise
+     *
+     * @deprecated since Symfony 5.4. In 6.0, security tokens will always be considered authenticated
      */
     public function isAuthenticated();
 
     /**
      * Sets the authenticated flag.
+     *
+     * @deprecated since Symfony 5.4. In 6.0, security tokens will always be considered authenticated
      */
     public function setAuthenticated(bool $isAuthenticated);
 

@@ -32,7 +32,8 @@ class AnonymousToken extends AbstractToken
 
         $this->secret = $secret;
         $this->setUser($user);
-        $this->setAuthenticated(true);
+        // @deprecated since Symfony 5.4
+        $this->setAuthenticated(true, false);
     }
 
     /**

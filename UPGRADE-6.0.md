@@ -322,6 +322,9 @@ Security
    `UsernamePasswordFormAuthenticationListener`, `UsernamePasswordJsonAuthenticationListener` and `X509AuthenticationListener`
    from security-http, use the new authenticator system instead
  * Remove the Guard component, use the new authenticator system instead
+ * Remove `TokenInterface:isAuthenticated()` and `setAuthenticated()` methods without replacement.
+   Security tokens won't have an "authenticated" flag anymore, so they will always be considered authenticated
+ * Remove `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead
 
 SecurityBundle
 --------------

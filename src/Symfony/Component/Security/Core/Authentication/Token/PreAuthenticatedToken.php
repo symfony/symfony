@@ -39,7 +39,7 @@ class PreAuthenticatedToken extends AbstractToken
         $this->firewallName = $firewallName;
 
         if ($roles) {
-            $this->setAuthenticated(true);
+            $this->setAuthenticated(true, false);
         }
     }
 

@@ -41,6 +41,7 @@ class AbstractTokenTest extends TestCase
 
             public function getRoles()
             {
+                return [];
             }
 
             public function getPassword()
@@ -104,6 +105,9 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
     }
 
+    /**
+     * @group legacy
+     */
     public function testAuthenticatedFlag()
     {
         $token = new ConcreteToken();
@@ -158,6 +162,7 @@ class AbstractTokenTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider getUserChanges
      */
     public function testSetUserSetsAuthenticatedToFalseWhenUserChanges($firstUser, $secondUser)
@@ -190,6 +195,7 @@ class AbstractTokenTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider getUsers
      */
     public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)
@@ -205,6 +211,9 @@ class AbstractTokenTest extends TestCase
         $this->assertTrue($token->isAuthenticated());
     }
 
+    /**
+     * @group legacy
+     */
     public function testIsUserChangedWhenSerializing()
     {
         $token = new ConcreteToken(['ROLE_ADMIN']);

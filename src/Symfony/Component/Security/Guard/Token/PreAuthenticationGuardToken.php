@@ -41,7 +41,7 @@ class PreAuthenticationGuardToken extends AbstractToken implements GuardTokenInt
 
         parent::__construct([]);
 
-        // never authenticated
+        // @deprecated since Symfony 5.4
         parent::setAuthenticated(false);
     }
 
@@ -61,6 +61,9 @@ class PreAuthenticationGuardToken extends AbstractToken implements GuardTokenInt
         return $this->credentials;
     }
 
+    /**
+     * @deprecated since Symfony 5.4
+     */
     public function setAuthenticated(bool $authenticated)
     {
         throw new \LogicException('The PreAuthenticationGuardToken is *never* authenticated.');

@@ -30,3 +30,6 @@ Security
    behavior when using `enable_authenticator_manager: true`)
  * Deprecate not setting the 5th argument (`$exceptionOnNoToken`) of `AccessListener` to `false`
    (this is the default behavior when using `enable_authenticator_manager: true`)
+ * Deprecate `TokenInterface:isAuthenticated()` and `setAuthenticated()` methods without replacement.
+   Security tokens won't have an "authenticated" flag anymore, so they will always be considered authenticated
+ * Deprecate `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead

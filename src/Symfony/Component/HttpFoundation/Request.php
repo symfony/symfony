@@ -2138,6 +2138,6 @@ class Request
         }
 
         // Now the IP chain contains only untrusted proxies and the client IP
-        return $clientIps ? array_reverse($clientIps) : [$firstTrustedIp];
+        return $clientIps ? $clientIps : [$firstTrustedIp];
     }
 }

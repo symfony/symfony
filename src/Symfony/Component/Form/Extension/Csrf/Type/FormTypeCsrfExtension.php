@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -76,7 +77,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             $tokenId = $options['csrf_token_id'] ?: ($form->getName() ?: \get_class($form->getConfig()->getType()->getInnerType()));
             $data = (string) $options['csrf_token_manager']->getToken($tokenId);
 
-            $csrfForm = $factory->createNamed($options['csrf_field_name'], 'Symfony\Component\Form\Extension\Core\Type\HiddenType', $data, [
+            $csrfForm = $factory->createNamed($options['csrf_field_name'], HiddenType::class, $data, [
                 'block_prefix' => 'csrf_token',
                 'mapped' => false,
             ]);

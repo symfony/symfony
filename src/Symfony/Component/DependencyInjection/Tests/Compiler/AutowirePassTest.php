@@ -256,6 +256,25 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
+    /**
+     * @requires PHP 8.1
+     */
+    public function testTypeNotGuessableIntersectionType()
+    {
+        $this->expectException(AutowiringFailedException::class);
+        $this->expectExceptionMessage('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\IntersectionClasses::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface&Symfony\Component\DependencyInjection\Tests\Compiler\AnotherInterface" but this class was not found.');
+        $container = new ContainerBuilder();
+
+        $container->register(CollisionInterface::class);
+        $container->register(AnotherInterface::class);
+
+        $aDefinition = $container->register('a', IntersectionClasses::class);
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
     public function testTypeNotGuessableWithTypeSet()
     {
         $container = new ContainerBuilder();

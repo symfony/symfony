@@ -118,7 +118,7 @@ class RedisSessionHandler extends AbstractSessionHandler
      * @return int|false
      */
     #[\ReturnTypeWillChange]
-    public function gc(int $maxlifetime): bool
+    public function gc(int $maxlifetime)
     {
         return 0;
     }

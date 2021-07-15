@@ -525,7 +525,6 @@ class TranslatorTest extends TestCase
     public function getValidLocalesTests()
     {
         return [
-            [''],
             ['fr'],
             ['francais'],
             ['FR'],

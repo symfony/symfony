@@ -150,7 +150,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     public function setLocale(string $locale)
     {
         $this->assertValidLocale($locale);
-        $this->locale = $locale ?? (class_exists(\Locale::class) ? \Locale::getDefault() : 'en');
+        $this->locale = $locale;
     }
 
     /**
@@ -444,7 +444,7 @@ EOF
      */
     protected function assertValidLocale(string $locale)
     {
-        if (null !== $locale && 1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
+        if (!preg_match('/^[a-z0-9@_\\.\\-]+$/i', $locale)) {
             throw new InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
         }
     }

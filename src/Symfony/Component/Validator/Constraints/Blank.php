@@ -28,6 +28,9 @@ class Blank extends Constraint
         self::NOT_BLANK_ERROR => 'NOT_BLANK_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be blank.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)

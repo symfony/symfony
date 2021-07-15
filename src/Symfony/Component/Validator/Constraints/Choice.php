@@ -32,15 +32,54 @@ class Choice extends Constraint
         self::TOO_MANY_ERROR => 'TOO_MANY_ERROR',
     ];
 
+    /**
+     * @var array|null
+     */
     public $choices;
+
+    /**
+     * @var string|callable|null
+     */
     public $callback;
+
+    /**
+     * @var bool
+     */
     public $multiple = false;
+
+    /**
+     * @var bool
+     */
     public $strict = true;
+
+    /**
+     * @var int|null
+     */
     public $min;
+
+    /**
+     * @var int|null
+     */
     public $max;
+
+    /**
+     * @var string
+     */
     public $message = 'The value you selected is not a valid choice.';
+
+    /**
+     * @var string
+     */
     public $multipleMessage = 'One or more of the given values is invalid.';
+
+    /**
+     * @var string
+     */
     public $minMessage = 'You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.';
+
+    /**
+     * @var string
+     */
     public $maxMessage = 'You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.';
 
     /**

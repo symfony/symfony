@@ -39,8 +39,19 @@ class Issn extends Constraint
         self::CHECKSUM_FAILED_ERROR => 'CHECKSUM_FAILED_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value is not a valid ISSN.';
+
+    /**
+     * @var bool
+     */
     public $caseSensitive = false;
+
+    /**
+     * @var bool
+     */
     public $requireHyphen = false;
 
     public function __construct(

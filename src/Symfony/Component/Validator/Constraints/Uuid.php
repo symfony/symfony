@@ -81,6 +81,9 @@ class Uuid extends Constraint
      */
     public $versions = self::ALL_VERSIONS;
 
+    /**
+     * @var callable|null
+     */
     public $normalizer;
 
     /**

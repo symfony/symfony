@@ -22,5 +22,8 @@ class Negative extends LessThan
 {
     use ZeroComparisonConstraintTrait;
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be negative.';
 }

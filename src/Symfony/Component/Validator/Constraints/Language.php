@@ -30,7 +30,14 @@ class Language extends Constraint
         self::NO_SUCH_LANGUAGE_ERROR => 'NO_SUCH_LANGUAGE_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value is not a valid language.';
+
+    /**
+     * @var bool
+     */
     public $alpha3 = false;
 
     public function __construct(

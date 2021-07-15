@@ -22,6 +22,9 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Valid extends Constraint
 {
+    /**
+     * @var bool
+     */
     public $traverse = true;
 
     public function __get(string $option)

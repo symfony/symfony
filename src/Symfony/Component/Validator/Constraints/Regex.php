@@ -29,10 +29,29 @@ class Regex extends Constraint
         self::REGEX_FAILED_ERROR => 'REGEX_FAILED_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value is not valid.';
+
+    /**
+     * @var string
+     */
     public $pattern;
+
+    /**
+     * @var string|null
+     */
     public $htmlPattern;
+
+    /**
+     * @var bool
+     */
     public $match = true;
+
+    /**
+     * @var callable|null
+     */
     public $normalizer;
 
     /**

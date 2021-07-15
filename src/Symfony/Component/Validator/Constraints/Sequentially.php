@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Constraint;
+
 /**
  * Use this constraint to sequentially validate nested constraints.
  * Validation for the nested constraints collection will stop at first violation.
@@ -22,6 +24,9 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class Sequentially extends Composite
 {
+    /**
+     * @var Constraint[]
+     */
     public $constraints = [];
 
     public function getDefaultOption()

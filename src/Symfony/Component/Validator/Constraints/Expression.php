@@ -32,8 +32,19 @@ class Expression extends Constraint
         self::EXPRESSION_FAILED_ERROR => 'EXPRESSION_FAILED_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value is not valid.';
+
+    /**
+     * @var string|ExpressionObject
+     */
     public $expression;
+
+    /**
+     * @var array
+     */
     public $values = [];
 
     /**

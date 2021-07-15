@@ -22,5 +22,8 @@ class NegativeOrZero extends LessThanOrEqual
 {
     use ZeroComparisonConstraintTrait;
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be either negative or zero.';
 }

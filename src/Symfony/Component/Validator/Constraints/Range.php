@@ -39,14 +39,49 @@ class Range extends Constraint
         self::TOO_LOW_ERROR => 'TOO_LOW_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
+
+    /**
+     * @var string
+     */
     public $minMessage = 'This value should be {{ limit }} or more.';
+
+    /**
+     * @var string
+     */
     public $maxMessage = 'This value should be {{ limit }} or less.';
+
+    /**
+     * @var string
+     */
     public $invalidMessage = 'This value should be a valid number.';
+
+    /**
+     * @var string
+     */
     public $invalidDateTimeMessage = 'This value should be a valid datetime.';
+
+    /**
+     * @var int|null
+     */
     public $min;
+
+    /**
+     * @var string|PropertyPathInterface|null
+     */
     public $minPropertyPath;
+
+    /**
+     * @var int|null
+     */
     public $max;
+
+    /**
+     * @var string|PropertyPathInterface|null
+     */
     public $maxPropertyPath;
 
     /**

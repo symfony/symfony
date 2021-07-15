@@ -30,7 +30,14 @@ class Country extends Constraint
         self::NO_SUCH_COUNTRY_ERROR => 'NO_SUCH_COUNTRY_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value is not a valid country.';
+
+    /**
+     * @var bool
+     */
     public $alpha3 = false;
 
     public function __construct(

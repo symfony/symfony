@@ -58,34 +58,140 @@ class Image extends File
         self::CORRUPTED_IMAGE_ERROR => 'CORRUPTED_IMAGE_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $mimeTypes = 'image/*';
+
+    /**
+     * @var int
+     */
     public $minWidth;
+
+    /**
+     * @var int
+     */
     public $maxWidth;
+
+    /**
+     * @var int
+     */
     public $maxHeight;
+
+    /**
+     * @var int
+     */
     public $minHeight;
+
+    /**
+     * @var float|int
+     */
     public $maxRatio;
+
+    /**
+     * @var float|int
+     */
     public $minRatio;
+
+    /**
+     * @var float|int
+     */
     public $minPixels;
+
+    /**
+     * @var float|int
+     */
     public $maxPixels;
+
+    /**
+     * @var bool
+     */
     public $allowSquare = true;
+
+    /**
+     * @var bool
+     */
     public $allowLandscape = true;
+
+    /**
+     * @var bool
+     */
     public $allowPortrait = true;
+
+    /**
+     * @var bool
+     */
     public $detectCorrupted = false;
 
     // The constant for a wrong MIME type is taken from the parent class.
+    /**
+     * @var string
+     */
     public $mimeTypesMessage = 'This file is not a valid image.';
+
+    /**
+     * @var string
+     */
     public $sizeNotDetectedMessage = 'The size of the image could not be detected.';
+
+    /**
+     * @var string
+     */
     public $maxWidthMessage = 'The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.';
+
+    /**
+     * @var string
+     */
     public $minWidthMessage = 'The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.';
+
+    /**
+     * @var string
+     */
     public $maxHeightMessage = 'The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.';
+
+    /**
+     * @var string
+     */
     public $minHeightMessage = 'The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.';
+
+    /**
+     * @var string
+     */
     public $minPixelsMessage = 'The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.';
+
+    /**
+     * @var string
+     */
     public $maxPixelsMessage = 'The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.';
+
+    /**
+     * @var string
+     */
     public $maxRatioMessage = 'The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.';
+
+    /**
+     * @var string
+     */
     public $minRatioMessage = 'The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.';
+
+    /**
+     * @var string
+     */
     public $allowSquareMessage = 'The image is square ({{ width }}x{{ height }}px). Square images are not allowed.';
+
+    /**
+     * @var string
+     */
     public $allowLandscapeMessage = 'The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.';
+
+    /**
+     * @var string
+     */
     public $allowPortraitMessage = 'The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.';
+
+    /**
+     * @var string
+     */
     public $corruptedMessage = 'The image file is corrupted.';
 
     /**

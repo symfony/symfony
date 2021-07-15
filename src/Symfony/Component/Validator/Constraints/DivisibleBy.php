@@ -26,5 +26,8 @@ class DivisibleBy extends AbstractComparison
         self::NOT_DIVISIBLE_BY => 'NOT_DIVISIBLE_BY',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be a multiple of {{ compared_value }}.';
 }

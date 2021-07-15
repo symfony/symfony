@@ -29,9 +29,24 @@ class Url extends Constraint
         self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value is not a valid URL.';
+
+    /**
+     * @var string[]
+     */
     public $protocols = ['http', 'https'];
+
+    /**
+     * @var bool
+     */
     public $relativeProtocol = false;
+
+    /**
+     * @var callable|null
+     */
     public $normalizer;
 
     public function __construct(

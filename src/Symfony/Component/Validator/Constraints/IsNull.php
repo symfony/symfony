@@ -28,6 +28,9 @@ class IsNull extends Constraint
         self::NOT_NULL_ERROR => 'NOT_NULL_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be null.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)

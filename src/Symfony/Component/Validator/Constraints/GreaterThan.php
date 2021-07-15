@@ -27,5 +27,8 @@ class GreaterThan extends AbstractComparison
         self::TOO_LOW_ERROR => 'TOO_LOW_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be greater than {{ compared_value }}.';
 }

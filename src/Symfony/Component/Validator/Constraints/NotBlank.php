@@ -30,8 +30,19 @@ class NotBlank extends Constraint
         self::IS_BLANK_ERROR => 'IS_BLANK_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value should not be blank.';
+
+    /**
+     * @var bool
+     */
     public $allowNull = false;
+
+    /**
+     * @var callable|null
+     */
     public $normalizer;
 
     public function __construct(array $options = null, string $message = null, bool $allowNull = null, callable $normalizer = null, array $groups = null, $payload = null)

@@ -22,6 +22,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Traverse extends Constraint
 {
+    /**
+     * @var bool
+     */
     public $traverse = true;
 
     /**

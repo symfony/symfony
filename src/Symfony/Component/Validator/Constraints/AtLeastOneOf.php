@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Constraint;
+
 /**
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
@@ -25,9 +27,24 @@ class AtLeastOneOf extends Composite
         self::AT_LEAST_ONE_OF_ERROR => 'AT_LEAST_ONE_OF_ERROR',
     ];
 
+    /**
+     * @var Constraint[]
+     */
     public $constraints = [];
+
+    /**
+     * @var string
+     */
     public $message = 'This value should satisfy at least one of the following constraints:';
+
+    /**
+     * @var string
+     */
     public $messageCollection = 'Each element of this collection should satisfy its own set of constraints.';
+
+    /**
+     * @var bool
+     */
     public $includeInternalMessages = true;
 
     public function getDefaultOption()

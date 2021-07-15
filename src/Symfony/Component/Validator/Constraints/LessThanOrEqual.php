@@ -27,5 +27,8 @@ class LessThanOrEqual extends AbstractComparison
         self::TOO_HIGH_ERROR => 'TOO_HIGH_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be less than or equal to {{ compared_value }}.';
 }

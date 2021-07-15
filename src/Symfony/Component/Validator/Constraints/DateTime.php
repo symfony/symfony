@@ -32,7 +32,14 @@ class DateTime extends Constraint
         self::INVALID_TIME_ERROR => 'INVALID_TIME_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $format = 'Y-m-d H:i:s';
+
+    /**
+     * @var string
+     */
     public $message = 'This value is not a valid datetime.';
 
     /**

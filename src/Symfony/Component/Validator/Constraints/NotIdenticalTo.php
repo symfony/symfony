@@ -27,5 +27,8 @@ class NotIdenticalTo extends AbstractComparison
         self::IS_IDENTICAL_ERROR => 'IS_IDENTICAL_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value should not be identical to {{ compared_value_type }} {{ compared_value }}.';
 }

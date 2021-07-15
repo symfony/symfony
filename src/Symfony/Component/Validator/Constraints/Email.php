@@ -46,8 +46,19 @@ class Email extends Constraint
         self::VALIDATION_MODE_LOOSE,
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value is not a valid email address.';
+
+    /**
+     * @var string
+     */
     public $mode;
+
+    /**
+     * @var callable
+     */
     public $normalizer;
 
     public function __construct(

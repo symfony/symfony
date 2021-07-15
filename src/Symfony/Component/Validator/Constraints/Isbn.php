@@ -41,10 +41,29 @@ class Isbn extends Constraint
         self::TYPE_NOT_RECOGNIZED_ERROR => 'TYPE_NOT_RECOGNIZED_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $isbn10Message = 'This value is not a valid ISBN-10.';
+
+    /**
+     * @var string
+     */
     public $isbn13Message = 'This value is not a valid ISBN-13.';
+
+    /**
+     * @var string
+     */
     public $bothIsbnMessage = 'This value is neither a valid ISBN-10 nor a valid ISBN-13.';
+
+    /**
+     * @var string|null
+     */
     public $type;
+
+    /**
+     * @var string|null
+     */
     public $message;
 
     /**

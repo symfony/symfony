@@ -30,7 +30,14 @@ class Locale extends Constraint
         self::NO_SUCH_LOCALE_ERROR => 'NO_SUCH_LOCALE_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value is not a valid locale.';
+
+    /**
+     * @var bool
+     */
     public $canonicalize = true;
 
     public function __construct(

@@ -41,21 +41,79 @@ class File extends Constraint
         self::INVALID_MIME_TYPE_ERROR => 'INVALID_MIME_TYPE_ERROR',
     ];
 
+    /**
+     * @var bool|null
+     */
     public $binaryFormat;
+
+    /**
+     * @var string|string[]
+     */
     public $mimeTypes = [];
+
+    /**
+     * @var string
+     */
     public $notFoundMessage = 'The file could not be found.';
+
+    /**
+     * @var string
+     */
     public $notReadableMessage = 'The file is not readable.';
+
+    /**
+     * @var string
+     */
     public $maxSizeMessage = 'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.';
+
+    /**
+     * @var string
+     */
     public $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
+
+    /**
+     * @var string
+     */
     public $disallowEmptyMessage = 'An empty file is not allowed.';
 
+    /**
+     * @var string
+     */
     public $uploadIniSizeErrorMessage = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
+
+    /**
+     * @var string
+     */
     public $uploadFormSizeErrorMessage = 'The file is too large.';
+
+    /**
+     * @var string
+     */
     public $uploadPartialErrorMessage = 'The file was only partially uploaded.';
+
+    /**
+     * @var string
+     */
     public $uploadNoFileErrorMessage = 'No file was uploaded.';
+
+    /**
+     * @var string
+     */
     public $uploadNoTmpDirErrorMessage = 'No temporary folder was configured in php.ini.';
+
+    /**
+     * @var string
+     */
     public $uploadCantWriteErrorMessage = 'Cannot write temporary file to disk.';
+
+    /**
+     * @var string
+     */
     public $uploadExtensionErrorMessage = 'A PHP extension caused the upload to fail.';
+
+    /**
+     * @var string
+     */
     public $uploadErrorMessage = 'The file could not be uploaded.';
 
     protected $maxSize;

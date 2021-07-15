@@ -29,10 +29,29 @@ class Collection extends Composite
         self::NO_SUCH_FIELD_ERROR => 'NO_SUCH_FIELD_ERROR',
     ];
 
+    /**
+     * @var array
+     */
     public $fields = [];
+
+    /**
+     * @var bool
+     */
     public $allowExtraFields = false;
+
+    /**
+     * @var bool
+     */
     public $allowMissingFields = false;
+
+    /**
+     * @var string
+     */
     public $extraFieldsMessage = 'This field was not expected.';
+
+    /**
+     * @var string
+     */
     public $missingFieldsMessage = 'This field is missing.';
 
     /**

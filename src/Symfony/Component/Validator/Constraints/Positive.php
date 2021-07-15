@@ -22,5 +22,8 @@ class Positive extends GreaterThan
 {
     use ZeroComparisonConstraintTrait;
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be positive.';
 }

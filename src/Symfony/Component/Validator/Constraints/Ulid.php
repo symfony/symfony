@@ -33,6 +33,9 @@ class Ulid extends Constraint
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This is not a valid ULID.';
 
     public function __construct(

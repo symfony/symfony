@@ -28,8 +28,19 @@ class ExpressionLanguageSyntax extends Constraint
         self::EXPRESSION_LANGUAGE_SYNTAX_ERROR => 'EXPRESSION_LANGUAGE_SYNTAX_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be a valid expression.';
+
+    /**
+     * @var string
+     */
     public $service;
+
+    /**
+     * @var array
+     */
     public $allowedVariables;
 
     public function __construct(array $options = null, string $message = null, string $service = null, array $allowedVariables = null, array $groups = null, $payload = null)

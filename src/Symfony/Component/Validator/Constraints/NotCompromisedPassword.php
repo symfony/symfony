@@ -28,8 +28,19 @@ class NotCompromisedPassword extends Constraint
 
     protected static $errorNames = [self::COMPROMISED_PASSWORD_ERROR => 'COMPROMISED_PASSWORD_ERROR'];
 
+    /**
+     * @var string
+     */
     public $message = 'This password has been leaked in a data breach, it must not be used. Please use another password.';
+
+    /**
+     * @var int
+     */
     public $threshold = 1;
+
+    /**
+     * @var bool
+     */
     public $skipOnError = false;
 
     public function __construct(

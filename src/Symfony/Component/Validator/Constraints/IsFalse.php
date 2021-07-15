@@ -28,6 +28,9 @@ class IsFalse extends Constraint
         self::NOT_FALSE_ERROR => 'NOT_FALSE_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be false.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)

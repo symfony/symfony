@@ -29,7 +29,14 @@ class Unique extends Constraint
         self::IS_NOT_UNIQUE => 'IS_NOT_UNIQUE',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This collection should contain only unique elements.';
+
+    /**
+     * @var callable|null
+     */
     public $normalizer;
 
     public function __construct(

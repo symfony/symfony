@@ -28,7 +28,14 @@ class Type extends Constraint
         self::INVALID_TYPE_ERROR => 'INVALID_TYPE_ERROR',
     ];
 
+    /**
+     * @var string
+     */
     public $message = 'This value should be of type {{ type }}.';
+
+    /**
+     * @var string|string[]
+     */
     public $type;
 
     /**

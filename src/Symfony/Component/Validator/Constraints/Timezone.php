@@ -29,9 +29,24 @@ class Timezone extends Constraint
     public const TIMEZONE_IDENTIFIER_IN_COUNTRY_ERROR = 'c4a22222-dc92-4fc0-abb0-d95b268c7d0b';
     public const TIMEZONE_IDENTIFIER_INTL_ERROR = '45863c26-88dc-41ba-bf53-c73bd1f7e90d';
 
+    /**
+     * @var int
+     */
     public $zone = \DateTimeZone::ALL;
+
+    /**
+     * @var string
+     */
     public $countryCode;
+
+    /**
+     * @var bool
+     */
     public $intlCompatible = false;
+
+    /**
+     * @var string
+     */
     public $message = 'This value is not a valid timezone.';
 
     protected static $errorNames = [

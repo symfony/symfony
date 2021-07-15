@@ -29,12 +29,8 @@ final class FixedWindowLimiter implements LimiterInterface
 {
     use ResetLimiterTrait;
 
-    private $limit;
-
-    /**
-     * @var int seconds
-     */
-    private $interval;
+    private int $limit;
+    private int $interval;
 
     public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
     {

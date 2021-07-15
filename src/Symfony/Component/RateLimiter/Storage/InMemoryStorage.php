@@ -20,7 +20,7 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 class InMemoryStorage implements StorageInterface
 {
-    private $buckets = [];
+    private array $buckets = [];
 
     public function save(LimiterStateInterface $limiterState): void
     {

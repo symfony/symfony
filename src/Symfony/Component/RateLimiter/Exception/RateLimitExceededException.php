@@ -20,7 +20,7 @@ use Symfony\Component\RateLimiter\RateLimit;
  */
 class RateLimitExceededException extends \RuntimeException
 {
-    private $rateLimit;
+    private RateLimit $rateLimit;
 
     public function __construct(RateLimit $rateLimit, int $code = 0, \Throwable $previous = null)
     {

@@ -38,17 +38,17 @@ class Link implements EvolvableLinkInterface
     // Extra relations
     public const REL_MERCURE = 'mercure';
 
-    private $href = '';
+    private string $href = '';
 
     /**
      * @var string[]
      */
-    private $rel = [];
+    private array $rel = [];
 
     /**
      * @var array<string, string|bool|string[]>
      */
-    private $attributes = [];
+    private array $attributes = [];
 
     public function __construct(string $rel = null, string $href = '')
     {

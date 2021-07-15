@@ -19,7 +19,7 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
     /**
      * @var LinkInterface[]
      */
-    private $links = [];
+    private array $links = [];
 
     /**
      * @param LinkInterface[] $links

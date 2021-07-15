@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-13T13:12:06Z
+
+PR ready!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-13T14:53:20Z
+
+> this should require psr/container 2.0
+
+I agree, and I did the same for psr/cache, sticking to 3.0.
+Now blocked by https://github.com/doctrine/cache/pull/382
+/cc @derrabus

@@ -18,10 +18,10 @@ namespace Symfony\Component\Yaml\Exception;
  */
 class ParseException extends RuntimeException
 {
-    private $parsedFile;
-    private $parsedLine;
-    private $snippet;
-    private $rawMessage;
+    private ?string $parsedFile;
+    private int $parsedLine;
+    private ?string $snippet;
+    private string $rawMessage;
 
     /**
      * @param string      $message    The error message

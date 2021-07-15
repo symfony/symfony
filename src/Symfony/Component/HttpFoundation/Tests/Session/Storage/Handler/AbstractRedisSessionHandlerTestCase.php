@@ -114,7 +114,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     public function testGcSession()
     {
-        $this->assertTrue($this->storage->gc(123));
+        $this->assertIsInt($this->storage->gc(123));
     }
 
     public function testUpdateTimestamp()

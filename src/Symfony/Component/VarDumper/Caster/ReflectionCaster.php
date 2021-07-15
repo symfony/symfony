@@ -102,7 +102,7 @@ class ReflectionCaster
                 $prefix.'allowsNull' => $c->allowsNull(),
                 $prefix.'isBuiltin' => $c->isBuiltin(),
             ];
-        } elseif ($c instanceof \ReflectionUnionType) {
+        } elseif ($c instanceof \ReflectionUnionType || $c instanceof \ReflectionIntersectionType) {
             $a[$prefix.'allowsNull'] = $c->allowsNull();
             self::addMap($a, $c, [
                 'types' => 'getTypes',

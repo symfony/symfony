@@ -24,7 +24,7 @@ class GenerateUlidCommand extends Command
     protected static $defaultName = 'ulid:generate';
     protected static $defaultDescription = 'Generate a ULID';
 
-    private $factory;
+    private UlidFactory $factory;
 
     public function __construct(UlidFactory $factory = null)
     {

@@ -18,9 +18,9 @@ namespace Symfony\Component\HttpFoundation\Session\Flash;
  */
 class FlashBag implements FlashBagInterface
 {
-    private $name = 'flashes';
-    private $flashes = [];
-    private $storageKey;
+    private string $name = 'flashes';
+    private array $flashes = [];
+    private string $storageKey;
 
     /**
      * @param string $storageKey The key used to store flashes in the session

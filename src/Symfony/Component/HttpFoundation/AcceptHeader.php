@@ -27,12 +27,9 @@ class AcceptHeader
     /**
      * @var AcceptHeaderItem[]
      */
-    private $items = [];
+    private array $items = [];
 
-    /**
-     * @var bool
-     */
-    private $sorted = true;
+    private bool $sorted = true;
 
     /**
      * @param AcceptHeaderItem[] $items

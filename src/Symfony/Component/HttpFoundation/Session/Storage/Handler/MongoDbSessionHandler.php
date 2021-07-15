@@ -26,17 +26,9 @@ use MongoDB\Collection;
  */
 class MongoDbSessionHandler extends AbstractSessionHandler
 {
-    private $mongo;
-
-    /**
-     * @var Collection
-     */
-    private $collection;
-
-    /**
-     * @var array
-     */
-    private $options;
+    private Client $mongo;
+    private Collection $collection;
+    private array $options;
 
     /**
      * Constructor.
@@ -164,11 +156,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
 
     private function getCollection(): Collection
     {
-        if (null === $this->collection) {
-            $this->collection = $this->mongo->selectCollection($this->options['database'], $this->options['collection']);
-        }
-
-        return $this->collection;
+        return $this->collection ??= $this->mongo->selectCollection($this->options['database'], $this->options['collection']);
     }
 
     protected function getMongo(): Client

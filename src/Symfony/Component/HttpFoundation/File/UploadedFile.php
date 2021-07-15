@@ -31,10 +31,10 @@ use Symfony\Component\Mime\MimeTypes;
  */
 class UploadedFile extends File
 {
-    private $test;
-    private $originalName;
-    private $mimeType;
-    private $error;
+    private bool $test;
+    private string $originalName;
+    private string $mimeType;
+    private int $error;
 
     /**
      * Accepts the information of the uploaded file as provided by the PHP global $_FILES.

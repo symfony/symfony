@@ -22,9 +22,9 @@ class_exists(PhpBridgeSessionStorage::class);
  */
 class PhpBridgeSessionStorageFactory implements SessionStorageFactoryInterface
 {
-    private $handler;
-    private $metaBag;
-    private $secure;
+    private AbstractProxy|\SessionHandlerInterface|null $handler;
+    private ?MetadataBag $metaBag;
+    private bool $secure;
 
     public function __construct(AbstractProxy|\SessionHandlerInterface $handler = null, MetadataBag $metaBag = null, bool $secure = false)
     {

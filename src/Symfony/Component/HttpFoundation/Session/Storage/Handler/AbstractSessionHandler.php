@@ -22,11 +22,11 @@ use Symfony\Component\HttpFoundation\Session\SessionUtils;
  */
 abstract class AbstractSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {
-    private $sessionName;
-    private $prefetchId;
-    private $prefetchData;
-    private $newSessionId;
-    private $igbinaryEmptyData;
+    private string $sessionName;
+    private string $prefetchId;
+    private string $prefetchData;
+    private ?string $newSessionId = null;
+    private string $igbinaryEmptyData;
 
     public function open(string $savePath, string $sessionName): bool
     {
@@ -54,10 +54,10 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
 
     public function read(string $sessionId): string
     {
-        if (null !== $this->prefetchId) {
+        if (isset($this->prefetchId)) {
             $prefetchId = $this->prefetchId;
             $prefetchData = $this->prefetchData;
-            $this->prefetchId = $this->prefetchData = null;
+            unset($this->prefetchId, $this->prefetchData);
 
             if ($prefetchId === $sessionId || '' === $prefetchData) {
                 $this->newSessionId = '' === $prefetchData ? $sessionId : null;
@@ -74,10 +74,8 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
 
     public function write(string $sessionId, string $data): bool
     {
-        if (null === $this->igbinaryEmptyData) {
-            // see https://github.com/igbinary/igbinary/issues/146
-            $this->igbinaryEmptyData = \function_exists('igbinary_serialize') ? igbinary_serialize([]) : '';
-        }
+        // see https://github.com/igbinary/igbinary/issues/146
+        $this->igbinaryEmptyData ??= \function_exists('igbinary_serialize') ? igbinary_serialize([]) : '';
         if ('' === $data || $this->igbinaryEmptyData === $data) {
             return $this->destroy($sessionId);
         }
@@ -89,7 +87,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
     public function destroy(string $sessionId): bool
     {
         if (!headers_sent() && filter_var(ini_get('session.use_cookies'), \FILTER_VALIDATE_BOOLEAN)) {
-            if (!$this->sessionName) {
+            if (!isset($this->sessionName)) {
                 throw new \LogicException(sprintf('Session name cannot be empty, did you forget to call "parent::open()" in "%s"?.', static::class));
             }
             $cookie = SessionUtils::popSessionCookie($this->sessionName, $sessionId);

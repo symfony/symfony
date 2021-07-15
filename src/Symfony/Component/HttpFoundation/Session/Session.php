@@ -32,16 +32,16 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 {
     protected $storage;
 
-    private $flashName;
-    private $attributeName;
-    private $data = [];
-    private $usageIndex = 0;
-    private $usageReporter;
+    private string $flashName;
+    private string $attributeName;
+    private array $data = [];
+    private int $usageIndex = 0;
+    private ?\Closure $usageReporter;
 
     public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null, callable $usageReporter = null)
     {
         $this->storage = $storage ?? new NativeSessionStorage();
-        $this->usageReporter = $usageReporter;
+        $this->usageReporter = $usageReporter instanceof \Closure || !\is_callable($usageReporter) ? $usageReporter : \Closure::fromCallable($usageReporter);
 
         $attributes = $attributes ?? new AttributeBag();
         $this->attributeName = $attributes->getName();

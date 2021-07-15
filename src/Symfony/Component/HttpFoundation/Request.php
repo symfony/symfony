@@ -205,19 +205,12 @@ class Request
 
     protected static $requestFactory;
 
-    /**
-     * @var string|null
-     */
-    private $preferredFormat;
-    private $isHostValid = true;
-    private $isForwardedValid = true;
+    private ?string $preferredFormat = null;
+    private bool $isHostValid = true;
+    private bool $isForwardedValid = true;
+    private bool $isSafeContentPreferred;
 
-    /**
-     * @var bool|null
-     */
-    private $isSafeContentPreferred;
-
-    private static $trustedHeaderSet = -1;
+    private static int $trustedHeaderSet = -1;
 
     private const FORWARDED_PARAMS = [
         self::HEADER_X_FORWARDED_FOR => 'for',
@@ -1665,20 +1658,16 @@ class Request
      */
     public function preferSafeContent(): bool
     {
-        if (null !== $this->isSafeContentPreferred) {
+        if (isset($this->isSafeContentPreferred)) {
             return $this->isSafeContentPreferred;
         }
 
         if (!$this->isSecure()) {
             // see https://tools.ietf.org/html/rfc8674#section-3
-            $this->isSafeContentPreferred = false;
-
-            return $this->isSafeContentPreferred;
+            return $this->isSafeContentPreferred = false;
         }
 
-        $this->isSafeContentPreferred = AcceptHeader::fromString($this->headers->get('Prefer'))->has('safe');
-
-        return $this->isSafeContentPreferred;
+        return $this->isSafeContentPreferred = AcceptHeader::fromString($this->headers->get('Prefer'))->has('safe');
     }
 
     /*

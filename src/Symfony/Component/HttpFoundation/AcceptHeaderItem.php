@@ -18,10 +18,10 @@ namespace Symfony\Component\HttpFoundation;
  */
 class AcceptHeaderItem
 {
-    private $value;
-    private $quality = 1.0;
-    private $index = 0;
-    private $attributes = [];
+    private string $value;
+    private float $quality = 1.0;
+    private int $index = 0;
+    private array $attributes = [];
 
     public function __construct(string $value, array $attributes = [])
     {

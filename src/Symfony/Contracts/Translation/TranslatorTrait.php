@@ -20,7 +20,7 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
  */
 trait TranslatorTrait
 {
-    private $locale;
+    private ?string $locale = null;
 
     /**
      * {@inheritdoc}

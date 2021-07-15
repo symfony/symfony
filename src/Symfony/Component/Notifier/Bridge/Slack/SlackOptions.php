@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Slack;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackBlockInterface;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
@@ -22,11 +23,17 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class SlackOptions implements MessageOptionsInterface
 {
+    private const MAX_BLOCKS = 50;
+
     private $options;
 
     public function __construct(array $options = [])
     {
         $this->options = $options;
+
+        if (\count($this->options['blocks'] ?? []) > self::MAX_BLOCKS) {
+            throw new LogicException(sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
+        }
     }
 
     public static function fromNotification(Notification $notification): self
@@ -85,6 +92,10 @@ final class SlackOptions implements MessageOptionsInterface
      */
     public function block(SlackBlockInterface $block): self
     {
+        if (\count($this->options['blocks'] ?? []) >= self::MAX_BLOCKS) {
+            throw new LogicException(sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
+        }
+
         $this->options['blocks'][] = $block->toArray();
 
         return $this;

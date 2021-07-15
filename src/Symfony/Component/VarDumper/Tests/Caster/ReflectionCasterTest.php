@@ -18,6 +18,7 @@ use Symfony\Component\VarDumper\Tests\Fixtures\ExtendsReflectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo;
 use Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes;
 use Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass;
+use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionIntersectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionNamedTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionUnionTypeFixture;
 
@@ -94,7 +95,7 @@ Closure($x) {
     $b: & 123
   }
   file: "%sReflectionCasterTest.php"
-  line: "87 to 87"
+  line: "88 to 88"
 }
 EOTXT
             , $var
@@ -235,6 +236,26 @@ EOTXT
         );
     }
 
+    /**
+     * @requires PHP 8.1
+     */
+    public function testReflectionParameterIntersection()
+    {
+        $f = eval('return function (Traversable&Countable $a) {};');
+        $var = new \ReflectionParameter($f, 0);
+
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionParameter {
+  +name: "a"
+  position: 0
+  typeHint: "Traversable&Countable"
+}
+EOTXT
+            , $var
+        );
+    }
+
     public function testReflectionPropertyScalar()
     {
         $var = new \ReflectionProperty(ReflectionNamedTypeFixture::class, 'a');
@@ -282,6 +303,34 @@ ReflectionUnionType {
       name: "int"
       allowsNull: false
       isBuiltin: true
+    }
+  ]
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testReflectionIntersectionType()
+    {
+        $var = (new \ReflectionProperty(ReflectionIntersectionTypeFixture::class, 'a'))->getType();
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionIntersectionType {
+  allowsNull: false
+  types: array:2 [
+    0 => ReflectionNamedType {
+      name: "Traversable"
+      allowsNull: false
+      isBuiltin: false
+    }
+    1 => ReflectionNamedType {
+      name: "Countable"
+      allowsNull: false
+      isBuiltin: false
     }
   ]
 }

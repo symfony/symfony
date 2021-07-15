@@ -121,11 +121,12 @@ class TestSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    public function gc($maxLifetime): bool
+    #[\ReturnTypeWillChange]
+    public function gc($maxLifetime)
     {
         echo __FUNCTION__, "\n";
 
-        return true;
+        return 1;
     }
 
     protected function doRead($sessionId): string

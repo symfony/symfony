@@ -29,10 +29,10 @@ class Inline
     public static $parsedLineNumber = -1;
     public static $parsedFilename;
 
-    private static $exceptionOnInvalidType = false;
-    private static $objectSupport = false;
-    private static $objectForMap = false;
-    private static $constantSupport = false;
+    private static bool $exceptionOnInvalidType = false;
+    private static bool $objectSupport = false;
+    private static bool $objectForMap = false;
+    private static bool $constantSupport = false;
 
     public static function initialize(int $flags, int $parsedLineNumber = null, string $parsedFilename = null)
     {
@@ -50,9 +50,9 @@ class Inline
     /**
      * Converts a YAML string to a PHP value.
      *
-     * @param string $value      A YAML string
-     * @param int    $flags      A bit field of PARSE_* constants to customize the YAML parser behavior
-     * @param array  $references Mapping of variable names to values
+     * @param string|null $value      A YAML string
+     * @param int         $flags      A bit field of PARSE_* constants to customize the YAML parser behavior
+     * @param array       $references Mapping of variable names to values
      *
      * @throws ParseException
      */

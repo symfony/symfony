@@ -29,8 +29,10 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Deprecated;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\FooObject;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\IntersectionConstructor;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructor;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Waldo;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\WaldoFoo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Wobble;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -952,5 +954,38 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
 
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testIntersectionTypePassesWithReference()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', WaldoFoo::class);
+        $container->register('intersection', IntersectionConstructor::class)
+            ->setArguments([new Reference('foo')]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testIntersectionTypeFailsWithReference()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('waldo', Waldo::class);
+        $container->register('intersection', IntersectionConstructor::class)
+            ->setArguments([new Reference('waldo')]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "intersection": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\IntersectionConstructor::__construct()" accepts "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo&Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\WaldoInterface", "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Waldo" passed.');
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
     }
 }

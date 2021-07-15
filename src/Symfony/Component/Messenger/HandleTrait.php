@@ -31,7 +31,7 @@ trait HandleTrait
      * the last one usually returning the handler result.
      *
      * @param object|Envelope $message The message or the message pre-wrapped in an envelope
-     * @param StampInterface[] $stamps Stamps to be set on the Envelope which are used to control middlewares behaviours
+     * @param StampInterface[] $stamps Stamps to be set on the Envelope which are used to control middlewares behaviors
      */
     private function handle(object $message, array $stamps = []): mixed
     {

@@ -28,8 +28,8 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
      */
     public const SESSION_NAMESPACE = '_csrf';
 
-    private $requestStack;
-    private $namespace;
+    private RequestStack $requestStack;
+    private string $namespace;
 
     /**
      * Initializes the storage with a RequestStack object and a session namespace.

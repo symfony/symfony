@@ -18,7 +18,7 @@ namespace Symfony\Component\Security\Csrf\TokenGenerator;
  */
 class UriSafeTokenGenerator implements TokenGeneratorInterface
 {
-    private $entropy;
+    private int $entropy;
 
     /**
      * Generates URI-safe CSRF tokens.

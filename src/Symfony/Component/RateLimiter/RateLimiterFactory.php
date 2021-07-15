@@ -29,9 +29,9 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
  */
 final class RateLimiterFactory
 {
-    private $config;
-    private $storage;
-    private $lockFactory;
+    private array $config;
+    private StorageInterface $storage;
+    private ?LockFactory $lockFactory;
 
     public function __construct(array $config, StorageInterface $storage, LockFactory $lockFactory = null)
     {

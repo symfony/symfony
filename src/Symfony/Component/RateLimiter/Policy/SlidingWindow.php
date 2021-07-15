@@ -22,32 +22,12 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class SlidingWindow implements LimiterStateInterface
 {
-    private $id;
-
-    /**
-     * @var int
-     */
-    private $hitCount = 0;
-
-    /**
-     * @var int
-     */
-    private $hitCountForLastWindow = 0;
-
-    /**
-     * @var int how long a time frame is
-     */
-    private $intervalInSeconds;
-
-    /**
-     * @var int the unix timestamp when the current window ends
-     */
-    private $windowEndAt;
-
-    /**
-     * @var bool true if this window has been cached
-     */
-    private $cached = true;
+    private string $id;
+    private int $hitCount = 0;
+    private int $hitCountForLastWindow = 0;
+    private int $intervalInSeconds;
+    private int $windowEndAt;
+    private bool $cached = true;
 
     public function __construct(string $id, int $intervalInSeconds)
     {

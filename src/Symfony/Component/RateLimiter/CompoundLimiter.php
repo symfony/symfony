@@ -20,7 +20,7 @@ use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
  */
 final class CompoundLimiter implements LimiterInterface
 {
-    private $limiters;
+    private array $limiters;
 
     /**
      * @param LimiterInterface[] $limiters

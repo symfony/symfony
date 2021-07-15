@@ -21,23 +21,11 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
-    private $id;
-    private $rate;
-
-    /**
-     * @var int
-     */
-    private $tokens;
-
-    /**
-     * @var int
-     */
-    private $burstSize;
-
-    /**
-     * @var float
-     */
-    private $timer;
+    private string $id;
+    private Rate $rate;
+    private int $tokens;
+    private int $burstSize;
+    private float $timer;
 
     /**
      * @param string     $id            unique identifier for this bucket

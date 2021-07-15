@@ -77,13 +77,11 @@ class TranslationUpdateCommand extends Command
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
-                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format (deprecated)'),
                 new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'xlf12'),
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the update be done'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
-                new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version (deprecated)'),
                 new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically', 'asc'),
                 new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
             ])
@@ -136,16 +134,8 @@ EOF
             return 1;
         }
 
-        $format = $input->getOption('output-format') ?: $input->getOption('format');
-        $xliffVersion = $input->getOption('xliff-version') ?? '1.2';
-
-        if ($input->getOption('xliff-version')) {
-            trigger_deprecation('symfony/framework-bundle', '5.3', 'The "--xliff-version" option is deprecated, use "--format=xlf%d" instead.', 10 * $xliffVersion);
-        }
-
-        if ($input->getOption('output-format')) {
-            trigger_deprecation('symfony/framework-bundle', '5.3', 'The "--output-format" option is deprecated, use "--format=xlf%d" instead.', 10 * $xliffVersion);
-        }
+        $format = $input->getOption('format');
+        $xliffVersion = '1.2';
 
         switch ($format) {
             case 'xlf20': $xliffVersion = '2.0';

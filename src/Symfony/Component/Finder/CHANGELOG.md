@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.4.0
+-----
+
+ * Deprecate `Comparator::setTarget()` and `Comparator::setOperator()`
+ * Add a constructor to `Comparator` that allows setting target and operator
+
 5.0.0
 -----
 

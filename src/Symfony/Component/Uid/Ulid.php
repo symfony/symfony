@@ -22,8 +22,8 @@ class Ulid extends AbstractUid
 {
     protected const NIL = '00000000000000000000000000';
 
-    private static $time = '';
-    private static $rand = [];
+    private static string $time = '';
+    private static array $rand = [];
 
     public function __construct(string $ulid = null)
     {

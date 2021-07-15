@@ -19,12 +19,12 @@ use Symfony\Component\Uid\UuidV6;
 
 class UuidFactory
 {
-    private $defaultClass;
-    private $timeBasedClass;
-    private $nameBasedClass;
-    private $randomBasedClass;
-    private $timeBasedNode;
-    private $nameBasedNamespace;
+    private string $defaultClass;
+    private string $timeBasedClass;
+    private string $nameBasedClass;
+    private string $randomBasedClass;
+    private ?Uuid $timeBasedNode;
+    private ?Uuid $nameBasedNamespace;
 
     public function __construct(string|int $defaultClass = UuidV6::class, string|int $timeBasedClass = UuidV6::class, string|int $nameBasedClass = UuidV5::class, string|int $randomBasedClass = UuidV4::class, Uuid|string $timeBasedNode = null, Uuid|string $nameBasedNamespace = null)
     {

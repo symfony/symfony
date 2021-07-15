@@ -94,7 +94,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     public function has(...$keys): bool
     {
         foreach ($keys as $key) {
-            if (\array_key_exists($key, $this->parameters)) {
+            if (\array_key_exists((string) $key, $this->parameters)) {
                 continue;
             }
 

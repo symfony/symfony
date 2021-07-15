@@ -26,12 +26,12 @@ class Parser
     public const OPERATOR_LEFT = 1;
     public const OPERATOR_RIGHT = 2;
 
-    private $stream;
-    private $unaryOperators;
-    private $binaryOperators;
-    private $functions;
-    private $names;
-    private $lint;
+    private TokenStream $stream;
+    private array $unaryOperators;
+    private array $binaryOperators;
+    private array $functions;
+    private ?array $names;
+    private bool $lint = false;
 
     public function __construct(array $functions)
     {
@@ -124,8 +124,7 @@ class Parser
             throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s".', $stream->current->type, $stream->current->value), $stream->current->cursor, $stream->getExpression());
         }
 
-        $this->stream = null;
-        $this->names = null;
+        unset($this->stream, $this->names);
 
         return $node;
     }

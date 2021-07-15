@@ -30,9 +30,9 @@ namespace Symfony\Component\ExpressionLanguage;
  */
 class ExpressionFunction
 {
-    private $name;
-    private $compiler;
-    private $evaluator;
+    private string $name;
+    private \Closure $compiler;
+    private \Closure $evaluator;
 
     /**
      * @param string   $name      The function name

@@ -20,8 +20,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class Compiler implements ResetInterface
 {
-    private $source;
-    private $functions;
+    private string $source = '';
+    private array $functions;
 
     public function __construct(array $functions)
     {

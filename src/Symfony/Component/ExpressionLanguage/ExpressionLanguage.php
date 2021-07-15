@@ -24,12 +24,12 @@ class_exists(ParsedExpression::class);
  */
 class ExpressionLanguage
 {
-    private $cache;
-    private $lexer;
-    private $parser;
-    private $compiler;
+    private CacheItemPoolInterface $cache;
+    private Lexer $lexer;
+    private Parser $parser;
+    private Compiler $compiler;
 
-    protected $functions = [];
+    protected array $functions = [];
 
     /**
      * @param ExpressionFunctionProviderInterface[] $providers
@@ -122,7 +122,7 @@ class ExpressionLanguage
      */
     public function register(string $name, callable $compiler, callable $evaluator)
     {
-        if (null !== $this->parser) {
+        if (isset($this->parser)) {
             throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
         }
 
@@ -148,27 +148,17 @@ class ExpressionLanguage
 
     private function getLexer(): Lexer
     {
-        if (null === $this->lexer) {
-            $this->lexer = new Lexer();
-        }
-
-        return $this->lexer;
+        return $this->lexer ??= new Lexer();
     }
 
     private function getParser(): Parser
     {
-        if (null === $this->parser) {
-            $this->parser = new Parser($this->functions);
-        }
-
-        return $this->parser;
+        return $this->parser ??= new Parser($this->functions);
     }
 
     private function getCompiler(): Compiler
     {
-        if (null === $this->compiler) {
-            $this->compiler = new Compiler($this->functions);
-        }
+        $this->compiler ??= new Compiler($this->functions);
 
         return $this->compiler->reset();
     }

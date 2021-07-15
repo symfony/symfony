@@ -28,15 +28,8 @@ final class TokenBucketLimiter implements LimiterInterface
 {
     use ResetLimiterTrait;
 
-    private $id;
     private $maxBurst;
     private $rate;
-    private $storage;
-
-    /**
-     * @var LockInterface
-     */
-    private $lock;
 
     public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, LockInterface $lock = null)
     {

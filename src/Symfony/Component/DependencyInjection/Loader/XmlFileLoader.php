@@ -335,14 +335,14 @@ class XmlFileLoader extends FileLoader
         $tags = $this->getChildren($service, 'tag');
 
         foreach ($tags as $tag) {
-            $tagName = $tag->nodeValue;
-            if ('' === $tagName && '' === $tagName = $tag->getAttribute('name')) {
+            $tagName = $tag->hasChildNodes() || '' === $tag->nodeValue ? $tag->getAttribute('name') : $tag->nodeValue;
+            if ('' === $tagName) {
                 throw new InvalidArgumentException(sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', (string) $service->getAttribute('id'), $file));
             }
 
             $parameters = $this->getTagAttributes($tag, sprintf('The attribute name of tag "%s" for service "%s" in %s must be a non-empty string.', $tagName, (string) $service->getAttribute('id'), $file));
             foreach ($tag->attributes as $name => $node) {
-                if ('name' === $name && '' === $tagName) {
+                if ('name' === $name) {
                     continue;
                 }
 
@@ -597,7 +597,7 @@ class XmlFileLoader extends FileLoader
             }
 
             if ($this->getChildren($childNode, 'attribute')) {
-                $parameters[$childNode->getAttribute('name')] = $this->getTagAttributes($childNode, $missingName);
+                $parameters[$name] = $this->getTagAttributes($childNode, $missingName);
             } else {
                 if (false !== strpos($name, '-') && false === strpos($name, '_') && !\array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
                     $parameters[$normalizedName] = XmlUtils::phpize($childNode->nodeValue);

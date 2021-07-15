@@ -208,15 +208,11 @@
     <xsd:attribute name="public" type="boolean" />
   </xsd:complexType>
 
-  <xsd:complexType name="tag">
+  <xsd:complexType name="tag" mixed="true">
     <xsd:choice minOccurs="0">
-      <xsd:element name="attribute" type="tag_attribute" maxOccurs="unbounded" />
+      <xsd:element name="attribute" type="tag_attribute" maxOccurs="unbounded"/>
     </xsd:choice>
-    <xsd:simpleContent>
-      <xsd:extension base="xsd:string">
-        <xsd:anyAttribute namespace="##any" processContents="lax" />
-      </xsd:extension>
-    </xsd:simpleContent>
+    <xsd:anyAttribute namespace="##any" processContents="lax" />
   </xsd:complexType>
 
   <xsd:complexType name="deprecated">
@@ -229,7 +225,7 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <xsd:complexType name="tag_attribute">
+  <xsd:complexType name="tag_attribute" mixed="true">
     <xsd:choice minOccurs="0">
       <xsd:element name="attribute" type="tag_attribute" maxOccurs="unbounded" />
     </xsd:choice>

@@ -184,9 +184,14 @@ class MongoDbSessionHandlerTest extends TestCase
             ->willReturnCallback(function ($criteria) {
                 $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $criteria[$this->options['expiry_field']]['$lt']);
                 $this->assertGreaterThanOrEqual(time() - 1, round((string) $criteria[$this->options['expiry_field']]['$lt'] / 1000));
+
+                $result = $this->createMock(\MongoDB\DeleteResult::class);
+                $result->method('getDeletedCount')->willReturn(42);
+
+                return $result;
             });
 
-        $this->assertTrue($this->storage->gc(1));
+        $this->assertSame(42, $this->storage->gc(1));
     }
 
     public function testGetConnection()

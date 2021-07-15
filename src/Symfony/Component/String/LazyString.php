@@ -18,7 +18,7 @@ namespace Symfony\Component\String;
  */
 class LazyString implements \Stringable, \JsonSerializable
 {
-    private $value;
+    private \Closure|string $value;
 
     /**
      * @param callable|array $callback A callable or a [Closure, method] lazy-callable

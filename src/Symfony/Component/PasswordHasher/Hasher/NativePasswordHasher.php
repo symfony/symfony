@@ -25,8 +25,8 @@ final class NativePasswordHasher implements PasswordHasherInterface
 {
     use CheckPasswordLengthTrait;
 
-    private $algorithm = \PASSWORD_BCRYPT;
-    private $options;
+    private string $algorithm = \PASSWORD_BCRYPT;
+    private array $options;
 
     /**
      * @param string|null $algorithm An algorithm supported by password_hash() or null to use the best available algorithm

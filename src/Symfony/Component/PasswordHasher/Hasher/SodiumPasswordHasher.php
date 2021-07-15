@@ -26,8 +26,8 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
 {
     use CheckPasswordLengthTrait;
 
-    private $opsLimit;
-    private $memLimit;
+    private int $opsLimit;
+    private int $memLimit;
 
     public function __construct(int $opsLimit = null, int $memLimit = null)
     {

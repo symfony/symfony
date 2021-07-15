@@ -37,8 +37,8 @@ class UserPasswordHashCommand extends Command
     protected static $defaultName = 'security:hash-password';
     protected static $defaultDescription = 'Hash a user password';
 
-    private $hasherFactory;
-    private $userClasses;
+    private PasswordHasherFactoryInterface $hasherFactory;
+    private array $userClasses;
 
     public function __construct(PasswordHasherFactoryInterface $hasherFactory, array $userClasses = [])
     {

@@ -99,12 +99,13 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * @return bool
+     * @return int|false
      */
+    #[\ReturnTypeWillChange]
     public function gc($maxlifetime)
     {
         // not required here because memcached will auto expire the records anyhow.
-        return true;
+        return 0;
     }
 
     /**

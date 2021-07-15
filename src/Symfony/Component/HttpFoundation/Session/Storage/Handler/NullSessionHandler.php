@@ -70,11 +70,11 @@ class NullSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * @return bool
+     * @return int|false
      */
     #[\ReturnTypeWillChange]
     public function gc($maxlifetime)
     {
-        return true;
+        return 0;
     }
 }

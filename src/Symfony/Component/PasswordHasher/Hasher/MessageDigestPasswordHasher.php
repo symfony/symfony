@@ -24,10 +24,10 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
 {
     use CheckPasswordLengthTrait;
 
-    private $algorithm;
-    private $encodeHashAsBase64;
-    private $iterations = 1;
-    private $hashLength = -1;
+    private string $algorithm;
+    private bool $encodeHashAsBase64;
+    private int $iterations = 1;
+    private int $hashLength = -1;
 
     /**
      * @param string $algorithm          The digest algorithm to use

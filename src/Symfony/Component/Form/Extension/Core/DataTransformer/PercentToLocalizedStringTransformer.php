@@ -39,8 +39,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * @see self::$types for a list of supported types
      *
-     * @param int      $scale        The scale
-     * @param string   $type         One of the supported types
      * @param int|null $roundingMode A value from \NumberFormatter, such as \NumberFormatter::ROUND_HALFUP
      * @param bool     $html5Format  Use an HTML5 specific format, see https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats
      *
@@ -48,10 +46,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      */
     public function __construct(int $scale = null, string $type = null, int $roundingMode = null, bool $html5Format = false)
     {
-        if (null === $scale) {
-            $scale = 0;
-        }
-
         if (null === $type) {
             $type = self::FRACTIONAL;
         }
@@ -65,7 +59,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         $this->type = $type;
-        $this->scale = $scale;
+        $this->scale = $scale ?? 0;
         $this->roundingMode = $roundingMode;
         $this->html5Format = $html5Format;
     }

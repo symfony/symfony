@@ -25,21 +25,9 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
 
     public function __construct(?int $scale = 2, ?bool $grouping = true, ?int $roundingMode = self::ROUND_HALF_UP, ?int $divisor = 1)
     {
-        if (null === $grouping) {
-            $grouping = true;
-        }
+        parent::__construct($scale ?? 2, $grouping ?? true, $roundingMode);
 
-        if (null === $scale) {
-            $scale = 2;
-        }
-
-        parent::__construct($scale, $grouping, $roundingMode);
-
-        if (null === $divisor) {
-            $divisor = 1;
-        }
-
-        $this->divisor = $divisor;
+        $this->divisor = $divisor ?? 1;
     }
 
     /**

@@ -20,13 +20,13 @@ use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\LazyLoadingValueHolderGenera
  */
 class LazyLoadingValueHolderFactory extends BaseFactory
 {
-    private $generator;
+    private ProxyGeneratorInterface $generator;
 
     /**
      * {@inheritdoc}
      */
     public function getGenerator(): ProxyGeneratorInterface
     {
-        return $this->generator ?: $this->generator = new LazyLoadingValueHolderGenerator();
+        return $this->generator ??= new LazyLoadingValueHolderGenerator();
     }
 }

@@ -32,10 +32,8 @@ trait TranslatorTrait
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale ?: (class_exists(\Locale::class) ? \Locale::getDefault() : 'en');
     }

@@ -40,10 +40,8 @@ trait ServiceLocatorTrait
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function has(string $id)
+    public function has(string $id): bool
     {
         return isset($this->factories[$id]);
     }

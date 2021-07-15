@@ -25,7 +25,7 @@
     "require-dev": {
         "symfony/error-handler": "^5.4|^6.0",
         "symfony/http-client": "^5.4|^6.0",
-        "symfony/translation-contracts": "^2",
+        "symfony/translation-contracts": "^2.0|^3.0",
         "symfony/var-exporter": "^5.4|^6.0"
     },
     "conflict": {

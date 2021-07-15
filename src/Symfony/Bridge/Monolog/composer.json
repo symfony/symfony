@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.0.2",
         "monolog/monolog": "^1.25.1|^2",
-        "symfony/service-contracts": "^1.1|^2",
+        "symfony/service-contracts": "^1.1|^2.0|^3.0",
         "symfony/http-kernel": "^5.4|^6.0"
     },
     "require-dev": {

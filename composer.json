@@ -18,18 +18,18 @@
     "provide": {
         "php-http/async-client-implementation": "*",
         "php-http/client-implementation": "*",
-        "psr/cache-implementation": "1.0|2.0|3.0",
-        "psr/container-implementation": "1.0",
+        "psr/cache-implementation": "2.0|3.0",
+        "psr/container-implementation": "1.1|2.0",
         "psr/event-dispatcher-implementation": "1.0",
         "psr/http-client-implementation": "1.0",
         "psr/link-implementation": "1.0",
         "psr/log-implementation": "1.0",
         "psr/simple-cache-implementation": "1.0",
-        "symfony/cache-implementation": "1.0|2.0",
-        "symfony/event-dispatcher-implementation": "2.0",
-        "symfony/http-client-implementation": "2.4",
-        "symfony/service-implementation": "1.0|2.0",
-        "symfony/translation-implementation": "2.3"
+        "symfony/cache-implementation": "1.1|2.0|3.0",
+        "symfony/event-dispatcher-implementation": "2.0|3.0",
+        "symfony/http-client-implementation": "2.5|3.0",
+        "symfony/service-implementation": "1.1|2.0|3.0",
+        "symfony/translation-implementation": "2.3|3.0"
     },
     "require": {
         "php": ">=8.0.2",
@@ -38,12 +38,12 @@
         "doctrine/event-manager": "~1.0",
         "doctrine/persistence": "^2",
         "twig/twig": "^2.13|^3.0.4",
-        "psr/cache": "^1.0|^2.0|^3.0",
-        "psr/container": "^1.0",
+        "psr/cache": "^2.0|^3.0",
+        "psr/container": "^1.1|^2.0",
         "psr/event-dispatcher": "^1.0",
         "psr/link": "^1.1",
         "psr/log": "~1.0",
-        "symfony/contracts": "^2.5",
+        "symfony/contracts": "^2.5|^3.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-grapheme": "~1.0",
         "symfony/polyfill-intl-icu": "~1.0",
@@ -186,7 +186,7 @@
             "url": "src/Symfony/Contracts",
             "options": {
                 "versions": {
-                    "symfony/contracts": "2.5.x-dev"
+                    "symfony/contracts": "3.0.x-dev"
                 }
             }
         },

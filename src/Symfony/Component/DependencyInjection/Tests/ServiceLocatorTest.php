@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\Test\ServiceLocatorTest as BaseServiceLocatorTest;
 
 class ServiceLocatorTest extends BaseServiceLocatorTest
 {
-    public function getServiceLocator(array $factories)
+    public function getServiceLocator(array $factories): ServiceLocator
     {
         return new ServiceLocator($factories);
     }

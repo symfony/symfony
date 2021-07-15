@@ -45,7 +45,7 @@ interface ContainerInterface extends PsrContainerInterface
     /**
      * @return bool true if the service is defined, false otherwise
      */
-    public function has(string $id);
+    public function has(string $id): bool;
 
     /**
      * Check for whether or not a service has been initialized.

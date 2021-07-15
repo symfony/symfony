@@ -173,14 +173,7 @@ class Container implements ContainerInterface, ResetInterface
         $this->services[$id] = $service;
     }
 
-    /**
-     * Returns true if the given service is defined.
-     *
-     * @param string $id The service identifier
-     *
-     * @return bool true if the service is defined, false otherwise
-     */
-    public function has(string $id)
+    public function has(string $id): bool
     {
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];

@@ -45,10 +45,8 @@ class ContainerBag extends FrozenParameterBag implements ContainerBagInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return $this->container->hasParameter($name);
     }

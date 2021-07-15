@@ -91,9 +91,17 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return bool true if the parameter exists, false otherwise
      */
-    public function has(string $key)
+    public function has(...$keys): bool
     {
-        return \array_key_exists($key, $this->parameters);
+        foreach ($keys as $key) {
+            if (\array_key_exists($key, $this->parameters)) {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     /**

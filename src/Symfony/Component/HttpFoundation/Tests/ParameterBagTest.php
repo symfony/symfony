@@ -87,9 +87,9 @@ class ParameterBagTest extends TestCase
 
     public function testHas()
     {
-        $bag = new ParameterBag(['foo' => 'bar']);
+        $bag = new ParameterBag(['foo' => 'bar', 'hello' => 'world']);
 
-        $this->assertTrue($bag->has('foo'), '->has() returns true if a parameter is defined');
+        $this->assertTrue($bag->has('foo', 'hello'), '->has() returns true if a parameters is defined');
         $this->assertFalse($bag->has('unknown'), '->has() return false if a parameter is not defined');
     }
 

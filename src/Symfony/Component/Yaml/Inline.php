@@ -66,42 +66,31 @@ class Inline
             return '';
         }
 
-        if (2 /* MB_OVERLOAD_STRING */ & (int) ini_get('mbstring.func_overload')) {
-            $mbEncoding = mb_internal_encoding();
-            mb_internal_encoding('ASCII');
+        $i = 0;
+        $tag = self::parseTag($value, $i, $flags);
+        switch ($value[$i]) {
+            case '[':
+                $result = self::parseSequence($value, $flags, $i, $references);
+                ++$i;
+                break;
+            case '{':
+                $result = self::parseMapping($value, $flags, $i, $references);
+                ++$i;
+                break;
+            default:
+                $result = self::parseScalar($value, $flags, null, $i, null === $tag, $references);
         }
 
-        try {
-            $i = 0;
-            $tag = self::parseTag($value, $i, $flags);
-            switch ($value[$i]) {
-                case '[':
-                    $result = self::parseSequence($value, $flags, $i, $references);
-                    ++$i;
-                    break;
-                case '{':
-                    $result = self::parseMapping($value, $flags, $i, $references);
-                    ++$i;
-                    break;
-                default:
-                    $result = self::parseScalar($value, $flags, null, $i, null === $tag, $references);
-            }
-
-            // some comments are allowed at the end
-            if (preg_replace('/\s*#.*$/A', '', substr($value, $i))) {
-                throw new ParseException(sprintf('Unexpected characters near "%s".', substr($value, $i)), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
-            }
-
-            if (null !== $tag && '' !== $tag) {
-                return new TaggedValue($tag, $result);
-            }
-
-            return $result;
-        } finally {
-            if (isset($mbEncoding)) {
-                mb_internal_encoding($mbEncoding);
-            }
+        // some comments are allowed at the end
+        if (preg_replace('/\s*#.*$/A', '', substr($value, $i))) {
+            throw new ParseException(sprintf('Unexpected characters near "%s".', substr($value, $i)), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
         }
+
+        if (null !== $tag && '' !== $tag) {
+            return new TaggedValue($tag, $result);
+        }
+
+        return $result;
     }
 
     /**

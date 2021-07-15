@@ -27,6 +27,6 @@ class LazyProperty
 
     public function getPropertyValue()
     {
-        return \call_user_func($this->propertyValueCallback);
+        return ($this->propertyValueCallback)();
     }
 }

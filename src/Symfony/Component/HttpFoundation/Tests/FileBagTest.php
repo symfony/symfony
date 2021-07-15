@@ -45,6 +45,23 @@ class FileBagTest extends TestCase
         $this->assertEquals($file, $bag->get('file'));
     }
 
+    public function testShouldConvertsUploadedFilesPhp81()
+    {
+        $tmpFile = $this->createTempFile();
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
+
+        $bag = new FileBag(['file' => [
+            'name' => basename($tmpFile),
+            'full_path' => basename($tmpFile),
+            'type' => 'text/plain',
+            'tmp_name' => $tmpFile,
+            'error' => 0,
+            'size' => null,
+        ]]);
+
+        $this->assertEquals($file, $bag->get('file'));
+    }
+
     public function testShouldSetEmptyUploadedFilesToNull()
     {
         $bag = new FileBag(['file' => [

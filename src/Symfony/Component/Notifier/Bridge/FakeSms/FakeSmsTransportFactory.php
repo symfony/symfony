@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeSms;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
@@ -20,38 +21,44 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author James Hemery <james@yieldstudio.fr>
  * @author Oskar Stark <oskarstark@googlemail.com>
+ * @author Antoine Makdessi <amakdessi@me.com>
  */
 final class FakeSmsTransportFactory extends AbstractTransportFactory
 {
     protected $mailer;
+    protected $logger;
 
-    public function __construct(MailerInterface $mailer)
+    public function __construct(MailerInterface $mailer, LoggerInterface $logger)
     {
         parent::__construct();
 
         $this->mailer = $mailer;
+        $this->logger = $logger;
     }
 
     /**
-     * @return FakeSmsEmailTransport
+     * @return FakeSmsEmailTransport|FakeSmsLoggerTransport
      */
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
 
-        if ('fakesms+email' !== $scheme) {
-            throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());
+        switch ($scheme) {
+            case 'fakesms+email':
+                $mailerTransport = $dsn->getHost();
+                $to = $dsn->getRequiredOption('to');
+                $from = $dsn->getRequiredOption('from');
+
+                return (new FakeSmsEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
+            case 'fakesms+logger':
+                return new FakeSmsLoggerTransport($this->logger);
         }
 
-        $mailerTransport = $dsn->getHost();
-        $to = $dsn->getRequiredOption('to');
-        $from = $dsn->getRequiredOption('from');
-
-        return (new FakeSmsEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
+        throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['fakesms+email'];
+        return ['fakesms+email', 'fakesms+logger'];
     }
 }

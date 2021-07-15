@@ -16,7 +16,7 @@ namespace Symfony\Component\Validator\Exception;
  */
 class UnexpectedValueException extends UnexpectedTypeException
 {
-    private $expectedType;
+    private string $expectedType;
 
     public function __construct(mixed $value, string $expectedType)
     {

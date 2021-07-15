@@ -35,7 +35,7 @@ class DebugCommand extends Command
     protected static $defaultName = 'debug:validator';
     protected static $defaultDescription = 'Display validation constraints for classes';
 
-    private $validator;
+    private MetadataFactoryInterface $validator;
 
     public function __construct(MetadataFactoryInterface $validator)
     {

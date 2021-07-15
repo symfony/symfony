@@ -18,16 +18,16 @@ namespace Symfony\Component\Validator;
  */
 class ConstraintViolation implements ConstraintViolationInterface
 {
-    private $message;
-    private $messageTemplate;
-    private $parameters;
-    private $plural;
-    private $root;
-    private $propertyPath;
-    private $invalidValue;
-    private $constraint;
-    private $code;
-    private $cause;
+    private string|\Stringable $message;
+    private ?string $messageTemplate;
+    private array $parameters;
+    private ?int $plural;
+    private mixed $root;
+    private ?string $propertyPath;
+    private mixed $invalidValue;
+    private ?Constraint $constraint;
+    private ?string $code;
+    private mixed $cause;
 
     /**
      * Creates a new constraint violation.

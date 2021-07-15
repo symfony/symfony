@@ -15,7 +15,6 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -46,42 +45,18 @@ class_exists(TranslatorTrait::class);
  */
 class ValidatorBuilder
 {
-    private $initializers = [];
-    private $loaders = [];
-    private $xmlMappings = [];
-    private $yamlMappings = [];
-    private $methodMappings = [];
-
-    /**
-     * @var Reader|null
-     */
-    private $annotationReader;
-    private $enableAnnotationMapping = false;
-
-    /**
-     * @var MetadataFactoryInterface|null
-     */
-    private $metadataFactory;
-
-    /**
-     * @var ConstraintValidatorFactoryInterface|null
-     */
-    private $validatorFactory;
-
-    /**
-     * @var CacheItemPoolInterface|null
-     */
-    private $mappingCache;
-
-    /**
-     * @var TranslatorInterface|null
-     */
-    private $translator;
-
-    /**
-     * @var string|null
-     */
-    private $translationDomain;
+    private array $initializers = [];
+    private array $loaders = [];
+    private array $xmlMappings = [];
+    private array $yamlMappings = [];
+    private array $methodMappings = [];
+    private ?Reader $annotationReader = null;
+    private bool $enableAnnotationMapping = false;
+    private ?MetadataFactoryInterface $metadataFactory = null;
+    private ConstraintValidatorFactoryInterface $validatorFactory;
+    private ?CacheItemPoolInterface $mappingCache = null;
+    private ?TranslatorInterface $translator = null;
+    private ?string $translationDomain = null;
 
     /**
      * Adds an object initializer to the validator.

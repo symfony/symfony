@@ -32,7 +32,7 @@ class EmailValidator extends ConstraintValidator
         Email::VALIDATION_MODE_HTML5 => self::PATTERN_HTML5,
     ];
 
-    private $defaultMode;
+    private string $defaultMode;
 
     public function __construct(string $defaultMode = Email::VALIDATION_MODE_LOOSE)
     {

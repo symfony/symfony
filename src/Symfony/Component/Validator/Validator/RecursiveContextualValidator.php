@@ -43,12 +43,12 @@ use Symfony\Component\Validator\Util\PropertyPath;
  */
 class RecursiveContextualValidator implements ContextualValidatorInterface
 {
-    private $context;
-    private $defaultPropertyPath;
-    private $defaultGroups;
-    private $metadataFactory;
-    private $validatorFactory;
-    private $objectInitializers;
+    private ExecutionContextInterface $context;
+    private string $defaultPropertyPath;
+    private array $defaultGroups;
+    private MetadataFactoryInterface $metadataFactory;
+    private ConstraintValidatorFactoryInterface $validatorFactory;
+    private array $objectInitializers;
 
     /**
      * Creates a validator for the given context.

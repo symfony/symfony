@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -80,7 +81,7 @@ class FormFactory implements FormFactoryInterface
     public function createBuilderForProperty(string $class, string $property, mixed $data = null, array $options = [])
     {
         if (null === $guesser = $this->registry->getTypeGuesser()) {
-            return $this->createNamedBuilder($property, 'Symfony\Component\Form\Extension\Core\Type\TextType', $data, $options);
+            return $this->createNamedBuilder($property, TextType::class, $data, $options);
         }
 
         $typeGuess = $guesser->guessType($class, $property);
@@ -88,7 +89,7 @@ class FormFactory implements FormFactoryInterface
         $requiredGuess = $guesser->guessRequired($class, $property);
         $patternGuess = $guesser->guessPattern($class, $property);
 
-        $type = $typeGuess ? $typeGuess->getType() : 'Symfony\Component\Form\Extension\Core\Type\TextType';
+        $type = $typeGuess ? $typeGuess->getType() : TextType::class;
 
         $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
         $pattern = $patternGuess ? $patternGuess->getValue() : null;

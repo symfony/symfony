@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 /**
  * Allows creating a form based on a name, a class or a property.
@@ -29,7 +30,7 @@ interface FormFactoryInterface
      *
      * @return FormInterface The form named after the type
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
+     * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
     public function create(string $type = FormType::class, mixed $data = null, array $options = []);
 
@@ -42,7 +43,7 @@ interface FormFactoryInterface
      *
      * @return FormInterface The form
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
+     * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
     public function createNamed(string $name, string $type = FormType::class, mixed $data = null, array $options = []);
 
@@ -57,7 +58,7 @@ interface FormFactoryInterface
      *
      * @return FormInterface The form named after the property
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the form type
+     * @throws InvalidOptionsException if any given option is not applicable to the form type
      */
     public function createForProperty(string $class, string $property, mixed $data = null, array $options = []);
 
@@ -68,7 +69,7 @@ interface FormFactoryInterface
      *
      * @return FormBuilderInterface The form builder
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
+     * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
     public function createBuilder(string $type = FormType::class, mixed $data = null, array $options = []);
 
@@ -79,7 +80,7 @@ interface FormFactoryInterface
      *
      * @return FormBuilderInterface The form builder
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
+     * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
     public function createNamedBuilder(string $name, string $type = FormType::class, mixed $data = null, array $options = []);
 
@@ -95,7 +96,7 @@ interface FormFactoryInterface
      *
      * @return FormBuilderInterface The form builder named after the property
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the form type
+     * @throws InvalidOptionsException if any given option is not applicable to the form type
      */
     public function createBuilderForProperty(string $class, string $property, mixed $data = null, array $options = []);
 }

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-14T12:56:19Z
+
+Psalm errors are false positives: Apparently Psalm does not know `ReflectionIntersectionType` yet.

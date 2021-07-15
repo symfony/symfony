@@ -174,6 +174,13 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
 
             throw new InvalidParameterTypeException($this->currentId, $e->getCode(), $parameter);
         }
+        if ($reflectionType instanceof \ReflectionIntersectionType) {
+            foreach ($reflectionType->getTypes() as $t) {
+                $this->checkType($checkedDefinition, $value, $parameter, $envPlaceholderUniquePrefix, $t);
+            }
+
+            return;
+        }
         if (!$reflectionType instanceof \ReflectionNamedType) {
             return;
         }

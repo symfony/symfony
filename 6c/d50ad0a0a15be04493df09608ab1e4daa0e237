@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by alexpott at 2021-07-14T23:14:53Z
+
+I don't think is the correct fix. I think we might want to get this new information into \Symfony\Component\HttpFoundation\File\UploadedFile - but the list of hardcoded keys is not that fun.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-15T08:05:56Z
+
+Maybe this is good enough for 4.4, and we need to improve `UploadedFile` in 5.4 to handle `full_path`?
+Up for a PR?
+
+---------------------------------------------------------------------------
+
+by alexpott at 2021-07-15T10:52:51Z
+
+@nicolas-grekas taking this approach in 4.4 seems reasonable. I've not got time atm for PR for 5.4. Working through well over 1000 fails for the Drupal test suite on PHP 8.1 :D

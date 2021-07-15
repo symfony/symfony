@@ -513,7 +513,11 @@ class AbstractControllerTest extends TestCase
 
     public function testCreateForm()
     {
-        $form = new Form($this->createMock(FormConfigInterface::class));
+        $config = $this->createMock(FormConfigInterface::class);
+        $config->method('getInheritData')->willReturn(false);
+        $config->method('getName')->willReturn('');
+
+        $form = new Form($config);
 
         $formFactory = $this->createMock(FormFactoryInterface::class);
         $formFactory->expects($this->once())->method('create')->willReturn($form);

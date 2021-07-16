@@ -85,7 +85,7 @@ class XmlFileLoader extends FileLoader
                 } else {
                     $options = [];
                 }
-            } elseif (\strlen((string) $node) > 0) {
+            } elseif ('' !== (string) $node) {
                 $options = XmlUtils::phpize(trim($node));
             } else {
                 $options = null;

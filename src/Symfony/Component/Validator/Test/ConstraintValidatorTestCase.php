@@ -60,8 +60,8 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected $propertyPath;
     protected $constraint;
     protected $defaultTimezone;
-    private $expectedViolations;
-    private $call;
+    private array $expectedViolations;
+    private int $call;
 
     protected function setUp(): void
     {
@@ -300,24 +300,21 @@ abstract class ConstraintValidatorTestCase extends TestCase
  */
 class ConstraintViolationAssertion
 {
-    /**
-     * @var ExecutionContextInterface
-     */
-    private $context;
+    private ExecutionContextInterface $context;
 
     /**
      * @var ConstraintViolationAssertion[]
      */
-    private $assertions;
+    private array $assertions;
 
-    private $message;
-    private $parameters = [];
-    private $invalidValue = 'InvalidValue';
-    private $propertyPath = 'property.path';
-    private $plural;
-    private $code;
-    private $constraint;
-    private $cause;
+    private string $message;
+    private array $parameters = [];
+    private mixed $invalidValue = 'InvalidValue';
+    private string $propertyPath = 'property.path';
+    private ?int $plural = null;
+    private ?string $code = null;
+    private ?Constraint $constraint;
+    private mixed $cause = null;
 
     public function __construct(ExecutionContextInterface $context, string $message, Constraint $constraint = null, array $assertions = [])
     {
@@ -433,12 +430,12 @@ class ConstraintViolationAssertion
  */
 class AssertingContextualValidator implements ContextualValidatorInterface
 {
-    private $context;
-    private $expectNoValidate = false;
-    private $atPathCalls = -1;
-    private $expectedAtPath = [];
-    private $validateCalls = -1;
-    private $expectedValidate = [];
+    private ExecutionContextInterface $context;
+    private bool $expectNoValidate = false;
+    private int $atPathCalls = -1;
+    private array $expectedAtPath = [];
+    private int $validateCalls = -1;
+    private array $expectedValidate = [];
 
     public function __construct(ExecutionContextInterface $context)
     {

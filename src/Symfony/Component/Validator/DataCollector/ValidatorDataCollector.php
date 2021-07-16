@@ -29,7 +29,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ValidatorDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private $validator;
+    private TraceableValidator $validator;
 
     public function __construct(TraceableValidator $validator)
     {

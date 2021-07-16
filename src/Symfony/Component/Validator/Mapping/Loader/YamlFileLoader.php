@@ -32,10 +32,8 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Caches the used YAML parser.
-     *
-     * @var YamlParser
      */
-    private $yamlParser;
+    private YamlParser $yamlParser;
 
     /**
      * {@inheritdoc}
@@ -132,10 +130,7 @@ class YamlFileLoader extends FileLoader
 
     private function loadClassesFromYaml()
     {
-        if (null === $this->yamlParser) {
-            $this->yamlParser = new YamlParser();
-        }
-
+        $this->yamlParser ??= new YamlParser();
         $this->classes = $this->parseFile($this->file);
 
         if (isset($this->classes['namespaces'])) {

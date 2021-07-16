@@ -37,98 +37,73 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ExecutionContext implements ExecutionContextInterface
 {
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
+    private ValidatorInterface $validator;
 
     /**
      * The root value of the validated object graph.
-     *
-     * @var mixed
      */
-    private $root;
+    private mixed $root;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var string|null
-     */
-    private $translationDomain;
+    private TranslatorInterface $translator;
+    private ?string $translationDomain;
 
     /**
      * The violations generated in the current context.
-     *
-     * @var ConstraintViolationList
      */
-    private $violations;
+    private ConstraintViolationList $violations;
 
     /**
      * The currently validated value.
-     *
-     * @var mixed
      */
-    private $value;
+    private mixed $value = null;
 
     /**
      * The currently validated object.
-     *
-     * @var object|null
      */
-    private $object;
+    private ?object $object = null;
 
     /**
      * The property path leading to the current value.
-     *
-     * @var string
      */
-    private $propertyPath = '';
+    private string $propertyPath = '';
 
     /**
      * The current validation metadata.
-     *
-     * @var MetadataInterface|null
      */
-    private $metadata;
+    private ?MetadataInterface $metadata = null;
 
     /**
      * The currently validated group.
-     *
-     * @var string|null
      */
-    private $group;
+    private ?string $group = null;
 
     /**
      * The currently validated constraint.
-     *
-     * @var Constraint|null
      */
-    private $constraint;
+    private ?Constraint $constraint = null;
 
     /**
      * Stores which objects have been validated in which group.
      *
      * @var bool[][]
      */
-    private $validatedObjects = [];
+    private array $validatedObjects = [];
 
     /**
      * Stores which class constraint has been validated for which object.
      *
      * @var bool[]
      */
-    private $validatedConstraints = [];
+    private array $validatedConstraints = [];
 
     /**
      * Stores which objects have been initialized.
      *
      * @var bool[]
      */
-    private $initializedObjects;
-    private $cachedObjectsRefs;
+    private array $initializedObjects = [];
+
+    private \SplObjectStorage $cachedObjectsRefs;
 
     /**
      * @internal Called by {@link ExecutionContextFactory}. Should not be used in user code.

@@ -21,7 +21,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * @var ConstraintViolationInterface[]
      */
-    private $violations = [];
+    private array $violations = [];
 
     /**
      * Creates a new constraint violation list.

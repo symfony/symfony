@@ -53,7 +53,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * @var \ReflectionMethod[]|\ReflectionProperty[]
      */
-    private $reflMember = [];
+    private array $reflMember = [];
 
     /**
      * @param string $class    The name of the class this member is defined on

@@ -106,10 +106,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      */
     public $traversalStrategy = TraversalStrategy::IMPLICIT;
 
-    /**
-     * @var \ReflectionClass
-     */
-    private $reflClass;
+    private \ReflectionClass $reflClass;
 
     public function __construct(string $class)
     {
@@ -450,11 +447,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      */
     public function getReflectionClass()
     {
-        if (!$this->reflClass) {
-            $this->reflClass = new \ReflectionClass($this->getClassName());
-        }
-
-        return $this->reflClass;
+        return $this->reflClass ??= new \ReflectionClass($this->getClassName());
     }
 
     /**

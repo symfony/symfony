@@ -22,8 +22,8 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  */
 class ContainerConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
-    private $container;
-    private $validators;
+    private ContainerInterface $container;
+    private array $validators;
 
     public function __construct(ContainerInterface $container)
     {

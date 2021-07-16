@@ -724,7 +724,7 @@ class Filesystem
 
     private function toIterable($files): iterable
     {
-        return \is_array($files) || $files instanceof \Traversable ? $files : [$files];
+        return is_iterable($files) ? $files : [$files];
     }
 
     /**

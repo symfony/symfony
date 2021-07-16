@@ -623,7 +623,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getWriteAccessInfo(string $class, string $property, $value): array
     {
-        $useAdderAndRemover = \is_array($value) || $value instanceof \Traversable;
+        $useAdderAndRemover = is_iterable($value);
         $key = str_replace('\\', '.', $class).'..'.$property.'..'.(int) $useAdderAndRemover;
 
         if (isset($this->writePropertyCache[$key])) {

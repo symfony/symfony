@@ -39,8 +39,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected $globals = [];
     protected $parser;
 
-    private $evalTemplate;
-    private $evalParameters;
+    private Storage $evalTemplate;
+    private array $evalParameters;
 
     /**
      * @param HelperInterface[] $helpers An array of helper instances
@@ -139,22 +139,22 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         $view = $this;
         if ($this->evalTemplate instanceof FileStorage) {
             extract($this->evalParameters, \EXTR_SKIP);
-            $this->evalParameters = null;
+            unset($this->evalParameters);
 
             ob_start();
             require $this->evalTemplate;
 
-            $this->evalTemplate = null;
+            unset($this->evalTemplate);
 
             return ob_get_clean();
         } elseif ($this->evalTemplate instanceof StringStorage) {
             extract($this->evalParameters, \EXTR_SKIP);
-            $this->evalParameters = null;
+            unset($this->evalParameters);
 
             ob_start();
             eval('; ?>'.$this->evalTemplate.'<?php ;');
 
-            $this->evalTemplate = null;
+            unset($this->evalTemplate);
 
             return ob_get_clean();
         }

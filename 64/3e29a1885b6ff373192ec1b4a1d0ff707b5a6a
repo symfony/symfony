@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by qurben at 2021-06-29T13:35:54Z
+
+I am not sure if it is possible to create a test for this. `testConsumeRememberMeCookieValid` could test that the value that is passed to the tokenProvider mock is also found in the cookie, but when the mock is called the cookie is not yet set.

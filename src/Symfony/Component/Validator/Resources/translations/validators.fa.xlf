@@ -60,7 +60,7 @@
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable.</source>
-                <target>پرونده خواندنی نمی باشد.</target>
+                <target>پرونده قابل خواندن نیست.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
@@ -385,6 +385,10 @@
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>این مقدار یک شماره شناسایی بین‌المللی اوراق بهادار (ISIN) معتبر نیست.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>این مقدار باید یک عبارت معتبر باشد.</target>
             </trans-unit>
         </body>
     </file>

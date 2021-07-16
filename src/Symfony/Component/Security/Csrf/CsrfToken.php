@@ -18,8 +18,8 @@ namespace Symfony\Component\Security\Csrf;
  */
 class CsrfToken
 {
-    private $id;
-    private $value;
+    private string $id;
+    private string $value;
 
     public function __construct(string $id, ?string $value)
     {

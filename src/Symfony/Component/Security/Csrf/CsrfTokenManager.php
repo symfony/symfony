@@ -26,9 +26,9 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
  */
 class CsrfTokenManager implements CsrfTokenManagerInterface
 {
-    private $generator;
-    private $storage;
-    private $namespace;
+    private TokenGeneratorInterface $generator;
+    private TokenStorageInterface $storage;
+    private \Closure|string $namespace;
 
     /**
      * @param $namespace
@@ -56,8 +56,10 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
 
                 return $superGlobalNamespaceGenerator();
             };
-        } elseif (\is_callable($namespace) || \is_string($namespace)) {
+        } elseif ($namespace instanceof \Closure || \is_string($namespace)) {
             $this->namespace = $namespace;
+        } elseif (\is_callable($namespace)) {
+            $this->namespace = \Closure::fromCallable($namespace);
         } else {
             throw new InvalidArgumentException(sprintf('$namespace must be a string, a callable returning a string, null or an instance of "RequestStack". "%s" given.', get_debug_type($namespace)));
         }

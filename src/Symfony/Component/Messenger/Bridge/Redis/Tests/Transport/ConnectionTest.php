@@ -28,7 +28,7 @@ class ConnectionTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         try {
-            $redis = Connection::fromDsn('redis://localhost/queue');
+            $redis = Connection::fromDsn('redis://localhost/queue?delete_after_ack=true');
             $redis->get();
         } catch (TransportException $e) {
             if (0 === strpos($e->getMessage(), 'ERR unknown command \'X')) {
@@ -61,11 +61,11 @@ class ConnectionTest extends TestCase
     public function testFromDsn()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue'], [
+            new Connection(['stream' => 'queue', 'delete_after_ack' => true], [
                 'host' => 'localhost',
                 'port' => 6379,
             ]),
-            Connection::fromDsn('redis://localhost/queue')
+            Connection::fromDsn('redis://localhost/queue?delete_after_ack=1')
         );
     }
 
@@ -80,33 +80,33 @@ class ConnectionTest extends TestCase
         }, $hosts);
         $dsn = implode(',', $dsn);
 
-        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn));
+        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['delete_after_ack' => true]));
     }
 
     public function testFromDsnOnUnixSocket()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue'], [
+            new Connection(['stream' => 'queue', 'delete_after_ack' => true], [
                 'host' => '/var/run/redis/redis.sock',
                 'port' => 0,
             ], [], $redis = $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis:///var/run/redis/redis.sock', ['stream' => 'queue'], $redis)
+            Connection::fromDsn('redis:///var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis)
         );
     }
 
     public function testFromDsnWithOptions()
     {
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2]),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0')
+            Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2, 'delete_after_ack' => true]),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0&delete_after_ack=1')
         );
     }
 
     public function testFromDsnWithOptionsAndTrailingSlash()
     {
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2]),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0')
+            Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2, 'delete_after_ack' => true]),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0&delete_after_ack=1')
         );
     }
 
@@ -146,32 +146,32 @@ class ConnectionTest extends TestCase
             ->with('tls://127.0.0.1', 6379)
             ->willReturn(null);
 
-        Connection::fromDsn('rediss://127.0.0.1', [], $redis);
+        Connection::fromDsn('rediss://127.0.0.1?delete_after_ack=true', [], $redis);
     }
 
     public function testFromDsnWithQueryOptions()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1'], [
+            new Connection(['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'delete_after_ack' => true], [
                 'host' => 'localhost',
                 'port' => 6379,
             ], [
                 'serializer' => 2,
             ]),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2')
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&delete_after_ack=1')
         );
     }
 
     public function testFromDsnWithMixDsnQueryOptions()
     {
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost/queue/group1?serializer=2', ['consumer' => 'specific-consumer']),
-            Connection::fromDsn('redis://localhost/queue/group1/specific-consumer?serializer=2')
+            Connection::fromDsn('redis://localhost/queue/group1?serializer=2', ['consumer' => 'specific-consumer', 'delete_after_ack' => true]),
+            Connection::fromDsn('redis://localhost/queue/group1/specific-consumer?serializer=2&delete_after_ack=1')
         );
 
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['consumer' => 'specific-consumer']),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1')
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['consumer' => 'specific-consumer', 'delete_after_ack' => true]),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?delete_after_ack=1')
         );
     }
 
@@ -200,7 +200,7 @@ class ConnectionTest extends TestCase
             ->with('symfony', 'consumer', ['queue' => 0], 1, null)
             ->willReturn(['queue' => [['message' => '{"body":"Test","headers":[]}']]]);
 
-        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
         $this->assertNotNull($connection->get());
         $this->assertNotNull($connection->get());
         $this->assertNotNull($connection->get());
@@ -214,7 +214,7 @@ class ConnectionTest extends TestCase
             ->with('password')
             ->willReturn(true);
 
-        Connection::fromDsn('redis://password@localhost/queue', [], $redis);
+        Connection::fromDsn('redis://password@localhost/queue', ['delete_after_ack' => true], $redis);
     }
 
     public function testAuthFromOptions()
@@ -225,7 +225,7 @@ class ConnectionTest extends TestCase
             ->with('password')
             ->willReturn(true);
 
-        Connection::fromDsn('redis://localhost/queue', ['auth' => 'password'], $redis);
+        Connection::fromDsn('redis://localhost/queue', ['auth' => 'password', 'delete_after_ack' => true], $redis);
     }
 
     public function testAuthFromOptionsAndDsn()
@@ -236,7 +236,7 @@ class ConnectionTest extends TestCase
             ->with('password2')
             ->willReturn(true);
 
-        Connection::fromDsn('redis://password1@localhost/queue', ['auth' => 'password2'], $redis);
+        Connection::fromDsn('redis://password1@localhost/queue', ['auth' => 'password2', 'delete_after_ack' => true], $redis);
     }
 
     public function testNoAuthWithEmptyPassword()
@@ -247,7 +247,7 @@ class ConnectionTest extends TestCase
             ->with('')
             ->willThrowException(new \RuntimeException());
 
-        Connection::fromDsn('redis://@localhost/queue', [], $redis);
+        Connection::fromDsn('redis://@localhost/queue', ['delete_after_ack' => true], $redis);
     }
 
     public function testAuthZeroPassword()
@@ -258,7 +258,7 @@ class ConnectionTest extends TestCase
             ->with('0')
             ->willReturn(true);
 
-        Connection::fromDsn('redis://0@localhost/queue', [], $redis);
+        Connection::fromDsn('redis://0@localhost/queue', ['delete_after_ack' => true], $redis);
     }
 
     public function testFailedAuth()
@@ -271,14 +271,14 @@ class ConnectionTest extends TestCase
             ->with('password')
             ->willReturn(false);
 
-        Connection::fromDsn('redis://password@localhost/queue', [], $redis);
+        Connection::fromDsn('redis://password@localhost/queue', ['delete_after_ack' => true], $redis);
     }
 
     public function testDbIndex()
     {
         $redis = new \Redis();
 
-        Connection::fromDsn('redis://localhost/queue?dbindex=2', [], $redis);
+        Connection::fromDsn('redis://localhost/queue?dbindex=2', ['delete_after_ack' => true], $redis);
 
         $this->assertSame(2, $redis->getDbNum());
     }
@@ -291,7 +291,7 @@ class ConnectionTest extends TestCase
             ->with('symfony', 'consumer', ['queue' => '0'], 1, null)
             ->willReturn(['queue' => [['message' => '{"body":"1","headers":[]}']]]);
 
-        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
         $connection->get();
     }
 
@@ -317,7 +317,7 @@ class ConnectionTest extends TestCase
             ->with('queue', 'symfony', 'consumer', 3600000, ['redisid-123'], ['JUSTID'])
             ->willReturn([]);
 
-        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
         $connection->get();
     }
 
@@ -345,7 +345,7 @@ class ConnectionTest extends TestCase
             ->with('queue', 'symfony', 'consumer', 3600000, ['redisid-123'], ['JUSTID'])
             ->willReturn([]);
 
-        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
         $connection->get();
     }
 
@@ -357,14 +357,14 @@ class ConnectionTest extends TestCase
         $redis->expects($this->once())->method('xreadgroup')->willReturn(false);
         $redis->expects($this->once())->method('getLastError')->willReturn('Redis error happens');
 
-        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false, 'delete_after_ack' => true], $redis);
         $connection->get();
     }
 
     public function testGetAfterReject()
     {
         $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true], $redis);
 
         $connection->add('1', []);
         $connection->add('2', []);
@@ -372,7 +372,7 @@ class ConnectionTest extends TestCase
         $failing = $connection->get();
         $connection->reject($failing['id']);
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget');
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true]);
         $this->assertNotNull($connection->get());
 
         $redis->del('messenger-rejectthenget');
@@ -382,7 +382,7 @@ class ConnectionTest extends TestCase
     {
         $redis = new \Redis();
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['delete_after_ack' => true], $redis);
 
         $this->assertNull($connection->get()); // no message, should return null immediately
         $connection->add('1', []);
@@ -394,7 +394,7 @@ class ConnectionTest extends TestCase
     public function testJsonError()
     {
         $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/json-error', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/json-error', ['delete_after_ack' => true], $redis);
         try {
             $connection->add("\xB1\x31", []);
         } catch (TransportException $e) {
@@ -411,7 +411,7 @@ class ConnectionTest extends TestCase
             ->with('queue', '*', ['message' => '{"body":"1","headers":[]}'], 20000, true)
             ->willReturn(1);
 
-        $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000', [], $redis); // 1 = always
+        $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000', ['delete_after_ack' => true], $redis);
         $connection->add('1', []);
     }
 
@@ -426,8 +426,18 @@ class ConnectionTest extends TestCase
             ->with('queue', ['1'])
             ->willReturn(1);
 
-        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_ack=true', [], $redis); // 1 = always
+        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_ack=true', [], $redis);
         $connection->ack('1');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyOmitDeleteAfterAck()
+    {
+        $this->expectDeprecation('Since symfony/redis-messenger 5.4: Not setting the "delete_after_ack" boolean option explicitly is deprecated, its default value will change to true in 6.0.');
+
+        Connection::fromDsn('redis://localhost/queue');
     }
 
     public function testDeleteAfterReject()
@@ -441,7 +451,7 @@ class ConnectionTest extends TestCase
             ->with('queue', ['1'])
             ->willReturn(1);
 
-        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_reject=true', [], $redis); // 1 = always
+        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_reject=true', ['delete_after_ack' => true], $redis);
         $connection->reject('1');
     }
 
@@ -455,7 +465,7 @@ class ConnectionTest extends TestCase
         $redis->method('getLastError')->willReturnOnConsecutiveCalls('xadd error', 'xack error');
         $redis->expects($this->exactly(2))->method('clearLastError');
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-clearlasterror', ['auto_setup' => false], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-clearlasterror', ['auto_setup' => false, 'delete_after_ack' => true], $redis);
 
         try {
             $connection->add('message', []);
@@ -475,7 +485,7 @@ class ConnectionTest extends TestCase
     public function testLazy()
     {
         $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', ['delete_after_ack' => true], $redis);
 
         $connection->add('1', []);
         $this->assertNotEmpty($message = $connection->get());
@@ -490,7 +500,8 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection(
             ['lazy' => true],
-            ['host' => explode(' ', getenv('REDIS_CLUSTER_HOSTS'))]
+            ['host' => explode(' ', getenv('REDIS_CLUSTER_HOSTS'))],
+            ['delete_after_ack' => true]
         );
 
         $connection->add('1', []);

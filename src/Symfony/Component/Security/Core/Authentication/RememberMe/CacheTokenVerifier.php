@@ -32,6 +32,7 @@ class CacheTokenVerifier implements TokenVerifierInterface
     {
         $this->cache = $cache;
         $this->outdatedTokenTtl = $outdatedTokenTtl;
+        $this->cacheKeyPrefix = $cacheKeyPrefix;
     }
 
     /**

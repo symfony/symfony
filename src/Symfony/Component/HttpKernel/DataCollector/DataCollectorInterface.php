@@ -29,8 +29,6 @@ interface DataCollectorInterface extends ResetInterface
 
     /**
      * Returns the name of the collector.
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 }

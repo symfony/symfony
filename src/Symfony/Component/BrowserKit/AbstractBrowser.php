@@ -403,11 +403,9 @@ abstract class AbstractBrowser
     /**
      * Makes a request in another process.
      *
-     * @return object
-     *
      * @throws \RuntimeException When processing returns exit code
      */
-    protected function doRequestInProcess(object $request)
+    protected function doRequestInProcess(object $request): object
     {
         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
         putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$deprecationsFile);
@@ -437,10 +435,8 @@ abstract class AbstractBrowser
 
     /**
      * Makes a request.
-     *
-     * @return object
      */
-    abstract protected function doRequest(object $request);
+    abstract protected function doRequest(object $request): object;
 
     /**
      * Returns the script to execute when the request must be insulated.
@@ -456,20 +452,16 @@ abstract class AbstractBrowser
 
     /**
      * Filters the BrowserKit request to the origin one.
-     *
-     * @return object
      */
-    protected function filterRequest(Request $request)
+    protected function filterRequest(Request $request): object
     {
         return $request;
     }
 
     /**
      * Filters the origin response to the BrowserKit one.
-     *
-     * @return Response
      */
-    protected function filterResponse(object $response)
+    protected function filterResponse(object $response): Response
     {
         return $response;
     }

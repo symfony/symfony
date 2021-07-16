@@ -48,11 +48,9 @@ interface ContainerInterface extends PsrContainerInterface
     public function initialized(string $id): bool;
 
     /**
-     * @return array|bool|string|int|float|null
-     *
      * @throws InvalidArgumentException if the parameter is not defined
      */
-    public function getParameter(string $name);
+    public function getParameter(string $name): array|bool|string|int|float|null;
 
     public function hasParameter(string $name): bool;
 

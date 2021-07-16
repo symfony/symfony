@@ -29,8 +29,6 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  *
  * @see UserInterface
  *
- * @method UserInterface loadUserByIdentifier(string $identifier)
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface UserProviderInterface
@@ -43,19 +41,15 @@ interface UserProviderInterface
      * object can just be merged into some internal array of users / identity
      * map.
      *
-     * @return UserInterface
-     *
      * @throws UnsupportedUserException if the user is not supported
      * @throws UserNotFoundException    if the user is not found
      */
-    public function refreshUser(UserInterface $user);
+    public function refreshUser(UserInterface $user): UserInterface;
 
     /**
      * Whether this provider supports the given user class.
-     *
-     * @return bool
      */
-    public function supportsClass(string $class);
+    public function supportsClass(string $class): bool;
 
     /**
      * Loads the user for the given user identifier (e.g. username or email).

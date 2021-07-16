@@ -127,8 +127,6 @@ interface FormRendererEngineInterface
      * @param FormView $view      The view to render
      * @param mixed    $resource  The renderer resource
      * @param array    $variables The variables to pass to the template
-     *
-     * @return string
      */
-    public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []);
+    public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []): string;
 }

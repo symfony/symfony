@@ -230,11 +230,9 @@ abstract class Constraint
      *
      * Override this method to define a default option.
      *
-     * @return string|null
-     *
      * @see __construct()
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return null;
     }
@@ -248,7 +246,7 @@ abstract class Constraint
      *
      * @see __construct()
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return [];
     }
@@ -259,10 +257,8 @@ abstract class Constraint
      * By default, this is the fully qualified name of the constraint class
      * suffixed with "Validator". You can override this method to change that
      * behavior.
-     *
-     * @return string
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return static::class.'Validator';
     }
@@ -276,7 +272,7 @@ abstract class Constraint
      *
      * @return string|string[] One or more constant values
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }

@@ -442,10 +442,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param bool          $catch Whether to catch exceptions or not
      * @param Response|null $entry A Response instance (the stale entry if present, null otherwise)
-     *
-     * @return Response
      */
-    protected function forward(Request $request, bool $catch = false, Response $entry = null)
+    protected function forward(Request $request, bool $catch = false, Response $entry = null): Response
     {
         if ($this->surrogate) {
             $this->surrogate->addSurrogateCapability($request);

@@ -180,7 +180,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getRouteCollection()
+    public function getRouteCollection(): RouteCollection
     {
         if (null === $this->collection) {
             $this->collection = $this->loader->load($this->resource, $this->options['resource_type']);

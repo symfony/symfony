@@ -23,11 +23,9 @@ interface TokenProviderInterface
     /**
      * Loads the active token for the given series.
      *
-     * @return PersistentTokenInterface
-     *
      * @throws TokenNotFoundException if the token is not found
      */
-    public function loadTokenBySeries(string $series);
+    public function loadTokenBySeries(string $series): PersistentTokenInterface;
 
     /**
      * Deletes all tokens belonging to series.

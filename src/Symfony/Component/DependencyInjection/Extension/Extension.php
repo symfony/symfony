@@ -31,7 +31,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     /**
      * {@inheritdoc}
      */
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|false
     {
         return false;
     }
@@ -39,7 +39,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     /**
      * {@inheritdoc}
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return 'http://example.org/schema/dic/'.$this->getAlias();
     }
@@ -76,7 +76,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     /**
      * {@inheritdoc}
      */
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
         $class = static::class;
 

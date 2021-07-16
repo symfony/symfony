@@ -165,10 +165,8 @@ class Command
      *
      * Override this to check for x or y and return false if the command can not
      * run properly under the current conditions.
-     *
-     * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return true;
     }
@@ -194,7 +192,7 @@ class Command
      *
      * @see setCode()
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         throw new LogicException('You must override the execute() method in the concrete command class.');
     }

@@ -213,7 +213,7 @@ class Application implements ResetInterface
      *
      * @return int 0 if everything went fine, or an error code
      */
-    public function doRun(InputInterface $input, OutputInterface $output)
+    public function doRun(InputInterface $input, OutputInterface $output): int
     {
         if (true === $input->hasParameterOption(['--version', '-V'], true)) {
             $output->writeln($this->getLongVersion());
@@ -420,10 +420,8 @@ class Application implements ResetInterface
 
     /**
      * Returns the long version of the application.
-     *
-     * @return string
      */
-    public function getLongVersion()
+    public function getLongVersion(): string
     {
         if ('UNKNOWN' !== $this->getName()) {
             if ('UNKNOWN' !== $this->getVersion()) {
@@ -463,10 +461,8 @@ class Application implements ResetInterface
      *
      * If a command with the same name already exists, it will be overridden.
      * If the command is not enabled it will not be added.
-     *
-     * @return Command|null
      */
-    public function add(Command $command)
+    public function add(Command $command): ?Command
     {
         $this->init();
 
@@ -499,11 +495,9 @@ class Application implements ResetInterface
     /**
      * Returns a registered command by name or alias.
      *
-     * @return Command
-     *
      * @throws CommandNotFoundException When given command name does not exist
      */
-    public function get(string $name)
+    public function get(string $name): Command
     {
         $this->init();
 
@@ -606,11 +600,9 @@ class Application implements ResetInterface
      * Contrary to get, this command tries to find the best
      * match if you give it an abbreviation of a name or alias.
      *
-     * @return Command
-     *
      * @throws CommandNotFoundException When command name is incorrect or ambiguous
      */
-    public function find(string $name)
+    public function find(string $name): Command
     {
         $this->init();
 
@@ -720,7 +712,7 @@ class Application implements ResetInterface
      *
      * @return Command[]
      */
-    public function all(string $namespace = null)
+    public function all(string $namespace = null): array
     {
         $this->init();
 
@@ -919,7 +911,7 @@ class Application implements ResetInterface
      *
      * @return int 0 if everything went fine, or an error code
      */
-    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
         foreach ($command->getHelperSet() as $helper) {
             if ($helper instanceof InputAwareInterface) {

@@ -483,7 +483,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setNormalizer(string $option, \Closure $normalizer)
+    public function setNormalizer(string $option, \Closure $normalizer): static
     {
         if ($this->locked) {
             throw new AccessException('Normalizers cannot be set from a lazy option or normalizer.');
@@ -567,7 +567,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setAllowedValues(string $option, mixed $allowedValues)
+    public function setAllowedValues(string $option, mixed $allowedValues): static
     {
         if ($this->locked) {
             throw new AccessException('Allowed values cannot be set from a lazy option or normalizer.');
@@ -607,7 +607,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function addAllowedValues(string $option, mixed $allowedValues)
+    public function addAllowedValues(string $option, mixed $allowedValues): static
     {
         if ($this->locked) {
             throw new AccessException('Allowed values cannot be added from a lazy option or normalizer.');
@@ -647,7 +647,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setAllowedTypes(string $option, string|array $allowedTypes)
+    public function setAllowedTypes(string $option, string|array $allowedTypes): static
     {
         if ($this->locked) {
             throw new AccessException('Allowed types cannot be set from a lazy option or normalizer.');
@@ -681,7 +681,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function addAllowedTypes(string $option, string|array $allowedTypes)
+    public function addAllowedTypes(string $option, string|array $allowedTypes): static
     {
         if ($this->locked) {
             throw new AccessException('Allowed types cannot be added from a lazy option or normalizer.');

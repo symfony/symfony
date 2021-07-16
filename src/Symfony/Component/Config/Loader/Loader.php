@@ -46,10 +46,8 @@ abstract class Loader implements LoaderInterface
 
     /**
      * Imports a resource.
-     *
-     * @return mixed
      */
-    public function import(mixed $resource, string $type = null)
+    public function import(mixed $resource, string $type = null): mixed
     {
         return $this->resolve($resource, $type)->load($resource, $type);
     }

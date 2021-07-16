@@ -57,10 +57,8 @@ class HttpKernelBrowser extends AbstractBrowser
      * {@inheritdoc}
      *
      * @param Request $request
-     *
-     * @return Response
      */
-    protected function doRequest(object $request)
+    protected function doRequest(object $request): Response
     {
         $response = $this->kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, $this->catchExceptions);
 
@@ -75,10 +73,8 @@ class HttpKernelBrowser extends AbstractBrowser
      * {@inheritdoc}
      *
      * @param Request $request
-     *
-     * @return string
      */
-    protected function getScript(object $request)
+    protected function getScript(object $request): string
     {
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);

@@ -73,15 +73,11 @@ interface FormTypeInterface
      *
      * The block prefix defaults to the underscored short class name with
      * the "Type" suffix removed (e.g. "UserProfileType" => "user_profile").
-     *
-     * @return string
      */
-    public function getBlockPrefix();
+    public function getBlockPrefix(): string;
 
     /**
      * Returns the name of the parent type.
-     *
-     * @return string|null
      */
-    public function getParent();
+    public function getParent(): ?string;
 }

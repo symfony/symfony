@@ -103,11 +103,9 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a parameter.
      *
-     * @return array|bool|string|int|float|null
-     *
      * @throws InvalidArgumentException if the parameter is not defined
      */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|string|int|float|null
     {
         return $this->parameterBag->get($name);
     }

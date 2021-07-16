@@ -76,10 +76,8 @@ class AuthenticationException extends RuntimeException
 
     /**
      * Message key to be used by the translation component.
-     *
-     * @return string
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'An authentication exception occurred.';
     }

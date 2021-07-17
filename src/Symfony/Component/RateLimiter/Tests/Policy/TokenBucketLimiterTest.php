@@ -17,6 +17,7 @@ use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\Policy\Rate;
 use Symfony\Component\RateLimiter\Policy\TokenBucket;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
 
@@ -34,6 +35,7 @@ class TokenBucketLimiterTest extends TestCase
         ClockMock::register(TokenBucketLimiter::class);
         ClockMock::register(InMemoryStorage::class);
         ClockMock::register(TokenBucket::class);
+        ClockMock::register(RateLimit::class);
     }
 
     public function testReserve()
@@ -87,6 +89,20 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertEquals(0, $rateLimit->getRemainingTokens());
         $this->assertEqualsWithDelta(time(), $rateLimit->getRetryAfter()->getTimestamp(), 1);
         $this->assertSame(10, $rateLimit->getLimit());
+    }
+
+    public function testWaitIntervalOnConsumeOverLimit()
+    {
+        $limiter = $this->createLimiter();
+
+        // initial consume
+        $limiter->consume(8);
+        // consumer over the limit
+        $rateLimit = $limiter->consume(4);
+
+        $start = microtime(true);
+        $rateLimit->wait(); // wait 1 second
+        $this->assertEqualsWithDelta($start + 1, microtime(true), 0.5);
     }
 
     public function testWrongWindowFromCache()

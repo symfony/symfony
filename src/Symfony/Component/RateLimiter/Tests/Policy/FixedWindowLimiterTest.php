@@ -14,6 +14,7 @@ namespace Symfony\Component\RateLimiter\Tests\Policy;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
+use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
 
@@ -29,6 +30,7 @@ class FixedWindowLimiterTest extends TestCase
         $this->storage = new InMemoryStorage();
 
         ClockMock::register(InMemoryStorage::class);
+        ClockMock::register(RateLimit::class);
     }
 
     public function testConsume()
@@ -63,6 +65,20 @@ class FixedWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(10);
         $this->assertEquals(0, $rateLimit->getRemainingTokens());
         $this->assertTrue($rateLimit->isAccepted());
+    }
+
+    public function testWaitIntervalOnConsumeOverLimit()
+    {
+        $limiter = $this->createLimiter();
+
+        // initial consume
+        $limiter->consume(8);
+        // consumer over the limit
+        $rateLimit = $limiter->consume(4);
+
+        $start = microtime(true);
+        $rateLimit->wait(); // wait 1 minute
+        $this->assertEqualsWithDelta($start + 60, microtime(true), 0.5);
     }
 
     public function testWrongWindowFromCache()

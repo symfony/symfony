@@ -374,7 +374,7 @@ class QuestionHelper extends Helper
         }
 
         $choices = explode(',', $entered);
-        if (\strlen($lastChoice = trim($choices[\count($choices) - 1])) > 0) {
+        if ('' !== $lastChoice = trim($choices[\count($choices) - 1])) {
             return $lastChoice;
         }
 

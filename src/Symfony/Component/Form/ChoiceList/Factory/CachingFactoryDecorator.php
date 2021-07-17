@@ -81,13 +81,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
 
     /**
      * {@inheritdoc}
-     *
-     * @param callable|string|Cache\ChoiceValue|null  $value  The callable or static option for
-     *                                                        generating the choice values
-     * @param callable|string|Cache\ChoiceFilter|null $filter The callable or static option for
-     *                                                        filtering the choices
      */
-    public function createListFromChoices(iterable $choices, callable|string|Cache\ChoiceValue $value = null, callable|string|Cache\ChoiceFilter $filter = null)
+    public function createListFromChoices(iterable $choices, mixed $value = null, mixed $filter = null)
     {
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
@@ -122,15 +117,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
 
     /**
      * {@inheritdoc}
-     *
-     * @param ChoiceLoaderInterface|Cache\ChoiceLoader $loader The loader or static loader to load
-     *                                                         the choices lazily
-     * @param callable|string|Cache\ChoiceValue|null   $value  The callable or static option for
-     *                                                         generating the choice values
-     * @param callable|string|Cache\ChoiceFilter|null  $filter The callable or static option for
-     *                                                         filtering the choices
      */
-    public function createListFromLoader(ChoiceLoaderInterface|Cache\ChoiceLoader $loader, callable|string|Cache\ChoiceValue $value = null, callable|string|Cache\ChoiceFilter $filter = null)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, mixed $value = null, mixed $filter = null)
     {
         $cache = true;
 
@@ -167,15 +155,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
 
     /**
      * {@inheritdoc}
-     *
-     * @param array|callable|string|Cache\PreferredChoice|null        $preferredChoices           The preferred choices
-     * @param callable|false|string|Cache\ChoiceLabel|null            $label                      The option or static option generating the choice labels
-     * @param callable|string|Cache\ChoiceFieldName|null              $index                      The option or static option generating the view indices
-     * @param callable|string|Cache\GroupBy|null                      $groupBy                    The option or static option generating the group names
-     * @param array|callable|string|Cache\ChoiceAttr|null             $attr                       The option or static option generating the HTML attributes
-     * @param array|callable|string|Cache\ChoiceTranslationParameters $labelTranslationParameters The parameters used to translate the choice labels
      */
-    public function createView(ChoiceListInterface $list, array|callable|string|Cache\PreferredChoice $preferredChoices = null, callable|false|string|Cache\ChoiceLabel $label = null, callable|string|Cache\ChoiceFieldName $index = null, callable|string|Cache\GroupBy $groupBy = null, array|callable|string|Cache\ChoiceAttr $attr = null, array|callable|string|Cache\ChoiceTranslationParameters $labelTranslationParameters = [])
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [])
     {
         $cache = true;
 

@@ -696,7 +696,7 @@ class Filesystem
 
     private function toIterable(string|iterable $files): iterable
     {
-        return \is_string($files) ? [$files] : $files;
+        return is_iterable($files) ? $files : [$files];
     }
 
     /**

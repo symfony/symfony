@@ -21,7 +21,7 @@ class FileTypeFilterIterator extends \FilterIterator
     public const ONLY_FILES = 1;
     public const ONLY_DIRECTORIES = 2;
 
-    private $mode;
+    private int $mode;
 
     /**
      * @param \Iterator $iterator The Iterator to filter

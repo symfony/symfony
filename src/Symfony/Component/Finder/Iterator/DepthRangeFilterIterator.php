@@ -18,7 +18,7 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class DepthRangeFilterIterator extends \FilterIterator
 {
-    private $minDepth = 0;
+    private int $minDepth = 0;
 
     /**
      * @param \RecursiveIteratorIterator $iterator The Iterator to filter

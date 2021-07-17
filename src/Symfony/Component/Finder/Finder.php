@@ -43,27 +43,27 @@ class Finder implements \IteratorAggregate, \Countable
     public const IGNORE_DOT_FILES = 2;
     public const IGNORE_VCS_IGNORED_FILES = 4;
 
-    private $mode = 0;
-    private $names = [];
-    private $notNames = [];
-    private $exclude = [];
-    private $filters = [];
-    private $depths = [];
-    private $sizes = [];
-    private $followLinks = false;
-    private $reverseSorting = false;
-    private $sort = false;
-    private $ignore = 0;
-    private $dirs = [];
-    private $dates = [];
-    private $iterators = [];
-    private $contains = [];
-    private $notContains = [];
-    private $paths = [];
-    private $notPaths = [];
-    private $ignoreUnreadableDirs = false;
+    private int $mode = 0;
+    private array $names = [];
+    private array $notNames = [];
+    private array $exclude = [];
+    private array $filters = [];
+    private array $depths = [];
+    private array $sizes = [];
+    private bool $followLinks = false;
+    private bool $reverseSorting = false;
+    private \Closure|int|false $sort = false;
+    private int $ignore = 0;
+    private array $dirs = [];
+    private array $dates = [];
+    private array $iterators = [];
+    private array $contains = [];
+    private array $notContains = [];
+    private array $paths = [];
+    private array $notPaths = [];
+    private bool $ignoreUnreadableDirs = false;
 
-    private static $vcsPatterns = ['.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg'];
+    private static array $vcsPatterns = ['.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg'];
 
     public function __construct()
     {

@@ -21,20 +21,13 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 {
-    /**
-     * @var bool
-     */
-    private $ignoreUnreadableDirs;
-
-    /**
-     * @var bool
-     */
-    private $rewindable;
+    private bool $ignoreUnreadableDirs;
+    private ?bool $rewindable = null;
 
     // these 3 properties take part of the performance optimization to avoid redoing the same work in all iterations
-    private $rootPath;
-    private $subPath;
-    private $directorySeparator = '/';
+    private string $rootPath;
+    private string $subPath;
+    private string $directorySeparator = '/';
 
     /**
      * @throws \RuntimeException
@@ -63,9 +56,10 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     {
         // the logic here avoids redoing the same work in all iterations
 
-        if (null === $subPathname = $this->subPath) {
-            $subPathname = $this->subPath = (string) $this->getSubPath();
+        if (!isset($this->subPath)) {
+            $this->subPath = (string) $this->getSubPath();
         }
+        $subPathname = $this->subPath;
         if ('' !== $subPathname) {
             $subPathname .= $this->directorySeparator;
         }

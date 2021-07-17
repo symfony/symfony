@@ -153,7 +153,7 @@ class ExecutionContext implements ExecutionContextInterface
         $this->value = $value;
         $this->object = $object;
         $this->metadata = $metadata;
-        $this->propertyPath = (string) $propertyPath;
+        $this->propertyPath = $propertyPath;
     }
 
     /**

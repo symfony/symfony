@@ -198,6 +198,6 @@ class XliffFileDumper extends FileDumper
 
     private function hasMetadataArrayInfo(string $key, array $metadata = null): bool
     {
-        return null !== $metadata && \array_key_exists($key, $metadata) && ($metadata[$key] instanceof \Traversable || \is_array($metadata[$key]));
+        return is_iterable($metadata[$key] ?? null);
     }
 }

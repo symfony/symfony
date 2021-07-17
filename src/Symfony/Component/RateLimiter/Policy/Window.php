@@ -80,15 +80,4 @@ final class Window implements LimiterStateInterface
 
         return $this->maxSize - $this->hitCount;
     }
-
-    public function calculateTimeForTokens(int $tokens): int
-    {
-        if (($this->maxSize - $this->hitCount) >= $tokens) {
-            return 0;
-        }
-
-        $cyclesRequired = ceil($tokens / $this->maxSize);
-
-        return $cyclesRequired * $this->intervalInSeconds;
-    }
 }

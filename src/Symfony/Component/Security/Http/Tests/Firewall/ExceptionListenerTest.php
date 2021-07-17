@@ -99,7 +99,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertNull($event->getResponse());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
+        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -122,7 +122,7 @@ class ExceptionListenerTest extends TestCase
 
         $this->assertEquals('Unauthorized', $event->getResponse()->getContent());
         $this->assertEquals(401, $event->getResponse()->getStatusCode());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
+        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -139,7 +139,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertEquals('error', $event->getResponse()->getContent());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
+        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -156,7 +156,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertEquals('OK', $event->getResponse()->getContent());
-        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getThrowable()->getPrevious());
+        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     public function testLogoutException()

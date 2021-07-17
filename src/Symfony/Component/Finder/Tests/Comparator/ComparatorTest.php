@@ -19,16 +19,17 @@ class ComparatorTest extends TestCase
     public function testGetSetOperator()
     {
         $comparator = new Comparator();
-        try {
-            $comparator->setOperator('foo');
-            $this->fail('->setOperator() throws an \InvalidArgumentException if the operator is not valid.');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->setOperator() throws an \InvalidArgumentException if the operator is not valid.');
-        }
-
-        $comparator = new Comparator();
         $comparator->setOperator('>');
         $this->assertEquals('>', $comparator->getOperator(), '->getOperator() returns the current operator');
+    }
+
+    public function testInvalidOperator()
+    {
+        $comparator = new Comparator();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid operator "foo".');
+        $comparator->setOperator('foo');
     }
 
     public function testGetSetTarget()
@@ -39,27 +40,55 @@ class ComparatorTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestData
+     * @dataProvider provideMatches
      */
-    public function testTest($operator, $target, $match, $noMatch)
+    public function testTestSucceeds(string $operator, string $target, string $testedValue)
     {
         $c = new Comparator();
         $c->setOperator($operator);
         $c->setTarget($target);
 
-        foreach ($match as $m) {
-            $this->assertTrue($c->test($m), '->test() tests a string against the expression');
-        }
-
-        foreach ($noMatch as $m) {
-            $this->assertFalse($c->test($m), '->test() tests a string against the expression');
-        }
+        $this->assertTrue($c->test($testedValue));
     }
 
-    public function getTestData()
+    public function provideMatches(): array
     {
         return [
-            ['<', '1000', ['500', '999'], ['1000', '1500']],
+            ['<', '1000', '500'],
+            ['<', '1000', '999'],
+            ['<=', '1000', '999'],
+            ['!=', '1000', '999'],
+            ['<=', '1000', '1000'],
+            ['==', '1000', '1000'],
+            ['>=', '1000', '1000'],
+            ['>=', '1000', '1001'],
+            ['>', '1000', '1001'],
+            ['>', '1000', '5000'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideNonMatches
+     */
+    public function testTestFails(string $operator, string $target, string $testedValue)
+    {
+        $c = new Comparator();
+        $c->setOperator($operator);
+        $c->setTarget($target);
+
+        $this->assertFalse($c->test($testedValue));
+    }
+
+    public function provideNonMatches(): array
+    {
+        return [
+            ['>', '1000', '500'],
+            ['>=', '1000', '500'],
+            ['>', '1000', '1000'],
+            ['!=', '1000', '1000'],
+            ['<', '1000', '1000'],
+            ['<', '1000', '1500'],
+            ['<=', '1000', '1500'],
         ];
     }
 }

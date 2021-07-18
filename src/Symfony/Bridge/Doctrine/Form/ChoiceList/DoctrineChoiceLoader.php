@@ -91,9 +91,18 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
             trigger_deprecation('symfony/doctrine-bridge', '5.1', 'Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "%s" or define the "choice_value" option instead.', __CLASS__);
         }
 
+        $idReader = null;
+        if (\is_array($value) && $value[0] instanceof IdReader) {
+            $idReader = $value[0];
+        } elseif ($value instanceof \Closure && ($rThis = (new \ReflectionFunction($value))->getClosureThis()) instanceof IdReader) {
+            $idReader = $rThis;
+        } elseif ($legacy) {
+            $idReader = $this->idReader;
+        }
+
         // Optimize performance in case we have an object loader and
         // a single-field identifier
-        if (($legacy || \is_array($value) && $this->idReader === $value[0]) && $this->objectLoader) {
+        if ($idReader && $this->objectLoader) {
             $objects = [];
             $objectsById = [];
 
@@ -101,8 +110,8 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
             // An alternative approach to the following loop is to add the
             // "INDEX BY" clause to the Doctrine query in the loader,
             // but I'm not sure whether that's doable in a generic fashion.
-            foreach ($this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values) as $object) {
-                $objectsById[$this->idReader->getIdValue($object)] = $object;
+            foreach ($this->objectLoader->getEntitiesByIds($idReader->getIdField(), $values) as $object) {
+                $objectsById[$idReader->getIdValue($object)] = $object;
             }
 
             foreach ($values as $i => $id) {

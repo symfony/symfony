@@ -28,6 +28,7 @@
             <directory>./src/Symfony/Bridge/*/Tests/</directory>
             <directory>./src/Symfony/Component/*/Tests/</directory>
             <directory>./src/Symfony/Component/*/*/Tests/</directory>
+            <directory>./src/Symfony/Component/*/*/*/Tests/</directory>
             <directory>./src/Symfony/Contract/*/Tests/</directory>
             <directory>./src/Symfony/Bundle/*/Tests/</directory>
         </testsuite>

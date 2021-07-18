@@ -153,7 +153,7 @@ class HtmlDumper extends CliDumper
      */
     protected function getDumpHeader()
     {
-        $this->headerIsDumped = null !== $this->outputStream ? $this->outputStream : $this->lineDumper;
+        $this->headerIsDumped = $this->outputStream ?? $this->lineDumper;
 
         if (null !== $this->dumpHeader) {
             return $this->dumpHeader;
@@ -964,7 +964,7 @@ EOHTML
         if (-1 === $this->lastDepth) {
             $this->line = sprintf($this->dumpPrefix, $this->dumpId, $this->indentPad).$this->line;
         }
-        if ($this->headerIsDumped !== (null !== $this->outputStream ? $this->outputStream : $this->lineDumper)) {
+        if ($this->headerIsDumped !== ($this->outputStream ?? $this->lineDumper)) {
             $this->line = $this->getDumpHeader().$this->line;
         }
 

@@ -58,7 +58,7 @@ class RememberMeListener extends AbstractListener implements ListenerInterface
         }
 
         $this->catchExceptions = $catchExceptions;
-        $this->sessionStrategy = null === $sessionStrategy ? new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE) : $sessionStrategy;
+        $this->sessionStrategy = $sessionStrategy ?? new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
     }
 
     /**

@@ -384,11 +384,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      */
     public function getPropertyMetadata(string $property)
     {
-        if (!isset($this->members[$property])) {
-            return [];
-        }
-
-        return $this->members[$property];
+        return $this->members[$property] ?? [];
     }
 
     /**

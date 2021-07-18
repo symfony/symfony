@@ -76,20 +76,14 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertEmpty(iterator_to_array($receiver->get()));
     }
 
-    /**
-     * @group legacy
-     * ^ for now, deprecation errors are thrown during serialization.
-     */
     public function testRetryAndDelay()
     {
-        $serializer = $this->createSerializer();
-
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
         $connection->purgeQueues();
 
-        $sender = new AmqpSender($connection, $serializer);
-        $receiver = new AmqpReceiver($connection, $serializer);
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
 
         // send a first message
         $sender->send($first = new Envelope(new DummyMessage('First')));

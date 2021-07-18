@@ -16,8 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0.2",
-        "symfony/deprecation-contracts": "^2.1|^3"
+        "php": ">=8.0.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Finder\\": "" },

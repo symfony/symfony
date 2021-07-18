@@ -274,10 +274,6 @@ EOT
 
         $composerConfig = json_decode(file_get_contents($composerFilePath), true);
 
-        if (isset($composerConfig['extra']['public-dir'])) {
-            return $composerConfig['extra']['public-dir'];
-        }
-
-        return $defaultPublicDir;
+        return $composerConfig['extra']['public-dir'] ?? $defaultPublicDir;
     }
 }

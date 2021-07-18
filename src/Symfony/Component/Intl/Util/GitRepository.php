@@ -95,7 +95,7 @@ final class GitRepository
         exec(sprintf('%s 2>&1', $command), $output, $result);
 
         if (0 !== $result) {
-            throw new RuntimeException(null !== $customErrorMessage ? $customErrorMessage : sprintf('The "%s" command failed.', $command));
+            throw new RuntimeException($customErrorMessage ?? sprintf('The "%s" command failed.', $command));
         }
 
         return $output;

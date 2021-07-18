@@ -1560,7 +1560,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function shareService(Definition $definition, $service, ?string $id, array &$inlineServices)
     {
-        $inlineServices[null !== $id ? $id : spl_object_hash($definition)] = $service;
+        $inlineServices[$id ?? spl_object_hash($definition)] = $service;
 
         if (null !== $id && $definition->isShared()) {
             $this->services[$id] = $service;

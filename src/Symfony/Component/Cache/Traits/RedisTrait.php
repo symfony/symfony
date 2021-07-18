@@ -172,7 +172,7 @@ trait RedisTrait
         if (null === $params['class'] && !isset($params['redis_sentinel']) && \extension_loaded('redis')) {
             $class = $params['redis_cluster'] ? \RedisCluster::class : (1 < \count($hosts) ? \RedisArray::class : \Redis::class);
         } else {
-            $class = null === $params['class'] ? \Predis\Client::class : $params['class'];
+            $class = $params['class'] ?? \Predis\Client::class;
         }
 
         if (is_a($class, \Redis::class, true)) {

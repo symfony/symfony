@@ -144,8 +144,8 @@ abstract class IntlDateFormatter
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'calendar', $calendar, 'Only the GREGORIAN calendar is supported');
         }
 
-        $this->datetype = null !== $datetype ? $datetype : self::FULL;
-        $this->timetype = null !== $timetype ? $timetype : self::FULL;
+        $this->datetype = $datetype ?? self::FULL;
+        $this->timetype = $timetype ?? self::FULL;
 
         if ('' === ($pattern ?? '')) {
             $pattern = $this->getDefaultPattern();

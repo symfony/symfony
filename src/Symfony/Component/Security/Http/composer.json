@@ -31,7 +31,7 @@
         "symfony/routing": "^4.4|^5.0|^6.0",
         "symfony/security-csrf": "^4.4|^5.0|^6.0",
         "symfony/translation": "^4.4|^5.0|^6.0",
-        "psr/log": "~1.0"
+        "psr/log": "^1|^2|^3"
     },
     "conflict": {
         "symfony/event-dispatcher": "<4.3",

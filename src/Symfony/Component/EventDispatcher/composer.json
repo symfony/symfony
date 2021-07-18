@@ -29,7 +29,7 @@
         "symfony/http-foundation": "^4.4|^5.0|^6.0",
         "symfony/service-contracts": "^1.1|^2",
         "symfony/stopwatch": "^4.4|^5.0|^6.0",
-        "psr/log": "~1.0"
+        "psr/log": "^1|^2|^3"
     },
     "conflict": {
         "symfony/dependency-injection": "<4.4"

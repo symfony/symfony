@@ -19,6 +19,11 @@ CHANGELOG
    `$exceptionOnNoToken` argument to `false` of `AuthorizationChecker`
  * Deprecate methods `TokenInterface::isAuthenticated()` and `setAuthenticated`,
    return null from "getUser()" instead when a token is not authenticated
+ * Add `AccessDecisionStrategyInterface` to allow custom access decision strategies
+ * Add access decision strategies `AffirmativeStrategy`, `ConsensusStrategy`, `PriorityStrategy`, `UnanimousStrategy`
+ * Deprecate passing the strategy as string to `AccessDecisionManager`,
+   pass an instance of `AccessDecisionStrategyInterface` instead
+ * Flag `AccessDecisionManager` as `@final`
 
 5.3
 ---

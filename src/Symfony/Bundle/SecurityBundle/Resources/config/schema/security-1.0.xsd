@@ -63,6 +63,7 @@
     <xsd:complexType name="access_decision_manager">
         <xsd:attribute name="strategy" type="access_decision_manager_strategy" />
         <xsd:attribute name="service" type="xsd:string" />
+        <xsd:attribute name="strategy-service" type="xsd:string" />
         <xsd:attribute name="allow-if-all-abstain" type="xsd:boolean" />
         <xsd:attribute name="allow-if-equal-granted-denied" type="xsd:boolean" />
     </xsd:complexType>

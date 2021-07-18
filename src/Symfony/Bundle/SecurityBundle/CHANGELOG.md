@@ -16,6 +16,7 @@ CHANGELOG
    factories instead.
  * Deprecate the `always_authenticate_before_granting` option
  * Display the roles of the logged-in user in the Web Debug Toolbar
+ * Add the `security.access_decision_manager.strategy_service` option
 
 5.3
 ---

@@ -39,6 +39,10 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
+use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
+use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
+use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
@@ -150,12 +154,18 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         if (isset($config['access_decision_manager']['service'])) {
             $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service']);
+        } elseif (isset($config['access_decision_manager']['strategy_service'])) {
+            $container
+                ->getDefinition('security.access.decision_manager')
+                ->addArgument(new Reference($config['access_decision_manager']['strategy_service']));
         } else {
             $container
                 ->getDefinition('security.access.decision_manager')
-                ->addArgument($config['access_decision_manager']['strategy'])
-                ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
-                ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied']);
+                ->addArgument($this->createStrategyDefinition(
+                    $config['access_decision_manager']['strategy'],
+                    $config['access_decision_manager']['allow_if_all_abstain'],
+                    $config['access_decision_manager']['allow_if_equal_granted_denied']
+                ));
         }
 
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
@@ -194,6 +204,25 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $container->registerForAutoconfiguration(VoterInterface::class)
             ->addTag('security.voter');
+    }
+
+    /**
+     * @throws \InvalidArgumentException if the $strategy is invalid
+     */
+    private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition
+    {
+        switch ($strategy) {
+            case MainConfiguration::STRATEGY_AFFIRMATIVE:
+                return new Definition(AffirmativeStrategy::class, [$allowIfAllAbstainDecisions]);
+            case MainConfiguration::STRATEGY_CONSENSUS:
+                return new Definition(ConsensusStrategy::class, [$allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions]);
+            case MainConfiguration::STRATEGY_UNANIMOUS:
+                return new Definition(UnanimousStrategy::class, [$allowIfAllAbstainDecisions]);
+            case MainConfiguration::STRATEGY_PRIORITY:
+                return new Definition(PriorityStrategy::class, [$allowIfAllAbstainDecisions]);
+        }
+
+        throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
     }
 
     private function createRoleHierarchy(array $config, ContainerBuilder $container)

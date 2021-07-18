@@ -60,6 +60,12 @@ EventDispatcher
 
  * Removed `LegacyEventDispatcherProxy`. Use the event dispatcher without the proxy.
 
+Finder
+------
+
+ * Remove `Comparator::setTarget()` and `Comparator::setOperator()`
+ * The `$target` parameter of `Comparator::__construct()` is now mandatory
+
 Form
 ----
 

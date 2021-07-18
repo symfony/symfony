@@ -6,6 +6,12 @@ Cache
 
  * Deprecate `DoctrineProvider` because this class has been added to the `doctrine/cache` package`
 
+Finder
+------
+
+ * Deprecate `Comparator::setTarget()` and `Comparator::setOperator()`
+ * Add a constructor to `Comparator` that allows setting target and operator
+
 FrameworkBundle
 ---------------
 

@@ -14,7 +14,7 @@ require $vendor.'/vendor/autoload.php';
 if (true) {
     class TestLogger extends \Psr\Log\AbstractLogger
     {
-        public function log($level, $message, array $context = [])
+        public function log($level, $message, array $context = []): void
         {
             echo $message, "\n";
         }

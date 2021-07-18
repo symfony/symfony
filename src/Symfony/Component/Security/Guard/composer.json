@@ -21,7 +21,7 @@
         "symfony/security-http": "^4.4.1"
     },
     "require-dev": {
-        "psr/log": "~1.0"
+        "psr/log": "^1|^2|^3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\Guard\\": "" },

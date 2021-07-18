@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\Credentia
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-class Passport implements UserPassportInterface
+class Passport implements UserPassportInterface, AttributedPassportInterface
 {
     use PassportTrait;
 
@@ -60,7 +60,7 @@ class Passport implements UserPassportInterface
     }
 
     /**
-     * @param mixed $value
+     * {@inheritdoc}
      */
     public function setAttribute(string $name, $value): void
     {
@@ -68,9 +68,7 @@ class Passport implements UserPassportInterface
     }
 
     /**
-     * @param mixed $default
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getAttribute(string $name, $default = null)
     {

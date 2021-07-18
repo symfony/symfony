@@ -6,6 +6,7 @@ CHANGELOG
 
  * Deprecate not setting the 5th argument (`$exceptionOnNoToken`) of `AccessListener` to `false`
  * Deprecate `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead
+ * Add `AttributedPassportInterface`
 
 5.3
 ---

@@ -19,5 +19,5 @@ return static function (ContainerConfigurator $container) {
         ->set('encryption.sodium', SodiumEncryption::class)
         ->alias(EncryptionInterface::class, 'encryption.sodium')
         ->alias('encryption', 'encryption.sodium')
-        ;
+    ;
 };

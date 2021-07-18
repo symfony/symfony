@@ -23,7 +23,7 @@
         "php": ">=8.0.2"
     },
     "require-dev": {
-        "psr/log": "~1.0",
+        "psr/log": "^1|^2|^3",
         "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/event-dispatcher": "^5.4|^6.0",
         "symfony/expression-language": "^5.4|^6.0",

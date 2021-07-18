@@ -28,10 +28,10 @@
         "symfony/lock": "^5.4|^6.0",
         "symfony/process": "^5.4|^6.0",
         "symfony/var-dumper": "^5.4|^6.0",
-        "psr/log": "~1.0"
+        "psr/log": "^1|^2"
     },
     "provide": {
-        "psr/log-implementation": "1.0"
+        "psr/log-implementation": "1.0|2.0"
     },
     "suggest": {
         "symfony/event-dispatcher": "",
@@ -40,6 +40,7 @@
         "psr/log": "For using the console logger"
     },
     "conflict": {
+        "psr/log": ">=3",
         "symfony/dependency-injection": "<5.4",
         "symfony/dotenv": "<5.4",
         "symfony/event-dispatcher": "<5.4",

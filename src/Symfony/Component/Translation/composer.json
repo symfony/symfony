@@ -31,7 +31,7 @@
         "symfony/service-contracts": "^1.1.2|^2.0|^3.0",
         "symfony/yaml": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",
-        "psr/log": "~1.0"
+        "psr/log": "^1|^2|^3"
     },
     "conflict": {
         "symfony/config": "<5.4",

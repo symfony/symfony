@@ -32,7 +32,7 @@
         "symfony/ldap": "^5.4|^6.0",
         "symfony/translation": "^5.4|^6.0",
         "symfony/validator": "^5.4|^6.0",
-        "psr/log": "~1.0"
+        "psr/log": "^1|^2|^3"
     },
     "conflict": {
         "symfony/event-dispatcher": "<5.4",

@@ -22,7 +22,7 @@
         "symfony/http-client-contracts": "^1.1|^2.0|^3.0",
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/polyfill-ctype": "^1.8",
-        "psr/log": "~1.0"
+        "psr/log": "^1|^2"
     },
     "require-dev": {
         "symfony/browser-kit": "^5.4|^6.0",
@@ -42,7 +42,7 @@
         "twig/twig": "^2.13|^3.0.4"
     },
     "provide": {
-        "psr/log-implementation": "1.0"
+        "psr/log-implementation": "1.0|2.0"
     },
     "conflict": {
         "symfony/browser-kit": "<5.4",

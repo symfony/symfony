@@ -23,20 +23,17 @@ class_exists(Section::class);
  */
 class Stopwatch implements ResetInterface
 {
-    /**
-     * @var bool
-     */
-    private $morePrecision;
+    private bool $morePrecision;
 
     /**
      * @var Section[]
      */
-    private $sections;
+    private array $sections;
 
     /**
      * @var Section[]
      */
-    private $activeSections;
+    private array $activeSections;
 
     /**
      * @param bool $morePrecision If true, time is stored as float to keep the original microsecond precision

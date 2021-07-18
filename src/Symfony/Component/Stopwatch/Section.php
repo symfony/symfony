@@ -21,27 +21,16 @@ class Section
     /**
      * @var StopwatchEvent[]
      */
-    private $events = [];
+    private array $events = [];
 
-    /**
-     * @var float|null
-     */
-    private $origin;
-
-    /**
-     * @var bool
-     */
-    private $morePrecision;
-
-    /**
-     * @var string
-     */
-    private $id;
+    private ?float $origin;
+    private bool $morePrecision;
+    private ?string $id = null;
 
     /**
      * @var Section[]
      */
-    private $children = [];
+    private array $children = [];
 
     /**
      * @param float|null $origin        Set the origin of the events in this section, use null to set their origin to their start time
@@ -86,7 +75,7 @@ class Section
     }
 
     /**
-     * @return string The identifier of the section
+     * @return string|null The identifier of the section
      */
     public function getId()
     {

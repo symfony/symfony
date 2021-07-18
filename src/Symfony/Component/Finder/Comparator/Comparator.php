@@ -16,7 +16,7 @@ namespace Symfony\Component\Finder\Comparator;
  */
 class Comparator
 {
-    private string $target;
+    private ?string $target;
     private string $operator = '==';
 
     public function __construct(string $target = null, string $operator = '==')

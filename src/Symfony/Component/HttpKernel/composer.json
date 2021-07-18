@@ -24,7 +24,7 @@
         "symfony/polyfill-ctype": "^1.8",
         "symfony/polyfill-php73": "^1.9",
         "symfony/polyfill-php80": "^1.15",
-        "psr/log": "~1.0"
+        "psr/log": "^1|^2"
     },
     "require-dev": {
         "symfony/browser-kit": "^4.3|^5.0",
@@ -45,7 +45,7 @@
         "twig/twig": "^1.43|^2.13|^3.0.4"
     },
     "provide": {
-        "psr/log-implementation": "1.0"
+        "psr/log-implementation": "1.0|2.0"
     },
     "conflict": {
         "symfony/browser-kit": "<4.3",

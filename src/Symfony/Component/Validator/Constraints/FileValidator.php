@@ -60,7 +60,7 @@ class FileValidator extends ConstraintValidator
                         $binaryFormat = $constraint->binaryFormat;
                     } else {
                         $limitInBytes = $iniLimitSize;
-                        $binaryFormat = null === $constraint->binaryFormat ? true : $constraint->binaryFormat;
+                        $binaryFormat = $constraint->binaryFormat ?? true;
                     }
 
                     [, $limitAsString, $suffix] = $this->factorizeSizes(0, $limitInBytes, $binaryFormat);

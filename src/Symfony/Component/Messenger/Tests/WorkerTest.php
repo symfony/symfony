@@ -329,7 +329,7 @@ class DummyReceiver implements ReceiverInterface
     {
         $val = array_shift($this->deliveriesOfEnvelopes);
 
-        return null === $val ? [] : $val;
+        return $val ?? [];
     }
 
     public function ack(Envelope $envelope): void

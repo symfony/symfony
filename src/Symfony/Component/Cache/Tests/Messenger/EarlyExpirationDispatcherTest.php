@@ -12,8 +12,8 @@
 namespace Symfony\Component\Cache\Tests\Messenger;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
-use Psr\Log\Test\TestLogger;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\CacheItem;
@@ -130,5 +130,19 @@ class EarlyExpirationDispatcherTest extends TestCase
             ],
         ];
         $this->assertSame($expected, $logger->records);
+    }
+}
+
+final class TestLogger extends AbstractLogger
+{
+    public $records = [];
+
+    public function log($level, $message, array $context = []): void
+    {
+        $this->records[] = [
+            'level' => $level,
+            'message' => $message,
+            'context' => $context,
+        ];
     }
 }

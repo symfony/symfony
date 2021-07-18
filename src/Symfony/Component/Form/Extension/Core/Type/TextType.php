@@ -62,6 +62,6 @@ class TextType extends AbstractType implements DataTransformerInterface
      */
     public function reverseTransform(mixed $data)
     {
-        return null === $data ? '' : $data;
+        return $data ?? '';
     }
 }

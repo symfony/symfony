@@ -33,13 +33,11 @@ class ComparatorTest extends TestCase
 
     public function testInvalidOperator()
     {
-        $comparator = new Comparator();
-
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid operator "foo".');
-        $comparator->setOperator('foo');
-    }
 
+        new Comparator('some target', 'foo');
+    }
 
     /**
      * @group legacy
@@ -88,9 +86,7 @@ class ComparatorTest extends TestCase
      */
     public function testTestFails(string $operator, string $target, string $testedValue)
     {
-        $c = new Comparator();
-        $c->setOperator($operator);
-        $c->setTarget($target);
+        $c = new Comparator($target, $operator);
 
         $this->assertFalse($c->test($testedValue));
     }

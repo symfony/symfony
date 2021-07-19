@@ -19,6 +19,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -71,6 +72,12 @@ final class MicrosoftTeamsTransport extends AbstractTransport
             'json' => $options,
         ]);
 
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote MicrosoftTeams server.', $response, 0, $e);
+        }
+
         $requestId = $response->getHeaders(false)['request-id'][0] ?? null;
         if (null === $requestId) {
             $originalContent = $message->getSubject();
@@ -78,7 +85,7 @@ final class MicrosoftTeamsTransport extends AbstractTransport
             throw new TransportException(sprintf('Unable to post the Microsoft Teams message: "%s" (request-id not found).', $originalContent), $response);
         }
 
-        if (200 !== $response->getStatusCode()) {
+        if (200 !== $statusCode) {
             $errorMessage = $response->getContent(false);
             $originalContent = $message->getSubject();
 

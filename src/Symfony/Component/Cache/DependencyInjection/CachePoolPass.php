@@ -116,20 +116,20 @@ class CachePoolPass implements CompilerPassInterface
 
             if (ChainAdapter::class === $class) {
                 $adapters = [];
-                foreach ($adapter->getArgument(0) as $provider => $chainableAdapter) {
-                    $chainedPool = $chainableAdapter;
-                    if (false === $chainableAdapter instanceof ChildDefinition) {
-                        $chainedPool = $chainableAdapter = new ChildDefinition($chainableAdapter);
+                foreach ($adapter->getArgument(0) as $provider => $adapter) {
+                    $chainedPool = $adapter;
+                    if (false === $adapter instanceof ChildDefinition) {
+                        $chainedPool = $adapter = new ChildDefinition($adapter);
                     }
 
                     $chainedTags = [\is_int($provider) ? [] : ['provider' => $provider]];
 
-                    while ($chainableAdapter instanceof ChildDefinition) {
-                        $chainableAdapter = $container->findDefinition($chainableAdapter->getParent());
-                        if (ChainAdapter::class === $chainableAdapter->getClass()) {
+                    while ($adapter instanceof ChildDefinition) {
+                        $adapter = $container->findDefinition($adapter->getParent());
+                        if (ChainAdapter::class === $adapter->getClass()) {
                             throw new InvalidArgumentException(sprintf('Invalid service "%s": chain of adapters cannot reference another chain, found "%s".', $id, $chainedPool->getParent()));
                         }
-                        if ($t = $chainableAdapter->getTag($this->cachePoolTag)) {
+                        if ($t = $adapter->getTag($this->cachePoolTag)) {
                             $chainedTags[0] += $t[0];
                         }
                     }
@@ -140,7 +140,7 @@ class CachePoolPass implements CompilerPassInterface
                         $chainedPool->replaceArgument($i++, new Reference(static::getServiceProvider($container, $chainedTags[0]['provider'])));
                     }
 
-                    if (isset($tags[0]['namespace']) && ArrayAdapter::class !== $chainableAdapter->getClass()) {
+                    if (isset($tags[0]['namespace']) && ArrayAdapter::class !== $adapter->getClass()) {
                         $chainedPool->replaceArgument($i++, $tags[0]['namespace']);
                     }
 

@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-13T15:24:19Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by PaolaRuby at 2021-07-13T15:35:00Z
+
+I don't understand **fabbot.io**
+```
+@@ -502,12 +502,12 @@
+         $tester = new ApplicationTester($application);
+         $tester->run(['command' => 'foos:bar1'], ['decorated' => false]);
+         $this->assertSame('
+-
+-  There are no commands defined in the "foos" namespace.
+```
+Line 502 has no changes
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-13T16:38:56Z
+
+Thanks for the PR.
+Please ignore fabbot here (false positive - he probably drinks too much wine these times).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-13T19:25:06Z
+
+@chalasr is `5.2` the right branch, shouldn't it be `5.3`? 🤔
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-14T12:37:46Z
+
+@OskarStark I don't think so, 5.2 is not EOM yet and bugfixes must target the lowest branch where they apply
+
+---------------------------------------------------------------------------
+
+by fredsal at 2021-07-15T13:45:07Z
+
+I hope it can be merged before end of support
+
+---------------------------------------------------------------------------
+
+by PaolaRuby at 2021-07-15T14:41:11Z
+
+@chalasr @stof resolved, thanks for the corrections

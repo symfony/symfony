@@ -19,6 +19,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -74,10 +75,16 @@ final class FirebaseTransport extends AbstractTransport
             'json' => array_filter($options),
         ]);
 
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Forebase server.', $response, 0, $e);
+        }
+
         $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
         $jsonContents = 0 === strpos($contentType, 'application/json') ? $response->toArray(false) : null;
 
-        if (200 !== $response->getStatusCode()) {
+        if (200 !== $statusCode) {
             $errorMessage = $jsonContents ? $jsonContents['results']['error'] : $response->getContent(false);
 
             throw new TransportException('Unable to post the Firebase message: '.$errorMessage, $response);

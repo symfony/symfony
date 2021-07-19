@@ -19,6 +19,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -122,13 +123,19 @@ final class GoogleChatTransport extends AbstractTransport
         ]);
 
         try {
-            $result = $response->toArray(false);
-        } catch (JsonException $jsonException) {
-            throw new TransportException('Unable to post the Google Chat message: Invalid response.', $response, $response->getStatusCode(), $jsonException);
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote GoogleChat server.', $response, 0, $e);
         }
 
-        if (200 !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to post the Google Chat message: "%s".', $result['error']['message'] ?? $response->getContent(false)), $response, $result['error']['code'] ?? $response->getStatusCode());
+        try {
+            $result = $response->toArray(false);
+        } catch (JsonException $jsonException) {
+            throw new TransportException('Unable to post the Google Chat message: Invalid response.', $response, $statusCode, $jsonException);
+        }
+
+        if (200 !== $statusCode) {
+            throw new TransportException(sprintf('Unable to post the Google Chat message: "%s".', $result['error']['message'] ?? $response->getContent(false)), $response, $result['error']['code'] ?? $statusCode);
         }
 
         if (!\array_key_exists('name', $result)) {

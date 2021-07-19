@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -76,7 +77,13 @@ final class InfobipTransport extends AbstractTransport
             ],
         ]);
 
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Infobip server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             $content = $response->toArray(false);
             $errorMessage = $content['requestError']['serviceException']['messageId'] ?? '';
             $errorInfo = $content['requestError']['serviceException']['text'] ?? '';

@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -81,11 +82,17 @@ final class MobytTransport extends AbstractTransport
             'body' => json_encode(array_filter($options)),
         ]);
 
-        if (401 === $response->getStatusCode() || 404 === $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Mobyt server.', $response, 0, $e);
+        }
+
+        if (401 === $statusCode || 404 === $statusCode) {
             throw new TransportException(sprintf('Unable to send the SMS: "%s". Check your credentials.', $message->getSubject()), $response);
         }
 
-        if (201 !== $response->getStatusCode()) {
+        if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
             throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error['result']), $response);

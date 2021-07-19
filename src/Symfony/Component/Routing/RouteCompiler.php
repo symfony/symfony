@@ -126,7 +126,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
-        $routeParamsPattern = '#\{(!)?(\w+)\}#';
+        $routeParamsPattern = '#\{(!)?([\w\pL]++)\}#';
         if ($needsUtf8) {
             $routeParamsPattern .= 'u';
         }

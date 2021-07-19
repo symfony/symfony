@@ -40,9 +40,9 @@ class RedisTransportFactoryTest extends TestCase
 
         $factory = new RedisTransportFactory();
         $serializer = $this->createMock(SerializerInterface::class);
-        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar']), $serializer);
+        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar', 'delete_after_ack' => true]), $serializer);
 
-        $this->assertEquals($expectedTransport, $factory->createTransport('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar'], $serializer));
+        $this->assertEquals($expectedTransport, $factory->createTransport('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar', 'delete_after_ack' => true], $serializer));
     }
 
     private function skipIfRedisUnavailable()

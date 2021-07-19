@@ -44,6 +44,7 @@ use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
+use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
@@ -92,6 +93,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             SlackTransportFactory::class => false,
             SmsapiTransportFactory::class => false,
             SmsBiurasTransportFactory::class => false,
+            SmscTransportFactory::class => false,
             SpotHitTransportFactory::class => false,
             TelegramTransportFactory::class => false,
             TelnyxTransportFactory::class => false,
@@ -146,6 +148,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['slack', 'symfony/slack-notifier'];
         yield ['smsapi', 'symfony/smsapi-notifier'];
         yield ['smsbiuras', 'symfony/sms-biuras-notifier'];
+        yield ['smsc', 'symfony/smsc-notifier'];
         yield ['spothit', 'symfony/spot-hit-notifier'];
         yield ['telegram', 'symfony/telegram-notifier'];
         yield ['telnyx', 'symfony/telnyx-notifier'];

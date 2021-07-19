@@ -139,6 +139,7 @@ use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
+use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
@@ -2426,6 +2427,7 @@ class FrameworkExtension extends Extension
             SlackTransportFactory::class => 'notifier.transport_factory.slack',
             SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
             SmsBiurasTransportFactory::class => 'notifier.transport_factory.smsbiuras',
+            SmscTransportFactory::class => 'notifier.transport_factory.smsc',
             SpotHitTransportFactory::class => 'notifier.transport_factory.spothit',
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',

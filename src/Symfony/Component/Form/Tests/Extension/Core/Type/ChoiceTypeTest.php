@@ -13,8 +13,11 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Forms;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\Validator\Validation;
 
 class ChoiceTypeTest extends BaseTypeTest
 {
@@ -1813,6 +1816,38 @@ class ChoiceTypeTest extends BaseTypeTest
             ->createView();
 
         $this->assertSame('name[]', $view->vars['full_name']);
+    }
+
+    public function testInvalidMessageAwarenessForMultiple()
+    {
+        $factory = Forms::createFormFactoryBuilder()
+            ->addExtensions([new ValidatorExtension(Validation::createValidator())])
+            ->getFormFactory();
+        $form = $factory->create(static::TESTED_TYPE, null, [
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->choices,
+            'invalid_message' => 'You are not able to use value "{{ value }}"',
+        ]);
+
+        $form->submit(['My invalid choice']);
+        $this->assertEquals("ERROR: You are not able to use value \"My invalid choice\"\n", (string) $form->getErrors(true));
+    }
+
+    public function testInvalidMessageAwarenessForMultipleWithoutScalarOrArrayViewData()
+    {
+        $factory = Forms::createFormFactoryBuilder()
+            ->addExtensions([new ValidatorExtension(Validation::createValidator())])
+            ->getFormFactory();
+        $form = $factory->create(static::TESTED_TYPE, null, [
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->choices,
+            'invalid_message' => 'You are not able to use value "{{ value }}"',
+        ]);
+
+        $form->submit(new \stdClass());
+        $this->assertEquals("ERROR: You are not able to use value \"object\"\n", (string) $form->getErrors(true));
     }
 
     // https://github.com/symfony/symfony/issues/3298

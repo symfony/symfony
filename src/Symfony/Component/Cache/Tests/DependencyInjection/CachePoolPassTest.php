@@ -20,6 +20,7 @@ use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class CachePoolPassTest extends TestCase
@@ -213,5 +214,28 @@ class CachePoolPassTest extends TestCase
         $doctrineCachePool = $container->getDefinition('doctrine.result_cache_pool');
         $this->assertInstanceOf(ChildDefinition::class, $doctrineCachePool);
         $this->assertSame('cache.app', $doctrineCachePool->getParent());
+    }
+
+    public function testChainInChainException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
+
+        $container->register('cache.adapter.array', ArrayAdapter::class)
+            ->addTag('cache.pool');
+        $container->register('cache.adapter.apcu', ApcuAdapter::class)
+            ->setArguments([null, 0, null])
+            ->addTag('cache.pool');
+        $container->register('cache.chain', ChainAdapter::class)
+            ->addArgument(['cache.adapter.array', 'cache.adapter.apcu'])
+            ->addTag('cache.pool');
+        $container->register('cache.chain_chain', ChainAdapter::class)
+            ->addArgument(['cache.chain', 'cache.adapter.array', 'cache.adapter.apcu'])
+            ->addTag('cache.pool');
+
+        $this->cachePoolPass->process($container);
     }
 }

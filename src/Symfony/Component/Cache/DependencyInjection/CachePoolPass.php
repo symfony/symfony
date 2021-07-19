@@ -116,26 +116,22 @@ class CachePoolPass implements CompilerPassInterface
 
             if (ChainAdapter::class === $class) {
                 $adapters = [];
-                foreach ($adapter->getArgument(0) as $provider => $adapter) {
-                    if ($adapter instanceof ChildDefinition) {
-                        $chainedPool = $adapter;
-                    } else {
-                        $chainedPool = $adapter = new ChildDefinition($adapter);
+                foreach ($adapter->getArgument(0) as $provider => $chainableAdapter) {
+                    $chainedPool = $chainableAdapter;
+                    if (false === $chainableAdapter instanceof ChildDefinition) {
+                        $chainedPool = $chainableAdapter = new ChildDefinition($chainableAdapter);
                     }
 
                     $chainedTags = [\is_int($provider) ? [] : ['provider' => $provider]];
-                    $chainedClass = '';
 
-                    while ($adapter instanceof ChildDefinition) {
-                        $adapter = $container->findDefinition($adapter->getParent());
-                        $chainedClass = $chainedClass ?: $adapter->getClass();
-                        if ($t = $adapter->getTag($this->cachePoolTag)) {
+                    while ($chainableAdapter instanceof ChildDefinition) {
+                        $chainableAdapter = $container->findDefinition($chainableAdapter->getParent());
+                        if (ChainAdapter::class === $chainableAdapter->getClass()) {
+                            throw new InvalidArgumentException(sprintf('Invalid service "%s": chain of adapters cannot reference another chain, found "%s".', $id, $chainedPool->getParent()));
+                        }
+                        if ($t = $chainableAdapter->getTag($this->cachePoolTag)) {
                             $chainedTags[0] += $t[0];
                         }
-                    }
-
-                    if (ChainAdapter::class === $chainedClass) {
-                        throw new InvalidArgumentException(sprintf('Invalid service "%s": chain of adapters cannot reference another chain, found "%s".', $id, $chainedPool->getParent()));
                     }
 
                     $i = 0;
@@ -144,7 +140,7 @@ class CachePoolPass implements CompilerPassInterface
                         $chainedPool->replaceArgument($i++, new Reference(static::getServiceProvider($container, $chainedTags[0]['provider'])));
                     }
 
-                    if (isset($tags[0]['namespace']) && ArrayAdapter::class !== $adapter->getClass()) {
+                    if (isset($tags[0]['namespace']) && ArrayAdapter::class !== $chainableAdapter->getClass()) {
                         $chainedPool->replaceArgument($i++, $tags[0]['namespace']);
                     }
 

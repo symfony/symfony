@@ -67,6 +67,8 @@ class OptionsResolverWrapper extends OptionsResolver
     }
 
     /**
+     * @param string|array $allowedTypes
+     *
      * @return $this
      */
     public function setAllowedTypes($option, $allowedTypes): self
@@ -81,6 +83,8 @@ class OptionsResolverWrapper extends OptionsResolver
     }
 
     /**
+     * @param string|array $allowedTypes
+     *
      * @return $this
      */
     public function addAllowedTypes($option, $allowedTypes): self

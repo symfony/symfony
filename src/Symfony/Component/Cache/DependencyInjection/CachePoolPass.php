@@ -127,7 +127,9 @@ class CachePoolPass implements CompilerPassInterface
                     while ($adapter instanceof ChildDefinition) {
                         $adapter = $container->findDefinition($adapter->getParent());
                         if (ChainAdapter::class === $adapter->getClass()) {
-                            throw new InvalidArgumentException(sprintf('Invalid service "%s": chain of adapters cannot reference another chain, found "%s".', $id, $chainedPool->getParent()));
+                            throw new InvalidArgumentException(
+                                sprintf('Invalid service "%s": chain of adapters cannot reference another chain, found "%s".', $id, $chainedPool->getParent())
+                            );
                         }
                         if ($t = $adapter->getTag($this->cachePoolTag)) {
                             $chainedTags[0] += $t[0];

@@ -37,6 +37,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -1863,6 +1864,18 @@ class ApplicationTest extends TestCase
         $this->assertTrue($command->signaled);
         $this->assertTrue($dispatcherCalled);
     }
+
+    public function testSignalableCommandInterfaceWithoutSignals()
+    {
+        $command = new SignableCommand();
+
+        $dispatcher = new EventDispatcher();
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($dispatcher);
+        $application->add($command);
+        $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+    }
 }
 
 class CustomApplication extends Application
@@ -1930,7 +1943,7 @@ class SignableCommand extends Command implements SignalableCommandInterface
 
     public function getSubscribedSignals(): array
     {
-        return [\SIGALRM];
+        return SignalRegistry::isSupported() ? [\SIGALRM] : [];
     }
 
     public function handleSignal(int $signal): void

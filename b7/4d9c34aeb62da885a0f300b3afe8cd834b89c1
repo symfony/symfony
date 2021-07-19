@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-19T00:30:31Z
+
+The CI is a false negative. I decide to ignore fabbot here and the psalm issue is fixed in #42183

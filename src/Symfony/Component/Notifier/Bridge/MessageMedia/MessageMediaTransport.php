@@ -80,7 +80,13 @@ final class MessageMediaTransport extends AbstractTransport
             ]
         );
 
-        if (202 === $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote MessageMedia server.', $response, 0, $e);
+        }
+
+        if (202 === $statusCode) {
             $result = $response->toArray(false)['messages'][0];
             $sentMessage = new SentMessage($message, (string) $this);
             $sentMessage->setMessageId($result['message_id']);

@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -68,7 +69,12 @@ final class NexmoTransport extends AbstractTransport
             ],
         ]);
 
-        $result = $response->toArray(false);
+        try {
+            $result = $response->toArray(false);
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Nexmo server.', $response, 0, $e);
+        }
+
         foreach ($result['messages'] as $msg) {
             if ($msg['status'] ?? false) {
                 throw new TransportException('Unable to send the SMS: '.$msg['error-text'].sprintf(' (code %s).', $msg['status']), $response);

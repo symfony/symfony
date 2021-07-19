@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead
  * Deprecate `CookieClearingLogoutHandler`, `SessionLogoutHandler` and `CsrfTokenClearingLogoutHandler`.
    Use `CookieClearingLogoutListener`, `SessionLogoutListener` and `CsrfTokenClearingLogoutListener` instead
+ * Deprecate `PassportInterface` and `UserPassportInterface`, use `Passport` instead
 
 5.3
 ---

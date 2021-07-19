@@ -77,7 +77,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             && $this->httpUtils->checkRequestPath($request, $this->options['check_path']);
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
         $credentials = $this->getCredentials($request);
 
@@ -106,9 +106,19 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     }
 
     /**
-     * @param Passport $passport
+     * @deprecated since Symfony 5.4, use {@link createToken()} instead
      */
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
+    {
+        trigger_deprecation('symfony/security-http', '5.4', 'Method "%s()" is deprecated, use "%s::createToken()" instead.', __METHOD__, __CLASS__);
+
+        return $this->createToken($passport, $firewallName);
+    }
+
+    /**
+     * @return UsernamePasswordToken
+     */
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         return new UsernamePasswordToken($passport->getUser(), null, $firewallName, $passport->getUser()->getRoles());
     }

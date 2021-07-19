@@ -24,8 +24,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * This event is dispatched after authentication has successfully completed.
  *
- * At this stage, the authenticator created an authenticated token
- * and generated an authentication success response. Listeners to
+ * At this stage, the authenticator created a token and
+ * generated an authentication success response. Listeners to
  * this event can do actions related to successful authentication
  * (such as migrating the password).
  *

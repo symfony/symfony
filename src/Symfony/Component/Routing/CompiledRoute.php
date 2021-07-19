@@ -18,6 +18,7 @@ namespace Symfony\Component\Routing;
  */
 class CompiledRoute implements \Serializable
 {
+    private $sanitizedVariables;
     private $variables;
     private $tokens;
     private $staticPrefix;
@@ -28,16 +29,17 @@ class CompiledRoute implements \Serializable
     private $hostTokens;
 
     /**
-     * @param string      $staticPrefix  The static prefix of the compiled route
-     * @param string      $regex         The regular expression to use to match this route
-     * @param array       $tokens        An array of tokens to use to generate URL for this route
-     * @param array       $pathVariables An array of path variables
-     * @param string|null $hostRegex     Host regex
-     * @param array       $hostTokens    Host tokens
-     * @param array       $hostVariables An array of host variables
-     * @param array       $variables     An array of variables (variables defined in the path and in the host patterns)
+     * @param string      $staticPrefix       The static prefix of the compiled route
+     * @param string      $regex              The regular expression to use to match this route
+     * @param array       $tokens             An array of tokens to use to generate URL for this route
+     * @param array       $pathVariables      An array of path variables
+     * @param string|null $hostRegex          Host regex
+     * @param array       $hostTokens         Host tokens
+     * @param array       $hostVariables      An array of host variables
+     * @param array       $variables          An array of variables (variables defined in the path and in the host patterns)
+     * @param array       $sanitizedVariables An array of sanitized variables (variables without utf8 characters)
      */
-    public function __construct(string $staticPrefix, string $regex, array $tokens, array $pathVariables, string $hostRegex = null, array $hostTokens = [], array $hostVariables = [], array $variables = [])
+    public function __construct(string $staticPrefix, string $regex, array $tokens, array $pathVariables, string $hostRegex = null, array $hostTokens = [], array $hostVariables = [], array $variables = [], array $sanitizedVariables = [])
     {
         $this->staticPrefix = $staticPrefix;
         $this->regex = $regex;
@@ -47,12 +49,14 @@ class CompiledRoute implements \Serializable
         $this->hostTokens = $hostTokens;
         $this->hostVariables = $hostVariables;
         $this->variables = $variables;
+        $this->sanitizedVariables = $sanitizedVariables;
     }
 
     public function __serialize(): array
     {
         return [
             'vars' => $this->variables,
+            'sanitized_vars' => $this->sanitizedVariables,
             'path_prefix' => $this->staticPrefix,
             'path_regex' => $this->regex,
             'path_tokens' => $this->tokens,
@@ -74,6 +78,7 @@ class CompiledRoute implements \Serializable
     public function __unserialize(array $data): void
     {
         $this->variables = $data['vars'];
+        $this->sanitizedVariables = $data['sanitized_vars'] ?? [];
         $this->staticPrefix = $data['path_prefix'];
         $this->regex = $data['path_regex'];
         $this->tokens = $data['path_tokens'];
@@ -169,5 +174,15 @@ class CompiledRoute implements \Serializable
     public function getHostVariables()
     {
         return $this->hostVariables;
+    }
+
+    /**
+     * Returns sanitized variables.
+     *
+     * @return array The sanitized variables
+     */
+    public function getSanitizedVariables(): array
+    {
+        return $this->sanitizedVariables;
     }
 }

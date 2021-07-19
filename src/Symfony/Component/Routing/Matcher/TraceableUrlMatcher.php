@@ -146,6 +146,8 @@ class TraceableUrlMatcher extends UrlMatcher
 
             $this->addTrace('Route matches!', self::ROUTE_MATCHES, $name, $route);
 
+            $matches = self::restoreRouteParamNames($matches, $compiledRoute);
+
             return $this->getAttributes($route, $name, array_replace($matches, $hostMatches, $status[1] ?? []));
         }
 

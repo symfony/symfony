@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Matcher;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\CompiledRoute;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -192,6 +193,8 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
+            $matches = self::restoreRouteParamNames($matches, $compiledRoute);
+
             return $this->getAttributes($route, $name, array_replace($matches, $hostMatches, $status[1] ?? []));
         }
 
@@ -275,5 +278,20 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             'SCRIPT_FILENAME' => $this->context->getBaseUrl(),
             'SCRIPT_NAME' => $this->context->getBaseUrl(),
         ]);
+    }
+
+    protected static function restoreRouteParamNames(array $params, CompiledRoute $compiledRoute): array
+    {
+        $sanitizedVariablesMap = $compiledRoute->getSanitizedVariables();
+        $result = [];
+        foreach ($params as $key => $value) {
+            if (\is_string($key)) {
+                $key = $sanitizedVariablesMap[$key] ?? $key;
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
     }
 }

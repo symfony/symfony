@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
 
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Routing\CompiledRoute;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -434,7 +435,7 @@ EOF;
 
         return [
             ['_route' => $name] + $defaults,
-            $vars,
+            $this->restoreRouteParamNames($vars, $route->compile()),
             array_flip($route->getMethods()) ?: null,
             array_flip($route->getSchemes()) ?: null,
             $hasTrailingSlash,
@@ -497,5 +498,20 @@ EOF;
         }
 
         return substr_replace($export, ']', -2);
+    }
+
+    protected static function restoreRouteParamNames($params, CompiledRoute $compiledRoute)
+    {
+        if (!\is_array($params)) {
+            return $params;
+        }
+
+        $sanitizedVariablesMap = $compiledRoute->getSanitizedVariables();
+        $result = [];
+        foreach ($params as $value) {
+            $result[] = $sanitizedVariablesMap[$value] ?? $value;
+        }
+
+        return $result;
     }
 }

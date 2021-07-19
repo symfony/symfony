@@ -91,6 +91,9 @@ class RouteCompiler implements RouteCompilerInterface
         $tokens = $result['tokens'];
         $regex = $result['regex'];
 
+        $uniqueVariables = array_unique($variables);
+        $sanitizedVariables = array_combine(self::sanitizeVariables($uniqueVariables), $uniqueVariables);
+
         return new CompiledRoute(
             $staticPrefix,
             $regex,
@@ -99,7 +102,8 @@ class RouteCompiler implements RouteCompilerInterface
             $hostRegex,
             $hostTokens,
             $hostVariables,
-            array_unique($variables)
+            $uniqueVariables,
+            $sanitizedVariables
         );
     }
 
@@ -122,10 +126,15 @@ class RouteCompiler implements RouteCompilerInterface
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
-        preg_match_all('#\{(!)?(\w+)\}#', $pattern, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER);
+        $routeParamsPattern = '#\{(!)?(\w+)\}#';
+        if ($needsUtf8) {
+            $routeParamsPattern .= 'u';
+        }
+        preg_match_all($routeParamsPattern, $pattern, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER);
         foreach ($matches as $match) {
             $important = $match[1][1] >= 0;
             $varName = $match[2][0];
+            $sanitizedVarName = self::sanitizeVariable($varName);
             // get all static text preceding the current variable
             $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
             $pos = $match[0][1] + \strlen($match[0][0]);
@@ -142,7 +151,7 @@ class RouteCompiler implements RouteCompilerInterface
 
             // A PCRE subpattern name must start with a non-digit. Also a PHP variable cannot start with a digit so the
             // variable would not be usable as a Controller action argument.
-            if (preg_match('/^\d/', $varName)) {
+            if (preg_match('/^\d/', $sanitizedVarName)) {
                 throw new \DomainException(sprintf('Variable name "%s" cannot start with a digit in route pattern "%s". Please use a different name.', $varName, $pattern));
             }
             if (\in_array($varName, $variables)) {
@@ -196,9 +205,9 @@ class RouteCompiler implements RouteCompilerInterface
             }
 
             if ($important) {
-                $token = ['variable', $isSeparator ? $precedingChar : '', $regexp, $varName, false, true];
+                $token = ['variable', $isSeparator ? $precedingChar : '', $regexp, $sanitizedVarName, false, true];
             } else {
-                $token = ['variable', $isSeparator ? $precedingChar : '', $regexp, $varName];
+                $token = ['variable', $isSeparator ? $precedingChar : '', $regexp, $sanitizedVarName];
             }
 
             $tokens[] = $token;
@@ -344,5 +353,20 @@ class RouteCompiler implements RouteCompilerInterface
         }
 
         return $regexp;
+    }
+
+    private static function sanitizeVariables(array $variables): array
+    {
+        $result = [];
+        foreach ($variables as $variable) {
+            $result[] = self::sanitizeVariable($variable);
+        }
+
+        return $result;
+    }
+
+    private static function sanitizeVariable(string $variable): string
+    {
+        return preg_replace('#\W#', '_', $variable);
     }
 }

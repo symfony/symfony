@@ -909,7 +909,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'b', 'b' => 'BBB'], $matcher->match('/en-en/BBB'));
     }
 
-    public function testTrailingRequirementWithDefault_A()
+    public function testTrailingRequirementWithDefaultA()
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/fr-fr/{a}', ['a' => 'aaa'], ['a' => '.+']));
@@ -920,7 +920,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/fr-fr/');
     }
 
-    public function testTrailingRequirementWithDefault_B()
+    public function testTrailingRequirementWithDefaultB()
     {
         $coll = new RouteCollection();
         $coll->add('b', new Route('/en-en/{b}', ['b' => 'bbb'], ['b' => '.*']));
@@ -939,6 +939,20 @@ class UrlMatcherTest extends TestCase
         $matcher = $this->getUrlMatcher($coll);
 
         $this->assertEquals(['_route' => 'a', '_' => '/'], $matcher->match('/hello/'));
+    }
+
+    public function testUtf8PatternMatchAndParameterReturn()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo/{bär}', [], [], ['utf8' => true]));
+        $matcher = $this->getUrlMatcher($collection);
+        try {
+            $matcher->match('/no-match');
+            $this->fail();
+        } catch (ResourceNotFoundException $e) {
+        }
+
+        $this->assertEquals(['_route' => 'foo', 'bär' => 'baz'], $matcher->match('/foo/baz'));
     }
 
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)

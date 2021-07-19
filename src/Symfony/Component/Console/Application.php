@@ -940,7 +940,7 @@ class Application implements ResetInterface
             }
         }
 
-        if ($command instanceof SignalableCommandInterface) {
+        if ($command instanceof SignalableCommandInterface && ($this->signalsToDispatchEvent || $command->getSubscribedSignals())) {
             if (!$this->signalRegistry) {
                 throw new RuntimeException('Unable to subscribe to signal events. Make sure that the `pcntl` extension is installed and that "pcntl_*" functions are not disabled by your php.ini\'s "disable_functions" directive.');
             }

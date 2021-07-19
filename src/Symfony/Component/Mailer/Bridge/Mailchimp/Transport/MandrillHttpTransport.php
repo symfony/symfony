@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractHttpTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -55,8 +56,14 @@ class MandrillHttpTransport extends AbstractHttpTransport
             ],
         ]);
 
-        $result = $response->toArray(false);
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+            $result = $response->toArray(false);
+        } catch (TransportExceptionInterface $e) {
+            throw new HttpTransportException('Could not reach the remote Mandrill server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             if ('error' === ($result['status'] ?? false)) {
                 throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $result['code']), $response);
             }

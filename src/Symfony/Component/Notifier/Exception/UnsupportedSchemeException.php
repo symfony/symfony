@@ -144,6 +144,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
             'package' => 'symfony/sms-biuras-notifier',
         ],
+        'smsc' => [
+            'class' => Bridge\Smsc\SmscTransportFactory::class,
+            'package' => 'symfony/smsc-notifier',
+        ],
         'spothit' => [
             'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
             'package' => 'symfony/spot-hit-notifier',

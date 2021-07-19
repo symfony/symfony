@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -71,7 +72,12 @@ final class IqsmsTransport extends AbstractTransport
             ],
         ]);
 
-        $result = $response->toArray(false);
+        try {
+            $result = $response->toArray(false);
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Iqsms server.', $response, 0, $e);
+        }
+
         foreach ($result['messages'] as $msg) {
             if ('accepted' !== $msg['status']) {
                 throw new TransportException(sprintf('Unable to send the SMS: "%s".', $msg['status']), $response);

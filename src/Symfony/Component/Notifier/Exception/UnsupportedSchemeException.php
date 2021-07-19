@@ -91,7 +91,7 @@ class UnsupportedSchemeException extends LogicException
     /**
      * @param string[] $supported
      */
-    public function __construct(Dsn $dsn, string $name = null, array $supported = [])
+    public function __construct(Dsn $dsn, string $name = null, array $supported = [], \Throwable $previous = null)
     {
         $provider = $dsn->getScheme();
         if (false !== $pos = strpos($provider, '+')) {
@@ -109,6 +109,6 @@ class UnsupportedSchemeException extends LogicException
             $message .= sprintf('; supported schemes for notifier "%s" are: "%s"', $name, implode('", "', $supported));
         }
 
-        parent::__construct($message.'.');
+        parent::__construct($message.'.', 0, $previous);
     }
 }

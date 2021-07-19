@@ -261,8 +261,16 @@ class FormValidator extends ConstraintValidator
 
     private static function getConstraintsInGroups($constraints, $group)
     {
-        return array_filter($constraints, static function (Constraint $constraint) use ($group) {
-            return \in_array($group, $constraint->groups, true);
+        $groups = (array) $group;
+
+        return array_filter($constraints, static function (Constraint $constraint) use ($groups) {
+            foreach ($groups as $group) {
+                if (\in_array($group, $constraint->groups, true)) {
+                    return true;
+                }
+            }
+
+            return false;
         });
     }
 }

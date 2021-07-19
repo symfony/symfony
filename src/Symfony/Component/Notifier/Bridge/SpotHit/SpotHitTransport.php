@@ -19,6 +19,8 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -81,7 +83,13 @@ final class SpotHitTransport extends AbstractTransport
             ],
         ]);
 
-        $data = json_decode($response->getContent(), true);
+        try {
+            $data = $response->toArray();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote SpotHit server.', $response, 0, $e);
+        } catch (HttpExceptionInterface | DecodingExceptionInterface $e) {
+            throw new TransportException('Unexpected reply from the remote SpotHit server.', $response, 0, $e);
+        }
 
         if (!$data['resultat']) {
             $errors = \is_array($data['erreurs']) ? implode(',', $data['erreurs']) : $data['erreurs'];

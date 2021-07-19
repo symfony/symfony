@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -64,7 +65,13 @@ final class MessageBirdTransport extends AbstractTransport
             ],
         ]);
 
-        if (201 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote MessageBird server.', $response, 0, $e);
+        }
+
+        if (201 !== $statusCode) {
             if (!isset($response->toArray(false)['errors'])) {
                 throw new TransportException('Unable to send the SMS.', $response);
             }

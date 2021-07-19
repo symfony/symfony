@@ -150,9 +150,8 @@ class AmqpExtIntegrationTest extends TestCase
         $connection->setup();
         $connection->purgeQueues();
 
-        $serializer = $this->createSerializer();
-        $sender = new AmqpSender($connection, $serializer);
-        $receiver = new AmqpReceiver($connection, $serializer);
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
 
         // initial delivery: should receive in both queues
         $sender->send(new Envelope(new DummyMessage('Payload')));

@@ -33,7 +33,7 @@ class RedisExtIntegrationTest extends TestCase
 
         try {
             $this->redis = new \Redis();
-            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
+            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], $this->redis);
             $this->connection->cleanup();
             $this->connection->setup();
         } catch (\Exception $e) {

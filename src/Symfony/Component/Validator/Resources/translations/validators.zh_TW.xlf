@@ -131,24 +131,24 @@
                 <target>該值應該為有效的數字。</target>
             </trans-unit>
             <trans-unit id="36">
-                <source>This value is not a valid country.</source>
-                <target>該值不是有效的國家名。</target>
-            </trans-unit>
-            <trans-unit id="37">
                 <source>This file is not a valid image.</source>
                 <target>該檔案不是有效的圖片。</target>
             </trans-unit>
-            <trans-unit id="38">
+            <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
                 <target>該值不是有效的IP地址。</target>
             </trans-unit>
-            <trans-unit id="39">
+            <trans-unit id="38">
                 <source>This value is not a valid language.</source>
                 <target>該值不是有效的語言名。</target>
             </trans-unit>
-            <trans-unit id="40">
+            <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
                 <target>該值不是有效的區域值（locale）。</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>該值不是有效的國家名。</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>

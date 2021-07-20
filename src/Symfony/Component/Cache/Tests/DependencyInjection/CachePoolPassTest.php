@@ -218,8 +218,6 @@ class CachePoolPassTest extends TestCase
 
     public function testChainInChainException()
     {
-        $this->expectException(InvalidArgumentException::class);
-
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.project_dir', 'foo');
@@ -236,6 +234,7 @@ class CachePoolPassTest extends TestCase
             ->addArgument(['cache.chain', 'cache.adapter.array', 'cache.adapter.apcu'])
             ->addTag('cache.pool');
 
+        $this->expectException(InvalidArgumentException::class);
         $this->cachePoolPass->process($container);
     }
 }

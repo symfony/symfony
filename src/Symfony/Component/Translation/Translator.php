@@ -37,54 +37,33 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     protected $catalogues = [];
 
-    /**
-     * @var string
-     */
-    private $locale;
+    private string $locale;
 
     /**
      * @var string[]
      */
-    private $fallbackLocales = [];
+    private array $fallbackLocales = [];
 
     /**
      * @var LoaderInterface[]
      */
-    private $loaders = [];
+    private array $loaders = [];
 
-    /**
-     * @var array
-     */
-    private $resources = [];
+    private array $resources = [];
 
-    /**
-     * @var MessageFormatterInterface
-     */
-    private $formatter;
+    private MessageFormatterInterface $formatter;
 
-    /**
-     * @var string
-     */
-    private $cacheDir;
+    private ?string $cacheDir;
 
-    /**
-     * @var bool
-     */
-    private $debug;
+    private bool $debug;
 
-    private $cacheVary;
+    private array $cacheVary;
 
-    /**
-     * @var ConfigCacheFactoryInterface|null
-     */
-    private $configCacheFactory;
+    private ?ConfigCacheFactoryInterface $configCacheFactory;
 
-    /**
-     * @var array|null
-     */
-    private $parentLocales;
+    private array $parentLocales;
 
-    private $hasIntlFormatter;
+    private bool $hasIntlFormatter;
 
     /**
      * @throws InvalidArgumentException If a locale contains invalid characters
@@ -409,9 +388,7 @@ EOF
 
     protected function computeFallbackLocales(string $locale)
     {
-        if (null === $this->parentLocales) {
-            $this->parentLocales = json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
-        }
+        $this->parentLocales ??= json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
 
         $originLocale = $locale;
         $locales = [];
@@ -468,9 +445,7 @@ EOF
      */
     private function getConfigCacheFactory(): ConfigCacheFactoryInterface
     {
-        if (!$this->configCacheFactory) {
-            $this->configCacheFactory = new ConfigCacheFactory($this->debug);
-        }
+        $this->configCacheFactory ??= new ConfigCacheFactory($this->debug);
 
         return $this->configCacheFactory;
     }

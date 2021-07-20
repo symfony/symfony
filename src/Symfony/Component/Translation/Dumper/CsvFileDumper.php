@@ -20,8 +20,8 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class CsvFileDumper extends FileDumper
 {
-    private $delimiter = ';';
-    private $enclosure = '"';
+    private string $delimiter = ';';
+    private string $enclosure = '"';
 
     /**
      * {@inheritdoc}

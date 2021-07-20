@@ -18,11 +18,11 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class TranslatorPass implements CompilerPassInterface
 {
-    private $translatorServiceId;
-    private $readerServiceId;
-    private $loaderTag;
-    private $debugCommandServiceId;
-    private $updateCommandServiceId;
+    private string $translatorServiceId;
+    private string $readerServiceId;
+    private string $loaderTag;
+    private string $debugCommandServiceId;
+    private string $updateCommandServiceId;
 
     public function __construct(string $translatorServiceId = 'translator.default', string $readerServiceId = 'translation.reader', string $loaderTag = 'translation.loader', string $debugCommandServiceId = 'console.command.translation_debug', string $updateCommandServiceId = 'console.command.translation_update')
     {

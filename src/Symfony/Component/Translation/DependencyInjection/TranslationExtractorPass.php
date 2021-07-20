@@ -21,8 +21,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class TranslationExtractorPass implements CompilerPassInterface
 {
-    private $extractorServiceId;
-    private $extractorTag;
+    private string $extractorServiceId;
+    private string $extractorTag;
 
     public function __construct(string $extractorServiceId = 'translation.extractor', string $extractorTag = 'translation.extractor')
     {

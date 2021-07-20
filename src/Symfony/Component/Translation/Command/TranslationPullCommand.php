@@ -35,12 +35,12 @@ final class TranslationPullCommand extends Command
     protected static $defaultName = 'translation:pull';
     protected static $defaultDescription = 'Pull translations from a given provider.';
 
-    private $providerCollection;
-    private $writer;
-    private $reader;
-    private $defaultLocale;
-    private $transPaths;
-    private $enabledLocales;
+    private TranslationProviderCollection $providerCollection;
+    private TranslationWriterInterface $writer;
+    private TranslationReaderInterface $reader;
+    private string $defaultLocale;
+    private array $transPaths;
+    private array $enabledLocales;
 
     public function __construct(TranslationProviderCollection $providerCollection, TranslationWriterInterface $writer, TranslationReaderInterface $reader, string $defaultLocale, array $transPaths = [], array $enabledLocales = [])
     {

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-19T06:10:40Z
+
+One minor question, why not against `4.4`?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-19T21:28:34Z
+
+The PR is updated.
+
+I've targeted 4.4 and made sure we get both status code and body inside the try/catch

@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @final
  *
- * @internal since Symfony 5.3
+ * @internal
  */
 class DebugHandlersListener implements EventSubscriberInterface
 {

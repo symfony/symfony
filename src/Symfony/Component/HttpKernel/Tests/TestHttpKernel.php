@@ -25,7 +25,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         parent::__construct(new EventDispatcher(), $this, null, $this);
     }
 
-    public function getController(Request $request)
+    public function getController(Request $request): callable|false
     {
         return [$this, 'callController'];
     }

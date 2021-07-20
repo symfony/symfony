@@ -2,7 +2,7 @@
 
 class ProjectWithXsdExtension extends ProjectExtension
 {
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|false
     {
         return __DIR__.'/schema';
     }

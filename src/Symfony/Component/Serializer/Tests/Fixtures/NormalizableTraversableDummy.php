@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class NormalizableTraversableDummy extends TraversableDummy implements NormalizableInterface, DenormalizableInterface
 {
-    public function normalize(NormalizerInterface $normalizer, string $format = null, array $context = [])
+    public function normalize(NormalizerInterface $normalizer, string $format = null, array $context = []): array|string|int|float|bool
     {
         return [
             'foo' => 'normalizedFoo',

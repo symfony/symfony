@@ -386,11 +386,7 @@ class MockPdo extends \PDO
         return parent::getAttribute($attribute);
     }
 
-    /**
-     * @return false|\PDOStatement
-     */
-    #[\ReturnTypeWillChange]
-    public function prepare($statement, $driverOptions = [])
+    public function prepare($statement, $driverOptions = []): \PDOStatement|false
     {
         return \is_callable($this->prepareResult)
             ? ($this->prepareResult)($statement, $driverOptions)

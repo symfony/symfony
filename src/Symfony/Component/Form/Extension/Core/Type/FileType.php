@@ -172,10 +172,8 @@ class FileType extends AbstractType
      * Returns the maximum size of an uploaded file as configured in php.ini.
      *
      * This method should be kept in sync with Symfony\Component\HttpFoundation\File\UploadedFile::getMaxFilesize().
-     *
-     * @return int|float The maximum size of an uploaded file in bytes (returns float if size > PHP_INT_MAX)
      */
-    private static function getMaxFilesize()
+    private static function getMaxFilesize(): int|float
     {
         $iniMax = strtolower(ini_get('upload_max_filesize'));
 

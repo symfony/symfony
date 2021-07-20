@@ -375,11 +375,9 @@ class Inline
     /**
      * Parses a YAML mapping.
      *
-     * @return array|\stdClass
-     *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseMapping(string $mapping, int $flags, int &$i = 0, array &$references = [])
+    private static function parseMapping(string $mapping, int $flags, int &$i = 0, array &$references = []): array|\stdClass
     {
         $output = [];
         $len = \strlen($mapping);

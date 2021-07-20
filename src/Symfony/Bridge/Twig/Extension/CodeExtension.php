@@ -169,12 +169,7 @@ final class CodeExtension extends AbstractExtension
         return $text;
     }
 
-    /**
-     * Returns the link for a given file/line pair.
-     *
-     * @return string|false A link or false
-     */
-    public function getFileLink(string $file, int $line)
+    public function getFileLink(string $file, int $line): string|false
     {
         if ($fmt = $this->fileLinkFormat) {
             return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line);

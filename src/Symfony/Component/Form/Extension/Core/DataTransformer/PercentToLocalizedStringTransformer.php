@@ -195,12 +195,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Rounds a number according to the configured scale and rounding mode.
-     *
-     * @param int|float $number A number
-     *
-     * @return int|float The rounded number
      */
-    private function round($number)
+    private function round(int|float $number): int|float
     {
         if (null !== $this->scale && null !== $this->roundingMode) {
             // shift number to maintain the correct scale during rounding

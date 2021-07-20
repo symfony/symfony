@@ -23,12 +23,8 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
 {
     /**
      * {@inheritdoc}
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return int|string
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = []): int|string
     {
         if (!$object instanceof \BackedEnum) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');

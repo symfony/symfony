@@ -147,9 +147,6 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         ]);
     }
 
-    /**
-     * Formats an array as a string.
-     */
     private function formatArgs(array $args): string
     {
         $result = [];
@@ -203,12 +200,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         return null;
     }
 
-    /**
-     * Returns the link for a given file/line pair.
-     *
-     * @return string|false A link or false
-     */
-    private function getFileLink(string $file, int $line)
+    private function getFileLink(string $file, int $line): string|false
     {
         if ($fmt = $this->fileLinkFormat) {
             return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line);

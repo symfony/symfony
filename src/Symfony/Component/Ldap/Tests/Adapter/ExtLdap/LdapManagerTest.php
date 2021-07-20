@@ -163,7 +163,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @return Collection|Entry[]
      */
-    private function executeSearchQuery($expectedResults = 1)
+    private function executeSearchQuery($expectedResults = 1): Collection|array
     {
         $results = $this
             ->adapter

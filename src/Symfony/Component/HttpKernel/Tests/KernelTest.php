@@ -521,7 +521,7 @@ EOF
                 return '';
             }
 
-            public function getXsdValidationBasePath()
+            public function getXsdValidationBasePath(): string|false
             {
                 return false;
             }

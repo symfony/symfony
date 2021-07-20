@@ -205,7 +205,7 @@ class FormValidator extends ConstraintValidator
      *
      * @return string|GroupSequence|array<string|GroupSequence> The validation groups
      */
-    private function getValidationGroups(FormInterface $form)
+    private function getValidationGroups(FormInterface $form): string|GroupSequence|array
     {
         // Determine the clicked button of the complete form tree
         $clickedButton = null;

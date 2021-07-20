@@ -190,7 +190,7 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
         return $this->username;
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         return $this->username;
     }

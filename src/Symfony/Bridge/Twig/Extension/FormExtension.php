@@ -103,10 +103,7 @@ final class FormExtension extends AbstractExtension
         return $view->vars['full_name'];
     }
 
-    /**
-     * @return string|array
-     */
-    public function getFieldValue(FormView $view)
+    public function getFieldValue(FormView $view): string|array
     {
         return $view->vars['value'];
     }

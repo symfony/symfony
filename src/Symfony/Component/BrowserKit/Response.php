@@ -54,11 +54,6 @@ final class Response
         return $headers."\n".$this->content;
     }
 
-    /**
-     * Gets the response content.
-     *
-     * @return string The response content
-     */
     public function getContent(): string
     {
         return $this->content;
@@ -69,22 +64,15 @@ final class Response
         return $this->status;
     }
 
-    /**
-     * Gets the response headers.
-     *
-     * @return array The response headers
-     */
     public function getHeaders(): array
     {
         return $this->headers;
     }
 
     /**
-     * Gets a response header.
-     *
      * @return string|array|null The first header value if $first is true, an array of values otherwise
      */
-    public function getHeader(string $header, bool $first = true)
+    public function getHeader(string $header, bool $first = true): string|array|null
     {
         $normalizedHeader = str_replace('-', '_', strtolower($header));
         foreach ($this->headers as $key => $value) {

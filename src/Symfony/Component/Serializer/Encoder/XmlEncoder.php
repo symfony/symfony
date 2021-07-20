@@ -247,10 +247,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     /**
      * Parse the input DOMNode into an array or a string.
-     *
-     * @return array|string
      */
-    private function parseXml(\DOMNode $node, array $context = [])
+    private function parseXml(\DOMNode $node, array $context = []): array|string
     {
         $data = $this->parseXmlAttributes($node, $context);
 
@@ -312,10 +310,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     /**
      * Parse the input DOMNode value (content and children) into an array or a string.
-     *
-     * @return array|string
      */
-    private function parseXmlValue(\DOMNode $node, array $context = [])
+    private function parseXmlValue(\DOMNode $node, array $context = []): array|string
     {
         if (!$node->hasChildNodes()) {
             return $node->nodeValue;

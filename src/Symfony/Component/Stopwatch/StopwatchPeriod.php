@@ -18,9 +18,9 @@ namespace Symfony\Component\Stopwatch;
  */
 class StopwatchPeriod
 {
-    private $start;
-    private $end;
-    private $memory;
+    private int|float $start;
+    private int|float $end;
+    private int $memory;
 
     /**
      * @param int|float $start         The relative time of the start of the period (in milliseconds)

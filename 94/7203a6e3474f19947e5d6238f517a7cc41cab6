@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-07-19T18:17:44Z
+
+perhaps worth checking in https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Translation/Resources/bin/translation-status.php

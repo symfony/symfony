@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-07-19T17:23:28Z
+
+I see wrong ids in translations. Please check by original translation https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/Validator/Resources/translations/validators.en.xlf
+PR example https://github.com/symfony/symfony/pull/41872/files
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-07-19T17:27:46Z
+
+@StaffNowa I've checked the changes of PR #41872 and the translation ids seem correct for Dutch already
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-07-19T18:08:53Z
+
+@rvanlaak perfect another countries have some issues which will be fixed with this PR https://github.com/symfony/symfony/pull/42197 :)

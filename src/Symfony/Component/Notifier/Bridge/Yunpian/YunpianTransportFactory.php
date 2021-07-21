@@ -14,7 +14,6 @@ namespace Symfony\Component\Notifier\Bridge\Yunpian;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
@@ -24,7 +23,7 @@ class YunpianTransportFactory extends AbstractTransportFactory
     /**
      * @return YunpianTransport
      */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): YunpianTransport
     {
         if ('yunpian' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'yunpian', $this->getSupportedSchemes());

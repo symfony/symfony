@@ -258,13 +258,11 @@ class Process implements \IteratorAggregate
      * This is identical to run() except that an exception is thrown if the process
      * exits with a non-zero exit code.
      *
-     * @return $this
-     *
      * @throws ProcessFailedException if the process didn't terminate successfully
      *
      * @final
      */
-    public function mustRun(callable $callback = null, array $env = []): self
+    public function mustRun(callable $callback = null, array $env = []): static
     {
         if (0 !== $this->run($callback, $env)) {
             throw new ProcessFailedException($this);
@@ -374,8 +372,6 @@ class Process implements \IteratorAggregate
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
-     * @return static
-     *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
      *
@@ -383,7 +379,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function restart(callable $callback = null, array $env = []): self
+    public function restart(callable $callback = null, array $env = []): static
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running.');

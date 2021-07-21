@@ -28,11 +28,9 @@ final class OptionConfigurator
     /**
      * Adds allowed types for this option.
      *
-     * @return $this
-     *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function allowedTypes(string ...$types): self
+    public function allowedTypes(string ...$types): static
     {
         $this->resolver->setAllowedTypes($this->name, $types);
 
@@ -44,11 +42,9 @@ final class OptionConfigurator
      *
      * @param mixed ...$values One or more acceptable values/closures
      *
-     * @return $this
-     *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function allowedValues(mixed ...$values): self
+    public function allowedValues(mixed ...$values): static
     {
         $this->resolver->setAllowedValues($this->name, $values);
 
@@ -58,11 +54,9 @@ final class OptionConfigurator
     /**
      * Sets the default value for this option.
      *
-     * @return $this
-     *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function default(mixed $value): self
+    public function default(mixed $value): static
     {
         $this->resolver->setDefault($this->name, $value);
 
@@ -83,10 +77,8 @@ final class OptionConfigurator
      * @param string          $package The name of the composer package that is triggering the deprecation
      * @param string          $version The version of the package that introduced the deprecation
      * @param string|\Closure $message The deprecation message to use
-     *
-     * @return $this
      */
-    public function deprecated(string $package, string $version, string|\Closure $message = 'The option "%name%" is deprecated.'): self
+    public function deprecated(string $package, string $version, string|\Closure $message = 'The option "%name%" is deprecated.'): static
     {
         $this->resolver->setDeprecated($this->name, $package, $version, $message);
 
@@ -96,11 +88,9 @@ final class OptionConfigurator
     /**
      * Sets the normalizer for this option.
      *
-     * @return $this
-     *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function normalize(\Closure $normalizer): self
+    public function normalize(\Closure $normalizer): static
     {
         $this->resolver->setNormalizer($this->name, $normalizer);
 
@@ -110,11 +100,9 @@ final class OptionConfigurator
     /**
      * Marks this option as required.
      *
-     * @return $this
-     *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function required(): self
+    public function required(): static
     {
         $this->resolver->setRequired($this->name);
 
@@ -124,11 +112,9 @@ final class OptionConfigurator
     /**
      * Sets an info message for an option.
      *
-     * @return $this
-     *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function info(string $info): self
+    public function info(string $info): static
     {
         $this->resolver->setInfo($this->name, $info);
 

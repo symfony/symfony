@@ -67,30 +67,22 @@ final class SlackOptions implements MessageOptionsInterface
 
     /**
      * @param string $id The hook id (anything after https://hooks.slack.com/services/)
-     *
-     * @return $this
      */
-    public function recipient(string $id): self
+    public function recipient(string $id): static
     {
         $this->options['recipient_id'] = $id;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function asUser(bool $bool): self
+    public function asUser(bool $bool): static
     {
         $this->options['as_user'] = $bool;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function block(SlackBlockInterface $block): self
+    public function block(SlackBlockInterface $block): static
     {
         if (\count($this->options['blocks'] ?? []) >= self::MAX_BLOCKS) {
             throw new LogicException(sprintf('Maximum number of "blocks" has been reached (%d).', self::MAX_BLOCKS));
@@ -101,90 +93,63 @@ final class SlackOptions implements MessageOptionsInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function iconEmoji(string $emoji): self
+    public function iconEmoji(string $emoji): static
     {
         $this->options['icon_emoji'] = $emoji;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function iconUrl(string $url): self
+    public function iconUrl(string $url): static
     {
         $this->options['icon_url'] = $url;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function linkNames(bool $bool): self
+    public function linkNames(bool $bool): static
     {
         $this->options['link_names'] = $bool;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function mrkdwn(bool $bool): self
+    public function mrkdwn(bool $bool): static
     {
         $this->options['mrkdwn'] = $bool;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function parse(string $parse): self
+    public function parse(string $parse): static
     {
         $this->options['parse'] = $parse;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function unfurlLinks(bool $bool): self
+    public function unfurlLinks(bool $bool): static
     {
         $this->options['unfurl_links'] = $bool;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function unfurlMedia(bool $bool): self
+    public function unfurlMedia(bool $bool): static
     {
         $this->options['unfurl_media'] = $bool;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function username(string $username): self
+    public function username(string $username): static
     {
         $this->options['username'] = $username;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function threadTs(string $threadTs): self
+    public function threadTs(string $threadTs): static
     {
         $this->options['thread_ts'] = $threadTs;
 

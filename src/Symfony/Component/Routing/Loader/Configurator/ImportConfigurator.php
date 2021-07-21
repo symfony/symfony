@@ -52,10 +52,8 @@ class ImportConfigurator
      * Sets the prefix to add to the path of all child routes.
      *
      * @param string|array $prefix the prefix, or the localized prefixes
-     *
-     * @return $this
      */
-    final public function prefix(string|array $prefix, bool $trailingSlashOnRoot = true): self
+    final public function prefix(string|array $prefix, bool $trailingSlashOnRoot = true): static
     {
         $this->addPrefix($this->route, $prefix, $trailingSlashOnRoot);
 
@@ -64,10 +62,8 @@ class ImportConfigurator
 
     /**
      * Sets the prefix to add to the name of all child routes.
-     *
-     * @return $this
      */
-    final public function namePrefix(string $namePrefix): self
+    final public function namePrefix(string $namePrefix): static
     {
         $this->route->addNamePrefix($namePrefix);
 
@@ -78,10 +74,8 @@ class ImportConfigurator
      * Sets the host to use for all child routes.
      *
      * @param string|array $host the host, or the localized hosts
-     *
-     * @return $this
      */
-    final public function host(string|array $host): self
+    final public function host(string|array $host): static
     {
         $this->addHost($this->route, $host);
 

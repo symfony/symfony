@@ -230,10 +230,7 @@ class PdoStore implements PersistingStoreInterface
         return $key->getState(__CLASS__);
     }
 
-    /**
-     * @return \PDO|Connection
-     */
-    private function getConnection(): object
+    private function getConnection(): \PDO|Connection
     {
         if (null === $this->conn) {
             if (strpos($this->dsn, '://')) {

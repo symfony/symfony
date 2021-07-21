@@ -25,10 +25,7 @@ class ZookeeperStoreTest extends AbstractStoreTest
 {
     use UnserializableTestTrait;
 
-    /**
-     * @return ZookeeperStore
-     */
-    public function getStore(): PersistingStoreInterface
+    public function getStore(): ZookeeperStore
     {
         $zookeeper_server = getenv('ZOOKEEPER_HOST').':2181';
 

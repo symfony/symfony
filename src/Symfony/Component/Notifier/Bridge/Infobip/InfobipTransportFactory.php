@@ -14,7 +14,6 @@ namespace Symfony\Component\Notifier\Bridge\Infobip;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -22,10 +21,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class InfobipTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return InfobipTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): InfobipTransport
     {
         $scheme = $dsn->getScheme();
 

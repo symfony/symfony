@@ -37,10 +37,7 @@ final class ChatMessage implements MessageInterface
         return $message;
     }
 
-    /**
-     * @return $this
-     */
-    public function subject(string $subject): self
+    public function subject(string $subject): static
     {
         $this->subject = $subject;
 
@@ -57,10 +54,7 @@ final class ChatMessage implements MessageInterface
         return $this->options ? $this->options->getRecipientId() : null;
     }
 
-    /**
-     * @return $this
-     */
-    public function options(MessageOptionsInterface $options): self
+    public function options(MessageOptionsInterface $options): static
     {
         $this->options = $options;
 
@@ -72,10 +66,7 @@ final class ChatMessage implements MessageInterface
         return $this->options;
     }
 
-    /**
-     * @return $this
-     */
-    public function transport(?string $transport): self
+    public function transport(?string $transport): static
     {
         $this->transport = $transport;
 

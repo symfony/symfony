@@ -39,10 +39,7 @@ final class SmsMessage implements MessageInterface
         return new self($recipient->getPhone(), $notification->getSubject());
     }
 
-    /**
-     * @return $this
-     */
-    public function phone(string $phone): self
+    public function phone(string $phone): static
     {
         if ('' === $phone) {
             throw new InvalidArgumentException(sprintf('"%s" needs a phone number, it cannot be empty.', static::class));
@@ -63,10 +60,7 @@ final class SmsMessage implements MessageInterface
         return $this->phone;
     }
 
-    /**
-     * @return $this
-     */
-    public function subject(string $subject): self
+    public function subject(string $subject): static
     {
         $this->subject = $subject;
 
@@ -78,10 +72,7 @@ final class SmsMessage implements MessageInterface
         return $this->subject;
     }
 
-    /**
-     * @return $this
-     */
-    public function transport(?string $transport): self
+    public function transport(?string $transport): static
     {
         $this->transport = $transport;
 

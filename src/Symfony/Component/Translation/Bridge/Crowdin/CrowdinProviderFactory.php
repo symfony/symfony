@@ -54,10 +54,7 @@ final class CrowdinProviderFactory extends AbstractProviderFactory
         $this->xliffFileDumper = $xliffFileDumper;
     }
 
-    /**
-     * @return CrowdinProvider
-     */
-    public function create(Dsn $dsn): ProviderInterface
+    public function create(Dsn $dsn): CrowdinProvider
     {
         if ('crowdin' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'crowdin', $this->getSupportedSchemes());

@@ -17,7 +17,6 @@ use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
@@ -33,10 +32,7 @@ final class MercureTransportFactory extends AbstractTransportFactory
         $this->registry = $registry;
     }
 
-    /**
-     * @return MercureTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MercureTransport
     {
         if ('mercure' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'mercure', $this->getSupportedSchemes());

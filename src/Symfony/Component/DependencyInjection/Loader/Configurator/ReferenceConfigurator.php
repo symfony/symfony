@@ -29,30 +29,21 @@ class ReferenceConfigurator extends AbstractConfigurator
         $this->id = $id;
     }
 
-    /**
-     * @return $this
-     */
-    final public function ignoreOnInvalid(): self
+    final public function ignoreOnInvalid(): static
     {
         $this->invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    final public function nullOnInvalid(): self
+    final public function nullOnInvalid(): static
     {
         $this->invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    final public function ignoreOnUninitialized(): self
+    final public function ignoreOnUninitialized(): static
     {
         $this->invalidBehavior = ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE;
 

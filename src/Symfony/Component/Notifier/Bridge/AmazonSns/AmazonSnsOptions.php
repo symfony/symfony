@@ -41,10 +41,8 @@ final class AmazonSnsOptions implements MessageOptionsInterface
 
     /**
      * @param string $topic The Topic ARN for SNS message
-     *
-     * @return $this
      */
-    public function recipient(string $topic): self
+    public function recipient(string $topic): static
     {
         $this->recipient = $topic;
 

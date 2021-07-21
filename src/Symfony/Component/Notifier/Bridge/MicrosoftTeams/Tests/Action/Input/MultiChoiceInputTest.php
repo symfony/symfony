@@ -9,10 +9,7 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 
 final class MultiChoiceInputTest extends AbstractInputTestCase
 {
-    /**
-     * @return MultiChoiceInput
-     */
-    public function createInput(): AbstractInput
+    public function createInput(): MultiChoiceInput
     {
         return new MultiChoiceInput();
     }

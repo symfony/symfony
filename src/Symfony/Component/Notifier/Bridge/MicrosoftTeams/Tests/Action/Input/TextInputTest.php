@@ -8,10 +8,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Test\Action\Input\AbstractI
 
 final class TextInputTest extends AbstractInputTestCase
 {
-    /**
-     * @return TextInput
-     */
-    public function createInput(): AbstractInput
+    public function createInput(): TextInput
     {
         return new TextInput();
     }

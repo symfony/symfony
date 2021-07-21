@@ -18,10 +18,7 @@ use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
  */
 final class NullTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return NullTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): NullTransport
     {
         if ('null' === $dsn->getScheme()) {
             return new NullTransport($this->dispatcher);

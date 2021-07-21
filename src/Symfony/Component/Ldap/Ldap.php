@@ -69,10 +69,8 @@ final class Ldap implements LdapInterface
      *
      * @param string $adapter The adapter name
      * @param array  $config  The adapter's configuration
-     *
-     * @return static
      */
-    public static function create(string $adapter, array $config = []): self
+    public static function create(string $adapter, array $config = []): static
     {
         if (!isset(self::ADAPTER_MAP[$adapter])) {
             throw new DriverNotFoundException(sprintf('Adapter "%s" not found. You should use one of: "%s".', $adapter, implode('", "', self::ADAPTER_MAP)));

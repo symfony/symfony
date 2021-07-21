@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\TurboSms;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Artem Henvald <genvaldartem@gmail.com>
  */
 final class TurboSmsTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return TurboSmsTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): TurboSmsTransport
     {
         $scheme = $dsn->getScheme();
 

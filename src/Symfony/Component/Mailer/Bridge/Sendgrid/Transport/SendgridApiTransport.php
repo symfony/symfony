@@ -19,6 +19,8 @@ use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -50,10 +52,17 @@ class SendgridApiTransport extends AbstractApiTransport
             'auth_bearer' => $this->key,
         ]);
 
-        if (202 !== $response->getStatusCode()) {
-            $errors = $response->toArray(false);
+        try {
+            $statusCode = $response->getStatusCode();
+            $result = $response->toArray(false);
+        } catch (DecodingExceptionInterface $e) {
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+        } catch (TransportExceptionInterface $e) {
+            throw new HttpTransportException('Could not reach the remote Sendgrid server.', $response, 0, $e);
+        }
 
-            throw new HttpTransportException('Unable to send an email: '.implode('; ', array_column($errors['errors'], 'message')).sprintf(' (code %d).', $response->getStatusCode()), $response);
+        if (202 !== $statusCode) {
+            throw new HttpTransportException('Unable to send an email: '.implode('; ', array_column($result['errors'], 'message')).sprintf(' (code %d).', $statusCode), $response);
         }
 
         $sentMessage->setMessageId($response->getHeaders(false)['x-message-id'][0]);

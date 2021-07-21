@@ -508,7 +508,7 @@ class Command
      * @param bool $hidden Whether or not the command should be hidden from the list of commands
      *                     The default value will be true in Symfony 6.0
      *
-     * @return Command The current instance
+     * @return $this
      *
      * @final since Symfony 5.1
      */

@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -66,8 +67,15 @@ class SesApiTransport extends AbstractApiTransport
             'body' => $payload = $this->getPayload($email, $envelope),
         ]);
 
-        $result = new \SimpleXMLElement($response->getContent(false));
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+            $content = $response->getContent(false);
+        } catch (TransportExceptionInterface $e) {
+            throw new HttpTransportException('Could not reach the remote Amazon server.', $response, 0, $e);
+        }
+
+        $result = new \SimpleXMLElement($content);
+        if (200 !== $statusCode) {
             throw new HttpTransportException('Unable to send an email: '.$result->Error->Message.sprintf(' (code %d).', $result->Error->Code), $response);
         }
 

@@ -31,7 +31,7 @@ class JsonSerializableNormalizerTest extends TestCase
     private $normalizer;
 
     /**
-     * @var MockObject|SerializerInterface
+     * @var MockObject&JsonSerializerNormalizer
      */
     private $serializer;
 

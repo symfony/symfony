@@ -41,12 +41,12 @@ class FormDataExtractorTest extends TestCase
     private $dataExtractor;
 
     /**
-     * @var MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
-     * @var MockObject
+     * @var MockObject&FormFactoryInterface
      */
     private $factory;
 

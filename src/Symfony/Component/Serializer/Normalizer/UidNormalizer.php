@@ -40,7 +40,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
      *
      * @param AbstractUid $object
      */
-    public function normalize(mixed $object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         switch ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
             case self::NORMALIZATION_FORMAT_CANONICAL:

@@ -23,7 +23,7 @@ class Dummy implements NormalizableInterface, DenormalizableInterface
     public $baz;
     public $qux;
 
-    public function normalize(NormalizerInterface $normalizer, string $format = null, array $context = [])
+    public function normalize(NormalizerInterface $normalizer, string $format = null, array $context = []): array|string|int|float|bool
     {
         return [
             'foo' => $this->foo,

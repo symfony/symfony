@@ -21,7 +21,7 @@ class ScalarDummy implements NormalizableInterface, DenormalizableInterface
     public $foo;
     public $xmlFoo;
 
-    public function normalize(NormalizerInterface $normalizer, string $format = null, array $context = [])
+    public function normalize(NormalizerInterface $normalizer, string $format = null, array $context = []): array|string|int|float|bool
     {
         return 'xml' === $format ? $this->xmlFoo : $this->foo;
     }

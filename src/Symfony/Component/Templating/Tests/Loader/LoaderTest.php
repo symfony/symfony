@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Templating\Tests\Loader;
 
+use Symfony\Component\Templating\Storage\Storage;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Templating\Loader\Loader;
@@ -29,8 +30,9 @@ class LoaderTest extends TestCase
 
 class ProjectTemplateLoader4 extends Loader
 {
-    public function load(TemplateReferenceInterface $template)
+    public function load(TemplateReferenceInterface $template): Storage|false
     {
+        return false;
     }
 
     public function getLogger()

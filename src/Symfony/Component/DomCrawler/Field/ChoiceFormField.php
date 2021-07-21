@@ -252,11 +252,9 @@ class ChoiceFormField extends FormField
     /**
      * Checks whether given value is in the existing options.
      *
-     * @internal since Symfony 5.3
-     *
-     * @return bool
+     * @internal
      */
-    public function containsOption(string $optionValue, array $options)
+    public function containsOption(string $optionValue, array $options): bool
     {
         if ($this->validationDisabled) {
             return true;

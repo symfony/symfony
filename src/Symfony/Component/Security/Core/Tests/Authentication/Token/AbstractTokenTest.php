@@ -261,7 +261,7 @@ class SerializableUser implements UserInterface
         return $this->name;
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         return $this->name;
     }

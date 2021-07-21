@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Templating\Tests\Loader;
 
+use Symfony\Component\Templating\Storage\Storage;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Templating\Loader\CacheLoader;
@@ -79,7 +80,7 @@ class ProjectTemplateLoaderVar extends Loader
         return 'Hello {{ name }}';
     }
 
-    public function load(TemplateReferenceInterface $template)
+    public function load(TemplateReferenceInterface $template): Storage|false
     {
         if (method_exists($this, $method = 'get'.ucfirst($template->get('name')).'Template')) {
             return new StringStorage($this->$method());

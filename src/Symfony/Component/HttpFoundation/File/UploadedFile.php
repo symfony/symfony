@@ -226,12 +226,7 @@ class UploadedFile extends File
         return min($sizePostMax ?: \PHP_INT_MAX, $sizeUploadMax ?: \PHP_INT_MAX);
     }
 
-    /**
-     * Returns the given size from an ini value in bytes.
-     *
-     * @return int|float Returns float if size > PHP_INT_MAX
-     */
-    private static function parseFilesize(string $size)
+    private static function parseFilesize(string $size): int|float
     {
         if ('' === $size) {
             return 0;

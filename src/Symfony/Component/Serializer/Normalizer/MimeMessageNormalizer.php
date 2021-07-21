@@ -52,7 +52,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if ($object instanceof Headers) {
             $ret = [];

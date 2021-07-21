@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
+use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
@@ -23,7 +24,7 @@ class AbstractNormalizerDummy extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false)
+    public function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
     {
         return parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
     }
@@ -31,7 +32,7 @@ class AbstractNormalizerDummy extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
     }
 

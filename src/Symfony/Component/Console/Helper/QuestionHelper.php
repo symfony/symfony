@@ -496,10 +496,8 @@ class QuestionHelper extends Helper
      *
      * @param resource $inputStream The handler resource
      * @param Question $question    The question being asked
-     *
-     * @return string|false The input received, false in case input could not be read
      */
-    private function readInput($inputStream, Question $question)
+    private function readInput($inputStream, Question $question): string|false
     {
         if (!$question->isMultiline()) {
             $cp = $this->setIOCodepage();
@@ -539,10 +537,8 @@ class QuestionHelper extends Helper
 
     /**
      * Sets console I/O to the specified code page and converts the user input.
-     *
-     * @return string|false
      */
-    private function resetIOCodepage(int $cp, string|false $input)
+    private function resetIOCodepage(int $cp, string|false $input): string|false
     {
         if (0 !== $cp) {
             sapi_windows_cp_set($cp);

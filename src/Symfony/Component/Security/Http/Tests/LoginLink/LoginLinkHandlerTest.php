@@ -271,7 +271,7 @@ class TestLoginLinkHandlerUser implements UserInterface
         return $this->username;
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         return $this->username;
     }

@@ -26,7 +26,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 class CachingFactoryDecoratorTest extends TestCase
 {
     /**
-     * @var MockObject
+     * @var MockObject&ChoiceListFactoryInterface
      */
     private $decoratedFactory;
 

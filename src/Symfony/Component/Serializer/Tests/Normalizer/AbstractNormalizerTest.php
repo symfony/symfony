@@ -36,7 +36,7 @@ class AbstractNormalizerTest extends TestCase
     private $normalizer;
 
     /**
-     * @var ClassMetadataFactoryInterface|MockObject
+     * @var MockObject&ClassMetadataFactoryInterface
      */
     private $classMetadata;
 

@@ -159,6 +159,6 @@ class Link implements EvolvableLinkInterface
 
     private function hrefIsTemplated(string $href): bool
     {
-        return false !== strpos($href, '{') || false !== strpos($href, '}');
+        return str_contains($href, '{') || str_contains($href, '}');
     }
 }

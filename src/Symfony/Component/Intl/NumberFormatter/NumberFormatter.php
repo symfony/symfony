@@ -533,7 +533,7 @@ abstract class NumberFormatter
             // value is not valid if grouping is used, but digits are not grouped in groups of three
             if ($error = isset($matches['grouping']) && !preg_match('/^-?(?:\d{1,3}+)?(?:(?:,\d{3})++|\d*+)(?:\.\d*+)?$/', $value)) {
                 // the position on error is 0 for positive and 1 for negative numbers
-                $position = 0 === strpos($value, '-') ? 1 : 0;
+                $position = str_starts_with($value, '-') ? 1 : 0;
             }
         } else {
             $error = true;

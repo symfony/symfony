@@ -163,7 +163,7 @@ class ConsoleFormatter implements FormatterInterface
     {
         $message = $record['message'];
 
-        if (false === strpos($message, '{')) {
+        if (!str_contains($message, '{')) {
             return $record;
         }
 

@@ -26,7 +26,7 @@
         "psr/log": "^1.1|^2|^3",
         "symfony/cache-contracts": "^1.1.7|^2",
         "symfony/deprecation-contracts": "^2.1",
-        "symfony/polyfill-php80": "^1.15",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/service-contracts": "^1.1|^2",
         "symfony/var-exporter": "^4.4|^5.0|^6.0"
     },

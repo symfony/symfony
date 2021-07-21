@@ -163,7 +163,7 @@ class Inline
                 return 'false';
             case \is_int($value):
                 return $value;
-            case is_numeric($value) && false === strpos($value, "\f") && false === strpos($value, "\n") && false === strpos($value, "\r") && false === strpos($value, "\t") && false === strpos($value, "\v"):
+            case is_numeric($value) && false === strpbrk($value, "\f\n\r\t\v"):
                 $locale = setlocale(\LC_NUMERIC, 0);
                 if (false !== $locale) {
                     setlocale(\LC_NUMERIC, 'C');
@@ -365,7 +365,7 @@ class Inline
                     $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references);
 
                     // the value can be an array if a reference has been resolved to an array var
-                    if (\is_string($value) && !$isQuoted && false !== strpos($value, ': ')) {
+                    if (\is_string($value) && !$isQuoted && str_contains($value, ': ')) {
                         // embedded mapping?
                         try {
                             $pos = 0;
@@ -552,7 +552,7 @@ class Inline
     {
         $scalar = trim($scalar);
 
-        if ('*' === ($scalar[0] ?? '')) {
+        if (str_starts_with($scalar, '*')) {
             if (false !== $pos = strpos($scalar, '#')) {
                 $value = substr($scalar, 1, $pos - 2);
             } else {
@@ -584,11 +584,11 @@ class Inline
                 return false;
             case '!' === $scalar[0]:
                 switch (true) {
-                    case 0 === strncmp($scalar, '!!str ', 6):
+                    case str_starts_with($scalar, '!!str '):
                         return (string) substr($scalar, 6);
-                    case 0 === strncmp($scalar, '! ', 2):
+                    case str_starts_with($scalar, '! '):
                         return substr($scalar, 2);
-                    case 0 === strncmp($scalar, '!php/object', 11):
+                    case str_starts_with($scalar, '!php/object'):
                         if (self::$objectSupport) {
                             if (!isset($scalar[12])) {
                                 trigger_deprecation('symfony/yaml', '5.1', 'Using the !php/object tag without a value is deprecated.');
@@ -604,7 +604,7 @@ class Inline
                         }
 
                         return null;
-                    case 0 === strncmp($scalar, '!php/const', 10):
+                    case str_starts_with($scalar, '!php/const'):
                         if (self::$constantSupport) {
                             if (!isset($scalar[11])) {
                                 trigger_deprecation('symfony/yaml', '5.1', 'Using the !php/const tag without a value is deprecated.');
@@ -624,9 +624,9 @@ class Inline
                         }
 
                         return null;
-                    case 0 === strncmp($scalar, '!!float ', 8):
+                    case str_starts_with($scalar, '!!float '):
                         return (float) substr($scalar, 8);
-                    case 0 === strncmp($scalar, '!!binary ', 9):
+                    case str_starts_with($scalar, '!!binary '):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
                     default:
                         throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);

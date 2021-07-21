@@ -61,7 +61,7 @@ class InputOption
      */
     public function __construct(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null)
     {
-        if (0 === strpos($name, '--')) {
+        if (str_starts_with($name, '--')) {
             $name = substr($name, 2);
         }
 

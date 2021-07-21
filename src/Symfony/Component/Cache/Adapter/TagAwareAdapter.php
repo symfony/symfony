@@ -232,7 +232,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     {
         if ('' !== $prefix) {
             foreach ($this->deferred as $key => $item) {
-                if (0 === strpos($key, $prefix)) {
+                if (str_starts_with($key, $prefix)) {
                     unset($this->deferred[$key]);
                 }
             }

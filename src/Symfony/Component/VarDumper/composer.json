@@ -18,7 +18,7 @@
     "require": {
         "php": ">=7.2.5",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php80": "^1.15"
+        "symfony/polyfill-php80": "^1.16"
     },
     "require-dev": {
         "ext-iconv": "*",

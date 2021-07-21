@@ -927,7 +927,7 @@ class OptionsResolver implements Options
                 $fmtAllowedTypes = implode('" or "', $this->allowedTypes[$option]);
                 $fmtProvidedTypes = implode('|', array_keys($invalidTypes));
                 $allowedContainsArrayType = \count(array_filter($this->allowedTypes[$option], static function ($item) {
-                    return '[]' === substr(self::TYPE_ALIASES[$item] ?? $item, -2);
+                    return str_ends_with(self::TYPE_ALIASES[$item] ?? $item, '[]');
                 })) > 0;
 
                 if (\is_array($value) && $allowedContainsArrayType) {

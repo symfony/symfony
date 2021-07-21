@@ -88,7 +88,7 @@ class MimeTypeTest extends TestCase
         touch($path);
         @chmod($path, 0333);
 
-        if ('0333' == substr(sprintf('%o', fileperms($path)), -4)) {
+        if (str_ends_with(sprintf('%o', fileperms($path)), '0333')) {
             $this->expectException(AccessDeniedException::class);
             MimeTypeGuesser::getInstance()->guess($path);
         } else {

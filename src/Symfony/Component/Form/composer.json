@@ -22,6 +22,7 @@
         "symfony/options-resolver": "~4.3|^5.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/property-access": "^3.4.40|^4.4.8|^5.0.8",
         "symfony/service-contracts": "^1.1|^2"
     },

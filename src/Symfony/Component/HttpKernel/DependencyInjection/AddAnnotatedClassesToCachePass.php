@@ -62,7 +62,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 
         // Explicit classes declared in the patterns are returned directly
         foreach ($patterns as $key => $pattern) {
-            if ('\\' !== substr($pattern, -1) && false === strpos($pattern, '*')) {
+            if (!str_ends_with($pattern, '\\') && false === strpos($pattern, '*')) {
                 unset($patterns[$key]);
                 $expanded[] = ltrim($pattern, '\\');
             }

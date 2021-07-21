@@ -527,7 +527,7 @@ class Route implements \Serializable
             $regex = (string) substr($regex, 1); // returns false for a single character
         }
 
-        if ('$' === substr($regex, -1)) {
+        if (str_ends_with($regex, '$')) {
             $regex = substr($regex, 0, -1);
         }
 

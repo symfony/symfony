@@ -504,7 +504,7 @@ EOF;
             return;
         }
         $file = $r->getFileName();
-        if (') : eval()\'d code' === substr($file, -17)) {
+        if (str_ends_with($file, ') : eval()\'d code')) {
             $file = substr($file, 0, strrpos($file, '(', -17));
         }
         if (!$file || $this->doExport($file) === $exportedFile = $this->export($file)) {
@@ -2095,7 +2095,7 @@ EOF;
 
         if ($resolveEnv && "'" === $export[0] && $export !== $resolvedExport = $this->container->resolveEnvPlaceholders($export, "'.\$this->getEnv('string:%s').'")) {
             $export = $resolvedExport;
-            if (".''" === substr($export, -3)) {
+            if (str_ends_with($export, ".''")) {
                 $export = substr($export, 0, -3);
                 if ("'" === $export[1]) {
                     $export = substr_replace($export, '', 18, 7);

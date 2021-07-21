@@ -25,6 +25,7 @@
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/http-kernel": "^4.4",
         "symfony/polyfill-mbstring": "~1.0",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/filesystem": "^3.4|^4.0|^5.0",
         "symfony/finder": "^3.4|^4.0|^5.0",
         "symfony/routing": "^4.4.12|^5.1.4"

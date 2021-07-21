@@ -160,6 +160,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',
         ],
+        'yunpian' => [
+            'class' => Bridge\Yunpian\YunpianTransportFactory::class,
+            'package' => 'symfony/yunpian-notifier',
+        ],
         'zulip' => [
             'class' => Bridge\Zulip\ZulipTransportFactory::class,
             'package' => 'symfony/zulip-notifier',

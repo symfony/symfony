@@ -28,7 +28,7 @@ class ArrayDenormalizerTest extends TestCase
     private $denormalizer;
 
     /**
-     * @var ContextAwareDenormalizerInterface|MockObject
+     * @var MockObject&ContextAwareDenormalizerInterface
      */
     private $serializer;
 

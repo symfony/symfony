@@ -28,15 +28,18 @@ class LazyChoiceListTest extends TestCase
     private $list;
 
     /**
-     * @var MockObject
+     * @var MockObject&ChoiceListInterface
      */
     private $loadedList;
 
     /**
-     * @var MockObject
+     * @var MockObject&ChoiceLoaderInterface
      */
     private $loader;
 
+    /**
+     * @var \Closure
+     */
     private $value;
 
     protected function setUp(): void

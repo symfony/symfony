@@ -20,7 +20,6 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormValidatorInterface;
 
 abstract class AbstractFormTest extends TestCase
 {
@@ -30,7 +29,7 @@ abstract class AbstractFormTest extends TestCase
     protected $dispatcher;
 
     /**
-     * @var FormFactoryInterface
+     * @var MockObject&FormFactoryInterface
      */
     protected $factory;
 
@@ -60,18 +59,19 @@ abstract class AbstractFormTest extends TestCase
         return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory, $options);
     }
 
-    protected function getDataMapper(): MockObject
+    /**
+     * @return MockObject&DataMapperInterface
+     */
+    protected function getDataMapper(): DataMapperInterface
     {
         return $this->createMock(DataMapperInterface::class);
     }
 
-    protected function getDataTransformer(): MockObject
+    /**
+     * @return MockObject&DataTransformerInterface
+     */
+    protected function getDataTransformer(): DataTransformerInterface
     {
         return $this->createMock(DataTransformerInterface::class);
-    }
-
-    protected function getFormValidator(): MockObject
-    {
-        return $this->createMock(FormValidatorInterface::class);
     }
 }

@@ -199,7 +199,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     {
         $file = str_replace('\\', '/', $file);
 
-        if (null !== $this->projectDir && str_starts_with($file, $this->projectDir)) {
+        if (null !== $this->projectDir && 0 === strpos($file, $this->projectDir)) {
             return ltrim(substr($file, \strlen($this->projectDir)), '/');
         }
 
@@ -316,7 +316,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
     private function formatLogMessage(string $message, array $context)
     {
-        if ($context && str_contains($message, '{')) {
+        if ($context && false !== strpos($message, '{')) {
             $replacements = [];
             foreach ($context as $key => $val) {
                 if (is_scalar($val)) {

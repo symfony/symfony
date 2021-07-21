@@ -401,7 +401,7 @@ EOF;
             $fmt = [substr($f, 0, $i)] + preg_split('/&([^>]++)>/', substr($f, $i), -1, \PREG_SPLIT_DELIM_CAPTURE);
 
             for ($i = 1; isset($fmt[$i]); ++$i) {
-                if (str_starts_with($path, $k = $fmt[$i++])) {
+                if (0 === strpos($path, $k = $fmt[$i++])) {
                     $path = substr_replace($path, $fmt[$i], 0, \strlen($k));
                     break;
                 }

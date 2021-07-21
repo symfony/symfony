@@ -43,7 +43,7 @@ class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
 
         $prefix = 'Call to undefined function ';
         $prefixLen = \strlen($prefix);
-        if (!str_starts_with($error['message'], $prefix)) {
+        if (0 !== strpos($error['message'], $prefix)) {
             return null;
         }
 

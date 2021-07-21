@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -66,16 +67,14 @@ class MailgunApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
+        } catch (DecodingExceptionInterface $e) {
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Mailgun server.', $response, 0, $e);
         }
 
         if (200 !== $statusCode) {
-            if ('application/json' === $response->getHeaders(false)['content-type'][0]) {
-                throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $statusCode), $response);
-            }
-
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $statusCode), $response);
         }
 
         $sentMessage->setMessageId($result['id']);

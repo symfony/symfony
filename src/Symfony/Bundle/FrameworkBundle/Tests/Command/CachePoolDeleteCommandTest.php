@@ -84,7 +84,7 @@ class CachePoolDeleteCommandTest extends TestCase
     }
 
     /**
-     * @return MockObject|KernelInterface
+     * @return MockObject&KernelInterface
      */
     private function getKernel(): object
     {

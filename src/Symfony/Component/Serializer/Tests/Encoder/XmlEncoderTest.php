@@ -860,7 +860,7 @@ XML;
     }
 
     /**
-     * @return MockObject|NormalizerInterface
+     * @return MockObject&NormalizerInterface
      */
     private function createMockDateTimeNormalizer(): object
     {

@@ -17,7 +17,7 @@ class ComposerLoaderFakeBis
     public function loadClass($className)
     {
         foreach ($this->getPrefixesPsr4() as $prefix => $baseDirs) {
-            if (0 !== strpos($className, $prefix)) {
+            if (str_contains($className, $prefix)) {
                 continue;
             }
 

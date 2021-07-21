@@ -250,7 +250,7 @@ class Container implements ContainerInterface, ResetInterface
                     continue;
                 }
                 $lev = levenshtein($id, $knownId);
-                if ($lev <= \strlen($id) / 3 || false !== strpos($knownId, $id)) {
+                if ($lev <= \strlen($id) / 3 || str_contains($knownId, $id)) {
                     $alternatives[] = $knownId;
                 }
             }
@@ -367,7 +367,7 @@ class Container implements ContainerInterface, ResetInterface
         $this->getEnv ??= \Closure::fromCallable([$this, 'getEnv']);
         $processors = $this->get($id);
 
-        if (false !== $i = strpos($name, ':')) {
+        if ($i = str_contains($name, ':')) {
             $prefix = substr($name, 0, $i);
             $localName = substr($name, 1 + $i);
         } else {

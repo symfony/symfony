@@ -109,7 +109,7 @@ trait MicroKernelTrait
                 ],
             ]);
 
-            $kernelClass = false !== strpos(static::class, "@anonymous\0") ? parent::class : static::class;
+            $kernelClass = str_contains(static::class, "@anonymous\0") ? parent::class : static::class;
 
             if (!$container->hasDefinition('kernel')) {
                 $container->register('kernel', $kernelClass)

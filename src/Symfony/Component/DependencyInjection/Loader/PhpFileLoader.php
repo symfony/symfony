@@ -178,7 +178,7 @@ class PhpFileLoader extends FileLoader
         // Try to get the extension alias
         $alias = Container::underscore(substr($namespace, 15, -6));
 
-        if (false !== strpos($alias, '\\')) {
+        if (str_contains($alias, '\\')) {
             throw new InvalidArgumentException('You can only use "root" ConfigBuilders from "Symfony\\Config\\" namespace. Nested classes like "Symfony\\Config\\Framework\\CacheConfig" cannot be used.');
         }
 

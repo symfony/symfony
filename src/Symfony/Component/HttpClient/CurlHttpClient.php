@@ -272,7 +272,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         if ($options['bindto']) {
             if (file_exists($options['bindto'])) {
                 $curlopts[\CURLOPT_UNIX_SOCKET_PATH] = $options['bindto'];
-            } elseif (0 !== strpos($options['bindto'], 'if!') && preg_match('/^(.*):(\d+)$/', $options['bindto'], $matches)) {
+            } elseif (str_contains($options['bindto'], 'if!') && preg_match('/^(.*):(\d+)$/', $options['bindto'], $matches)) {
                 $curlopts[\CURLOPT_INTERFACE] = $matches[1];
                 $curlopts[\CURLOPT_LOCALPORT] = $matches[2];
             } else {
@@ -382,7 +382,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         // curl before 7.65 doesn't validate the pushed ":authority" header,
         // but this is a MUST in the HTTP/2 RFC; let's restrict pushes to the original host,
         // ignoring domains mentioned as alt-name in the certificate for now (same as curl).
-        if (0 !== strpos($origin, $url.'/')) {
+        if (str_contains($origin, $url.'/')) {
             $this->logger && $this->logger->debug(sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
 
             return \CURL_PUSH_DENY;

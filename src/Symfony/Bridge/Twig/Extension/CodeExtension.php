@@ -62,7 +62,7 @@ final class CodeExtension extends AbstractExtension
 
     public function abbrMethod(string $method): string
     {
-        if (false !== strpos($method, '::')) {
+        if (str_contains($method, '::')) {
             [$class, $method] = explode('::', $method, 2);
             $result = sprintf('%s::%s()', $this->abbrClass($class), $method);
         } elseif ('Closure' === $method) {
@@ -206,7 +206,7 @@ final class CodeExtension extends AbstractExtension
      */
     public function formatLogMessage(string $message, array $context): string
     {
-        if ($context && false !== strpos($message, '{')) {
+        if ($context && str_contains($message, '{')) {
             $replacements = [];
             foreach ($context as $key => $val) {
                 if (is_scalar($val)) {

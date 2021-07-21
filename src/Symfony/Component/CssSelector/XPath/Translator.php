@@ -74,7 +74,7 @@ class Translator implements TranslatorInterface
         $string = $element;
         $parts = [];
         while (true) {
-            if (false !== $pos = strpos($string, "'")) {
+            if ($pos = str_contains($string, "'")) {
                 $parts[] = sprintf("'%s'", substr($string, 0, $pos));
                 $parts[] = "\"'\"";
                 $string = substr($string, $pos + 1);

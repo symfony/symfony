@@ -104,7 +104,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         $prefix = str_replace('\\', '/', $this->prefix);
         $paths = null;
 
-        if (0 !== strpos($this->prefix, 'phar://') && false === strpos($this->pattern, '/**/')) {
+        if (str_contains($this->prefix, 'phar://') && false === strpos($this->pattern, '/**/')) {
             if ($this->globBrace || false === strpos($this->pattern, '{')) {
                 $paths = glob($this->prefix.$this->pattern, \GLOB_NOSORT | $this->globBrace);
             } elseif (false === strpos($this->pattern, '\\') || !preg_match('/\\\\[,{}]/', $this->pattern)) {
@@ -220,7 +220,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 
         $j = 0;
         foreach ($patterns as $i => $p) {
-            if (false !== strpos($p, '{')) {
+            if (str_contains($p, '{')) {
                 $p = $this->expandGlob($p);
                 array_splice($paths, $i + $j, 1, $p);
                 $j += \count($p) - 1;

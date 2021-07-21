@@ -246,7 +246,7 @@ EOF
 
         if ($callable instanceof \Closure) {
             $r = new \ReflectionFunction($callable);
-            if (false !== strpos($r->name, '{closure}')) {
+            if (str_contains($r->name, '{closure}')) {
                 return 'Closure()';
             }
             if ($class = $r->getClosureScopeClass()) {

@@ -38,7 +38,7 @@ class LinkStub extends ConstStub
                 $label = substr($label, 7);
             }
             $href = substr($href, 7);
-        } elseif (false !== strpos($href, '://')) {
+        } elseif (str_contains($href, '://')) {
             $this->attr['href'] = $href;
 
             return;

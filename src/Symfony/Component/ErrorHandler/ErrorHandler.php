@@ -387,7 +387,7 @@ class ErrorHandler
      */
     public function handleError(int $type, string $message, string $file, int $line): bool
     {
-        if (\E_WARNING === $type && '"' === $message[0] && false !== strpos($message, '" targeting switch is equivalent to "break')) {
+        if (\E_WARNING === $type && '"' === $message[0] && str_contains($message, '" targeting switch is equivalent to "break')) {
             $type = \E_DEPRECATED;
         }
 
@@ -438,7 +438,7 @@ class ErrorHandler
                 return true;
             }
         } else {
-            if (false !== strpos($message, '@anonymous')) {
+            if (str_contains($message, '@anonymous')) {
                 $backtrace = debug_backtrace(false, 5);
 
                 for ($i = 1; isset($backtrace[$i]); ++$i) {
@@ -504,7 +504,7 @@ class ErrorHandler
         }
 
         if ($this->loggedErrors & $type) {
-            if (false !== strpos($message = $exception->getMessage(), "@anonymous\0")) {
+            if (str_contains($message = $exception->getMessage(), "@anonymous\0")) {
                 $message = $this->parseAnonymousClass($message);
             }
 

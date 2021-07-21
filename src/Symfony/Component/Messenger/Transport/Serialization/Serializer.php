@@ -112,7 +112,7 @@ class Serializer implements SerializerInterface
     {
         $stamps = [];
         foreach ($encodedEnvelope['headers'] as $name => $value) {
-            if (0 !== strpos($name, self::STAMP_HEADER_PREFIX)) {
+            if (str_contains($name, self::STAMP_HEADER_PREFIX)) {
                 continue;
             }
 

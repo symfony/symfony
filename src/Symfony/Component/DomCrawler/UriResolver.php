@@ -115,7 +115,7 @@ class UriResolver
      */
     private static function cleanupQuery(string $uri): string
     {
-        if (false !== $pos = strpos($uri, '?')) {
+        if ($pos = str_contains($uri, '?')) {
             return substr($uri, 0, $pos);
         }
 
@@ -127,7 +127,7 @@ class UriResolver
      */
     private static function cleanupAnchor(string $uri): string
     {
-        if (false !== $pos = strpos($uri, '#')) {
+        if ($pos = str_contains($uri, '#')) {
             return substr($uri, 0, $pos);
         }
 

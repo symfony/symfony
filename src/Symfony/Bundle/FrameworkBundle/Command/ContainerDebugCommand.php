@@ -264,7 +264,7 @@ EOF
         }
 
         // if the id has a \, assume it is a class
-        if (false !== strpos($serviceId, '\\')) {
+        if (str_contains($serviceId, '\\')) {
             return true;
         }
 

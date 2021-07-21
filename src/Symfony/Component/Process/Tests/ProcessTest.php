@@ -39,7 +39,7 @@ class ProcessTest extends TestCase
 
         ob_start();
         phpinfo(\INFO_GENERAL);
-        self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
+        self::$sigchild = str_contains(ob_get_clean(), '--enable-sigchild');
     }
 
     protected function tearDown(): void
@@ -143,7 +143,7 @@ class ProcessTest extends TestCase
 
         $completeOutput = '';
         $result = $p->waitUntil(function ($type, $output) use (&$completeOutput) {
-            return false !== strpos($completeOutput .= $output, 'One more');
+            return str_contains($completeOutput .= $output, 'One more');
         });
         $this->assertTrue($result);
         $this->assertLessThan(20, microtime(true) - $start);

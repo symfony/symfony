@@ -435,7 +435,7 @@ abstract class AbstractUnicodeString extends AbstractString
         $width = 0;
         $s = str_replace(["\x00", "\x05", "\x07"], '', $this->string);
 
-        if (false !== strpos($s, "\r")) {
+        if (str_contains($s, "\r")) {
             $s = str_replace(["\r\n", "\r"], "\n", $s);
         }
 

@@ -143,7 +143,7 @@ class ControllerResolver implements ControllerResolverInterface
     private function getControllerError(mixed $callable): string
     {
         if (\is_string($callable)) {
-            if (false !== strpos($callable, '::')) {
+            if (str_contains($callable, '::')) {
                 $callable = explode('::', $callable, 2);
             } else {
                 return sprintf('Function "%s" does not exist.', $callable);
@@ -184,7 +184,7 @@ class ControllerResolver implements ControllerResolverInterface
         foreach ($collection as $item) {
             $lev = levenshtein($method, $item);
 
-            if ($lev <= \strlen($method) / 3 || false !== strpos($item, $method)) {
+            if ($lev <= \strlen($method) / 3 || str_contains($item, $method)) {
                 $alternatives[] = $item;
             }
         }

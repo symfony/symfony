@@ -127,7 +127,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 
     private function matchAnyRegexps(string $class, array $regexps): bool
     {
-        $isTest = false !== strpos($class, 'Test');
+        $isTest = str_contains($class, 'Test');
 
         foreach ($regexps as $regex) {
             if ($isTest && false === strpos($regex, 'Test')) {

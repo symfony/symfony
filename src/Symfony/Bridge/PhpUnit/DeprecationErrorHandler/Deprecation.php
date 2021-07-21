@@ -122,7 +122,7 @@ class Deprecation
             return;
         }
 
-        if (!isset($line['class'], $trace[$i - 2]['function']) || 0 !== strpos($line['class'], SymfonyTestsListenerFor::class)) {
+        if (!isset($line['class'], $trace[$i - 2]['function']) || str_contains($line['class'], SymfonyTestsListenerFor::class)) {
             $this->originClass = isset($line['object']) ? \get_class($line['object']) : $line['class'];
             $this->originMethod = $line['function'];
 
@@ -171,7 +171,7 @@ class Deprecation
 
         $class = $this->originClass;
 
-        return false !== strpos($class, "@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class)) ?: 'class').'@anonymous' : $class;
+        return str_contains($class, "@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class)) ?: 'class').'@anonymous' : $class;
     }
 
     /**
@@ -225,7 +225,7 @@ class Deprecation
             return 0 === strpos($this->trace[1]['class'], 'PHPUnit\\');
         }
 
-        return false !== strpos($this->triggeringFile, \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR.'phpunit'.\DIRECTORY_SEPARATOR);
+        return str_contains($this->triggeringFile, \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR.'phpunit'.\DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -339,7 +339,7 @@ class Deprecation
             }
             foreach ($paths as $path) {
                 foreach (self::$vendors as $vendor) {
-                    if (0 !== strpos($path, $vendor)) {
+                    if (str_contains($path, $vendor)) {
                         self::$internalPaths[] = $path;
                     }
                 }

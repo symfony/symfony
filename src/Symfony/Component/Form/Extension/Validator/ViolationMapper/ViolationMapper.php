@@ -153,7 +153,7 @@ class ViolationMapper implements ViolationMapperInterface
             $message = $violation->getMessage();
             $messageTemplate = $violation->getMessageTemplate();
 
-            if (false !== strpos($message, '{{ label }}') || false !== strpos($messageTemplate, '{{ label }}')) {
+            if (str_contains($message, '{{ label }}') || str_contains($messageTemplate, '{{ label }}')) {
                 $form = $scope;
 
                 do {

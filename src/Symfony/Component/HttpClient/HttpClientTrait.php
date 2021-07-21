@@ -227,7 +227,7 @@ trait HttpClientTrait
             $alternatives = [];
 
             foreach ($defaultOptions as $key => $v) {
-                if (levenshtein($name, $key) <= \strlen($name) / 3 || false !== strpos($key, $name)) {
+                if (levenshtein($name, $key) <= \strlen($name) / 3 || str_contains($key, $name)) {
                     $alternatives[] = $key;
                 }
             }
@@ -486,7 +486,7 @@ trait HttpClientTrait
                 continue;
             }
 
-            if (false !== strpos($parts[$part], '%')) {
+            if (str_contains($parts[$part], '%')) {
                 // https://tools.ietf.org/html/rfc3986#section-2.3
                 $parts[$part] = preg_replace_callback('/%(?:2[DE]|3[0-9]|[46][1-9A-F]|5F|[57][0-9A]|7E)++/i', function ($m) { return rawurldecode($m[0]); }, $parts[$part]);
             }

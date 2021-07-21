@@ -147,7 +147,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $charset = null;
         if (false !== $pos = stripos($type, 'charset=')) {
             $charset = substr($type, $pos + 8);
-            if (false !== $pos = strpos($charset, ';')) {
+            if ($pos = str_contains($charset, ';')) {
                 $charset = substr($charset, 0, $pos);
             }
         }
@@ -939,7 +939,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $string = $s;
         $parts = [];
         while (true) {
-            if (false !== $pos = strpos($string, "'")) {
+            if ($pos = str_contains($string, "'")) {
                 $parts[] = sprintf("'%s'", substr($string, 0, $pos));
                 $parts[] = "\"'\"";
                 $string = substr($string, $pos + 1);
@@ -1049,7 +1049,7 @@ class Crawler implements \Countable, \IteratorAggregate
             } elseif (preg_match('/^(ancestor|ancestor-or-self|attribute|following|following-sibling|namespace|parent|preceding|preceding-sibling)::/', $expression)) {
                 // the fake root has no parent, preceding or following nodes and also no attributes (even no namespace attributes)
                 $expression = $nonMatchingExpression;
-            } elseif (0 !== strpos($expression, 'descendant-or-self::')) {
+            } elseif (str_contains($expression, 'descendant-or-self::')) {
                 $expression = 'self::'.$expression;
             }
             $expressions[] = $parenthesis.$expression;

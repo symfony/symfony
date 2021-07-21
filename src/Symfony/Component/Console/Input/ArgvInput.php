@@ -133,7 +133,7 @@ class ArgvInput extends Input
     {
         $name = substr($token, 2);
 
-        if (false !== $pos = strpos($name, '=')) {
+        if ($pos = str_contains($name, '=')) {
             if (0 === \strlen($value = substr($name, $pos + 1))) {
                 array_unshift($this->parsed, $value);
             }
@@ -264,7 +264,7 @@ class ArgvInput extends Input
         $isOption = false;
         foreach ($this->tokens as $i => $token) {
             if ($token && '-' === $token[0]) {
-                if (false !== strpos($token, '=') || !isset($this->tokens[$i + 1])) {
+                if (str_contains($token, '=') || !isset($this->tokens[$i + 1])) {
                     continue;
                 }
 

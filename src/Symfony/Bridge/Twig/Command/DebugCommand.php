@@ -212,7 +212,7 @@ EOF
         foreach ($types as $index => $type) {
             $items = [];
             foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
-                if (!$filter || false !== strpos($name, $filter)) {
+                if (!$filter || str_contains($name, $filter)) {
                     $items[$name] = $name.$this->getPrettyMetadata($type, $entity, $decorated);
                 }
             }
@@ -246,7 +246,7 @@ EOF
         $data = [];
         foreach ($types as $type) {
             foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
-                if (!$filter || false !== strpos($name, $filter)) {
+                if (!$filter || str_contains($name, $filter)) {
                     $data[$type][$name] = $this->getMetadata($type, $entity);
                 }
             }
@@ -526,7 +526,7 @@ EOF
         $alternatives = [];
         foreach ($collection as $item) {
             $lev = levenshtein($name, $item);
-            if ($lev <= \strlen($name) / 3 || false !== strpos($item, $name)) {
+            if ($lev <= \strlen($name) / 3 || str_contains($item, $name)) {
                 $alternatives[$item] = isset($alternatives[$item]) ? $alternatives[$item] - $lev : $lev;
             }
         }

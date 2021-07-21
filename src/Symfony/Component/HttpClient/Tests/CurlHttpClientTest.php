@@ -22,7 +22,7 @@ class CurlHttpClientTest extends HttpClientTestCase
 {
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
-        if (false !== strpos($testCase, 'Push')) {
+        if (str_contains($testCase, 'Push')) {
             if (!\defined('CURLMOPT_PUSHFUNCTION') || 0x073d00 > ($v = curl_version())['version_number'] || !(\CURL_VERSION_HTTP2 & $v['features'])) {
                 $this->markTestSkipped('curl <7.61 is used or it is not compiled with support for HTTP/2 PUSH');
             }

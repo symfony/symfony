@@ -309,7 +309,7 @@ abstract class AbstractCloner implements ClonerInterface
         $obj = $stub->value;
         $class = $stub->class;
 
-        if (false !== strpos($class, "@anonymous\0")) {
+        if (str_contains($class, "@anonymous\0")) {
             $stub->class = get_debug_type($obj);
         }
         if (isset($this->classInfo[$class])) {

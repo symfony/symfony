@@ -313,7 +313,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
     private function formatLogMessage(string $message, array $context)
     {
-        if ($context && false !== strpos($message, '{')) {
+        if ($context && str_contains($message, '{')) {
             $replacements = [];
             foreach ($context as $key => $val) {
                 if (is_scalar($val)) {

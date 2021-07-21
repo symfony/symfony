@@ -48,7 +48,7 @@ class CookieJar
             }
 
             foreach ($pathCookies as $cookiePath => $namedCookies) {
-                if (0 !== strpos($path, $cookiePath)) {
+                if (str_contains($path, $cookiePath)) {
                     continue;
                 }
                 if (isset($namedCookies[$name])) {

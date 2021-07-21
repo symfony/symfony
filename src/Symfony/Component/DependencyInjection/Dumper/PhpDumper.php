@@ -155,7 +155,7 @@ class PhpDumper extends Dumper
         $this->inlineRequires = $options['inline_class_loader_parameter'] && ($this->container->hasParameter($options['inline_class_loader_parameter']) ? $this->container->getParameter($options['inline_class_loader_parameter']) : $options['debug']);
         $this->serviceLocatorTag = $options['service_locator_tag'];
 
-        if (0 !== strpos($baseClass = $options['base_class'], '\\') && 'Container' !== $baseClass) {
+        if (str_contains($baseClass = $options['base_class'], '\\') && 'Container' !== $baseClass) {
             $baseClass = sprintf('%s\%s', $options['namespace'] ? '\\'.$options['namespace'] : '', $baseClass);
             $this->baseClass = $baseClass;
         } elseif ('Container' === $baseClass) {
@@ -327,7 +327,7 @@ require __DIR__.'/$preloadedFiles';
 EOF;
 
                 foreach ($this->preload as $class) {
-                    if (!$class || false !== strpos($class, '$') || \in_array($class, ['int', 'float', 'string', 'bool', 'resource', 'object', 'array', 'null', 'callable', 'iterable', 'mixed', 'void'], true)) {
+                    if (!$class || str_contains($class, '$') || \in_array($class, ['int', 'float', 'string', 'bool', 'resource', 'object', 'array', 'null', 'callable', 'iterable', 'mixed', 'void'], true)) {
                         continue;
                     }
                     if (!(class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) || (new \ReflectionClass($class))->isUserDefined()) {
@@ -1864,10 +1864,10 @@ EOF;
      */
     private function dumpLiteralClass(string $class): string
     {
-        if (false !== strpos($class, '$')) {
+        if (str_contains($class, '$')) {
             return sprintf('${($_ = %s) && false ?: "_"}', $class);
         }
-        if (0 !== strpos($class, "'") || !preg_match('/^\'(?:\\\{2})?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(?:\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
+        if (str_contains($class, "'") || !preg_match('/^\'(?:\\\{2})?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(?:\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
             throw new RuntimeException(sprintf('Cannot dump definition because of invalid class name (%s).', $class ?: 'n/a'));
         }
 
@@ -2113,7 +2113,7 @@ EOF;
         if ($shouldCacheValue && isset($this->exportedVariables[$value])) {
             return $this->exportedVariables[$value];
         }
-        if (\is_string($value) && false !== strpos($value, "\n")) {
+        if (\is_string($value) && str_contains($value, "\n")) {
             $cleanParts = explode("\n", $value);
             $cleanParts = array_map(function ($part) { return var_export($part, true); }, $cleanParts);
             $export = implode('."\n".', $cleanParts);
@@ -2121,10 +2121,10 @@ EOF;
             $export = var_export($value, true);
         }
         if ($this->asFiles) {
-            if (false !== strpos($export, '$this')) {
+            if (str_contains($export, '$this')) {
                 $export = str_replace('$this', "$'.'this", $export);
             }
-            if (false !== strpos($export, 'function () {')) {
+            if (str_contains($export, 'function () {')) {
                 $export = str_replace('function () {', "function ('.') {", $export);
             }
         }

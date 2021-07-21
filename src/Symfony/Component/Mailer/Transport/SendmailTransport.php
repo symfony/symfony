@@ -63,7 +63,7 @@ class SendmailTransport extends AbstractTransport
         }
 
         $this->stream = new ProcessStream();
-        if (false !== strpos($this->command, ' -bs')) {
+        if (str_contains($this->command, ' -bs')) {
             $this->stream->setCommand($this->command);
             $this->transport = new SmtpTransport($this->stream, $dispatcher, $logger);
         }

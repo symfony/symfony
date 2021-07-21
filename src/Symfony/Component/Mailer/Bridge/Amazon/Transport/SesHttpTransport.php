@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractHttpTransport;
 use Symfony\Component\Mime\Message;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -79,8 +80,15 @@ class SesHttpTransport extends AbstractHttpTransport
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint(), $request);
 
-        $result = new \SimpleXMLElement($response->getContent(false));
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+            $content = $response->getContent(false);
+        } catch (TransportExceptionInterface $e) {
+            throw new HttpTransportException('Could not reach the remote Amazon server.', $response, 0, $e);
+        }
+
+        $result = new \SimpleXMLElement($content);
+        if (200 !== $statusCode) {
             throw new HttpTransportException('Unable to send an email: '.$result->Error->Message.sprintf(' (code %d).', $result->Error->Code), $response);
         }
 

@@ -1322,6 +1322,27 @@ TABLE
         ];
     }
 
+    public function testSetTitleWithoutHeaders()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setHeaderTitle('Reproducer')
+            ->setRows([
+                ['Value', '123-456'],
+                ['Some other value', '789-0'],
+            ])
+            ->render();
+
+        $expected = <<<'TABLE'
++-------- Reproducer --------+
+| Value            | 123-456 |
+| Some other value | 789-0   |
++------------------+---------+
+
+TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
     public function testColumnMaxWidths()
     {
         $table = new Table($output = $this->getOutputStream());

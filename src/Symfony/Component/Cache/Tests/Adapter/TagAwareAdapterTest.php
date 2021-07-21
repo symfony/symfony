@@ -218,7 +218,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @return MockObject|PruneableCacheInterface
+     * @return MockObject&PruneableCacheInterface
      */
     private function getPruneableMock(): AdapterInterface
     {

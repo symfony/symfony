@@ -39,17 +39,15 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
     {
         $scheme = $dsn->getScheme();
 
-        if (!\in_array($scheme, $this->getSupportedSchemes())) {
+        if ('fakesms+email' !== $scheme) {
             throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());
         }
 
-        if ('fakesms+email' === $scheme) {
-            $mailerTransport = $dsn->getHost();
-            $to = $dsn->getRequiredOption('to');
-            $from = $dsn->getRequiredOption('from');
+        $mailerTransport = $dsn->getHost();
+        $to = $dsn->getRequiredOption('to');
+        $from = $dsn->getRequiredOption('from');
 
-            return (new FakeSmsEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
-        }
+        return (new FakeSmsEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
     }
 
     protected function getSupportedSchemes(): array

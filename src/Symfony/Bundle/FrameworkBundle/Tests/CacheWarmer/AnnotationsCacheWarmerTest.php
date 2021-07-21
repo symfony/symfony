@@ -167,7 +167,7 @@ class AnnotationsCacheWarmerTest extends TestCase
     }
 
     /**
-     * @return MockObject|Reader
+     * @return MockObject&Reader
      */
     private function getReadOnlyReader(): object
     {

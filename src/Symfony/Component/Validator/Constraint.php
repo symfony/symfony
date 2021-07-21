@@ -202,8 +202,6 @@ abstract class Constraint
      * @return mixed The value of the option
      *
      * @throws InvalidOptionsException If an invalid option name is given
-     *
-     * @internal this method should not be used or overwritten in userland code
      */
     public function __get(string $option)
     {

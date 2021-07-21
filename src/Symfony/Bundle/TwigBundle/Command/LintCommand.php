@@ -44,7 +44,7 @@ EOF
 
     protected function findFiles(string $filename): iterable
     {
-        if (0 === strpos($filename, '@')) {
+        if (str_starts_with($filename, '@')) {
             $dir = $this->getApplication()->getKernel()->locateResource($filename);
 
             return Finder::create()->files()->in($dir)->name('*.twig');

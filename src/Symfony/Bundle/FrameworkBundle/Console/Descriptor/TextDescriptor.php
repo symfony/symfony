@@ -548,7 +548,7 @@ class TextDescriptor extends Descriptor
                 $r = new \ReflectionMethod($controller, '__invoke');
             } elseif (!\is_string($controller)) {
                 return $anchorText;
-            } elseif (false !== strpos($controller, '::')) {
+            } elseif (str_contains($controller, '::')) {
                 $r = new \ReflectionMethod($controller);
             } else {
                 $r = new \ReflectionFunction($controller);
@@ -601,7 +601,7 @@ class TextDescriptor extends Descriptor
 
         if ($callable instanceof \Closure) {
             $r = new \ReflectionFunction($callable);
-            if (false !== strpos($r->name, '{closure}')) {
+            if (str_contains($r->name, '{closure}')) {
                 return 'Closure()';
             }
             if ($class = $r->getClosureScopeClass()) {

@@ -167,7 +167,7 @@ EOF
                 $classes[] = $fqcn;
             } elseif (class_exists($fqcn = $namespace.'\\'.ucfirst($shortClassName).'Type')) {
                 $classes[] = $fqcn;
-            } elseif ('type' === substr($shortClassName, -4) && class_exists($fqcn = $namespace.'\\'.ucfirst(substr($shortClassName, 0, -4).'Type'))) {
+            } elseif (str_ends_with($shortClassName, 'type') && class_exists($fqcn = $namespace.'\\'.ucfirst(substr($shortClassName, 0, -4).'Type'))) {
                 $classes[] = $fqcn;
             }
         }
@@ -230,7 +230,7 @@ EOF
         $alternatives = [];
         foreach ($collection as $item) {
             $lev = levenshtein($name, $item);
-            if ($lev <= \strlen($name) / 3 || false !== strpos($item, $name)) {
+            if ($lev <= \strlen($name) / 3 || str_contains($item, $name)) {
                 $alternatives[$item] = isset($alternatives[$item]) ? $alternatives[$item] - $lev : $lev;
             }
         }

@@ -572,7 +572,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testExtensionInPhar()
     {
-        if (\extension_loaded('suhosin') && false === strpos(ini_get('suhosin.executor.include.whitelist'), 'phar')) {
+        if (\extension_loaded('suhosin') && !str_contains(ini_get('suhosin.executor.include.whitelist'), 'phar')) {
             $this->markTestSkipped('To run this test, add "phar" to the "suhosin.executor.include.whitelist" settings in your php.ini file.');
         }
 

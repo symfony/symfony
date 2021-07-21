@@ -230,7 +230,7 @@ class Exporter
                 return $m[1].$m[2];
             }, $code, -1, $count);
 
-            if ($count && 0 === strpos($code, "''.")) {
+            if ($count && str_starts_with($code, "''.")) {
                 $code = substr($code, 3);
             }
 

@@ -107,7 +107,7 @@ class UnusedTagsPass implements CompilerPassInterface
                     continue;
                 }
 
-                if (false !== strpos($definedTag, $tag) || levenshtein($tag, $definedTag) <= \strlen($tag) / 3) {
+                if (str_contains($definedTag, $tag) || levenshtein($tag, $definedTag) <= \strlen($tag) / 3) {
                     $candidates[] = $definedTag;
                 }
             }

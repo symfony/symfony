@@ -104,7 +104,7 @@ class Definition
     {
         $this->changes['factory'] = true;
 
-        if (\is_string($factory) && false !== strpos($factory, '::')) {
+        if (\is_string($factory) && str_contains($factory, '::')) {
             $factory = explode('::', $factory, 2);
         } elseif ($factory instanceof Reference) {
             $factory = [$factory, '__invoke'];
@@ -737,7 +737,7 @@ class Definition
                 throw new InvalidArgumentException('Invalid characters found in deprecation template.');
             }
 
-            if (false === strpos($message, '%service_id%')) {
+            if (!str_contains($message, '%service_id%')) {
                 throw new InvalidArgumentException('The deprecation template must contain the "%service_id%" placeholder.');
             }
         }
@@ -798,7 +798,7 @@ class Definition
     {
         $this->changes['configurator'] = true;
 
-        if (\is_string($configurator) && false !== strpos($configurator, '::')) {
+        if (\is_string($configurator) && str_contains($configurator, '::')) {
             $configurator = explode('::', $configurator, 2);
         } elseif ($configurator instanceof Reference) {
             $configurator = [$configurator, '__invoke'];

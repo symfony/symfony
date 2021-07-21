@@ -71,7 +71,7 @@ abstract class FileLoader extends Loader
      */
     public function import($resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, $exclude = null)
     {
-        if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && false === strpos($resource, "\n")) {
+        if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
             $excluded = [];
             foreach ((array) $exclude as $pattern) {
                 foreach ($this->glob($pattern, true, $_, false, true) as $path => $info) {
@@ -81,7 +81,7 @@ abstract class FileLoader extends Loader
             }
 
             $ret = [];
-            $isSubpath = 0 !== $i && false !== strpos(substr($resource, 0, $i), '/');
+            $isSubpath = 0 !== $i && str_contains(substr($resource, 0, $i), '/');
             foreach ($this->glob($resource, false, $_, $ignoreErrors || !$isSubpath, false, $excluded) as $path => $info) {
                 if (null !== $res = $this->doImport($path, 'glob' === $type ? null : $type, $ignoreErrors, $sourceResource)) {
                     $ret[] = $res;
@@ -105,7 +105,7 @@ abstract class FileLoader extends Loader
         if (\strlen($pattern) === $i = strcspn($pattern, '*?{[')) {
             $prefix = $pattern;
             $pattern = '';
-        } elseif (0 === $i || false === strpos(substr($pattern, 0, $i), '/')) {
+        } elseif (0 === $i || !str_contains(substr($pattern, 0, $i), '/')) {
             $prefix = '.';
             $pattern = '/'.$pattern;
         } else {

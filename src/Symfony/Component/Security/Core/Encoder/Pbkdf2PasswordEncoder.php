@@ -80,7 +80,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid(string $encoded, string $raw, ?string $salt)
     {
-        if (\strlen($encoded) !== $this->encodedLength || false !== strpos($encoded, '$')) {
+        if (\strlen($encoded) !== $this->encodedLength || str_contains($encoded, '$')) {
             return false;
         }
 

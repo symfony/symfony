@@ -48,7 +48,7 @@ class BufferingLogger extends AbstractLogger
     public function __destruct()
     {
         foreach ($this->logs as [$level, $message, $context]) {
-            if (false !== strpos($message, '{')) {
+            if (str_contains($message, '{')) {
                 foreach ($context as $key => $val) {
                     if (null === $val || is_scalar($val) || (\is_object($val) && \is_callable([$val, '__toString']))) {
                         $message = str_replace("{{$key}}", $val, $message);

@@ -109,14 +109,14 @@ final class PhpDocTypeHelper
             return null;
         }
 
-        if ('[]' === substr($docType, -2)) {
+        if (str_ends_with($docType, '[]')) {
             $collectionKeyType = new Type(Type::BUILTIN_TYPE_INT);
             $collectionValueType = $this->createType($type, false, substr($docType, 0, -2));
 
             return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyType, $collectionValueType);
         }
 
-        if (0 === strpos($docType, 'array<') && $type instanceof Array_) {
+        if (str_starts_with($docType, 'array<') && $type instanceof Array_) {
             // array<value> is converted to x[] which is handled above
             // so it's only necessary to handle array<key, value> here
             $collectionKeyType = $this->getTypes($type->getKeyType())[0];

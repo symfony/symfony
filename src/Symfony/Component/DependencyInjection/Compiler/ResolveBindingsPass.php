@@ -44,7 +44,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
             foreach ($this->unusedBindings as [$key, $serviceId, $bindingType, $file]) {
                 $argumentType = $argumentName = $message = null;
 
-                if (false !== strpos($key, ' ')) {
+                if (str_contains($key, ' ')) {
                     [$argumentType, $argumentName] = explode(' ', $key, 2);
                 } elseif ('$' === $key[0]) {
                     $argumentName = $key;

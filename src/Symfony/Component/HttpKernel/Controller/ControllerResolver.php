@@ -104,7 +104,7 @@ class ControllerResolver implements ControllerResolverInterface
      */
     protected function createController(string $controller)
     {
-        if (false === strpos($controller, '::')) {
+        if (!str_contains($controller, '::')) {
             $controller = $this->instantiateController($controller);
 
             if (!\is_callable($controller)) {
@@ -150,7 +150,7 @@ class ControllerResolver implements ControllerResolverInterface
     private function getControllerError($callable): string
     {
         if (\is_string($callable)) {
-            if (false !== strpos($callable, '::')) {
+            if (str_contains($callable, '::')) {
                 $callable = explode('::', $callable, 2);
             } else {
                 return sprintf('Function "%s" does not exist.', $callable);
@@ -191,7 +191,7 @@ class ControllerResolver implements ControllerResolverInterface
         foreach ($collection as $item) {
             $lev = levenshtein($method, $item);
 
-            if ($lev <= \strlen($method) / 3 || false !== strpos($item, $method)) {
+            if ($lev <= \strlen($method) / 3 || str_contains($item, $method)) {
                 $alternatives[] = $item;
             }
         }

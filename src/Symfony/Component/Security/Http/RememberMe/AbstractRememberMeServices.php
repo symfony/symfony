@@ -261,7 +261,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     protected function encodeCookie(array $cookieParts)
     {
         foreach ($cookieParts as $cookiePart) {
-            if (false !== strpos($cookiePart, self::COOKIE_DELIMITER)) {
+            if (str_contains($cookiePart, self::COOKIE_DELIMITER)) {
                 throw new \InvalidArgumentException(sprintf('$cookieParts should not contain the cookie delimiter "%s".', self::COOKIE_DELIMITER));
             }
         }

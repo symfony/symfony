@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by a1812 at 2021-07-21T07:30:50Z
+
+Hi @OskarStark, what do you think about reworking the test "testSetTitle" and include testSetTitle2 in it ?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-21T08:10:24Z
+
+IMHO the second test case in your new data provider is already included in the `testSetTitle` data provider.
+
+So a test case `testSetTitleWithoutHeaders` without a data provider would be my favorite

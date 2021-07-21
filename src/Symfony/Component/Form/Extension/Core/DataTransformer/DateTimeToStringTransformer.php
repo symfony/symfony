@@ -62,7 +62,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         // where the time corresponds to the current server time.
         // With "|" and "Y-m-d", "2010-02-03" becomes "2010-02-03 00:00:00",
         // which is at least deterministic and thus used here.
-        if (false === strpos($this->parseFormat, '|')) {
+        if (!str_contains($this->parseFormat, '|')) {
             $this->parseFormat .= '|';
         }
     }

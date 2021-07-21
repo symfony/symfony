@@ -83,9 +83,9 @@ trait RedisTrait
      */
     public static function createConnection(string $dsn, array $options = [])
     {
-        if (0 === strpos($dsn, 'redis:')) {
+        if (str_starts_with($dsn, 'redis:')) {
             $scheme = 'redis';
-        } elseif (0 === strpos($dsn, 'rediss:')) {
+        } elseif (str_starts_with($dsn, 'rediss:')) {
             $scheme = 'rediss';
         } else {
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: "%s" does not start with "redis:" or "rediss".', $dsn));

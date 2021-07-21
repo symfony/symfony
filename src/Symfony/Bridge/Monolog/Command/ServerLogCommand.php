@@ -97,7 +97,7 @@ EOF
             'multiline' => OutputInterface::VERBOSITY_DEBUG <= $output->getVerbosity(),
         ]));
 
-        if (false === strpos($host = $input->getOption('host'), '://')) {
+        if (!str_contains($host = $input->getOption('host'), '://')) {
             $host = 'tcp://'.$host;
         }
 

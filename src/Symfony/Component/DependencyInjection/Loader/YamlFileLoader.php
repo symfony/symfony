@@ -241,7 +241,7 @@ class YamlFileLoader extends FileLoader
                 if (!$service || !\is_array($service)) {
                     throw new InvalidArgumentException(sprintf('Type definition "%s" must be a non-empty array within "_instanceof" in "%s". Check your YAML syntax.', $id, $file));
                 }
-                if (\is_string($service) && 0 === strpos($service, '@')) {
+                if (\is_string($service) && str_starts_with($service, '@')) {
                     throw new InvalidArgumentException(sprintf('Type definition "%s" cannot be an alias within "_instanceof" in "%s". Check your YAML syntax.', $id, $file));
                 }
                 $this->parseDefinition($id, $service, $file, []);
@@ -325,7 +325,7 @@ class YamlFileLoader extends FileLoader
     private function isUsingShortSyntax(array $service): bool
     {
         foreach ($service as $key => $value) {
-            if (\is_string($key) && ('' === $key || ('$' !== $key[0] && false === strpos($key, '\\')))) {
+            if (\is_string($key) && ('' === $key || ('$' !== $key[0] && !str_contains($key, '\\')))) {
                 return false;
             }
         }
@@ -342,7 +342,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('Service names that start with an underscore are reserved. Rename the "%s" service or define it in XML instead.', $id));
         }
 
-        if (\is_string($service) && 0 === strpos($service, '@')) {
+        if (\is_string($service) && str_starts_with($service, '@')) {
             $alias = new Alias(substr($service, 1));
 
             if (isset($defaults['public'])) {
@@ -703,7 +703,7 @@ class YamlFileLoader extends FileLoader
     {
         if (\is_string($callable)) {
             if ('' !== $callable && '@' === $callable[0]) {
-                if (false === strpos($callable, ':')) {
+                if (!str_contains($callable, ':')) {
                     return [$this->resolveServices($callable, $file), '__invoke'];
                 }
 
@@ -882,20 +882,20 @@ class YamlFileLoader extends FileLoader
             foreach ($value as $k => $v) {
                 $value[$k] = $this->resolveServices($v, $file, $isParameter);
             }
-        } elseif (\is_string($value) && 0 === strpos($value, '@=')) {
+        } elseif (\is_string($value) && str_starts_with($value, '@=')) {
             if (!class_exists(Expression::class)) {
                 throw new \LogicException('The "@=" expression syntax cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".');
             }
 
             return new Expression(substr($value, 2));
-        } elseif (\is_string($value) && 0 === strpos($value, '@')) {
-            if (0 === strpos($value, '@@')) {
+        } elseif (\is_string($value) && str_starts_with($value, '@')) {
+            if (str_starts_with($value, '@@')) {
                 $value = substr($value, 1);
                 $invalidBehavior = null;
-            } elseif (0 === strpos($value, '@!')) {
+            } elseif (str_starts_with($value, '@!')) {
                 $value = substr($value, 2);
                 $invalidBehavior = ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE;
-            } elseif (0 === strpos($value, '@?')) {
+            } elseif (str_starts_with($value, '@?')) {
                 $value = substr($value, 2);
                 $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
             } else {

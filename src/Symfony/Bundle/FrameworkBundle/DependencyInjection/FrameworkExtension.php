@@ -1313,7 +1313,7 @@ class FrameworkExtension extends Extension
                     'scanned_directories' => $scannedDirectories = array_merge($dirs, $nonExistingDirs),
                     'cache_vary' => [
                         'scanned_directories' => array_map(static function (string $dir) use ($projectDir): string {
-                            return 0 === strpos($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir;
+                            return str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir;
                         }, $scannedDirectories),
                     ],
                 ]

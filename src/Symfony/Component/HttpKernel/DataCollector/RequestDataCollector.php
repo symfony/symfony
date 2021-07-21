@@ -433,7 +433,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     protected function parseController(array|object|string|null $controller)
     {
-        if (\is_string($controller) && false !== strpos($controller, '::')) {
+        if (\is_string($controller) && str_contains($controller, '::')) {
             $controller = explode('::', $controller);
         }
 
@@ -470,7 +470,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 'line' => $r->getStartLine(),
             ];
 
-            if (false !== strpos($r->name, '{closure}')) {
+            if (str_contains($r->name, '{closure}')) {
                 return $controller;
             }
             $controller['method'] = $r->name;

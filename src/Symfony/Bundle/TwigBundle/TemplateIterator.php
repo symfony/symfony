@@ -49,7 +49,7 @@ class TemplateIterator implements \IteratorAggregate
 
         foreach ($this->kernel->getBundles() as $bundle) {
             $name = $bundle->getName();
-            if ('Bundle' === substr($name, -6)) {
+            if (str_ends_with($name, 'Bundle')) {
                 $name = substr($name, 0, -6);
             }
 

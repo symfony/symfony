@@ -129,7 +129,7 @@ class RedirectController
         }
 
         if ($qs = $request->server->get('QUERY_STRING') ?: $request->getQueryString()) {
-            if (false === strpos($path, '?')) {
+            if (!str_contains($path, '?')) {
                 $qs = '?'.$qs;
             } else {
                 $qs = '&'.$qs;

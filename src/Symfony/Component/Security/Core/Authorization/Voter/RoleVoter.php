@@ -36,7 +36,7 @@ class RoleVoter implements VoterInterface
         $roles = $this->extractRoles($token);
 
         foreach ($attributes as $attribute) {
-            if (!\is_string($attribute) || 0 !== strpos($attribute, $this->prefix)) {
+            if (!\is_string($attribute) || !str_starts_with($attribute, $this->prefix)) {
                 continue;
             }
 

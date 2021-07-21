@@ -31,7 +31,7 @@ class ConnectionTest extends TestCase
             $redis = Connection::fromDsn('redis://localhost/queue?delete_after_ack=true');
             $redis->get();
         } catch (TransportException $e) {
-            if (0 === strpos($e->getMessage(), 'ERR unknown command \'X')) {
+            if (str_starts_with($e->getMessage(), 'ERR unknown command \'X')) {
                 throw new SkippedTestSuiteError('Redis server >= 5 is required');
             }
 

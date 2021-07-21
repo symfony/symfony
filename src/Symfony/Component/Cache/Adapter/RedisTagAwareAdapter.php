@@ -83,7 +83,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     protected function doSave(array $values, int $lifetime, array $addTagData = [], array $delTagData = []): array
     {
         $eviction = $this->getRedisEvictionPolicy();
-        if ('noeviction' !== $eviction && 0 !== strpos($eviction, 'volatile-')) {
+        if ('noeviction' !== $eviction && !str_starts_with($eviction, 'volatile-')) {
             throw new LogicException(sprintf('Redis maxmemory-policy setting "%s" is *not* supported by RedisTagAwareAdapter, use "noeviction" or "volatile-*" eviction policies.', $eviction));
         }
 

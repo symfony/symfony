@@ -86,9 +86,9 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->normalizeKeys(false)
                         ->beforeNormalization()
-                            ->ifTrue(function ($v) { return \is_string($v) && 0 === strpos($v, '@'); })
+                            ->ifTrue(function ($v) { return \is_string($v) && str_starts_with($v, '@'); })
                             ->then(function ($v) {
-                                if (0 === strpos($v, '@@')) {
+                                if (str_starts_with($v, '@@')) {
                                     return substr($v, 1);
                                 }
 

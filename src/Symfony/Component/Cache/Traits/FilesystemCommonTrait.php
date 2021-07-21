@@ -58,7 +58,7 @@ trait FilesystemCommonTrait
         $ok = true;
 
         foreach ($this->scanHashDir($this->directory) as $file) {
-            if ('' !== $namespace && 0 !== strpos($this->getFileKey($file), $namespace)) {
+            if ('' !== $namespace && !str_starts_with($this->getFileKey($file), $namespace)) {
                 continue;
             }
 
@@ -98,7 +98,7 @@ trait FilesystemCommonTrait
             try {
                 $h = fopen($this->tmp, 'x');
             } catch (\ErrorException $e) {
-                if (false === strpos($e->getMessage(), 'File exists')) {
+                if (!str_contains($e->getMessage(), 'File exists')) {
                     throw $e;
                 }
 

@@ -173,7 +173,7 @@ class TwigExtension extends Extension
 
     private function normalizeBundleName(string $name): string
     {
-        if ('Bundle' === substr($name, -6)) {
+        if (str_ends_with($name, 'Bundle')) {
             $name = substr($name, 0, -6);
         }
 

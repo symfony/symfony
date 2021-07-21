@@ -64,7 +64,7 @@ class Compiler
      */
     public function log(CompilerPassInterface $pass, string $message)
     {
-        if (false !== strpos($message, "\n")) {
+        if (str_contains($message, "\n")) {
             $message = str_replace("\n", "\n".\get_class($pass).': ', trim($message));
         }
 

@@ -86,9 +86,9 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return
             !$method->isStatic() &&
             (
-                ((0 === strpos($method->name, 'get') && 3 < $methodLength) ||
-                (0 === strpos($method->name, 'is') && 2 < $methodLength) ||
-                (0 === strpos($method->name, 'has') && 3 < $methodLength)) &&
+                ((str_starts_with($method->name, 'get') && 3 < $methodLength) ||
+                (str_starts_with($method->name, 'is') && 2 < $methodLength) ||
+                (str_starts_with($method->name, 'has') && 3 < $methodLength)) &&
                 0 === $method->getNumberOfRequiredParameters()
             )
         ;
@@ -108,7 +108,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
                 continue;
             }
 
-            $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
+            $attributeName = lcfirst(substr($method->name, str_starts_with($method->name, 'is') ? 2 : 3));
 
             if ($this->isAllowedAttribute($object, $attributeName, $format, $context)) {
                 $attributes[] = $attributeName;

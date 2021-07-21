@@ -156,7 +156,7 @@ class PdoSessionHandlerTest extends TestCase
         $insertStmt = $this->createMock(\PDOStatement::class);
 
         $pdo->prepareResult = function ($statement) use ($selectStmt, $insertStmt) {
-            return 0 === strpos($statement, 'INSERT') ? $insertStmt : $selectStmt;
+            return str_starts_with($statement, 'INSERT') ? $insertStmt : $selectStmt;
         };
 
         $content = 'foobar';

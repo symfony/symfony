@@ -21,6 +21,8 @@ use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -64,17 +66,19 @@ class MailgunApiTransport extends AbstractApiTransport
             'body' => $body->bodyToIterable(),
         ]);
 
-        if (200 !== $response->getStatusCode()) {
-            if ('application/json' === $response->getHeaders(false)['content-type'][0]) {
-                $result = $response->toArray(false);
-                throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $response->getStatusCode()), $response);
-            }
-
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $response->getStatusCode()), $response);
+        try {
+            $statusCode = $response->getStatusCode();
+            $result = $response->toArray(false);
+        } catch (DecodingExceptionInterface $e) {
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+        } catch (TransportExceptionInterface $e) {
+            throw new HttpTransportException('Could not reach the remote Mailgun server.', $response, 0, $e);
         }
 
-        // The assumption here is that all 200 responses are "application/json", so it's safe to call "toArray".
-        $result = $response->toArray(false);
+        if (200 !== $statusCode) {
+            throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $statusCode), $response);
+        }
+
         $sentMessage->setMessageId($result['id']);
 
         return $response;

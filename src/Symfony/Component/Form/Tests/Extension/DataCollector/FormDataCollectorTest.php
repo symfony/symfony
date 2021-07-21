@@ -32,7 +32,7 @@ use Symfony\Component\Form\ResolvedFormTypeFactory;
 class FormDataCollectorTest extends TestCase
 {
     /**
-     * @var MockObject
+     * @var MockObject&FormDataExtractorInterface
      */
     private $dataExtractor;
 
@@ -42,17 +42,17 @@ class FormDataCollectorTest extends TestCase
     private $dataCollector;
 
     /**
-     * @var MockObject
+     * @var EventDispatcher
      */
     private $dispatcher;
 
     /**
-     * @var MockObject
+     * @var FormFactory
      */
     private $factory;
 
     /**
-     * @var MockObject
+     * @var PropertyPathMapper
      */
     private $dataMapper;
 

@@ -53,7 +53,7 @@ class CachePruneCommandTest extends TestCase
     /**
      * @return MockObject&KernelInterface
      */
-    private function getKernel()
+    private function getKernel(): KernelInterface
     {
         $container = $this->createMock(ContainerInterface::class);
 
@@ -74,7 +74,7 @@ class CachePruneCommandTest extends TestCase
     /**
      * @return MockObject&PruneableInterface
      */
-    private function getPruneableInterfaceMock()
+    private function getPruneableInterfaceMock(): PruneableInterface
     {
         $pruneable = $this->createMock(PruneableInterface::class);
         $pruneable

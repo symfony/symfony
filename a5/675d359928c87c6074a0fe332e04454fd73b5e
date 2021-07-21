@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-06T07:44:21Z
+
+See my comment here: https://github.com/symfony/symfony/pull/41576#issuecomment-874537201
+
+---------------------------------------------------------------------------
+
+by Tobion at 2021-07-13T22:53:49Z
+
+Could we merge this to not create conflicts? We don't need to wait for CS fixer to have the relevant rules before merging this. We can just enable the rule when it's available.

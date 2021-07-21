@@ -25,7 +25,7 @@ class DataCollectorExtensionTest extends TestCase
     private $extension;
 
     /**
-     * @var MockObject
+     * @var MockObject&FormDataCollectorInterface
      */
     private $dataCollector;
 

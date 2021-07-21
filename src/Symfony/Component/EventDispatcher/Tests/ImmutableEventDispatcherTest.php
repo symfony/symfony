@@ -24,7 +24,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ImmutableEventDispatcherTest extends TestCase
 {
     /**
-     * @var MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private $innerDispatcher;
 

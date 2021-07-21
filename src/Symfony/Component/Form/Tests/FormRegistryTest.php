@@ -44,17 +44,17 @@ class FormRegistryTest extends TestCase
     private $registry;
 
     /**
-     * @var MockObject|ResolvedFormTypeFactoryInterface
+     * @var MockObject&ResolvedFormTypeFactoryInterface
      */
     private $resolvedTypeFactory;
 
     /**
-     * @var MockObject
+     * @var MockObject&FormTypeGuesserInterface
      */
     private $guesser1;
 
     /**
-     * @var MockObject
+     * @var MockObject&FormTypeGuesserInterface
      */
     private $guesser2;
 

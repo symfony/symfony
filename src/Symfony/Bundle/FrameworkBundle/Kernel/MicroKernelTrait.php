@@ -83,12 +83,17 @@ trait MicroKernelTrait
         return $_SERVER['APP_LOG_DIR'] ?? parent::getLogDir();
     }
 
+    public function getConfigDir(): string
+    {
+        return $this->getProjectDir().'/config';
+    }
+
     /**
      * {@inheritdoc}
      */
     public function registerBundles(): iterable
     {
-        $contents = require $this->getProjectDir().'/config/bundles.php';
+        $contents = require $this->getConfigDir().'/bundles.php';
         foreach ($contents as $class => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {
                 yield new $class();
@@ -124,7 +129,7 @@ trait MicroKernelTrait
             $kernelDefinition->addTag('routing.route_loader');
 
             $container->addObjectResource($this);
-            $container->fileExists($this->getProjectDir().'/config/bundles.php');
+            $container->fileExists($this->getConfigDir().'/bundles.php');
 
             try {
                 $configureContainer = new \ReflectionMethod($this, 'configureContainer');

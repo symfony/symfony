@@ -24,7 +24,7 @@ class SetupTransportsCommandTest extends TestCase
     public function testReceiverNames()
     {
         // mock a service locator
-        /** @var MockObject|ServiceLocator $serviceLocator */
+        /** @var MockObject&ServiceLocator $serviceLocator */
         $serviceLocator = $this->createMock(ServiceLocator::class);
         // get method must be call twice and will return consecutively a setup-able transport and a non setup-able transport
         $serviceLocator->expects($this->exactly(2))
@@ -49,7 +49,7 @@ class SetupTransportsCommandTest extends TestCase
     public function testReceiverNameArgument()
     {
         // mock a service locator
-        /** @var MockObject|ServiceLocator $serviceLocator */
+        /** @var MockObject&ServiceLocator $serviceLocator */
         $serviceLocator = $this->createMock(ServiceLocator::class);
         // get method must be call twice and will return consecutively a setup-able transport and a non setup-able transport
         $serviceLocator->expects($this->exactly(1))
@@ -74,7 +74,7 @@ class SetupTransportsCommandTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The "not_found" transport does not exist.');
         // mock a service locator
-        /** @var MockObject|ServiceLocator $serviceLocator */
+        /** @var MockObject&ServiceLocator $serviceLocator */
         $serviceLocator = $this->createMock(ServiceLocator::class);
         // get method must be call twice and will return consecutively a setup-able transport and a non setup-able transport
         $serviceLocator->expects($this->exactly(0))

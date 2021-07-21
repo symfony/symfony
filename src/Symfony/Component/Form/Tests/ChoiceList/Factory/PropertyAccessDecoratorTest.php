@@ -27,7 +27,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class PropertyAccessDecoratorTest extends TestCase
 {
     /**
-     * @var MockObject
+     * @var MockObject&ChoiceListFactoryInterface
      */
     private $decoratedFactory;
 

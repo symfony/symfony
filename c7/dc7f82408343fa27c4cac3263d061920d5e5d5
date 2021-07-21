@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-06-07T19:26:06Z
+
+Hey!
+
+I think @fancyweb has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-06T07:43:45Z
+
+Even if I appreciate the effort in modernizing the code base, I don't see any benefits of such a change. The code is not really different and it introduces a new polyfill as a dep (which might make the code slower).
+Pondering the pros and the cons, I'm :-1: for such a change until we require 8.1+.
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2021-07-06T09:08:03Z
+
+@fabpot hi,
+
+> The code is not really different and it introduces a new polyfill as a dep
+
+according to https://packagist.org/packages/symfony/polyfill-php80/dependents?order_by=downloads, this "internal" package is required on major symfony packages already
+
+> (which might make the code slower)
+
+this indeed can be the main reason, when running on sf v4 or v5 without php v8n thus leveraging the polyfill, but I can not tell if it has an impact or not :s
+
+> until we require 8.1+.
+
+I do not understand the `8.1+`, sf v6 which require php v8.0+ could be a good candidate no?
+
+thx
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-06T09:13:55Z
+
+> > until we require 8.1+.
+>
+> I do not understand the `8.1+`, sf v6 which require php v8.0+ could be a good candidate no?
+>
+
+That's a typo, I meant 8.0
+
+---------------------------------------------------------------------------
+
+by Tobion at 2021-07-06T09:58:52Z
+
+@fabpot as already said by @noniagriconomie, the php80 polyfill is already a requirement in 4.4 by major symfony components like httpkernel and console. So it's already part of every symfony app. So there is no additional dependency.
+
+I'd also argue it really makes the code mroe readable and it clarifies the intent. There are several workarounds implementations, some better suited than others (see rfc). By using the standard functions it also normalizes those inconsistencies.
+
+You said it might make the code slower. I'd say it makes it faster, especially on PHP 8.0+. One of the arguments for introducing the functions was that the alternatives are not efficient.
+Another argument is that SF 4.4 will be maintained a year longer than PHP 7.4. So at one point symfony 4.4 users are likely to run on PHP 8. Then they will get the performance increase automatically.
+
+So to me there is no downside here and it makes the code future-proof. Please reconsider.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-06T11:48:56Z
+
+ok, let's do it then, but we need to enable the rule on PHP CS fixer to be sure we will catch "old" usages in PRs.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-06T18:46:29Z
+
+We need to get the rule merged into CS Fixer then. 😓

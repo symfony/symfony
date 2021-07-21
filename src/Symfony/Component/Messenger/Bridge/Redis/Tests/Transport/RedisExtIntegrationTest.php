@@ -33,7 +33,7 @@ class RedisExtIntegrationTest extends TestCase
 
         try {
             $this->redis = new \Redis();
-            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
+            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], $this->redis);
             $this->connection->cleanup();
             $this->connection->setup();
         } catch (\Exception $e) {
@@ -109,7 +109,7 @@ class RedisExtIntegrationTest extends TestCase
     public function testConnectionBelowRedeliverTimeout()
     {
         // lower redeliver timeout and claim interval
-        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], $this->redis);
 
         $connection->cleanup();
         $connection->setup();
@@ -137,7 +137,7 @@ class RedisExtIntegrationTest extends TestCase
         // lower redeliver timeout and claim interval
         $connection = Connection::fromDsn(
             getenv('MESSENGER_REDIS_DSN'),
-            ['redeliver_timeout' => 0, 'claim_interval' => 500],
+            ['redeliver_timeout' => 0, 'claim_interval' => 500, 'delete_after_ack' => true],
             $this->redis
         );
 

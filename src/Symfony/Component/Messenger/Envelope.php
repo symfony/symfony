@@ -49,7 +49,7 @@ final class Envelope
     }
 
     /**
-     * @return Envelope a new Envelope instance with additional stamp
+     * @return static A new Envelope instance with additional stamp
      */
     public function with(StampInterface ...$stamps): self
     {
@@ -63,7 +63,7 @@ final class Envelope
     }
 
     /**
-     * @return Envelope a new Envelope instance without any stamps of the given class
+     * @return static A new Envelope instance without any stamps of the given class
      */
     public function withoutAll(string $stampFqcn): self
     {

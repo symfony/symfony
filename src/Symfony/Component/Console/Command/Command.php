@@ -505,9 +505,9 @@ class Command
     /**
      * @param bool $hidden Whether or not the command should be hidden from the list of commands
      *
-     * @return Command The current instance
+     * @return $this
      */
-    final public function setHidden(bool $hidden = true): static
+    public function setHidden(bool $hidden = true): static
     {
         $this->hidden = $hidden;
 

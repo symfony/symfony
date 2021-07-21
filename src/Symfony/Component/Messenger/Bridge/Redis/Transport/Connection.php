@@ -175,6 +175,8 @@ class Connection
         if (\array_key_exists('delete_after_ack', $redisOptions)) {
             $deleteAfterAck = filter_var($redisOptions['delete_after_ack'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['delete_after_ack']);
+        } else {
+            trigger_deprecation('symfony/redis-messenger', '5.4', 'Not setting the "delete_after_ack" boolean option explicitly is deprecated, its default value will change to true in 6.0.');
         }
 
         $deleteAfterReject = null;

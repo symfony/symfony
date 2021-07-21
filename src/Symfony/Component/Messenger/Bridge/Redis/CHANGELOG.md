@@ -7,6 +7,12 @@ CHANGELOG
  * Remove option `tls`
  * Using invalid options will throw a `LogicException`
 
+5.4
+---
+
+ * Deprecate not setting the `delete_after_ack` config option (or DSN parameter),
+   its default value will change to `true` in 6.0
+
 5.3
 ---
 

@@ -226,7 +226,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->beforeNormalization()
                             ->ifArray()->then(function ($v) {
                                 foreach ($v as $originalName => $cookieConfig) {
-                                    if (false !== strpos($originalName, '-')) {
+                                    if (str_contains($originalName, '-')) {
                                         $normalizedName = str_replace('-', '_', $originalName);
                                         @trigger_error(sprintf('Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "%s" cookie configured in "logout.delete_cookies" will delete the "%s" cookie instead of the "%s" cookie.', $originalName, $originalName, $normalizedName), \E_USER_DEPRECATED);
 
@@ -304,7 +304,7 @@ class MainConfiguration implements ConfigurationInterface
                             continue;
                         }
 
-                        if (false !== strpos($firewall[$k]['check_path'], '/') && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
+                        if (str_contains($firewall[$k]['check_path'], '/') && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
                             throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
                         }
                     }

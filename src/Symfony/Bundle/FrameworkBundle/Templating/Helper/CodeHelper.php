@@ -63,7 +63,7 @@ class CodeHelper extends Helper
 
     public function abbrMethod($method)
     {
-        if (false !== strpos($method, '::')) {
+        if (str_contains($method, '::')) {
             [$class, $method] = explode('::', $method, 2);
             $result = sprintf('%s::%s()', $this->abbrClass($class), $method);
         } elseif ('Closure' === $method) {
@@ -164,7 +164,7 @@ class CodeHelper extends Helper
         if (null === $text) {
             $file = trim($file);
             $fileStr = $file;
-            if (0 === strpos($fileStr, $this->rootDir)) {
+            if (str_starts_with($fileStr, $this->rootDir)) {
                 $fileStr = str_replace(['\\', $this->rootDir], ['/', ''], $fileStr);
                 $fileStr = htmlspecialchars($fileStr, $flags, $this->charset);
                 $fileStr = sprintf('<abbr title="%s">kernel.project_dir</abbr>/%s', htmlspecialchars($this->rootDir, $flags, $this->charset), $fileStr);

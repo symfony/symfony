@@ -72,7 +72,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     {
         if (null !== $domain) {
             // skip messages merge if intl-icu requested explicitly
-            if (false !== strpos($domain, self::INTL_DOMAIN_SUFFIX)) {
+            if (str_contains($domain, self::INTL_DOMAIN_SUFFIX)) {
                 return $this->messages[$domain] ?? [];
             }
 
@@ -166,7 +166,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         }
         $intlDomain = $domain;
         $suffixLength = \strlen(self::INTL_DOMAIN_SUFFIX);
-        if (\strlen($domain) < $suffixLength || false === strpos($domain, self::INTL_DOMAIN_SUFFIX, -$suffixLength)) {
+        if (\strlen($domain) < $suffixLength || !str_contains($domain, self::INTL_DOMAIN_SUFFIX, -$suffixLength)) {
             $intlDomain .= self::INTL_DOMAIN_SUFFIX;
         }
         foreach ($messages as $id => $message) {

@@ -180,7 +180,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
      */
     private function escapeClassName(string $class): string
     {
-        if (false !== strpos($class, '@')) {
+        if (str_contains($class, '@')) {
             // anonymous class: replace all PSR6-reserved characters
             return str_replace(["\0", '\\', '/', '@', ':', '{', '}', '(', ')'], '.', $class);
         }

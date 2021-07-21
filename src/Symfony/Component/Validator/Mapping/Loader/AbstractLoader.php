@@ -66,9 +66,9 @@ abstract class AbstractLoader implements LoaderInterface
      */
     protected function newConstraint(string $name, $options = null)
     {
-        if (false !== strpos($name, '\\') && class_exists($name)) {
+        if (str_contains($name, '\\') && class_exists($name)) {
             $className = (string) $name;
-        } elseif (false !== strpos($name, ':')) {
+        } elseif (str_contains($name, ':')) {
             [$prefix, $className] = explode(':', $name, 2);
 
             if (!isset($this->namespaces[$prefix])) {

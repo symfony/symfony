@@ -19,6 +19,7 @@
         "php": ">=7.2.5",
         "ext-xml": "*",
         "symfony/http-kernel": "^4.4|^5.0",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/twig-bridge": "^4.4|^5.0",
         "symfony/var-dumper": "^4.4|^5.0"
     },

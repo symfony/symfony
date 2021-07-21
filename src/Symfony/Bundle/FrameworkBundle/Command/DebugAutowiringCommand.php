@@ -83,7 +83,7 @@ EOF
         if ($search = $input->getArgument('search')) {
             $searchNormalized = preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', '', $search);
             $serviceIds = array_filter($serviceIds, function ($serviceId) use ($searchNormalized) {
-                return false !== stripos(str_replace('\\', '', $serviceId), $searchNormalized) && 0 !== strpos($serviceId, '.');
+                return false !== stripos(str_replace('\\', '', $serviceId), $searchNormalized) && !str_starts_with($serviceId, '.');
             });
 
             if (empty($serviceIds)) {
@@ -107,7 +107,7 @@ EOF
         foreach ($serviceIds as $serviceId) {
             $text = [];
             $resolvedServiceId = $serviceId;
-            if (0 !== strpos($serviceId, $previousId)) {
+            if (!str_starts_with($serviceId, $previousId)) {
                 $text[] = '';
                 if ('' !== $description = Descriptor::getClassDescription($serviceId, $resolvedServiceId)) {
                     if (isset($hasAlias[$serviceId])) {

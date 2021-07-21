@@ -20,7 +20,8 @@
         "monolog/monolog": "^1.25.1|^2",
         "symfony/service-contracts": "^1.1|^2",
         "symfony/http-kernel": "^5.3",
-        "symfony/deprecation-contracts": "^2.1"
+        "symfony/deprecation-contracts": "^2.1",
+        "symfony/polyfill-php80": "^1.16"
     },
     "require-dev": {
         "symfony/console": "^4.4|^5.0",

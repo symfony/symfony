@@ -246,7 +246,7 @@ TXT
         $timedOutTime = time() + $timeoutInSeconds;
 
         while (time() < $timedOutTime) {
-            if (0 === strpos($process->getOutput(), $output)) {
+            if (str_starts_with($process->getOutput(), $output)) {
                 return;
             }
 

@@ -267,7 +267,7 @@ class ViolationMapper implements ViolationMapperInterface
                 if ($childPath === $chunk) {
                     $target = $child;
                     $foundAtIndex = $it->key();
-                } elseif (0 === strpos($childPath, $chunk)) {
+                } elseif (str_starts_with($childPath, $chunk)) {
                     continue;
                 }
 

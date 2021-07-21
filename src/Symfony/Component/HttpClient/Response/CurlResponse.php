@@ -381,7 +381,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 return \strlen($data);
             }
 
-            if (0 !== strpos($data, 'HTTP/')) {
+            if (!str_starts_with($data, 'HTTP/')) {
                 if (0 === stripos($data, 'Location:')) {
                     $location = trim(substr($data, 9));
                 }

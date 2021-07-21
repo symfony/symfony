@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=7.2.5",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/security-core": "^4.4|^5.0"
     },
     "require-dev": {

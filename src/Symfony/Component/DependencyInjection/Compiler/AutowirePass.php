@@ -324,7 +324,7 @@ class AutowirePass extends AbstractRecursivePass
 
             if ($this->container->has($name) && !$this->container->findDefinition($name)->isAbstract()) {
                 foreach ($this->container->getAliases() as $id => $alias) {
-                    if ($name === (string) $alias && 0 === strpos($id, $type.' $')) {
+                    if ($name === (string) $alias && str_starts_with($id, $type.' $')) {
                         return new TypedReference($name, $type, $reference->getInvalidBehavior());
                     }
                 }

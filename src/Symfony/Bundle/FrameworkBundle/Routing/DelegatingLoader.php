@@ -82,7 +82,7 @@ class DelegatingLoader extends BaseDelegatingLoader
                 continue;
             }
 
-            if (false !== strpos($controller, '::')) {
+            if (str_contains($controller, '::')) {
                 continue;
             }
 

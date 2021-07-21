@@ -91,7 +91,7 @@ abstract class FileLoader extends BaseFileLoader
      */
     public function registerClasses(Definition $prototype, string $namespace, string $resource, $exclude = null)
     {
-        if ('\\' !== substr($namespace, -1)) {
+        if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));
         }
         if (!preg_match('/^(?:[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+\\\\)++$/', $namespace)) {
@@ -193,7 +193,7 @@ abstract class FileLoader extends BaseFileLoader
             if (null === $prefixLen) {
                 $prefixLen = \strlen($resource->getPrefix());
 
-                if ($excludePrefix && 0 !== strpos($excludePrefix, $resource->getPrefix())) {
+                if ($excludePrefix && !str_starts_with($excludePrefix, $resource->getPrefix())) {
                     throw new InvalidArgumentException(sprintf('Invalid "exclude" pattern when importing classes for "%s": make sure your "exclude" pattern (%s) is a subset of the "resource" pattern (%s).', $namespace, $excludePattern, $pattern));
                 }
             }

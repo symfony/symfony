@@ -64,7 +64,7 @@ class RouterListenerTest extends TestCase
 
         $this->assertEquals($expectedHttpPort, $context->getHttpPort());
         $this->assertEquals($expectedHttpsPort, $context->getHttpsPort());
-        $this->assertEquals(0 === strpos($uri, 'https') ? 'https' : 'http', $context->getScheme());
+        $this->assertEquals(str_starts_with($uri, 'https') ? 'https' : 'http', $context->getScheme());
     }
 
     public function getPortData()

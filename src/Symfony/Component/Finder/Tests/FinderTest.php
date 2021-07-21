@@ -869,7 +869,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testFilter()
     {
         $finder = $this->buildFinder();
-        $this->assertSame($finder, $finder->filter(function (\SplFileInfo $f) { return false !== strpos($f, 'test'); }));
+        $this->assertSame($finder, $finder->filter(function (\SplFileInfo $f) { return str_contains($f, 'test'); }));
         $this->assertIterator($this->toAbsolute(['test.php', 'test.py']), $finder->in(self::$tmpDir)->getIterator());
     }
 

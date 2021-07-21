@@ -20,6 +20,7 @@
         "symfony/config": "^4.4|^5.0",
         "symfony/framework-bundle": "^5.3",
         "symfony/http-kernel": "^5.3",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/routing": "^4.4|^5.0",
         "symfony/twig-bundle": "^4.4|^5.0",
         "twig/twig": "^2.13|^3.0.4"

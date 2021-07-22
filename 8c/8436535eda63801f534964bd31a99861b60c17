@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-07-21T16:20:38Z
+
+the usage of `get_debug_type` in `FatalThrowableError` also seems to cause issues (see the Goutte issue referencing that ticket)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-21T16:23:46Z
+
+Out of curiosity: What's the problem with using the polyfill here?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-07-21T16:49:27Z
+
+@derrabus polyfills rely on autoloading (for the internal class). So this breaks if the polyfill is called inside the autoloading stack (as autoloading the polyfill internal classes will also try to use them then).
+For the error handling part, I suspect it is similar (for cases where an error happens during the error handling or during the autoloading of the polyfill internals)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-22T05:13:03Z
+
+I dont see us using any PHP8-only code in the ErrorHandler. I agree with @Tobion
+
+With that change, Im :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-22T07:23:00Z
+
+Polyfill now removed (we were using a few calls to `get_debug_type()`, now removed).

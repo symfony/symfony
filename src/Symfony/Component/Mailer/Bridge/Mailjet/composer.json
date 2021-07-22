@@ -17,8 +17,7 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/mailer": "^4.4|^5.0|^6.0",
-        "symfony/polyfill-php80": "^1.16"
+        "symfony/mailer": "^4.4|^5.0|^6.0"
     },
     "require-dev": {
         "symfony/http-client": "^4.4|^5.0|^6.0"

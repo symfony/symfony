@@ -406,7 +406,7 @@ class ErrorHandler
      */
     public function handleError(int $type, string $message, string $file, int $line): bool
     {
-        if (\PHP_VERSION_ID >= 70300 && \E_WARNING === $type && '"' === $message[0] && str_contains($message, '" targeting switch is equivalent to "break')) {
+        if (\PHP_VERSION_ID >= 70300 && \E_WARNING === $type && '"' === $message[0] && false !== strpos($message, '" targeting switch is equivalent to "break')) {
             $type = \E_DEPRECATED;
         }
 
@@ -457,7 +457,7 @@ class ErrorHandler
                 return true;
             }
         } else {
-            if (str_contains($message, '@anonymous')) {
+            if (false !== strpos($message, '@anonymous')) {
                 $backtrace = debug_backtrace(false, 5);
 
                 for ($i = 1; isset($backtrace[$i]); ++$i) {
@@ -566,7 +566,7 @@ class ErrorHandler
         }
 
         if ($this->loggedErrors & $type) {
-            if (str_contains($message = $exception->getMessage(), "@anonymous\0")) {
+            if (false !== strpos($message = $exception->getMessage(), "@anonymous\0")) {
                 $message = $this->parseAnonymousClass($message);
             }
 
@@ -680,7 +680,7 @@ class ErrorHandler
             $handler->throwAt(0, true);
             $trace = $error['backtrace'] ?? null;
 
-            if (str_starts_with($error['message'], 'Allowed memory') || str_starts_with($error['message'], 'Out of memory')) {
+            if (0 === strpos($error['message'], 'Allowed memory') || 0 === strpos($error['message'], 'Out of memory')) {
                 $fatalError = new OutOfMemoryError($handler->levels[$error['type']].': '.$error['message'], 0, $error, 2, false, $trace);
             } else {
                 $fatalError = new FatalError($handler->levels[$error['type']].': '.$error['message'], 0, $error, 2, true, $trace);

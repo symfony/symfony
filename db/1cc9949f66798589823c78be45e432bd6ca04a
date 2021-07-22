@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-22T04:11:20Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-22T04:11:44Z
+
+Hey!
+
+Oh no, it looks like you have made this PR towards a branch that is not maintained anymore. :/
+Could you update the [PR base branch](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request) to target one of these branches instead? 4.4, 5.2, 5.3, 5.4, 6.0.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-22T05:09:07Z
+
+Great. Thank you for this PR and the references in #42227.
+
+Note that `MongoDbSessionHandler` also exists in 4.4. Question for other maintainers: Is it best to send a new PR to 4.4 that fixes this issue in `MongoDbSessionHandler`? Then modify this PR to only make changes in the `MongoDbStore`?
+
+---------------------------------------------------------------------------
+
+by kralos at 2021-07-22T05:25:40Z
+
+@Nyholm yeah, probably better to be neat for the sf 4.x people :( 1 moment please
+
+---------------------------------------------------------------------------
+
+by kralos at 2021-07-22T05:35:33Z
+
+@Nyholm see https://github.com/symfony/symfony/issues/42229 for `Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler`
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-22T06:35:04Z
+
+Friendly ping @alcaeus

@@ -47,7 +47,7 @@ class UndefinedMethodErrorEnhancer implements ErrorEnhancerInterface
         $candidates = [];
         foreach ($methods as $definedMethodName) {
             $lev = levenshtein($methodName, $definedMethodName);
-            if ($lev <= \strlen($methodName) / 3 || str_contains($definedMethodName, $methodName)) {
+            if ($lev <= \strlen($methodName) / 3 || false !== strpos($definedMethodName, $methodName)) {
                 $candidates[] = $definedMethodName;
             }
         }

@@ -346,7 +346,7 @@ class FlattenException
             if ($value instanceof \__PHP_Incomplete_Class) {
                 $result[$key] = ['incomplete-object', $this->getClassNameFromIncomplete($value)];
             } elseif (\is_object($value)) {
-                $result[$key] = ['object', \get_class($value)];
+                $result[$key] = ['object', get_debug_type($value)];
             } elseif (\is_array($value)) {
                 if ($level > 10) {
                     $result[$key] = ['array', '*DEEP NESTED ARRAY*'];

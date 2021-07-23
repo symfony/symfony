@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support of PHP backed enumerations
+ * Add support for denormalizing invalid datetime without throwing an exception
 
 5.3
 ---

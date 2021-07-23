@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 /**
  * Normalizes an object implementing the {@see \DateTimeInterface} to a date string.
  * Denormalizes a date string to an instance of {@see \DateTime} or {@see \DateTimeImmutable}.
+ * The denormalization may return the raw data if invalid according to the value of $context[self::THROW_EXCEPTION_ON_INVALID_KEY].
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -24,10 +25,13 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 {
     public const FORMAT_KEY = 'datetime_format';
     public const TIMEZONE_KEY = 'datetime_timezone';
+    public const THROW_EXCEPTION_ON_INVALID_KEY = 'throw_exception_on_invalid_key';
 
     private $defaultContext = [
         self::FORMAT_KEY => \DateTime::RFC3339,
         self::TIMEZONE_KEY => null,
+        // BC layer to be moved to "false" in 6.0
+        self::THROW_EXCEPTION_ON_INVALID_KEY => null,
     ];
 
     private const SUPPORTED_TYPES = [
@@ -39,6 +43,10 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     public function __construct(array $defaultContext = [])
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
+
+        if (null === $this->defaultContext[self::THROW_EXCEPTION_ON_INVALID_KEY]) {
+            trigger_deprecation('symfony/serializer', '5.4', 'The key context "%s" of "%s" must be defined. The value will be "false" in Symfony 6.0.', self::THROW_EXCEPTION_ON_INVALID_KEY, __CLASS__);
+        }
     }
 
     /**
@@ -77,15 +85,22 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      * {@inheritdoc}
      *
      * @throws NotNormalizableValueException
-     *
-     * @return \DateTimeInterface
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
+        $throwExceptionOnInvalid = $context[self::THROW_EXCEPTION_ON_INVALID_KEY] ?? $this->defaultContext[self::THROW_EXCEPTION_ON_INVALID_KEY];
+        // BC layer to be removed in 6.0
+        if (null === $throwExceptionOnInvalid) {
+            $throwExceptionOnInvalid = true;
+        }
         $timezone = $this->getTimezone($context);
 
         if (null === $data || (\is_string($data) && '' === trim($data))) {
+            if (!$throwExceptionOnInvalid) {
+                return $data;
+            }
+
             throw new NotNormalizableValueException('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         }
 
@@ -98,12 +113,20 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
             $dateTimeErrors = \DateTime::class === $type ? \DateTime::getLastErrors() : \DateTimeImmutable::getLastErrors();
 
+            if (!$throwExceptionOnInvalid) {
+                return $data;
+            }
+
             throw new NotNormalizableValueException(sprintf('Parsing datetime string "%s" using format "%s" resulted in %d errors: ', $data, $dateTimeFormat, $dateTimeErrors['error_count'])."\n".implode("\n", $this->formatDateTimeErrors($dateTimeErrors['errors'])));
         }
 
         try {
             return \DateTime::class === $type ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
         } catch (\Exception $e) {
+            if (!$throwExceptionOnInvalid) {
+                return $data;
+            }
+
             throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
         }
     }

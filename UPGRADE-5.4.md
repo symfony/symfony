@@ -45,3 +45,8 @@ Security
  * Deprecate `TokenInterface:isAuthenticated()` and `setAuthenticated()` methods without replacement.
    Security tokens won't have an "authenticated" flag anymore, so they will always be considered authenticated
  * Deprecate `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead
+
+Serializer
+----------
+
+ * Deprecate not setting a value for the context key `DateTimeNormalizer::THROW_EXCEPTION_ON_INVALID_KEY`

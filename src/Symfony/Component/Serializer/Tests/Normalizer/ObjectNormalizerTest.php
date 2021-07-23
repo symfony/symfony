@@ -619,7 +619,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
-        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer([DateTimeNormalizer::THROW_EXCEPTION_ON_INVALID_KEY => false]), $normalizer]);
 
         $obj = $serializer->denormalize([
             'inner' => ['foo' => 'foo', 'bar' => 'bar'],
@@ -638,7 +638,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
-        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer([DateTimeNormalizer::THROW_EXCEPTION_ON_INVALID_KEY => false]), $normalizer]);
 
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'json')->number);
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'jsonld')->number);

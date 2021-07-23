@@ -13,3 +13,9 @@ framework:
 
 services:
     logger: { class: Psr\Log\NullLogger }
+
+    serializer.normalizer.datetime:
+        class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
+        arguments:
+            $defaultContext:
+                throw_exception_on_invalid_key: false

@@ -32,7 +32,7 @@ trait ContextMetadataTestTrait
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new PhpDocExtractor());
-        new Serializer([new DateTimeNormalizer(), $normalizer]);
+        new Serializer([new DateTimeNormalizer([DateTimeNormalizer::THROW_EXCEPTION_ON_INVALID_KEY => false]), $normalizer]);
 
         $dummy = new ContextMetadataDummy();
         $dummy->date = new \DateTime('2011-07-28T08:44:00.123+00:00');
@@ -52,7 +52,7 @@ trait ContextMetadataTestTrait
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new PhpDocExtractor());
-        new Serializer([new DateTimeNormalizer(), $normalizer]);
+        new Serializer([new DateTimeNormalizer([DateTimeNormalizer::THROW_EXCEPTION_ON_INVALID_KEY => false]), $normalizer]);
 
         /** @var ContextMetadataDummy $dummy */
         $dummy = $normalizer->denormalize(['date' => '2011-07-28T08:44:00+00:00'], ContextMetadataDummy::class);

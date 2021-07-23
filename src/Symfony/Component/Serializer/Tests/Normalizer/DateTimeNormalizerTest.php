@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -21,6 +22,8 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
  */
 class DateTimeNormalizerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @var DateTimeNormalizer
      */
@@ -28,7 +31,9 @@ class DateTimeNormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->normalizer = new DateTimeNormalizer();
+        $this->normalizer = new DateTimeNormalizer([
+            DateTimeNormalizer::THROW_EXCEPTION_ON_INVALID_KEY => true,
+        ]);
     }
 
     public function testSupportsNormalization()
@@ -51,13 +56,13 @@ class DateTimeNormalizerTest extends TestCase
 
     public function testNormalizeUsingFormatPassedInConstructor()
     {
-        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'y']);
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'y', DateTimeNormalizer::THROW_EXCEPTION_ON_INVALID_KEY => true]);
         $this->assertEquals('16', $normalizer->normalize(new \DateTime('2016/01/01', new \DateTimeZone('UTC'))));
     }
 
     public function testNormalizeUsingTimeZonePassedInConstructor()
     {
-        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('Japan')]);
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('Japan'), DateTimeNormalizer::THROW_EXCEPTION_ON_INVALID_KEY => true]);
 
         $this->assertSame('2016-12-01T00:00:00+09:00', $normalizer->normalize(new \DateTime('2016/12/01', new \DateTimeZone('Japan'))));
         $this->assertSame('2016-12-01T09:00:00+09:00', $normalizer->normalize(new \DateTime('2016/12/01', new \DateTimeZone('UTC'))));
@@ -184,7 +189,7 @@ class DateTimeNormalizerTest extends TestCase
     {
         $timezone = new \DateTimeZone('Japan');
         $expected = new \DateTime('2016/12/01 17:35:00', $timezone);
-        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => $timezone]);
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => $timezone, DateTimeNormalizer::THROW_EXCEPTION_ON_INVALID_KEY => true]);
 
         $this->assertEquals($expected, $normalizer->denormalize('2016.12.01 17:35:00', \DateTime::class, null, [
             DateTimeNormalizer::FORMAT_KEY => 'Y.m.d H:i:s',
@@ -275,5 +280,32 @@ class DateTimeNormalizerTest extends TestCase
     {
         $this->expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y-m-d|']);
+    }
+
+    public function provideDenormalizeInvalidDataDontThrowsExceptionTests()
+    {
+        yield ['invalid date'];
+        yield [null];
+        yield [''];
+        yield ['  '];
+        yield ['  2016.01.01  ', [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d|']];
+        yield ['2016-01-01T00:00:00+00:00', [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d|']];
+    }
+
+    /** @dataProvider provideDenormalizeInvalidDataDontThrowsExceptionTests */
+    public function testDenormalizeInvalidDataDontThrowsException($data, array $context = [])
+    {
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::THROW_EXCEPTION_ON_INVALID_KEY => false]);
+        $this->assertSame($data, $normalizer->denormalize($data, \DateTimeInterface::class, null, $context));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyConstructor()
+    {
+        $this->expectDeprecation('Since symfony/serializer 5.4: The key context "throw_exception_on_invalid_key" of "Symfony\Component\Serializer\Normalizer\DateTimeNormalizer" must be defined. The value will be "false" in Symfony 6.0.');
+
+        new DateTimeNormalizer();
     }
 }

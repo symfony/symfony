@@ -329,6 +329,8 @@ class Form extends Link implements \ArrayAccess
      * @param string       $name  The field name
      * @param string|array $value The value of the field
      *
+     * @return void
+     *
      * @throws \InvalidArgumentException if the field does not exist
      */
     public function offsetSet(mixed $name, mixed $value)
@@ -340,6 +342,8 @@ class Form extends Link implements \ArrayAccess
      * Removes a field from the form.
      *
      * @param string $name The field name
+     *
+     * @return void
      */
     public function offsetUnset(mixed $name)
     {

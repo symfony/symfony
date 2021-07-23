@@ -59,6 +59,8 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
+     * @return mixed
+     *
      * @throws BadMethodCallException
      */
     public function offsetGet(mixed $offset)
@@ -71,6 +73,8 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
+     * @return void
+     *
      * @throws BadMethodCallException
      */
     public function offsetSet(mixed $offset, mixed $value)
@@ -82,6 +86,8 @@ class Button implements \IteratorAggregate, FormInterface
      * Unsupported method.
      *
      * This method should not be invoked.
+     *
+     * @return void
      *
      * @throws BadMethodCallException
      */

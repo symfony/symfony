@@ -108,6 +108,8 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function offsetGet(mixed $key)
     {
@@ -120,6 +122,8 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function offsetSet(mixed $key, mixed $value)
     {
@@ -141,6 +145,8 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function offsetUnset(mixed $key)
     {

@@ -128,6 +128,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Implements \ArrayAccess.
      *
+     * @return void
+     *
      * @throws BadMethodCallException always as setting a child by name is not allowed
      */
     public function offsetSet(mixed $name, mixed $value)
@@ -139,6 +141,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Removes a child (implements \ArrayAccess).
      *
      * @param string $name The child name
+     *
+     * @return void
      */
     public function offsetUnset(mixed $name)
     {

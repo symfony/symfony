@@ -38,6 +38,9 @@ class CollectionConfigurator
         $this->parentPrefixes = $parentPrefixes;
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

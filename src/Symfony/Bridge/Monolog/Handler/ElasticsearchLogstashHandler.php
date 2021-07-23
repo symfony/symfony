@@ -126,6 +126,9 @@ class ElasticsearchLogstashHandler extends AbstractHandler
         $this->wait(false);
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

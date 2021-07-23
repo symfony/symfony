@@ -125,6 +125,8 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      * ArrayAccess for argument setter.
      *
      * @param string $key Array key to set
+     *
+     * @return void
      */
     public function offsetSet(mixed $key, mixed $value)
     {
@@ -135,6 +137,8 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      * ArrayAccess for unset argument.
      *
      * @param string $key Array key
+     *
+     * @return void
      */
     public function offsetUnset(mixed $key)
     {

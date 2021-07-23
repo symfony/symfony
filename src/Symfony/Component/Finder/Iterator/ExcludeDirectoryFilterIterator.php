@@ -76,6 +76,9 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
         return $this->isRecursive && $this->iterator->hasChildren();
     }
 
+    /**
+     * @return self
+     */
     public function getChildren()
     {
         $children = new self($this->iterator->getChildren(), []);

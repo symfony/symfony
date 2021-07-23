@@ -186,6 +186,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Sets a helper.
+     *
+     * @return void
      */
     public function offsetSet(mixed $name, mixed $value)
     {
@@ -194,6 +196,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Removes a helper.
+     *
+     * @return void
      *
      * @throws \LogicException
      */

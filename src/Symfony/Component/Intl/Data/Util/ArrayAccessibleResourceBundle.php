@@ -44,17 +44,17 @@ class ArrayAccessibleResourceBundle implements \ArrayAccess, \IteratorAggregate,
         return null !== $this->bundleImpl->get($offset);
     }
 
-    public function offsetGet(mixed $offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->get($offset);
     }
 
-    public function offsetSet(mixed $offset, mixed $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new BadMethodCallException('Resource bundles cannot be modified.');
     }
 
-    public function offsetUnset(mixed $offset)
+    public function offsetUnset(mixed $offset): void
     {
         throw new BadMethodCallException('Resource bundles cannot be modified.');
     }

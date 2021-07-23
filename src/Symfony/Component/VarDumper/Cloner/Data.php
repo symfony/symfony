@@ -155,16 +155,22 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->__isset($key);
     }
 
-    public function offsetGet(mixed $key)
+    public function offsetGet(mixed $key): mixed
     {
         return $this->__get($key);
     }
 
+    /**
+     * @return void
+     */
     public function offsetSet(mixed $key, mixed $value)
     {
         throw new \BadMethodCallException(self::class.' objects are immutable.');
     }
 
+    /**
+     * @return void
+     */
     public function offsetUnset(mixed $key)
     {
         throw new \BadMethodCallException(self::class.' objects are immutable.');

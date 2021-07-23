@@ -592,6 +592,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $data;
         }
 
+        if ([] === $attributeValue && ($context[self::PRESERVE_EMPTY_OBJECTS] ?? $this->defaultContext[self::PRESERVE_EMPTY_OBJECTS] ?? false)) {
+            $attributeValue = new \ArrayObject();
+        }
+
         if ($this->nameConverter) {
             $attribute = $this->nameConverter->normalize($attribute, $class, $format, $context);
         }

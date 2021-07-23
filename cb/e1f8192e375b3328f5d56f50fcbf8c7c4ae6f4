@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-23T09:14:20Z
+
+I'm sorry I suggested this approach, but wouldn't it be better to patch DebugHandlersListener instead of the DI ext? To make it accept the service at the new position? Then we bump, no need for FC layer.

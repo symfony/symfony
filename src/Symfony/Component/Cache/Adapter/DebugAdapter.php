@@ -24,7 +24,7 @@ class DebugAdapter extends ProxyAdapter
         $result = parent::save($item);
 
         if (!$result) {
-            throw new CacheException("Can not save cache item {$item->get()}");
+            throw new CacheException("Can not save cache item with key '{$item->getKey()}'.");
         }
 
         return $result;
@@ -38,7 +38,7 @@ class DebugAdapter extends ProxyAdapter
         $result = parent::saveDeferred($item);
 
         if (!$result) {
-            throw new CacheException("Can not save cache item {$item->get()}");
+            throw new CacheException("Can not save cache item with key '{$item->getKey()}'.");
         }
 
         return $result;

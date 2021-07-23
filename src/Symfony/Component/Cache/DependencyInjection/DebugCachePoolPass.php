@@ -37,7 +37,7 @@ class DebugCachePoolPass implements CompilerPassInterface
             if (is_subclass_of($decoratablePool->getClass(), TagAwareAdapterInterface::class)) {
                 $decoratingClass = DebugTagAwareAdapter::class;
             }
-            $renamedServiceId = $id . '.inner_adapter';
+            $renamedServiceId = $id.'.inner_adapter';
 
             $decoratingPool = new Definition($decoratingClass, [$decoratablePool]);
             $decoratingPool->setArguments([new Reference($renamedServiceId)]);

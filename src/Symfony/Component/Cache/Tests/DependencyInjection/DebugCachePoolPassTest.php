@@ -35,6 +35,7 @@ class DebugCachePoolPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.project_dir', 'foo');
+        $container->setParameter('cache.exception_on_save', 'true');
 
         $container->register('cache.adapter.array', ArrayAdapter::class)
             ->addTag('cache.pool');

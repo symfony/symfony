@@ -23,6 +23,10 @@ class DebugCachePoolPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        if (!$container->getParameter('cache.exception_on_save')) {
+            return;
+        }
+
         foreach ($container->findTaggedServiceIds('cache.pool') as $id => $tags) {
             $decoratablePool = $container->getDefinition($id);
             if ($decoratablePool->isAbstract()) {

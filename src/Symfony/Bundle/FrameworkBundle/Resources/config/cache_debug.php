@@ -15,6 +15,10 @@ use Symfony\Bundle\FrameworkBundle\CacheWarmer\CachePoolClearerCacheWarmer;
 use Symfony\Component\Cache\DataCollector\CacheDataCollector;
 
 return static function (ContainerConfigurator $container) {
+    $container->parameters()
+        ->set('cache.exception_on_save', false)
+    ;
+
     $container->services()
         // DataCollector (public to prevent inlining, made private in CacheCollectorPass)
         ->set('data_collector.cache', CacheDataCollector::class)

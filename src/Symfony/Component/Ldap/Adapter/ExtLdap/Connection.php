@@ -35,6 +35,9 @@ class Connection extends AbstractConnection
     /** @var resource */
     private $connection;
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

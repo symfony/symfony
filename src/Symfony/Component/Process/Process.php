@@ -198,6 +198,9 @@ class Process implements \IteratorAggregate
         return $process;
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

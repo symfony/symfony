@@ -1,0 +1,109 @@
+---------------------------------------------------------------------------
+
+by Guikingone at 2021-07-19T15:42:16Z
+
+Regarding the question:
+
+> log timestamps now display milliseconds. Do you like this or is it enough with seconds?
+
+Milliseconds can be a good approach as it allows to debug easily some actions performed in an asynchronous way and logged.
+
+Depending on workers and commands, a more precise approach is a better idea.
+
+---------------------------------------------------------------------------
+
+by WhiteRabbitDE at 2021-07-19T15:45:46Z
+
+I like the changes and think it looks great!
+
+The only thing that comes to my mind is that an option to have some kind of default filtering could be a nice addition.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2021-07-19T16:28:20Z
+
+The logs explorer of Datadog could be a source of inspiration. The toggle "only/all" is really useful. Moreover, the counter at the end of each filter is also quite useful, we don't need to click on each filter to see if there are associated logs.
+
+<img src="https://user-images.githubusercontent.com/4578773/126193260-28a1ee88-a2a2-490a-b387-3d1d12153958.gif" width="500"/>
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-07-20T09:20:18Z
+
+OK, I've made some changes based on comments here and on Slack.
+
+When you load the logs page, the behavior is the same as before:
+
+* if there are errors, display those;
+* else if there are deprecations, display those;
+* else display all messages
+
+![log-initial](https://user-images.githubusercontent.com/73419/126295792-fa0a9f0f-fdfa-4ffd-85ab-e03c203d2a87.png)
+
+We've also restored the original "log type selector", but simpler than before:
+
+![log-type-selector](https://user-images.githubusercontent.com/73419/126296052-b66ddfd6-a427-4fdc-99d8-977e7357c2eb.gif)
+
+The log details have been tweaked _(note: even we use colors for each log type, no information is conveyed only using color, so this should be 100% accessible)_:
+
+![log-detail](https://user-images.githubusercontent.com/73419/126295982-4aec58b5-2206-4c3e-a778-8ab50cbb5b62.png)
+
+Finally, filters now show a "Select All" and "Select None" to improve productivity:
+
+![log-filter](https://user-images.githubusercontent.com/73419/126296119-ea118042-2c12-424d-89f8-d510435fe490.gif)
+
+~I need to polish some design things (dark mode) but this should be almost ready~ This is now ready. What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-20T12:06:16Z
+
+Looks great!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-07-21T19:17:00Z
+
+> log timestamps now display milliseconds. Do you like this or is it enough with seconds?
+
+![image](https://user-images.githubusercontent.com/1047696/126546773-257660b0-6a97-404f-85ab-bbc4c1d3d5d9.png)
+
+this sends the wrong signal yes
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-07-21T19:33:39Z
+
+About the milliseconds, I also see all messages in `.000`. Am I doing something wrong or is just that Symfony doesn't store milliseconds for logs?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-07-21T19:43:37Z
+
+> Am I doing something wrong or is just that Symfony doesn't store milliseconds for logs?
+
+Something must be wrong. The timestamps are logged with milliseconds in the log files
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-07-22T08:15:05Z
+
+About timestamps, I've checked the `$this->data` contents of the `LoggerDataCollector` and we only have simple timestamps. No millisecond information is stored. But it's true that Monolog shows the milliseconds ... so the info must be there somewhere.
+
+About refactoring the entire code of `LoggerDataCollector`, I think it's out of the scope of this PR. We can do that later in a separate PR (@ro0NL maybe you can help us here, because it looks like you know this well 🙏 ).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-07-22T08:45:22Z
+
+In 82ea7cb I found the way to store microseconds in debug log messages. Would this be an acceptable solution?
+
+![](https://user-images.githubusercontent.com/73419/126612401-70e4a442-cd61-4ce8-96ba-a7d603879c35.png)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-07-22T10:38:17Z
+
+>About refactoring the entire code of LoggerDataCollector, I think it's out of the scope of this PR.
+
+i challenge you to merge new getProcessedLogs into existing getLogs, yes :)

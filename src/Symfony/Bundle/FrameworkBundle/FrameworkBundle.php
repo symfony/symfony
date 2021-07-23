@@ -34,6 +34,7 @@ use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
+use Symfony\Component\Cache\DependencyInjection\DebugCachePoolPass;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
@@ -166,6 +167,7 @@ class FrameworkBundle extends Bundle
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);
             $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
+            $this->addCompilerPassIfExists($container, DebugCachePoolPass::class);
         }
     }
 

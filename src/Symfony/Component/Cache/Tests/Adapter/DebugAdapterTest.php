@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;

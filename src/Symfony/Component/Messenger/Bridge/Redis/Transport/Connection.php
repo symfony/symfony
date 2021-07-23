@@ -32,7 +32,7 @@ class Connection
         'group' => 'symfony',
         'consumer' => 'consumer',
         'auto_setup' => true,
-        'delete_after_ack' => false,
+        'delete_after_ack' => true,
         'delete_after_reject' => true,
         'stream_max_entries' => 0, // any value higher than 0 defines an approximate maximum number of stream entries
         'dbindex' => 0,
@@ -175,8 +175,6 @@ class Connection
         if (\array_key_exists('delete_after_ack', $redisOptions)) {
             $deleteAfterAck = filter_var($redisOptions['delete_after_ack'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['delete_after_ack']);
-        } else {
-            trigger_deprecation('symfony/redis-messenger', '5.4', 'Not setting the "delete_after_ack" boolean option explicitly is deprecated, its default value will change to true in 6.0.');
         }
 
         $deleteAfterReject = null;

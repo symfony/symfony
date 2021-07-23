@@ -168,7 +168,7 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * Alternatively the TTL index can be created manually on the database:
      *
-     *  db.lock.ensureIndex(
+     *  db.lock.createIndex(
      *      { "expires_at": 1 },
      *      { "expireAfterSeconds": 0 }
      *  )

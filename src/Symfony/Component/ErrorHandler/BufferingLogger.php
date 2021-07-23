@@ -35,6 +35,9 @@ class BufferingLogger extends AbstractLogger
         return $logs;
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

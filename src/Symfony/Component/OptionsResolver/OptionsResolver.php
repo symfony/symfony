@@ -1211,6 +1211,8 @@ class OptionsResolver implements Options
     /**
      * Not supported.
      *
+     * @return void
+     *
      * @throws AccessException
      */
     public function offsetSet($option, $value)
@@ -1220,6 +1222,8 @@ class OptionsResolver implements Options
 
     /**
      * Not supported.
+     *
+     * @return void
      *
      * @throws AccessException
      */

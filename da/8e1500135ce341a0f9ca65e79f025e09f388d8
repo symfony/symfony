@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-27T13:41:50Z
+
+Please rebase to restart tests :pray:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-13T09:18:14Z
+
+We are missing a BC layer in 5.4 first to deprecate the argument and accept the new signature.
+Could you please have a look?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-07-19T08:22:01Z
+
+I was on holiday, I'll have a look on Friday 👍🏼
+About the BC: The class is internal now. see https://github.com/symfony/symfony/pull/39016#discussion_r518842159
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-07-23T12:49:10Z
+
+I updated the PR with the new approach

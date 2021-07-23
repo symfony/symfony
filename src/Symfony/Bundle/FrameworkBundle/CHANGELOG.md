@@ -11,6 +11,7 @@ CHANGELOG
  * Deprecate the `cache.adapter.doctrine` service
  * Add support for resetting container services after each messenger message
  * Add `configureContainer()`, `configureRoutes()`, `getConfigDir()` and `getBundlesPath()` to `MicroKernelTrait`
+ * Add support for configuring log level, and status code by exception class
 
 5.3
 ---

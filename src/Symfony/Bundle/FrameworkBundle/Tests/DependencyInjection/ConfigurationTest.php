@@ -579,6 +579,7 @@ class ConfigurationTest extends TestCase
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 6,
             ],
+            'exceptions' => [],
         ];
     }
 }

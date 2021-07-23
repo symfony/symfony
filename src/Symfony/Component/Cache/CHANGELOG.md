@@ -6,6 +6,7 @@ CHANGELOG
 
  * Make `LockRegistry` use semaphores when possible
  * Deprecate `DoctrineProvider` because this class has been added to the `doctrine/cache` package
+ * Introduce `DebugAdapter` that throws exception when save resulted in failure
 
 5.3
 ---

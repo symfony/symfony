@@ -990,6 +990,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      * @param string        $name  Ignored. The name of the child is used
      * @param FormInterface $child The child to be added
      *
+     * @return void
+     *
      * @throws AlreadySubmittedException if the form has already been submitted
      * @throws LogicException            when trying to add a child to a non-compound form
      *
@@ -1005,6 +1007,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @param string $name The name of the child to remove
      *
+     * @return void
+     *
      * @throws AlreadySubmittedException if the form has already been submitted
      */
     public function offsetUnset($name)
@@ -1015,7 +1019,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the iterator for this group.
      *
-     * @return \Traversable|FormInterface[]
+     * @return \Traversable<FormInterface>
      */
     public function getIterator()
     {

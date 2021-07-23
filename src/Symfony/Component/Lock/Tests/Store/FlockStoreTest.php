@@ -83,4 +83,25 @@ class FlockStoreTest extends AbstractStoreTest
 
         $store->delete($key);
     }
+
+    public function testSaveSanitizeLongName()
+    {
+        $store = $this->getStore();
+
+        $key = new Key(str_repeat(__CLASS__, 100));
+
+        $file = sprintf(
+            '%s/sf.Symfony-Component-Lock-Tests-Store-FlockStoreTestS.%s.lock',
+            sys_get_temp_dir(),
+            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
+        );
+        // ensure the file does not exist before the store
+        @unlink($file);
+
+        $store->save($key);
+
+        $this->assertFileExists($file);
+
+        $store->delete($key);
+    }
 }

@@ -43,6 +43,30 @@ class DebugProcessorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider providerDatetimeRfc3339FormatTests
+     */
+    public function testDatetimeRfc3339Format(array $record, $expectedTimestamp)
+    {
+        $processor = new DebugProcessor();
+        $processor($record);
+
+        $records = $processor->getLogs();
+        self::assertCount(1, $records);
+        self::assertSame($expectedTimestamp, $records[0]['timestamp_rfc3339']);
+    }
+
+    public function providerDatetimeRfc3339FormatTests(): array
+    {
+        $record = $this->getRecord();
+
+        return [
+            [array_merge($record, ['datetime' => new \DateTime('2019-01-01T00:01:00+00:00')]), '2019-01-01T00:01:00.000+00:00'],
+            [array_merge($record, ['datetime' => '2019-01-01T00:01:00+00:00']), '2019-01-01T00:01:00.000+00:00'],
+            [array_merge($record, ['datetime' => 'foo']), false],
+        ];
+    }
+
     public function testDebugProcessor()
     {
         $processor = new DebugProcessor();

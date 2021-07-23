@@ -14,6 +14,7 @@ CHANGELOG
 ---
 
  * Deprecate `AbstractTestSessionListener::getSession` inject a session in the request instead
+ * Deprecate the `fileLinkFormat` parameter of `DebugHandlersListener`
 
 5.3
 ---

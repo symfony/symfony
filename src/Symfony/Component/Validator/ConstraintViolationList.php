@@ -133,6 +133,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function offsetGet($offset)
     {
@@ -141,6 +143,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function offsetSet($offset, $violation)
     {
@@ -153,6 +157,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function offsetUnset($offset)
     {

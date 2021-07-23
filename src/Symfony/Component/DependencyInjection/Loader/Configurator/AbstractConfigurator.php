@@ -34,6 +34,9 @@ abstract class AbstractConfigurator
         throw new \BadMethodCallException(sprintf('Call to undefined method "%s::%s()".', static::class, $method));
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

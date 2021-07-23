@@ -50,6 +50,9 @@ final class Lock implements LockInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

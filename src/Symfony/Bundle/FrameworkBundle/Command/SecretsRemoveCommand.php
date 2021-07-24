@@ -13,6 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionInterface;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,7 +29,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @internal
  */
-final class SecretsRemoveCommand extends Command
+final class SecretsRemoveCommand extends Command implements CompletionInterface
 {
     protected static $defaultName = 'secrets:remove';
     protected static $defaultDescription = 'Remove a secret from the vault';
@@ -79,5 +82,16 @@ EOF
         }
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if (!$input->mustSuggestArgumentValuesFor('name')) {
+            return;
+        }
+
+        $vault = $input->getOption('local') ? $this->localVault : $this->vault;
+        $vaultKeys = array_keys($this->vault->list(false));
+        $suggestions->suggestValues(array_intersect($vaultKeys, array_keys($vault->list(false))));
     }
 }

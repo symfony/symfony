@@ -748,7 +748,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                     return;
                 }
 
-                // hide rows that don't match the current filters
+                /* hide rows that don't match the current filters */
                 let numVisibleRows = 0;
                 logs.querySelectorAll('tbody tr').forEach((row) => {
                     if ('all' !== selectedType && selectedType !== row.getAttribute('data-type')) {
@@ -773,11 +773,11 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                 document.querySelector('table.logs').style.display = 0 === numVisibleRows ? 'none' : 'table';
                 document.querySelector('.no-logs-message').style.display = 0 === numVisibleRows ? 'block' : 'none';
 
-                // update the selected totals of all filters
+                /* update the selected totals of all filters */
                 document.querySelector('#log-filter-priority .filter-active-num').innerText = (priorities.length === selectedPriorities.length) ? 'All' : selectedPriorities.length;
                 document.querySelector('#log-filter-channel .filter-active-num').innerText = (channels.length === selectedChannels.length) ? 'All' : selectedChannels.length;
 
-                // update the currently selected "log type" tab
+                /* update the currently selected "log type" tab */
                 document.querySelectorAll('#log-filter-type li').forEach((tab) => tab.classList.remove('active'));
                 document.querySelector(`#log-filter-type input[value="${selectedType}"]`).parentElement.classList.add('active');
             },

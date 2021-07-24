@@ -54,7 +54,7 @@ final class LokaliseProviderFactory extends AbstractProviderFactory
         $endpoint .= $dsn->getPort() ? ':'.$dsn->getPort() : '';
 
         $client = $this->client->withOptions([
-            'base_uri' => 'https://'.$endpoint.'/projects/'.$this->getUser($dsn).'/api2/',
+            'base_uri' => 'https://'.$endpoint.'/api2/projects/'.$this->getUser($dsn).'/',
             'headers' => [
                 'X-Api-Token' => $this->getPassword($dsn),
             ],

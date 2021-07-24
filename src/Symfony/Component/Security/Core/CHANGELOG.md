@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Deprecate setting the 4th argument (`$alwaysAuthenticate`) to `true` and not setting the
+   5th argument (`$exceptionOnNoToken`) to `false` of `AuthorizationChecker`
+ * Deprecate methods `TokenInterface::isAuthenticated()` and `setAuthenticated`,
+   tokens will always be considered authenticated in 6.0
+
 5.3
 ---
 

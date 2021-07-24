@@ -35,23 +35,16 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  */
 final class SlidingWindowLimiter implements LimiterInterface
 {
-    private $id;
+    use ResetLimiterTrait;
+
     private $limit;
-    private $storage;
 
     /**
      * @var int seconds
      */
     private $interval;
 
-    /**
-     * @var LockInterface
-     */
-    private $lock;
-
-    use ResetLimiterTrait;
-
-    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, ?LockInterface $lock = null)
+    public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
     {
         $this->storage = $storage;
         $this->lock = $lock ?? new NoLock();
@@ -60,7 +53,7 @@ final class SlidingWindowLimiter implements LimiterInterface
         $this->interval = TimeUtil::dateIntervalToSeconds($interval);
     }
 
-    public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
+    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
     {
         throw new ReserveNotSupportedException(__CLASS__);
     }

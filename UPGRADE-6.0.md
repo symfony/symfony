@@ -11,6 +11,11 @@ DoctrineBridge
 
  * Remove `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()`
 
+Cache
+-----
+
+ * Remove `DoctrineProvider` because it has been added to the `doctrine/cache` package
+
 Config
 ------
 
@@ -54,6 +59,12 @@ EventDispatcher
 ---------------
 
  * Removed `LegacyEventDispatcherProxy`. Use the event dispatcher without the proxy.
+
+Finder
+------
+
+ * Remove `Comparator::setTarget()` and `Comparator::setOperator()`
+ * The `$target` parameter of `Comparator::__construct()` is now mandatory
 
 Form
 ----
@@ -141,6 +152,7 @@ Messenger
  * The signature of method `RetryStrategyInterface::getWaitingTime()` has been updated to `RetryStrategyInterface::getWaitingTime(Envelope $message, \Throwable $throwable = null)`.
  * Removed the `prefetch_count` parameter in the AMQP bridge.
  * Removed the use of TLS option for Redis Bridge, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
+ * The `delete_after_ack` config option of the Redis transport now defaults to `true`
 
 Mime
 ----
@@ -194,6 +206,8 @@ Routing
 Security
 --------
 
+ * Remove the 4th and 5th argument of `AuthorizationChecker`
+ * Remove the 5th argument of `AccessListener`
  * Remove class `User`, use `InMemoryUser` or your own implementation instead.
    If you are using the `isAccountNonLocked()`, `isAccountNonExpired()` or `isCredentialsNonExpired()` method, consider re-implementing them
    in your own user class as they are not part of the `InMemoryUser` API
@@ -309,10 +323,14 @@ Security
    `UsernamePasswordFormAuthenticationListener`, `UsernamePasswordJsonAuthenticationListener` and `X509AuthenticationListener`
    from security-http, use the new authenticator system instead
  * Remove the Guard component, use the new authenticator system instead
+ * Remove `TokenInterface:isAuthenticated()` and `setAuthenticated()` methods without replacement.
+   Security tokens won't have an "authenticated" flag anymore, so they will always be considered authenticated
+ * Remove `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead
 
 SecurityBundle
 --------------
 
+ * Remove the `always_authenticate_before_granting` option
  * Remove the `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
    use `UserPasswordHashCommand` and `user:hash-password` instead
  * Remove the `security.encoder_factory.generic` service, the `security.encoder_factory` and `Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface` aliases,

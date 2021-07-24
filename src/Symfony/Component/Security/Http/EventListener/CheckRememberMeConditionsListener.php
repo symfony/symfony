@@ -14,12 +14,8 @@ namespace Symfony\Component\Security\Http\EventListener;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
-use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
-use Symfony\Component\Security\Http\Event\LogoutEvent;
-use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Component\Security\Http\ParameterBagUtils;
-use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 
 /**
  * Checks if all conditions are met for remember me.
@@ -42,7 +38,7 @@ class CheckRememberMeConditionsListener implements EventSubscriberInterface
     private $options;
     private $logger;
 
-    public function __construct(array $options = [], ?LoggerInterface $logger = null)
+    public function __construct(array $options = [], LoggerInterface $logger = null)
     {
         $this->options = $options + ['always_remember_me' => false, 'remember_me_parameter' => '_remember_me'];
         $this->logger = $logger;

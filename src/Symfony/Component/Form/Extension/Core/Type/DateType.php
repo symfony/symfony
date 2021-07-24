@@ -39,8 +39,8 @@ class DateType extends AbstractType
     ];
 
     private const WIDGETS = [
-        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
-        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+        'text' => TextType::class,
+        'choice' => ChoiceType::class,
     ];
 
     /**
@@ -58,7 +58,7 @@ class DateType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            if ('' !== $pattern && false === strpos($pattern, 'y') && false === strpos($pattern, 'M') && false === strpos($pattern, 'd')) {
+            if ('' !== $pattern && !str_contains($pattern, 'y') && !str_contains($pattern, 'M') && !str_contains($pattern, 'd')) {
                 throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" or "d". Its current value is "%s".', $pattern));
             }
 
@@ -71,7 +71,7 @@ class DateType extends AbstractType
                 $pattern
             ));
         } else {
-            if ('' !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd'))) {
+            if ('' !== $pattern && (!str_contains($pattern, 'y') || !str_contains($pattern, 'M') || !str_contains($pattern, 'd'))) {
                 throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" and "d". Its current value is "%s".', $pattern));
             }
 

@@ -60,9 +60,6 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         return $this->prefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString(): string
     {
         return 'glob.'.$this->prefix.(int) $this->recursive.$this->pattern.(int) $this->forExclusion.implode("\0", $this->excludedPrefixes);
@@ -110,10 +107,10 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         $prefix = str_replace('\\', '/', $this->prefix);
         $paths = null;
 
-        if (0 !== strpos($this->prefix, 'phar://') && false === strpos($this->pattern, '/**/')) {
-            if ($this->globBrace || false === strpos($this->pattern, '{')) {
+        if (!str_starts_with($this->prefix, 'phar://') && !str_contains($this->pattern, '/**/')) {
+            if ($this->globBrace || !str_contains($this->pattern, '{')) {
                 $paths = glob($this->prefix.$this->pattern, \GLOB_NOSORT | $this->globBrace);
-            } elseif (false === strpos($this->pattern, '\\') || !preg_match('/\\\\[,{}]/', $this->pattern)) {
+            } elseif (!str_contains($this->pattern, '\\') || !preg_match('/\\\\[,{}]/', $this->pattern)) {
                 foreach ($this->expandGlob($this->pattern) as $p) {
                     $paths[] = glob($this->prefix.$p, \GLOB_NOSORT);
                 }
@@ -226,7 +223,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 
         $j = 0;
         foreach ($patterns as $i => $p) {
-            if (false !== strpos($p, '{')) {
+            if (str_contains($p, '{')) {
                 $p = $this->expandGlob($p);
                 array_splice($paths, $i + $j, 1, $p);
                 $j += \count($p) - 1;

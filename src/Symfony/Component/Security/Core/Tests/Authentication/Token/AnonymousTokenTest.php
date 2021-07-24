@@ -18,11 +18,17 @@ class AnonymousTokenTest extends TestCase
 {
     public function testConstructor()
     {
-        $token = new AnonymousToken('foo', 'bar');
-        $this->assertTrue($token->isAuthenticated());
-
         $token = new AnonymousToken('foo', 'bar', ['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testIsAuthenticated()
+    {
+        $token = new AnonymousToken('foo', 'bar');
+        $this->assertTrue($token->isAuthenticated());
     }
 
     public function testGetKey()

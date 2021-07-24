@@ -159,7 +159,7 @@ final class Languages extends ResourceBundle
      *
      * @return string[]
      */
-    public static function getAlpha3Names($displayLocale = null): array
+    public static function getAlpha3Names(string $displayLocale = null): array
     {
         $alpha2Names = self::getNames($displayLocale);
         $alpha3Names = [];

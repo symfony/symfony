@@ -28,7 +28,7 @@ use Symfony\Component\Form\FormTypeInterface;
 class CachingFactoryDecoratorTest extends TestCase
 {
     /**
-     * @var MockObject
+     * @var MockObject&ChoiceListFactoryInterface
      */
     private $decoratedFactory;
 

@@ -194,9 +194,9 @@ class SmtpTransport extends AbstractTransport
 
         try {
             $envelope = $message->getEnvelope();
-            $this->doMailFromCommand($envelope->getSender()->getAddress());
+            $this->doMailFromCommand($envelope->getSender()->getEncodedAddress());
             foreach ($envelope->getRecipients() as $recipient) {
-                $this->doRcptToCommand($recipient->getAddress());
+                $this->doRcptToCommand($recipient->getEncodedAddress());
             }
 
             $this->executeCommand("DATA\r\n", [354]);
@@ -340,6 +340,9 @@ class SmtpTransport extends AbstractTransport
         $this->restartCounter = 0;
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

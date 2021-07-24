@@ -19,9 +19,6 @@ class ManagerRegistryTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
-        if (!class_exists(\PHPUnit_Framework_TestCase::class)) {
-            self::markTestSkipped('proxy-manager-bridge is not yet compatible with namespaced phpunit versions.');
-        }
         $test = new PhpDumperTest();
         $test->testDumpContainerWithProxyServiceWillShareProxies();
     }

@@ -164,7 +164,7 @@ class RangeValidator extends ConstraintValidator
         }
     }
 
-    private function getLimit($propertyPath, $default, Constraint $constraint)
+    private function getLimit(?string $propertyPath, $default, Constraint $constraint)
     {
         if (null === $propertyPath) {
             return $default;

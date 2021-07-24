@@ -71,12 +71,7 @@ class StopwatchTest extends TestCase
         $events = new \ReflectionProperty(Section::class, 'events');
         $events->setAccessible(true);
 
-        $stopwatchMockEvent = $this->getMockBuilder(StopwatchEvent::class)
-            ->setConstructorArgs([microtime(true) * 1000])
-            ->getMock()
-        ;
-
-        $events->setValue(end($section), ['foo' => $stopwatchMockEvent]);
+        $events->setValue(end($section), ['foo' => new StopwatchEvent(microtime(true) * 1000)]);
 
         $this->assertFalse($stopwatch->isStarted('foo'));
     }

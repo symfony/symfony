@@ -40,6 +40,10 @@ class AccessListener extends AbstractListener
 
     public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager, bool $exceptionOnNoToken = true)
     {
+        if (false !== $exceptionOnNoToken) {
+            trigger_deprecation('symfony/security-core', '5.4', 'Not setting the 5th argument of "%s" to "false" is deprecated.', __METHOD__);
+        }
+
         $this->tokenStorage = $tokenStorage;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->map = $map;
@@ -91,7 +95,9 @@ class AccessListener extends AbstractListener
             $token = new NullToken();
         }
 
-        if (!$token->isAuthenticated()) {
+        // @deprecated since Symfony 5.4
+        if (!$token->isAuthenticated(false)) {
+            trigger_deprecation('symfony/core', '5.4', 'Returning false from "%s()" is deprecated and won\'t have any effect in Symfony 6.0 as security tokens will always be considered authenticated.');
             $token = $this->authManager->authenticate($token);
             $this->tokenStorage->setToken($token);
         }

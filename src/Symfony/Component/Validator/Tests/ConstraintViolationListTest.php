@@ -155,6 +155,15 @@ EOF;
         ];
     }
 
+    public function testCreateFromMessage()
+    {
+        $list = ConstraintViolationList::createFromMessage('my message');
+
+        $this->assertCount(1, $list);
+        $this->assertInstanceOf(ConstraintViolation::class, $list[0]);
+        $this->assertSame('my message', $list[0]->getMessage());
+    }
+
     protected function getViolation($message, $root = null, $propertyPath = null, $code = null)
     {
         return new ConstraintViolation($message, $message, [], $root, $propertyPath, null, null, $code);

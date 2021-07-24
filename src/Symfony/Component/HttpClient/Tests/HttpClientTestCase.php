@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
@@ -295,11 +296,11 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         }
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            self::markTestSkipped('Testing with the "vulcain" is not supported on Windows.');
+            throw new SkippedTestSuiteError('Testing with the "vulcain" is not supported on Windows.');
         }
 
         if (['application/json'] !== $client->request('GET', 'http://127.0.0.1:8057/json')->getHeaders()['content-type']) {
-            self::markTestSkipped('symfony/http-client-contracts >= 2.0.1 required');
+            throw new SkippedTestSuiteError('symfony/http-client-contracts >= 2.0.1 required');
         }
 
         $process = new Process(['vulcain'], null, [
@@ -316,14 +317,14 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         if (!$process->isRunning()) {
             if ('\\' !== \DIRECTORY_SEPARATOR && 127 === $process->getExitCode()) {
-                self::markTestSkipped('vulcain binary is missing');
+                throw new SkippedTestSuiteError('vulcain binary is missing');
             }
 
             if ('\\' !== \DIRECTORY_SEPARATOR && 126 === $process->getExitCode()) {
-                self::markTestSkipped('vulcain binary is not executable');
+                throw new SkippedTestSuiteError('vulcain binary is not executable');
             }
 
-            self::markTestSkipped((new ProcessFailedException($process))->getMessage());
+            throw new SkippedTestSuiteError((new ProcessFailedException($process))->getMessage());
         }
 
         self::$vulcainStarted = true;

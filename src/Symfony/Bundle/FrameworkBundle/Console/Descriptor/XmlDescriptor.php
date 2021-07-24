@@ -53,7 +53,7 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getContainerTagsDocument($builder, isset($options['show_hidden']) && $options['show_hidden']));
     }
 
-    protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -255,7 +255,7 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    private function getContainerServiceDocument($service, string $id, ContainerBuilder $builder = null, bool $showArguments = false): \DOMDocument
+    private function getContainerServiceDocument(object $service, string $id, ContainerBuilder $builder = null, bool $showArguments = false): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
 
@@ -505,7 +505,7 @@ class XmlDescriptor extends Descriptor
                 $callableXML->setAttribute('name', $callable[1]);
                 $callableXML->setAttribute('class', \get_class($callable[0]));
             } else {
-                if (0 !== strpos($callable[1], 'parent::')) {
+                if (!str_starts_with($callable[1], 'parent::')) {
                     $callableXML->setAttribute('name', $callable[1]);
                     $callableXML->setAttribute('class', $callable[0]);
                     $callableXML->setAttribute('static', 'true');
@@ -523,7 +523,7 @@ class XmlDescriptor extends Descriptor
         if (\is_string($callable)) {
             $callableXML->setAttribute('type', 'function');
 
-            if (false === strpos($callable, '::')) {
+            if (!str_contains($callable, '::')) {
                 $callableXML->setAttribute('name', $callable);
             } else {
                 $callableParts = explode('::', $callable);
@@ -540,7 +540,7 @@ class XmlDescriptor extends Descriptor
             $callableXML->setAttribute('type', 'closure');
 
             $r = new \ReflectionFunction($callable);
-            if (false !== strpos($r->name, '{closure}')) {
+            if (str_contains($r->name, '{closure}')) {
                 return $dom;
             }
             $callableXML->setAttribute('name', $r->name);

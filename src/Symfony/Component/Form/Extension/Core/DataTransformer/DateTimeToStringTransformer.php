@@ -44,9 +44,9 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @see \DateTime::format() for supported formats
      *
-     * @param string $inputTimezone  The name of the input timezone
-     * @param string $outputTimezone The name of the output timezone
-     * @param string $format         The date format
+     * @param string|null $inputTimezone  The name of the input timezone
+     * @param string|null $outputTimezone The name of the output timezone
+     * @param string      $format         The date format
      */
     public function __construct(string $inputTimezone = null, string $outputTimezone = null, string $format = 'Y-m-d H:i:s')
     {
@@ -62,7 +62,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         // where the time corresponds to the current server time.
         // With "|" and "Y-m-d", "2010-02-03" becomes "2010-02-03 00:00:00",
         // which is at least deterministic and thus used here.
-        if (false === strpos($this->parseFormat, '|')) {
+        if (!str_contains($this->parseFormat, '|')) {
             $this->parseFormat .= '|';
         }
     }

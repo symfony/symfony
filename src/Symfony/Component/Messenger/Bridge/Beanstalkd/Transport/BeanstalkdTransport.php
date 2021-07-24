@@ -27,7 +27,7 @@ class BeanstalkdTransport implements TransportInterface, MessageCountAwareInterf
     private $receiver;
     private $sender;
 
-    public function __construct(Connection $connection, ?SerializerInterface $serializer = null)
+    public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
         $this->connection = $connection;
         $this->serializer = $serializer ?? new PhpSerializer();

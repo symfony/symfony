@@ -71,7 +71,7 @@ TXT
         $tester = $this->createCommandTester();
         $tester->execute(['class' => 'DateTime'], ['decorated' => false, 'interactive' => false]);
 
-        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $tester->assertCommandIsSuccessful('Returns 0 in case of success');
         $this->assertStringContainsString('Symfony\Component\Form\Extension\Core\Type\DateTimeType (Block prefix: "datetime")', $tester->getDisplay());
     }
 
@@ -123,7 +123,7 @@ TXT;
         $tester->setInputs([0]);
         $tester->execute(['class' => 'AmbiguousType'], ['decorated' => false, 'interactive' => true]);
 
-        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $tester->assertCommandIsSuccessful('Returns 0 in case of success');
         $output = $tester->getDisplay(true);
         $this->assertStringMatchesFormat(<<<TXT
 

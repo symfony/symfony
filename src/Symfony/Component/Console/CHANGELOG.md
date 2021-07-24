@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `TesterTrait::assertCommandIsSuccessful()` to test command
+
 5.3
 ---
 

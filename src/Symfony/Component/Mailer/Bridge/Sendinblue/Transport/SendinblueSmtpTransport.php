@@ -20,7 +20,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 final class SendinblueSmtpTransport extends EsmtpTransport
 {
-    public function __construct(string $username, string $password, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
+    public function __construct(string $username, string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct('smtp-relay.sendinblue.com', 465, true, $dispatcher, $logger);
 

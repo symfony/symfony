@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Secrets;
 
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
+use Symfony\Component\VarExporter\VarExporter;
 
 /**
  * @author Tobias Schultze <http://tobion.de>
@@ -89,7 +90,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $list = $this->list();
         $list[$name] = null;
         uksort($list, 'strnatcmp');
-        file_put_contents($this->pathPrefix.'list.php', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), \LOCK_EX));
+        file_put_contents($this->pathPrefix.'list.php', sprintf("<?php\n\nreturn %s;\n", VarExporter::export($list)), \LOCK_EX);
 
         $this->lastMessage = sprintf('Secret "%s" encrypted in "%s"; you can commit it.', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
     }
@@ -141,7 +142,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
         $list = $this->list();
         unset($list[$name]);
-        file_put_contents($this->pathPrefix.'list.php', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), \LOCK_EX));
+        file_put_contents($this->pathPrefix.'list.php', sprintf("<?php\n\nreturn %s;\n", VarExporter::export($list)), \LOCK_EX);
 
         $this->lastMessage = sprintf('Secret "%s" removed from "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
@@ -199,9 +200,10 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
     private function export(string $file, string $data): void
     {
+        $b64 = 'decrypt.private' === $file ? '// SYMFONY_DECRYPTION_SECRET='.base64_encode($data)."\n" : '';
         $name = basename($this->pathPrefix.$file);
         $data = str_replace('%', '\x', rawurlencode($data));
-        $data = sprintf("<?php // %s on %s\n\nreturn \"%s\";\n", $name, date('r'), $data);
+        $data = sprintf("<?php // %s on %s\n\n%sreturn \"%s\";\n", $name, date('r'), $b64, $data);
 
         $this->createSecretsDir();
 

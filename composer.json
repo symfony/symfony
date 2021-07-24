@@ -23,7 +23,7 @@
         "psr/event-dispatcher-implementation": "1.0",
         "psr/http-client-implementation": "1.0",
         "psr/link-implementation": "1.0",
-        "psr/log-implementation": "1.0",
+        "psr/log-implementation": "1.0|2.0",
         "psr/simple-cache-implementation": "1.0",
         "symfony/cache-implementation": "1.0|2.0",
         "symfony/event-dispatcher-implementation": "2.0",
@@ -42,7 +42,7 @@
         "psr/container": "^1.0",
         "psr/event-dispatcher": "^1.0",
         "psr/link": "^1.0",
-        "psr/log": "~1.0",
+        "psr/log": "^1|^2",
         "symfony/contracts": "^2.1",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-grapheme": "~1.0",
@@ -51,7 +51,7 @@
         "symfony/polyfill-intl-normalizer": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php73": "^1.11",
-        "symfony/polyfill-php80": "^1.15",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/polyfill-php81": "^1.22",
         "symfony/polyfill-uuid": "^1.15"
     },
@@ -125,7 +125,7 @@
         "cache/integration-tests": "dev-master",
         "composer/package-versions-deprecated": "^1.8",
         "doctrine/annotations": "^1.12",
-        "doctrine/cache": "^1.6|^2.0",
+        "doctrine/cache": "^1.11|^2.0",
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "^2.10|^3.0",
@@ -192,7 +192,7 @@
             "url": "src/Symfony/Contracts",
             "options": {
                 "versions": {
-                    "symfony/contracts": "2.4.x-dev"
+                    "symfony/contracts": "2.5.x-dev"
                 }
             }
         },

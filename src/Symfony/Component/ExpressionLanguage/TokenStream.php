@@ -56,12 +56,9 @@ class TokenStream
     }
 
     /**
-     * Tests a token.
-     *
-     * @param array|int   $type    The type to test
      * @param string|null $message The syntax error message
      */
-    public function expect($type, string $value = null, string $message = null)
+    public function expect(string $type, string $value = null, string $message = null)
     {
         $token = $this->current;
         if (!$token->test($type, $value)) {

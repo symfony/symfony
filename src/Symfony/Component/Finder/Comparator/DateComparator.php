@@ -45,7 +45,6 @@ class DateComparator extends Comparator
             $operator = '<';
         }
 
-        $this->setOperator($operator);
-        $this->setTarget($target);
+        parent::__construct($target, $operator);
     }
 }

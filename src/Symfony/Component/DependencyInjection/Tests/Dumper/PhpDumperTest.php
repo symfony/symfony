@@ -42,6 +42,8 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
@@ -49,7 +51,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
-use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
@@ -166,28 +167,6 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/custom_container_class_with_mandatory_constructor_arguments.php', $dumper->dump(['base_class' => 'ConstructorWithMandatoryArgumentsContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Tests\Fixtures\Container']));
-    }
-
-    /**
-     * @dataProvider provideInvalidParameters
-     */
-    public function testExportParameters($parameters)
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $container = new ContainerBuilder(new ParameterBag($parameters));
-        $container->compile();
-        $dumper = new PhpDumper($container);
-        $dumper->dump();
-    }
-
-    public function provideInvalidParameters()
-    {
-        return [
-            [['foo' => new Definition('stdClass')]],
-            [['foo' => new Expression('service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")')]],
-            [['foo' => new Reference('foo')]],
-            [['foo' => new Variable('foo')]],
-        ];
     }
 
     public function testAddParameters()
@@ -1226,6 +1205,29 @@ class PhpDumperTest extends TestCase
         $container = new \Symfony_DI_PhpDumper_Test_Object_Class_Name();
 
         $this->assertInstanceOf(\stdClass::class, $container->get('bar'));
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testDumpHandlesEnumeration()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', FooClassWithEnumAttribute::class)
+            ->setPublic(true)
+            ->addArgument(FooUnitEnum::BAR);
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump([
+            'class' => 'Symfony_DI_PhpDumper_Test_Enumeration',
+        ]));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Enumeration();
+
+        $this->assertSame(FooUnitEnum::BAR, $container->get('foo')->getBar());
     }
 
     public function testUninitializedSyntheticReference()

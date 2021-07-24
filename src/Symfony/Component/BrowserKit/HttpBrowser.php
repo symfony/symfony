@@ -42,7 +42,7 @@ class HttpBrowser extends AbstractBrowser
     /**
      * @param Request $request
      */
-    protected function doRequest($request): Response
+    protected function doRequest(object $request): Response
     {
         $headers = $this->getHeaders($request);
         [$body, $extraHeaders] = $this->getBodyAndExtraHeaders($request, $headers);
@@ -100,7 +100,7 @@ class HttpBrowser extends AbstractBrowser
         foreach ($request->getServer() as $key => $value) {
             $key = strtolower(str_replace('_', '-', $key));
             $contentHeaders = ['content-length' => true, 'content-md5' => true, 'content-type' => true];
-            if (0 === strpos($key, 'http-')) {
+            if (str_starts_with($key, 'http-')) {
                 $headers[substr($key, 5)] = $value;
             } elseif (isset($contentHeaders[$key])) {
                 // CONTENT_* are not prefixed with HTTP_

@@ -25,6 +25,7 @@ class UserPasswordHashCommandTest extends TestCase
 {
     /** @var CommandTester */
     private $passwordHasherCommandTester;
+    private $colSize;
 
     public function testEncodePasswordEmptySalt()
     {
@@ -287,7 +288,9 @@ EOTXT
 
     protected function setUp(): void
     {
+        $this->colSize = getenv('COLUMNS');
         putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
+
         $hasherFactory = new PasswordHasherFactory([
             InMemoryUser::class => ['algorithm' => 'plaintext'],
             'Custom\Class\Native\User' => ['algorithm' => 'native', 'cost' => 10],
@@ -304,12 +307,11 @@ EOTXT
     protected function tearDown(): void
     {
         $this->passwordHasherCommandTester = null;
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     private function setupArgon2i()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Argon2i\User' => ['algorithm' => 'argon2i'],
         ]);
@@ -321,8 +323,6 @@ EOTXT
 
     private function setupArgon2id()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Argon2id\User' => ['algorithm' => 'argon2id'],
         ]);
@@ -334,8 +334,6 @@ EOTXT
 
     private function setupBcrypt()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Bcrypt\User' => ['algorithm' => 'bcrypt'],
         ]);
@@ -348,8 +346,6 @@ EOTXT
 
     private function setupSodium()
     {
-        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
-
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Sodium\User' => ['algorithm' => 'sodium'],
         ]);

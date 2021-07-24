@@ -18,6 +18,9 @@ class TestHttpServer
 {
     private static $process = [];
 
+    /**
+     * @return Process
+     */
     public static function start(int $port = 8057)
     {
         if (isset(self::$process[$port])) {

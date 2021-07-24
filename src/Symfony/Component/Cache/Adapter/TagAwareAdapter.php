@@ -27,11 +27,11 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
  */
 class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, PruneableInterface, ResettableInterface, LoggerAwareInterface
 {
-    public const TAGS_PREFIX = "\0tags\0";
-
     use ContractsTrait;
     use LoggerAwareTrait;
     use ProxyTrait;
+
+    public const TAGS_PREFIX = "\0tags\0";
 
     private $deferred = [];
     private $tags;
@@ -232,7 +232,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     {
         if ('' !== $prefix) {
             foreach ($this->deferred as $key => $item) {
-                if (0 === strpos($key, $prefix)) {
+                if (str_starts_with($key, $prefix)) {
                     unset($this->deferred[$key]);
                 }
             }
@@ -313,6 +313,9 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         return $this->invalidateTags([]);
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
@@ -328,7 +331,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         $this->commit();
     }
 
-    private function generateItems(iterable $items, array $tagKeys)
+    private function generateItems(iterable $items, array $tagKeys): \Generator
     {
         $bufferedItems = $itemTags = [];
         $f = self::$setCacheItemTags;

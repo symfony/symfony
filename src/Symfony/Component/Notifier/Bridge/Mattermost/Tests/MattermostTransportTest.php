@@ -27,7 +27,7 @@ final class MattermostTransportTest extends TransportTestCase
     /**
      * @return MattermostTransport
      */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
         return (new MattermostTransport('testAccessToken', 'testChannel', null, $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }

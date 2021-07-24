@@ -31,7 +31,7 @@ final class Window implements LimiterStateInterface
      */
     private $timer;
 
-    public function __construct(string $id, int $intervalInSeconds, int $windowSize, ?float $timer = null)
+    public function __construct(string $id, int $intervalInSeconds, int $windowSize, float $timer = null)
     {
         $this->id = $id;
         $this->intervalInSeconds = $intervalInSeconds;
@@ -49,7 +49,7 @@ final class Window implements LimiterStateInterface
         return $this->intervalInSeconds;
     }
 
-    public function add(int $hits = 1, ?float $now = null)
+    public function add(int $hits = 1, float $now = null)
     {
         $now = $now ?? microtime(true);
         if (($now - $this->timer) > $this->intervalInSeconds) {

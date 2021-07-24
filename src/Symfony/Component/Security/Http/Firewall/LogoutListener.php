@@ -46,7 +46,7 @@ class LogoutListener extends AbstractListener
      * @param EventDispatcherInterface $eventDispatcher
      * @param array                    $options         An array of options to process a logout attempt
      */
-    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, /* EventDispatcherInterface */$eventDispatcher, array $options = [], CsrfTokenManagerInterface $csrfTokenManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, $eventDispatcher, array $options = [], CsrfTokenManagerInterface $csrfTokenManager = null)
     {
         if (!$eventDispatcher instanceof EventDispatcherInterface) {
             trigger_deprecation('symfony/security-http', '5.1', 'Passing a logout success handler to "%s" is deprecated, pass an instance of "%s" instead.', __METHOD__, EventDispatcherInterface::class);

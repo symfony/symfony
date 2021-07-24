@@ -174,6 +174,13 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
 
             throw new InvalidParameterTypeException($this->currentId, $e->getCode(), $parameter);
         }
+        if ($reflectionType instanceof \ReflectionIntersectionType) {
+            foreach ($reflectionType->getTypes() as $t) {
+                $this->checkType($checkedDefinition, $value, $parameter, $envPlaceholderUniquePrefix, $t);
+            }
+
+            return;
+        }
         if (!$reflectionType instanceof \ReflectionNamedType) {
             return;
         }
@@ -224,7 +231,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 $value = $this->container->getParameter(substr($value, 1, -1));
             }
 
-            if ($envPlaceholderUniquePrefix && \is_string($value) && false !== strpos($value, 'env_')) {
+            if ($envPlaceholderUniquePrefix && \is_string($value) && str_contains($value, 'env_')) {
                 // If the value is an env placeholder that is either mixed with a string or with another env placeholder, then its resolved value will always be a string, so we don't need to resolve it.
                 // We don't need to change the value because it is already a string.
                 if ('' === preg_replace('/'.$envPlaceholderUniquePrefix.'_\w+_[a-f0-9]{32}/U', '', $value, -1, $c) && 1 === $c) {

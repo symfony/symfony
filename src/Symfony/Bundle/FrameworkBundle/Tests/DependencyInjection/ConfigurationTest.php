@@ -494,7 +494,7 @@ class ConfigurationTest extends TestCase
                 'pools' => [],
                 'app' => 'cache.adapter.filesystem',
                 'system' => 'cache.adapter.system',
-                'directory' => '%kernel.cache_dir%/pools',
+                'directory' => '%kernel.cache_dir%/pools/app',
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
                 'default_pdo_provider' => ContainerBuilder::willBeAvailable('doctrine/dbal', Connection::class, ['symfony/framework-bundle']) ? 'database_connection' : null,

@@ -59,7 +59,7 @@ class SymfonyStyle extends OutputStyle
      *
      * @param string|array $messages The message to write in the block
      */
-    public function block($messages, ?string $type = null, ?string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
+    public function block($messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
     {
         $messages = \is_array($messages) ? array_values($messages) : [$messages];
 
@@ -264,7 +264,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function ask(string $question, ?string $default = null, $validator = null)
+    public function ask(string $question, string $default = null, callable $validator = null)
     {
         $question = new Question($question, $default);
         $question->setValidator($validator);
@@ -275,7 +275,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function askHidden(string $question, $validator = null)
+    public function askHidden(string $question, callable $validator = null)
     {
         $question = new Question($question);
 
@@ -288,7 +288,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function confirm($question, $default = true)
+    public function confirm(string $question, bool $default = true)
     {
         return $this->askQuestion(new ConfirmationQuestion($question, $default));
     }
@@ -447,7 +447,7 @@ class SymfonyStyle extends OutputStyle
     {
         $fetched = $this->bufferedOutput->fetch();
         //Prepend new line if last char isn't EOL:
-        if ("\n" !== substr($fetched, -1)) {
+        if (!str_ends_with($fetched, "\n")) {
             $this->newLine();
         }
     }

@@ -124,9 +124,11 @@ use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory as MailjetNotifierTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransport;
+use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
@@ -138,8 +140,10 @@ use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
+use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
+use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Notifier;
@@ -1318,7 +1322,7 @@ class FrameworkExtension extends Extension
                     'scanned_directories' => $scannedDirectories = array_merge($dirs, $nonExistingDirs),
                     'cache_vary' => [
                         'scanned_directories' => array_map(static function (string $dir) use ($projectDir): string {
-                            return 0 === strpos($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir;
+                            return str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir;
                         }, $scannedDirectories),
                     ],
                 ]
@@ -1705,6 +1709,9 @@ class FrameworkExtension extends Extension
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
         $loader->load('serializer.php');
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
+        }
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
@@ -2427,9 +2434,11 @@ class FrameworkExtension extends Extension
             IqsmsTransportFactory::class => 'notifier.transport_factory.iqsms',
             LightSmsTransportFactory::class => 'notifier.transport_factory.lightsms',
             LinkedInTransportFactory::class => 'notifier.transport_factory.linkedin',
+            MailjetNotifierTransportFactory::class => 'notifier.transport_factory.mailjet',
             MattermostTransportFactory::class => 'notifier.transport_factory.mattermost',
             MercureTransportFactory::class => 'notifier.transport_factory.mercure',
             MessageBirdTransport::class => 'notifier.transport_factory.messagebird',
+            MessageMediaTransportFactory::class => 'notifier.transport_factory.messagemedia',
             MicrosoftTeamsTransportFactory::class => 'notifier.transport_factory.microsoftteams',
             MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
             NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
@@ -2441,8 +2450,10 @@ class FrameworkExtension extends Extension
             SlackTransportFactory::class => 'notifier.transport_factory.slack',
             SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
             SmsBiurasTransportFactory::class => 'notifier.transport_factory.smsbiuras',
+            SmscTransportFactory::class => 'notifier.transport_factory.smsc',
             SpotHitTransportFactory::class => 'notifier.transport_factory.spothit',
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
+            TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
         ];
@@ -2458,6 +2469,7 @@ class FrameworkExtension extends Extension
                 case 'lightsms': $package = 'light-sms'; break;
                 case 'linkedin': $package = 'linked-in'; break;
                 case 'messagebird': $package = 'message-bird'; break;
+                case 'messagemedia': $package = 'message-media'; break;
                 case 'microsoftteams': $package = 'microsoft-teams'; break;
                 case 'ovhcloud': $package = 'ovh-cloud'; break;
                 case 'rocketchat': $package = 'rocket-chat'; break;

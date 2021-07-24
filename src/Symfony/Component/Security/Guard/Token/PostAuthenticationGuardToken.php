@@ -49,7 +49,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
 
         // this token is meant to be used after authentication success, so it is always authenticated
         // you could set it as non authenticated later if you need to
-        $this->setAuthenticated(true);
+        $this->setAuthenticated(true, false);
     }
 
     /**

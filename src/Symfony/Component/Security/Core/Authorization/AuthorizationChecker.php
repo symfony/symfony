@@ -34,6 +34,13 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 
     public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, bool $alwaysAuthenticate = false, bool $exceptionOnNoToken = true)
     {
+        if (false !== $alwaysAuthenticate) {
+            trigger_deprecation('symfony/security-core', '5.4', 'Not setting the 4th argument of "%s" to "false" is deprecated.', __METHOD__);
+        }
+        if (false !== $exceptionOnNoToken) {
+            trigger_deprecation('symfony/security-core', '5.4', 'Not setting the 5th argument of "%s" to "false" is deprecated.', __METHOD__);
+        }
+
         $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
         $this->accessDecisionManager = $accessDecisionManager;
@@ -55,7 +62,12 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 
             $token = new NullToken();
         } else {
-            if ($this->alwaysAuthenticate || !$token->isAuthenticated()) {
+            $authenticated = true;
+            // @deprecated since Symfony 5.4
+            if ($this->alwaysAuthenticate || !$authenticated = $token->isAuthenticated(false)) {
+                if (!($authenticated ?? true)) {
+                    trigger_deprecation('symfony/core', '5.4', 'Returning false from "%s()" is deprecated and won\'t have any effect in Symfony 6.0 as security tokens will always be considered authenticated.');
+                }
                 $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
             }
         }

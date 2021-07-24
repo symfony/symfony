@@ -18,6 +18,7 @@ use Symfony\Component\VarDumper\Tests\Fixtures\ExtendsReflectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo;
 use Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes;
 use Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass;
+use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionIntersectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionNamedTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionUnionTypeFixture;
 
@@ -94,7 +95,7 @@ Closure($x) {
     $b: & 123
   }
   file: "%sReflectionCasterTest.php"
-  line: "87 to 87"
+  line: "88 to 88"
 }
 EOTXT
             , $var
@@ -138,8 +139,9 @@ EOTXT
     {
         $var = new \ReflectionParameter(reflectionParameterFixture::class, 0);
 
-        $this->assertDumpMatchesFormat(
-            <<<'EOTXT'
+        if (\PHP_VERSION_ID < 80100) {
+            $this->assertDumpMatchesFormat(
+                <<<'EOTXT'
 ReflectionParameter {
   +name: "arg1"
   position: 0
@@ -147,8 +149,21 @@ ReflectionParameter {
   default: null
 }
 EOTXT
-            , $var
-        );
+                , $var
+            );
+        } else {
+            $this->assertDumpMatchesFormat(
+                <<<'EOTXT'
+ReflectionParameter {
+  +name: "arg1"
+  position: 0
+  allowsNull: true
+  typeHint: "Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass"
+}
+EOTXT
+                , $var
+            );
+        }
     }
 
     public function testReflectionParameterScalar()
@@ -231,6 +246,26 @@ EOTXT
     }
 
     /**
+     * @requires PHP 8.1
+     */
+    public function testReflectionParameterIntersection()
+    {
+        $f = eval('return function (Traversable&Countable $a) {};');
+        $var = new \ReflectionParameter($f, 0);
+
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionParameter {
+  +name: "a"
+  position: 0
+  typeHint: "Traversable&Countable"
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
      * @requires PHP 7.4
      */
     public function testReflectionPropertyScalar()
@@ -286,6 +321,34 @@ ReflectionUnionType {
       name: "int"
       allowsNull: false
       isBuiltin: true
+    }
+  ]
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testReflectionIntersectionType()
+    {
+        $var = (new \ReflectionProperty(ReflectionIntersectionTypeFixture::class, 'a'))->getType();
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionIntersectionType {
+  allowsNull: false
+  types: array:2 [
+    0 => ReflectionNamedType {
+      name: "Traversable"
+      allowsNull: false
+      isBuiltin: false
+    }
+    1 => ReflectionNamedType {
+      name: "Countable"
+      allowsNull: false
+      isBuiltin: false
     }
   ]
 }
@@ -422,7 +485,8 @@ EOTXT
         $generator = new GeneratorDemo();
         $generator = $generator->baz();
 
-        $expectedDump = <<<'EODUMP'
+        if (\PHP_VERSION_ID < 80100) {
+            $expectedDump = <<<'EODUMP'
 Generator {
   this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
   executing: {
@@ -436,6 +500,23 @@ Generator {
   closed: false
 }
 EODUMP;
+        } else {
+            $expectedDump = <<<'EODUMP'
+Generator {
+  this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
+  trace: {
+    ./src/Symfony/Component/VarDumper/Tests/Fixtures/GeneratorDemo.php:13 {
+      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz()
+      › public function baz()
+      › {
+      ›     yield from bar();
+    }
+    Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz() {}
+  }
+  closed: false
+}
+EODUMP;
+        }
 
         $this->assertDumpMatchesFormat($expectedDump, $generator);
 
@@ -443,7 +524,8 @@ EODUMP;
             break;
         }
 
-        $expectedDump = <<<'EODUMP'
+        if (\PHP_VERSION_ID < 80100) {
+            $expectedDump = <<<'EODUMP'
 array:2 [
   0 => ReflectionGenerator {
     this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
@@ -472,6 +554,39 @@ array:2 [
   }
 ]
 EODUMP;
+        } else {
+            $expectedDump = <<<'EODUMP'
+array:2 [
+  0 => ReflectionGenerator {
+    this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
+    trace: {
+      %s%eTests%eFixtures%eGeneratorDemo.php:9 {
+        Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
+        › {
+        ›     yield 1;
+        › }
+      }
+      %s%eTests%eFixtures%eGeneratorDemo.php:20 { …}
+      %s%eTests%eFixtures%eGeneratorDemo.php:14 { …}
+      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz() {}
+    }
+    closed: false
+  }
+  1 => Generator {
+    trace: {
+      ./src/Symfony/Component/VarDumper/Tests/Fixtures/GeneratorDemo.php:9 {
+        Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
+        › {
+        ›     yield 1;
+        › }
+      }
+      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo() {}
+    }
+    closed: false
+  }
+]
+EODUMP;
+        }
 
         $r = new \ReflectionGenerator($generator);
         $this->assertDumpMatchesFormat($expectedDump, [$r, $r->getExecutingGenerator()]);

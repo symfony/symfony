@@ -8,6 +8,9 @@ if (\PHP_VERSION_ID >= 80000) {
     require __DIR__.'/uniontype_classes.php';
     require __DIR__.'/autowiring_classes_80.php';
 }
+if (\PHP_VERSION_ID >= 80100) {
+    require __DIR__.'/intersectiontype_classes.php';
+}
 
 class Foo
 {

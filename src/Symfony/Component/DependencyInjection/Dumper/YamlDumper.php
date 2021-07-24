@@ -306,6 +306,8 @@ class YamlDumper extends Dumper
             return $this->getExpressionCall((string) $value);
         } elseif ($value instanceof Definition) {
             return new TaggedValue('service', (new Parser())->parse("_:\n".$this->addService('_', $value), Yaml::PARSE_CUSTOM_TAGS)['_']['_']);
+        } elseif ($value instanceof \UnitEnum) {
+            return new TaggedValue('php/const', sprintf('%s::%s', \get_class($value), $value->name));
         } elseif ($value instanceof AbstractArgument) {
             return new TaggedValue('abstract', $value->getText());
         } elseif (\is_object($value) || \is_resource($value)) {
@@ -345,7 +347,7 @@ class YamlDumper extends Dumper
         foreach ($parameters as $key => $value) {
             if (\is_array($value)) {
                 $value = $this->prepareParameters($value, $escape);
-            } elseif ($value instanceof Reference || \is_string($value) && 0 === strpos($value, '@')) {
+            } elseif ($value instanceof Reference || \is_string($value) && str_starts_with($value, '@')) {
                 $value = '@'.$value;
             }
 

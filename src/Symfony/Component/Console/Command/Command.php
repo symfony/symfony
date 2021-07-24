@@ -420,8 +420,8 @@ class Command
     /**
      * Adds an argument.
      *
-     * @param int|null             $mode    The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param string|string[]|null $default The default value (for InputArgument::OPTIONAL mode only)
+     * @param int|null $mode    The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param mixed    $default The default value (for InputArgument::OPTIONAL mode only)
      *
      * @throws InvalidArgumentException When argument mode is not valid
      *
@@ -440,9 +440,9 @@ class Command
     /**
      * Adds an option.
      *
-     * @param string|array|null         $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param int|null                  $mode     The option mode: One of the InputOption::VALUE_* constants
-     * @param string|string[]|bool|null $default  The default value (must be null for InputOption::VALUE_NONE)
+     * @param string|array|null $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param int|null          $mode     The option mode: One of the InputOption::VALUE_* constants
+     * @param mixed             $default  The default value (must be null for InputOption::VALUE_NONE)
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      *
@@ -508,7 +508,7 @@ class Command
      * @param bool $hidden Whether or not the command should be hidden from the list of commands
      *                     The default value will be true in Symfony 6.0
      *
-     * @return Command The current instance
+     * @return $this
      *
      * @final since Symfony 5.1
      */
@@ -652,7 +652,7 @@ class Command
      */
     public function addUsage(string $usage)
     {
-        if (0 !== strpos($usage, $this->name)) {
+        if (!str_starts_with($usage, $this->name)) {
             $usage = sprintf('%s %s', $this->name, $usage);
         }
 

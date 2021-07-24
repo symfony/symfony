@@ -529,8 +529,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $listeners[] = new Reference('security.firewall.authenticator.'.$id);
 
             // Add authenticators to the debug:firewall command
-            $debugCommand = $container->getDefinition('security.command.debug_firewall');
-            $debugCommand->replaceArgument(3, array_merge($debugCommand->getArgument(3), [$id => $authenticators]));
+            if ($container->hasDefinition('security.command.debug_firewall')) {
+                $debugCommand = $container->getDefinition('security.command.debug_firewall');
+                $debugCommand->replaceArgument(3, array_merge($debugCommand->getArgument(3), [$id => $authenticators]));
+            }
         }
 
         $config->replaceArgument(7, $configuredEntryPoint ?: $defaultEntryPoint);

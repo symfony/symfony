@@ -291,14 +291,12 @@ trait AbstractAdapterTrait
      *
      * Calling this method also clears the memoized namespace version and thus forces a resynchonization of it.
      *
-     * @param bool $enable
-     *
      * @return bool the previous state of versioning
      */
-    public function enableVersioning($enable = true)
+    public function enableVersioning(bool $enable = true)
     {
         $wasEnabled = $this->versioningIsEnabled;
-        $this->versioningIsEnabled = (bool) $enable;
+        $this->versioningIsEnabled = $enable;
         $this->namespaceVersion = '';
         $this->ids = [];
 
@@ -317,6 +315,9 @@ trait AbstractAdapterTrait
         $this->ids = [];
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
@@ -334,7 +335,7 @@ trait AbstractAdapterTrait
         }
     }
 
-    private function generateItems(iterable $items, array &$keys): iterable
+    private function generateItems(iterable $items, array &$keys): \Generator
     {
         $f = self::$createCacheItem;
 
@@ -394,7 +395,7 @@ trait AbstractAdapterTrait
     /**
      * @internal
      */
-    public static function handleUnserializeCallback($class)
+    public static function handleUnserializeCallback(string $class)
     {
         throw new \DomainException('Class not found: '.$class);
     }

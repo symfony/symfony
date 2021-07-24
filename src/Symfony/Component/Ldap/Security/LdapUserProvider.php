@@ -132,7 +132,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
      *
      * @final
      */
-    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
+    public function upgradePassword($user, string $newHashedPassword): void
     {
         if (!$user instanceof LdapUser) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
@@ -143,9 +143,9 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
 
         try {
-            $user->getEntry()->setAttribute($this->passwordAttribute, [$newEncodedPassword]);
+            $user->getEntry()->setAttribute($this->passwordAttribute, [$newHashedPassword]);
             $this->ldap->getEntryManager()->update($user->getEntry());
-            $user->setPassword($newEncodedPassword);
+            $user->setPassword($newHashedPassword);
         } catch (ExceptionInterface $e) {
             // ignore failed password upgrades
         }

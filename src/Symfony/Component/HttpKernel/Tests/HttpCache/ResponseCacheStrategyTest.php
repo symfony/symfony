@@ -370,10 +370,50 @@ class ResponseCacheStrategyTest extends TestCase
         ];
 
         yield 'merge max-age and s-maxage' => [
-            ['public' => true, 's-maxage' => '60', 'max-age' => null],
+            ['public' => true, 'max-age' => '60'],
             ['public' => true, 's-maxage' => 3600],
             [
                 ['public' => true, 'max-age' => 60],
+            ],
+        ];
+
+        yield 's-maxage may be set to 0' => [
+            ['public' => true, 's-maxage' => '0', 'max-age' => null],
+            ['public' => true, 's-maxage' => '0'],
+            [
+                ['public' => true, 's-maxage' => '60'],
+            ],
+        ];
+
+        yield 's-maxage may be set to 0, and works independently from maxage' => [
+            ['public' => true, 's-maxage' => '0', 'max-age' => '30'],
+            ['public' => true, 's-maxage' => '0', 'max-age' => '30'],
+            [
+                ['public' => true, 'max-age' => '60'],
+            ],
+        ];
+
+        yield 'public subresponse without lifetime does not remove lifetime for main response' => [
+            ['public' => true, 's-maxage' => '30', 'max-age' => null],
+            ['public' => true, 's-maxage' => '30'],
+            [
+                ['public' => true],
+            ],
+        ];
+
+        yield 'lifetime for subresponse is kept when main response has no lifetime' => [
+            ['public' => true, 'max-age' => '30'],
+            ['public' => true],
+            [
+                ['public' => true, 'max-age' => '30'],
+            ],
+        ];
+
+        yield 's-maxage on the subresponse implies public, so the result is public as well' => [
+            ['public' => true, 'max-age' => '10', 's-maxage' => null],
+            ['public' => true, 'max-age' => '10'],
+            [
+                ['max-age' => '30', 's-maxage' => '20'],
             ],
         ];
 

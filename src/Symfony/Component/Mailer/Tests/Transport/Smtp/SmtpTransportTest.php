@@ -114,6 +114,25 @@ class SmtpTransportTest extends TestCase
         $this->assertNotContains("\r\n.\r\n", $stream->getCommands());
         $this->assertTrue($stream->isClosed());
     }
+
+    public function testWriteEncodedRecipientAndSenderAddresses()
+    {
+        $stream = new DummyStream();
+
+        $transport = new SmtpTransport($stream);
+
+        $message = new Email();
+        $message->from('sender@exämple.org');
+        $message->addTo('recipient@exämple.org');
+        $message->addTo('recipient2@example.org');
+        $message->text('.');
+
+        $transport->send($message);
+
+        $this->assertContains("MAIL FROM:<sender@xn--exmple-cua.org>\r\n", $stream->getCommands());
+        $this->assertContains("RCPT TO:<recipient@xn--exmple-cua.org>\r\n", $stream->getCommands());
+        $this->assertContains("RCPT TO:<recipient2@example.org>\r\n", $stream->getCommands());
+    }
 }
 
 class DummyStream extends AbstractStream
@@ -147,9 +166,9 @@ class DummyStream extends AbstractStream
 
         $this->commands[] = $bytes;
 
-        if (0 === strpos($bytes, 'DATA')) {
+        if (str_starts_with($bytes, 'DATA')) {
             $this->nextResponse = '354 Enter message, ending with "." on a line by itself';
-        } elseif (0 === strpos($bytes, 'QUIT')) {
+        } elseif (str_starts_with($bytes, 'QUIT')) {
             $this->nextResponse = '221 Goodbye';
         } else {
             $this->nextResponse = '250 OK';

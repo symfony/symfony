@@ -85,7 +85,7 @@ interface StyleInterface
      *
      * @return mixed
      */
-    public function ask(string $question, ?string $default = null, callable $validator = null);
+    public function ask(string $question, string $default = null, callable $validator = null);
 
     /**
      * Asks a question with the user input hidden.

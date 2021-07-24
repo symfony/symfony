@@ -28,6 +28,19 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 abstract class AbstractDescriptorTest extends TestCase
 {
+    private $colSize;
+
+    protected function setUp(): void
+    {
+        $this->colSize = getenv('COLUMNS');
+        putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
+    }
+
+    protected function tearDown(): void
+    {
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
+    }
+
     /** @dataProvider getDescribeDefaultsTestData */
     public function testDescribeDefaults($object, array $options, $fixtureName)
     {

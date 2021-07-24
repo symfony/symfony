@@ -36,7 +36,7 @@ class XliffLintCommandTest extends TestCase
             ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
-        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $tester->assertCommandIsSuccessful('Returns 0 in case of success');
         $this->assertStringContainsString('OK', trim($tester->getDisplay()));
     }
 
@@ -51,7 +51,7 @@ class XliffLintCommandTest extends TestCase
             ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
-        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $tester->assertCommandIsSuccessful('Returns 0 in case of success');
         $this->assertStringContainsString('OK', trim($tester->getDisplay()));
     }
 
@@ -101,7 +101,7 @@ class XliffLintCommandTest extends TestCase
 
         $tester->execute(['filename' => $filename], ['decorated' => false]);
 
-        $this->assertEquals(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
     }
 
@@ -112,7 +112,7 @@ class XliffLintCommandTest extends TestCase
 
         $tester->execute(['filename' => $filename], ['decorated' => false]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
     }
 

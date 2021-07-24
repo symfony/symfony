@@ -32,7 +32,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
      *
      * @throws InvalidArgumentException
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         $normalized = [
             'message' => $object->getMessage(),
@@ -42,13 +42,11 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
             'file' => $object->getFile(),
             'line' => $object->getLine(),
             'previous' => null === $object->getPrevious() ? null : $this->normalize($object->getPrevious(), $format, $context),
+            'status' => $object->getStatusCode(),
             'status_text' => $object->getStatusText(),
             'trace' => $object->getTrace(),
             'trace_as_string' => $object->getTraceAsString(),
         ];
-        if (null !== $status = $object->getStatusCode()) {
-            $normalized['status'] = $status;
-        }
 
         return $normalized;
     }
@@ -56,7 +54,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, string $format = null, array $context = [])
     {
         return $data instanceof FlattenException && ($context[Serializer::MESSENGER_SERIALIZATION_CONTEXT] ?? false);
     }
@@ -64,13 +62,13 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $object = new FlattenException();
 
         $object->setMessage($data['message']);
         $object->setCode($data['code']);
-        $object->setStatusCode($data['status'] ?? null);
+        $object->setStatusCode($data['status'] ?? 500);
         $object->setClass($data['class']);
         $object->setFile($data['file']);
         $object->setLine($data['line']);
@@ -95,7 +93,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = [])
     {
         return FlattenException::class === $type && ($context[Serializer::MESSENGER_SERIALIZATION_CONTEXT] ?? false);
     }

@@ -29,12 +29,12 @@ final class PasswordHasherAdapter implements LegacyPasswordHasherInterface
         $this->passwordEncoder = $passwordEncoder;
     }
 
-    public function hash(string $plainPassword, ?string $salt = null): string
+    public function hash(string $plainPassword, string $salt = null): string
     {
         return $this->passwordEncoder->encodePassword($plainPassword, $salt);
     }
 
-    public function verify(string $hashedPassword, string $plainPassword, ?string $salt = null): bool
+    public function verify(string $hashedPassword, string $plainPassword, string $salt = null): bool
     {
         return $this->passwordEncoder->isPasswordValid($hashedPassword, $plainPassword, $salt);
     }

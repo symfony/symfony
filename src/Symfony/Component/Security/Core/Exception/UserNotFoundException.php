@@ -32,7 +32,7 @@ class UserNotFoundException extends AuthenticationException
     /**
      * Get the user identifier (e.g. username or e-mailaddress).
      */
-    public function getUserIdentifier(): string
+    public function getUserIdentifier(): ?string
     {
         return $this->identifier;
     }

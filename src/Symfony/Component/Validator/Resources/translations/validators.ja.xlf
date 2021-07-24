@@ -386,6 +386,10 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>この値は有効な国際証券識別番号（ISIN）ではありません。</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>式でなければなりません。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

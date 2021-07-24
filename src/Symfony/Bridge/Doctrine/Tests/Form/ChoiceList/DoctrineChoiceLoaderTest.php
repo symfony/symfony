@@ -31,17 +31,17 @@ class DoctrineChoiceLoaderTest extends TestCase
     use ExpectDeprecationTrait;
 
     /**
-     * @var ChoiceListFactoryInterface|MockObject
+     * @var MockObject&ChoiceListFactoryInterface
      */
     private $factory;
 
     /**
-     * @var ObjectManager|MockObject
+     * @var MockObject&ObjectManager
      */
     private $om;
 
     /**
-     * @var ObjectRepository|MockObject
+     * @var MockObject&ObjectRepository
      */
     private $repository;
 
@@ -51,12 +51,12 @@ class DoctrineChoiceLoaderTest extends TestCase
     private $class;
 
     /**
-     * @var IdReader|MockObject
+     * @var MockObject&IdReader
      */
     private $idReader;
 
     /**
-     * @var EntityLoaderInterface|MockObject
+     * @var MockObject&EntityLoaderInterface
      */
     private $objectLoader;
 

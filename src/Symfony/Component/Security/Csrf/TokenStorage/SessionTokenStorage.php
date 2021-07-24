@@ -34,7 +34,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
     private $requestStack;
     private $namespace;
     /**
-     * Tp be remove in Symfony 6.0
+     * To be removed in Symfony 6.0.
      */
     private $session;
 
@@ -121,7 +121,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
     {
         $session = $this->getSession();
         foreach (array_keys($session->all()) as $key) {
-            if (0 === strpos($key, $this->namespace.'/')) {
+            if (str_starts_with($key, $this->namespace.'/')) {
                 $session->remove($key);
             }
         }
@@ -130,7 +130,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
     private function getSession(): SessionInterface
     {
         try {
-            return $this->requestStack->getSession();
+            return $this->session ?? $this->requestStack->getSession();
         } catch (SessionNotFoundException $e) {
             trigger_deprecation('symfony/security-csrf', '5.3', 'Using the "%s" without a session has no effect and is deprecated. It will throw a "%s" in Symfony 6.0', __CLASS__, SessionNotFoundException::class);
 

@@ -24,14 +24,10 @@ final class Envelope
     private $message;
 
     /**
-     * @param object           $message
      * @param StampInterface[] $stamps
      */
-    public function __construct($message, array $stamps = [])
+    public function __construct(object $message, array $stamps = [])
     {
-        if (!\is_object($message)) {
-            throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object but got "%s".', __METHOD__, get_debug_type($message)));
-        }
         $this->message = $message;
 
         foreach ($stamps as $stamp) {
@@ -45,7 +41,7 @@ final class Envelope
      * @param object|Envelope  $message
      * @param StampInterface[] $stamps
      */
-    public static function wrap($message, array $stamps = []): self
+    public static function wrap(object $message, array $stamps = []): self
     {
         $envelope = $message instanceof self ? $message : new self($message);
 
@@ -53,7 +49,7 @@ final class Envelope
     }
 
     /**
-     * @return Envelope a new Envelope instance with additional stamp
+     * @return static A new Envelope instance with additional stamp
      */
     public function with(StampInterface ...$stamps): self
     {
@@ -67,7 +63,7 @@ final class Envelope
     }
 
     /**
-     * @return Envelope a new Envelope instance without any stamps of the given class
+     * @return static A new Envelope instance without any stamps of the given class
      */
     public function withoutAll(string $stampFqcn): self
     {
@@ -127,6 +123,6 @@ final class Envelope
     {
         static $resolved;
 
-        return $resolved[$fqcn] ?? ($resolved[$fqcn] = (new \ReflectionClass($fqcn))->getName());
+        return $resolved[$fqcn] ?? ($resolved[$fqcn] = class_exists($fqcn) ? (new \ReflectionClass($fqcn))->getName() : $fqcn);
     }
 }

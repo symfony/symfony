@@ -161,7 +161,7 @@ TXT
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Controller\Controller', $tester->getDisplay());
         $this->assertStringContainsString('/home/hamza/projet/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php', $tester->getDisplay());
     }
@@ -181,7 +181,7 @@ TXT
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] There are no deprecations in the logs!', $tester->getDisplay());
     }
 
@@ -199,7 +199,7 @@ TXT
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[WARNING] The deprecation file does not exist', $tester->getDisplay());
     }
 

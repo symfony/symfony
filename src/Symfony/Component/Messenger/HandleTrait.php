@@ -34,7 +34,7 @@ trait HandleTrait
      *
      * @return mixed The handler returned value
      */
-    private function handle($message)
+    private function handle(object $message)
     {
         if (!$this->messageBus instanceof MessageBusInterface) {
             throw new LogicException(sprintf('You must provide a "%s" instance in the "%s::$messageBus" property, "%s" given.', MessageBusInterface::class, static::class, get_debug_type($this->messageBus)));

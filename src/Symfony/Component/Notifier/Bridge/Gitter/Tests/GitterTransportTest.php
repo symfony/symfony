@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class GitterTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
         return (new GitterTransport('token', '5539a3ee5etest0d3255bfef', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('api.gitter.im');
     }

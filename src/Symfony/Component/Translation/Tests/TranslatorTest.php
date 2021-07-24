@@ -50,7 +50,7 @@ class TranslatorTest extends TestCase
     {
         $translator = new Translator($locale);
 
-        $this->assertSame($locale, $translator->getLocale());
+        $this->assertSame($locale ?: (class_exists(\Locale::class) ? \Locale::getDefault() : 'en'), $translator->getLocale());
     }
 
     public function testSetGetLocale()
@@ -81,7 +81,7 @@ class TranslatorTest extends TestCase
         $translator = new Translator($locale);
         $translator->setLocale($locale);
 
-        $this->assertEquals($locale, $translator->getLocale());
+        $this->assertEquals($locale ?: (class_exists(\Locale::class) ? \Locale::getDefault() : 'en'), $translator->getLocale());
     }
 
     public function testGetCatalogue()

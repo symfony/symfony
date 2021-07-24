@@ -25,16 +25,13 @@ class ParameterBag implements ParameterBagInterface
     protected $parameters = [];
     protected $resolved = false;
 
-    /**
-     * @param array $parameters An array of parameters
-     */
     public function __construct(array $parameters = [])
     {
         $this->add($parameters);
     }
 
     /**
-     * Clears all parameters.
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -42,9 +39,7 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Adds parameters to the service container parameters.
-     *
-     * @param array $parameters An array of parameters
+     * {@inheritdoc}
      */
     public function add(array $parameters)
     {
@@ -74,13 +69,13 @@ class ParameterBag implements ParameterBagInterface
             $alternatives = [];
             foreach ($this->parameters as $key => $parameterValue) {
                 $lev = levenshtein($name, $key);
-                if ($lev <= \strlen($name) / 3 || false !== strpos($key, $name)) {
+                if ($lev <= \strlen($name) / 3 || str_contains($key, $name)) {
                     $alternatives[] = $key;
                 }
             }
 
             $nonNestedAlternative = null;
-            if (!\count($alternatives) && false !== strpos($name, '.')) {
+            if (!\count($alternatives) && str_contains($name, '.')) {
                 $namePartsLength = array_map('strlen', explode('.', $name));
                 $key = substr($name, 0, -1 * (1 + array_pop($namePartsLength)));
                 while (\count($namePartsLength)) {
@@ -102,10 +97,7 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Sets a service container parameter.
-     *
-     * @param string $name  The parameter name
-     * @param mixed  $value The parameter value
+     * {@inheritdoc}
      */
     public function set(string $name, $value)
     {
@@ -121,9 +113,7 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Removes a parameter.
-     *
-     * @param string $name The parameter name
+     * {@inheritdoc}
      */
     public function remove(string $name)
     {

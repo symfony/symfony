@@ -29,7 +29,7 @@ class PhpSerializer implements SerializerInterface
             throw new MessageDecodingFailedException('Encoded envelope should have at least a "body".');
         }
 
-        if (false === strpos($encodedEnvelope['body'], '}', -1)) {
+        if (!str_ends_with($encodedEnvelope['body'], '}')) {
             $encodedEnvelope['body'] = base64_decode($encodedEnvelope['body']);
         }
 
@@ -81,7 +81,7 @@ class PhpSerializer implements SerializerInterface
     /**
      * @internal
      */
-    public static function handleUnserializeCallback($class)
+    public static function handleUnserializeCallback(string $class)
     {
         throw new MessageDecodingFailedException(sprintf('Message class "%s" not found during decoding.', $class));
     }

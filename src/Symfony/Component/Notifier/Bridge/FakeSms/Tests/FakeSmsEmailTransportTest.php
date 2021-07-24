@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FakeSmsEmailTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null, ?string $transportName = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $transportName = null): TransportInterface
     {
         $transport = (new FakeSmsEmailTransport($this->createMock(MailerInterface::class), 'recipient@email.net', 'sender@email.net', $client ?? $this->createMock(HttpClientInterface::class)));
 

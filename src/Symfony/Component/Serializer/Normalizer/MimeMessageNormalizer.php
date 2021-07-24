@@ -52,7 +52,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, ?string $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         if ($object instanceof Headers) {
             $ret = [];
@@ -76,7 +76,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (Headers::class === $type) {
             $ret = [];
@@ -108,7 +108,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, string $type, ?string $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null)
     {
         return is_a($type, Message::class, true) || Headers::class === $type || AbstractPart::class === $type;
     }

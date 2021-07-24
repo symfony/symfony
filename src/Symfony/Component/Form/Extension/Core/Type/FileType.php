@@ -188,9 +188,9 @@ class FileType extends AbstractType
         }
 
         $max = ltrim($iniMax, '+');
-        if (0 === strpos($max, '0x')) {
+        if (str_starts_with($max, '0x')) {
             $max = \intval($max, 16);
-        } elseif (0 === strpos($max, '0')) {
+        } elseif (str_starts_with($max, '0')) {
             $max = \intval($max, 8);
         } else {
             $max = (int) $max;

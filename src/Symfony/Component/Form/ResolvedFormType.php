@@ -43,11 +43,14 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     private $optionsResolver;
 
+    /**
+     * @param FormTypeExtensionInterface[] $typeExtensions
+     */
     public function __construct(FormTypeInterface $innerType, array $typeExtensions = [], ResolvedFormTypeInterface $parent = null)
     {
         foreach ($typeExtensions as $extension) {
             if (!$extension instanceof FormTypeExtensionInterface) {
-                throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormTypeExtensionInterface');
+                throw new UnexpectedTypeException($extension, FormTypeExtensionInterface::class);
             }
         }
 
@@ -117,7 +120,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     }
 
     /**
-     * Configures a form builder for the type hierarchy.
+     * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -133,9 +136,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     }
 
     /**
-     * Configures a form view for the type hierarchy.
-     *
-     * This method is called before the children of the view are built.
+     * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -151,9 +152,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     }
 
     /**
-     * Finishes a form view for the type hierarchy.
-     *
-     * This method is called after the children of the view have been built.
+     * {@inheritdoc}
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
@@ -170,9 +169,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     }
 
     /**
-     * Returns the configured options resolver used for this type.
-     *
-     * @return \Symfony\Component\OptionsResolver\OptionsResolver The options resolver
+     * {@inheritdoc}
      */
     public function getOptionsResolver()
     {

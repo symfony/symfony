@@ -13,35 +13,35 @@ define('LINE_WIDTH', 75);
 
 define('LINE', str_repeat('-', LINE_WIDTH)."\n");
 
-function bailout($message)
+function bailout(string $message)
 {
     echo wordwrap($message, LINE_WIDTH)." Aborting.\n";
 
     exit(1);
 }
 
-function strip_minor_versions($version)
+function strip_minor_versions(string $version)
 {
     preg_match('/^(?P<version>[0-9]\.[0-9]|[0-9]{2,})/', $version, $matches);
 
     return $matches['version'];
 }
 
-function centered($text)
+function centered(string $text)
 {
     $padding = (int) ((LINE_WIDTH - strlen($text)) / 2);
 
     return str_repeat(' ', $padding).$text;
 }
 
-function cd($dir)
+function cd(string $dir)
 {
     if (false === chdir($dir)) {
         bailout("Could not switch to directory $dir.");
     }
 }
 
-function run($command)
+function run(string $command)
 {
     exec($command, $output, $status);
 
@@ -53,7 +53,7 @@ function run($command)
     }
 }
 
-function get_icu_version_from_genrb($genrb)
+function get_icu_version_from_genrb(string $genrb)
 {
     exec($genrb.' --version - 2>&1', $output, $status);
 
@@ -70,7 +70,7 @@ function get_icu_version_from_genrb($genrb)
 
 error_reporting(\E_ALL);
 
-set_error_handler(function ($type, $msg, $file, $line) {
+set_error_handler(function (int $type, string $msg, string $file, int $line) {
     throw new \ErrorException($msg, 0, $type, $file, $line);
 });
 

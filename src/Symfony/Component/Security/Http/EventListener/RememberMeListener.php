@@ -18,7 +18,6 @@ use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
-use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 
 /**
@@ -38,7 +37,7 @@ class RememberMeListener implements EventSubscriberInterface
     private $rememberMeHandler;
     private $logger;
 
-    public function __construct(RememberMeHandlerInterface $rememberMeHandler, ?LoggerInterface $logger = null)
+    public function __construct(RememberMeHandlerInterface $rememberMeHandler, LoggerInterface $logger = null)
     {
         $this->rememberMeHandler = $rememberMeHandler;
         $this->logger = $logger;

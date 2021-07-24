@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Data\Bundle\Reader;
 
 use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
-use Symfony\Component\Intl\Exception\RuntimeException;
 
 /**
  * Reads .php resource bundles.

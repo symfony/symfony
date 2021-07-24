@@ -1400,10 +1400,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(new Reference('serializer.mapping.cache.symfony'), $cache);
     }
 
-    public function testSerializerCacheActivatedDebug()
+    public function testSerializerCacheNotActivatedDebug()
     {
         $container = $this->createContainerFromFile('serializer_enabled', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
-        $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
     }
 
     public function testSerializerMapping()
@@ -1876,6 +1876,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testIfNotifierTransportsAreKnownByFrameworkExtension()
     {
+        if (!class_exists(FullStack::class)) {
+            $this->markTestSkipped('This test can only run in fullstack test suites');
+        }
+
         $container = $this->createContainerFromFile('notifier');
 
         foreach ((new Finder())->in(\dirname(__DIR__, 4).'/Component/Notifier/Bridge')->directories()->depth(0)->exclude('Mercure') as $bridgeDirectory) {

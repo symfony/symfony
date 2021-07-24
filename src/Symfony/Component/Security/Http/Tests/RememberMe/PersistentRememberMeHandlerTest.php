@@ -92,8 +92,14 @@ class PersistentRememberMeHandlerTest extends TestCase
 
         /** @var Cookie $cookie */
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-        $this->assertNotEquals($rememberMeDetails->toString(), $cookie->getValue());
-        $this->assertMatchesRegularExpression('{'.str_replace('\\', '\\\\', base64_decode($rememberMeDetails->withValue('[a-zA-Z0-9/+]+')->toString())).'}', base64_decode($cookie->getValue()));
+        $rememberParts = explode(':', base64_decode($rememberMeDetails->toString()), 4);
+        $cookieParts = explode(':', base64_decode($cookie->getValue()), 4);
+
+        $this->assertSame($rememberParts[0], $cookieParts[0]); // class
+        $this->assertSame($rememberParts[1], $cookieParts[1]); // identifier
+        $this->assertSame($rememberParts[2], $cookieParts[2]); // expire
+        $this->assertNotSame($rememberParts[3], $cookieParts[3]); // value
+        $this->assertSame(explode(':', $rememberParts[3])[0], explode(':', $cookieParts[3])[0]); // series
     }
 
     public function testConsumeRememberMeCookieInvalidToken()

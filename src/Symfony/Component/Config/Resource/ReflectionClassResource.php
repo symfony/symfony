@@ -85,7 +85,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             $file = $class->getFileName();
             if (false !== $file && is_file($file)) {
                 foreach ($this->excludedVendors as $vendor) {
-                    if (0 === strpos($file, $vendor) && false !== strpbrk(substr($file, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
+                    if (str_starts_with($file, $vendor) && false !== strpbrk(substr($file, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                         $file = false;
                         break;
                     }
@@ -163,6 +163,8 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             }
         }
 
+        $defined = \Closure::bind(static function ($c) { return \defined($c); }, null, $class->name);
+
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
             if (\PHP_VERSION_ID >= 80000) {
                 foreach ($m->getAttributes() as $a) {
@@ -189,7 +191,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                     continue;
                 }
 
-                if (!$p->isDefaultValueConstant() || \defined($p->getDefaultValueConstantName())) {
+                if (!$p->isDefaultValueConstant() || $defined($p->getDefaultValueConstantName())) {
                     $defaults[$p->name] = $p->getDefaultValue();
 
                     continue;

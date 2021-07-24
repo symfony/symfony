@@ -68,6 +68,9 @@ class Connection
         $this->queueUrl = $queueUrl;
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
@@ -273,7 +276,7 @@ class Connection
         }
 
         if (null !== $this->configuration['account']) {
-            throw new InvalidArgumentException(sprintf('The Amazon SQS queue "%s" does not exists (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
+            throw new InvalidArgumentException(sprintf('The Amazon SQS queue "%s" does not exist (or you don\'t have permissions on it), and can\'t be created when an account is provided.', $this->configuration['queue_name']));
         }
 
         $parameters = ['QueueName' => $this->configuration['queue_name']];
@@ -289,7 +292,7 @@ class Connection
         // Blocking call to wait for the queue to be created
         $exists->wait();
         if (!$exists->isSuccess()) {
-            throw new TransportException(sprintf('Failed to crate the Amazon SQS queue "%s".', $this->configuration['queue_name']));
+            throw new TransportException(sprintf('Failed to create the Amazon SQS queue "%s".', $this->configuration['queue_name']));
         }
         $this->queueUrl = null;
     }
@@ -314,7 +317,7 @@ class Connection
         return (int) ($attributes[QueueAttributeName::APPROXIMATE_NUMBER_OF_MESSAGES] ?? 0);
     }
 
-    public function send(string $body, array $headers, int $delay = 0, ?string $messageGroupId = null, ?string $messageDeduplicationId = null, ?string $xrayTraceId = null): void
+    public function send(string $body, array $headers, int $delay = 0, string $messageGroupId = null, string $messageDeduplicationId = null, string $xrayTraceId = null): void
     {
         if ($this->configuration['auto_setup']) {
             $this->setup();

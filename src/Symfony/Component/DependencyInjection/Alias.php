@@ -15,11 +15,11 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 class Alias
 {
+    private const DEFAULT_DEPRECATION_TEMPLATE = 'The "%alias_id%" service alias is deprecated. You should stop using it, as it will be removed in the future.';
+
     private $id;
     private $public;
     private $deprecation = [];
-
-    private static $defaultDeprecationTemplate = 'The "%alias_id%" service alias is deprecated. You should stop using it, as it will be removed in the future.';
 
     public function __construct(string $id, bool $public = false)
     {
@@ -112,12 +112,12 @@ class Alias
                 throw new InvalidArgumentException('Invalid characters found in deprecation template.');
             }
 
-            if (false === strpos($message, '%alias_id%')) {
+            if (!str_contains($message, '%alias_id%')) {
                 throw new InvalidArgumentException('The deprecation template must contain the "%alias_id%" placeholder.');
             }
         }
 
-        $this->deprecation = $status ? ['package' => $package, 'version' => $version, 'message' => $message ?: self::$defaultDeprecationTemplate] : [];
+        $this->deprecation = $status ? ['package' => $package, 'version' => $version, 'message' => $message ?: self::DEFAULT_DEPRECATION_TEMPLATE] : [];
 
         return $this;
     }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add support of PHP backed enumerations
+
 5.3
 ---
 

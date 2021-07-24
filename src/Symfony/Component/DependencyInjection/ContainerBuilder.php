@@ -524,11 +524,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Gets a service.
-     *
-     * @param string $id              The service identifier
-     * @param int    $invalidBehavior The behavior when the service does not exist
-     *
      * @return object|null The associated service
      *
      * @throws InvalidArgumentException          when no definitions are available
@@ -842,11 +837,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->aliasDefinitions[$alias] = $id;
     }
 
-    /**
-     * Removes an alias.
-     *
-     * @param string $alias The alias to remove
-     */
     public function removeAlias(string $alias)
     {
         if (isset($this->aliasDefinitions[$alias])) {
@@ -856,8 +846,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Returns true if an alias exists under the given identifier.
-     *
      * @return bool true if the alias exists, false otherwise
      */
     public function hasAlias(string $id)
@@ -866,8 +854,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Gets all defined aliases.
-     *
      * @return Alias[] An array of aliases
      */
     public function getAliases()
@@ -876,8 +862,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Gets an alias.
-     *
      * @return Alias An Alias instance
      *
      * @throws InvalidArgumentException if the alias does not exist
@@ -1586,7 +1570,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * {@inheritdoc}
      */
-    protected function getEnv($name)
+    protected function getEnv(string $name)
     {
         $value = parent::getEnv($name);
         $bag = $this->getParameterBag();
@@ -1615,7 +1599,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
     }
 
-    private function callMethod($service, array $call, array &$inlineServices)
+    private function callMethod(object $service, array $call, array &$inlineServices)
     {
         foreach (self::getServiceConditionals($call[1]) as $s) {
             if (!$this->has($s)) {
@@ -1640,7 +1624,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function shareService(Definition $definition, $service, ?string $id, array &$inlineServices)
     {
-        $inlineServices[null !== $id ? $id : spl_object_hash($definition)] = $service;
+        $inlineServices[$id ?? spl_object_hash($definition)] = $service;
 
         if (null !== $id && $definition->isShared()) {
             $this->services[$id] = $service;
@@ -1668,7 +1652,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $path = realpath($path) ?: $path;
 
         foreach ($this->vendors as $vendor) {
-            if (0 === strpos($path, $vendor) && false !== strpbrk(substr($path, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
+            if (str_starts_with($path, $vendor) && false !== strpbrk(substr($path, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                 $this->addResource(new FileResource($vendor.'/composer/installed.json'));
 
                 return true;

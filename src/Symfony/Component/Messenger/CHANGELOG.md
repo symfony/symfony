@@ -4,6 +4,7 @@ CHANGELOG
 5.4
 ---
  * Deprecate `Middleware\RejectRedeliveredMessageMiddleware`. Install `symfony/amqp-messenger` and use same class from there.
+ * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
 
 5.3
 ---

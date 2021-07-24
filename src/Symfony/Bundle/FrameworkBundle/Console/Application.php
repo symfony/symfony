@@ -109,7 +109,7 @@ class Application extends BaseApplication
     /**
      * {@inheritdoc}
      */
-    public function find($name)
+    public function find(string $name)
     {
         $this->registerCommands();
 
@@ -119,7 +119,7 @@ class Application extends BaseApplication
     /**
      * {@inheritdoc}
      */
-    public function get($name)
+    public function get(string $name)
     {
         $this->registerCommands();
 
@@ -135,7 +135,7 @@ class Application extends BaseApplication
     /**
      * {@inheritdoc}
      */
-    public function all($namespace = null)
+    public function all(string $namespace = null)
     {
         $this->registerCommands();
 

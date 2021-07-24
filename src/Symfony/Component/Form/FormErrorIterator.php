@@ -170,6 +170,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Unsupported method.
      *
+     * @return void
+     *
      * @throws BadMethodCallException
      */
     public function offsetSet($position, $value)
@@ -179,6 +181,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 
     /**
      * Unsupported method.
+     *
+     * @return void
      *
      * @throws BadMethodCallException
      */
@@ -200,6 +204,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 
     /**
      * Alias of {@link current()}.
+     *
+     * @return self
      */
     public function getChildren()
     {
@@ -232,6 +238,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * Sets the position of the iterator.
      *
      * @param int $position The new position
+     *
+     * @return void
      *
      * @throws OutOfBoundsException If the position is invalid
      */

@@ -94,7 +94,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param PropertyReadInfoExtractorInterface  $readInfoExtractor
      * @param PropertyWriteInfoExtractorInterface $writeInfoExtractor
      */
-    public function __construct(/*int */$magicMethods = self::MAGIC_GET | self::MAGIC_SET, /*int */$throw = self::THROW_ON_INVALID_PROPERTY_PATH, CacheItemPoolInterface $cacheItemPool = null, /*PropertyReadInfoExtractorInterface */$readInfoExtractor = null, /*PropertyWriteInfoExtractorInterface */$writeInfoExtractor = null)
+    public function __construct($magicMethods = self::MAGIC_GET | self::MAGIC_SET, $throw = self::THROW_ON_INVALID_PROPERTY_PATH, CacheItemPoolInterface $cacheItemPool = null, $readInfoExtractor = null, $writeInfoExtractor = null)
     {
         if (\is_bool($magicMethods)) {
             trigger_deprecation('symfony/property-access', '5.2', 'Passing a boolean as the first argument to "%s()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).', __METHOD__);
@@ -249,7 +249,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         if (\PHP_VERSION_ID < 80000) {
-            if (0 !== strpos($message, 'Argument ')) {
+            if (!str_starts_with($message, 'Argument ')) {
                 return;
             }
 
@@ -466,7 +466,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                             && $object instanceof $trace['class']
                             && preg_match('/Return value (?:of .*::\w+\(\) )?must be of (?:the )?type (\w+), null returned$/', $e->getMessage(), $matches)
                         ) {
-                            throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', false === strpos(\get_class($object), "@anonymous\0") ? \get_class($object) : (get_parent_class($object) ?: key(class_implements($object)) ?: 'class').'@anonymous', $name, $matches[1]), 0, $e);
+                            throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', !str_contains(\get_class($object), "@anonymous\0") ? \get_class($object) : (get_parent_class($object) ?: key(class_implements($object)) ?: 'class').'@anonymous', $name, $matches[1]), 0, $e);
                         }
 
                         throw $e;
@@ -630,7 +630,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     private function getWriteInfo(string $class, string $property, $value): PropertyWriteInfo
     {
-        $useAdderAndRemover = \is_array($value) || $value instanceof \Traversable;
+        $useAdderAndRemover = is_iterable($value);
         $key = str_replace('\\', '.', $class).'..'.$property.'..'.(int) $useAdderAndRemover;
 
         if (isset($this->writePropertyCache[$key])) {
@@ -660,10 +660,8 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * Returns whether a property is writable in the given object.
-     *
-     * @param object $object The object to write to
      */
-    private function isPropertyWritable($object, string $property): bool
+    private function isPropertyWritable(object $object, string $property): bool
     {
         if (!\is_object($object)) {
             return false;

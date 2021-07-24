@@ -18,7 +18,7 @@ class SortableIteratorTest extends RealIteratorTestCase
     public function testConstructor()
     {
         try {
-            new SortableIterator(new Iterator([]), 'foobar');
+            new SortableIterator(new Iterator([]), -255);
             $this->fail('__construct() throws an \InvalidArgumentException exception if the mode is not valid');
         } catch (\Exception $e) {
             $this->assertInstanceOf(\InvalidArgumentException::class, $e, '__construct() throws an \InvalidArgumentException exception if the mode is not valid');

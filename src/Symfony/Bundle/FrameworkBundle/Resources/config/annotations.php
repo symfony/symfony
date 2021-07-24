@@ -16,11 +16,11 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Cache\DoctrineProvider;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -36,9 +36,11 @@ return static function (ContainerConfigurator $container) {
         ->set('annotations.cached_reader', CachedReader::class)
             ->args([
                 service('annotations.reader'),
-                inline_service(DoctrineProvider::class)->args([
-                    inline_service(ArrayAdapter::class),
-                ]),
+                inline_service(DoctrineProvider::class)
+                    ->factory([DoctrineProvider::class, 'wrap'])
+                    ->args([
+                        inline_service(ArrayAdapter::class),
+                    ]),
                 abstract_arg('Debug-Flag'),
             ])
 
@@ -50,6 +52,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('annotations.filesystem_cache', DoctrineProvider::class)
+            ->factory([DoctrineProvider::class, 'wrap'])
             ->args([
                 service('annotations.filesystem_cache_adapter'),
             ])
@@ -71,6 +74,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.hot_path')
 
         ->set('annotations.cache', DoctrineProvider::class)
+            ->factory([DoctrineProvider::class, 'wrap'])
             ->args([
                 service('annotations.cache_adapter'),
             ])

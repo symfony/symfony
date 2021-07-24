@@ -64,11 +64,19 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
-                <target>تلاش‌های ناموفق زیادی برای ورود صورت گرفته است، لطفاً بعداً دوباره تلاش کنید.</target>
+                <target>تلاش‌های ناموفق زیادی برای ورود صورت گرفته است، لطفاً بعداً دوباره امتحان کنید.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
                 <target>لینک ورود نامعتبر یا تاریخ‌گذشته است.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>تلاش‌های ناموفق زیادی برای ورود صورت گرفته است، لطفاً %minutes% دقیقه دیگر دوباره امتحان کنید.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>تلاش‌های ناموفق زیادی برای ورود صورت گرفته است، لطفاً %minutes% دقیقه دیگر دوباره امتحان کنید.</target>
             </trans-unit>
         </body>
     </file>

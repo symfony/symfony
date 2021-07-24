@@ -27,7 +27,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
     {
         foreach ($guessers as $guesser) {
             if (!$guesser instanceof FormTypeGuesserInterface) {
-                throw new UnexpectedTypeException($guesser, 'Symfony\Component\Form\FormTypeGuesserInterface');
+                throw new UnexpectedTypeException($guesser, FormTypeGuesserInterface::class);
             }
 
             if ($guesser instanceof self) {

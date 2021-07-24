@@ -75,7 +75,7 @@ class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
     /**
      * {@inheritdoc}
      */
-    protected function isRememberMeAware($config)
+    protected function isRememberMeAware(array $config)
     {
         return false;
     }

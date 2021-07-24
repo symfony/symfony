@@ -131,24 +131,24 @@
                 <target>Ši reikšmė turi būti skaičius.</target>
             </trans-unit>
             <trans-unit id="36">
-                <source>This value is not a valid country.</source>
-                <target>Ši reikšmė nėra tinkama šalis.</target>
-            </trans-unit>
-            <trans-unit id="37">
                 <source>This file is not a valid image.</source>
                 <target>Byla nėra paveikslėlis.</target>
             </trans-unit>
-            <trans-unit id="38">
+            <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
                 <target>Ši reikšmė nėra tinkamas IP adresas.</target>
             </trans-unit>
-            <trans-unit id="39">
+            <trans-unit id="38">
                 <source>This value is not a valid language.</source>
                 <target>Ši reikšmė nėra tinkama kalba.</target>
             </trans-unit>
-            <trans-unit id="40">
+            <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
                 <target>Ši reikšmė nėra tinkama lokalė.</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>Ši reikšmė nėra tinkama šalis.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -385,6 +385,10 @@
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Ši reišmė neatitinka tarptautinio vertybinių popierių identifikavimo numerio formato (ISIN).</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Ši vertė turėtų būti teisinga išraiška.</target>
             </trans-unit>
         </body>
     </file>

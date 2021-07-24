@@ -114,7 +114,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     public function testGcSession()
     {
-        $this->assertTrue($this->storage->gc(123));
+        $this->assertIsInt($this->storage->gc(123));
     }
 
     public function testUpdateTimestamp()
@@ -122,7 +122,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $lowTtl = 10;
 
         $this->redisClient->setex(self::PREFIX.'id', $lowTtl, 'foo');
-        $this->storage->updateTimestamp('id', []);
+        $this->storage->updateTimestamp('id', 'data');
 
         $this->assertGreaterThan($lowTtl, $this->redisClient->ttl(self::PREFIX.'id'));
     }

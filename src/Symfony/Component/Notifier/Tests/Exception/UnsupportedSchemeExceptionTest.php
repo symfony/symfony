@@ -28,9 +28,11 @@ use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
+use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
@@ -42,8 +44,10 @@ use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
+use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
+use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
@@ -73,9 +77,11 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             IqsmsTransportFactory::class => false,
             LightSmsTransportFactory::class => false,
             LinkedInTransportFactory::class => false,
+            MailjetTransportFactory::class => false,
             MattermostTransportFactory::class => false,
             MercureTransportFactory::class => false,
             MessageBirdTransportFactory::class => false,
+            MessageMediaTransportFactory::class => false,
             MicrosoftTeamsTransportFactory::class => false,
             MobytTransportFactory::class => false,
             NexmoTransportFactory::class => false,
@@ -87,8 +93,10 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             SlackTransportFactory::class => false,
             SmsapiTransportFactory::class => false,
             SmsBiurasTransportFactory::class => false,
+            SmscTransportFactory::class => false,
             SpotHitTransportFactory::class => false,
             TelegramTransportFactory::class => false,
+            TelnyxTransportFactory::class => false,
             TwilioTransportFactory::class => false,
             ZulipTransportFactory::class => false,
         ]);
@@ -124,9 +132,11 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['iqsms', 'symfony/iqsms-notifier'];
         yield ['lightsms', 'symfony/light-sms-notifier'];
         yield ['linkedin', 'symfony/linked-in-notifier'];
+        yield ['mailjet', 'symfony/mailjet-notifier'];
         yield ['mattermost', 'symfony/mattermost-notifier'];
         yield ['mercure', 'symfony/mercure-notifier'];
         yield ['messagebird', 'symfony/message-bird-notifier'];
+        yield ['messagemedia', 'symfony/message-media-notifier'];
         yield ['microsoftteams', 'symfony/microsoft-teams-notifier'];
         yield ['mobyt', 'symfony/mobyt-notifier'];
         yield ['nexmo', 'symfony/nexmo-notifier'];
@@ -138,8 +148,10 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['slack', 'symfony/slack-notifier'];
         yield ['smsapi', 'symfony/smsapi-notifier'];
         yield ['smsbiuras', 'symfony/sms-biuras-notifier'];
+        yield ['smsc', 'symfony/smsc-notifier'];
         yield ['spothit', 'symfony/spot-hit-notifier'];
         yield ['telegram', 'symfony/telegram-notifier'];
+        yield ['telnyx', 'symfony/telnyx-notifier'];
         yield ['twilio', 'symfony/twilio-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];
     }

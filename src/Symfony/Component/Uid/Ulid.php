@@ -20,7 +20,7 @@ namespace Symfony\Component\Uid;
  */
 class Ulid extends AbstractUid
 {
-    private const NIL = '00000000000000000000000000';
+    protected const NIL = '00000000000000000000000000';
 
     private static $time = '';
     private static $rand = [];
@@ -43,7 +43,7 @@ class Ulid extends AbstractUid
             throw new \InvalidArgumentException(sprintf('Invalid ULID: "%s".', $ulid));
         }
 
-        $this->uid = strtr($ulid, 'abcdefghjkmnpqrstvwxyz', 'ABCDEFGHJKMNPQRSTVWXYZ');
+        $this->uid = strtoupper($ulid);
     }
 
     public static function isValid(string $ulid): bool
@@ -67,10 +67,14 @@ class Ulid extends AbstractUid
         if (36 === \strlen($ulid) && Uuid::isValid($ulid)) {
             $ulid = (new Uuid($ulid))->toBinary();
         } elseif (22 === \strlen($ulid) && 22 === strspn($ulid, BinaryUtil::BASE58[''])) {
-            $ulid = BinaryUtil::fromBase($ulid, BinaryUtil::BASE58);
+            $ulid = str_pad(BinaryUtil::fromBase($ulid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
         }
 
         if (16 !== \strlen($ulid)) {
+            if (self::NIL === $ulid) {
+                return new NilUlid();
+            }
+
             return new static($ulid);
         }
 
@@ -84,6 +88,10 @@ class Ulid extends AbstractUid
             base_convert(substr($ulid, 22, 5), 16, 32),
             base_convert(substr($ulid, 27, 5), 16, 32)
         );
+
+        if (self::NIL === $ulid) {
+            return new NilUlid();
+        }
 
         $u = new static(self::NIL);
         $u->uid = strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');

@@ -93,7 +93,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         if (!$nestingLevel) {
             $projectDir = '__'.'DIR__.'.var_export('/'.$projectDir, true);
         } else {
-            $projectDir = 'dirname(__'."DIR__, $nestingLevel)".('' !== $projectDir ? var_export('/'.$projectDir, true) : '');
+            $projectDir = 'dirname(__'."DIR__, $nestingLevel)".('' !== $projectDir ? '.'.var_export('/'.$projectDir, true) : '');
         }
 
         $runtimeClass = $extra['class'] ?? SymfonyRuntime::class;

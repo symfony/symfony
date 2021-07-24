@@ -1033,14 +1033,14 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $bar->setRedrawFrequency(4); // disable step based redraws
         $bar->start();
 
-        $bar->setProgress(1); // No treshold hit, no redraw
+        $bar->setProgress(1); // No threshold hit, no redraw
         $bar->maxSecondsBetweenRedraws(2);
         sleep(1);
         $bar->setProgress(2); // Still no redraw because it takes 2 seconds for a redraw
         sleep(1);
         $bar->setProgress(3); // 1+1 = 2 -> redraw finally
         $bar->setProgress(4); // step based redraw freq hit, redraw even without sleep
-        $bar->setProgress(5); // No treshold hit, no redraw
+        $bar->setProgress(5); // No threshold hit, no redraw
         $bar->maxSecondsBetweenRedraws(3);
         sleep(2);
         $bar->setProgress(6); // No redraw even though 2 seconds passed. Throttling has priority
@@ -1071,7 +1071,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $bar->setProgress(3); // 1 second passed but we changed threshold, should not draw
         sleep(1);
         $bar->setProgress(4); // 1+1 seconds = 2 seconds passed which conforms threshold, draw
-        $bar->setProgress(5); // No treshold hit, no redraw
+        $bar->setProgress(5); // No threshold hit, no redraw
 
         rewind($output->getStream());
         $this->assertEquals(

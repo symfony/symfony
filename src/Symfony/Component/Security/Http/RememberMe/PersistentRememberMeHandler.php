@@ -36,7 +36,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
     private $tokenVerifier;
     private $secret;
 
-    public function __construct(TokenProviderInterface $tokenProvider, string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, ?LoggerInterface $logger = null, ?TokenVerifierInterface $tokenVerifier = null)
+    public function __construct(TokenProviderInterface $tokenProvider, string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null, TokenVerifierInterface $tokenVerifier = null)
     {
         parent::__construct($userProvider, $requestStack, $options, $logger);
 
@@ -89,16 +89,15 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         // if a token was regenerated less than a minute ago, there is no need to regenerate it
         // if multiple concurrent requests reauthenticate a user we do not want to update the token several times
         if ($persistentToken->getLastUsed()->getTimestamp() + 60 < time()) {
-            $tokenValue = base64_encode(random_bytes(64));
-            $tokenValueHash = $this->generateHash($tokenValue);
+            $tokenValue = $this->generateHash(base64_encode(random_bytes(64)));
             $tokenLastUsed = new \DateTime();
             if ($this->tokenVerifier) {
-                $this->tokenVerifier->updateExistingToken($persistentToken, $tokenValueHash, $tokenLastUsed);
+                $this->tokenVerifier->updateExistingToken($persistentToken, $tokenValue, $tokenLastUsed);
             }
-            $this->tokenProvider->updateToken($series, $tokenValueHash, $tokenLastUsed);
+            $this->tokenProvider->updateToken($series, $tokenValue, $tokenLastUsed);
         }
 
-        $this->createCookie($rememberMeDetails->withValue($tokenValue));
+        $this->createCookie($rememberMeDetails->withValue($series.':'.$tokenValue));
     }
 
     /**

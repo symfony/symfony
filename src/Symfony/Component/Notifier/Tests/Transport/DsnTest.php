@@ -21,7 +21,7 @@ final class DsnTest extends TestCase
     /**
      * @dataProvider constructProvider
      */
-    public function testConstruct(string $dsnString, string $scheme, string $host, ?string $user = null, ?string $password = null, ?int $port = null, array $options = [], ?string $path = null)
+    public function testConstruct(string $dsnString, string $scheme, string $host, string $user = null, string $password = null, int $port = null, array $options = [], string $path = null)
     {
         $dsn = new Dsn($dsnString);
         $this->assertSame($dsnString, $dsn->getOriginalDsn());
@@ -172,7 +172,7 @@ final class DsnTest extends TestCase
     /**
      * @dataProvider getOptionProvider
      */
-    public function testGetOption($expected, string $dsnString, string $option, ?string $default = null)
+    public function testGetOption($expected, string $dsnString, string $option, string $default = null)
     {
         $dsn = new Dsn($dsnString);
 

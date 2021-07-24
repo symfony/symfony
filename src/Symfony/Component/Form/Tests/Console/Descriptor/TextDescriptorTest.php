@@ -15,16 +15,6 @@ use Symfony\Component\Form\Console\Descriptor\TextDescriptor;
 
 class TextDescriptorTest extends AbstractDescriptorTest
 {
-    protected function setUp(): void
-    {
-        putenv('COLUMNS=121');
-    }
-
-    protected function tearDown(): void
-    {
-        putenv('COLUMNS');
-    }
-
     protected function getDescriptor()
     {
         return new TextDescriptor();

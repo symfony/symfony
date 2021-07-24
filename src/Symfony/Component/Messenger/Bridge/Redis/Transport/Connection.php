@@ -40,6 +40,8 @@ class Connection
         'redeliver_timeout' => 3600, // Timeout before redeliver messages still in pending state (seconds)
         'claim_interval' => 60000, // Interval by which pending/abandoned messages should be checked
         'lazy' => false,
+        'auth' => null,
+        'serializer' => \Redis::SERIALIZER_PHP,
     ];
 
     private $connection;
@@ -180,6 +182,8 @@ class Connection
         if (\array_key_exists('delete_after_ack', $redisOptions)) {
             $deleteAfterAck = filter_var($redisOptions['delete_after_ack'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['delete_after_ack']);
+        } else {
+            trigger_deprecation('symfony/redis-messenger', '5.4', 'Not setting the "delete_after_ack" boolean option explicitly is deprecated, its default value will change to true in 6.0.');
         }
 
         $deleteAfterReject = null;
@@ -231,7 +235,7 @@ class Connection
             $connectionCredentials = [
                 'host' => $parsedUrl['host'] ?? '127.0.0.1',
                 'port' => $parsedUrl['port'] ?? 6379,
-                'auth' => $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
+                'auth' => $redisOptions['auth'] ?? $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
             ];
 
             $pathParts = explode('/', rtrim($parsedUrl['path'] ?? '', '/'));
@@ -275,7 +279,6 @@ class Connection
     private static function validateOptions(array $options): void
     {
         $availableOptions = array_keys(self::DEFAULT_OPTIONS);
-        $availableOptions[] = 'serializer';
 
         if (0 < \count($invalidOptions = array_diff(array_keys($options), $availableOptions))) {
             trigger_deprecation('symfony/messenger', '5.1', 'Invalid option(s) "%s" passed to the Redis Messenger transport. Passing invalid options is deprecated.', implode('", "', $invalidOptions));

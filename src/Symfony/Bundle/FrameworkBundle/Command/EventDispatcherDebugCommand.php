@@ -120,7 +120,7 @@ EOF
         return 0;
     }
 
-    private function searchForEvent(EventDispatcherInterface $dispatcher, $needle): array
+    private function searchForEvent(EventDispatcherInterface $dispatcher, string $needle): array
     {
         $output = [];
         $lcNeedle = strtolower($needle);

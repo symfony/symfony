@@ -45,7 +45,7 @@ final class TokenBucket implements LimiterStateInterface
      * @param Rate       $rate          the fill rate and time of this bucket
      * @param float|null $timer         the current timer of the bucket, defaulting to microtime(true)
      */
-    public function __construct(string $id, int $initialTokens, Rate $rate, ?float $timer = null)
+    public function __construct(string $id, int $initialTokens, Rate $rate, float $timer = null)
     {
         if ($initialTokens < 1) {
             throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));

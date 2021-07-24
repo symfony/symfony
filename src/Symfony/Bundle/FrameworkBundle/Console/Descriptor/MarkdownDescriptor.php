@@ -88,7 +88,7 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
-    protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -286,7 +286,7 @@ class MarkdownDescriptor extends Descriptor
 
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
-        $event = \array_key_exists('event', $options) ? $options['event'] : null;
+        $event = $options['event'] ?? null;
         $dispatcherServiceName = $options['dispatcher_service_name'] ?? null;
 
         $title = 'Registered listeners';
@@ -337,7 +337,7 @@ class MarkdownDescriptor extends Descriptor
                 $string .= "\n".sprintf('- Name: `%s`', $callable[1]);
                 $string .= "\n".sprintf('- Class: `%s`', \get_class($callable[0]));
             } else {
-                if (0 !== strpos($callable[1], 'parent::')) {
+                if (!str_starts_with($callable[1], 'parent::')) {
                     $string .= "\n".sprintf('- Name: `%s`', $callable[1]);
                     $string .= "\n".sprintf('- Class: `%s`', $callable[0]);
                     $string .= "\n- Static: yes";
@@ -355,7 +355,7 @@ class MarkdownDescriptor extends Descriptor
         if (\is_string($callable)) {
             $string .= "\n- Type: `function`";
 
-            if (false === strpos($callable, '::')) {
+            if (!str_contains($callable, '::')) {
                 $string .= "\n".sprintf('- Name: `%s`', $callable);
             } else {
                 $callableParts = explode('::', $callable);
@@ -372,7 +372,7 @@ class MarkdownDescriptor extends Descriptor
             $string .= "\n- Type: `closure`";
 
             $r = new \ReflectionFunction($callable);
-            if (false !== strpos($r->name, '{closure}')) {
+            if (str_contains($r->name, '{closure}')) {
                 return $this->write($string."\n");
             }
             $string .= "\n".sprintf('- Name: `%s`', $r->name);

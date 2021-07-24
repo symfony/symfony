@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -65,14 +66,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->method('getPreAuthenticatedData')
             ->willReturn($userCredentials);
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenAuthenticationFails()
@@ -112,14 +106,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->method('getPreAuthenticatedData')
             ->willReturn($userCredentials);
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenAuthenticationFailsWithDifferentToken()
@@ -161,12 +148,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->method('getPreAuthenticatedData')
             ->willReturn($userCredentials);
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener($event);
     }
@@ -203,14 +185,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->method('getPreAuthenticatedData')
             ->willReturn($userCredentials);
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWithAnInvalidSimilarToken()
@@ -253,13 +228,6 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->method('getPreAuthenticatedData')
             ->willReturn($userCredentials);
 
-        $event = $this->createMock(RequestEvent::class);
-        $event
-            ->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-
-        $listener($event);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 }

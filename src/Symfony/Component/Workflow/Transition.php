@@ -32,16 +32,25 @@ class Transition
         $this->tos = (array) $tos;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @return string[]
+     */
     public function getFroms()
     {
         return $this->froms;
     }
 
+    /**
+     * @return string[]
+     */
     public function getTos()
     {
         return $this->tos;

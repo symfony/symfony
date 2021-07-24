@@ -90,7 +90,10 @@ class MainConfiguration implements ConfigurationInterface
                     ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
                 ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
-                ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
+                ->booleanNode('always_authenticate_before_granting')
+                    ->defaultFalse()
+                    ->setDeprecated('symfony/security-bundle', '5.4')
+                ->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
                 ->booleanNode('enable_authenticator_manager')->defaultFalse()->info('Enables the new Symfony Security system based on Authenticators, all used authenticators must support this before enabling this.')->end()
                 ->arrayNode('access_decision_manager')
@@ -322,7 +325,7 @@ class MainConfiguration implements ConfigurationInterface
                             continue;
                         }
 
-                        if (false !== strpos($firewall[$k]['check_path'], '/') && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
+                        if (str_contains($firewall[$k]['check_path'], '/') && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
                             throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
                         }
                     }

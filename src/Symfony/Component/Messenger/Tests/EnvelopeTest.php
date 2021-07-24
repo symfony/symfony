@@ -55,6 +55,13 @@ class EnvelopeTest extends TestCase
         $this->assertCount(1, $envelope->all(DelayStamp::class));
     }
 
+    public function testWithoutAllWithNonExistentStampClass()
+    {
+        $envelope = new Envelope(new DummyMessage('dummy'));
+
+        $this->assertInstanceOf(Envelope::class, $envelope->withoutAll(NonExistentStamp::class));
+    }
+
     public function testWithoutStampsOfType()
     {
         $envelope = new Envelope(new DummyMessage('dummy'), [
@@ -77,6 +84,13 @@ class EnvelopeTest extends TestCase
         $this->assertEmpty($envelope5->all());
     }
 
+    public function testWithoutStampsOfTypeWithNonExistentStampClass()
+    {
+        $envelope = new Envelope(new DummyMessage('dummy'));
+
+        $this->assertInstanceOf(Envelope::class, $envelope->withoutStampsOfType(NonExistentStamp::class));
+    }
+
     public function testLast()
     {
         $receivedStamp = new ReceivedStamp('transport');
@@ -84,6 +98,13 @@ class EnvelopeTest extends TestCase
 
         $this->assertSame($receivedStamp, $envelope->last(ReceivedStamp::class));
         $this->assertNull($envelope->last(ValidationStamp::class));
+    }
+
+    public function testLastWithNonExistentStampClass()
+    {
+        $envelope = new Envelope(new DummyMessage('dummy'));
+
+        $this->assertNull($envelope->last(NonExistentStamp::class));
     }
 
     public function testAll()
@@ -98,6 +119,13 @@ class EnvelopeTest extends TestCase
         $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class][0]);
         $this->assertArrayHasKey(ValidationStamp::class, $stamps);
         $this->assertSame($validationStamp, $stamps[ValidationStamp::class][0]);
+    }
+
+    public function testAllWithNonExistentStampClass()
+    {
+        $envelope = new Envelope(new DummyMessage('dummy'));
+
+        $this->assertSame([], $envelope->all(NonExistentStamp::class));
     }
 
     public function testWrapWithMessage()

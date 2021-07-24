@@ -44,11 +44,9 @@ class ChildDefinition extends Definition
     /**
      * Sets the Definition to inherit from.
      *
-     * @param string $parent
-     *
      * @return $this
      */
-    public function setParent($parent)
+    public function setParent(string $parent)
     {
         $this->parent = $parent;
 
@@ -95,7 +93,7 @@ class ChildDefinition extends Definition
     {
         if (\is_int($index)) {
             $this->arguments['index_'.$index] = $value;
-        } elseif (0 === strpos($index, '$')) {
+        } elseif (str_starts_with($index, '$')) {
             $this->arguments[$index] = $value;
         } else {
             throw new InvalidArgumentException('The argument must be an existing index or the name of a constructor\'s parameter.');

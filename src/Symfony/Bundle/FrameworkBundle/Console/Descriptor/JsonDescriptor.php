@@ -67,7 +67,7 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -313,7 +313,7 @@ class JsonDescriptor extends Descriptor
                 $data['name'] = $callable[1];
                 $data['class'] = \get_class($callable[0]);
             } else {
-                if (0 !== strpos($callable[1], 'parent::')) {
+                if (!str_starts_with($callable[1], 'parent::')) {
                     $data['name'] = $callable[1];
                     $data['class'] = $callable[0];
                     $data['static'] = true;
@@ -331,7 +331,7 @@ class JsonDescriptor extends Descriptor
         if (\is_string($callable)) {
             $data['type'] = 'function';
 
-            if (false === strpos($callable, '::')) {
+            if (!str_contains($callable, '::')) {
                 $data['name'] = $callable;
             } else {
                 $callableParts = explode('::', $callable);
@@ -348,7 +348,7 @@ class JsonDescriptor extends Descriptor
             $data['type'] = 'closure';
 
             $r = new \ReflectionFunction($callable);
-            if (false !== strpos($r->name, '{closure}')) {
+            if (str_contains($r->name, '{closure}')) {
                 return $data;
             }
             $data['name'] = $r->name;

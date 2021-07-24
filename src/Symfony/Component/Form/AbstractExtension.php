@@ -22,14 +22,14 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * The types provided by this extension.
      *
-     * @var FormTypeInterface[] An array of FormTypeInterface
+     * @var FormTypeInterface[]
      */
     private $types;
 
     /**
      * The type extensions provided by this extension.
      *
-     * @var FormTypeExtensionInterface[] An array of FormTypeExtensionInterface
+     * @var FormTypeExtensionInterface[][]
      */
     private $typeExtensions;
 
@@ -153,7 +153,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
         foreach ($this->loadTypes() as $type) {
             if (!$type instanceof FormTypeInterface) {
-                throw new UnexpectedTypeException($type, 'Symfony\Component\Form\FormTypeInterface');
+                throw new UnexpectedTypeException($type, FormTypeInterface::class);
             }
 
             $this->types[\get_class($type)] = $type;
@@ -172,7 +172,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
         foreach ($this->loadTypeExtensions() as $extension) {
             if (!$extension instanceof FormTypeExtensionInterface) {
-                throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormTypeExtensionInterface');
+                throw new UnexpectedTypeException($extension, FormTypeExtensionInterface::class);
             }
 
             foreach ($extension::getExtendedTypes() as $extendedType) {
@@ -192,7 +192,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
         $this->typeGuesser = $this->loadTypeGuesser();
         if (null !== $this->typeGuesser && !$this->typeGuesser instanceof FormTypeGuesserInterface) {
-            throw new UnexpectedTypeException($this->typeGuesser, 'Symfony\Component\Form\FormTypeGuesserInterface');
+            throw new UnexpectedTypeException($this->typeGuesser, FormTypeGuesserInterface::class);
         }
     }
 }

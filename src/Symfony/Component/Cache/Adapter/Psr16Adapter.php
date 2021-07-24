@@ -23,12 +23,12 @@ use Symfony\Component\Cache\Traits\ProxyTrait;
  */
 class Psr16Adapter extends AbstractAdapter implements PruneableInterface, ResettableInterface
 {
+    use ProxyTrait;
+
     /**
      * @internal
      */
     protected const NS_SEPARATOR = '_';
-
-    use ProxyTrait;
 
     private $miss;
 

@@ -125,7 +125,7 @@
         {% if app is defined and app.request is defined %}{%- set input_lang = app.request.locale -%}{%- endif -%}
         {%- set attr = {lang: input_lang} | merge(attr) -%}
         {{- block('form_widget_simple') -}}
-        {%- set label_attr = label_attr|merge({ class: (label_attr.class|default('') ~ ' custom-file-label')|trim }) -%}
+        {%- set label_attr = label_attr|merge({ class: (label_attr.class|default('') ~ ' custom-file-label')|trim })|filter((value, key) => key != 'id') -%}
         <label for="{{ form.vars.id }}" {% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if attr.placeholder is defined and attr.placeholder is not none -%}
                 {{- translation_domain is same as(false) ? attr.placeholder : attr.placeholder|trans({}, translation_domain) -}}

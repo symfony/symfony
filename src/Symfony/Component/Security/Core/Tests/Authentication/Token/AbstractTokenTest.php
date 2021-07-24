@@ -33,23 +33,28 @@ class AbstractTokenTest extends TestCase
         $token->setUser(new TestUser('fabien'));
         $this->assertEquals('fabien', $token->getUsername());
 
-        $legacyUser = new class implements UserInterface {
+        $legacyUser = new class() implements UserInterface {
             public function getUsername()
             {
                 return 'fabien';
             }
 
             public function getRoles()
-            {}
+            {
+                return [];
+            }
 
             public function getPassword()
-            {}
+            {
+            }
 
             public function getSalt()
-            {}
+            {
+            }
 
             public function eraseCredentials()
-            {}
+            {
+            }
         };
         $token->setUser($legacyUser);
         $this->assertEquals('fabien', $token->getUsername());
@@ -100,6 +105,9 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
     }
 
+    /**
+     * @group legacy
+     */
     public function testAuthenticatedFlag()
     {
         $token = new ConcreteToken();
@@ -154,6 +162,7 @@ class AbstractTokenTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider getUserChanges
      */
     public function testSetUserSetsAuthenticatedToFalseWhenUserChanges($firstUser, $secondUser)
@@ -186,6 +195,7 @@ class AbstractTokenTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider getUsers
      */
     public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)
@@ -201,6 +211,9 @@ class AbstractTokenTest extends TestCase
         $this->assertTrue($token->isAuthenticated());
     }
 
+    /**
+     * @group legacy
+     */
     public function testIsUserChangedWhenSerializing()
     {
         $token = new ConcreteToken(['ROLE_ADMIN']);

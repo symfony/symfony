@@ -1988,7 +1988,7 @@ class RecursiveValidatorTest extends TestCase
         $this->assertSame($constraint, $violations[0]->getConstraint());
     }
 
-    public function testCollectionConstraitViolationHasCorrectContext()
+    public function testCollectionConstraintViolationHasCorrectContext()
     {
         $data = [
             'foo' => 'fooValue',

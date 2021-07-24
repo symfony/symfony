@@ -48,31 +48,27 @@ class MockSplFileInfo extends \SplFileInfo
         }
     }
 
-    public function isFile()
+    public function isFile(): bool
     {
         if (null === $this->type) {
-            return false !== strpos($this->getFilename(), 'file');
+            return str_contains($this->getFilename(), 'file');
         }
 
         return self::TYPE_FILE === $this->type;
     }
 
-    public function isDir()
+    public function isDir(): bool
     {
         if (null === $this->type) {
-            return false !== strpos($this->getFilename(), 'directory');
+            return str_contains($this->getFilename(), 'directory');
         }
 
         return self::TYPE_DIRECTORY === $this->type;
     }
 
-    public function isReadable()
+    public function isReadable(): bool
     {
-        if (null === $this->mode) {
-            return preg_match('/r\+/', $this->getFilename());
-        }
-
-        return preg_match('/r\+/', $this->mode);
+        return (bool) preg_match('/r\+/', $this->mode ?? $this->getFilename());
     }
 
     public function getContents()

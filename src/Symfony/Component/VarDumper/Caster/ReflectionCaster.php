@@ -42,7 +42,7 @@ class ReflectionCaster
 
         $a = static::castFunctionAbstract($c, $a, $stub, $isNested, $filter);
 
-        if (false === strpos($c->name, '{closure}')) {
+        if (!str_contains($c->name, '{closure}')) {
             $stub->class = isset($a[$prefix.'class']) ? $a[$prefix.'class']->value.'::'.$c->name : $c->name;
             unset($a[$prefix.'class']);
         }
@@ -102,7 +102,7 @@ class ReflectionCaster
                 $prefix.'allowsNull' => $c->allowsNull(),
                 $prefix.'isBuiltin' => $c->isBuiltin(),
             ];
-        } elseif ($c instanceof \ReflectionUnionType) {
+        } elseif ($c instanceof \ReflectionUnionType || $c instanceof \ReflectionIntersectionType) {
             $a[$prefix.'allowsNull'] = $c->allowsNull();
             self::addMap($a, $c, [
                 'types' => 'getTypes',
@@ -381,7 +381,7 @@ class ReflectionCaster
                 } elseif (\is_array($v)) {
                     $signature .= $v ? '[…'.\count($v).']' : '[]';
                 } elseif (\is_string($v)) {
-                    $signature .= 10 > \strlen($v) && false === strpos($v, '\\') ? "'{$v}'" : "'…".\strlen($v)."'";
+                    $signature .= 10 > \strlen($v) && !str_contains($v, '\\') ? "'{$v}'" : "'…".\strlen($v)."'";
                 } elseif (\is_bool($v)) {
                     $signature .= $v ? 'true' : 'false';
                 } else {

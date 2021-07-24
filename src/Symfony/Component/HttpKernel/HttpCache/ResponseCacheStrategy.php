@@ -81,12 +81,15 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
             return;
         }
 
-        $this->storeRelativeAgeDirective('max-age', $response->headers->getCacheControlDirective('max-age'), $age);
-        $this->storeRelativeAgeDirective('s-maxage', $response->headers->getCacheControlDirective('s-maxage') ?: $response->headers->getCacheControlDirective('max-age'), $age);
+        $isHeuristicallyCacheable = $response->headers->hasCacheControlDirective('public');
+        $maxAge = $response->headers->hasCacheControlDirective('max-age') ? (int) $response->headers->getCacheControlDirective('max-age') : null;
+        $this->storeRelativeAgeDirective('max-age', $maxAge, $age, $isHeuristicallyCacheable);
+        $sharedMaxAge = $response->headers->hasCacheControlDirective('s-maxage') ? (int) $response->headers->getCacheControlDirective('s-maxage') : $maxAge;
+        $this->storeRelativeAgeDirective('s-maxage', $sharedMaxAge, $age, $isHeuristicallyCacheable);
 
         $expires = $response->getExpires();
         $expires = null !== $expires ? (int) $expires->format('U') - (int) $response->getDate()->format('U') : null;
-        $this->storeRelativeAgeDirective('expires', $expires >= 0 ? $expires : null, 0);
+        $this->storeRelativeAgeDirective('expires', $expires >= 0 ? $expires : null, 0, $isHeuristicallyCacheable);
     }
 
     /**
@@ -197,11 +200,29 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
      * we have to subtract the age so that the value is normalized for an age of 0.
      *
      * If the value is lower than the currently stored value, we update the value, to keep a rolling
-     * minimal value of each instruction. If the value is NULL, the directive will not be set on the final response.
+     * minimal value of each instruction.
+     *
+     * If the value is NULL and the isHeuristicallyCacheable parameter is false, the directive will
+     * not be set on the final response. In this case, not all responses had the directive set and no
+     * value can be found that satisfies the requirements of all responses. The directive will be dropped
+     * from the final response.
+     *
+     * If the isHeuristicallyCacheable parameter is true, however, the current response has been marked
+     * as cacheable in a public (shared) cache, but did not provide an explicit lifetime that would serve
+     * as an upper bound. In this case, we can proceed and possibly keep the directive on the final response.
      */
-    private function storeRelativeAgeDirective(string $directive, ?int $value, int $age)
+    private function storeRelativeAgeDirective(string $directive, ?int $value, int $age, bool $isHeuristicallyCacheable)
     {
         if (null === $value) {
+            if ($isHeuristicallyCacheable) {
+                /*
+                 * See https://datatracker.ietf.org/doc/html/rfc7234#section-4.2.2
+                 * This particular response does not require maximum lifetime; heuristics might be applied.
+                 * Other responses, however, might have more stringent requirements on maximum lifetime.
+                 * So, return early here so that the final response can have the more limiting value set.
+                 */
+                return;
+            }
             $this->ageDirectives[$directive] = false;
         }
 

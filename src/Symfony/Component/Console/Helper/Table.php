@@ -362,6 +362,7 @@ class Table
 
         $isHeader = !$this->horizontal;
         $isFirstRow = $this->horizontal;
+        $hasTitle = (bool) $this->headerTitle;
         foreach ($rows as $row) {
             if ($divider === $row) {
                 $isHeader = false;
@@ -379,12 +380,13 @@ class Table
             }
 
             if ($isHeader || $isFirstRow) {
-                if ($isFirstRow) {
-                    $this->renderRowSeparator(self::SEPARATOR_TOP_BOTTOM);
-                    $isFirstRow = false;
-                } else {
-                    $this->renderRowSeparator(self::SEPARATOR_TOP, $this->headerTitle, $this->style->getHeaderTitleFormat());
-                }
+                $this->renderRowSeparator(
+                    $isHeader ? self::SEPARATOR_TOP : self::SEPARATOR_TOP_BOTTOM,
+                    $hasTitle ? $this->headerTitle : null,
+                    $hasTitle ? $this->style->getHeaderTitleFormat() : null
+                );
+                $isFirstRow = false;
+                $hasTitle = false;
             }
             if ($this->horizontal) {
                 $this->renderRow($row, $this->style->getCellRowFormat(), $this->style->getCellHeaderFormat());
@@ -596,11 +598,11 @@ class Table
 
         return new TableRows(function () use ($rows, $unmergedRows): \Traversable {
             foreach ($rows as $rowKey => $row) {
-                yield $this->fillCells($row);
+                yield $row instanceof TableSeparator ? $row : $this->fillCells($row);
 
                 if (isset($unmergedRows[$rowKey])) {
-                    foreach ($unmergedRows[$rowKey] as $unmergedRow) {
-                        yield $this->fillCells($unmergedRow);
+                    foreach ($unmergedRows[$rowKey] as $row) {
+                        yield $row instanceof TableSeparator ? $row : $this->fillCells($row);
                     }
                 }
             }
@@ -681,7 +683,7 @@ class Table
     /**
      * fill cells for a row that contains colspan > 1.
      */
-    private function fillCells($row)
+    private function fillCells(iterable $row)
     {
         $newRow = [];
 

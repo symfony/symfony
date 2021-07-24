@@ -56,6 +56,10 @@ class UserPasswordValidator extends ConstraintValidator
             return;
         }
 
+        if (!\is_string($password)) {
+            throw new UnexpectedTypeException($password, 'string');
+        }
+
         $user = $this->tokenStorage->getToken()->getUser();
 
         if (!$user instanceof UserInterface) {
@@ -63,7 +67,7 @@ class UserPasswordValidator extends ConstraintValidator
         }
 
         if (!$user instanceof PasswordAuthenticatedUserInterface) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Using the "%s" validation constraint is deprecated.', PasswordAuthenticatedUserInterface::class, get_debug_type($user), UserPassword::class);
+            trigger_deprecation('symfony/security-core', '5.3', 'Using the "%s" validation constraint without implementing the "%s" interface is deprecated, the "%s" class should implement it.', UserPassword::class, PasswordAuthenticatedUserInterface::class, get_debug_type($user));
         }
 
         $salt = $user->getSalt();

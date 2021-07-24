@@ -32,7 +32,7 @@ final class SlackTransportTest extends TransportTestCase
     /**
      * @return SlackTransport
      */
-    public function createTransport(?HttpClientInterface $client = null, string $channel = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $channel = null): TransportInterface
     {
         return new SlackTransport('xoxb-TestToken', $channel, $client ?? $this->createMock(HttpClientInterface::class));
     }
@@ -236,6 +236,34 @@ final class SlackTransportTest extends TransportTestCase
         });
 
         $transport = $this->createTransport($client);
+
+        $transport->send(new ChatMessage('testMessage'));
+    }
+
+    public function testSendWithErrorsIncluded()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn(json_encode([
+                'ok' => false,
+                'error' => 'invalid_blocks',
+                'errors' => ['no more than 50 items allowed [json-pointer:/blocks]'],
+            ]));
+
+        $client = new MockHttpClient(function () use ($response): ResponseInterface {
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Unable to post the Slack message: "invalid_blocks" (no more than 50 items allowed [json-pointer:/blocks]).');
 
         $transport->send(new ChatMessage('testMessage'));
     }

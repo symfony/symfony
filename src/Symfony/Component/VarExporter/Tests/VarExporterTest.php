@@ -67,10 +67,13 @@ class VarExporterTest extends TestCase
 
         yield [$a];
 
-        $a = [null, $h];
-        $a[0] = &$a;
+        // This test segfaults on the final PHP 7.2 release
+        if (\PHP_VERSION_ID !== 70234) {
+            $a = [null, $h];
+            $a[0] = &$a;
 
-        yield [$a];
+            yield [$a];
+        }
     }
 
     /**
@@ -163,10 +166,13 @@ class VarExporterTest extends TestCase
 
         yield ['hard-references', $value];
 
-        $value = [];
-        $value[0] = &$value;
+        // This test segfaults on the final PHP 7.2 release
+        if (\PHP_VERSION_ID !== 70234) {
+            $value = [];
+            $value[0] = &$value;
 
-        yield ['hard-references-recursive', $value];
+            yield ['hard-references-recursive', $value];
+        }
 
         static $value = [123];
 

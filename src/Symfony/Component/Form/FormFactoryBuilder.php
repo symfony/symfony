@@ -38,7 +38,7 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
     private $types = [];
 
     /**
-     * @var FormTypeExtensionInterface[]
+     * @var FormTypeExtensionInterface[][]
      */
     private $typeExtensions = [];
 

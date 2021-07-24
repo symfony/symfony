@@ -30,8 +30,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class TimeType extends AbstractType
 {
     private const WIDGETS = [
-        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
-        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+        'text' => TextType::class,
+        'choice' => ChoiceType::class,
     ];
 
     /**

@@ -150,7 +150,7 @@ class XmlUtilsTest extends TestCase
     /**
      * @dataProvider getDataForPhpize
      */
-    public function testPhpize($expected, $value)
+    public function testPhpize($expected, string $value)
     {
         $this->assertSame($expected, XmlUtils::phpize($value));
     }

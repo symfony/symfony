@@ -76,7 +76,7 @@ final class MobytOptions implements MessageOptionsInterface
         $this->options['message_type'] = $type;
     }
 
-    public static function validateMessageType($type): string
+    public static function validateMessageType(string $type): string
     {
         if (!\in_array($type, $supported = [self::MESSAGE_TYPE_QUALITY_HIGH, self::MESSAGE_TYPE_QUALITY_MEDIUM, self::MESSAGE_TYPE_QUALITY_LOW], true)) {
             throw new InvalidArgumentException(sprintf('The message type "%s" is not supported; supported message types are: "%s"', $type, implode('", "', $supported)));

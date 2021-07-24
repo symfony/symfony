@@ -20,7 +20,7 @@
         "symfony/deprecation-contracts": "^2.1",
         "symfony/filesystem": "^4.4|^5.0|^6.0",
         "symfony/polyfill-ctype": "~1.8",
-        "symfony/polyfill-php80": "^1.15",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/polyfill-php81": "^1.22"
     },
     "require-dev": {

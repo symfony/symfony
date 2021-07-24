@@ -311,7 +311,7 @@ class QuestionHelper extends Helper
                         $matches = array_filter(
                             $autocomplete($ret),
                             function ($match) use ($ret) {
-                                return '' === $ret || 0 === strpos($match, $ret);
+                                return '' === $ret || str_starts_with($match, $ret);
                             }
                         );
                         $numMatches = \count($matches);
@@ -348,7 +348,7 @@ class QuestionHelper extends Helper
 
                 foreach ($autocomplete($ret) as $value) {
                     // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
-                    if (0 === strpos($value, $tempRet)) {
+                    if (str_starts_with($value, $tempRet)) {
                         $matches[$numMatches++] = $value;
                     }
                 }
@@ -374,12 +374,12 @@ class QuestionHelper extends Helper
     private function mostRecentlyEnteredValue(string $entered): string
     {
         // Determine the most recent value that the user entered
-        if (false === strpos($entered, ',')) {
+        if (!str_contains($entered, ',')) {
             return $entered;
         }
 
         $choices = explode(',', $entered);
-        if (\strlen($lastChoice = trim($choices[\count($choices) - 1])) > 0) {
+        if ('' !== $lastChoice = trim($choices[\count($choices) - 1])) {
             return $lastChoice;
         }
 
@@ -504,7 +504,7 @@ class QuestionHelper extends Helper
      * @param resource $inputStream The handler resource
      * @param Question $question    The question being asked
      *
-     * @return string|bool The input received, false in case input could not be read
+     * @return string|false The input received, false in case input could not be read
      */
     private function readInput($inputStream, Question $question)
     {

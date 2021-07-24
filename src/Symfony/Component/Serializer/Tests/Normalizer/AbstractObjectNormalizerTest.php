@@ -604,7 +604,7 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
      */
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
-        return '[]' === substr($type, -2)
+        return str_ends_with($type, '[]')
             && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
     }
 

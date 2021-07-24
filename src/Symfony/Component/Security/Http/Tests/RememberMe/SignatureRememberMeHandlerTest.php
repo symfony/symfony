@@ -20,8 +20,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureException;
 use Symfony\Component\Security\Core\Signature\Exception\InvalidSignatureException;
 use Symfony\Component\Security\Core\Signature\SignatureHasher;
-use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
 use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 use Symfony\Component\Security\Http\RememberMe\SignatureRememberMeHandler;
@@ -73,7 +73,7 @@ class SignatureRememberMeHandlerTest extends TestCase
 
         /** @var Cookie $cookie */
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-        $this->assertEquals(null, $cookie->getValue());
+        $this->assertNull($cookie->getValue());
     }
 
     /**

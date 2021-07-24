@@ -20,6 +20,8 @@ class Stream extends File
 {
     /**
      * {@inheritdoc}
+     *
+     * @return int|false
      */
     public function getSize()
     {

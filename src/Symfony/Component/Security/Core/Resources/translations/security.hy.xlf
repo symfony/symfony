@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>No session available, it either timed out or cookies are not enabled.</target>
+                <target>Հասանելի սեսիա չկա, կամ այն սպառվել է կամ cookie-ները անջատված են:</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>

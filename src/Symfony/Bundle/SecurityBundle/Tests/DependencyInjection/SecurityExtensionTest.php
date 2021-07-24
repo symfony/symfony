@@ -635,6 +635,9 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
+    /**
+     * @group legacy
+     */
     public function testAlwaysAuthenticateBeforeGrantingCannotBeTrueWithAuthenticatorManager()
     {
         $this->expectException(InvalidConfigurationException::class);

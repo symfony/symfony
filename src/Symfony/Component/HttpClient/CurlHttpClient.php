@@ -272,7 +272,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         if ($options['bindto']) {
             if (file_exists($options['bindto'])) {
                 $curlopts[\CURLOPT_UNIX_SOCKET_PATH] = $options['bindto'];
-            } elseif (0 !== strpos($options['bindto'], 'if!') && preg_match('/^(.*):(\d+)$/', $options['bindto'], $matches)) {
+            } elseif (!str_starts_with($options['bindto'], 'if!') && preg_match('/^(.*):(\d+)$/', $options['bindto'], $matches)) {
                 $curlopts[\CURLOPT_INTERFACE] = $matches[1];
                 $curlopts[\CURLOPT_LOCALPORT] = $matches[2];
             } else {
@@ -345,6 +345,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         $this->multi->reset();
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
@@ -382,7 +385,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         // curl before 7.65 doesn't validate the pushed ":authority" header,
         // but this is a MUST in the HTTP/2 RFC; let's restrict pushes to the original host,
         // ignoring domains mentioned as alt-name in the certificate for now (same as curl).
-        if (0 !== strpos($origin, $url.'/')) {
+        if (!str_starts_with($origin, $url.'/')) {
             $this->logger && $this->logger->debug(sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
 
             return \CURL_PUSH_DENY;
@@ -490,10 +493,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         };
     }
 
-    private function findConstantName($opt): ?string
+    private function findConstantName(int $opt): ?string
     {
         $constants = array_filter(get_defined_constants(), static function ($v, $k) use ($opt) {
-            return $v === $opt && 'C' === $k[0] && (0 === strpos($k, 'CURLOPT_') || 0 === strpos($k, 'CURLINFO_'));
+            return $v === $opt && 'C' === $k[0] && (str_starts_with($k, 'CURLOPT_') || str_starts_with($k, 'CURLINFO_'));
         }, \ARRAY_FILTER_USE_BOTH);
 
         return key($constants);

@@ -24,7 +24,7 @@ final class NexmoTransportTest extends TransportTestCase
     /**
      * @return NexmoTransport
      */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
         return new NexmoTransport('apiKey', 'apiSecret', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
     }

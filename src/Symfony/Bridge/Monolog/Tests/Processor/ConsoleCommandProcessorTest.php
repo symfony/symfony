@@ -16,6 +16,7 @@ use Symfony\Bridge\Monolog\Processor\ConsoleCommandProcessor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsoleCommandProcessorTest extends TestCase
 {
@@ -66,10 +67,7 @@ class ConsoleCommandProcessorTest extends TestCase
         $input->method('getOptions')->willReturn(self::TEST_OPTIONS);
         $command = $this->createMock(Command::class);
         $command->method('getName')->willReturn(self::TEST_NAME);
-        $consoleEvent = $this->createMock(ConsoleEvent::class);
-        $consoleEvent->method('getCommand')->willReturn($command);
-        $consoleEvent->method('getInput')->willReturn($input);
 
-        return $consoleEvent;
+        return new ConsoleEvent($command, $input, $this->createMock(OutputInterface::class));
     }
 }

@@ -35,7 +35,7 @@ use TypeError;
  */
 final class MercureTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null, ?HubInterface $hub = null, string $hubId = 'hubId', $topics = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, HubInterface $hub = null, string $hubId = 'hubId', $topics = null): TransportInterface
     {
         $hub = $hub ?? $this->createMock(HubInterface::class);
 
@@ -78,7 +78,7 @@ final class MercureTransportTest extends TransportTestCase
     public function testConstructWithWrongTopicsThrows()
     {
         $this->expectException(TypeError::class);
-        $this->createTransport(null, null, 'publisherId', 1);
+        $this->createTransport(null, null, 'publisherId', new \stdClass());
     }
 
     public function testSendWithNonMercureOptionsThrows()

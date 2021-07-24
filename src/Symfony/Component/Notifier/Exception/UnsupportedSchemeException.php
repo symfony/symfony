@@ -80,6 +80,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\LinkedIn\LinkedInTransportFactory::class,
             'package' => 'symfony/linked-in-notifier',
         ],
+        'mailjet' => [
+            'class' => Bridge\Mailjet\MailjetTransportFactory::class,
+            'package' => 'symfony/mailjet-notifier',
+        ],
         'mattermost' => [
             'class' => Bridge\Mattermost\MattermostTransportFactory::class,
             'package' => 'symfony/mattermost-notifier',
@@ -91,6 +95,10 @@ class UnsupportedSchemeException extends LogicException
         'messagebird' => [
             'class' => Bridge\MessageBird\MessageBirdTransportFactory::class,
             'package' => 'symfony/message-bird-notifier',
+        ],
+        'messagemedia' => [
+            'class' => Bridge\MessageMedia\MessageMediaTransportFactory::class,
+            'package' => 'symfony/message-media-notifier',
         ],
         'microsoftteams' => [
             'class' => Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class,
@@ -136,6 +144,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
             'package' => 'symfony/sms-biuras-notifier',
         ],
+        'smsc' => [
+            'class' => Bridge\Smsc\SmscTransportFactory::class,
+            'package' => 'symfony/smsc-notifier',
+        ],
         'spothit' => [
             'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
             'package' => 'symfony/spot-hit-notifier',
@@ -143,6 +155,10 @@ class UnsupportedSchemeException extends LogicException
         'telegram' => [
             'class' => Bridge\Telegram\TelegramTransportFactory::class,
             'package' => 'symfony/telegram-notifier',
+        ],
+        'telnyx' => [
+            'class' => Bridge\Telnyx\TelnyxTransportFactory::class,
+            'package' => 'symfony/telnyx-notifier',
         ],
         'twilio' => [
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
@@ -157,7 +173,7 @@ class UnsupportedSchemeException extends LogicException
     /**
      * @param string[] $supported
      */
-    public function __construct(Dsn $dsn, string $name = null, array $supported = [])
+    public function __construct(Dsn $dsn, string $name = null, array $supported = [], \Throwable $previous = null)
     {
         $provider = $dsn->getScheme();
         if (false !== $pos = strpos($provider, '+')) {
@@ -175,6 +191,6 @@ class UnsupportedSchemeException extends LogicException
             $message .= sprintf('; supported schemes for notifier "%s" are: "%s"', $name, implode('", "', $supported));
         }
 
-        parent::__construct($message.'.');
+        parent::__construct($message.'.', 0, $previous);
     }
 }

@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -66,7 +67,11 @@ final class GitterTransport extends AbstractTransport
             ],
         ]);
 
-        $result = $response->toArray(false);
+        try {
+            $result = $response->toArray(false);
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Gitter server.', $response, 0, $e);
+        }
 
         if (200 !== $response->getStatusCode()) {
             throw new TransportException(sprintf('Unable to post the Gitter message: "%s".', $result['error']), $response);

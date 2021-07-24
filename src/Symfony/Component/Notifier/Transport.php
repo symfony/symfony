@@ -22,8 +22,10 @@ use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
+use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransport;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
@@ -35,7 +37,9 @@ use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
+use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
+use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
@@ -66,8 +70,10 @@ class Transport
         InfobipTransportFactory::class,
         IqsmsTransportFactory::class,
         LightSmsTransportFactory::class,
+        MailjetTransportFactory::class,
         MattermostTransportFactory::class,
         MessageBirdTransportFactory::class,
+        MessageMediaTransportFactory::class,
         MicrosoftTeamsTransport::class,
         MobytTransportFactory::class,
         NexmoTransportFactory::class,
@@ -79,7 +85,9 @@ class Transport
         SlackTransportFactory::class,
         SmsapiTransportFactory::class,
         SmsBiurasTransportFactory::class,
+        SmscTransportFactory::class,
         TelegramTransportFactory::class,
+        TelnyxTransportFactory::class,
         TwilioTransportFactory::class,
         ZulipTransportFactory::class,
     ];

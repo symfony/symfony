@@ -386,6 +386,10 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Deze waarde is geen geldig International Securities Identification Number (ISIN).</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Deze waarde moet een geldige expressie zijn.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

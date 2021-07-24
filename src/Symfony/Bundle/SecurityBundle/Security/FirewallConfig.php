@@ -29,7 +29,7 @@ final class FirewallConfig
     private $listeners;
     private $switchUser;
 
-    public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $listeners = [], $switchUser = null)
+    public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $listeners = [], array $switchUser = null)
     {
         $this->name = $name;
         $this->userChecker = $userChecker;

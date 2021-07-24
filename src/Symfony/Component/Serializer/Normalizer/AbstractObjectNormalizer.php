@@ -217,7 +217,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Computes the normalization context merged with current one. Metadata always wins over global context, as more specific.
      */
-    private function getAttributeNormalizationContext($object, string $attribute, array $context): array
+    private function getAttributeNormalizationContext(object $object, string $attribute, array $context): array
     {
         if (null === $metadata = $this->getAttributeMetadata($object, $attribute)) {
             return $context;
@@ -273,11 +273,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Gets and caches attributes for the given object, format and context.
      *
-     * @param object $object
-     *
      * @return string[]
      */
-    protected function getAttributes($object, ?string $format, array $context)
+    protected function getAttributes(object $object, ?string $format, array $context)
     {
         $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
         $key = $class.'-'.$context['cache_key'];
@@ -370,7 +368,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
             }
 
-            $value = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $attributeContext);
+            $types = $this->getTypes($resolvedClass, $attribute);
+
+            if (null !== $types) {
+                $value = $this->validateAndDenormalize($types, $resolvedClass, $attribute, $value, $format, $attributeContext);
+            }
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $attributeContext);
             } catch (InvalidArgumentException $e) {
@@ -393,19 +395,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Validates the submitted data and denormalizes it.
      *
-     * @param mixed $data
+     * @param Type[] $types
+     * @param mixed  $data
      *
      * @return mixed
      *
      * @throws NotNormalizableValueException
      * @throws LogicException
      */
-    private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context)
+    private function validateAndDenormalize(array $types, string $currentClass, string $attribute, $data, ?string $format, array $context)
     {
-        if (null === $types = $this->getTypes($currentClass, $attribute)) {
-            return $data;
-        }
-
         $expectedTypes = [];
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
@@ -517,7 +516,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // PHP's json_decode automatically converts Numbers without a decimal part to integers.
             // To circumvent this behavior, integers are converted to floats when denormalizing JSON based formats and when
             // a float is expected.
-            if (Type::BUILTIN_TYPE_FLOAT === $builtinType && \is_int($data) && false !== strpos($format, JsonEncoder::FORMAT)) {
+            if (Type::BUILTIN_TYPE_FLOAT === $builtinType && \is_int($data) && str_contains($format, JsonEncoder::FORMAT)) {
                 return (float) $data;
             }
 
@@ -538,11 +537,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, $parameterData, array $context, string $format = null)
     {
-        if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $this->propertyTypeExtractor->getTypes($class->getName(), $parameterName)) {
+        if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $types = $this->getTypes($class->getName(), $parameterName)) {
             return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
         }
 
-        return $this->validateAndDenormalize($class->getName(), $parameterName, $parameterData, $format, $context);
+        return $this->validateAndDenormalize($types, $class->getName(), $parameterName, $parameterData, $format, $context);
     }
 
     /**

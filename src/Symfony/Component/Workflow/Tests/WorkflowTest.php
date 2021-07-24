@@ -637,7 +637,28 @@ class WorkflowTest extends TestCase
             $dispatcher->addListener($eventName, $assertWorkflowContext);
         }
 
-        $workflow->apply($subject, 't1', $context);
+        $marking = $workflow->apply($subject, 't1', $context);
+
+        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertSame($context, $marking->getContext());
+    }
+
+    public function testEventContextUpdated()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $dispatcher = new EventDispatcher();
+
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher);
+
+        $dispatcher->addListener('workflow.transition', function (TransitionEvent $event) {
+            $event->setContext(['foo' => 'bar']);
+        });
+
+        $marking = $workflow->apply($subject, 't1', ['initial']);
+
+        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertSame(['foo' => 'bar'], $marking->getContext());
     }
 
     public function testEventDefaultInitialContext()

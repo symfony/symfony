@@ -97,7 +97,7 @@ class RecursiveValidator implements ValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validateProperty($object, string $propertyName, $groups = null)
+    public function validateProperty(object $object, string $propertyName, $groups = null)
     {
         return $this->startContext($object)
             ->validateProperty($object, $propertyName, $groups)

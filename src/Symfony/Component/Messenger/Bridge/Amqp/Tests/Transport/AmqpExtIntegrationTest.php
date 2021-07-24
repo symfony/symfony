@@ -76,20 +76,14 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertEmpty(iterator_to_array($receiver->get()));
     }
 
-    /**
-     * @group legacy
-     * ^ for now, deprecation errors are thrown during serialization.
-     */
     public function testRetryAndDelay()
     {
-        $serializer = $this->createSerializer();
-
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
         $connection->purgeQueues();
 
-        $sender = new AmqpSender($connection, $serializer);
-        $receiver = new AmqpReceiver($connection, $serializer);
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
 
         // send a first message
         $sender->send($first = new Envelope(new DummyMessage('First')));
@@ -156,9 +150,8 @@ class AmqpExtIntegrationTest extends TestCase
         $connection->setup();
         $connection->purgeQueues();
 
-        $serializer = $this->createSerializer();
-        $sender = new AmqpSender($connection, $serializer);
-        $receiver = new AmqpReceiver($connection, $serializer);
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
 
         // initial delivery: should receive in both queues
         $sender->send(new Envelope(new DummyMessage('Payload')));
@@ -253,7 +246,7 @@ TXT
         $timedOutTime = time() + $timeoutInSeconds;
 
         while (time() < $timedOutTime) {
-            if (0 === strpos($process->getOutput(), $output)) {
+            if (str_starts_with($process->getOutput(), $output)) {
                 return;
             }
 

@@ -11,6 +11,7 @@ return (new PhpCsFixer\Config())
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'protected_to_private' => false,
+        'nullable_type_declaration_for_default_null_value' => ['use_nullable_type_declaration' => false],
     ])
     ->setRiskyAllowed(true)
     ->setFinder(
@@ -26,6 +27,7 @@ return (new PhpCsFixer\Config())
                 'Symfony/Bundle/FrameworkBundle/Resources/views/Form',
                 // explicit trigger_error tests
                 'Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/',
+                'Symfony/Component/Intl/Resources/data/',
             ])
             // Support for older PHPunit version
             ->notPath('Symfony/Bridge/PhpUnit/SymfonyTestsListener.php')

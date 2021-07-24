@@ -35,6 +35,14 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
         }
     }
 
+    public static function createFromMessage(string $message): self
+    {
+        $self = new self();
+        $self->add(new ConstraintViolation($message, '', [], null, '', null));
+
+        return $self;
+    }
+
     /**
      * Converts the violation into a string for debugging purposes.
      *
@@ -133,6 +141,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function offsetGet($offset)
     {
@@ -141,6 +151,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function offsetSet($offset, $violation)
     {
@@ -153,6 +165,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function offsetUnset($offset)
     {

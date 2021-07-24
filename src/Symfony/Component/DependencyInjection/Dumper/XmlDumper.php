@@ -324,6 +324,9 @@ class XmlDumper extends Dumper
                 $element->setAttribute('type', 'binary');
                 $text = $this->document->createTextNode(self::phpToXml(base64_encode($value)));
                 $element->appendChild($text);
+            } elseif ($value instanceof \UnitEnum) {
+                $element->setAttribute('type', 'constant');
+                $element->appendChild($this->document->createTextNode(self::phpToXml($value)));
             } elseif ($value instanceof AbstractArgument) {
                 $element->setAttribute('type', 'abstract');
                 $text = $this->document->createTextNode(self::phpToXml($value->getText()));
@@ -381,6 +384,8 @@ class XmlDumper extends Dumper
                 return 'false';
             case $value instanceof Parameter:
                 return '%'.$value.'%';
+            case $value instanceof \UnitEnum:
+                return sprintf('%s::%s', \get_class($value), $value->name);
             case \is_object($value) || \is_resource($value):
                 throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
             default:

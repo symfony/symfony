@@ -62,7 +62,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
             try {
                 // @deprecated since 5.3, change to $provider->loadUserByIdentifier() in 6.0
                 if (!method_exists($provider, 'loadUserByIdentifier')) {
-                    trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', \get_debug_type($provider));
+                    trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($provider));
 
                     return $provider->loadUserByUsername($userIdentifier);
                 }
@@ -130,16 +130,20 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
      *
      * {@inheritdoc}
      */
-    public function upgradePassword($user, string $newEncodedPassword): void
+    public function upgradePassword($user, string $newHashedPassword): void
     {
         if (!$user instanceof PasswordAuthenticatedUserInterface) {
             trigger_deprecation('symfony/security-core', '5.3', 'The "%s::upgradePassword()" method expects an instance of "%s" as first argument, the "%s" class should implement it.', PasswordUpgraderInterface::class, PasswordAuthenticatedUserInterface::class, get_debug_type($user));
+
+            if (!$user instanceof UserInterface) {
+                throw new \TypeError(sprintf('The "%s::upgradePassword()" method expects an instance of "%s" as first argument, "%s" given.', PasswordAuthenticatedUserInterface::class, get_debug_type($user)));
+            }
         }
 
         foreach ($this->providers as $provider) {
             if ($provider instanceof PasswordUpgraderInterface) {
                 try {
-                    $provider->upgradePassword($user, $newEncodedPassword);
+                    $provider->upgradePassword($user, $newHashedPassword);
                 } catch (UnsupportedUserException $e) {
                     // ignore: password upgrades are opportunistic
                 }

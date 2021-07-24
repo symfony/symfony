@@ -386,6 +386,10 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target> صالح (ISIN) هذه القيمة ليست رقم تعريف الأوراق المالية الدولي.</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>يجب أن تكون هذه القيمة تعبيرًا صالحًا.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

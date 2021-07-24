@@ -19,7 +19,7 @@ final class AmazonSqsFifoStamp implements NonSendableStampInterface
 
     private $messageDeduplicationId;
 
-    public function __construct(?string $messageGroupId = null, ?string $messageDeduplicationId = null)
+    public function __construct(string $messageGroupId = null, string $messageDeduplicationId = null)
     {
         $this->messageGroupId = $messageGroupId;
         $this->messageDeduplicationId = $messageDeduplicationId;

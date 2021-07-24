@@ -15,9 +15,9 @@ use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Cache\DoctrineProvider;
 
 /**
  * Warms up annotation caches for classes found in composer's autoload class map
@@ -56,7 +56,7 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
         $annotatedClasses = include $annotatedClassPatterns;
         $reader = class_exists(PsrCachedReader::class)
             ? new PsrCachedReader($this->annotationReader, $arrayAdapter, $this->debug)
-            : new CachedReader($this->annotationReader, new DoctrineProvider($arrayAdapter), $this->debug)
+            : new CachedReader($this->annotationReader, DoctrineProvider::wrap($arrayAdapter), $this->debug)
         ;
 
         foreach ($annotatedClasses as $class) {

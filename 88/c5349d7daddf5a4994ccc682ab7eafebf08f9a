@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-06-05T10:20:03Z
+
+I just figured out there no relevant reason that `enabled_locales` was related to the locales passed to the push and pull commands. In fact, someone could need to pull/push translation for a locales which is not (yet) enabled.
+
+WDTY about not set locales for Providers from `enabled_locales`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-08T14:31:15Z
+
+It's true that this line might be strange:
+https://github.com/welcoMattic/symfony/blob/94a451dcd1dd44a20a1b8038d1a12b80255460f6/src/Symfony/Component/Translation/Command/TranslationPushCommand.php#L100
+
+I don't see how the 2nd DI parameter that ismentionned in the message relates to the command.
+Maybe the command should default to the list of locales of each provider? Is that doable?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-06-14T21:17:11Z
+
+It's pretty much what I thought to do, and make the following behaviour:
+
+A provider will treat all locales (`framework.translator.enabled_locales`) by default, unless we pass explicit locales via CLI options.
+
+Are we agree on it?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-07-25T09:42:48Z
+
+I've just pushed an update to use `enabled_locales` by default, and append all `framework.translator.providers.(loco|lokalise|crowdin).locales` values, then `array_unique` the result. It will allow users to defined a common list of locales for push/pull commands, and specify additional locales (for instance, a not yet enabled locale) for one or more provider.

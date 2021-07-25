@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Command;
 
+use Symfony\Component\Console\CI\GithubActionReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -56,7 +57,7 @@ class XliffLintCommand extends Command
         $this
             ->setDescription(self::$defaultDescription)
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
-            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints an XLIFF file and outputs to STDOUT
 the first encountered syntax error.
@@ -85,6 +86,10 @@ EOF
         $filenames = (array) $input->getArgument('filename');
         $this->format = $input->getOption('format');
         $this->displayCorrectFiles = $output->isVerbose();
+
+        if (null === $this->format) {
+            $this->format = GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt';
+        }
 
         if (['-'] === $filenames) {
             return $this->display($io, [$this->validate(file_get_contents('php://stdin'))]);
@@ -160,15 +165,18 @@ EOF
                 return $this->displayTxt($io, $files);
             case 'json':
                 return $this->displayJson($io, $files);
+            case 'github':
+                return $this->displayTxt($io, $files, true);
             default:
                 throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $this->format));
         }
     }
 
-    private function displayTxt(SymfonyStyle $io, array $filesInfo)
+    private function displayTxt(SymfonyStyle $io, array $filesInfo, bool $errorAsGithubAnnotations = false)
     {
         $countFiles = \count($filesInfo);
         $erroredFiles = 0;
+        $githubReporter = $errorAsGithubAnnotations ? new GithubActionReporter($io) : null;
 
         foreach ($filesInfo as $info) {
             if ($info['valid'] && $this->displayCorrectFiles) {
@@ -176,9 +184,15 @@ EOF
             } elseif (!$info['valid']) {
                 ++$erroredFiles;
                 $io->text('<error> ERROR </error>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
-                $io->listing(array_map(function ($error) {
+                $io->listing(array_map(function ($error) use ($info, $githubReporter) {
                     // general document errors have a '-1' line number
-                    return -1 === $error['line'] ? $error['message'] : sprintf('Line %d, Column %d: %s', $error['line'], $error['column'], $error['message']);
+                    $line = -1 === $error['line'] ? null : $error['line'];
+
+                    if ($githubReporter) {
+                        $githubReporter->error($error['message'], $info['file'], $line, null !== $line ? $error['column'] : null);
+                    }
+
+                    return null === $line ? $error['message'] : sprintf('Line %d, Column %d: %s', $line, $error['column'], $error['message']);
                 }, $info['messages']));
             }
         }

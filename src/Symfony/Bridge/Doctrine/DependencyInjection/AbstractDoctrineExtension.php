@@ -221,7 +221,7 @@ abstract class AbstractDoctrineExtension extends Extension
                 ]);
             }
             $mappingDriverDef->setPublic(false);
-            if (false !== strpos($mappingDriverDef->getClass(), 'yml') || false !== strpos($mappingDriverDef->getClass(), 'xml')) {
+            if (str_contains($mappingDriverDef->getClass(), 'yml') || str_contains($mappingDriverDef->getClass(), 'xml')) {
                 $mappingDriverDef->setArguments([array_flip($driverPaths)]);
                 $mappingDriverDef->addMethodCall('setGlobalBasename', ['mapping']);
             }

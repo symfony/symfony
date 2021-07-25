@@ -84,7 +84,7 @@ EOF
         $realBuildDir = $kernel->getContainer()->hasParameter('kernel.build_dir') ? $kernel->getContainer()->getParameter('kernel.build_dir') : $realCacheDir;
         // the old cache dir name must not be longer than the real one to avoid exceeding
         // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
-        $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');
+        $oldCacheDir = substr($realCacheDir, 0, -1).(str_ends_with($realCacheDir, '~') ? '+' : '~');
         $fs->remove($oldCacheDir);
 
         if (!is_writable($realCacheDir)) {

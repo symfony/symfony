@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/deprecation-contracts": "^2.1"
+        "symfony/deprecation-contracts": "^2.1",
+        "symfony/polyfill-php80": "^1.16"
     },
     "suggest": {
         "symfony/http-foundation": ""

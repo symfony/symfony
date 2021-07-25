@@ -121,7 +121,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
     {
         $session = $this->getSession();
         foreach (array_keys($session->all()) as $key) {
-            if (0 === strpos($key, $this->namespace.'/')) {
+            if (str_starts_with($key, $this->namespace.'/')) {
                 $session->remove($key);
             }
         }

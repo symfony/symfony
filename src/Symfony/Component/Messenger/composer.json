@@ -21,7 +21,7 @@
         "symfony/amqp-messenger": "^5.1|^6.0",
         "symfony/deprecation-contracts": "^2.1",
         "symfony/doctrine-messenger": "^5.1|^6.0",
-        "symfony/polyfill-php80": "^1.15",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/redis-messenger": "^5.1|^6.0"
     },
     "require-dev": {

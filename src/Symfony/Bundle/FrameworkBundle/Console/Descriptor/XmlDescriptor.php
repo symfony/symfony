@@ -505,7 +505,7 @@ class XmlDescriptor extends Descriptor
                 $callableXML->setAttribute('name', $callable[1]);
                 $callableXML->setAttribute('class', \get_class($callable[0]));
             } else {
-                if (0 !== strpos($callable[1], 'parent::')) {
+                if (!str_starts_with($callable[1], 'parent::')) {
                     $callableXML->setAttribute('name', $callable[1]);
                     $callableXML->setAttribute('class', $callable[0]);
                     $callableXML->setAttribute('static', 'true');
@@ -523,7 +523,7 @@ class XmlDescriptor extends Descriptor
         if (\is_string($callable)) {
             $callableXML->setAttribute('type', 'function');
 
-            if (false === strpos($callable, '::')) {
+            if (!str_contains($callable, '::')) {
                 $callableXML->setAttribute('name', $callable);
             } else {
                 $callableParts = explode('::', $callable);
@@ -540,7 +540,7 @@ class XmlDescriptor extends Descriptor
             $callableXML->setAttribute('type', 'closure');
 
             $r = new \ReflectionFunction($callable);
-            if (false !== strpos($r->name, '{closure}')) {
+            if (str_contains($r->name, '{closure}')) {
                 return $dom;
             }
             $callableXML->setAttribute('name', $r->name);

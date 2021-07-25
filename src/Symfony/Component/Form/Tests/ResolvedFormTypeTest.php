@@ -33,22 +33,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ResolvedFormTypeTest extends TestCase
 {
     /**
-     * @var MockObject|FormTypeInterface
+     * @var MockObject&FormTypeInterface
      */
     private $parentType;
 
     /**
-     * @var MockObject|FormTypeInterface
+     * @var MockObject&FormTypeInterface
      */
     private $type;
 
     /**
-     * @var MockObject|FormTypeExtensionInterface
+     * @var MockObject&FormTypeExtensionInterface
      */
     private $extension1;
 
     /**
-     * @var MockObject|FormTypeExtensionInterface
+     * @var MockObject&FormTypeExtensionInterface
      */
     private $extension2;
 
@@ -373,17 +373,26 @@ class ResolvedFormTypeTest extends TestCase
         ];
     }
 
-    private function getMockFormType($typeClass = AbstractType::class): MockObject
+    /**
+     * @return MockObject&FormTypeInterface
+     */
+    private function getMockFormType($typeClass = AbstractType::class): FormTypeInterface
     {
         return $this->getMockBuilder($typeClass)->setMethods(['getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
     }
 
-    private function getMockFormTypeExtension(): MockObject
+    /**
+     * @return MockObject&FormTypeExtensionInterface
+     */
+    private function getMockFormTypeExtension(): FormTypeExtensionInterface
     {
         return $this->getMockBuilder(AbstractTypeExtension::class)->setMethods(['getExtendedTypes', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
     }
 
-    private function getMockFormFactory(): MockObject
+    /**
+     * @return MockObject&FormFactoryInterface
+     */
+    private function getMockFormFactory(): FormFactoryInterface
     {
         return $this->createMock(FormFactoryInterface::class);
     }

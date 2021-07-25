@@ -32,22 +32,22 @@ use Symfony\Component\Form\Test\FormBuilderInterface;
 class FormFactoryTest extends TestCase
 {
     /**
-     * @var MockObject
+     * @var MockObject&FormTypeGuesserInterface
      */
     private $guesser1;
 
     /**
-     * @var MockObject
+     * @var MockObject&FormTypeGuesserInterface
      */
     private $guesser2;
 
     /**
-     * @var MockObject
+     * @var MockObject&FormRegistryInterface
      */
     private $registry;
 
     /**
-     * @var MockObject
+     * @var MockObject&FormBuilderInterface
      */
     private $builder;
 

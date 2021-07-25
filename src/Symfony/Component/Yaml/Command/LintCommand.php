@@ -174,7 +174,7 @@ EOF
                 $io->text('<error> ERROR </error>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
                 $io->text(sprintf('<error> >> %s</error>', $info['message']));
 
-                if (false !== strpos($info['message'], 'PARSE_CUSTOM_TAGS')) {
+                if (str_contains($info['message'], 'PARSE_CUSTOM_TAGS')) {
                     $suggestTagOption = true;
                 }
 
@@ -203,7 +203,7 @@ EOF
                 ++$errors;
             }
 
-            if (isset($v['message']) && false !== strpos($v['message'], 'PARSE_CUSTOM_TAGS')) {
+            if (isset($v['message']) && str_contains($v['message'], 'PARSE_CUSTOM_TAGS')) {
                 $v['message'] .= ' Use the --parse-tags option if you want parse custom tags.';
             }
         });

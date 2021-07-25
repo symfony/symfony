@@ -49,6 +49,7 @@ use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -98,6 +99,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             TelegramTransportFactory::class => false,
             TelnyxTransportFactory::class => false,
             TwilioTransportFactory::class => false,
+            YunpianTransportFactory::class => false,
             ZulipTransportFactory::class => false,
         ]);
     }

@@ -166,9 +166,9 @@ class DummyStream extends AbstractStream
 
         $this->commands[] = $bytes;
 
-        if (0 === strpos($bytes, 'DATA')) {
+        if (str_starts_with($bytes, 'DATA')) {
             $this->nextResponse = '354 Enter message, ending with "." on a line by itself';
-        } elseif (0 === strpos($bytes, 'QUIT')) {
+        } elseif (str_starts_with($bytes, 'QUIT')) {
             $this->nextResponse = '221 Goodbye';
         } else {
             $this->nextResponse = '250 OK';

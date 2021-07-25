@@ -90,7 +90,7 @@ class WebProfilerExtension extends ProfilerExtension
         $message = twig_escape_filter($env, $message);
         $message = preg_replace('/&quot;(.*?)&quot;/', '&quot;<b>$1</b>&quot;', $message);
 
-        if (null === $context || false === strpos($message, '{')) {
+        if (null === $context || !str_contains($message, '{')) {
             return '<span class="dump-inline">'.$message.'</span>';
         }
 

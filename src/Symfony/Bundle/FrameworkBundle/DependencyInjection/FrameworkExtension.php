@@ -145,6 +145,7 @@ use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
@@ -1322,7 +1323,7 @@ class FrameworkExtension extends Extension
                     'scanned_directories' => $scannedDirectories = array_merge($dirs, $nonExistingDirs),
                     'cache_vary' => [
                         'scanned_directories' => array_map(static function (string $dir) use ($projectDir): string {
-                            return 0 === strpos($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir;
+                            return str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir;
                         }, $scannedDirectories),
                     ],
                 ]
@@ -2455,6 +2456,7 @@ class FrameworkExtension extends Extension
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
+            YunpianTransportFactory::class => 'notifier.transport_factory.yunpian',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
         ];
 

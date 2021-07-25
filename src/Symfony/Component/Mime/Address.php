@@ -136,7 +136,7 @@ final class Address
     {
         trigger_deprecation('symfony/mime', '5.2', '"%s()" is deprecated, use "%s::create()" instead.', __METHOD__, __CLASS__);
 
-        if (false === strpos($string, '<')) {
+        if (!str_contains($string, '<')) {
             return new self($string, '');
         }
 

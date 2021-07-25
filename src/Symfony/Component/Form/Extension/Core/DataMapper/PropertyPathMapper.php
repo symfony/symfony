@@ -102,7 +102,7 @@ class PropertyPathMapper implements DataMapperInterface
         } catch (AccessException $e) {
             if (!$e instanceof UninitializedPropertyException
                 // For versions without UninitializedPropertyException check the exception message
-                && (class_exists(UninitializedPropertyException::class) || false === strpos($e->getMessage(), 'You should initialize it'))
+                && (class_exists(UninitializedPropertyException::class) || !str_contains($e->getMessage(), 'You should initialize it'))
             ) {
                 throw $e;
             }

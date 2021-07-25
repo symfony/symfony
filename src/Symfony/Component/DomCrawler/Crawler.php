@@ -154,7 +154,7 @@ class Crawler implements \Countable, \IteratorAggregate
     public function addContent(string $content, string $type = null)
     {
         if (empty($type)) {
-            $type = 0 === strpos($content, '<?xml') ? 'application/xml' : 'text/html';
+            $type = str_starts_with($content, '<?xml') ? 'application/xml' : 'text/html';
         }
 
         // DOM only for HTML/XML content
@@ -966,11 +966,11 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public static function xpathLiteral(string $s)
     {
-        if (false === strpos($s, "'")) {
+        if (!str_contains($s, "'")) {
             return sprintf("'%s'", $s);
         }
 
-        if (false === strpos($s, '"')) {
+        if (!str_contains($s, '"')) {
             return sprintf('"%s"', $s);
         }
 
@@ -1065,29 +1065,29 @@ class Crawler implements \Countable, \IteratorAggregate
             }
             $expression = rtrim(substr($xpath, $startPosition, $i - $startPosition));
 
-            if (0 === strpos($expression, 'self::*/')) {
+            if (str_starts_with($expression, 'self::*/')) {
                 $expression = './'.substr($expression, 8);
             }
 
             // add prefix before absolute element selector
             if ('' === $expression) {
                 $expression = $nonMatchingExpression;
-            } elseif (0 === strpos($expression, '//')) {
+            } elseif (str_starts_with($expression, '//')) {
                 $expression = 'descendant-or-self::'.substr($expression, 2);
-            } elseif (0 === strpos($expression, './/')) {
+            } elseif (str_starts_with($expression, './/')) {
                 $expression = 'descendant-or-self::'.substr($expression, 3);
-            } elseif (0 === strpos($expression, './')) {
+            } elseif (str_starts_with($expression, './')) {
                 $expression = 'self::'.substr($expression, 2);
-            } elseif (0 === strpos($expression, 'child::')) {
+            } elseif (str_starts_with($expression, 'child::')) {
                 $expression = 'self::'.substr($expression, 7);
-            } elseif ('/' === $expression[0] || '.' === $expression[0] || 0 === strpos($expression, 'self::')) {
+            } elseif ('/' === $expression[0] || '.' === $expression[0] || str_starts_with($expression, 'self::')) {
                 $expression = $nonMatchingExpression;
-            } elseif (0 === strpos($expression, 'descendant::')) {
+            } elseif (str_starts_with($expression, 'descendant::')) {
                 $expression = 'descendant-or-self::'.substr($expression, 12);
             } elseif (preg_match('/^(ancestor|ancestor-or-self|attribute|following|following-sibling|namespace|parent|preceding|preceding-sibling)::/', $expression)) {
                 // the fake root has no parent, preceding or following nodes and also no attributes (even no namespace attributes)
                 $expression = $nonMatchingExpression;
-            } elseif (0 !== strpos($expression, 'descendant-or-self::')) {
+            } elseif (!str_starts_with($expression, 'descendant-or-self::')) {
                 $expression = 'self::'.$expression;
             }
             $expressions[] = $parenthesis.$expression;

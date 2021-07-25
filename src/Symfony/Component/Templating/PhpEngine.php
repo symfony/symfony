@@ -193,6 +193,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param HelperInterface $name  The helper instance
      * @param string          $value An alias
+     *
+     * @return void
      */
     public function offsetSet($name, $value)
     {
@@ -203,6 +205,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * Removes a helper.
      *
      * @param string $name The helper name
+     *
+     * @return void
      *
      * @throws \LogicException
      */

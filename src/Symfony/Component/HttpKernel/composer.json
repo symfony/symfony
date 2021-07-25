@@ -24,7 +24,7 @@
         "symfony/http-foundation": "^5.3|^6.0",
         "symfony/polyfill-ctype": "^1.8",
         "symfony/polyfill-php73": "^1.9",
-        "symfony/polyfill-php80": "^1.15",
+        "symfony/polyfill-php80": "^1.16",
         "psr/log": "^1|^2"
     },
     "require-dev": {

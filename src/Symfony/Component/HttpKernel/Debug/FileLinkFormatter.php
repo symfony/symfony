@@ -60,7 +60,7 @@ class FileLinkFormatter
     {
         if ($fmt = $this->getFileLinkFormat()) {
             for ($i = 1; isset($fmt[$i]); ++$i) {
-                if (0 === strpos($file, $k = $fmt[$i++])) {
+                if (str_starts_with($file, $k = $fmt[$i++])) {
                     $file = substr_replace($file, $fmt[$i], 0, \strlen($k));
                     break;
                 }

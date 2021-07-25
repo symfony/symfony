@@ -1049,7 +1049,7 @@ class OptionsResolver implements Options
                 $fmtAllowedTypes = implode('" or "', $this->allowedTypes[$option]);
                 $fmtProvidedTypes = implode('|', array_keys($invalidTypes));
                 $allowedContainsArrayType = \count(array_filter($this->allowedTypes[$option], static function ($item) {
-                    return '[]' === substr($item, -2);
+                    return str_ends_with($item, '[]');
                 })) > 0;
 
                 if (\is_array($value) && $allowedContainsArrayType) {
@@ -1211,6 +1211,8 @@ class OptionsResolver implements Options
     /**
      * Not supported.
      *
+     * @return void
+     *
      * @throws AccessException
      */
     public function offsetSet($option, $value)
@@ -1220,6 +1222,8 @@ class OptionsResolver implements Options
 
     /**
      * Not supported.
+     *
+     * @return void
      *
      * @throws AccessException
      */

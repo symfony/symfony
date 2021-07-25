@@ -59,7 +59,7 @@ class EntityTypeTest extends BaseTypeTest
     private $em;
 
     /**
-     * @var MockObject|ManagerRegistry
+     * @var MockObject&ManagerRegistry
      */
     private $emRegistry;
 
@@ -1312,7 +1312,10 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame($choiceList1, $choiceList3);
     }
 
-    protected function createRegistryMock($name, $em)
+    /**
+     * @return MockObject&ManagerRegistry
+     */
+    protected function createRegistryMock($name, $em): ManagerRegistry
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())

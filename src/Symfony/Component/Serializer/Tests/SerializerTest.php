@@ -535,7 +535,10 @@ class SerializerTest extends TestCase
         $object['foo'] = new \ArrayObject();
         $object['bar'] = new \ArrayObject(['notempty']);
         $object['baz'] = new \ArrayObject(['nested' => new \ArrayObject()]);
-        $this->assertEquals('{"foo":{},"bar":["notempty"],"baz":{"nested":{}}}', $serializer->serialize($object, 'json', [AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true]));
+        $object['innerObject'] = new class() {
+            public $map = [];
+        };
+        $this->assertEquals('{"foo":{},"bar":["notempty"],"baz":{"nested":{}},"innerObject":{"map":{}}}', $serializer->serialize($object, 'json', [AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true]));
     }
 
     public function testNormalizeScalar()

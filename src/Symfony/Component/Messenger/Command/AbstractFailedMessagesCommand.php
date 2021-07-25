@@ -50,13 +50,6 @@ abstract class AbstractFailedMessagesCommand extends Command
         parent::__construct();
     }
 
-    protected function getReceiverName(): string
-    {
-        trigger_deprecation('symfony/messenger', '5.3', 'The method "%s()" is deprecated, use getGlobalFailureReceiverName() instead.', __METHOD__);
-
-        return $this->globalFailureReceiverName;
-    }
-
     protected function getGlobalFailureReceiverName(): ?string
     {
         return $this->globalFailureReceiverName;

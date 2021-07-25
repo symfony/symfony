@@ -6,6 +6,7 @@ CHANGELOG
 
  * Remove option `tls`
  * Using invalid options will throw a `LogicException`
+ * The `delete_after_ack` config option now defaults to `true`
 
 5.4
 ---

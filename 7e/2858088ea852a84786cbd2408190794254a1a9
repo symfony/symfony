@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-01-26T12:43:36Z
+
+Need rework after #39484
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-01-30T22:41:19Z
+
+Thanks to the refactoring done by @jderusse in #39484, this PR has been simplified.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-16T17:19:54Z
+
+(small rebase needed)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-02-17T10:00:10Z
+
+Rebased. The CS fix suggested by fabbot are not related to this PR.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-04-26T16:56:30Z
+
+Rebased again.

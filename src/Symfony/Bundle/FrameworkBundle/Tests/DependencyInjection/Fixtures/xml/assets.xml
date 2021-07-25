@@ -25,6 +25,7 @@
             <framework:package name="remote_manifest" json-manifest-path="https://cdn.example.com/manifest.json" />
             <framework:package name="var_manifest" json-manifest-path="%var_json_manifest_path%" />
             <framework:package name="env_manifest" json-manifest-path="%env(env_manifest)%" />
+            <framework:package name="strict_manifest_strategy" json-manifest-path="/path/to/manifest.json" strict-mode="true" />
         </framework:assets>
     </framework:config>
 

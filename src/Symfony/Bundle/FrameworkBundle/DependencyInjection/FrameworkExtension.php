@@ -110,6 +110,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
@@ -2421,6 +2422,7 @@ class FrameworkExtension extends Extension
 
         $classToServices = [
             AllMySmsTransportFactory::class => 'notifier.transport_factory.allmysms',
+            AmazonSnsTransportFactory::class => 'notifier.transport_factory.amazonsns',
             ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
             DiscordTransportFactory::class => 'notifier.transport_factory.discord',
             EsendexTransportFactory::class => 'notifier.transport_factory.esendex',
@@ -2464,6 +2466,7 @@ class FrameworkExtension extends Extension
 
         foreach ($classToServices as $class => $service) {
             switch ($package = substr($service, \strlen('notifier.transport_factory.'))) {
+                case 'amazonsns': $package = 'amazon-sns'; break;
                 case 'fakechat': $package = 'fake-chat'; break;
                 case 'fakesms': $package = 'fake-sms'; break;
                 case 'freemobile': $package = 'free-mobile'; break;

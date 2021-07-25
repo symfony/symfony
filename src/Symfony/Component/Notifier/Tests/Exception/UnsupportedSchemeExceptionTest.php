@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Tests\Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
@@ -64,6 +65,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         ClassExistsMock::register(__CLASS__);
         ClassExistsMock::withMockedClasses([
             AllMySmsTransportFactory::class => false,
+            AmazonSnsTransportFactory::class => false,
             ClickatellTransportFactory::class => false,
             DiscordTransportFactory::class => false,
             EsendexTransportFactory::class => false,
@@ -120,6 +122,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     public function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
     {
         yield ['allmysms', 'symfony/allmysms-notifier'];
+        yield ['sns', 'symfony/amazon-sns-notifier'];
         yield ['clickatell', 'symfony/clickatell-notifier'];
         yield ['discord', 'symfony/discord-notifier'];
         yield ['esendex', 'symfony/esendex-notifier'];

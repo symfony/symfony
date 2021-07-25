@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-11-22T21:03:04Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-09T12:52:43Z
+
+`.gitignore` file is missing
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-06-23T11:43:51Z
+
+Can you rebase to fix the conflicts and have a look at the tests as they are broken by this PR? Thank you.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-02T08:45:06Z
+
+Please create Doc PR, thanks
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-04T12:23:43Z
+
+@adrien-chinour Are you still interested in finishing this implementation?
+
+---------------------------------------------------------------------------
+
+by adrien-chinour at 2021-07-04T23:30:53Z
+
+> @adrien-chinour Are you still interested in finishing this implementation?
+
+Yes, I will work on it.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-13T19:19:24Z
+
+Please add the bridge to the `UnsupportedSchemeExceptionTest`. Thanks
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-20T06:59:03Z
+
+Final review @Nyholm ?

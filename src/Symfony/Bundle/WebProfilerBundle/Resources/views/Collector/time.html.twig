@@ -6,7 +6,7 @@
     {% set has_time_events = collector.events|length > 0 %}
     {% set total_time = has_time_events ? '%.0f'|format(collector.duration) : 'n/a' %}
     {% set initialization_time = collector.events|length ? '%.0f'|format(collector.inittime) : 'n/a' %}
-    {% set status_color = has_time_events and collector.duration > 1000 ? 'yellow' : '' %}
+    {% set status_color = has_time_events and collector.duration > 1000 ? 'yellow' %}
 
     {% set icon %}
         {{ include('@WebProfiler/Icon/time.svg') }}

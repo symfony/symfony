@@ -123,7 +123,7 @@
                                 {%- endif -%}
                             {%- endset %}
                             {% if menu is not empty %}
-                                <li class="{{ name }} {{ name == panel ? 'selected' : '' }}">
+                                <li class="{{ name }} {{ name == panel ? 'selected' }}">
                                     <a href="{{ path('_profiler', { token: token, panel: name }) }}">{{ menu|raw }}</a>
                                 </li>
                             {% endif %}

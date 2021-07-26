@@ -879,6 +879,10 @@ EOD;
 
     public function testTraversableMultiselectAutocomplete()
     {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
         // <NEWLINE>
         // F<TAB><NEWLINE>
         // A<3x UP ARROW><TAB>,F<TAB><NEWLINE>

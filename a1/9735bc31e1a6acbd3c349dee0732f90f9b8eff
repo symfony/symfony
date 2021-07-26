@@ -1,0 +1,125 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-01T08:01:25Z
+
+Hey!
+
+You, my friend, deserve a BIG HUG for making this PR.
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-01T09:20:02Z
+
+Dunno why @carsonbot closed this one.
+
+---------------------------------------------------------------------------
+
+by lmillucci at 2021-02-01T09:21:48Z
+
+I think it was closed because I didn't read well the first comment
+`To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?`
+
+I'm moving this to "ready for review"
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2021-02-01T10:27:55Z
+
+hello, isnt this "similar" to https://symfony.com/doc/current/reference/configuration/framework.html#ide?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-02-01T14:16:00Z
+
+> hello, isn't this "similar" to https://symfony.com/doc/current/reference/configuration/framework.html#ide?
+
+Yes, but not all IDEs support that feature, I think it would be worth it.
+
+👍   on my side.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-04T09:55:06Z
+
+Oh does the icon work in dark mode? Can you please update your screenshot?
+
+---------------------------------------------------------------------------
+
+by lmillucci at 2021-02-04T11:08:22Z
+
+These are the updated screenshots:
+![Screenshot from 2021-02-04 11-56-46](https://user-images.githubusercontent.com/5730780/106883380-31414280-66e0-11eb-8d25-fa2631d2e71d.png)
+![Screenshot_2021-02-04 MyException (500 Internal Server Error)(1)](https://user-images.githubusercontent.com/5730780/106883383-31d9d900-66e0-11eb-86fe-15c477cc2969.png)
+
+PS: What about coding standard issues found by fabbot? Should I fix them?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-06T16:17:50Z
+
+I am with @noniagriconomie. I am also a bit confused =)
+
+The way I see it, on the error page, you see the relative path to each line in the stack trace. If you click at any of them it will open in PHPStorm... if you dont have it configured that way, you will get the file opened in the broswer and there you will see the absolute path.
+
+![Screenshot 2021-02-06 at 17 13 36](https://user-images.githubusercontent.com/1275206/107123688-34cef800-689f-11eb-8a87-e4d504444d19.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-16T10:38:56Z
+
+I think that allowing a copy/paste of the path of the file is interesting.
+In order to account for Docker/etc, we could allow passing a 3rd `$format` argument to `FileLinkFormatter::format()`, that would be used instead of `$fmt[0]` when possible, on the last line here:
+https://github.com/symfony/symfony/blob/4d91b8f5c2227fe43546b59aba648723ea101be9/src/Symfony/Component/HttpKernel/Debug/FileLinkFormatter.php#L49-L59
+
+Then we would patch HtmlRenderer::getFileLink to also handle and forward the same optional argument.
+
+@lmillucci works for you? Can you please update the PR to account for all latest comments?
+
+---------------------------------------------------------------------------
+
+by lmillucci at 2021-02-17T08:48:01Z
+
+> I think that allowing a copy/paste of the path of the file is interesting.
+> In order to account for Docker/etc, we could allow passing a 3rd `$format` argument to `FileLinkFormatter::format()`, that would be used instead of `$fmt[0]` when possible, on the last line here:
+> https://github.com/symfony/symfony/blob/4d91b8f5c2227fe43546b59aba648723ea101be9/src/Symfony/Component/HttpKernel/Debug/FileLinkFormatter.php#L49-L59
+>
+> Then we would patch HtmlRenderer::getFileLink to also handle and forward the same optional argument.
+>
+> @lmillucci works for you? Can you please update the PR to account for all latest comments?
+
+I'm not sure about the behavior of the  `$format` argument of `FileLinkFormatter::format()`. I can add it to the function to override the default format but how should I use it in this situation?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-06-23T09:59:46Z
+
+I would display the copy button only on hover to avoid having too many icons on the page.
+
+---------------------------------------------------------------------------
+
+by lmillucci at 2021-07-16T06:32:21Z
+
+I've updated the branch to display the icon only on hover.  I'm still not sure about what should I do with `FileLinkFormatter`
+
+This is an example:
+![copy_icon_gif](https://user-images.githubusercontent.com/5730780/125902653-85e75a9c-5dce-4246-a01f-8db5b850b563.gif)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-25T15:11:21Z
+
+@lmillucci Can you rebase on the current 5.4 branch to resolve the conflicts? Ping me when it's done so that I can merge this PR. Thank you.
+
+---------------------------------------------------------------------------
+
+by lmillucci at 2021-07-26T07:03:30Z
+
+@fabpot rebased :+1:

@@ -54,7 +54,7 @@ class TestMultiplePcreFilterIterator extends MultiplePcreFilterIterator
     {
     }
 
-    public function accept()
+    public function accept(): bool
     {
         throw new \BadFunctionCallException('Not implemented');
     }

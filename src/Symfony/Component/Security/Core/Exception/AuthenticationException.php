@@ -128,7 +128,7 @@ class AuthenticationException extends RuntimeException
     /**
      * @internal
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'unserialize'))->getDeclaringClass()->name) {
             @trigger_error(sprintf('Implementing the "%s::unserialize()" method is deprecated since Symfony 4.3, implement the __serialize() and __unserialize() methods instead.', $c), \E_USER_DEPRECATED);

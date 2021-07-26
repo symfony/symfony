@@ -45,6 +45,7 @@ class Collection implements CollectionInterface
     /**
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         $con = $this->connection->getResource();

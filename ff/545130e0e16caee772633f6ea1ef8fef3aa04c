@@ -1,0 +1,111 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-22T05:25:00Z
+
+Hm.. I would argue that this is a new feature. It should target 5.4.
+
+---------------------------------------------------------------------------
+
+by Tyraelqp at 2021-07-22T05:39:50Z
+
+> Hm.. I would argue that this is a new feature. It should target 5.4.
+
+We have `ping_threshold` for a long time - it is part of `SmtpTransport`. But it was not implemented in Ses factory, and this looks more like a bug, because without this prop you can't use ses+smtp in background (messenger) without issues
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-22T07:31:47Z
+
+Adding a new config option is a feature. It is currently not unusable in a background process. But I do understand it is painful and I agree that we should improve.
+
+If I remember correctly, there is not a lot of changes in mailer between 4.4 and 5.4. The component is fairly stable. (I’m on my phone, cannot check now… I might be wrong).
+
+It would not be an issue for you to keep using version 4.4 for other components and 5.4 for just mailer.
+
+---------------------------------------------------------------------------
+
+by Tyraelqp at 2021-07-22T07:43:24Z
+
+@Nyholm I'm not using 4.4 and the target is 4.4 now because Oskar said in prev PR what target should be 4.4. I can open new PR to 5.4, it's not a problem. But i have several questions:
+* May/should i add `restart_threshold` too?
+* What if i'll set default value for `ping_threshold` to 8 or 9 (because SES closes SMTP connection after 10 seconds of inactivity) for SesSmtpTransport with possibility to override this value as in this PR?
+* What about documentation? Should i add something in docs repo?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-22T08:34:04Z
+
+I would argue that the current implementation is not usable right now, that's why I would vote for a bugfix, ofc I am aware of the ne option new code -> new feature.
+
+@nicolas-grekas WDYT?
+
+---------------------------------------------------------------------------
+
+by Tyraelqp at 2021-07-22T08:47:09Z
+
+@OskarStark @nicolas-grekas  What do you think about default value? (second question from this comment https://github.com/symfony/symfony/pull/42219#issuecomment-884716804)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-22T11:04:08Z
+
+I would fix this as a bugfix, and as a feature against 5.4 setting the default value to 8
+
+---------------------------------------------------------------------------
+
+by Tyraelqp at 2021-07-22T11:15:38Z
+
+> I would fix this as a bugfix, and as a feature against 5.4 setting the default value to 8
+
+Sorry, but i did not quite understand: leave this PR as is for 4.4, and open new one in 5.4 with default value?
+I think it will be more correct to do vice versa: in 4.4 set default value to 8 (bugfix)[this is better fix than possibility to change value because works out of the box and does not requires any action from user/configuration], and in 5.4 add possibility to change value (feature)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-22T12:25:18Z
+
+I agree, but the problem is, it would change the current behaviour, while just adding the possibility to set a value, can introduce new bugs, but will not break the current behaviour. Not sure I am to picky here.
+
+@nicolas-grekas please decide 😄
+
+---------------------------------------------------------------------------
+
+by Tyraelqp at 2021-07-22T12:34:07Z
+
+> please decide
+
+Option 1: default value in 4.4 and support of `ping_threshold` in 5.4
+Option 2: default value in 5.4 and support of `ping_threshold` in 4.4
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-24T06:41:21Z
+
+> I'm not using 4.4 and the target is 4.4 now because Oskar said in prev PR what target should be 4.4. I can open new PR to 5.4, it's not a problem.
+
+I see. Thank you. Since both Oskar and Nicolas think this can be merged in 4.4 that is okey.
+
+> May/should i add restart_threshold too?
+
+Could you elaborate why that is needed?
+
+> What if i'll set default value for ping_threshold to 8 or 9 (because SES closes SMTP connection after 10 seconds of inactivity) for SesSmtpTransport with possibility to override this value as in this PR?
+
+I prefer no default value. Just add the option to be able to set `ping_threshold`. We don't want to modify existing behavior.
+
+> What about documentation? Should i add something in docs repo?
+
+Yes please. When the PR is merged, I would appriciate that you sent a PR to https://github.com/symfony/symfony-docs
+Remember to target the correct branch.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-25T15:09:55Z
+
+Sorry to be the one to do this, but adding a new config is a new feature, no matter what. So, that's for 5.4.
+
+---------------------------------------------------------------------------
+
+by Tyraelqp at 2021-07-26T06:56:27Z
+
+It is possible to reparse PR with @carsonbot to change tags and milestone?

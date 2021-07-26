@@ -57,7 +57,7 @@ final class MessageBirdTransport extends AbstractTransport
         }
 
         $options = $message->getOptions();
-        if ($options !== null && !$options  instanceof MessageBirdOptions) {
+        if (null !== $options && !$options instanceof MessageBirdOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, MessageBirdOptions::class));
         }
 
@@ -68,7 +68,7 @@ final class MessageBirdTransport extends AbstractTransport
                 'originator' => $this->from,
                 'recipients' => $message->getPhone(),
                 'body' => $message->getSubject(),
-            ], $options !== null ? $options->toArray() : []),
+            ], null !== $options ? $options->toArray() : []),
         ]);
 
         try {

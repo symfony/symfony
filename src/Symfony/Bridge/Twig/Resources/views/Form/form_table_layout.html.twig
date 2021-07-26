@@ -27,7 +27,7 @@
 {%- endblock button_row -%}
 
 {%- block hidden_row -%}
-    {%- set style = row_attr.style is defined ? (row_attr.style ~ (row_attr.style|trim|last != ';' ? '; ')) : '' -%}
+    {%- set style = row_attr.style is defined ? (row_attr.style ~ (row_attr.style|trim|last != ';' ? '; ')) -%}
     <tr{% with {attr: row_attr|merge({style: (style ~ ' display: none')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <td colspan="2">
             {{- form_widget(form) -}}

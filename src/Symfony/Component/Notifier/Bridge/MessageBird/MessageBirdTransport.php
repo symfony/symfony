@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\MessageBird;
 
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -55,14 +56,19 @@ final class MessageBirdTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $options = $message->getOptions();
+        if ($options !== null && !$options  instanceof MessageBirdOptions) {
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, MessageBirdOptions::class));
+        }
+
         $endpoint = sprintf('https://%s/messages', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => 'AccessKey:'.$this->token,
-            'body' => [
+            'body' => array_merge([
                 'originator' => $this->from,
                 'recipients' => $message->getPhone(),
                 'body' => $message->getSubject(),
-            ],
+            ], $options !== null ? $options->toArray() : []),
         ]);
 
         try {

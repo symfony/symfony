@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+* Added MessageBirdOptions
+
 5.3
 ---
 

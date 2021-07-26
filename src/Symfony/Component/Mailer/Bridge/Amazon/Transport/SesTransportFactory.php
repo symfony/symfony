@@ -30,7 +30,13 @@ final class SesTransportFactory extends AbstractTransportFactory
         $region = $dsn->getOption('region');
 
         if ('ses+smtp' === $scheme || 'ses+smtps' === $scheme) {
-            return new SesSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $region, $this->dispatcher, $this->logger);
+            $transport = new SesSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $region, $this->dispatcher, $this->logger);
+
+            if (null !== $pingThreshold = $dsn->getOption('ping_threshold')) {
+                $transport->setPingThreshold((int) $pingThreshold);
+            }
+
+            return $transport;
         }
 
         switch ($scheme) {

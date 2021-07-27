@@ -7,6 +7,10 @@ in 5.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.2.0...v5.2.1
 
+* 5.2.13 (2021-07-27)
+
+ * bug #42270 [WebProfilerBundle] [WebProfiler] "empty" filter bugfix. Filter with name "empty" is not … (luzrain)
+
 * 5.2.12 (2021-07-26)
 
  * bug #42212 [Lock] Handle lock with long key (jderusse)

@@ -49,6 +49,7 @@ class PdoStore implements PersistingStoreInterface
     private $expirationCol = 'key_expiration';
     private $username = '';
     private $password = '';
+    private $lazyCreateTable = true;
     private $connectionOptions = [];
     private $gcProbability;
     private $initialTtl;
@@ -65,6 +66,7 @@ class PdoStore implements PersistingStoreInterface
      *  * db_expiration_col: The column where to store the expiration [default: key_expiration]
      *  * db_username: The username when lazy-connect [default: '']
      *  * db_password: The password when lazy-connect [default: '']
+     *  * db_lazy_create_table: Whether or not lazy create table for lock [default: true]
      *  * db_connection_options: An array of driver-specific connection options [default: []]
      *
      * @param \PDO|Connection|string $connOrDsn     A \PDO or Connection instance or DSN string or null
@@ -106,6 +108,7 @@ class PdoStore implements PersistingStoreInterface
         $this->username = $options['db_username'] ?? $this->username;
         $this->password = $options['db_password'] ?? $this->password;
         $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
+        $this->lazyCreateTable = $options['db_lazy_create_table'] ?? $this->lazyCreateTable;
 
         $this->gcProbability = $gcProbability;
         $this->initialTtl = $initialTtl;
@@ -123,12 +126,12 @@ class PdoStore implements PersistingStoreInterface
         try {
             $stmt = $conn->prepare($sql);
         } catch (TableNotFoundException $e) {
-            if (!$conn->isTransactionActive() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+            if ($this->isLazyCreateTablePossible($conn)) {
                 $this->createTable();
             }
             $stmt = $conn->prepare($sql);
         } catch (\PDOException $e) {
-            if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+            if ($this->isLazyCreateTablePossible($conn)) {
                 $this->createTable();
             }
             $stmt = $conn->prepare($sql);
@@ -213,6 +216,13 @@ class PdoStore implements PersistingStoreInterface
         $result = $stmt->execute();
 
         return (bool) (\is_object($result) ? $result->fetchOne() : $stmt->fetchColumn());
+    }
+
+    /**
+     *  Сhecking if it is possible to lazy create a table
+     */
+    private function isLazyCreateTablePossible(object $connection): bool {
+        return $this->lazyCreateTable && (!$connection->isTransactionActive() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true));
     }
 
     /**

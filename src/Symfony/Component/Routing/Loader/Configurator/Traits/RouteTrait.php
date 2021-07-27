@@ -130,7 +130,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function controller(callable|string $controller): self
+    final public function controller(callable|string|array $controller): self
     {
         $this->route->addDefaults(['_controller' => $controller]);
 

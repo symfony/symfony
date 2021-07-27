@@ -219,9 +219,10 @@ class PdoStore implements PersistingStoreInterface
     }
 
     /**
-     *  Сhecking if it is possible to lazy create a table
+     *  Сhecking if it is possible to lazy create a table.
      */
-    private function isLazyCreateTablePossible(object $connection): bool {
+    private function isLazyCreateTablePossible(object $connection): bool
+    {
         return $this->lazyCreateTable && (!$connection->isTransactionActive() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true));
     }
 

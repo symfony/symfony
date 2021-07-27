@@ -64,7 +64,7 @@
 {% block menu %}
     {% set events = collector.events %}
 
-    <span class="label {{ events.messages|length ? '' : 'disabled' }}">
+    <span class="label {{ events.messages is empty ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/mailer.svg') }}</span>
 
         <strong>E-mails</strong>

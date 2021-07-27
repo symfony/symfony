@@ -2,7 +2,7 @@
 
 {% block toolbar %}
     {% if collector.violationsCount > 0 or collector.calls|length %}
-        {% set status_color = collector.violationsCount ? 'red' : '' %}
+        {% set status_color = collector.violationsCount ? 'red' %}
         {% set icon %}
             {{ include('@WebProfiler/Icon/validator.svg') }}
             <span class="sf-toolbar-value">

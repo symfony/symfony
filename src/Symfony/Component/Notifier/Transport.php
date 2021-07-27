@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier;
 
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
@@ -41,6 +42,7 @@ use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -60,6 +62,7 @@ class Transport
 {
     private const FACTORY_CLASSES = [
         AllMySmsTransportFactory::class,
+        AmazonSnsTransportFactory::class,
         ClickatellTransportFactory::class,
         DiscordTransportFactory::class,
         EsendexTransportFactory::class,
@@ -89,6 +92,7 @@ class Transport
         TelegramTransportFactory::class,
         TelnyxTransportFactory::class,
         TwilioTransportFactory::class,
+        YunpianTransportFactory::class,
         ZulipTransportFactory::class,
     ];
 

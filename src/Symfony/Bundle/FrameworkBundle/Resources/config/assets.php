@@ -79,6 +79,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('manifest path'),
                 service('http_client')->nullOnInvalid(),
+                false,
             ])
     ;
 };

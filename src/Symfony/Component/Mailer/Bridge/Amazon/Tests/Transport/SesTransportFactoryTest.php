@@ -116,6 +116,11 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('ses+smtps', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
             new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', $dispatcher, $logger),
         ];
+
+        yield [
+            new Dsn('ses+smtps', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1', 'ping_threshold' => '10']),
+            (new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', $dispatcher, $logger))->setPingThreshold(10),
+        ];
     }
 
     public function unsupportedSchemeProvider(): iterable

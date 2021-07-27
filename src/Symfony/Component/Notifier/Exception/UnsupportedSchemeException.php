@@ -148,6 +148,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Smsc\SmscTransportFactory::class,
             'package' => 'symfony/smsc-notifier',
         ],
+        'sns' => [
+            'class' => Bridge\AmazonSns\AmazonSnsTransportFactory::class,
+            'package' => 'symfony/amazon-sns-notifier',
+        ],
         'spothit' => [
             'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
             'package' => 'symfony/spot-hit-notifier',
@@ -163,6 +167,10 @@ class UnsupportedSchemeException extends LogicException
         'twilio' => [
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',
+        ],
+        'yunpian' => [
+            'class' => Bridge\Yunpian\YunpianTransportFactory::class,
+            'package' => 'symfony/yunpian-notifier',
         ],
         'zulip' => [
             'class' => Bridge\Zulip\ZulipTransportFactory::class,

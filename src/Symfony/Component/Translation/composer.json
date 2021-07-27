@@ -38,7 +38,8 @@
         "symfony/dependency-injection": "<5.4",
         "symfony/http-kernel": "<5.4",
         "symfony/twig-bundle": "<5.4",
-        "symfony/yaml": "<5.4"
+        "symfony/yaml": "<5.4",
+        "symfony/console": "<5.4"
     },
     "provide": {
         "symfony/translation-implementation": "2.3|3.0"

@@ -99,20 +99,16 @@ class OrderedHashMapIterator implements \Iterator
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->current;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
-    public function next()
+    public function next(): void
     {
         ++$this->cursor;
 
@@ -127,10 +123,8 @@ class OrderedHashMapIterator implements \Iterator
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function key()
+    public function key(): mixed
     {
         if (null === $this->key) {
             return null;
@@ -151,10 +145,8 @@ class OrderedHashMapIterator implements \Iterator
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->cursor = 0;
 

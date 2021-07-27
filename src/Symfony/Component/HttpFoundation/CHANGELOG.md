@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add the `litespeed_finish_request` method to work with Litespeed
+
 5.3
 ---
 

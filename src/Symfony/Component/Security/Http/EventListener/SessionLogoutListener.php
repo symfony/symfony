@@ -25,7 +25,9 @@ class SessionLogoutListener implements EventSubscriberInterface
 {
     public function onLogout(LogoutEvent $event): void
     {
-        $event->getRequest()->getSession()->invalidate();
+        if ($event->getRequest()->hasSession()) {
+            $event->getRequest()->getSession()->invalidate();
+        }
     }
 
     public static function getSubscribedEvents(): array

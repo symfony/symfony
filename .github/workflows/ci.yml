@@ -1,0 +1,48 @@
+name: CI
+
+on:
+    pull_request:
+    push:
+
+jobs:
+    test:
+        name: 'Test ${{ matrix.deps }} on PHP ${{ matrix.php }}'
+        runs-on: ubuntu-latest
+
+        strategy:
+            fail-fast: false
+            matrix:
+                php: ['7.1.3', '7.2', '7.3', '7.4', '8.0']
+                include:
+                    - php: '7.4'
+                      deps: lowest
+                      deprecations: max[self]=0
+                    - php: '8.0'
+                      deps: highest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '${{ matrix.php }}'
+                  coverage: none
+
+            - name: Configure composer
+              if: "${{ matrix.deps == 'highest' }}"
+              run: composer config minimum-stability dev
+
+            - name: Composer install
+              uses: ramsey/composer-install@v1
+              with:
+                  dependency-versions: '${{ matrix.deps }}'
+
+            - name: Install PHPUnit
+              run: vendor/bin/simple-phpunit install
+
+            - name: Run tests
+              run: vendor/bin/simple-phpunit
+              env:
+                  SYMFONY_DEPRECATIONS_HELPER: '${{ matrix.deprecations }}'

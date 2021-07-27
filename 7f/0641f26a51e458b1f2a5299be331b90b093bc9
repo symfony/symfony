@@ -1,0 +1,117 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-27T07:15:06Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by kassner at 2021-07-27T09:05:22Z
+
+The change was introduced in #41992
+
+---------------------------------------------------------------------------
+
+by brosenberger at 2021-07-27T10:27:47Z
+
+@derrabus i agree that those comments are not really usefull, nethertheless all magento2 builds use this module and do generate interceptors (for a precompiled aop solution) which uses the method parameter php-doc (if present) - therefore many shops have to update their versions either to fixate it to v4.4.26 or add a patch where the @params are added again to gain a green build
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-27T13:38:10Z
+
+Okay and why can't this be fixed on Magento's side?
+
+---------------------------------------------------------------------------
+
+by hostep at 2021-07-27T13:48:50Z
+
+@derrabus: Magento really needs to fix this, but the release cycle of Magento is super slow and upgrades from one version of Magento to another are very tedious and take a lot of time, even for minor releases. So even if Magento released a new version (next one is scheduled for 2022, they will only release security fixes in 2021 anymore), it would take people a lot of time and effort to upgrade to it.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2021-07-27T14:25:27Z
+
+@brosenberger There are multiple packages that do the same thing, including many Doctrine packages. These two parameters are self-explanatory through the signature and the documentation adds no value (especially since Symfony no longer publishes this documentation IIRC).
+
+Slow release process aside, I don't think this issue should be fixed anywhere but in Magento itself.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-27T14:30:01Z
+
+So Magento is basically not doing bugfix releases?
+
+---------------------------------------------------------------------------
+
+by fascinosum at 2021-07-27T14:42:37Z
+
+@alcaeus IMHO, using a mixed approach for DocBlock annotation may be not the best. At least when you read reduced DocBlock, it does not contribute to a better understanding. I would say it can be confusing
+Speaking of best practices: https://github.com/php-fig/fig-standards/blob/master/proposed/phpdoc-tags.md#59-param
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-27T15:23:08Z
+
+Are you completely sure this is the only phpdoc that Magento needs? We removed much more, that's why I'm asking.
+I'm fine reverting in 4.4, but we should keep that change in 5.4 IMHO.
+
+---------------------------------------------------------------------------
+
+by viktym at 2021-07-27T16:15:13Z
+
+@nicolas-grekas  currently Magento has dependency on "symfony/console": "~4.4.0".
+Do you have any ETA when symfony/console:4.4.29 with this fix for Magento can be released?
+
+---------------------------------------------------------------------------
+
+by mortenbirkelund at 2021-07-27T16:27:29Z
+
+> So Magento is basically not doing bugfix releases?
+
+Magento make quarterly releases, and anything else has to be patched manually on each shops either by using magentos patch tool (with a limited amount of patches) ; by using patch command on Linux or a library like cweagans.
+https://devdocs.magento.com/guides/v2.4/comp-mgr/patching.html
+
+So this is possible, but as stated by @hostep it will require alot of work by alot of people (all shops individually)
+A bug fix release of symfony/console would be the easiest solution by far, and then hopefully magento will fix the actual problem in next release.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-27T16:42:19Z
+
+> and then hopefully magento will fix the actual problem in next release.
+
+They'll have to. We really cannot anticipate which doc block change might break this little Magento tool again.
+
+> Do you have any ETA when symfony/console:4.4.29 with this fix for Magento can be released?
+
+The next regular release would be by the end of August.
+
+---------------------------------------------------------------------------
+
+by IbrahimS2 at 2021-07-27T18:22:54Z
+
+@derrabus I fully agree with you, Why in the world is Magento not reading the "variables type properly", **it is already defined in the construct itself!** if not then and only then can fall back to PHP variables annotations.
+
+Anyhow, I think the point here is to be part of the solution; if we can let this one slide so not everyone gets into this problem until a proper fix is presented in Magento would be highly appreciated.

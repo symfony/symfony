@@ -28,7 +28,7 @@
         "symfony/http-kernel": "^4.4 || ^5.0",
         "symfony/phpunit-bridge": "^4.4.19 || ^5.2",
         "nyholm/psr7": "^1.1",
-        "psr/log": "^1.1"
+        "psr/log": "^1.1 || ^2 || ^3"
     },
     "suggest": {
         "nyholm/psr7": "For a super lightweight PSR-7/17 implementation"

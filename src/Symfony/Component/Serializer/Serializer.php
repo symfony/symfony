@@ -47,6 +47,12 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class Serializer implements SerializerInterface, ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface, ContextAwareEncoderInterface, ContextAwareDecoderInterface
 {
+    /**
+     * Flag to control whether an empty array should be transformed to an
+     * object (in JSON: {}) or to a map (in JSON: []).
+     */
+    public const EMPTY_ARRAYS_AS_OBJECT = 'empty_iterable_as_object';
+
     private const SCALAR_TYPES = [
         'int' => true,
         'bool' => true,
@@ -159,8 +165,13 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         }
 
         if (is_iterable($data)) {
-            if (($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) === true && $data instanceof \Countable && 0 === $data->count()) {
-                return $data;
+            if (is_countable($data) && \count($data) === 0) {
+                switch (true) {
+                    case ($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && is_object($data):
+                        return $data;
+                    case ($context[self::EMPTY_ARRAYS_AS_OBJECT] ?? false) && is_array($data):
+                        return new \ArrayObject();
+                }
             }
 
             $normalized = [];
@@ -179,7 +190,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             throw new NotNormalizableValueException(sprintf('Could not normalize object of type "%s", no supporting normalizer found.', get_debug_type($data)));
         }
 
-        throw new NotNormalizableValueException('An unexpected value could not be normalized: '.(!\is_resource($data) ? var_export($data, true) : sprintf('%s resource', get_resource_type($data))));
+        throw new NotNormalizableValueException('An unexpected value could not be normalized: '.(!\is_resource($data) ? var_export($data, true) : sprintf('"%s" resource', get_resource_type($data))));
     }
 
     /**

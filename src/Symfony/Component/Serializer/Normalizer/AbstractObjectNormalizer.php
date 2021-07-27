@@ -90,6 +90,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public const DEEP_OBJECT_TO_POPULATE = 'deep_object_to_populate';
 
+    /**
+     * Flag to control whether an empty object should be kept as an object (in
+     * JSON: {}) or converted to a list (in JSON: []).
+     */
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
     private $propertyTypeExtractor;
@@ -590,10 +594,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         if (null === $attributeValue && ($context[self::SKIP_NULL_VALUES] ?? $this->defaultContext[self::SKIP_NULL_VALUES] ?? false)) {
             return $data;
-        }
-
-        if ([] === $attributeValue && ($context[self::PRESERVE_EMPTY_OBJECTS] ?? $this->defaultContext[self::PRESERVE_EMPTY_OBJECTS] ?? false)) {
-            $attributeValue = new \ArrayObject();
         }
 
         if ($this->nameConverter) {

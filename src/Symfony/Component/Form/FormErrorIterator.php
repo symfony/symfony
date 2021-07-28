@@ -205,7 +205,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Alias of {@link current()}.
      *
-     * @return self
+     * @return FormError|self
      */
     public function getChildren()
     {

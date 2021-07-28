@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-27T03:13:32Z
+
+Shouldn't maximebf/debugbar be patched instead? Can you please them a PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-27T03:21:10Z
+
+> their code does check for NULL headers when printing so they are a possibility.
+
+I read that in the issue on maximebf/debugbar, found the corresponding line in the code. This makes sense as a big fix now.
+
+Can you please add a test case to back the behavior up?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-27T03:31:40Z
+
+I suggested an alternate fix in https://github.com/maximebf/php-debugbar/issues/474
+
+---------------------------------------------------------------------------
+
+by barryvdh at 2021-07-27T05:50:03Z
+
+I fixed it for the time being now: https://github.com/maximebf/php-debugbar/pull/475
+
+I think we needed to reset it for a reason, which isn't currently possible. We're now overriding this method which solves it, but either a nullable check or a reset method would be helpful.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-27T20:47:51Z
+
+> I think we needed to reset it for a reason, which isn't currently possible.
+
+Do you want to contribute the reset method as a feature for 5.4?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-28T05:00:07Z
+
+Actually I prefer making the setter null able as a bugfix :)

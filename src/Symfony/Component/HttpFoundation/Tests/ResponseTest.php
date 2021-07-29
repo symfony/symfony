@@ -581,6 +581,12 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals('no-cache', $response->headers->get('pragma'));
         $this->assertEquals('-1', $response->headers->get('expires'));
 
+        $response = new Response('foo');
+        $response->headers->remove('cache-control');
+        $response->prepare($request);
+        $this->assertFalse($response->headers->has('pragma'));
+        $this->assertFalse($response->headers->has('expires'));
+
         $request->server->set('SERVER_PROTOCOL', 'HTTP/1.1');
         $response = new Response('foo');
         $response->prepare($request);

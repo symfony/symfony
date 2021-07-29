@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Sartzeko esteka baliogabea edo iraungia.</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Saioa hasteko huts gehiegi egin dira, saiatu berriro minutu %minutes% geroago.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Saioa hasteko huts gehiegi egin dira, saiatu berriro %minutes% minututan.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

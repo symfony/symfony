@@ -366,14 +366,14 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             return null;
         }
 
-        $appPrefix = $this->projectDir . '/src/';
-        $vendorPrefix = $this->projectDir . '/vendor/';
+        $appPrefix = $this->projectDir.'/src/';
+        $vendorPrefix = $this->projectDir.'/vendor/';
 
         // Composer packages
         if (str_starts_with($throwable->getFile(), $vendorPrefix)) {
-            preg_match('@' . preg_quote($vendorPrefix, '@') . '([^/]+)/([^/]+).*$@', $throwable->getFile(), $matches);
+            preg_match('@'.preg_quote($vendorPrefix, '@').'([^/]+)/([^/]+).*$@', $throwable->getFile(), $matches);
 
-            return $matches[1] . '/' . $matches[2];
+            return $matches[1].'/'.$matches[2];
         }
 
         // App

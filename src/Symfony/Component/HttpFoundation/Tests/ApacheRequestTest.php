@@ -89,6 +89,14 @@ class ApacheRequestTest extends TestCase
                 '',
                 '/',
             ],
+            [
+                [
+                    'SCRIPT_NAME' => '/app_dev.php',
+                ],
+                '/',
+                '',
+                '/',
+            ],
         ];
     }
 }

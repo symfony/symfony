@@ -31,7 +31,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     private $processedLogs;
     private $projectDir;
 
-    public function __construct(object $logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null, string $projectDir)
+    public function __construct(object $logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null, string $projectDir = null)
     {
         if (null !== $logger && $logger instanceof DebugLoggerInterface) {
             $this->logger = $logger;

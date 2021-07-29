@@ -54,15 +54,18 @@ class SendgridApiTransport extends AbstractApiTransport
 
         try {
             $statusCode = $response->getStatusCode();
-            $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface $e) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Sendgrid server.', $response, 0, $e);
         }
 
         if (202 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.implode('; ', array_column($result['errors'], 'message')).sprintf(' (code %d).', $statusCode), $response);
+            try {
+                $result = $response->toArray(false);
+
+                throw new HttpTransportException('Unable to send an email: '.implode('; ', array_column($result['errors'], 'message')).sprintf(' (code %d).', $statusCode), $response);
+            } catch (DecodingExceptionInterface $e) {
+                throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+            }
         }
 
         $sentMessage->setMessageId($response->getHeaders(false)['x-message-id'][0]);

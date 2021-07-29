@@ -377,7 +377,7 @@ class Inline
                     $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references);
 
                     // the value can be an array if a reference has been resolved to an array var
-                    if (\is_string($value) && !$isQuoted && str_contains($value, ': ')) {
+                    if (\is_string($value) && !$isQuoted && false !== strpos($value, ': ')) {
                         // embedded mapping?
                         try {
                             $pos = 0;
@@ -564,7 +564,7 @@ class Inline
     {
         $scalar = trim($scalar);
 
-        if (str_starts_with($scalar, '*')) {
+        if (0 === strpos($scalar, '*')) {
             if (false !== $pos = strpos($scalar, '#')) {
                 $value = substr($scalar, 1, $pos - 2);
             } else {
@@ -596,11 +596,11 @@ class Inline
                 return false;
             case '!' === $scalar[0]:
                 switch (true) {
-                    case str_starts_with($scalar, '!!str '):
+                    case 0 === strpos($scalar, '!!str '):
                         return (string) substr($scalar, 6);
-                    case str_starts_with($scalar, '! '):
+                    case 0 === strpos($scalar, '! '):
                         return substr($scalar, 2);
-                    case str_starts_with($scalar, '!php/object'):
+                    case 0 === strpos($scalar, '!php/object'):
                         if (self::$objectSupport) {
                             if (!isset($scalar[12])) {
                                 trigger_deprecation('symfony/yaml', '5.1', 'Using the !php/object tag without a value is deprecated.');
@@ -616,7 +616,7 @@ class Inline
                         }
 
                         return null;
-                    case str_starts_with($scalar, '!php/const'):
+                    case 0 === strpos($scalar, '!php/const'):
                         if (self::$constantSupport) {
                             if (!isset($scalar[11])) {
                                 trigger_deprecation('symfony/yaml', '5.1', 'Using the !php/const tag without a value is deprecated.');
@@ -636,9 +636,9 @@ class Inline
                         }
 
                         return null;
-                    case str_starts_with($scalar, '!!float '):
+                    case 0 === strpos($scalar, '!!float '):
                         return (float) substr($scalar, 8);
-                    case str_starts_with($scalar, '!!binary '):
+                    case 0 === strpos($scalar, '!!binary '):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
                     default:
                         throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);

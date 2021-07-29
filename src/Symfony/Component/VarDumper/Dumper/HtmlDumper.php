@@ -117,7 +117,7 @@ class HtmlDumper extends CliDumper
     /**
      * Sets an HTML header that will be dumped once in the output stream.
      */
-    public function setDumpHeader(string $header)
+    public function setDumpHeader(?string $header)
     {
         $this->dumpHeader = $header;
     }

@@ -181,7 +181,7 @@ final class Dotenv
         $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
 
         foreach ($values as $name => $value) {
-            $notHttpName = !str_starts_with($name, 'HTTP_');
+            $notHttpName = 0 !== strpos($name, 'HTTP_');
             // don't check existence with getenv() because of thread safety issues
             if (!isset($loadedVars[$name]) && (!$overrideExistingVars && (isset($_ENV[$name]) || (isset($_SERVER[$name]) && $notHttpName)))) {
                 continue;
@@ -417,7 +417,7 @@ final class Dotenv
 
     private function resolveCommands(string $value, array $loadedVars): string
     {
-        if (!str_contains($value, '$')) {
+        if (false === strpos($value, '$')) {
             return $value;
         }
 
@@ -453,7 +453,7 @@ final class Dotenv
 
             $env = [];
             foreach ($this->values as $name => $value) {
-                if (isset($loadedVars[$name]) || (!isset($_ENV[$name]) && !(isset($_SERVER[$name]) && !str_starts_with($name, 'HTTP_')))) {
+                if (isset($loadedVars[$name]) || (!isset($_ENV[$name]) && !(isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')))) {
                     $env[$name] = $value;
                 }
             }
@@ -471,7 +471,7 @@ final class Dotenv
 
     private function resolveVariables(string $value, array $loadedVars): string
     {
-        if (!str_contains($value, '$')) {
+        if (false === strpos($value, '$')) {
             return $value;
         }
 
@@ -506,7 +506,7 @@ final class Dotenv
                 $value = $this->values[$name];
             } elseif (isset($_ENV[$name])) {
                 $value = $_ENV[$name];
-            } elseif (isset($_SERVER[$name]) && !str_starts_with($name, 'HTTP_')) {
+            } elseif (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
                 $value = $_SERVER[$name];
             } elseif (isset($this->values[$name])) {
                 $value = $this->values[$name];

@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Traversable;
 
 /**
  * HelperSet represents a set of helpers to be used with a command.
@@ -91,7 +92,7 @@ class HelperSet implements \IteratorAggregate
     /**
      * @return Helper[]
      */
-    public function getIterator()
+    public function getIterator() : Traversable
     {
         return new \ArrayIterator($this->helpers);
     }

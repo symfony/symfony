@@ -386,6 +386,10 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Balio hori ez da baliozko baloreen nazioarteko identifikazio-zenbaki bat (ISIN).</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Balio hori baliozko adierazpena izan beharko litzateke.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

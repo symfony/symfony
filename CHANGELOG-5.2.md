@@ -7,6 +7,12 @@ in 5.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.2.0...v5.2.1
 
+* 5.2.14 (2021-07-29)
+
+ * bug #42307 [Mailer] Fixed decode exception when sendgrid response is 202 (rubanooo)
+ * bug #42296 [Dotenv][Yaml] Remove PHP 8.0 polyfill (derrabus)
+ * bug #42289 [HttpFoundation] Fixed type mismatch (Toflar)
+
 * 5.2.13 (2021-07-27)
 
  * bug #42270 [WebProfilerBundle] [WebProfiler] "empty" filter bugfix. Filter with name "empty" is not … (luzrain)

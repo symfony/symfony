@@ -25,10 +25,11 @@ interface EventDispatcherInterface extends ContractsEventDispatcherInterface
     /**
      * Adds an event listener that listens on the specified events.
      *
-     * @param int $priority The higher this value, the earlier an event
-     *                      listener will be triggered in the chain (defaults to 0)
+     * @param callable $listener The listener
+     * @param int      $priority The higher this value, the earlier an event
+     *                           listener will be triggered in the chain (defaults to 0)
      */
-    public function addListener(string $eventName, callable $listener, int $priority = 0);
+    public function addListener(string $eventName, $listener, int $priority = 0);
 
     /**
      * Adds an event subscriber.
@@ -40,8 +41,10 @@ interface EventDispatcherInterface extends ContractsEventDispatcherInterface
 
     /**
      * Removes an event listener from the specified events.
+     *
+     * @param callable $listener The listener to remove
      */
-    public function removeListener(string $eventName, callable $listener);
+    public function removeListener(string $eventName, $listener);
 
     public function removeSubscriber(EventSubscriberInterface $subscriber);
 
@@ -57,9 +60,11 @@ interface EventDispatcherInterface extends ContractsEventDispatcherInterface
      *
      * Returns null if the event or the listener does not exist.
      *
+     * @param callable $listener The listener
+     *
      * @return int|null The event listener priority
      */
-    public function getListenerPriority(string $eventName, callable $listener);
+    public function getListenerPriority(string $eventName, $listener);
 
     /**
      * Checks whether an event has any registered listeners.

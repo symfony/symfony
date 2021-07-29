@@ -29,8 +29,9 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     private $currentRequest;
     private $requestStack;
     private $processedLogs;
+    private $projectDir;
 
-    public function __construct(object $logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null)
+    public function __construct(object $logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null, string $projectDir)
     {
         if (null !== $logger && $logger instanceof DebugLoggerInterface) {
             $this->logger = $logger;
@@ -38,6 +39,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
         $this->containerPathPrefix = $containerPathPrefix;
         $this->requestStack = $requestStack;
+        $this->projectDir = $projectDir;
     }
 
     /**
@@ -281,6 +283,10 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
                     'scream' => false,
                 ];
 
+                if ($channel = $this->extractDeprecationChannel($exception)) {
+                    $log['channel'] = $channel;
+                }
+
                 $sanitizedLogs[$errorId] = $log;
             }
         }
@@ -352,5 +358,29 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         ksort($count['priorities']);
 
         return $count;
+    }
+
+    private function extractDeprecationChannel(\Throwable $throwable = null): ?string
+    {
+        if (null === $throwable || !$this->projectDir) {
+            return null;
+        }
+
+        $appPrefix = $this->projectDir . '/src/';
+        $vendorPrefix = $this->projectDir . '/vendor/';
+
+        // Composer packages
+        if (str_starts_with($throwable->getFile(), $vendorPrefix)) {
+            preg_match('@' . preg_quote($vendorPrefix, '@') . '([^/]+)/([^/]+).*$@', $throwable->getFile(), $matches);
+
+            return $matches[1] . '/' . $matches[2];
+        }
+
+        // App
+        if (str_starts_with($throwable->getFile(), $appPrefix)) {
+            return 'app';
+        }
+
+        return null;
     }
 }

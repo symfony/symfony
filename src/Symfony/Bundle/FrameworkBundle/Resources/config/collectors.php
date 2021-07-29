@@ -57,6 +57,7 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->ignoreOnInvalid(),
                 sprintf('%s/%s', param('kernel.build_dir'), param('kernel.container_class')),
                 service('request_stack')->ignoreOnInvalid(),
+                param('kernel.project_dir'),
             ])
             ->tag('monolog.logger', ['channel' => 'profiler'])
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/logger.html.twig', 'id' => 'logger', 'priority' => 300])

@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Add support of PHP backed enumerations
- * Add support for preserving empty object in object property
+ * Add support for serializing empty array as object
 
 5.3
 ---

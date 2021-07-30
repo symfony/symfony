@@ -21,6 +21,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Security\Http\Logout\CsrfTokenClearingLogoutHandler;
 
+/**
+ * @group legacy
+ */
 class CsrfTokenClearingLogoutHandlerTest extends TestCase
 {
     private $session;

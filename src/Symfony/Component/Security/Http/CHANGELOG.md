@@ -6,6 +6,8 @@ CHANGELOG
 
  * Deprecate not setting the 5th argument (`$exceptionOnNoToken`) of `AccessListener` to `false`
  * Deprecate `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead
+ * Deprecate `CookieClearingLogoutHandler`, `SessionLogoutHandler` and `CsrfTokenClearingLogoutHandler`.
+   Use `CookieClearingLogoutListener`, `SessionLogoutListener` and `CsrfTokenClearingLogoutListener` instead
 
 5.3
 ---

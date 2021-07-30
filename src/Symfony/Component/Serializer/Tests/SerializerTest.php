@@ -492,7 +492,7 @@ class SerializerTest extends TestCase
     public function testNotNormalizableValueExceptionMessageForAResource()
     {
         $this->expectException(NotNormalizableValueException::class);
-        $this->expectExceptionMessage('An unexpected value could not be normalized: stream resource');
+        $this->expectExceptionMessage('An unexpected value could not be normalized: "stream" resource');
 
         (new Serializer())->normalize(tmpfile());
     }
@@ -514,11 +514,13 @@ class SerializerTest extends TestCase
         $object['foo'] = new \ArrayObject();
         $object['bar'] = new \ArrayObject(['notempty']);
         $object['baz'] = new \ArrayObject(['nested' => new \ArrayObject()]);
+        $object['a'] = new \ArrayObject(['nested' => []]);
+        $object['b'] = [];
 
-        $this->assertSame('{"foo":[],"bar":["notempty"],"baz":{"nested":[]}}', $serializer->serialize($object, 'json'));
+        $this->assertSame('{"foo":[],"bar":["notempty"],"baz":{"nested":[]},"a":{"nested":[]},"b":[]}', $serializer->serialize($object, 'json'));
     }
 
-    public function testNormalizePreserveEmptyArrayObject()
+    public function provideObjectOrCollectionTests()
     {
         $serializer = new Serializer(
           [
@@ -531,14 +533,77 @@ class SerializerTest extends TestCase
           ]
         );
 
-        $object = [];
-        $object['foo'] = new \ArrayObject();
-        $object['bar'] = new \ArrayObject(['notempty']);
-        $object['baz'] = new \ArrayObject(['nested' => new \ArrayObject()]);
-        $object['innerObject'] = new class() {
+        $data = [];
+        $data['a1'] = new \ArrayObject();
+        $data['a2'] = new \ArrayObject(['k' => 'v']);
+        $data['b1'] = [];
+        $data['b2'] = ['k' => 'v'];
+        $data['c1'] = new \ArrayObject(['nested' => new \ArrayObject()]);
+        $data['c2'] = new \ArrayObject(['nested' => new \ArrayObject(['k' => 'v'])]);
+        $data['d1'] = new \ArrayObject(['nested' => []]);
+        $data['d2'] = new \ArrayObject(['nested' => ['k' => 'v']]);
+        $data['e1'] = new class() {
             public $map = [];
         };
-        $this->assertEquals('{"foo":{},"bar":["notempty"],"baz":{"nested":{}},"innerObject":{"map":{}}}', $serializer->serialize($object, 'json', [AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true]));
+        $data['e2'] = new class() {
+            public $map = ['k' => 'v'];
+        };
+        $data['f1'] = new class(new \ArrayObject()) {
+            public $map;
+
+            public function __construct(\ArrayObject $map)
+            {
+                $this->map = $map;
+            }
+        };
+        $data['f2'] = new class(new \ArrayObject(['k' => 'v'])) {
+            public $map;
+
+            public function __construct(\ArrayObject $map)
+            {
+                $this->map = $map;
+            }
+        };
+
+        $data['g1'] = new Baz([]);
+        $data['g2'] = new Baz(['greg']);
+
+        yield [$serializer, $data];
+    }
+
+    /** @dataProvider provideObjectOrCollectionTests */
+    public function testNormalizeWithCollection(Serializer $serializer, array $data)
+    {
+        $expected = '{"a1":[],"a2":{"k":"v"},"b1":[],"b2":{"k":"v"},"c1":{"nested":[]},"c2":{"nested":{"k":"v"}},"d1":{"nested":[]},"d2":{"nested":{"k":"v"}},"e1":{"map":[]},"e2":{"map":{"k":"v"}},"f1":{"map":[]},"f2":{"map":{"k":"v"}},"g1":{"list":[],"settings":[]},"g2":{"list":["greg"],"settings":[]}}';
+        $this->assertSame($expected, $serializer->serialize($data, 'json'));
+    }
+
+    /** @dataProvider provideObjectOrCollectionTests */
+    public function testNormalizePreserveEmptyArrayObject(Serializer $serializer, array $data)
+    {
+        $expected = '{"a1":{},"a2":{"k":"v"},"b1":[],"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":[]},"d2":{"nested":{"k":"v"}},"e1":{"map":[]},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{"list":[]},"settings":[]},"g2":{"list":["greg"],"settings":[]}}';
+        $this->assertSame($expected, $serializer->serialize($data, 'json', [
+            AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
+        ]));
+    }
+
+    /** @dataProvider provideObjectOrCollectionTests */
+    public function testNormalizeEmptyArrayAsObject(Serializer $serializer, array $data)
+    {
+        $expected = '{"a1":[],"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":[]},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":[]},"f2":{"map":{"k":"v"}},"g1":{"list":[],"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
+        $this->assertSame($expected, $serializer->serialize($data, 'json', [
+            Serializer::EMPTY_ARRAYS_AS_OBJECT => true,
+        ]));
+    }
+
+    /** @dataProvider provideObjectOrCollectionTests */
+    public function testNormalizeEmptyArrayAsObjectAndPreserveEmptyArrayObject(Serializer $serializer, array $data)
+    {
+        $expected = '{"a1":{},"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{"list":[]},"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
+        $this->assertSame($expected, $serializer->serialize($data, 'json', [
+            Serializer::EMPTY_ARRAYS_AS_OBJECT => true,
+            AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
+        ]));
     }
 
     public function testNormalizeScalar()
@@ -711,6 +776,38 @@ class Bar
     public function __construct($value)
     {
         $this->value = $value;
+    }
+}
+
+class Baz
+{
+    public $list;
+
+    public $settings = [];
+
+    public function __construct(array $list)
+    {
+        $this->list = new DummyList($list);
+    }
+}
+
+class DummyList implements \Countable, \IteratorAggregate
+{
+    public $list;
+
+    public function __construct(array $list)
+    {
+        $this->list = $list;
+    }
+
+    public function count(): int
+    {
+        return \count($this->list);
+    }
+
+    public function getIterator():\Traversable
+    {
+        return new \ArrayIterator($this->list);
     }
 }
 

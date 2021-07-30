@@ -12,6 +12,8 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -152,5 +154,30 @@ class ChannelListenerTest extends TestCase
         $listener($event);
 
         $this->assertSame($response, $event->getResponse());
+    }
+
+    public function testSupportsWithoutHeaders()
+    {
+        $request = $this->createMock(Request::class);
+        $request
+            ->expects($this->any())
+            ->method('isSecure')
+            ->willReturn(false)
+        ;
+        $request->headers = new HeaderBag();
+
+        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap
+            ->expects($this->any())
+            ->method('getPatterns')
+            ->with($this->equalTo($request))
+            ->willReturn([[], 'https'])
+        ;
+
+        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
+
+        $listener = new ChannelListener($accessMap, $entryPoint, new NullLogger());
+
+        $this->assertTrue($listener->supports($request));
     }
 }

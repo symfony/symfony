@@ -45,3 +45,5 @@ Security
  * Deprecate `TokenInterface:isAuthenticated()` and `setAuthenticated()` methods without replacement.
    Security tokens won't have an "authenticated" flag anymore, so they will always be considered authenticated
  * Deprecate `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead
+ * Deprecate `CookieClearingLogoutHandler`, `SessionLogoutHandler` and `CsrfTokenClearingLogoutHandler`.
+   Use `CookieClearingLogoutListener`, `SessionLogoutListener` and `CsrfTokenClearingLogoutListener` instead

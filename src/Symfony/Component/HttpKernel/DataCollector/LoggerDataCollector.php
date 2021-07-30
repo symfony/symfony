@@ -371,7 +371,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
         // Composer packages
         if (str_starts_with($throwable->getFile(), $vendorPrefix)) {
-            preg_match('@'.preg_quote($vendorPrefix, '@').'([^/]+)/([^/]+).*$@', $throwable->getFile(), $matches);
+            preg_match('@^'.preg_quote($vendorPrefix, '@').'([^/]+)/([^/]+).*$@', $throwable->getFile(), $matches);
 
             return $matches[1].'/'.$matches[2];
         }

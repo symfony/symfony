@@ -11,6 +11,7 @@ CHANGELOG
    use `security.password_hasher_factory` and `Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface` instead
  * Remove the `security.user_password_encoder.generic` service, the `security.password_encoder` and the `Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface` aliases,
    use `security.user_password_hasher`, `security.password_hasher` and `Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface` instead
+ * Remove the `logout.success_handler` and `logout.handlers` config options, register a listener on the `LogoutEvent` event instead
 
 5.4
 ---

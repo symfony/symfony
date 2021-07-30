@@ -23,7 +23,6 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 
 /**
@@ -31,7 +30,7 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-abstract class AbstractRememberMeServices implements RememberMeServicesInterface, LogoutHandlerInterface
+abstract class AbstractRememberMeServices implements RememberMeServicesInterface
 {
     public const COOKIE_DELIMITER = ':';
 
@@ -157,9 +156,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         return null;
     }
 
-    /**
-     * Implementation for LogoutHandlerInterface. Deletes the cookie.
-     */
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
         $this->cancelCookie($request);

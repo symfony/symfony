@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2021-07-15T11:57:43Z
+
+@OskarStark done, if wanted, I can create a second PR for FakeChatLoggerTransport
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-16T18:54:52Z
+
+> @OskarStark done, if wanted, I can create a second PR for FakeChatLoggerTransport
+
+Yes please do 👍🏻
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-19T17:20:13Z
+
+Sorry for asking. But why can't we just add a logger to the FakeSMS transport?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-19T19:57:04Z
+
+In this case one need to configure the email stuff just to get the logging.
+
+If you have no mailing in your project, you would need to set it up just for local dev to have the entry point via DSN
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-28T23:33:34Z
+
+Please add a test case to UnsupportedSchemeExceptionTest
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2021-07-30T09:16:24Z
+
+@OskarStark
+
+PR rebased, also on
+
+> Please add a test case to UnsupportedSchemeExceptionTest
+
+I am sorry I really do not understand this, when I check into this class Notifier\UnsupportedSchemeExceptionTest, I already see logic on `FakeSmsTransportFactory`
+
+can you be more precise on the way to do the required test? thank you
+
+edit: appveyor failure is not related to this addition
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-30T11:34:08Z
+
+You are right, it is just a new transport for an existing bridge 👍

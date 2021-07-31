@@ -2506,7 +2506,8 @@ class FrameworkExtension extends Extension
 
         if (ContainerBuilder::willBeAvailable('symfony/fake-sms-notifier', FakeSmsTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier', 'symfony/mailer'])) {
             $container->getDefinition($classToServices[FakeSmsTransportFactory::class])
-                ->replaceArgument('$mailer', new Reference('mailer'));
+                ->replaceArgument('$mailer', new Reference('mailer'))
+                ->replaceArgument('$logger', new Reference('logger'));
         }
 
         if (isset($config['admin_recipients'])) {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeSms\Tests;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
@@ -23,7 +24,7 @@ final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
      */
     public function createFactory(): TransportFactoryInterface
     {
-        return new FakeSmsTransportFactory($this->createMock(MailerInterface::class));
+        return new FakeSmsTransportFactory($this->createMock(MailerInterface::class), $this->createMock(LoggerInterface::class));
     }
 
     public function createProvider(): iterable
@@ -36,6 +37,11 @@ final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
         yield [
             'fakesms+email://mailchimp?to=recipient@email.net&from=sender@email.net',
             'fakesms+email://mailchimp?to=recipient@email.net&from=sender@email.net',
+        ];
+
+        yield [
+            'fakesms+logger://default',
+            'fakesms+logger://default',
         ];
     }
 

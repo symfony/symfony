@@ -76,7 +76,7 @@ final class Languages extends ResourceBundle
     /**
      * Gets the list of language names indexed with alpha2 codes as keys.
      *
-     * @return string[]
+     * @return array<string, string>
      */
     public static function getNames(string $displayLocale = null): array
     {
@@ -157,7 +157,7 @@ final class Languages extends ResourceBundle
      *
      * Same as method getNames, but with ISO 639-2 three-letter codes instead of ISO 639-1 codes as keys.
      *
-     * @return string[]
+     * @return array<string, string>
      */
     public static function getAlpha3Names(string $displayLocale = null): array
     {

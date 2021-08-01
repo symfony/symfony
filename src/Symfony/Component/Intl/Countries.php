@@ -107,9 +107,9 @@ final class Countries extends ResourceBundle
     /**
      * Gets the list of country names indexed with alpha2 codes as keys.
      *
-     * @return string[]
+     * @return array<string, string>
      */
-    public static function getNames(?string $displayLocale = null): array
+    public static function getNames(string $displayLocale = null): array
     {
         return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
     }
@@ -119,9 +119,9 @@ final class Countries extends ResourceBundle
      *
      * Same as method getNames, but with alpha3 codes instead of alpha2 codes as keys.
      *
-     * @return string[]
+     * @return array<string, string>
      */
-    public static function getAlpha3Names(?string $displayLocale = null): array
+    public static function getAlpha3Names(string $displayLocale = null): array
     {
         $alpha2Names = self::getNames($displayLocale);
         $alpha3Names = [];

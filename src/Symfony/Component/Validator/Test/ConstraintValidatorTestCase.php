@@ -295,10 +295,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     abstract protected function createValidator();
 }
 
-/**
- * @internal
- */
-class ConstraintViolationAssertion
+final class ConstraintViolationAssertion
 {
     private ExecutionContextInterface $context;
 
@@ -316,6 +313,9 @@ class ConstraintViolationAssertion
     private ?Constraint $constraint;
     private mixed $cause = null;
 
+    /**
+     * @internal
+     */
     public function __construct(ExecutionContextInterface $context, string $message, Constraint $constraint = null, array $assertions = [])
     {
         $this->context = $context;

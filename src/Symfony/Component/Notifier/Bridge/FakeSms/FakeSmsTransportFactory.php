@@ -43,15 +43,16 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
     {
         $scheme = $dsn->getScheme();
 
-        switch ($scheme) {
-            case 'fakesms+email':
-                $mailerTransport = $dsn->getHost();
-                $to = $dsn->getRequiredOption('to');
-                $from = $dsn->getRequiredOption('from');
+        if ('fakesms+email' === $scheme) {
+            $mailerTransport = $dsn->getHost();
+            $to = $dsn->getRequiredOption('to');
+            $from = $dsn->getRequiredOption('from');
 
-                return (new FakeSmsEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
-            case 'fakesms+logger':
-                return new FakeSmsLoggerTransport($this->logger);
+            return (new FakeSmsEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
+        }
+
+        if ('fakesms+logger' === $scheme) {
+            return new FakeSmsLoggerTransport($this->logger);
         }
 
         throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());

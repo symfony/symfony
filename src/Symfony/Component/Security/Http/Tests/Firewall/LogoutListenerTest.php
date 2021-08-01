@@ -25,8 +25,6 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
 use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
-use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 class LogoutListenerTest extends TestCase
 {
@@ -161,42 +159,6 @@ class LogoutListenerTest extends TestCase
             ->willReturn(false);
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyLogoutHandlers()
-    {
-        $this->expectDeprecation('Since symfony/security-http 5.1: The "%s\LogoutSuccessHandlerInterface" interface is deprecated, create a listener for the "%s" event instead.');
-        $this->expectDeprecation('Since symfony/security-http 5.1: Passing a logout success handler to "%s\LogoutListener::__construct" is deprecated, pass an instance of "%s" instead.');
-        $this->expectDeprecation('Since symfony/security-http 5.1: Calling "%s::addHandler" is deprecated, register a listener on the "%s" event instead.');
-
-        $logoutSuccessHandler = $this->createMock(LogoutSuccessHandlerInterface::class);
-        [$listener, $tokenStorage, $httpUtils, $options] = $this->getListener($logoutSuccessHandler);
-
-        $token = $this->getToken();
-        $tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
-
-        $request = new Request();
-
-        $httpUtils->expects($this->once())
-            ->method('checkRequestPath')
-            ->with($request, $options['logout_path'])
-            ->willReturn(true);
-
-        $response = new Response();
-        $logoutSuccessHandler->expects($this->any())->method('onLogoutSuccess')->willReturn($response);
-
-        $handler = $this->createMock(LogoutHandlerInterface::class);
-        $handler->expects($this->once())->method('logout')->with($request, $response, $token);
-        $listener->addHandler($handler);
-
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
-
-        $listener($event);
-
-        $this->assertSame($response, $event->getResponse());
     }
 
     private function getTokenManager()

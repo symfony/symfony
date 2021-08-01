@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-07-30T16:18:57Z
+
+what about other resource bundles? currencies, timezones & co.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-30T16:20:44Z
+
+> what about other resource bundles? currencies, timezones & co.
+
+PR(s) welcome, I suppose?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2021-07-30T16:22:16Z
+
+> what about other resource bundles? currencies, timezones & co.
+
+There is tons of array in symfony code which does not give any information about the keys (and maybe the values).
+I try to open (small) PR when I find some because of static-analysis error reported in my project.
+
+PR is always welcome I would say.

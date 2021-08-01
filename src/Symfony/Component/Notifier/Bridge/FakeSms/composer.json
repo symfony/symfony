@@ -1,7 +1,7 @@
 {
     "name": "symfony/fake-sms-notifier",
     "type": "symfony-bridge",
-    "description": "Fake SMS (as email during development) Notifier Bridge.",
+    "description": "Fake SMS (as email or log during development) Notifier Bridge.",
     "keywords": ["sms", "development", "email", "notifier", "symfony"],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -9,6 +9,11 @@
         {
             "name": "James Hemery",
             "homepage": "https://github.com/JamesHemery"
+        },
+        {
+            "name": "Antoine Makdessi",
+            "email": "amakdessi@me.com",
+            "homepage": "http://antoine.makdessi.free.fr"
         },
         {
             "name": "Symfony Community",

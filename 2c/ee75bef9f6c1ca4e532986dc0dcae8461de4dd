@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-01T16:37:17Z
+
+Do you have a piece of documentation at hand for this card format? I cannot really tell if your change is correct.
+
+---------------------------------------------------------------------------
+
+by ossinkine at 2021-08-01T16:43:13Z
+
+We are working with MIR card 19 digits length but I didn't find any documentation for it except https://en.wikipedia.org/wiki/Payment_card_number which already been used as trusted source

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
-use PHPUnit\Framework\SkippedTestSuiteError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
@@ -19,36 +18,10 @@ use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * @requires extension redis >= 4.3.0
- * @group integration
  */
 class ConnectionTest extends TestCase
 {
     use ExpectDeprecationTrait;
-
-    public static function setUpBeforeClass(): void
-    {
-        try {
-            $redis = Connection::fromDsn('redis://localhost/queue');
-            $redis->get();
-        } catch (TransportException $e) {
-            if (str_starts_with($e->getMessage(), 'ERR unknown command \'X')) {
-                throw new SkippedTestSuiteError('Redis server >= 5 is required');
-            }
-
-            throw $e;
-        } catch (\RedisException $e) {
-            throw new SkippedTestSuiteError($e->getMessage());
-        }
-    }
-
-    private function skipIfRedisClusterUnavailable()
-    {
-        try {
-            new \RedisCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
-        } catch (\Exception $e) {
-            self::markTestSkipped($e->getMessage());
-        }
-    }
 
     public function testFromInvalidDsn()
     {
@@ -64,23 +37,9 @@ class ConnectionTest extends TestCase
             new Connection(['stream' => 'queue'], [
                 'host' => 'localhost',
                 'port' => 6379,
-            ]),
-            Connection::fromDsn('redis://localhost/queue')
+            ], [], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue', [], $this->createMock(\Redis::class))
         );
-    }
-
-    public function testFromDsnWithMultipleHosts()
-    {
-        $this->skipIfRedisClusterUnavailable();
-
-        $hosts = explode(' ', getenv('REDIS_CLUSTER_HOSTS'));
-
-        $dsn = array_map(function ($host) {
-            return 'redis://'.$host;
-        }, $hosts);
-        $dsn = implode(',', $dsn);
-
-        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn));
     }
 
     public function testFromDsnOnUnixSocket()
@@ -97,16 +56,16 @@ class ConnectionTest extends TestCase
     public function testFromDsnWithOptions()
     {
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2]),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0')
+            Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0', [], $this->createMock(\Redis::class))
         );
     }
 
     public function testFromDsnWithOptionsAndTrailingSlash()
     {
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2]),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0')
+            Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0', [], $this->createMock(\Redis::class))
         );
     }
 
@@ -157,21 +116,21 @@ class ConnectionTest extends TestCase
                 'port' => 6379,
             ], [
                 'serializer' => 2,
-            ]),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2')
+            ], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2', [], $this->createMock(\Redis::class))
         );
     }
 
     public function testFromDsnWithMixDsnQueryOptions()
     {
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost/queue/group1?serializer=2', ['consumer' => 'specific-consumer']),
-            Connection::fromDsn('redis://localhost/queue/group1/specific-consumer?serializer=2')
+            Connection::fromDsn('redis://localhost/queue/group1?serializer=2', ['consumer' => 'specific-consumer'], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue/group1/specific-consumer?serializer=2', [], $this->createMock(\Redis::class))
         );
 
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['consumer' => 'specific-consumer']),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1')
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['consumer' => 'specific-consumer'], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1', [], $this->createMock(\Redis::class))
         );
     }
 
@@ -181,14 +140,12 @@ class ConnectionTest extends TestCase
     public function testDeprecationIfInvalidOptionIsPassedWithDsn()
     {
         $this->expectDeprecation('Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated.');
-        Connection::fromDsn('redis://localhost/queue?foo=bar');
+        Connection::fromDsn('redis://localhost/queue?foo=bar', [], $this->createMock(\Redis::class));
     }
 
     public function testRedisClusterInstanceIsSupported()
     {
-        $this->skipIfRedisClusterUnavailable();
-
-        $redis = new \RedisCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
+        $redis = $this->createMock(\RedisCluster::class);
         $this->assertInstanceOf(Connection::class, new Connection([], [], [], $redis));
     }
 
@@ -274,15 +231,6 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('redis://password@localhost/queue', [], $redis);
     }
 
-    public function testDbIndex()
-    {
-        $redis = new \Redis();
-
-        Connection::fromDsn('redis://localhost/queue?dbindex=2', [], $redis);
-
-        $this->assertSame(2, $redis->getDbNum());
-    }
-
     public function testGetPendingMessageFirst()
     {
         $redis = $this->createMock(\Redis::class);
@@ -361,48 +309,6 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
-    public function testGetAfterReject()
-    {
-        $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', [], $redis);
-
-        $connection->add('1', []);
-        $connection->add('2', []);
-
-        $failing = $connection->get();
-        $connection->reject($failing['id']);
-
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget');
-        $this->assertNotNull($connection->get());
-
-        $redis->del('messenger-rejectthenget');
-    }
-
-    public function testGetNonBlocking()
-    {
-        $redis = new \Redis();
-
-        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', [], $redis);
-
-        $this->assertNull($connection->get()); // no message, should return null immediately
-        $connection->add('1', []);
-        $this->assertNotEmpty($message = $connection->get());
-        $connection->reject($message['id']);
-        $redis->del('messenger-getnonblocking');
-    }
-
-    public function testJsonError()
-    {
-        $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/json-error', [], $redis);
-        try {
-            $connection->add("\xB1\x31", []);
-        } catch (TransportException $e) {
-        }
-
-        $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getMessage());
-    }
-
     public function testMaxEntries()
     {
         $redis = $this->createMock(\Redis::class);
@@ -470,33 +376,5 @@ class ConnectionTest extends TestCase
         }
 
         $this->assertSame('xack error', $e->getMessage());
-    }
-
-    public function testLazy()
-    {
-        $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', [], $redis);
-
-        $connection->add('1', []);
-        $this->assertNotEmpty($message = $connection->get());
-        $this->assertSame('1', $message['body']);
-        $connection->reject($message['id']);
-        $redis->del('messenger-lazy');
-    }
-
-    public function testLazyCluster()
-    {
-        $this->skipIfRedisClusterUnavailable();
-
-        $connection = new Connection(
-            ['lazy' => true],
-            ['host' => explode(' ', getenv('REDIS_CLUSTER_HOSTS'))]
-        );
-
-        $connection->add('1', []);
-        $this->assertNotEmpty($message = $connection->get());
-        $this->assertSame('1', $message['body']);
-        $connection->reject($message['id']);
-        $connection->cleanup();
     }
 }

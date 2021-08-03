@@ -15,8 +15,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
  * This class decorates internal authenticators to add the LDAP integration.
@@ -29,7 +32,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
  *
  * @final
  */
-class LdapAuthenticator implements AuthenticatorInterface
+class LdapAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {
     private $authenticator;
     private $ldapServiceId;
@@ -74,5 +77,19 @@ class LdapAuthenticator implements AuthenticatorInterface
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         return $this->authenticator->onAuthenticationFailure($request, $exception);
+    }
+
+    public function start(Request $request, AuthenticationException $authException = null): Response
+    {
+        if (!$this->authenticator instanceof AuthenticationEntryPointInterface) {
+            throw new LogicException(sprintf('Decorated authenticator "%s" must implement interface "%s".', get_debug_type($this->authenticator), AuthenticationEntryPointInterface::class));
+        }
+
+        return $this->authenticator->start($request, $authException);
+    }
+
+    public function isInteractive(): bool
+    {
+        return true;
     }
 }

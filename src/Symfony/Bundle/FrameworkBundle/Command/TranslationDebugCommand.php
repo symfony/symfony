@@ -165,7 +165,7 @@ EOF
                 $transPaths = [$path.'/translations'];
                 $codePaths = [$path.'/templates'];
 
-                if (!is_dir($transPaths[0]) && !isset($transPaths[1])) {
+                if (!is_dir($transPaths[0])) {
                     throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
                 }
             }

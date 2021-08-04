@@ -865,6 +865,10 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         return [
             [$entity, new class() implements \Iterator {
+                /**
+                 * @return mixed
+                 */
+                #[\ReturnTypeWillChange]
                 public function current()
                 {
                     return null;
@@ -875,19 +879,28 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                     return false;
                 }
 
-                public function next()
+                public function next(): void
                 {
                 }
 
+                /**
+                 * @return mixed
+                 */
+                #[\ReturnTypeWillChange]
                 public function key()
                 {
+                    return false;
                 }
 
-                public function rewind()
+                public function rewind(): void
                 {
                 }
             }],
             [$entity, new class() implements \Iterator {
+                /**
+                 * @return mixed
+                 */
+                #[\ReturnTypeWillChange]
                 public function current()
                 {
                     return false;
@@ -898,15 +911,20 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
                     return false;
                 }
 
-                public function next()
+                public function next(): void
                 {
                 }
 
+                /**
+                 * @return mixed
+                 */
+                #[\ReturnTypeWillChange]
                 public function key()
                 {
+                    return false;
                 }
 
-                public function rewind()
+                public function rewind(): void
                 {
                 }
             }],

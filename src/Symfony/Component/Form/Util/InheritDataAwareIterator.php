@@ -30,6 +30,7 @@ class InheritDataAwareIterator extends \IteratorIterator implements \RecursiveIt
      *
      * @return static
      */
+    #[\ReturnTypeWillChange]
     public function getChildren()
     {
         return new static($this->current());
@@ -38,6 +39,7 @@ class InheritDataAwareIterator extends \IteratorIterator implements \RecursiveIt
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function hasChildren()
     {
         return (bool) $this->current()->getConfig()->getInheritData();

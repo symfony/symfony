@@ -177,6 +177,9 @@ class PhpFileLoaderTest extends TestCase
         $expectedCollection->add('buz', (new Route('/zub'))
             ->setDefaults(['_controller' => 'foo:act', '_stateless' => true])
         );
+        $expectedCollection->add('controller_class', (new Route('/controller'))
+            ->setDefaults(['_controller' => ['Acme\MyApp\MyController', 'myAction']])
+        );
         $expectedCollection->add('c_root', (new Route('/sub/pub/'))
             ->setRequirements(['id' => '\d+'])
         );

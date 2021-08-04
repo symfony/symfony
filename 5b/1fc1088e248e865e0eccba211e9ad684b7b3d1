@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-26T16:43:04Z
+
+> Did you use some tool to generate this? It'd be cool to document how we did so that others can do the same I their libs.
+
+No, this was manual work. I used PhpStorm to find all implementations of `Countable`, `IteratorAggregate` and friends. For each case I checked individually whether I can add a return type directly or need to add the attribute. I also checked for each occurrence if the `@return` annotation is equivalent or covariant to the return type in PHP 8.1.
+
+---------------------------------------------------------------------------
+
+by sebastianbergmann at 2021-07-27T13:20:35Z
+
+> No, this was manual work.
+
+Would be nice if that did not have to be the case. CC @TomasVotruba
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2021-07-27T14:09:36Z
+
+@sebastianbergmann Depends how much time it took to do. If its < 30 minutes, than automation would take longer.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-27T14:17:28Z
+
+> @sebastianbergmann Depends how much time it took to do. If its < 30 minutes, than automation would take longer.
+
+I was definitely faster than 30 min. 😎
+
+---------------------------------------------------------------------------
+
+by sebastianbergmann at 2021-07-27T14:22:32Z
+
+> > @sebastianbergmann Depends how much time it took to do. If its < 30 minutes, than automation would take longer.
+> I was definitely faster than 30 min. 😎
+
+Sorry for the noise.
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2021-07-28T06:56:29Z
+
+@sebastianbergmann Thanks for the ping. If this would be something that every Symfony user has to change in their projects too, saved times is enourmous.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-03T08:16:45Z
+
+Seems like we should also do this change for `__wakeUp()`:
+
+`PHP Fatal error:  During inheritance of Exception: Uncaught RuntimeException: PHP Error: Return type of Symfony\Component\Security\Core\Exception\AuthenticationException::__wakeup() should either be compatible with Exception::__wakeup(): void, or the #[ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /home/runner/work/WouterJEloquentBundle/WouterJEloquentBundle/vendor/symfony/security-core/Exception/AuthenticationException.php:115 in /home/runner/work/WouterJEloquentBundle/WouterJEloquentBundle/vendor/vimeo/psalm/src/Psalm/Internal/ErrorHandler.php:66`
+https://github.com/wouterj/WouterJEloquentBundle/runs/3211636106?check_suite_focus=true#step:9:8
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-03T08:19:55Z
+
+@wouterj This PR already includes that change. Code reviews welcome. 🙂
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-04T20:43:50Z
+
+@symfony/mergers Merging this PR would remove some noise from our CI. Any objections against it?

@@ -34,15 +34,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CovertTest extends TestCase
 {
-    private $tmpDir;
-
     protected function setUp(): void
     {
         if (!class_exists(Psr7Request::class)) {
             $this->markTestSkipped('nyholm/psr7 is not installed.');
         }
-
-        $this->tmpDir = sys_get_temp_dir();
     }
 
     /**
@@ -233,7 +229,7 @@ class CovertTest extends TestCase
 
     private function createUploadedFile($content, $originalName, $mimeType, $error)
     {
-        $path = tempnam($this->tmpDir, uniqid());
+        $path = tempnam(sys_get_temp_dir(), uniqid());
         file_put_contents($path, $content);
 
         return new UploadedFile($path, $originalName, $mimeType, $error, true);

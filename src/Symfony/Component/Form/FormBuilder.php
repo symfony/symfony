@@ -161,6 +161,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         if ($this->locked) {
@@ -215,6 +216,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      *
      * @return FormBuilderInterface[]|\Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         if ($this->locked) {

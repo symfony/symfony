@@ -112,7 +112,7 @@ class AuthenticationException extends RuntimeException
     /**
      * @internal
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->__unserialize($this->serialized);
         unset($this->serialized);

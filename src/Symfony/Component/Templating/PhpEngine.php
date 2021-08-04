@@ -169,6 +169,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \InvalidArgumentException if the helper is not defined
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet(mixed $name)
     {
         return $this->get($name);
@@ -179,6 +180,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @return bool true if the helper is defined, false otherwise
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists(mixed $name)
     {
         return isset($this->helpers[$name]);
@@ -189,6 +191,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet(mixed $name, mixed $value)
     {
         $this->set($name, $value);
@@ -201,6 +204,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \LogicException
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset(mixed $name)
     {
         throw new \LogicException(sprintf('You can\'t unset a helper (%s).', $name));

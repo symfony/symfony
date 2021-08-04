@@ -29,12 +29,17 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable
         return \array_key_exists($offset, $this->array);
     }
 
+    /**
+     * @param mixed $offset
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->array[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (null === $offset) {
             $this->array[] = $value;
@@ -43,7 +48,7 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable
         }
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->array[$offset]);
     }

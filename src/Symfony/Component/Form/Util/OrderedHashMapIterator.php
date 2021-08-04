@@ -100,6 +100,7 @@ class OrderedHashMapIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function current(): mixed
     {
         return $this->current;
@@ -124,6 +125,7 @@ class OrderedHashMapIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function key(): mixed
     {
         if (null === $this->key) {

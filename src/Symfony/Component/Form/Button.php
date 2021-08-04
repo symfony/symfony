@@ -49,6 +49,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return bool Always returns false
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists(mixed $offset)
     {
         return false;
@@ -63,6 +64,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet(mixed $offset)
     {
         throw new BadMethodCallException('Buttons cannot have children.');
@@ -77,6 +79,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet(mixed $offset, mixed $value)
     {
         throw new BadMethodCallException('Buttons cannot have children.');
@@ -91,6 +94,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset(mixed $offset)
     {
         throw new BadMethodCallException('Buttons cannot have children.');
@@ -414,6 +418,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return int Always returns 0
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return 0;
@@ -424,6 +429,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return \EmptyIterator Always returns an empty iterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new \EmptyIterator();

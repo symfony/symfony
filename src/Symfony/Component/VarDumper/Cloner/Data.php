@@ -111,6 +111,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return \count($this->getValue());
@@ -119,6 +120,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return \Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         if (!\is_array($value = $this->getValue())) {
@@ -150,6 +152,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return $this->__isset($key);
@@ -158,6 +161,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->__get($key);
@@ -166,6 +170,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         throw new \BadMethodCallException(self::class.' objects are immutable.');
@@ -174,6 +179,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         throw new \BadMethodCallException(self::class.' objects are immutable.');

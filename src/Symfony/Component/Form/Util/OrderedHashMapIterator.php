@@ -105,6 +105,7 @@ class OrderedHashMapIterator implements \Iterator
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->current;
@@ -112,10 +113,8 @@ class OrderedHashMapIterator implements \Iterator
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
-    public function next()
+    public function next(): void
     {
         ++$this->cursor;
 
@@ -133,6 +132,7 @@ class OrderedHashMapIterator implements \Iterator
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         if (null === $this->key) {
@@ -154,10 +154,8 @@ class OrderedHashMapIterator implements \Iterator
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->cursor = 0;
 

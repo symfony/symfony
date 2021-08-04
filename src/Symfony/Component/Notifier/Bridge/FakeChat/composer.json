@@ -1,7 +1,7 @@
 {
     "name": "symfony/fake-chat-notifier",
     "type": "symfony-bridge",
-    "description": "Fake Chat (as email during development) Notifier Bridge.",
+    "description": "Fake Chat (as email or log during development) Notifier Bridge.",
     "keywords": ["chat", "development", "email", "notifier", "symfony"],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -9,6 +9,11 @@
         {
             "name": "Oskar Stark",
             "homepage": "https://github.com/OskarStark"
+        },
+        {
+            "name": "Antoine Makdessi",
+            "email": "amakdessi@me.com",
+            "homepage": "http://antoine.makdessi.free.fr"
         },
         {
             "name": "Symfony Community",

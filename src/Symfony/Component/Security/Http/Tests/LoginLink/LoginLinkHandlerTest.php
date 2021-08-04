@@ -53,7 +53,6 @@ class LoginLinkHandlerTest extends TestCase
 
     /**
      * @dataProvider provideCreateLoginLinkData
-     * @group time-sensitive
      */
     public function testCreateLoginLink($user, array $extraProperties, Request $request = null)
     {
@@ -65,8 +64,10 @@ class LoginLinkHandlerTest extends TestCase
                     return 'weaverryan' == $parameters['user']
                         && isset($parameters['expires'])
                         && isset($parameters['hash'])
+                         // allow a small expiration offset to avoid time-sensitivity
+                        && abs(time() + 600 - $parameters['expires']) <= 1
                         // make sure hash is what we expect
-                        && $parameters['hash'] === $this->createSignatureHash('weaverryan', time() + 600, array_values($extraProperties));
+                        && $parameters['hash'] === $this->createSignatureHash('weaverryan', $parameters['expires'], array_values($extraProperties));
                 }),
                 UrlGeneratorInterface::ABSOLUTE_URL
             )

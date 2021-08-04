@@ -36,8 +36,9 @@ class ChoiceGroupView implements \IteratorAggregate
     /**
      * {@inheritdoc}
      *
-     * @return self[]|ChoiceView[]
+     * @return \Traversable<ChoiceGroupView|ChoiceView>
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new \ArrayIterator($this->choices);

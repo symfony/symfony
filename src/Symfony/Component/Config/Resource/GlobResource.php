@@ -102,6 +102,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
     /**
      * @return \Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         if (!file_exists($this->prefix) || (!$this->recursive && '' === $this->pattern)) {

@@ -45,6 +45,7 @@ class TemplateIterator implements \IteratorAggregate
     /**
      * @return \Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         if (null !== $this->templates) {

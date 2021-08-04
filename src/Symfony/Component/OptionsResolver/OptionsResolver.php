@@ -914,8 +914,6 @@ class OptionsResolver implements Options
      *
      * @param bool $triggerDeprecation Whether to trigger the deprecation or not (true by default)
      *
-     * @return mixed The option value
-     *
      * @throws AccessException           If accessing this method outside of
      *                                   {@link resolve()}
      * @throws NoSuchOptionException     If the option is not set
@@ -924,8 +922,7 @@ class OptionsResolver implements Options
      * @throws OptionDefinitionException If there is a cyclic dependency between
      *                                   lazy options and/or normalizers
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet(mixed $option, bool $triggerDeprecation = true)
+    public function offsetGet(mixed $option, bool $triggerDeprecation = true): mixed
     {
         if (!$this->locked) {
             throw new AccessException('Array access is only supported within closures of lazy options and normalizers.');
@@ -1174,14 +1171,11 @@ class OptionsResolver implements Options
     /**
      * Returns whether a resolved option with the given name exists.
      *
-     * @return bool Whether the option is set
-     *
      * @throws AccessException If accessing this method outside of {@link resolve()}
      *
      * @see \ArrayAccess::offsetExists()
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists(mixed $option)
+    public function offsetExists(mixed $option): bool
     {
         if (!$this->locked) {
             throw new AccessException('Array access is only supported within closures of lazy options and normalizers.');
@@ -1193,12 +1187,9 @@ class OptionsResolver implements Options
     /**
      * Not supported.
      *
-     * @return void
-     *
      * @throws AccessException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet(mixed $option, mixed $value)
+    public function offsetSet(mixed $option, mixed $value): void
     {
         throw new AccessException('Setting options via array access is not supported. Use setDefault() instead.');
     }
@@ -1206,12 +1197,9 @@ class OptionsResolver implements Options
     /**
      * Not supported.
      *
-     * @return void
-     *
      * @throws AccessException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset(mixed $option)
+    public function offsetUnset(mixed $option): void
     {
         throw new AccessException('Removing options via array access is not supported. Use remove() instead.');
     }
@@ -1221,14 +1209,11 @@ class OptionsResolver implements Options
      *
      * This may be only a subset of the defined options.
      *
-     * @return int Number of options
-     *
      * @throws AccessException If accessing this method outside of {@link resolve()}
      *
      * @see \Countable::count()
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         if (!$this->locked) {
             throw new AccessException('Counting is only supported within closures of lazy options and normalizers.');

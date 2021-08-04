@@ -38,8 +38,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return bool Always returns false
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists(mixed $offset)
+    public function offsetExists(mixed $offset): bool
     {
         return false;
     }
@@ -49,12 +48,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @return mixed
-     *
      * @throws BadMethodCallException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet(mixed $offset)
+    public function offsetGet(mixed $offset): mixed
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -64,12 +60,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @return void
-     *
      * @throws BadMethodCallException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet(mixed $offset, mixed $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -79,12 +72,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @return void
-     *
      * @throws BadMethodCallException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset(mixed $offset)
+    public function offsetUnset(mixed $offset): void
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -407,8 +397,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return int Always returns 0
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return 0;
     }
@@ -418,8 +407,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return \EmptyIterator Always returns an empty iterator
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \EmptyIterator
     {
         return new \EmptyIterator();
     }

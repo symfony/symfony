@@ -108,20 +108,12 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return $children;
     }
 
-    /**
-     * @return int
-     */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return \count($this->getValue());
     }
 
-    /**
-     * @return \Traversable
-     */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         if (!\is_array($value = $this->getValue())) {
             throw new \LogicException(sprintf('"%s" object holds non-iterable type "%s".', self::class, get_debug_type($value)));
@@ -149,11 +141,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return null !== $this->seek($key);
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetExists(mixed $key)
+    public function offsetExists(mixed $key): bool
     {
         return $this->__isset($key);
     }
@@ -163,20 +151,12 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->__get($key);
     }
 
-    /**
-     * @return void
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetSet(mixed $key, mixed $value)
+    public function offsetSet(mixed $key, mixed $value): void
     {
         throw new \BadMethodCallException(self::class.' objects are immutable.');
     }
 
-    /**
-     * @return void
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset(mixed $key)
+    public function offsetUnset(mixed $key): void
     {
         throw new \BadMethodCallException(self::class.' objects are immutable.');
     }

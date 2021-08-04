@@ -301,11 +301,8 @@ class Form extends Link implements \ArrayAccess
      * Returns true if the named field exists.
      *
      * @param string $name The field name
-     *
-     * @return bool true if the field exists, false otherwise
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists(mixed $name)
+    public function offsetExists(mixed $name): bool
     {
         return $this->has($name);
     }
@@ -319,8 +316,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet(mixed $name)
+    public function offsetGet(mixed $name): FormField|array
     {
         return $this->fields->get($name);
     }
@@ -331,12 +327,9 @@ class Form extends Link implements \ArrayAccess
      * @param string       $name  The field name
      * @param string|array $value The value of the field
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet(mixed $name, mixed $value)
+    public function offsetSet(mixed $name, mixed $value): void
     {
         $this->fields->set($name, $value);
     }
@@ -345,11 +338,8 @@ class Form extends Link implements \ArrayAccess
      * Removes a field from the form.
      *
      * @param string $name The field name
-     *
-     * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset(mixed $name)
+    public function offsetUnset(mixed $name): void
     {
         $this->fields->remove($name);
     }

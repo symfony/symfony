@@ -196,11 +196,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * Returns a new iterator for this path.
-     *
-     * @return ViolationPathIterator
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): ViolationPathIterator
     {
         return new ViolationPathIterator($this);
     }

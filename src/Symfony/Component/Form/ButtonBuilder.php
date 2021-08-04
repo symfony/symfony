@@ -693,8 +693,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @return int Always returns 0
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return 0;
     }
@@ -704,8 +703,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @return \EmptyIterator Always returns an empty iterator
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \EmptyIterator
     {
         return new \EmptyIterator();
     }

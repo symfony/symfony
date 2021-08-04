@@ -28,11 +28,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
     private $newSessionId;
     private $igbinaryEmptyData;
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function open(string $savePath, string $sessionName)
+    public function open(string $savePath, string $sessionName): bool
     {
         $this->sessionName = $sessionName;
         if (!headers_sent() && !ini_get('session.cache_limiter') && '0' !== ini_get('session.cache_limiter')) {
@@ -57,11 +53,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
      */
     abstract protected function doDestroy(string $sessionId);
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function validateId(string $sessionId)
+    public function validateId(string $sessionId): bool
     {
         $this->prefetchData = $this->read($sessionId);
         $this->prefetchId = $sessionId;
@@ -69,11 +61,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
         return '' !== $this->prefetchData;
     }
 
-    /**
-     * @return string
-     */
-    #[\ReturnTypeWillChange]
-    public function read(string $sessionId)
+    public function read(string $sessionId): string
     {
         if (null !== $this->prefetchId) {
             $prefetchId = $this->prefetchId;
@@ -93,11 +81,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
         return $data;
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function write(string $sessionId, string $data)
+    public function write(string $sessionId, string $data): bool
     {
         if (null === $this->igbinaryEmptyData) {
             // see https://github.com/igbinary/igbinary/issues/146
@@ -111,11 +95,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
         return $this->doWrite($sessionId, $data);
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function destroy(string $sessionId)
+    public function destroy(string $sessionId): bool
     {
         if (!headers_sent() && filter_var(ini_get('session.use_cookies'), \FILTER_VALIDATE_BOOLEAN)) {
             if (!$this->sessionName) {

@@ -613,11 +613,8 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
-     *
-     * @return \Generator
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator(int $flags = 0)
+    public function getIterator(int $flags = 0): \Generator
     {
         $this->readPipesForOutput(__FUNCTION__, false);
 

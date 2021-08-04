@@ -103,11 +103,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Returns a child by name (implements \ArrayAccess).
      *
      * @param string $name The child name
-     *
-     * @return self The child view
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet(mixed $name)
+    public function offsetGet(mixed $name): self
     {
         return $this->children[$name];
     }
@@ -116,11 +113,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Returns whether the given child exists (implements \ArrayAccess).
      *
      * @param string $name The child name
-     *
-     * @return bool Whether the child view exists
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists(mixed $name)
+    public function offsetExists(mixed $name): bool
     {
         return isset($this->children[$name]);
     }
@@ -128,12 +122,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Implements \ArrayAccess.
      *
-     * @return void
-     *
      * @throws BadMethodCallException always as setting a child by name is not allowed
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet(mixed $name, mixed $value)
+    public function offsetSet(mixed $name, mixed $value): void
     {
         throw new BadMethodCallException('Not supported.');
     }
@@ -142,11 +133,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Removes a child (implements \ArrayAccess).
      *
      * @param string $name The child name
-     *
-     * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset(mixed $name)
+    public function offsetUnset(mixed $name): void
     {
         unset($this->children[$name]);
     }
@@ -156,19 +144,12 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return \ArrayIterator<string, FormView> The iterator
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->children);
     }
 
-    /**
-     * Implements \Countable.
-     *
-     * @return int The number of children views
-     */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return \count($this->children);
     }

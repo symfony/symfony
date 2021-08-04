@@ -915,11 +915,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      * Returns whether a child with the given name exists (implements the \ArrayAccess interface).
      *
      * @param string $name The name of the child
-     *
-     * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists(mixed $name)
+    public function offsetExists(mixed $name): bool
     {
         return $this->has($name);
     }
@@ -929,12 +926,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @param string $name The name of the child
      *
-     * @return FormInterface The child form
-     *
      * @throws OutOfBoundsException if the named child does not exist
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet(mixed $name)
+    public function offsetGet(mixed $name): FormInterface
     {
         return $this->get($name);
     }
@@ -945,15 +939,12 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      * @param string        $name  Ignored. The name of the child is used
      * @param FormInterface $child The child to be added
      *
-     * @return void
-     *
      * @throws AlreadySubmittedException if the form has already been submitted
      * @throws LogicException            when trying to add a child to a non-compound form
      *
      * @see self::add()
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet(mixed $name, mixed $child)
+    public function offsetSet(mixed $name, mixed $child): void
     {
         $this->add($child);
     }
@@ -963,12 +954,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @param string $name The name of the child to remove
      *
-     * @return void
-     *
      * @throws AlreadySubmittedException if the form has already been submitted
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset(mixed $name)
+    public function offsetUnset(mixed $name): void
     {
         $this->remove($name);
     }
@@ -976,10 +964,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the iterator for this group.
      *
-     * @return \Traversable<FormInterface>
+     * @return \Traversable<string, FormInterface>
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return $this->children;
     }
@@ -989,8 +976,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @return int The number of embedded form children
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return \count($this->children);
     }

@@ -42,11 +42,7 @@ class Collection implements CollectionInterface
         return $this->entries;
     }
 
-    /**
-     * @return int
-     */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         $con = $this->connection->getResource();
         $searches = $this->search->getResources();

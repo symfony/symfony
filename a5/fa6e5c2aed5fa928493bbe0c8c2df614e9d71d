@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by malarzm at 2021-08-03T20:11:32Z
+
+Failing test is unrelated with the changes, it's red due to an error during composer install.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-08-03T21:48:03Z
+
+This is not a BC break as it is just a private method.

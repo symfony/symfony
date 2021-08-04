@@ -72,7 +72,7 @@ class MarshallingSessionHandlerTest extends TestCase
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
         $this->handler->expects($this->once())->method('gc')
-            ->with(4711)->willReturn(true);
+            ->with(4711)->willReturn(1);
 
         $marshallingSessionHandler->gc(4711);
     }

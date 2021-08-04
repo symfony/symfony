@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by fre5h at 2021-06-03T06:25:45Z
+
+Travis build failed because of
+```
+  Problem 1
+    - Root composer.json requires symfony/turbo-sms-notifier, it could not be found in any version, there may be a typo in the package name.
+```
+
+I added a new package to the composer.json https://github.com/symfony/symfony/pull/41522/files#diff-08024b4d552345610ae41302c94fd454bae1875e86c8eb751409172aa249514cR84 But this package doesn't exist yet.
+I don't now how to fix CI correctly. Should I remove this package from composer.json? Or is there some other trick?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-06-03T09:52:33Z
+
+I'm not super comfortable with adding a bridge to a service whose documentation is not available in english, that limits the potential adoption quite a lot. (note that we don't have any policy yet, I'm just wondering).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-06-03T14:36:39Z
+
+> valid point but IMHO there should be no need for the docs unless it works like expected? WDYT?
+
+If one day the implementation becomes outdated or no longer works as expected for whatever reason, who will be able to fix it?
+Not providing an internationalized entry point for a product is either a sign of a lack of resources or it means the product targets a very specific, localized population.
+Maybe this should just be released as a community bundle until the service has a universally accessible entry point?
+I won't vote against this PR, but I don't feel safe regarding our ability to maintain this transport on the long run.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-06-03T15:53:29Z
+
+IIRC we already have some bridges which have the same problem. This should not be an argument, just an info.
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-06-04T04:01:19Z
+
+@chalasr our community a big :) I am provided two companies from Lithuania and if needed to help read docs it is not a big issue :))) one company officially have English translation, another company have only LT :)
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-06-04T04:05:08Z
+
+As I see TurboSMS is a UA company, but page loads Russian :) Too know Russian no problem 😊😁
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-06-04T06:41:58Z
+
+My 2cts: Providers (notifier, mailer, translation, ...) MUST be maintained by the community (the developers using them), the core team cannot maintain them except for mass changes (CS, new PHP version, ...).
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-06-04T07:59:02Z
+
+Agree with @fabpot 👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-06-04T11:40:03Z
+
+Works for me.
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-06-06T19:04:52Z
+
+You will need to make fabbot happy (rebase) :)
+
+---------------------------------------------------------------------------
+
+by fre5h at 2021-06-07T06:46:28Z
+
+rebased
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-13T19:13:24Z
+
+Can you please rebase? Thanks
+
+---------------------------------------------------------------------------
+
+by fre5h at 2021-08-02T07:21:29Z
+
+@OskarStark rebased

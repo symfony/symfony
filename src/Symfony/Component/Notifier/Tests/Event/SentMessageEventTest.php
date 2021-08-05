@@ -8,9 +8,6 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 
-/**
- * @author Smaïne Milianni <smaine.milianni@gmail.com>
- */
 final class SentMessageEventTest extends TestCase
 {
     /**

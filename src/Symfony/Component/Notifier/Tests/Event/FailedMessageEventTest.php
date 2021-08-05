@@ -15,9 +15,6 @@ use Symfony\Component\Notifier\Transport\NullTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
- * @author Smaïne Milianni <smaine.milianni@gmail.com>
- */
 final class FailedMessageEventTest extends TestCase
 {
     /**

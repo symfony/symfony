@@ -47,6 +47,13 @@ class UniqueValidator extends ConstraintValidator
         $collectionElements = [];
         $normalizer = $this->getNormalizer($constraint);
         foreach ($value as $element) {
+            if (!empty($fields)) {
+                $element = $this->reduceElementKeys($fields, $element);
+                if (empty($element)) {
+                    continue;
+                }
+            }
+
             $element = $normalizer($element);
 
             if (\in_array($element, $collectionElements, true)) {
@@ -70,5 +77,17 @@ class UniqueValidator extends ConstraintValidator
         }
 
         return $unique->normalizer;
+    }
+
+    private function reduceElementKeys(array $fields, array $element): array
+    {
+        $output = [];
+        foreach ($fields as $field) {
+            if (isset($element[$field])) {
+                $output[$field] = $element[$field];
+            }
+        }
+
+        return $output;
     }
 }

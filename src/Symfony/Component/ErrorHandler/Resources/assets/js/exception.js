@@ -176,7 +176,7 @@ if (typeof Sfjs === 'undefined') {
                     }
 
                     /* Prevents from disallowing clicks on "copy to clipboard" elements inside toggles */
-                    var copyToClipboardElements = toggles[i].querySelectorAll('span[data-clipboard-text]')
+                    var copyToClipboardElements = toggles[i].querySelectorAll('span[data-clipboard-text]');
                     for (var k = 0; k < copyToClipboardElements.length; k++) {
                         addEventListener(copyToClipboardElements[k], 'click', function(e) {
                             e.stopPropagation();

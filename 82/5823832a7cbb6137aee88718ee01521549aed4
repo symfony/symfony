@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-15T13:28:34Z
+
+There's a failing test in DoctrineBridge that does not happen on 6.0. I don't quite understand it yet, but I'm on it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-18T12:40:48Z
+
+~~Blocked by #42135.~~ Ready

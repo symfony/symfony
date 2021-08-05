@@ -30,6 +30,7 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function open(string $savePath, string $name)
     {
         return $this->handler->open($savePath, $name);
@@ -38,6 +39,7 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function close()
     {
         return $this->handler->close();
@@ -46,14 +48,16 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function destroy(string $sessionId)
     {
         return $this->handler->destroy($sessionId);
     }
 
     /**
-     * @return bool
+     * @return int|false
      */
+    #[\ReturnTypeWillChange]
     public function gc(int $maxlifetime)
     {
         return $this->handler->gc($maxlifetime);
@@ -62,6 +66,7 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function read(string $sessionId)
     {
         return $this->marshaller->unmarshall($this->handler->read($sessionId));
@@ -70,6 +75,7 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function write(string $sessionId, string $data)
     {
         $failed = [];
@@ -85,6 +91,7 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function validateId(string $sessionId)
     {
         return $this->handler->validateId($sessionId);
@@ -93,6 +100,7 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function updateTimestamp(string $sessionId, string $data)
     {
         return $this->handler->updateTimestamp($sessionId, $data);

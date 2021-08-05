@@ -307,7 +307,7 @@ class MyArrayObject extends \ArrayObject
         parent::__construct($array, 1);
     }
 
-    public function setFlags($flags)
+    public function setFlags($flags): void
     {
         throw new \BadMethodCallException('Calling MyArrayObject::setFlags() is forbidden');
     }
@@ -340,7 +340,7 @@ final class FinalArrayIterator extends \ArrayIterator
         return serialize([123, parent::serialize()]);
     }
 
-    public function unserialize($data)
+    public function unserialize($data): void
     {
         if ('' === $data) {
             throw new \InvalidArgumentException('Serialized data is empty.');

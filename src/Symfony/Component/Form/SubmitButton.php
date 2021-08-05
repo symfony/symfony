@@ -18,7 +18,7 @@ namespace Symfony\Component\Form;
  */
 class SubmitButton extends Button implements ClickableInterface
 {
-    private $clicked = false;
+    private bool $clicked = false;
 
     /**
      * {@inheritdoc}

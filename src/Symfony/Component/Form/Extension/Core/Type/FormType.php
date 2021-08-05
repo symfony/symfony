@@ -28,7 +28,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 class FormType extends BaseType
 {
-    private $dataMapper;
+    private DataMapper $dataMapper;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {

@@ -23,9 +23,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class BooleanToStringTransformer implements DataTransformerInterface
 {
-    private $trueValue;
+    private string $trueValue;
 
-    private $falseValues;
+    private array $falseValues;
 
     /**
      * @param string $trueValue The value emitted upon transform if the input is true

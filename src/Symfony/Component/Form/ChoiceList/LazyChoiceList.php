@@ -27,16 +27,14 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
  */
 class LazyChoiceList implements ChoiceListInterface
 {
-    private $loader;
+    private ChoiceLoaderInterface $loader;
 
     /**
      * The callable creating string values for each choice.
      *
      * If null, choices are cast to strings.
-     *
-     * @var callable|null
      */
-    private $value;
+    private ?\Closure $value;
 
     /**
      * Creates a lazily-loaded list using the given loader.
@@ -50,7 +48,7 @@ class LazyChoiceList implements ChoiceListInterface
     public function __construct(ChoiceLoaderInterface $loader, callable $value = null)
     {
         $this->loader = $loader;
-        $this->value = $value;
+        $this->value = null === $value || $value instanceof \Closure ? $value : \Closure::fromCallable($value);
     }
 
     /**

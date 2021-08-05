@@ -26,9 +26,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FormTypeValidatorExtension extends BaseValidatorExtension
 {
-    private $validator;
-    private $violationMapper;
-    private $legacyErrorMessages;
+    private ValidatorInterface $validator;
+    private ViolationMapper $violationMapper;
+    private bool $legacyErrorMessages;
 
     public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
     {

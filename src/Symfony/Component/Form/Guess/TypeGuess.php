@@ -19,8 +19,8 @@ namespace Symfony\Component\Form\Guess;
  */
 class TypeGuess extends Guess
 {
-    private $type;
-    private $options;
+    private string $type;
+    private array $options;
 
     /**
      * @param string $type       The guessed field type

@@ -31,10 +31,10 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         self::INTEGER,
     ];
 
-    private $roundingMode;
-    private $type;
-    private $scale;
-    private $html5Format;
+    private int $roundingMode;
+    private string $type;
+    private int $scale;
+    private bool $html5Format;
 
     /**
      * @see self::$types for a list of supported types

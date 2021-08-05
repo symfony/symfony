@@ -27,8 +27,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     protected $roundingMode;
 
-    private $scale;
-    private $locale;
+    private ?int $scale;
+    private ?string $locale;
 
     public function __construct(int $scale = null, ?bool $grouping = false, ?int $roundingMode = \NumberFormatter::ROUND_HALFUP, string $locale = null)
     {

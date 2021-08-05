@@ -20,30 +20,11 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 {
-    /**
-     * @var array
-     */
-    private $elements = [];
-
-    /**
-     * @var array
-     */
-    private $isIndex = [];
-
-    /**
-     * @var array
-     */
-    private $mapsForm = [];
-
-    /**
-     * @var string
-     */
-    private $pathAsString = '';
-
-    /**
-     * @var int
-     */
-    private $length = 0;
+    private array $elements = [];
+    private array $isIndex = [];
+    private array $mapsForm = [];
+    private string $pathAsString = '';
+    private int $length = 0;
 
     /**
      * Creates a new violation path from a string.

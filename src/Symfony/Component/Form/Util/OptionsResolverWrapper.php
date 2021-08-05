@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OptionsResolverWrapper extends OptionsResolver
 {
-    private $undefined = [];
+    private array $undefined = [];
 
     /**
      * @return $this

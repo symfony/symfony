@@ -21,20 +21,9 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  */
 class Button implements \IteratorAggregate, FormInterface
 {
-    /**
-     * @var FormInterface|null
-     */
-    private $parent;
-
-    /**
-     * @var FormConfigInterface
-     */
-    private $config;
-
-    /**
-     * @var bool
-     */
-    private $submitted = false;
+    private ?FormInterface $parent = null;
+    private FormConfigInterface $config;
+    private bool $submitted = false;
 
     /**
      * Creates a new button from a form configuration.

@@ -16,7 +16,7 @@ use Symfony\Component\Form\Guess\Guess;
 
 class FormTypeGuesserChain implements FormTypeGuesserInterface
 {
-    private $guessers = [];
+    private array $guessers = [];
 
     /**
      * @param FormTypeGuesserInterface[] $guessers

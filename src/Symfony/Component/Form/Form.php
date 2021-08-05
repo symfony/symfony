@@ -69,68 +69,41 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
-    /**
-     * @var FormConfigInterface
-     */
-    private $config;
-
-    /**
-     * @var FormInterface|null
-     */
-    private $parent;
+    private FormConfigInterface $config;
+    private ?FormInterface $parent = null;
 
     /**
      * A map of FormInterface instances.
      *
      * @var FormInterface[]|OrderedHashMap
      */
-    private $children;
+    private OrderedHashMap $children;
 
     /**
      * @var FormError[]
      */
-    private $errors = [];
+    private array $errors = [];
 
-    /**
-     * @var bool
-     */
-    private $submitted = false;
+    private bool $submitted = false;
 
     /**
      * The button that was used to submit the form.
-     *
-     * @var FormInterface|ClickableInterface|null
      */
-    private $clickedButton;
+    private FormInterface|ClickableInterface|null $clickedButton = null;
 
-    /**
-     * @var mixed
-     */
-    private $modelData;
-
-    /**
-     * @var mixed
-     */
-    private $normData;
-
-    /**
-     * @var mixed
-     */
-    private $viewData;
+    private mixed $modelData = null;
+    private mixed $normData = null;
+    private mixed $viewData = null;
 
     /**
      * The submitted values that don't belong to any children.
-     *
-     * @var array
      */
-    private $extraData = [];
+    private array $extraData = [];
 
     /**
      * The transformation failure generated during submission, if any.
-     *
-     * @var TransformationFailedException|null
      */
-    private $transformationFailure;
+    private ?TransformationFailedException $transformationFailure = null;
 
     /**
      * Whether the form's data has been initialized.
@@ -141,34 +114,22 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      * lazily in order to save performance when {@link setData()} is called
      * manually, making the initialization with the configured default value
      * superfluous.
-     *
-     * @var bool
      */
-    private $defaultDataSet = false;
+    private bool $defaultDataSet = false;
 
     /**
      * Whether setData() is currently being called.
-     *
-     * @var bool
      */
-    private $lockSetData = false;
+    private bool $lockSetData = false;
 
-    /**
-     * @var string
-     */
-    private $name = '';
+    private string $name = '';
 
     /**
      * Whether the form inherits its underlying data from its parent.
-     *
-     * @var bool
      */
-    private $inheritData;
+    private bool $inheritData;
 
-    /**
-     * @var PropertyPathInterface|null
-     */
-    private $propertyPath;
+    private ?PropertyPathInterface $propertyPath = null;
 
     /**
      * @throws LogicException if a data mapper is not provided for a compound form

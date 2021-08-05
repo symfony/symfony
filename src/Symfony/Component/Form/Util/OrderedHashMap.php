@@ -68,24 +68,18 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     /**
      * The elements of the map, indexed by their keys.
-     *
-     * @var array
      */
-    private $elements = [];
+    private array $elements = [];
 
     /**
      * The keys of the map in the order in which they were inserted or changed.
-     *
-     * @var array
      */
-    private $orderedKeys = [];
+    private array $orderedKeys = [];
 
     /**
      * References to the cursors of all open iterators.
-     *
-     * @var array
      */
-    private $managedCursors = [];
+    private array $managedCursors = [];
 
     /**
      * Creates a new map.

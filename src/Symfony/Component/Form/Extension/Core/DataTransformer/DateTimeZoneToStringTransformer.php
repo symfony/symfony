@@ -21,7 +21,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class DateTimeZoneToStringTransformer implements DataTransformerInterface
 {
-    private $multiple;
+    private bool $multiple;
 
     public function __construct(bool $multiple = false)
     {

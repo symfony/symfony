@@ -20,32 +20,29 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  */
 class FormFactoryBuilder implements FormFactoryBuilderInterface
 {
-    private $forceCoreExtension;
+    private bool $forceCoreExtension;
 
-    /**
-     * @var ResolvedFormTypeFactoryInterface
-     */
-    private $resolvedTypeFactory;
+    private ResolvedFormTypeFactoryInterface $resolvedTypeFactory;
 
     /**
      * @var FormExtensionInterface[]
      */
-    private $extensions = [];
+    private array $extensions = [];
 
     /**
      * @var FormTypeInterface[]
      */
-    private $types = [];
+    private array $types = [];
 
     /**
      * @var FormTypeExtensionInterface[][]
      */
-    private $typeExtensions = [];
+    private array $typeExtensions = [];
 
     /**
      * @var FormTypeGuesserInterface[]
      */
-    private $typeGuessers = [];
+    private array $typeGuessers = [];
 
     public function __construct(bool $forceCoreExtension = false)
     {

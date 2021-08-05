@@ -18,11 +18,11 @@ use Symfony\Component\Form\FormTypeGuesserChain;
 
 class DependencyInjectionExtension implements FormExtensionInterface
 {
-    private $guesser;
-    private $guesserLoaded = false;
-    private $typeContainer;
-    private $typeExtensionServices;
-    private $guesserServices;
+    private ?FormTypeGuesserChain $guesser = null;
+    private bool $guesserLoaded = false;
+    private ContainerInterface $typeContainer;
+    private array $typeExtensionServices;
+    private iterable $guesserServices;
 
     /**
      * @param iterable[] $typeExtensionServices

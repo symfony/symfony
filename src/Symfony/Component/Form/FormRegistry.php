@@ -26,24 +26,16 @@ class FormRegistry implements FormRegistryInterface
     /**
      * @var FormExtensionInterface[]
      */
-    private $extensions = [];
+    private array $extensions = [];
 
     /**
      * @var ResolvedFormTypeInterface[]
      */
-    private $types = [];
+    private array $types = [];
 
-    /**
-     * @var FormTypeGuesserInterface|false|null
-     */
-    private $guesser = false;
-
-    /**
-     * @var ResolvedFormTypeFactoryInterface
-     */
-    private $resolvedTypeFactory;
-
-    private $checkedTypes = [];
+    private FormTypeGuesserInterface|null|false $guesser = false;
+    private ResolvedFormTypeFactoryInterface $resolvedTypeFactory;
+    private array $checkedTypes = [];
 
     /**
      * @param FormExtensionInterface[] $extensions

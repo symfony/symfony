@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ismail1432 at 2020-12-28T16:05:46Z
+
+the failed test seems not related
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-06-17T09:18:45Z
+
+can you give us a final review here @jderusse ? Thanks
+
+---------------------------------------------------------------------------
+
+by ismail1432 at 2021-07-13T07:50:21Z
+
+friendly pump :smiley:
+
+---------------------------------------------------------------------------
+
+by ismail1432 at 2021-08-05T08:57:22Z
+
+> LGTM, but we need to add an entry to `src/Symfony/Component/Notifier/CHANGELOG.md`.
+
+Updated, let me know if it's not good.

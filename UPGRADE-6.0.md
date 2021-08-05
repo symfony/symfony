@@ -69,6 +69,7 @@ Finder
 Form
 ----
 
+ * `FormErrorIterator::children()` throws an exception if the current element is not iterable.
  * The default value of the `rounding_mode` option of the `PercentType` has been changed to `\NumberFormatter::ROUND_HALFUP`.
  * The default rounding mode of the `PercentToLocalizedStringTransformer` has been changed to `\NumberFormatter::ROUND_HALFUP`.
  * Added the `getIsEmptyCallback()` method to the `FormConfigInterface`.

@@ -203,7 +203,13 @@ final class DkimSigner
             hash_update($hash, $canon);
         }
 
-        if (0 === $length) {
+        // Add trailing Line return if last line is non empty
+        if (\strlen($currentLine) > 0) {
+            hash_update($hash, "\r\n");
+            $length += \strlen("\r\n");
+        }
+
+        if (!$relaxed && 0 === $length) {
             hash_update($hash, "\r\n");
             $length = 2;
         }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
+use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * @requires extension redis
@@ -173,6 +174,99 @@ class RedisExtIntegrationTest extends TestCase
         $connection->ack($encoded['id']);
     }
 
+    public function testLazyCluster()
+    {
+        $this->skipIfRedisClusterUnavailable();
+
+        $connection = new Connection(
+            ['lazy' => true],
+            ['host' => explode(' ', getenv('REDIS_CLUSTER_HOSTS'))]
+        );
+
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $this->assertSame('1', $message['body']);
+        $connection->reject($message['id']);
+        $connection->cleanup();
+    }
+
+    public function testLazy()
+    {
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', [], $redis);
+
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $this->assertSame('1', $message['body']);
+        $connection->reject($message['id']);
+        $redis->del('messenger-lazy');
+    }
+
+    public function testDbIndex()
+    {
+        $redis = new \Redis();
+
+        Connection::fromDsn('redis://localhost/queue?dbindex=2', [], $redis);
+
+        $this->assertSame(2, $redis->getDbNum());
+    }
+
+    public function testFromDsnWithMultipleHosts()
+    {
+        $this->skipIfRedisClusterUnavailable();
+
+        $hosts = explode(' ', getenv('REDIS_CLUSTER_HOSTS'));
+
+        $dsn = array_map(function ($host) {
+            return 'redis://'.$host;
+        }, $hosts);
+        $dsn = implode(',', $dsn);
+
+        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn));
+    }
+
+    public function testJsonError()
+    {
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/json-error', [], $redis);
+        try {
+            $connection->add("\xB1\x31", []);
+        } catch (TransportException $e) {
+        }
+
+        $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getMessage());
+    }
+
+    public function testGetNonBlocking()
+    {
+        $redis = new \Redis();
+
+        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', [], $redis);
+
+        $this->assertNull($connection->get()); // no message, should return null immediately
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $connection->reject($message['id']);
+        $redis->del('messenger-getnonblocking');
+    }
+
+    public function testGetAfterReject()
+    {
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', [], $redis);
+
+        $connection->add('1', []);
+        $connection->add('2', []);
+
+        $failing = $connection->get();
+        $connection->reject($failing['id']);
+
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget');
+        $this->assertNotNull($connection->get());
+
+        $redis->del('messenger-rejectthenget');
+    }
+
     private function getConnectionGroup(Connection $connection): string
     {
         $property = (new \ReflectionClass(Connection::class))->getProperty('group');
@@ -187,5 +281,14 @@ class RedisExtIntegrationTest extends TestCase
         $property->setAccessible(true);
 
         return $property->getValue($connection);
+    }
+
+    private function skipIfRedisClusterUnavailable()
+    {
+        try {
+            new \RedisCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
     }
 }

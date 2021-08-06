@@ -34,7 +34,7 @@ interface AuthenticatorInterface
     /**
      * Does the authenticator support the given Request?
      *
-     * If this returns false, the authenticator will be skipped.
+     * If this returns true, authenticate() will be called. If false, the authenticator will be skipped.
      *
      * Returning null means authenticate() can be called lazily when accessing the token storage.
      */

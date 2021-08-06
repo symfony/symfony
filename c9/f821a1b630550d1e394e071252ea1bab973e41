@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-08-04T15:30:20Z
+
+I'd say it's OK to merge in 5.4 only, because the answer to the question -> *"Is the code broken if we don't make this change?"* is "No" ... so it's not a bug fix.

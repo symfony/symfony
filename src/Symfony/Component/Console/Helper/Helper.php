@@ -170,7 +170,7 @@ abstract class Helper implements HelperInterface
         // remove <...> formatting
         $string = $formatter->format($string ?? '');
         // remove already formatted characters
-        $string = preg_replace("/\033\[[^m]*m/", '', $string);
+        $string = preg_replace("/\033\[[^m]*m/", '', $string ?? '');
         $formatter->setDecorated($isDecorated);
 
         return $string;

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UniqueValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): UniqueValidator
     {
         return new UniqueValidator();
     }
@@ -217,6 +217,13 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(['Hello', 'World'], new Unique([
             'normalizer' => $callback,
         ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function testCollectionFieldsAreOptional()
+    {
+        $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique('id'));
 
         $this->assertNoViolation();
     }

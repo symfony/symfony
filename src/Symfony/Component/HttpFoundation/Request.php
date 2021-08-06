@@ -703,6 +703,8 @@ class Request
      * @param mixed $default The default value if the parameter key does not exist
      *
      * @return mixed
+     *
+     * @internal since Symfony 5.4, use explicit input sources instead
      */
     public function get(string $key, $default = null)
     {

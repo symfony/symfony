@@ -23,6 +23,11 @@ HttpKernel
 
  * Deprecate `AbstractTestSessionListener::getSession` inject a session in the request instead
 
+HttpFoundation
+--------------
+
+ * Mark `Request::get()` internal, use explicit input sources instead
+
 Messenger
 ---------
 

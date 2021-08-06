@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2021-08-05T00:26:43Z
+
+NullOutputFormatter has a void return type. Seems wrong to me. Shouldn't this be null?
+The test for it added in https://github.com/symfony/symfony/pull/34869/files#diff-260058da84f48eedd4b4792b7719ebf98ebb4f5e274c80724b6620e5555cc218R24-R32 (NullOutputFormatterTest ::testFormat) does not make sense. The param is not passed by reference, so it cannot be changed. What it really means to test is that it returns null for any input message?!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-05T00:29:59Z
+
+> NullOutputFormatter has a void return type. Seems wrong to me. Shouldn't this be null?
+
+I believe so: #42382

@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-20T11:45:16Z
+
+Can you please target 4.4 instead?
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-07-20T12:08:38Z
+
+Could we use this tool's error output code for the CI job?
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-07-20T12:25:43Z
+
+@fabpot did remove the changelog entry, @nicolas-grekas did target branch 4.4 instead 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-21T08:38:46Z
+
+Thanks.
+Can you add a step in the CI that would run this command to warn us when there is a mistake?
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-07-21T09:27:46Z
+
+Done in c2aa16e
+
+The script now runs in verbose mode, so translation mismatches get visible. Output looks great on CI: https://github.com/symfony/symfony/pull/42201/checks?check_run_id=3122692589
+
+Please note; missing translations will not be taken into account for the script's exit code
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-07-21T09:59:23Z
+
+@fabpot @nicolas-grekas ready for review again
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-08-06T10:49:30Z
+
+Based on the suggestion of @OskarStark fb731ac7c6a8b8cba97a4d95747ab0578e1bfa23 was committed. The CI step now runs as part of the existing integration workflow, and only runs when translation files were changes.
+
+This now also means that CI is green entirely, as this PR does not change any translation files. Would be good to create a reminder of still having to fix those translation IDs.
+
+Ready for review again @nicolas-grekas @fabpot

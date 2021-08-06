@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-24T09:03:02Z
+
+Renamed `createAuthenticatedToken()` to `createToken` because of the argument type change which is BC breaking on PHP < 7.4.
+That seems to be a good move anyway as 6.0 does not have `authenticated` tokens, just tokens (https://github.com/symfony/symfony/pull/42050).
+
+PR is ready.

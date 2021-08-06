@@ -53,6 +53,8 @@ interface OutputFormatterInterface
 
     /**
      * Formats a message according to the given styles.
+     *
+     * @return string|null
      */
     public function format(?string $message);
 }

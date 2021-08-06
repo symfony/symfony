@@ -40,7 +40,7 @@ class PostAuthenticationToken extends AbstractToken
     }
 
     /**
-     * This is meant to be only an authenticated token, where credentials
+     * This is meant to be only a token, where credentials
      * have already been used and are thus cleared.
      *
      * {@inheritdoc}

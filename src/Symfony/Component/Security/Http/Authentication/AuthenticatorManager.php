@@ -74,11 +74,12 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
      */
     public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
     {
-        // create an authenticated token for the User
+        // create an authentication token for the User
         // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
-        $token = $authenticator->createAuthenticatedToken($passport = new SelfValidatingPassport(new UserBadge(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), function () use ($user) { return $user; }), $badges), $this->firewallName);
+        $passport = new SelfValidatingPassport(new UserBadge(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), function () use ($user) { return $user; }), $badges);
+        $token = method_exists($authenticator, 'createToken') ? $authenticator->createToken($passport, $this->firewallName) : $authenticator->createAuthenticatedToken($passport, $this->firewallName);
 
-        // announce the authenticated token
+        // announce the authentication token
         $token = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($token, $passport))->getAuthenticatedToken();
 
         // authenticate this in the system
@@ -189,10 +190,10 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
                 throw new BadCredentialsException(sprintf('Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "%s".', implode('", "', $missingRequiredBadges)));
             }
 
-            // create the authenticated token
-            $authenticatedToken = $authenticator->createAuthenticatedToken($passport, $this->firewallName);
+            // create the authentication token
+            $authenticatedToken = method_exists($authenticator, 'createToken') ? $authenticator->createToken($passport, $this->firewallName) : $authenticator->createAuthenticatedToken($passport, $this->firewallName);
 
-            // announce the authenticated token
+            // announce the authentication token
             $authenticatedToken = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($authenticatedToken, $passport))->getAuthenticatedToken();
 
             if (true === $this->eraseCredentials) {

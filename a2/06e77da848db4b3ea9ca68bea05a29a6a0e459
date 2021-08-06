@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-02T16:44:19Z
+
+The pass position might have been changed for a good reason in https://github.com/symfony/symfony/pull/40406.
+ping @derrabus :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-03T12:09:40Z
+
+I don't recall why I did that. I guess it was necessary for my original implementation and it might very well be the case that the final implementation did not need the passes to be rearranged anymore. As long as the tests are green, I'm fine with the change.

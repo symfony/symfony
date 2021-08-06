@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-05T15:27:38Z
+
+yeah much internal usage.
+
+no time to do such maintenance, sorry. Feel free to takeover.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-05T15:30:38Z
+
+`@internal` also works for me, i can do that quick :+1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-05T18:26:05Z
+
+to make this PR actionable, i chosen `@internal` approach.
+
+The goal to me is to get this method out of public API scope.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-08-06T04:33:37Z
+
+Im okey removing it from the public API. In my opinion it should never be used by application authors.

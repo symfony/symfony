@@ -116,6 +116,7 @@ use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
+use Symfony\Component\Notifier\Bridge\Expo\ExpoTransportFactory;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
@@ -2452,6 +2453,7 @@ class FrameworkExtension extends Extension
             ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
             DiscordTransportFactory::class => 'notifier.transport_factory.discord',
             EsendexTransportFactory::class => 'notifier.transport_factory.esendex',
+            ExpoTransportFactory::class => 'notifier.transport_factory.expo',
             FakeChatTransportFactory::class => 'notifier.transport_factory.fakechat',
             FakeSmsTransportFactory::class => 'notifier.transport_factory.fakesms',
             FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',

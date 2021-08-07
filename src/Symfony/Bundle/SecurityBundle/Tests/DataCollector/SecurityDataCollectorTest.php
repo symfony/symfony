@@ -37,7 +37,7 @@ class SecurityDataCollectorTest extends TestCase
 {
     public function testCollectWhenSecurityIsDisabled()
     {
-        $collector = new SecurityDataCollector();
+        $collector = new SecurityDataCollector(null, null, null, null, null, null, true);
         $collector->collect(new Request(), new Response());
 
         $this->assertSame('security', $collector->getName());
@@ -57,7 +57,7 @@ class SecurityDataCollectorTest extends TestCase
     public function testCollectWhenAuthenticationTokenIsNull()
     {
         $tokenStorage = new TokenStorage();
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
         $collector->collect(new Request(), new Response());
 
         $this->assertTrue($collector->isEnabled());
@@ -71,7 +71,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertCount(0, $collector->getInheritedRoles());
         $this->assertEmpty($collector->getUser());
         $this->assertNull($collector->getFirewall());
-        $this->assertFalse($collector->isAuthenticatorManagerEnabled());
+        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     /** @dataProvider provideRoles */
@@ -80,7 +80,7 @@ class SecurityDataCollectorTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $roles));
 
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
         $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
@@ -94,7 +94,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($normalizedRoles, $collector->getRoles()->getValue(true));
         $this->assertSame($inheritedRoles, $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
-        $this->assertFalse($collector->isAuthenticatorManagerEnabled());
+        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     public function testCollectSwitchUserToken()
@@ -104,7 +104,7 @@ class SecurityDataCollectorTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new SwitchUserToken('hhamon', 'P4$$w0rD', 'provider', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $adminToken));
 
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
         $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
@@ -160,7 +160,7 @@ class SecurityDataCollectorTest extends TestCase
         $response = new Response();
 
         // Don't inject any firewall map
-        $collector = new SecurityDataCollector();
+        $collector = new SecurityDataCollector(null, null, null, null, null, null, true);
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
 
@@ -170,7 +170,7 @@ class SecurityDataCollectorTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()), true);
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
 
@@ -180,7 +180,7 @@ class SecurityDataCollectorTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()), true);
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
     }
@@ -214,7 +214,7 @@ class SecurityDataCollectorTest extends TestCase
         $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
         $firewall->onKernelRequest($event);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, $firewall);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, $firewall, true);
         $collector->collect($request, $response);
 
         $this->assertNotEmpty($collected = $collector->getListeners()[0]);
@@ -339,7 +339,7 @@ class SecurityDataCollectorTest extends TestCase
             ->method('getDecisionLog')
             ->willReturn($decisionLog);
 
-        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager);
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null, true);
         $dataCollector->collect(new Request(), new Response());
 
         $this->assertEquals($dataCollector->getAccessDecisionLog(), $expectedDecisionLog, 'Wrong value returned by getAccessDecisionLog');

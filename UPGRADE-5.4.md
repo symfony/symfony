@@ -37,6 +37,7 @@ Messenger
 SecurityBundle
 --------------
 
+ * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`
  * Deprecate `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of
    `AuthenticatorFactoryInterface` and `SecurityExtension::addAuthenticatorFactory()`
  * Add `AuthenticatorFactoryInterface::getPriority()` which replaces `SecurityFactoryInterface::getPosition()`.
@@ -57,10 +58,14 @@ SecurityBundle
 Security
 --------
 
- * Deprecate setting the 4th argument (`$alwaysAuthenticate`) to `true` and not setting the
-   5th argument (`$exceptionOnNoToken`) to `false` of `AuthorizationChecker` (this is the default
+ * Deprecate the `$authManager` argument of `AccessListener`
+ * Deprecate the `$authenticationManager` argument of the `AuthorizationChecker` constructor
+ * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`
+   (this is the default behavior when using `enable_authenticator_manager: true`)
+ * Deprecate setting the `$alwaysAuthenticate` argument to `true` and not setting the
+   `$exceptionOnNoToken argument to `false` of `AuthorizationChecker` (this is the default
    behavior when using `enable_authenticator_manager: true`)
- * Deprecate not setting the 5th argument (`$exceptionOnNoToken`) of `AccessListener` to `false`
+ * Deprecate not setting the `$exceptionOnNoToken` argument of `AccessListener` to `false`
    (this is the default behavior when using `enable_authenticator_manager: true`)
  * Deprecate `TokenInterface:isAuthenticated()` and `setAuthenticated()` methods without replacement.
    Security tokens won't have an "authenticated" flag anymore, so they will always be considered authenticated

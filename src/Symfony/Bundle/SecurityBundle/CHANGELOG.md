@@ -4,6 +4,7 @@ CHANGELOG
 5.4
 ---
 
+ * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`
  * Deprecate `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of
    `AuthenticatorFactoryInterface` and `SecurityExtension::addAuthenticatorFactory()`
  * Add `AuthenticatorFactoryInterface::getPriority()` which replaces `SecurityFactoryInterface::getPosition()`

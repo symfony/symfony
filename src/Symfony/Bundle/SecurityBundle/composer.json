@@ -26,10 +26,10 @@
         "symfony/http-foundation": "^5.3|^6.0",
         "symfony/password-hasher": "^5.3|^6.0",
         "symfony/polyfill-php80": "^1.16",
-        "symfony/security-core": "^5.3|^6.0",
+        "symfony/security-core": "^5.4|^6.0",
         "symfony/security-csrf": "^4.4|^5.0|^6.0",
         "symfony/security-guard": "^5.3|^6.0",
-        "symfony/security-http": "^5.3.2|^6.0"
+        "symfony/security-http": "^5.4|^6.0"
     },
     "require-dev": {
         "doctrine/annotations": "^1.10.4",

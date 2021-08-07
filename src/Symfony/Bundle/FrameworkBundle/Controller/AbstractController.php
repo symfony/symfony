@@ -463,7 +463,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Send a notification via the Notifier.
      *
-     * @param Notification $notification The $notification.
+     * @param Notification $notification the $notification
      */
     protected function notify(Notification $notification): void
     {

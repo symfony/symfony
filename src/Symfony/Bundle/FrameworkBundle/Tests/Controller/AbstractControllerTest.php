@@ -38,6 +38,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -78,6 +81,7 @@ class AbstractControllerTest extends TestCase
             'messenger.default_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
             'security.token_storage' => '?Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorageInterface',
             'security.csrf.token_manager' => '?Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
+            'notifier' => '?Symfony\\Component\\Notifier\\NotifierInterface',
         ];
 
         $this->assertEquals($expectedServices, $subscribed, 'Subscribed core services in AbstractController have changed');
@@ -627,5 +631,31 @@ class AbstractControllerTest extends TestCase
         $links = $request->attributes->get('_links')->getLinks();
         $this->assertContains($link1, $links);
         $this->assertContains($link2, $links);
+    }
+
+    public function testNotify()
+    {
+        $notifier = $this->createMock(NotifierInterface::class);
+        $notifier->expects($this->once())->method('send');
+
+        $container = new Container();
+        $container->set('notifier', $notifier);
+        
+        $controller = $this->createController();
+        $controller->setContainer($container);
+        
+        $controller->notify(new Notification());
+    }
+
+    public function testNotifyThrowErrorIfNotifierIsNotInstalled()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The Notifier is not registered in your application. Try running "composer require symfony/notifier".');
+
+        $container = new Container();
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $controller->notify(new Notification());
     }
 }

@@ -27,6 +27,11 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface, Secur
         throw new \LogicException('Custom authenticators are not supported when "security.enable_authenticator_manager" is not set to true.');
     }
 
+    public function getPriority(): int
+    {
+        return 0;
+    }
+
     public function getPosition(): string
     {
         return 'pre_auth';

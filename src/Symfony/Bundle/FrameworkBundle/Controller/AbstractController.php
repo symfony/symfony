@@ -35,6 +35,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -103,6 +105,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'parameter_bag' => '?'.ContainerBagInterface::class,
             'message_bus' => '?'.MessageBusInterface::class,
             'messenger.default_bus' => '?'.MessageBusInterface::class,
+            'notifier' => '?'.NotifierInterface::class,
         ];
     }
 
@@ -455,5 +458,19 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         $request->attributes->set('_links', $linkProvider->withLink($link));
+    }
+
+    /**
+     * Send a notification via the Notifier.
+     *
+     * @param Notification $notification The $notification.
+     */
+    protected function notify(Notification $notification): void
+    {
+        if (!$this->container->has('notifier')) {
+            throw new \LogicException('The Notifier is not registered in your application. Try running "composer require symfony/notifier".');
+        }
+
+        $this->container->get('notifier')->send($notification);
     }
 }

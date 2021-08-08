@@ -17,6 +17,7 @@ FrameworkBundle
 
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private
+ * Deprecate `getDoctrine()` and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
 
 HttpKernel
 ----------

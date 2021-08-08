@@ -101,6 +101,7 @@ FrameworkBundle
  * Remove option `--xliff-version` of the `translation:update` command, use e.g. `--output-format=xlf20` instead
  * Remove option `--output-format` of the `translation:update` command, use e.g. `--output-format=xlf20` instead
  * Remove the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
+ * Remove `getDoctrine()` and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
 
 HttpFoundation
 --------------

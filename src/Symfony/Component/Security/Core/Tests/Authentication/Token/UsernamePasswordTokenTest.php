@@ -13,13 +13,25 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class UsernamePasswordTokenTest extends TestCase
 {
     public function testConstructor()
     {
+        $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
+        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
+        $this->assertEquals('key', $token->getFirewallName());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyConstructor()
+    {
         $token = new UsernamePasswordToken('foo', 'bar', 'key', ['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
+        $this->assertEquals('bar', $token->getCredentials());
         $this->assertEquals('key', $token->getFirewallName());
     }
 
@@ -55,6 +67,9 @@ class UsernamePasswordTokenTest extends TestCase
         $this->assertFalse($token->isAuthenticated());
     }
 
+    /**
+     * @group legacy
+     */
     public function testEraseCredentials()
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
@@ -64,7 +79,7 @@ class UsernamePasswordTokenTest extends TestCase
 
     public function testToString()
     {
-        $token = new UsernamePasswordToken('foo', '', 'foo', ['A', 'B']);
+        $token = new UsernamePasswordToken(new InMemoryUser('foo', '', ['A', 'B']), 'foo', ['A', 'B']);
         $this->assertEquals('UsernamePasswordToken(user="foo", authenticated=true, roles="A, B")', (string) $token);
     }
 }

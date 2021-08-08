@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
  * Token representing a user who temporarily impersonates another one.
  *
@@ -22,15 +24,29 @@ class SwitchUserToken extends UsernamePasswordToken
     private $originatedFromUri;
 
     /**
-     * @param string|object $user              The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
-     * @param mixed         $credentials       This usually is the password of the user
+     * @param UserInterface $user
      * @param string|null   $originatedFromUri The URI where was the user at the switch
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($user, $credentials, string $firewallName, array $roles, TokenInterface $originalToken, string $originatedFromUri = null)
+    public function __construct($user, /*string*/ $firewallName, /*array*/ $roles, /*TokenInterface*/ $originalToken, /*string*/ $originatedFromUri = null)
     {
-        parent::__construct($user, $credentials, $firewallName, $roles);
+        if (\is_string($roles)) {
+            // @deprecated since 5.4, deprecation is triggered by UsernamePasswordToken::__construct()
+            $credentials = $firewallName;
+            $firewallName = $roles;
+            $roles = $originalToken;
+            $originalToken = $originatedFromUri;
+            $originatedFromUri = \func_num_args() > 5 ? func_get_arg(5) : null;
+
+            parent::__construct($user, $credentials, $firewallName, $roles);
+        } else {
+            parent::__construct($user, $firewallName, $roles);
+        }
+
+        if (!$originalToken instanceof TokenInterface) {
+            throw new \TypeError(sprintf('Argument $originalToken of "%s" must be an instance of "%s", "%s" given.', __METHOD__, TokenInterface::class, get_debug_type($originalToken)));
+        }
 
         $this->originalToken = $originalToken;
         $this->originatedFromUri = $originatedFromUri;

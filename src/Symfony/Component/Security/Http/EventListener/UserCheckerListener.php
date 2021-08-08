@@ -46,6 +46,7 @@ class UserCheckerListener implements EventSubscriberInterface
     public function postCheckCredentials(AuthenticationSuccessEvent $event): void
     {
         $user = $event->getAuthenticationToken()->getUser();
+        // @deprecated since 5.4, $user will always be an UserInterface instance
         if (!$user instanceof UserInterface) {
             return;
         }

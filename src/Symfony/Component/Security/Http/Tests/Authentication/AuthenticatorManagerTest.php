@@ -159,7 +159,7 @@ class AuthenticatorManagerTest extends TestCase
         $csrfBadge = new CsrfTokenBadge('csrfid', 'csrftoken');
         $csrfBadge->markResolved();
         $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter'), [$csrfBadge]));
-        $authenticator->expects($this->any())->method('createToken')->willReturn(new UsernamePasswordToken($this->user, null, 'main'));
+        $authenticator->expects($this->any())->method('createToken')->willReturn(new UsernamePasswordToken($this->user, 'main'));
 
         $authenticator->expects($this->once())->method('onAuthenticationSuccess');
 

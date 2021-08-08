@@ -28,6 +28,9 @@ class MissingUserProviderTest extends AbstractWebTestCase
         ]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyUserProviderIsNeeded()
     {
         $client = $this->createClient(['test_case' => 'MissingUserProvider', 'root_config' => 'config.yml', 'debug' => true]);

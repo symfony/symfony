@@ -59,8 +59,11 @@ SecurityBundle
 Security
 --------
 
- * Deprecate the `$authManager` argument of `AccessListener`
- * Deprecate the `$authenticationManager` argument of the `AuthorizationChecker` constructor
+ * Deprecate `AnonymousToken`, as the related authenticator was deprecated in 5.3
+ * Deprecate `Token::getCredentials()`, tokens should no longer contain credentials (as they represent authenticated sessions)
+ * Deprecate not returning an `UserInterface` from `Token::getUser()`
+ * Deprecate the `$authManager` argument of `AccessListener`, the argument will be removed
+ * Deprecate the `$authenticationManager` argument of the `AuthorizationChecker` constructor, the argument will be removed
  * Deprecate setting the `$alwaysAuthenticate` argument to `true` and not setting the
    `$exceptionOnNoToken argument to `false` of `AuthorizationChecker` (this is the default
    behavior when using `enable_authenticator_manager: true`)

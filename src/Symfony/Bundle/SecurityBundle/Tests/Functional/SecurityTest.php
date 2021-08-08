@@ -27,7 +27,7 @@ class SecurityTest extends AbstractWebTestCase
 
         // put a token into the storage so the final calls can function
         $user = new InMemoryUser('foo', 'pass');
-        $token = new UsernamePasswordToken($user, '', 'provider', ['ROLE_USER']);
+        $token = new UsernamePasswordToken($user, 'provider', ['ROLE_USER']);
         $container->get('functional.test.security.token_storage')->setToken($token);
 
         $security = $container->get('functional_test.security.helper');
@@ -105,7 +105,7 @@ class SecurityTest extends AbstractWebTestCase
 
         // put a token into the storage so the final calls can function
         $user = new InMemoryUser('foo', 'pass');
-        $token = new UsernamePasswordToken($user, '', 'provider', ['ROLE_USER']);
+        $token = new UsernamePasswordToken($user, 'provider', ['ROLE_USER']);
         $container->get('functional.test.security.token_storage')->setToken($token);
 
         $security = $container->get('functional_test.security.helper');

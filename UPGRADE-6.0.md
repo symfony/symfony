@@ -207,6 +207,9 @@ Routing
 Security
 --------
 
+ * Remove `AnonymousToken`
+ * Remove `Token::getCredentials()`, tokens should no longer contain credentials (as they represent authenticated sessions)
+ * Restrict the return type of `Token::getUser()` to `UserInterface` (removing `string|\Stringable`)
  * Remove the 4th and 5th argument of `AuthorizationChecker`
  * Remove the 5th argument of `AccessListener`
  * Remove class `User`, use `InMemoryUser` or your own implementation instead.

@@ -29,6 +29,7 @@ use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -78,7 +79,7 @@ class SecurityDataCollectorTest extends TestCase
     public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles)
     {
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $roles));
+        $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('hhamon', 'P4$$w0rD', $roles), 'provider', $roles));
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
         $collector->collect(new Request(), new Response());
@@ -99,10 +100,10 @@ class SecurityDataCollectorTest extends TestCase
 
     public function testCollectSwitchUserToken()
     {
-        $adminToken = new UsernamePasswordToken('yceruto', 'P4$$w0rD', 'provider', ['ROLE_ADMIN']);
+        $adminToken = new UsernamePasswordToken(new InMemoryUser('yceruto', 'P4$$w0rD', ['ROLE_ADMIN']), 'provider', ['ROLE_ADMIN']);
 
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new SwitchUserToken('hhamon', 'P4$$w0rD', 'provider', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $adminToken));
+        $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN']), 'provider', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $adminToken));
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
         $collector->collect(new Request(), new Response());

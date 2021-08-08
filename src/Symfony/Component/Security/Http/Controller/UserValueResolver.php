@@ -49,6 +49,7 @@ final class UserValueResolver implements ArgumentValueResolverInterface
         $user = $token->getUser();
 
         // in case it's not an object we cannot do anything with it; E.g. "anon."
+        // @deprecated since 5.4
         return $user instanceof UserInterface;
     }
 

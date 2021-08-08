@@ -43,25 +43,24 @@ interface TokenInterface extends \Serializable
      * Returns the user credentials.
      *
      * @return mixed The user credentials
+     *
+     * @deprecated since 5.4
      */
     public function getCredentials();
 
     /**
      * Returns a user representation.
      *
-     * @return string|\Stringable|UserInterface
+     * @return UserInterface
      *
      * @see AbstractToken::setUser()
      */
     public function getUser();
 
     /**
-     * Sets the user in the token.
+     * Sets the authenticated user in the token.
      *
-     * The user can be a UserInterface instance, or an object implementing
-     * a __toString method or the username as a regular string.
-     *
-     * @param string|\Stringable|UserInterface $user
+     * @param UserInterface $user
      *
      * @throws \InvalidArgumentException
      */

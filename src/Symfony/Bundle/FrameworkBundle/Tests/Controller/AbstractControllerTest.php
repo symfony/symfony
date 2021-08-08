@@ -138,7 +138,7 @@ class AbstractControllerTest extends TestCase
     public function testGetUser()
     {
         $user = new InMemoryUser('user', 'pass');
-        $token = new UsernamePasswordToken($user, 'pass', 'default', ['ROLE_USER']);
+        $token = new UsernamePasswordToken($user, 'default', ['ROLE_USER']);
 
         $controller = $this->createController();
         $controller->setContainer($this->getContainerWithTokenStorage($token));
@@ -146,6 +146,9 @@ class AbstractControllerTest extends TestCase
         $this->assertSame($controller->getUser(), $user);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetUserAnonymousUserConvertedToNull()
     {
         $token = new AnonymousToken('default', 'anon.');

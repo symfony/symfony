@@ -29,13 +29,11 @@ class AuthorizationCheckerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
         $this->accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $this->tokenStorage = new TokenStorage();
 
         $this->authorizationChecker = new AuthorizationChecker(
             $this->tokenStorage,
-            $this->authenticationManager,
             $this->accessDecisionManager,
             false,
             false
@@ -52,7 +50,9 @@ class AuthorizationCheckerTest extends TestCase
 
         $newToken = new UsernamePasswordToken('username', 'password', 'provider');
 
-        $this->authenticationManager
+        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $this->authorizationChecker = new AuthorizationChecker($this->tokenStorage, $authenticationManager, $this->accessDecisionManager, false, false);
+        $authenticationManager
             ->expects($this->once())
             ->method('authenticate')
             ->with($this->equalTo($token))
@@ -81,11 +81,7 @@ class AuthorizationCheckerTest extends TestCase
      */
     public function testLegacyVoteWithoutAuthenticationToken()
     {
-        $authorizationChecker = new AuthorizationChecker(
-            $this->tokenStorage,
-            $this->authenticationManager,
-            $this->accessDecisionManager
-        );
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager);
 
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
 
@@ -94,7 +90,7 @@ class AuthorizationCheckerTest extends TestCase
 
     public function testVoteWithoutAuthenticationToken()
     {
-        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->authenticationManager, $this->accessDecisionManager, false, false);
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager, false, false);
 
         $this->accessDecisionManager
             ->expects($this->once())

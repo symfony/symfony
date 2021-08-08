@@ -64,7 +64,6 @@ return static function (ContainerConfigurator $container) {
             ->public()
             ->args([
                 service('security.token_storage'),
-                service('security.authentication.manager'),
                 service('security.access.decision_manager'),
                 param('security.access.always_authenticate_before_granting'),
             ])

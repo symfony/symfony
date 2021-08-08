@@ -103,11 +103,18 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             // The authenticator system no longer has anonymous tokens. This makes sure AccessListener
             // and AuthorizationChecker do not throw AuthenticationCredentialsNotFoundException when no
             // token is available in the token storage.
-            $container->getDefinition('security.access_listener')->setArgument(4, false);
+            $container->getDefinition('security.access_listener')->setArgument(3, false);
+            $container->getDefinition('security.authorization_checker')->setArgument(3, false);
             $container->getDefinition('security.authorization_checker')->setArgument(4, false);
-            $container->getDefinition('security.authorization_checker')->setArgument(5, false);
         } else {
             trigger_deprecation('symfony/security-bundle', '5.3', 'Not setting the "security.enable_authenticator_manager" config option to true is deprecated.');
+
+            if ($config['always_authenticate_before_granting']) {
+                $authorizationChecker = $container->getDefinition('security.authorization_checker');
+                $authorizationCheckerArgs = $authorizationChecker->getArguments();
+                array_splice($authorizationCheckerArgs, 1, 0, [new Reference('security.authentication_manager')]);
+                $authorizationChecker->setArguments($authorizationCheckerArgs);
+            }
 
             $loader->load('security_legacy.php');
         }

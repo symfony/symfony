@@ -46,7 +46,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $token = new class extends AbstractToken {
+        $token = new class() extends AbstractToken {
             public function isAuthenticated(): bool
             {
                 return true;
@@ -76,8 +76,6 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class),
-            false,
             false
         );
 
@@ -146,7 +144,6 @@ class AccessListenerTest extends TestCase
             $accessDecisionManager,
             $accessMap,
             $authManager,
-            false,
             false
         );
 
@@ -182,8 +179,6 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $this->createMock(AccessDecisionManagerInterface::class),
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class),
-            false,
             false
         );
 
@@ -212,8 +207,6 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $this->createMock(AccessDecisionManagerInterface::class),
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class),
-            false,
             false
         );
 
@@ -278,8 +271,6 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class),
-            false,
             false
         );
 
@@ -308,8 +299,6 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class),
-            false,
             false
         );
 
@@ -340,8 +329,6 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class),
-            false,
             false
         );
 
@@ -377,8 +364,6 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class),
-            false,
             false
         );
 

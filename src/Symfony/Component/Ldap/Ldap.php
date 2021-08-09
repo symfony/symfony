@@ -13,6 +13,7 @@ namespace Symfony\Component\Ldap;
 
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
+use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Exception\DriverNotFoundException;
 
@@ -22,10 +23,6 @@ use Symfony\Component\Ldap\Exception\DriverNotFoundException;
 final class Ldap implements LdapInterface
 {
     private $adapter;
-
-    private const ADAPTER_MAP = [
-        'ext_ldap' => 'Symfony\Component\Ldap\Adapter\ExtLdap\Adapter',
-    ];
 
     public function __construct(AdapterInterface $adapter)
     {
@@ -74,12 +71,10 @@ final class Ldap implements LdapInterface
      */
     public static function create(string $adapter, array $config = []): self
     {
-        if (!isset(self::ADAPTER_MAP[$adapter])) {
-            throw new DriverNotFoundException(sprintf('Adapter "%s" not found. You should use one of: "%s".', $adapter, implode('", "', self::ADAPTER_MAP)));
+        if ('ext_ldap' !== $adapter) {
+            throw new DriverNotFoundException(sprintf('Adapter "%s" not found. Only "ext_ldap" is supported at the moment.', $adapter));
         }
 
-        $class = self::ADAPTER_MAP[$adapter];
-
-        return new self(new $class($config));
+        return new self(new Adapter($config));
     }
 }

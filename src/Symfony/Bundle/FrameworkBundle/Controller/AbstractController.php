@@ -50,7 +50,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
 
 /**
- * Provides common features needed in controllers.
+ * Provides shortcuts for HTTP-related features in controllers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -368,9 +368,13 @@ abstract class AbstractController implements ServiceSubscriberInterface
      * Shortcut to return the Doctrine Registry service.
      *
      * @throws \LogicException If DoctrineBundle is not available
+     *
+     * @deprecated since 5.4, inject an instance of ManagerRegistry in your controller instead
      */
     protected function getDoctrine(): ManagerRegistry
     {
+        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, inject an instance of ManagerRegistry in your controller instead.', __METHOD__);
+
         if (!$this->container->has('doctrine')) {
             throw new \LogicException('The DoctrineBundle is not registered in your application. Try running "composer require symfony/orm-pack".');
         }
@@ -424,9 +428,13 @@ abstract class AbstractController implements ServiceSubscriberInterface
      * Dispatches a message to the bus.
      *
      * @param object|Envelope $message The message or the message pre-wrapped in an envelope
+     *
+     * @deprecated since 5.4, inject an instance of MessageBusInterface in your controller instead
      */
     protected function dispatchMessage(object $message, array $stamps = []): Envelope
     {
+        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, inject an instance of MessageBusInterface in your controller instead.', __METHOD__);
+
         if (!$this->container->has('messenger.default_bus')) {
             $message = class_exists(Envelope::class) ? 'You need to define the "messenger.default_bus" configuration option.' : 'Try running "composer require symfony/messenger".';
             throw new \LogicException('The message bus is not enabled in your application. '.$message);

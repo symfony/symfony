@@ -24,12 +24,19 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {
+    public const PRIORITY = -40;
+
     public function __construct()
     {
         $this->addOption('username_path', 'username');
         $this->addOption('password_path', 'password');
         $this->defaultFailureHandlerOptions = [];
         $this->defaultSuccessHandlerOptions = [];
+    }
+
+    public function getPriority(): int
+    {
+        return self::PRIORITY;
     }
 
     /**

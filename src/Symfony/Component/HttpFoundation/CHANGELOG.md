@@ -18,6 +18,11 @@ CHANGELOG
  * Passing non-scalar default value as the second argument `InputBag::get()` will throw `\InvalidArgumentException`
  * Passing non-scalar, non-array value as the second argument `InputBag::set()` will throw `\InvalidArgumentException`
 
+5.4
+---
+
+ * Add the `litespeed_finish_request` method to work with Litespeed
+
 5.3
 ---
 

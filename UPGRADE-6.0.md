@@ -101,6 +101,7 @@ FrameworkBundle
  * Remove option `--xliff-version` of the `translation:update` command, use e.g. `--output-format=xlf20` instead
  * Remove option `--output-format` of the `translation:update` command, use e.g. `--output-format=xlf20` instead
  * Remove the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
+ * Remove `getDoctrine()` and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
 
 HttpFoundation
 --------------
@@ -334,10 +335,48 @@ Security
  * Remove `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead
  * Remove `CookieClearingLogoutHandler`, `SessionLogoutHandler` and `CsrfTokenClearingLogoutHandler`.
    Use `CookieClearingLogoutListener`, `SessionLogoutListener` and `CsrfTokenClearingLogoutListener` instead
+ * Remove `AuthenticatorInterface::createAuthenticatedToken()`, use `AuthenticatorInterface::createToken()` instead
+ * Remove `PassportInterface` and `UserPassportInterface`, use `Passport` instead.
+   Also, the return type declaration of `AuthenticatorInterface::authenticate()` was changed to `Passport`
+
+   Before:
+   ```php
+   class MyAuthenticator implements AuthenticatorInterface
+   {
+       public function authenticate(Request $request): PassportInterface
+       {
+       }
+   }
+   ```
+
+   After:
+   ```php
+   class MyAuthenticator implements AuthenticatorInterface
+   {
+       public function authenticate(Request $request): Passport
+       {
+       }
+   }
+   ```
 
 SecurityBundle
 --------------
 
+ * Remove `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of
+   `AuthenticatorFactoryInterface` and `SecurityExtension::addAuthenticatorFactory()`
+ * Add `AuthenticatorFactoryInterface::getPriority()` which replaces `SecurityFactoryInterface::getPosition()`.
+   Previous positions are mapped to the following priorities:
+
+    | Position    | Constant                                              | Priority |
+    | ----------- | ----------------------------------------------------- | -------- |
+    | pre_auth    | `RemoteUserFactory::PRIORITY`/`X509Factory::PRIORITY` | -10      |
+    | form        | `FormLoginFactory::PRIORITY`                          | -30      |
+    | http        | `HttpBasicFactory::PRIORITY`                          | -50      |
+    | remember_me | `RememberMeFactory::PRIORITY`                         | -60      |
+    | anonymous   | n/a                                                   | -70      |
+
+ * Remove passing an array of arrays as 1st argument to `MainConfiguration`, pass a sorted flat array of
+   factories instead.
  * Remove the `always_authenticate_before_granting` option
  * Remove the `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
    use `UserPasswordHashCommand` and `user:hash-password` instead

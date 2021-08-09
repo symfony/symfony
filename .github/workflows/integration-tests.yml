@@ -180,3 +180,13 @@ jobs:
       #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.0-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
+
+      - uses: marceloprado/has-changed-path@v1
+        id: changed-translation-files
+        with:
+          paths: src/**/Resources/translations/*.xlf
+
+      - name: Check Translation Status
+        if: steps.changed-translation-files.outputs.changed == 'true'
+        run: |
+          php src/Symfony/Component/Translation/Resources/bin/translation-status.php -v

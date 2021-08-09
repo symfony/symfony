@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
@@ -37,7 +36,7 @@ class ExpressionLanguageTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
         $accessDecisionManager = new AccessDecisionManager([new RoleVoter(), new AuthenticatedVoter($trustResolver)]);
-        $authChecker = new AuthorizationChecker($tokenStorage, $this->createMock(AuthenticationManagerInterface::class), $accessDecisionManager, false, false);
+        $authChecker = new AuthorizationChecker($tokenStorage, $accessDecisionManager, false, false);
 
         $context = [];
         $context['auth_checker'] = $authChecker;

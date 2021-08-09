@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\AccessMapInterface;
+use Symfony\Component\Security\Http\Authentication\NoopAuthenticationManager;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
 
 /**
@@ -38,16 +39,22 @@ class AccessListener extends AbstractListener
     private $authManager;
     private $exceptionOnNoToken;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager, bool $exceptionOnNoToken = true)
+    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, /*bool*/ $exceptionOnNoToken = true)
     {
+        if ($exceptionOnNoToken instanceof AuthenticationManagerInterface) {
+            trigger_deprecation('symfony/security-http', '5.4', 'The $authManager argument of "%s" is deprecated.', __METHOD__);
+            $authManager = $exceptionOnNoToken;
+            $exceptionOnNoToken = \func_num_args() > 4 ? func_get_arg(4) : true;
+        }
+
         if (false !== $exceptionOnNoToken) {
-            trigger_deprecation('symfony/security-core', '5.4', 'Not setting the 5th argument of "%s" to "false" is deprecated.', __METHOD__);
+            trigger_deprecation('symfony/security-http', '5.4', 'Not setting the $exceptionOnNoToken argument of "%s" to "false" is deprecated.', __METHOD__);
         }
 
         $this->tokenStorage = $tokenStorage;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->map = $map;
-        $this->authManager = $authManager;
+        $this->authManager = $authManager ?? new NoopAuthenticationManager();
         $this->exceptionOnNoToken = $exceptionOnNoToken;
     }
 

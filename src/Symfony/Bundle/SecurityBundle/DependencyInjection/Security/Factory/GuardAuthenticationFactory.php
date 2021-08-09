@@ -34,6 +34,11 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface, Authentica
         return 'pre_auth';
     }
 
+    public function getPriority(): int
+    {
+        return 0;
+    }
+
     public function getKey(): string
     {
         return 'guard';

@@ -691,6 +691,8 @@ class Request
      * Order of precedence: PATH (routing placeholders or custom attributes), GET, POST
      *
      * @return mixed
+     *
+     * @internal since Symfony 5.4, use explicit input sources instead
      */
     public function get(string $key, mixed $default = null)
     {
@@ -1321,7 +1323,7 @@ class Request
     public function getFormat(?string $mimeType)
     {
         $canonicalMimeType = null;
-        if (false !== $pos = strpos($mimeType, ';')) {
+        if ($mimeType && false !== $pos = strpos($mimeType, ';')) {
             $canonicalMimeType = trim(substr($mimeType, 0, $pos));
         }
 

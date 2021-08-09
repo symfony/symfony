@@ -14,7 +14,6 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 use Symfony\Bridge\Twig\Extension\LogoutUrlExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -55,42 +54,20 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private $requestMatchers = [];
     private $expressions = [];
     private $contextListeners = [];
-    private $listenerPositions = ['pre_auth', 'form', 'http', 'remember_me', 'anonymous'];
+    /** @var array<array{0: int, 1: AuthenticatorFactoryInterface|SecurityFactoryInterface}> */
     private $factories = [];
+    /** @var (AuthenticatorFactoryInterface|SecurityFactoryInterface)[] */
+    private $sortedFactories = [];
     private $userProviderFactories = [];
     private $statelessFirewallKeys = [];
 
     private $authenticatorManagerEnabled = false;
 
-    public function __construct()
-    {
-        foreach ($this->listenerPositions as $position) {
-            $this->factories[$position] = [];
-        }
-    }
-
     public function prepend(ContainerBuilder $container)
     {
-        $rememberMeSecureDefault = false;
-        $rememberMeSameSiteDefault = null;
-
-        if (!isset($container->getExtensions()['framework'])) {
-            return;
-        }
-        foreach ($container->getExtensionConfig('framework') as $config) {
-            if (isset($config['session']) && \is_array($config['session'])) {
-                $rememberMeSecureDefault = $config['session']['cookie_secure'] ?? $rememberMeSecureDefault;
-                $rememberMeSameSiteDefault = \array_key_exists('cookie_samesite', $config['session']) ? $config['session']['cookie_samesite'] : $rememberMeSameSiteDefault;
-            }
-        }
-        foreach ($this->listenerPositions as $position) {
-            foreach ($this->factories[$position] as $factory) {
-                if ($factory instanceof RememberMeFactory) {
-                    \Closure::bind(function () use ($rememberMeSecureDefault, $rememberMeSameSiteDefault) {
-                        $this->options['secure'] = $rememberMeSecureDefault;
-                        $this->options['samesite'] = $rememberMeSameSiteDefault;
-                    }, $factory, $factory)();
-                }
+        foreach ($this->getSortedFactories() as $factory) {
+            if ($factory instanceof PrependExtensionInterface) {
+                $factory->prepend($container);
             }
         }
     }
@@ -123,11 +100,18 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             // The authenticator system no longer has anonymous tokens. This makes sure AccessListener
             // and AuthorizationChecker do not throw AuthenticationCredentialsNotFoundException when no
             // token is available in the token storage.
-            $container->getDefinition('security.access_listener')->setArgument(4, false);
+            $container->getDefinition('security.access_listener')->setArgument(3, false);
+            $container->getDefinition('security.authorization_checker')->setArgument(3, false);
             $container->getDefinition('security.authorization_checker')->setArgument(4, false);
-            $container->getDefinition('security.authorization_checker')->setArgument(5, false);
         } else {
             trigger_deprecation('symfony/security-bundle', '5.3', 'Not setting the "security.enable_authenticator_manager" config option to true is deprecated.');
+
+            if ($config['always_authenticate_before_granting']) {
+                $authorizationChecker = $container->getDefinition('security.authorization_checker');
+                $authorizationCheckerArgs = $authorizationChecker->getArguments();
+                array_splice($authorizationCheckerArgs, 1, 0, [new Reference('security.authentication_manager')]);
+                $authorizationChecker->setArguments($authorizationCheckerArgs);
+            }
 
             $loader->load('security_legacy.php');
         }
@@ -529,12 +513,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $container->setAlias('security.user_checker.'.$id, new Alias($firewall['user_checker'], false));
 
-        foreach ($this->factories as $position) {
-            foreach ($position as $factory) {
-                $key = str_replace('-', '_', $factory->getKey());
-                if (\array_key_exists($key, $firewall)) {
-                    $listenerKeys[] = $key;
-                }
+        foreach ($this->getSortedFactories() as $factory) {
+            $key = str_replace('-', '_', $factory->getKey());
+            if (\array_key_exists($key, $firewall)) {
+                $listenerKeys[] = $key;
             }
         }
 
@@ -567,44 +549,42 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $hasListeners = false;
         $entryPoints = [];
 
-        foreach ($this->listenerPositions as $position) {
-            foreach ($this->factories[$position] as $factory) {
-                $key = str_replace('-', '_', $factory->getKey());
+        foreach ($this->getSortedFactories() as $factory) {
+            $key = str_replace('-', '_', $factory->getKey());
 
-                if (isset($firewall[$key])) {
-                    $userProvider = $this->getUserProvider($container, $id, $firewall, $key, $defaultProvider, $providerIds, $contextListenerId);
+            if (isset($firewall[$key])) {
+                $userProvider = $this->getUserProvider($container, $id, $firewall, $key, $defaultProvider, $providerIds, $contextListenerId);
 
-                    if ($this->authenticatorManagerEnabled) {
-                        if (!$factory instanceof AuthenticatorFactoryInterface) {
-                            throw new InvalidConfigurationException(sprintf('Cannot configure AuthenticatorManager as "%s" authentication does not support it, set "security.enable_authenticator_manager" to `false`.', $key));
-                        }
+                if ($this->authenticatorManagerEnabled) {
+                    if (!$factory instanceof AuthenticatorFactoryInterface) {
+                        throw new InvalidConfigurationException(sprintf('Cannot configure AuthenticatorManager as "%s" authentication does not support it, set "security.enable_authenticator_manager" to `false`.', $key));
+                    }
 
-                        $authenticators = $factory->createAuthenticator($container, $id, $firewall[$key], $userProvider);
-                        if (\is_array($authenticators)) {
-                            foreach ($authenticators as $authenticator) {
-                                $authenticationProviders[] = $authenticator;
-                                $entryPoints[] = $authenticator;
-                            }
-                        } else {
-                            $authenticationProviders[] = $authenticators;
-                            $entryPoints[$key] = $authenticators;
+                    $authenticators = $factory->createAuthenticator($container, $id, $firewall[$key], $userProvider);
+                    if (\is_array($authenticators)) {
+                        foreach ($authenticators as $authenticator) {
+                            $authenticationProviders[] = $authenticator;
+                            $entryPoints[] = $authenticator;
                         }
                     } else {
-                        [$provider, $listenerId, $defaultEntryPoint] = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
-
-                        $listeners[] = new Reference($listenerId);
-                        $authenticationProviders[] = $provider;
+                        $authenticationProviders[] = $authenticators;
+                        $entryPoints[$key] = $authenticators;
                     }
+                } else {
+                    [$provider, $listenerId, $defaultEntryPoint] = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
 
-                    if ($factory instanceof FirewallListenerFactoryInterface) {
-                        $firewallListenerIds = $factory->createListeners($container, $id, $firewall[$key]);
-                        foreach ($firewallListenerIds as $firewallListenerId) {
-                            $listeners[] = new Reference($firewallListenerId);
-                        }
-                    }
-
-                    $hasListeners = true;
+                    $listeners[] = new Reference($listenerId);
+                    $authenticationProviders[] = $provider;
                 }
+
+                if ($factory instanceof FirewallListenerFactoryInterface) {
+                    $firewallListenerIds = $factory->createListeners($container, $id, $firewall[$key]);
+                    foreach ($firewallListenerIds as $firewallListenerId) {
+                        $listeners[] = new Reference($firewallListenerId);
+                    }
+                }
+
+                $hasListeners = true;
             }
         }
 
@@ -921,9 +901,27 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $this->requestMatchers[$id] = new Reference($id);
     }
 
+    /**
+     * @deprecated since 5.4, use "addAuthenticatorFactory()" instead
+     */
     public function addSecurityListenerFactory(SecurityFactoryInterface $factory)
     {
-        $this->factories[$factory->getPosition()][] = $factory;
+        trigger_deprecation('symfony/security-bundle', '5.4', 'Method "%s()" is deprecated, use "addAuthenticatorFactory()" instead.', __METHOD__);
+
+        $this->factories[] = [[
+            'pre_auth' => -10,
+            'form' => -30,
+            'http' => -40,
+            'remember_me' => -50,
+            'anonymous' => -60,
+        ][$factory->getPosition()], $factory];
+        $this->sortedFactories = [];
+    }
+
+    public function addAuthenticatorFactory(AuthenticatorFactoryInterface $factory)
+    {
+        $this->factories[] = [method_exists($factory, 'getPriority') ? $factory->getPriority() : 0, $factory];
+        $this->sortedFactories = [];
     }
 
     public function addUserProviderFactory(UserProviderFactoryInterface $factory)
@@ -947,7 +945,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
         // first assemble the factories
-        return new MainConfiguration($this->factories, $this->userProviderFactories);
+        return new MainConfiguration($this->getSortedFactories(), $this->userProviderFactories);
     }
 
     private function isValidIps(string|array $ips): bool
@@ -993,5 +991,26 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         return false;
+    }
+
+    /**
+     * @return (AuthenticatorFactoryInterface|SecurityFactoryInterface)[]
+     */
+    private function getSortedFactories(): array
+    {
+        if (!$this->sortedFactories) {
+            $factories = [];
+            foreach ($this->factories as $i => $factory) {
+                $factories[] = array_merge($factory, [$i]);
+            }
+
+            usort($factories, function ($a, $b) {
+                return $b[0] <=> $a[0] ?: $a[2] <=> $b[2];
+            });
+
+            $this->sortedFactories = array_column($factories, 1);
+        }
+
+        return $this->sortedFactories;
     }
 }

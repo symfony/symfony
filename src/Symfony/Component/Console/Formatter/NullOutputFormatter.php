@@ -21,9 +21,9 @@ final class NullOutputFormatter implements OutputFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function format(?string $message): void
+    public function format(?string $message): ?string
     {
-        // do nothing
+        return null;
     }
 
     /**

@@ -11,10 +11,12 @@ CHANGELOG
 5.4
 ---
 
- * Deprecate not setting the 5th argument (`$exceptionOnNoToken`) of `AccessListener` to `false`
+ * Deprecate the `$authManager` argument of `AccessListener`
+ * Deprecate not setting the `$exceptionOnNoToken` argument of `AccessListener` to `false`
  * Deprecate `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead
  * Deprecate `CookieClearingLogoutHandler`, `SessionLogoutHandler` and `CsrfTokenClearingLogoutHandler`.
    Use `CookieClearingLogoutListener`, `SessionLogoutListener` and `CsrfTokenClearingLogoutListener` instead
+ * Deprecate `PassportInterface` and `UserPassportInterface`, use `Passport` instead
 
 5.3
 ---

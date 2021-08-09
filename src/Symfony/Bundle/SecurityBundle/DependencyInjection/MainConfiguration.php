@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -30,8 +32,17 @@ class MainConfiguration implements ConfigurationInterface
     private $factories;
     private $userProviderFactories;
 
+    /**
+     * @param (SecurityFactoryInterface|AuthenticatorFactoryInterface)[] $factories
+     */
     public function __construct(array $factories, array $userProviderFactories)
     {
+        if (\is_array(current($factories))) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'Passing an array of arrays as 1st argument to "%s" is deprecated, pass a sorted array of factories instead.', __METHOD__);
+
+            $factories = array_merge(...array_values($factories));
+        }
+
         $this->factories = $factories;
         $this->userProviderFactories = $userProviderFactories;
     }
@@ -271,19 +282,17 @@ class MainConfiguration implements ConfigurationInterface
         ;
 
         $abstractFactoryKeys = [];
-        foreach ($factories as $factoriesAtPosition) {
-            foreach ($factoriesAtPosition as $factory) {
-                $name = str_replace('-', '_', $factory->getKey());
-                $factoryNode = $firewallNodeBuilder->arrayNode($name)
-                    ->canBeUnset()
-                ;
+        foreach ($factories as $factory) {
+            $name = str_replace('-', '_', $factory->getKey());
+            $factoryNode = $firewallNodeBuilder->arrayNode($name)
+                ->canBeUnset()
+            ;
 
-                if ($factory instanceof AbstractFactory) {
-                    $abstractFactoryKeys[] = $name;
-                }
-
-                $factory->addConfiguration($factoryNode);
+            if ($factory instanceof AbstractFactory) {
+                $abstractFactoryKeys[] = $name;
             }
+
+            $factory->addConfiguration($factoryNode);
         }
 
         // check for unreachable check paths

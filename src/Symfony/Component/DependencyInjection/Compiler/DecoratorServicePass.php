@@ -62,13 +62,11 @@ class DecoratorServicePass extends AbstractRecursivePass
             if ($container->hasAlias($inner)) {
                 $alias = $container->getAlias($inner);
                 $public = $alias->isPublic();
-                $private = $alias->isPrivate();
                 $container->setAlias($renamedId, new Alias((string) $alias, false));
                 $decoratedDefinition = $container->findDefinition($alias);
             } elseif ($container->hasDefinition($inner)) {
                 $decoratedDefinition = $container->getDefinition($inner);
                 $public = $decoratedDefinition->isPublic();
-                $private = $decoratedDefinition->isPrivate();
                 $decoratedDefinition->setPublic(false);
                 $container->setDefinition($renamedId, $decoratedDefinition);
                 $decoratingDefinitions[$inner] = $decoratedDefinition;
@@ -77,7 +75,6 @@ class DecoratorServicePass extends AbstractRecursivePass
                 continue;
             } elseif (ContainerInterface::NULL_ON_INVALID_REFERENCE === $invalidBehavior) {
                 $public = $definition->isPublic();
-                $private = $definition->isPrivate();
                 $decoratedDefinition = null;
             } else {
                 throw new ServiceNotFoundException($inner, $id);

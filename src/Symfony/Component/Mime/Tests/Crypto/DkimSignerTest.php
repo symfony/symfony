@@ -122,14 +122,14 @@ EOF;
             DkimSigner::CANON_SIMPLE, "\r\n", '', \PHP_INT_MAX,
         ];
         yield 'relaxed_empty' => [
-            DkimSigner::CANON_RELAXED, "\r\n", '', \PHP_INT_MAX,
+            DkimSigner::CANON_RELAXED, '', '', \PHP_INT_MAX,
         ];
 
         yield 'simple_empty_single_ending_CLRF' => [
             DkimSigner::CANON_SIMPLE, "\r\n", "\r\n", \PHP_INT_MAX,
         ];
         yield 'relaxed_empty_single_ending_CLRF' => [
-            DkimSigner::CANON_RELAXED, "\r\n", "\r\n", \PHP_INT_MAX,
+            DkimSigner::CANON_RELAXED, '', "\r\n", \PHP_INT_MAX,
         ];
 
         yield 'simple_multiple_ending_CLRF' => [

@@ -52,6 +52,11 @@ class AnonymousFactory implements SecurityFactoryInterface, AuthenticatorFactory
         throw new InvalidConfigurationException(sprintf('The authenticator manager no longer has "anonymous" security. Please remove this option under the "%s" firewall'.($config['lazy'] ? ' and add "lazy: true"' : '').'.', $firewallName));
     }
 
+    public function getPriority(): int
+    {
+        return -60;
+    }
+
     public function getPosition(): string
     {
         return 'anonymous';

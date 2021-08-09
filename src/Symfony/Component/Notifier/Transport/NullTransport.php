@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Transport;
 
 use Symfony\Component\Notifier\Event\MessageEvent;
+use Symfony\Component\Notifier\Event\SentMessageEvent;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\NullMessage;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -32,12 +33,16 @@ class NullTransport implements TransportInterface
     public function send(MessageInterface $message): SentMessage
     {
         $message = new NullMessage($message);
+        $sentMessage = new SentMessage($message, (string) $this);
 
-        if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(new MessageEvent($message));
+        if (null === $this->dispatcher) {
+            return $sentMessage;
         }
 
-        return new SentMessage($message, (string) $this);
+        $this->dispatcher->dispatch(new MessageEvent($message));
+        $this->dispatcher->dispatch(new SentMessageEvent($sentMessage));
+
+        return $sentMessage;
     }
 
     public function __toString(): string

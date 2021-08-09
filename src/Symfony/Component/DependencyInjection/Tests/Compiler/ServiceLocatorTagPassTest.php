@@ -13,8 +13,11 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -143,4 +146,56 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(['foo'], array_keys($locator->getBindings()));
         $this->assertInstanceOf(BoundArgument::class, $locator->getBindings()['foo']);
     }
+
+    public function testIndexedByServiceIdWithDecoration()
+    {
+        $container = new ContainerBuilder();
+
+        $locator = new Definition(Locator::class);
+        $locator->setPublic(true);
+        $locator->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('test_tag', null, null, true)));
+
+        $container->setDefinition(Locator::class, $locator);
+
+        $service = new Definition(Service::class);
+        $service->setPublic(true);
+        $service->addTag('test_tag');
+
+        $container->setDefinition(Service::class, $service);
+
+        $decorated = new Definition(Decorated::class);
+        $decorated->setPublic(true);
+        $decorated->setDecoratedService(Service::class);
+
+        $container->setDefinition(Decorated::class, $decorated);
+
+        $container->compile();
+
+        /** @var ServiceLocator $locator */
+        $locator = $container->get(Locator::class)->locator;
+        static::assertTrue($locator->has(Service::class));
+        static::assertFalse($locator->has(Decorated::class));
+        static::assertInstanceOf(Decorated::class, $locator->get(Service::class));
+    }
+}
+
+class Locator
+{
+    /**
+     * @var ServiceLocator
+     */
+    public $locator;
+
+    public function __construct(ServiceLocator $locator)
+    {
+        $this->locator = $locator;
+    }
+}
+
+class Service
+{
+}
+
+class DecoratedService
+{
 }

@@ -26,6 +26,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RemoteUserFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {
+    public const PRIORITY = -10;
+
     public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $providerId = 'security.authentication.provider.pre_authenticated.'.$id;
@@ -56,6 +58,11 @@ class RemoteUserFactory implements SecurityFactoryInterface, AuthenticatorFactor
         ;
 
         return $authenticatorId;
+    }
+
+    public function getPriority(): int
+    {
+        return self::PRIORITY;
     }
 
     public function getPosition(): string

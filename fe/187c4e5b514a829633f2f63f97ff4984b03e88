@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-09T08:26:26Z
+
+> I also propose to change `EMPTY_ARRAYS_AS_OBJECT` to `EMPTY_ARRAY_AS_OBJECT`
+
+This change is missing in the diff, right?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2021-08-09T08:27:15Z
+
+> > I also propose to change `EMPTY_ARRAYS_AS_OBJECT` to `EMPTY_ARRAY_AS_OBJECT`
+>
+> This change is missing in the diff, right?
+
+Yes, I can add it shortly.

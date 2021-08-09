@@ -31,6 +31,7 @@ class TraversableArrayObject implements \ArrayAccess, \IteratorAggregate, \Count
 
     /**
      * @param mixed $offset
+     *
      * @return mixed
      */
     #[\ReturnTypeWillChange]

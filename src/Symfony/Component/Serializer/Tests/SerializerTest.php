@@ -592,7 +592,7 @@ class SerializerTest extends TestCase
     {
         $expected = '{"a1":[],"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":[]},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":[]},"f2":{"map":{"k":"v"}},"g1":{"list":[],"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
         $this->assertSame($expected, $serializer->serialize($data, 'json', [
-            Serializer::EMPTY_ARRAYS_AS_OBJECT => true,
+            Serializer::EMPTY_ARRAY_AS_OBJECT => true,
         ]));
     }
 
@@ -601,7 +601,7 @@ class SerializerTest extends TestCase
     {
         $expected = '{"a1":{},"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{"list":[]},"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
         $this->assertSame($expected, $serializer->serialize($data, 'json', [
-            Serializer::EMPTY_ARRAYS_AS_OBJECT => true,
+            Serializer::EMPTY_ARRAY_AS_OBJECT => true,
             AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
         ]));
     }

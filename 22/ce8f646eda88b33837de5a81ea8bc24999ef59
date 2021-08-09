@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-08T09:57:13Z
+
+Makes sense, although `getDoctrine()` has been there for so long that we have to update quite some docs I think. Also a friendly ping to @weaverryan as I think this will impact SymfonyCasts as well.
+
+---------------------------------------------------------------------------
+
+by zairigimad at 2021-08-08T11:04:31Z
+
+Makes sense, but Messenger is one of the recently added components in the AbstractControllers, I believe it's not only HTTP related feature, should this part be flagged as deprecated and moved out from the AbstractController?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-09T08:29:42Z
+
+> I suggest to trigger a deprecation notice from `AbstractController::get()` when the passed id is one of `message_bus`, `messenger.default_bus` or `doctrine`.
+
+I will deprecate `get` and `has` in another PR as I don't think these methods make sense as they give access to a limited (and arbitrary?) set of services.

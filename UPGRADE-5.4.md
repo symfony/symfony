@@ -61,8 +61,6 @@ Security
 
  * Deprecate the `$authManager` argument of `AccessListener`
  * Deprecate the `$authenticationManager` argument of the `AuthorizationChecker` constructor
- * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`
-   (this is the default behavior when using `enable_authenticator_manager: true`)
  * Deprecate setting the `$alwaysAuthenticate` argument to `true` and not setting the
    `$exceptionOnNoToken argument to `false` of `AuthorizationChecker` (this is the default
    behavior when using `enable_authenticator_manager: true`)

@@ -601,6 +601,9 @@ class AbstractControllerTest extends TestCase
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetDoctrine()
     {
         $doctrine = $this->createMock(ManagerRegistry::class);

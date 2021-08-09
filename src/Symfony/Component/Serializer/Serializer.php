@@ -49,9 +49,9 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
 {
     /**
      * Flag to control whether an empty array should be transformed to an
-     * object (in JSON: {}) or to a map (in JSON: []).
+     * object (in JSON: {}) or to a list (in JSON: []).
      */
-    public const EMPTY_ARRAYS_AS_OBJECT = 'empty_arrays_as_object';
+    public const EMPTY_ARRAY_AS_OBJECT = 'empty_array_as_object';
 
     private const SCALAR_TYPES = [
         'int' => true,
@@ -169,7 +169,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 switch (true) {
                     case ($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && \is_object($data):
                         return $data;
-                    case ($context[self::EMPTY_ARRAYS_AS_OBJECT] ?? false) && \is_array($data):
+                    case ($context[self::EMPTY_ARRAY_AS_OBJECT] ?? false) && \is_array($data):
                         return new \ArrayObject();
                 }
             }

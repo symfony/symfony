@@ -96,21 +96,25 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'session' => '?'.SessionInterface::class,
             'security.authorization_checker' => '?'.AuthorizationCheckerInterface::class,
             'twig' => '?'.Environment::class,
-            'doctrine' => '?'.ManagerRegistry::class,
+            'doctrine' => '?'.ManagerRegistry::class, // to be removed in 6.0
             'form.factory' => '?'.FormFactoryInterface::class,
             'security.token_storage' => '?'.TokenStorageInterface::class,
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerBagInterface::class,
-            'message_bus' => '?'.MessageBusInterface::class,
-            'messenger.default_bus' => '?'.MessageBusInterface::class,
+            'message_bus' => '?'.MessageBusInterface::class, // to be removed in 6.0
+            'messenger.default_bus' => '?'.MessageBusInterface::class, // to be removed in 6.0
         ];
     }
 
     /**
      * Returns true if the service id is defined.
+     *
+     * @deprecated since 5.4, use method or constructor injection in your controller instead
      */
     protected function has(string $id): bool
     {
+        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, use method or constructor injection in your controller instead.', __METHOD__);
+
         return $this->container->has($id);
     }
 
@@ -118,9 +122,13 @@ abstract class AbstractController implements ServiceSubscriberInterface
      * Gets a container service by its id.
      *
      * @return object The service
+     *
+     * @deprecated since 5.4, use method or constructor injection in your controller instead
      */
     protected function get(string $id): object
     {
+        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, use method or constructor injection in your controller instead.', __METHOD__);
+
         return $this->container->get($id);
     }
 

@@ -29,13 +29,7 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable
         return \array_key_exists($offset, $this->array);
     }
 
-    /**
-     * @param mixed $offset
-     *
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->array[$offset];
     }

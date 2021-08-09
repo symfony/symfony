@@ -43,20 +43,12 @@ class Iterator implements \Iterator
         next($this->values);
     }
 
-    /**
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function current()
+    public function current(): mixed
     {
         return current($this->values);
     }
 
-    /**
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function key()
+    public function key(): mixed
     {
         return key($this->values);
     }

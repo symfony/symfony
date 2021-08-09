@@ -78,7 +78,7 @@ final class FirebaseTransport extends AbstractTransport
         try {
             $statusCode = $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {
-            throw new TransportException('Could not reach the remote Forebase server.', $response, 0, $e);
+            throw new TransportException('Could not reach the remote Firebase server.', $response, 0, $e);
         }
 
         $contentType = $response->getHeaders(false)['content-type'][0] ?? '';

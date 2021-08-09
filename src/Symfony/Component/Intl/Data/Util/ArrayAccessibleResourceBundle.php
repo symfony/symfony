@@ -46,6 +46,7 @@ class ArrayAccessibleResourceBundle implements \ArrayAccess, \IteratorAggregate,
 
     /**
      * @param mixed $offset
+     *
      * @return mixed
      */
     #[\ReturnTypeWillChange]

@@ -1335,7 +1335,7 @@ class Request
     public function getFormat(?string $mimeType)
     {
         $canonicalMimeType = null;
-        if (false !== $pos = strpos($mimeType, ';')) {
+        if ($mimeType && false !== $pos = strpos($mimeType, ';')) {
             $canonicalMimeType = trim(substr($mimeType, 0, $pos));
         }
 

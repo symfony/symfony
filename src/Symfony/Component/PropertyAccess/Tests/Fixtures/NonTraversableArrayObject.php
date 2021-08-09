@@ -31,6 +31,7 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable, \Serializab
 
     /**
      * @param mixed $offset
+     *
      * @return mixed
      */
     #[\ReturnTypeWillChange]

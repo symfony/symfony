@@ -31,6 +31,7 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
 
     /**
      * @param mixed $offset
+     *
      * @return mixed
      */
     #[\ReturnTypeWillChange]

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-21T11:32:47Z
+
+(psalm issues are false positives, with a slight code improvement in ef84e66b47)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-03T20:16:34Z
+
+PR is ready @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-09T12:10:50Z
+
+PR rebased and ready.

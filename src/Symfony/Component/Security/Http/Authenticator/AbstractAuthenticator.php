@@ -31,6 +31,10 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
      */
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
+        if (self::class !== (new \ReflectionMethod($this, 'createAuthenticatedToken'))->getDeclaringClass()->getName() && self::class === (new \ReflectionMethod($this, 'createToken'))->getDeclaringClass()->getName()) {
+            return $this->createAuthenticatedToken($passport, $firewallName);
+        }
+
         return new PostAuthenticationToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());
     }
 
@@ -46,6 +50,6 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
 
         trigger_deprecation('symfony/security-http', '5.4', 'Method "%s()" is deprecated, use "%s::createToken()" instead.', __METHOD__, __CLASS__);
 
-        return $this->createToken($passport, $firewallName);
+        return new PostAuthenticationToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());
     }
 }

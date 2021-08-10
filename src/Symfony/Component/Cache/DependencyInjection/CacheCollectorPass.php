@@ -57,6 +57,15 @@ class CacheCollectorPass implements CompilerPassInterface
         }
         $recorder->setArguments([new Reference($innerId = $id.'.recorder_inner')]);
 
+        foreach ($definition->getMethodCalls() as [$method, $args]) {
+            if ('setCallbackWrapper' !== $method || !$args[0] instanceof Definition || !($args[0]->getArguments()[2] ?? null) instanceof Definition) {
+                continue;
+            }
+            if ([new Reference($id), 'setCallbackWrapper'] == $args[0]->getArguments()[2]->getFactory()) {
+                $args[0]->getArguments()[2]->setFactory([new Reference($innerId), 'setCallbackWrapper']);
+            }
+        }
+
         $definition->setTags([]);
         $definition->setPublic(false);
 

@@ -99,11 +99,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * @return int|false
-     */
-    #[\ReturnTypeWillChange]
-    public function gc(int $maxlifetime)
+    public function gc(int $maxlifetime): int|false
     {
         return $this->getCollection()->deleteMany([
             $this->options['expiry_field'] => ['$lt' => new \MongoDB\BSON\UTCDateTime()],

@@ -112,12 +112,9 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @param string $key Array key
      *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException if key does not exist in $this->args
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet(mixed $key)
+    public function offsetGet(mixed $key): mixed
     {
         return $this->getArgument($key);
     }
@@ -126,11 +123,8 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      * ArrayAccess for argument setter.
      *
      * @param string $key Array key to set
-     *
-     * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet(mixed $key, mixed $value)
+    public function offsetSet(mixed $key, mixed $value): void
     {
         $this->setArgument($key, $value);
     }
@@ -139,11 +133,8 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      * ArrayAccess for unset argument.
      *
      * @param string $key Array key
-     *
-     * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset(mixed $key)
+    public function offsetUnset(mixed $key): void
     {
         if ($this->hasArgument($key)) {
             unset($this->arguments[$key]);
@@ -154,22 +145,16 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      * ArrayAccess has argument.
      *
      * @param string $key Array key
-     *
-     * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists(mixed $key)
+    public function offsetExists(mixed $key): bool
     {
         return $this->hasArgument($key);
     }
 
     /**
      * IteratorAggregate for iterating over the object like an array.
-     *
-     * @return \ArrayIterator
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->arguments);
     }

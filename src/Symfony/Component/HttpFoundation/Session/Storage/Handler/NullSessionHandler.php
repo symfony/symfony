@@ -18,20 +18,12 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class NullSessionHandler extends AbstractSessionHandler
 {
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function close()
+    public function close(): bool
     {
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function validateId(string $sessionId)
+    public function validateId(string $sessionId): bool
     {
         return true;
     }
@@ -44,11 +36,7 @@ class NullSessionHandler extends AbstractSessionHandler
         return '';
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function updateTimestamp(string $sessionId, string $data)
+    public function updateTimestamp(string $sessionId, string $data): bool
     {
         return true;
     }
@@ -69,11 +57,7 @@ class NullSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * @return int|false
-     */
-    #[\ReturnTypeWillChange]
-    public function gc(int $maxlifetime)
+    public function gc(int $maxlifetime): int|false
     {
         return 0;
     }

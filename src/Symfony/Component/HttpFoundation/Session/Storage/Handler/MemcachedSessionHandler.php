@@ -54,11 +54,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
         $this->prefix = $options['prefix'] ?? 'sf2s';
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function close()
+    public function close(): bool
     {
         return $this->memcached->quit();
     }
@@ -71,11 +67,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
         return $this->memcached->get($this->prefix.$sessionId) ?: '';
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function updateTimestamp(string $sessionId, string $data)
+    public function updateTimestamp(string $sessionId, string $data): bool
     {
         $this->memcached->touch($this->prefix.$sessionId, time() + $this->ttl);
 
@@ -100,11 +92,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
         return $result || \Memcached::RES_NOTFOUND == $this->memcached->getResultCode();
     }
 
-    /**
-     * @return int|false
-     */
-    #[\ReturnTypeWillChange]
-    public function gc(int $maxlifetime)
+    public function gc(int $maxlifetime): int|false
     {
         // not required here because memcached will auto expire the records anyhow.
         return 0;

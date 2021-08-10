@@ -156,11 +156,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         return $this->children;
     }
 
-    /**
-     * @return int
-     */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -212,10 +208,9 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * {@inheritdoc}
      *
-     * @return FormBuilderInterface[]|\Traversable
+     * @return \Traversable<string, FormBuilderInterface>
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');

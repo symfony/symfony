@@ -66,11 +66,7 @@ class InputStream implements \IteratorAggregate
         return !$this->open;
     }
 
-    /**
-     * @return \Traversable
-     */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $this->open = true;
 

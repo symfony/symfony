@@ -128,22 +128,16 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
 
     /**
      * Returns an iterator for attributes.
-     *
-     * @return \ArrayIterator An \ArrayIterator instance
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->attributes);
     }
 
     /**
      * Returns the number of attributes.
-     *
-     * @return int The number of attributes
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return \count($this->attributes);
     }

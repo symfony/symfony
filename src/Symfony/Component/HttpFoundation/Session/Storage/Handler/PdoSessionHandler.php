@@ -259,11 +259,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         return $this->sessionExpired;
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function open(string $savePath, string $sessionName)
+    public function open(string $savePath, string $sessionName): bool
     {
         $this->sessionExpired = false;
 
@@ -274,11 +270,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         return parent::open($savePath, $sessionName);
     }
 
-    /**
-     * @return string
-     */
-    #[\ReturnTypeWillChange]
-    public function read(string $sessionId)
+    public function read(string $sessionId): string
     {
         try {
             return parent::read($sessionId);
@@ -289,11 +281,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         }
     }
 
-    /**
-     * @return int|false
-     */
-    #[\ReturnTypeWillChange]
-    public function gc(int $maxlifetime)
+    public function gc(int $maxlifetime): int|false
     {
         // We delay gc() to close() so that it is executed outside the transactional and blocking read-write process.
         // This way, pruning expired sessions does not block them from being started while the current session is used.
@@ -369,11 +357,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function updateTimestamp(string $sessionId, string $data)
+    public function updateTimestamp(string $sessionId, string $data): bool
     {
         $expiry = time() + (int) ini_get('session.gc_maxlifetime');
 
@@ -394,11 +378,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function close()
+    public function close(): bool
     {
         $this->commit();
 

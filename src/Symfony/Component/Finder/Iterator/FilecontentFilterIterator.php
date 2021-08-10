@@ -24,8 +24,7 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    #[\ReturnTypeWillChange]
-    public function accept()
+    public function accept(): bool
     {
         if (!$this->matchRegexps && !$this->noMatchRegexps) {
             return true;

@@ -1071,20 +1071,15 @@ class Crawler implements \Countable, \IteratorAggregate
         return $this->nodes[$position] ?? null;
     }
 
-    /**
-     * @return int
-     */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return \count($this->nodes);
     }
 
     /**
-     * @return \ArrayIterator|\DOMNode[]
+     * @return \ArrayIterator<int, \DOMNode>
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->nodes);
     }

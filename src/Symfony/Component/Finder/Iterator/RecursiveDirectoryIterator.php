@@ -37,6 +37,11 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     private $directorySeparator = '/';
 
     /**
+     * @var \RecursiveDirectoryIterator|null
+     */
+    private $children;
+
+    /**
      * @throws \RuntimeException
      */
     public function __construct(string $path, int $flags, bool $ignoreUnreadableDirs = false)
@@ -51,6 +56,17 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
         if ('/' !== \DIRECTORY_SEPARATOR && !($flags & self::UNIX_PATHS)) {
             $this->directorySeparator = \DIRECTORY_SEPARATOR;
         }
+    }
+
+    /**
+     * @return void
+     */
+    #[\ReturnTypeWillChange]
+    public function next()
+    {
+        $this->children = null;
+
+        parent::next();
     }
 
     /**
@@ -79,7 +95,30 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     }
 
     /**
-     * @return \RecursiveIterator
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
+    #[\ReturnTypeWillChange]
+    public function hasChildren($allowLinks = false)
+    {
+        $hasChildren = parent::hasChildren($allowLinks);
+
+        if (!$hasChildren || !$this->ignoreUnreadableDirs) {
+            return $hasChildren;
+        }
+
+        try {
+            $this->children = parent::getChildren();
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return \RecursiveDirectoryIterator
      *
      * @throws AccessDeniedException
      */
@@ -87,7 +126,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     public function getChildren()
     {
         try {
-            $children = parent::getChildren();
+            $children = $this->children ?? parent::getChildren();
 
             if ($children instanceof self) {
                 // parent method will call the constructor with default arguments, so unreadable dirs won't be ignored anymore
@@ -100,12 +139,15 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 
             return $children;
         } catch (\UnexpectedValueException $e) {
+            // @deprecated The if block can be removed in 6.0.
             if ($this->ignoreUnreadableDirs) {
+                trigger_deprecation('symfony/finder', '5.4', 'Calling "%s" if "hasChildren()" returns false is deprecated.', __METHOD__);
+
                 // If directory is unreadable and finder is set to ignore it, a fake empty content is returned.
                 return new \RecursiveArrayIterator([]);
-            } else {
-                throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
             }
+
+            throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -117,11 +159,24 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     #[\ReturnTypeWillChange]
     public function rewind()
     {
+        $this->children = null;
+
         if (false === $this->isRewindable()) {
             return;
         }
 
         parent::rewind();
+    }
+
+    /**
+     * @return void
+     */
+    #[\ReturnTypeWillChange]
+    public function seek($offset)
+    {
+        $this->children = null;
+
+        parent::seek($offset);
     }
 
     /**

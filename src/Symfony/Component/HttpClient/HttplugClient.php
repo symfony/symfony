@@ -102,10 +102,8 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
 
     /**
      * {@inheritdoc}
-     *
-     * @return HttplugPromise
      */
-    public function sendAsyncRequest(RequestInterface $request): Promise
+    public function sendAsyncRequest(RequestInterface $request): HttplugPromise
     {
         if (!$promisePool = $this->promisePool) {
             throw new \LogicException(sprintf('You cannot use "%s()" as the "guzzlehttp/promises" package is not installed. Try running "composer require guzzlehttp/promises".', __METHOD__));

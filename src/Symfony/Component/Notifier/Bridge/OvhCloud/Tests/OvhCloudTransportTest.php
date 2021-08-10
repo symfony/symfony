@@ -18,15 +18,11 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class OvhCloudTransportTest extends TransportTestCase
 {
-    /**
-     * @return OvhCloudTransport
-     */
-    public function createTransport(HttpClientInterface $client = null, string $sender = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $sender = null): OvhCloudTransport
     {
         return (new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $client ?? $this->createMock(HttpClientInterface::class)))->setSender($sender);
     }

@@ -8,10 +8,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Test\Action\Input\AbstractI
 
 final class DateInputTest extends AbstractInputTestCase
 {
-    /**
-     * @return DateInput
-     */
-    public function createInput(): AbstractInput
+    public function createInput(): DateInput
     {
         return new DateInput();
     }

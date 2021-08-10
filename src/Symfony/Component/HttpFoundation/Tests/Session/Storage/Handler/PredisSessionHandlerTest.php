@@ -18,10 +18,7 @@ use Predis\Client;
  */
 class PredisSessionHandlerTest extends AbstractRedisSessionHandlerTestCase
 {
-    /**
-     * @return Client
-     */
-    protected function createRedisClient(string $host): object
+    protected function createRedisClient(string $host): Client
     {
         return new Client(['host' => $host]);
     }

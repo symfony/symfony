@@ -956,10 +956,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Filters the list of nodes with an XPath expression.
      *
      * The XPath expression should already be processed to apply it in the context of each node.
-     *
-     * @return static
      */
-    private function filterRelativeXPath(string $xpath): object
+    private function filterRelativeXPath(string $xpath): static
     {
         $crawler = $this->createSubCrawler(null);
         if (null === $this->document) {
@@ -1202,10 +1200,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Creates a crawler for some subnodes.
      *
      * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $nodes
-     *
-     * @return static
      */
-    private function createSubCrawler(\DOMNodeList|\DOMNode|array|string|null $nodes): object
+    private function createSubCrawler(\DOMNodeList|\DOMNode|array|string|null $nodes): static
     {
         $crawler = new static($nodes, $this->uri, $this->baseHref);
         $crawler->isHtml = $this->isHtml;

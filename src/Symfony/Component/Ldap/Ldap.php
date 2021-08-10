@@ -66,10 +66,8 @@ final class Ldap implements LdapInterface
      *
      * @param string $adapter The adapter name
      * @param array  $config  The adapter's configuration
-     *
-     * @return static
      */
-    public static function create(string $adapter, array $config = []): self
+    public static function create(string $adapter, array $config = []): static
     {
         if ('ext_ldap' !== $adapter) {
             throw new DriverNotFoundException(sprintf('Adapter "%s" not found. Only "ext_ldap" is supported at the moment.', $adapter));

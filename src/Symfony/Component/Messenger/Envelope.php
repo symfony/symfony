@@ -49,9 +49,9 @@ final class Envelope
     }
 
     /**
-     * @return static A new Envelope instance with additional stamp
+     * Adds one or more stamps.
      */
-    public function with(StampInterface ...$stamps): self
+    public function with(StampInterface ...$stamps): static
     {
         $cloned = clone $this;
 
@@ -63,9 +63,9 @@ final class Envelope
     }
 
     /**
-     * @return static A new Envelope instance without any stamps of the given class
+     * Removes all stamps of the given class.
      */
-    public function withoutAll(string $stampFqcn): self
+    public function withoutAll(string $stampFqcn): static
     {
         $cloned = clone $this;
 
@@ -107,9 +107,6 @@ final class Envelope
         return $this->stamps;
     }
 
-    /**
-     * @return object The original message contained in the envelope
-     */
     public function getMessage(): object
     {
         return $this->message;

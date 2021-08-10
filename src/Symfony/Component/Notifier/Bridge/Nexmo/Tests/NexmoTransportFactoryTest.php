@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Nexmo\Tests;
 
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class NexmoTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return NexmoTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): NexmoTransportFactory
     {
         return new NexmoTransportFactory();
     }

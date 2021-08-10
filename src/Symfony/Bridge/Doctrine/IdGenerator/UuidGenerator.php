@@ -49,10 +49,7 @@ final class UuidGenerator extends AbstractIdGenerator
         return $clone;
     }
 
-    /**
-     * @return static
-     */
-    public function randomBased(): self
+    public function randomBased(): static
     {
         $clone = clone $this;
         $clone->factory = $clone->protoFactory->randomBased();

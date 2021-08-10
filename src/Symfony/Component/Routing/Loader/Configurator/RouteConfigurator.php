@@ -37,10 +37,8 @@ class RouteConfigurator
      * Sets the host to use for all child routes.
      *
      * @param string|array $host the host, or the localized hosts
-     *
-     * @return $this
      */
-    final public function host(string|array $host): self
+    final public function host(string|array $host): static
     {
         $this->addHost($this->route, $host);
 

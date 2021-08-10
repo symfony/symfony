@@ -22,11 +22,9 @@ trait CallTrait
      * @param array  $arguments    An array of arguments to pass to the method call
      * @param bool   $returnsClone Whether the call returns the service instance or not
      *
-     * @return $this
-     *
      * @throws InvalidArgumentException on empty $method param
      */
-    final public function call(string $method, array $arguments = [], bool $returnsClone = false): self
+    final public function call(string $method, array $arguments = [], bool $returnsClone = false): static
     {
         $this->definition->addMethodCall($method, static::processValue($arguments, true), $returnsClone);
 

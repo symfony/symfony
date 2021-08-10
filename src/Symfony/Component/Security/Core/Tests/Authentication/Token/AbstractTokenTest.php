@@ -266,7 +266,7 @@ class SerializableUser implements UserInterface
         return $this->name;
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return '***';
     }
@@ -284,7 +284,7 @@ class SerializableUser implements UserInterface
     {
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return null;
     }

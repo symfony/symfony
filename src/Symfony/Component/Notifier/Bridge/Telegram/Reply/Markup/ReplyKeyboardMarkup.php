@@ -27,10 +27,8 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
 
     /**
      * @param array|KeyboardButton[] $buttons
-     *
-     * @return $this
      */
-    public function keyboard(array $buttons): self
+    public function keyboard(array $buttons): static
     {
         $buttons = array_map(static function (KeyboardButton $button) {
             return $button->toArray();

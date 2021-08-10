@@ -41,10 +41,7 @@ final class LokaliseProviderFactory extends AbstractProviderFactory
         $this->loader = $loader;
     }
 
-    /**
-     * @return LokaliseProvider
-     */
-    public function create(Dsn $dsn): ProviderInterface
+    public function create(Dsn $dsn): LokaliseProvider
     {
         if ('lokalise' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'lokalise', $this->getSupportedSchemes());

@@ -15,10 +15,8 @@ trait ClassTrait
 {
     /**
      * Sets the service class.
-     *
-     * @return $this
      */
-    final public function class(?string $class): self
+    final public function class(?string $class): static
     {
         $this->definition->setClass($class);
 

@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class SlackTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return SlackTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): SlackTransportFactory
     {
         return new SlackTransportFactory();
     }

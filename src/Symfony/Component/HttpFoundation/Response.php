@@ -410,11 +410,9 @@ class Response
     /**
      * Sets the HTTP protocol version (1.0 or 1.1).
      *
-     * @return $this
-     *
      * @final
      */
-    public function setProtocolVersion(string $version): object
+    public function setProtocolVersion(string $version): static
     {
         $this->version = $version;
 
@@ -437,13 +435,11 @@ class Response
      * If the status text is null it will be automatically populated for the known
      * status codes and left empty otherwise.
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      *
      * @final
      */
-    public function setStatusCode(int $code, string $text = null): object
+    public function setStatusCode(int $code, string $text = null): static
     {
         $this->statusCode = $code;
         if ($this->isInvalid()) {
@@ -480,11 +476,9 @@ class Response
     /**
      * Sets the response charset.
      *
-     * @return $this
-     *
      * @final
      */
-    public function setCharset(string $charset): object
+    public function setCharset(string $charset): static
     {
         $this->charset = $charset;
 
@@ -561,11 +555,9 @@ class Response
      *
      * It makes the response ineligible for serving other clients.
      *
-     * @return $this
-     *
      * @final
      */
-    public function setPrivate(): object
+    public function setPrivate(): static
     {
         $this->headers->removeCacheControlDirective('public');
         $this->headers->addCacheControlDirective('private');
@@ -578,11 +570,9 @@ class Response
      *
      * It makes the response eligible for serving other clients.
      *
-     * @return $this
-     *
      * @final
      */
-    public function setPublic(): object
+    public function setPublic(): static
     {
         $this->headers->addCacheControlDirective('public');
         $this->headers->removeCacheControlDirective('private');
@@ -593,11 +583,9 @@ class Response
     /**
      * Marks the response as "immutable".
      *
-     * @return $this
-     *
      * @final
      */
-    public function setImmutable(bool $immutable = true): object
+    public function setImmutable(bool $immutable = true): static
     {
         if ($immutable) {
             $this->headers->addCacheControlDirective('immutable');
@@ -648,11 +636,9 @@ class Response
     /**
      * Sets the Date header.
      *
-     * @return $this
-     *
      * @final
      */
-    public function setDate(\DateTimeInterface $date): object
+    public function setDate(\DateTimeInterface $date): static
     {
         if ($date instanceof \DateTime) {
             $date = \DateTimeImmutable::createFromMutable($date);
@@ -713,11 +699,9 @@ class Response
      *
      * Passing null as value will remove the header.
      *
-     * @return $this
-     *
      * @final
      */
-    public function setExpires(\DateTimeInterface $date = null): object
+    public function setExpires(\DateTimeInterface $date = null): static
     {
         if (null === $date) {
             $this->headers->remove('Expires');
@@ -766,11 +750,9 @@ class Response
      *
      * This methods sets the Cache-Control max-age directive.
      *
-     * @return $this
-     *
      * @final
      */
-    public function setMaxAge(int $value): object
+    public function setMaxAge(int $value): static
     {
         $this->headers->addCacheControlDirective('max-age', $value);
 
@@ -782,11 +764,9 @@ class Response
      *
      * This methods sets the Cache-Control s-maxage directive.
      *
-     * @return $this
-     *
      * @final
      */
-    public function setSharedMaxAge(int $value): object
+    public function setSharedMaxAge(int $value): static
     {
         $this->setPublic();
         $this->headers->addCacheControlDirective('s-maxage', $value);
@@ -816,11 +796,9 @@ class Response
      *
      * This method adjusts the Cache-Control/s-maxage directive.
      *
-     * @return $this
-     *
      * @final
      */
-    public function setTtl(int $seconds): object
+    public function setTtl(int $seconds): static
     {
         $this->setSharedMaxAge($this->getAge() + $seconds);
 
@@ -832,11 +810,9 @@ class Response
      *
      * This method adjusts the Cache-Control/max-age directive.
      *
-     * @return $this
-     *
      * @final
      */
-    public function setClientTtl(int $seconds): object
+    public function setClientTtl(int $seconds): static
     {
         $this->setMaxAge($this->getAge() + $seconds);
 
@@ -860,11 +836,9 @@ class Response
      *
      * Passing null as value will remove the header.
      *
-     * @return $this
-     *
      * @final
      */
-    public function setLastModified(\DateTimeInterface $date = null): object
+    public function setLastModified(\DateTimeInterface $date = null): static
     {
         if (null === $date) {
             $this->headers->remove('Last-Modified');
@@ -898,11 +872,9 @@ class Response
      * @param string|null $etag The ETag unique identifier or null to remove the header
      * @param bool        $weak Whether you want a weak ETag or not
      *
-     * @return $this
-     *
      * @final
      */
-    public function setEtag(string $etag = null, bool $weak = false): object
+    public function setEtag(string $etag = null, bool $weak = false): static
     {
         if (null === $etag) {
             $this->headers->remove('Etag');
@@ -922,13 +894,11 @@ class Response
      *
      * Available options are: must_revalidate, no_cache, no_store, no_transform, public, private, proxy_revalidate, max_age, s_maxage, immutable, last_modified and etag.
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException
      *
      * @final
      */
-    public function setCache(array $options): object
+    public function setCache(array $options): static
     {
         if ($diff = array_diff(array_keys($options), array_keys(self::HTTP_RESPONSE_CACHE_CONTROL_DIRECTIVES))) {
             throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', $diff)));
@@ -985,13 +955,11 @@ class Response
      * This sets the status, removes the body, and discards any headers
      * that MUST NOT be included in 304 responses.
      *
-     * @return $this
-     *
      * @see https://tools.ietf.org/html/rfc2616#section-10.3.5
      *
      * @final
      */
-    public function setNotModified(): object
+    public function setNotModified(): static
     {
         $this->setStatusCode(304);
         $this->setContent(null);
@@ -1038,11 +1006,9 @@ class Response
      *
      * @param bool $replace Whether to replace the actual value or not (true by default)
      *
-     * @return $this
-     *
      * @final
      */
-    public function setVary(string|array $headers, bool $replace = true): object
+    public function setVary(string|array $headers, bool $replace = true): static
     {
         $this->headers->set('Vary', $headers, $replace);
 

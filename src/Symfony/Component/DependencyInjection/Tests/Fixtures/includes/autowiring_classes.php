@@ -277,20 +277,16 @@ class Wither
 
     /**
      * @required
-     *
-     * @return static
      */
-    public function withFoo1(Foo $foo): self
+    public function withFoo1(Foo $foo): static
     {
         return $this->withFoo2($foo);
     }
 
     /**
      * @required
-     *
-     * @return static
      */
-    public function withFoo2(Foo $foo): self
+    public function withFoo2(Foo $foo): static
     {
         $new = clone $this;
         $new->foo = $foo;

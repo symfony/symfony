@@ -82,10 +82,7 @@ class ContainerConfigurator extends AbstractConfigurator
         return $this->env;
     }
 
-    /**
-     * @return static
-     */
-    final public function withPath(string $path): self
+    final public function withPath(string $path): static
     {
         $clone = clone $this;
         $clone->path = $clone->file = $path;

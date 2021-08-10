@@ -109,7 +109,7 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
     /**
      * {@inheritdoc}
      */
-    public function withOptions(array $options): self
+    public function withOptions(array $options): static
     {
         $clone = clone $this;
         $clone->client = $this->client->withOptions($options);

@@ -41,10 +41,7 @@ final class LocoProviderFactory extends AbstractProviderFactory
         $this->loader = $loader;
     }
 
-    /**
-     * @return LocoProvider
-     */
-    public function create(Dsn $dsn): ProviderInterface
+    public function create(Dsn $dsn): LocoProvider
     {
         if ('loco' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'loco', $this->getSupportedSchemes());

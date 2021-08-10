@@ -22,11 +22,9 @@ trait DeprecateTrait
      * @param string $version The version of the package that introduced the deprecation
      * @param string $message The deprecation message to use
      *
-     * @return $this
-     *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    final public function deprecate(string $package, string $version, string $message): self
+    final public function deprecate(string $package, string $version, string $message): static
     {
         $this->definition->setDeprecated($package, $version, $message);
 

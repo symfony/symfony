@@ -257,12 +257,12 @@ class TestLoginLinkHandlerUser implements UserInterface
         return [];
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->passwordProperty;
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return '';
     }

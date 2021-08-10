@@ -27,20 +27,14 @@ class ParametersConfigurator extends AbstractConfigurator
         $this->container = $container;
     }
 
-    /**
-     * @return $this
-     */
-    final public function set(string $name, mixed $value): self
+    final public function set(string $name, mixed $value): static
     {
         $this->container->setParameter($name, static::processValue($value, true));
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    final public function __invoke(string $name, mixed $value): self
+    final public function __invoke(string $name, mixed $value): static
     {
         return $this->set($name, $value);
     }

@@ -459,10 +459,7 @@ abstract class AbstractUnicodeString extends AbstractString
         return $width;
     }
 
-    /**
-     * @return static
-     */
-    private function pad(int $len, self $pad, int $type): parent
+    private function pad(int $len, self $pad, int $type): static
     {
         $sLen = $this->length();
 

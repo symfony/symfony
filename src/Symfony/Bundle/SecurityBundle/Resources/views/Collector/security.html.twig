@@ -76,6 +76,8 @@
                     </div>
                 {% endif %}
             </div>
+
+            {% block additional_toolbar_information '' %}
         {% endset %}
 
         {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: color_code }) }}

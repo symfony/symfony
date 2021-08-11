@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Inbalido o nagexpire na ang link para makapaglogin.</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Madaming bagsak na pagtatangka, pakisubukan ulit pagkatapos ng %minutes% minuto.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Madaming bagsak na pagtatangka, pakisubukan ulit pagkatapos ng %minutes% minuto.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
-use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -803,9 +802,7 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Resolves services.
-     *
-     * @return array|string|Reference|ArgumentInterface
+     * @return mixed
      */
     private function resolveServices($value, string $file, bool $isParameter = false)
     {

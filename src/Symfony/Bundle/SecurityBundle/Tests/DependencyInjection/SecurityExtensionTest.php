@@ -856,6 +856,10 @@ class TestAuthenticator implements AuthenticatorInterface
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
     }
+
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
+    {
+    }
 }
 
 class NullAuthenticator implements GuardAuthenticatorInterface

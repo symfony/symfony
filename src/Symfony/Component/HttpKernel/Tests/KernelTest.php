@@ -522,7 +522,7 @@ EOF
             }
 
             /**
-             * @return false
+             * @return string|false
              */
             public function getXsdValidationBasePath()
             {

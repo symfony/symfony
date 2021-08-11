@@ -20,6 +20,9 @@ trait PassportTrait
 {
     private $badges = [];
 
+    /**
+     * @return $this
+     */
     public function addBadge(BadgeInterface $badge): PassportInterface
     {
         $this->badges[\get_class($badge)] = $badge;

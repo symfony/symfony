@@ -516,7 +516,7 @@ EOF
                 $container->setParameter('test.extension-registered', true);
             }
 
-            public function getNamespace()
+            public function getNamespace(): string
             {
                 return '';
             }
@@ -526,7 +526,7 @@ EOF
                 return false;
             }
 
-            public function getAlias()
+            public function getAlias(): string
             {
                 return 'test-extension';
             }

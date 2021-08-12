@@ -128,7 +128,7 @@ class InputDefinition
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function getArgument(string|int $name)
+    public function getArgument(string|int $name): InputArgument
     {
         if (!$this->hasArgument($name)) {
             throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
@@ -144,7 +144,7 @@ class InputDefinition
      *
      * @return bool true if the InputArgument object exists, false otherwise
      */
-    public function hasArgument(string|int $name)
+    public function hasArgument(string|int $name): bool
     {
         $arguments = \is_int($name) ? array_values($this->arguments) : $this->arguments;
 
@@ -156,7 +156,7 @@ class InputDefinition
      *
      * @return InputArgument[] An array of InputArgument objects
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
@@ -166,7 +166,7 @@ class InputDefinition
      *
      * @return int The number of InputArguments
      */
-    public function getArgumentCount()
+    public function getArgumentCount(): int
     {
         return null !== $this->lastArrayArgument ? \PHP_INT_MAX : \count($this->arguments);
     }
@@ -176,7 +176,7 @@ class InputDefinition
      *
      * @return int The number of required InputArguments
      */
-    public function getArgumentRequiredCount()
+    public function getArgumentRequiredCount(): int
     {
         return $this->requiredCount;
     }
@@ -184,7 +184,7 @@ class InputDefinition
     /**
      * @return array<string|bool|int|float|array|null>
      */
-    public function getArgumentDefaults()
+    public function getArgumentDefaults(): array
     {
         $values = [];
         foreach ($this->arguments as $argument) {
@@ -262,7 +262,7 @@ class InputDefinition
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function getOption(string $name)
+    public function getOption(string $name): InputOption
     {
         if (!$this->hasOption($name)) {
             throw new InvalidArgumentException(sprintf('The "--%s" option does not exist.', $name));
@@ -279,7 +279,7 @@ class InputDefinition
      *
      * @return bool true if the InputOption object exists, false otherwise
      */
-    public function hasOption(string $name)
+    public function hasOption(string $name): bool
     {
         return isset($this->options[$name]);
     }
@@ -289,7 +289,7 @@ class InputDefinition
      *
      * @return InputOption[] An array of InputOption objects
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -299,7 +299,7 @@ class InputDefinition
      *
      * @return bool true if the InputOption object exists, false otherwise
      */
-    public function hasShortcut(string $name)
+    public function hasShortcut(string $name): bool
     {
         return isset($this->shortcuts[$name]);
     }
@@ -317,7 +317,7 @@ class InputDefinition
      *
      * @return InputOption An InputOption object
      */
-    public function getOptionForShortcut(string $shortcut)
+    public function getOptionForShortcut(string $shortcut): InputOption
     {
         return $this->getOption($this->shortcutToName($shortcut));
     }
@@ -325,7 +325,7 @@ class InputDefinition
     /**
      * @return array<string|bool|int|float|array|null>
      */
-    public function getOptionDefaults()
+    public function getOptionDefaults(): array
     {
         $values = [];
         foreach ($this->options as $option) {
@@ -372,7 +372,7 @@ class InputDefinition
      *
      * @return string The synopsis
      */
-    public function getSynopsis(bool $short = false)
+    public function getSynopsis(bool $short = false): string
     {
         $elements = [];
 

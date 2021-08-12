@@ -40,7 +40,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @see Reference
      */
-    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
+    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE): ?object;
 
     /**
      * @return bool true if the service is defined, false otherwise
@@ -52,7 +52,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @return bool true if the service has been initialized, false otherwise
      */
-    public function initialized(string $id);
+    public function initialized(string $id): bool;
 
     /**
      * @return array|bool|string|int|float|null
@@ -64,7 +64,7 @@ interface ContainerInterface extends PsrContainerInterface
     /**
      * @return bool
      */
-    public function hasParameter(string $name);
+    public function hasParameter(string $name): bool;
 
     public function setParameter(string $name, array|bool|string|int|float|null $value);
 }

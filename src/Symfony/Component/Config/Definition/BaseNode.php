@@ -102,26 +102,17 @@ abstract class BaseNode implements NodeInterface
         $this->attributes[$key] = $value;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAttribute(string $key, mixed $default = null)
+    public function getAttribute(string $key, mixed $default = null): mixed
     {
         return $this->attributes[$key] ?? $default;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasAttribute(string $key)
+    public function hasAttribute(string $key): bool
     {
         return isset($this->attributes[$key]);
     }
 
-    /**
-     * @return array
-     */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -149,7 +140,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return string|null The info text
      */
-    public function getInfo()
+    public function getInfo(): ?string
     {
         return $this->getAttribute('info');
     }
@@ -167,7 +158,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return string|array|null The example
      */
-    public function getExample()
+    public function getExample(): string|array|null
     {
         return $this->getAttribute('example');
     }
@@ -238,17 +229,15 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    public function isRequired()
+    public function isRequired(): bool
     {
         return $this->required;
     }
 
     /**
      * Checks if this node is deprecated.
-     *
-     * @return bool
      */
-    public function isDeprecated()
+    public function isDeprecated(): bool
     {
         return (bool) $this->deprecation;
     }
@@ -269,7 +258,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -277,7 +266,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getPath()
+    public function getPath(): string
     {
         if (null !== $this->parent) {
             return $this->parent->getPath().$this->pathSeparator.$this->name;
@@ -372,17 +361,15 @@ abstract class BaseNode implements NodeInterface
      *
      * @return mixed The normalized array value
      */
-    protected function preNormalize(mixed $value)
+    protected function preNormalize(mixed $value): mixed
     {
         return $value;
     }
 
     /**
      * Returns parent node for this node.
-     *
-     * @return NodeInterface|null
      */
-    public function getParent()
+    public function getParent(): ?NodeInterface
     {
         return $this->parent;
     }
@@ -440,21 +427,21 @@ abstract class BaseNode implements NodeInterface
      *
      * @return mixed The normalized value
      */
-    abstract protected function normalizeValue(mixed $value);
+    abstract protected function normalizeValue(mixed $value): mixed;
 
     /**
      * Merges two values together.
      *
      * @return mixed The merged value
      */
-    abstract protected function mergeValues(mixed $leftSide, mixed $rightSide);
+    abstract protected function mergeValues(mixed $leftSide, mixed $rightSide): mixed;
 
     /**
      * Finalizes a value.
      *
      * @return mixed The finalized value
      */
-    abstract protected function finalizeValue(mixed $value);
+    abstract protected function finalizeValue(mixed $value): mixed;
 
     /**
      * Tests if placeholder values are allowed for this node.

@@ -26,17 +26,17 @@ interface CommandLoaderInterface
      *
      * @throws CommandNotFoundException
      */
-    public function get(string $name);
+    public function get(string $name): Command;
 
     /**
      * Checks if a command exists.
      *
      * @return bool
      */
-    public function has(string $name);
+    public function has(string $name): bool;
 
     /**
      * @return string[] All registered command names
      */
-    public function getNames();
+    public function getNames(): array;
 }

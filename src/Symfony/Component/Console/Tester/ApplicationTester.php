@@ -49,7 +49,7 @@ class ApplicationTester
      *
      * @return int The command exit code
      */
-    public function run(array $input, array $options = [])
+    public function run(array $input, array $options = []): int
     {
         $this->input = new ArrayInput($input);
         if (isset($options['interactive'])) {

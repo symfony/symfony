@@ -73,28 +73,28 @@ interface StyleInterface
      *
      * @return mixed
      */
-    public function ask(string $question, string $default = null, callable $validator = null);
+    public function ask(string $question, string $default = null, callable $validator = null): mixed;
 
     /**
      * Asks a question with the user input hidden.
      *
      * @return mixed
      */
-    public function askHidden(string $question, callable $validator = null);
+    public function askHidden(string $question, callable $validator = null): mixed;
 
     /**
      * Asks for confirmation.
      *
      * @return bool
      */
-    public function confirm(string $question, bool $default = true);
+    public function confirm(string $question, bool $default = true): bool;
 
     /**
      * Asks a choice question.
      *
      * @return mixed
      */
-    public function choice(string $question, array $choices, mixed $default = null);
+    public function choice(string $question, array $choices, mixed $default = null): mixed;
 
     /**
      * Add newline(s).

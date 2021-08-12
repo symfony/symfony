@@ -26,7 +26,7 @@ interface InputInterface
      *
      * @return string|null The value of the first argument or null otherwise
      */
-    public function getFirstArgument();
+    public function getFirstArgument(): ?string;
 
     /**
      * Returns true if the raw parameters (not parsed) contain a value.
@@ -41,7 +41,7 @@ interface InputInterface
      *
      * @return bool true if the value is contained in the raw parameters
      */
-    public function hasParameterOption(string|array $values, bool $onlyParams = false);
+    public function hasParameterOption(string|array $values, bool $onlyParams = false): bool;
 
     /**
      * Returns the value of a raw option (not parsed).
@@ -57,7 +57,7 @@ interface InputInterface
      *
      * @return mixed The option value
      */
-    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false);
+    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed;
 
     /**
      * Binds the current Input instance with the given arguments and options.
@@ -78,7 +78,7 @@ interface InputInterface
      *
      * @return array<string|bool|int|float|array|null>
      */
-    public function getArguments();
+    public function getArguments(): array;
 
     /**
      * Returns the argument value for a given argument name.
@@ -87,7 +87,7 @@ interface InputInterface
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function getArgument(string $name);
+    public function getArgument(string $name): mixed;
 
     /**
      * Sets an argument value by name.
@@ -101,14 +101,14 @@ interface InputInterface
      *
      * @return bool true if the InputArgument object exists, false otherwise
      */
-    public function hasArgument(string $name);
+    public function hasArgument(string $name): bool;
 
     /**
      * Returns all the given options merged with the default values.
      *
      * @return array<string|bool|int|float|array|null>
      */
-    public function getOptions();
+    public function getOptions(): array;
 
     /**
      * Returns the option value for a given option name.
@@ -117,7 +117,7 @@ interface InputInterface
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function getOption(string $name);
+    public function getOption(string $name): mixed;
 
     /**
      * Sets an option value by name.
@@ -131,14 +131,14 @@ interface InputInterface
      *
      * @return bool true if the InputOption object exists, false otherwise
      */
-    public function hasOption(string $name);
+    public function hasOption(string $name): bool;
 
     /**
      * Is this input means interactive?
      *
      * @return bool
      */
-    public function isInteractive();
+    public function isInteractive(): bool;
 
     /**
      * Sets the input interactivity.

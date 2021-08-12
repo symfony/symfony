@@ -45,7 +45,7 @@ class QuestionHelper extends Helper
      *
      * @throws RuntimeException If there is no data to read in the input stream
      */
-    public function ask(InputInterface $input, OutputInterface $output, Question $question)
+    public function ask(InputInterface $input, OutputInterface $output, Question $question): mixed
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -83,7 +83,7 @@ class QuestionHelper extends Helper
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'question';
     }
@@ -196,7 +196,7 @@ class QuestionHelper extends Helper
     /**
      * @return string[]
      */
-    protected function formatChoiceQuestionChoices(ChoiceQuestion $question, string $tag)
+    protected function formatChoiceQuestionChoices(ChoiceQuestion $question, string $tag): array
     {
         $messages = [];
 

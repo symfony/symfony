@@ -30,28 +30,28 @@ interface NodeInterface
      *
      * @return string The name of the node
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Returns the path of the node.
      *
      * @return string The node path
      */
-    public function getPath();
+    public function getPath(): string;
 
     /**
      * Returns true when the node is required.
      *
      * @return bool If the node is required
      */
-    public function isRequired();
+    public function isRequired(): bool;
 
     /**
      * Returns true when the node has a default value.
      *
      * @return bool If the node has a default value
      */
-    public function hasDefaultValue();
+    public function hasDefaultValue(): bool;
 
     /**
      * Returns the default value of the node.
@@ -60,7 +60,7 @@ interface NodeInterface
      *
      * @throws \RuntimeException if the node has no default value
      */
-    public function getDefaultValue();
+    public function getDefaultValue(): mixed;
 
     /**
      * Normalizes a value.
@@ -69,7 +69,7 @@ interface NodeInterface
      *
      * @throws InvalidTypeException if the value type is invalid
      */
-    public function normalize(mixed $value);
+    public function normalize(mixed $value): mixed;
 
     /**
      * Merges two values together.
@@ -79,7 +79,7 @@ interface NodeInterface
      * @throws ForbiddenOverwriteException if the configuration path cannot be overwritten
      * @throws InvalidTypeException        if the value type is invalid
      */
-    public function merge(mixed $leftSide, mixed $rightSide);
+    public function merge(mixed $leftSide, mixed $rightSide): mixed;
 
     /**
      * Finalizes a value.
@@ -89,5 +89,5 @@ interface NodeInterface
      * @throws InvalidTypeException          if the value type is invalid
      * @throws InvalidConfigurationException if the value is invalid configuration
      */
-    public function finalize(mixed $value);
+    public function finalize(mixed $value): mixed;
 }

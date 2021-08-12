@@ -47,7 +47,7 @@ class Question
      *
      * @return string
      */
-    public function getQuestion()
+    public function getQuestion(): string
     {
         return $this->question;
     }
@@ -57,7 +57,7 @@ class Question
      *
      * @return string|bool|int|float|null
      */
-    public function getDefault()
+    public function getDefault(): string|bool|int|float|null
     {
         return $this->default;
     }
@@ -75,7 +75,7 @@ class Question
      *
      * @return $this
      */
-    public function setMultiline(bool $multiline): self
+    public function setMultiline(bool $multiline): static
     {
         $this->multiline = $multiline;
 
@@ -87,7 +87,7 @@ class Question
      *
      * @return bool
      */
-    public function isHidden()
+    public function isHidden(): bool
     {
         return $this->hidden;
     }
@@ -99,7 +99,7 @@ class Question
      *
      * @throws LogicException In case the autocompleter is also used
      */
-    public function setHidden(bool $hidden)
+    public function setHidden(bool $hidden): static
     {
         if ($this->autocompleterCallback) {
             throw new LogicException('A hidden question cannot use the autocompleter.');
@@ -115,7 +115,7 @@ class Question
      *
      * @return bool
      */
-    public function isHiddenFallback()
+    public function isHiddenFallback(): bool
     {
         return $this->hiddenFallback;
     }
@@ -125,7 +125,7 @@ class Question
      *
      * @return $this
      */
-    public function setHiddenFallback(bool $fallback)
+    public function setHiddenFallback(bool $fallback): static
     {
         $this->hiddenFallback = (bool) $fallback;
 
@@ -137,7 +137,7 @@ class Question
      *
      * @return iterable|null
      */
-    public function getAutocompleterValues()
+    public function getAutocompleterValues(): ?iterable
     {
         $callback = $this->getAutocompleterCallback();
 
@@ -151,7 +151,7 @@ class Question
      *
      * @throws LogicException
      */
-    public function setAutocompleterValues(?iterable $values)
+    public function setAutocompleterValues(?iterable $values): static
     {
         if (\is_array($values)) {
             $values = $this->isAssoc($values) ? array_merge(array_keys($values), array_values($values)) : array_values($values);
@@ -186,7 +186,7 @@ class Question
      *
      * @return $this
      */
-    public function setAutocompleterCallback(callable $callback = null): self
+    public function setAutocompleterCallback(callable $callback = null): static
     {
         if ($this->hidden && null !== $callback) {
             throw new LogicException('A hidden question cannot use the autocompleter.');
@@ -202,7 +202,7 @@ class Question
      *
      * @return $this
      */
-    public function setValidator(callable $validator = null)
+    public function setValidator(callable $validator = null): static
     {
         $this->validator = $validator;
 
@@ -214,7 +214,7 @@ class Question
      *
      * @return callable|null
      */
-    public function getValidator()
+    public function getValidator(): ?callable
     {
         return $this->validator;
     }
@@ -228,7 +228,7 @@ class Question
      *
      * @throws InvalidArgumentException in case the number of attempts is invalid
      */
-    public function setMaxAttempts(?int $attempts)
+    public function setMaxAttempts(?int $attempts): static
     {
         if (null !== $attempts) {
             $attempts = (int) $attempts;
@@ -249,7 +249,7 @@ class Question
      *
      * @return int|null
      */
-    public function getMaxAttempts()
+    public function getMaxAttempts(): ?int
     {
         return $this->attempts;
     }
@@ -261,7 +261,7 @@ class Question
      *
      * @return $this
      */
-    public function setNormalizer(callable $normalizer)
+    public function setNormalizer(callable $normalizer): static
     {
         $this->normalizer = $normalizer;
 
@@ -275,7 +275,7 @@ class Question
      *
      * @return callable|null
      */
-    public function getNormalizer()
+    public function getNormalizer(): ?callable
     {
         return $this->normalizer;
     }
@@ -293,7 +293,7 @@ class Question
     /**
      * @return $this
      */
-    public function setTrimmable(bool $trimmable): self
+    public function setTrimmable(bool $trimmable): static
     {
         $this->trimmable = $trimmable;
 

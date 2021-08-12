@@ -33,7 +33,7 @@ trait ReferenceSetArgumentTrait
     /**
      * @return Reference[] The values in the set
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }

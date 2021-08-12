@@ -25,7 +25,7 @@ interface ConfigCacheInterface
      *
      * @return string The cache file path
      */
-    public function getPath();
+    public function getPath(): string;
 
     /**
      * Checks if the cache is still fresh.
@@ -34,7 +34,7 @@ interface ConfigCacheInterface
      *
      * @return bool Whether the cache is still fresh
      */
-    public function isFresh();
+    public function isFresh(): bool;
 
     /**
      * Writes the given content into the cache file. Metadata will be stored

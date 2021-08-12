@@ -63,7 +63,7 @@ class TableCellStyle
      *
      * @return string[]
      */
-    public function getTagOptions()
+    public function getTagOptions(): array
     {
         return array_filter(
             $this->getOptions(),

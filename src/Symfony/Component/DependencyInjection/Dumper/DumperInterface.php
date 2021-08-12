@@ -23,5 +23,5 @@ interface DumperInterface
      *
      * @return string|array The representation of the service container
      */
-    public function dump(array $options = []);
+    public function dump(array $options = []): string|array;
 }

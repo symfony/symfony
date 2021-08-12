@@ -27,10 +27,7 @@ class InvalidConfigurationException extends Exception
         $this->path = $path;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPath()
+    public function getPath(): ?string
     {
         return $this->path;
     }

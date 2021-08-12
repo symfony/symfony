@@ -70,7 +70,7 @@ class DescriptorHelper extends Helper
      *
      * @return $this
      */
-    public function register(string $format, DescriptorInterface $descriptor)
+    public function register(string $format, DescriptorInterface $descriptor): static
     {
         $this->descriptors[$format] = $descriptor;
 
@@ -80,7 +80,7 @@ class DescriptorHelper extends Helper
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'descriptor';
     }

@@ -46,7 +46,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * If you have a mixed key like foo-bar_moo, it will not be altered.
      * The key will also not be altered if the target key already exists.
      */
-    protected function preNormalize(mixed $value)
+    protected function preNormalize(mixed $value): mixed
     {
         if (!$this->normalizeKeys || !\is_array($value)) {
             return $value;
@@ -70,7 +70,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array<string, NodeInterface>
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }
@@ -90,7 +90,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array an array of the form [[string, string]]
      */
-    public function getXmlRemappings()
+    public function getXmlRemappings(): array
     {
         return $this->xmlRemappings;
     }
@@ -151,7 +151,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return $this->addIfNotSet;
     }
@@ -159,7 +159,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getDefaultValue()
+    public function getDefaultValue(): mixed
     {
         if (!$this->hasDefaultValue()) {
             throw new \RuntimeException(sprintf('The node at path "%s" has no default value.', $this->getPath()));
@@ -200,7 +200,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @throws UnsetKeyException
      * @throws InvalidConfigurationException if the node doesn't have enough children
      */
-    protected function finalizeValue(mixed $value)
+    protected function finalizeValue(mixed $value): mixed
     {
         if (false === $value) {
             throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s.', $this->getPath(), json_encode($value)));
@@ -264,7 +264,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @throws InvalidConfigurationException
      */
-    protected function normalizeValue(mixed $value)
+    protected function normalizeValue(mixed $value): mixed
     {
         if (false === $value) {
             return $value;
@@ -325,7 +325,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array The remapped values
      */
-    protected function remapXml(array $value)
+    protected function remapXml(array $value): array
     {
         foreach ($this->xmlRemappings as [$singular, $plural]) {
             if (!isset($value[$singular])) {
@@ -345,7 +345,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @throws InvalidConfigurationException
      * @throws \RuntimeException
      */
-    protected function mergeValues(mixed $leftSide, mixed $rightSide)
+    protected function mergeValues(mixed $leftSide, mixed $rightSide): mixed
     {
         if (false === $rightSide) {
             // if this is still false after the last config has been merged the

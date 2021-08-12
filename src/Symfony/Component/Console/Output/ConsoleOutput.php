@@ -94,7 +94,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * {@inheritdoc}
      */
-    public function getErrorOutput()
+    public function getErrorOutput(): OutputInterface
     {
         return $this->stderr;
     }
@@ -113,7 +113,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      *
      * @return bool
      */
-    protected function hasStdoutSupport()
+    protected function hasStdoutSupport(): bool
     {
         return false === $this->isRunningOS400();
     }
@@ -124,7 +124,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      *
      * @return bool
      */
-    protected function hasStderrSupport()
+    protected function hasStderrSupport(): bool
     {
         return false === $this->isRunningOS400();
     }

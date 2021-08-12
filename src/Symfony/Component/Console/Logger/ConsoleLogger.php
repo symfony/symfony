@@ -90,7 +90,7 @@ class ConsoleLogger extends AbstractLogger
      *
      * @return bool
      */
-    public function hasErrored()
+    public function hasErrored(): bool
     {
         return $this->errored;
     }

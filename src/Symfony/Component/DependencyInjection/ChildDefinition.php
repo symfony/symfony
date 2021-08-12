@@ -36,7 +36,7 @@ class ChildDefinition extends Definition
      *
      * @return string
      */
-    public function getParent()
+    public function getParent(): string
     {
         return $this->parent;
     }
@@ -46,7 +46,7 @@ class ChildDefinition extends Definition
      *
      * @return $this
      */
-    public function setParent(string $parent)
+    public function setParent(string $parent): static
     {
         $this->parent = $parent;
 
@@ -63,7 +63,7 @@ class ChildDefinition extends Definition
      *
      * @throws OutOfBoundsException When the argument does not exist
      */
-    public function getArgument(int|string $index)
+    public function getArgument(int|string $index): mixed
     {
         if (\array_key_exists('index_'.$index, $this->arguments)) {
             return $this->arguments['index_'.$index];
@@ -84,7 +84,7 @@ class ChildDefinition extends Definition
      *
      * @throws InvalidArgumentException when $index isn't an integer
      */
-    public function replaceArgument(int|string $index, mixed $value)
+    public function replaceArgument(int|string $index, mixed $value): static
     {
         if (\is_int($index)) {
             $this->arguments['index_'.$index] = $value;

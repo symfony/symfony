@@ -39,7 +39,7 @@ class BooleanNode extends ScalarNode
     /**
      * {@inheritdoc}
      */
-    protected function isValueEmpty(mixed $value)
+    protected function isValueEmpty(mixed $value): bool
     {
         // a boolean value cannot be empty
         return false;

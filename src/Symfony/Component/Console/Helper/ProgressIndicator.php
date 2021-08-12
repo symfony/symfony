@@ -136,7 +136,7 @@ class ProgressIndicator
      *
      * @return string|null A format string
      */
-    public static function getFormatDefinition(string $name)
+    public static function getFormatDefinition(string $name): ?string
     {
         if (!self::$formats) {
             self::$formats = self::initFormats();
@@ -164,7 +164,7 @@ class ProgressIndicator
      *
      * @return callable|null A PHP callable
      */
-    public static function getPlaceholderFormatterDefinition(string $name)
+    public static function getPlaceholderFormatterDefinition(string $name): ?callable
     {
         if (!self::$formatters) {
             self::$formatters = self::initPlaceholderFormatters();

@@ -60,7 +60,7 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
         unset($this->bag);
     }
 
-    protected function processValue(mixed $value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (\is_string($value)) {
             try {

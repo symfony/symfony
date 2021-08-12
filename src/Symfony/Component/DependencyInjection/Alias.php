@@ -32,7 +32,7 @@ class Alias
      *
      * @return bool
      */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->public;
     }
@@ -42,7 +42,7 @@ class Alias
      *
      * @return $this
      */
-    public function setPublic(bool $boolean)
+    public function setPublic(bool $boolean): static
     {
         $this->public = $boolean;
 
@@ -54,7 +54,7 @@ class Alias
      *
      * @return bool
      */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return !$this->public;
     }
@@ -71,7 +71,7 @@ class Alias
      *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    public function setDeprecated(string $package, string $version, string $message)
+    public function setDeprecated(string $package, string $version, string $message): static
     {
         if ('' !== $message) {
             if (preg_match('#[\r\n]|\*/#', $message)) {

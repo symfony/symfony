@@ -54,7 +54,7 @@ class Request
      *
      * @return string The request URI
      */
-    public function getUri()
+    public function getUri(): string
     {
         return $this->uri;
     }
@@ -64,7 +64,7 @@ class Request
      *
      * @return string The request HTTP method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -74,7 +74,7 @@ class Request
      *
      * @return array The request parameters
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
@@ -84,7 +84,7 @@ class Request
      *
      * @return array The request files
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         return $this->files;
     }
@@ -94,7 +94,7 @@ class Request
      *
      * @return array The request cookies
      */
-    public function getCookies()
+    public function getCookies(): array
     {
         return $this->cookies;
     }
@@ -104,7 +104,7 @@ class Request
      *
      * @return array The request server parameters
      */
-    public function getServer()
+    public function getServer(): array
     {
         return $this->server;
     }
@@ -114,7 +114,7 @@ class Request
      *
      * @return string|null The request raw body data
      */
-    public function getContent()
+    public function getContent(): ?string
     {
         return $this->content;
     }

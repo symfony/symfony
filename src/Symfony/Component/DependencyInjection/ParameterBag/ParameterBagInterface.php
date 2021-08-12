@@ -40,7 +40,7 @@ interface ParameterBagInterface
      *
      * @return array An array of parameters
      */
-    public function all();
+    public function all(): array;
 
     /**
      * Gets a service container parameter.
@@ -49,7 +49,7 @@ interface ParameterBagInterface
      *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
-    public function get(string $name);
+    public function get(string $name): array|bool|string|int|float|null;
 
     /**
      * Removes a parameter.
@@ -68,7 +68,7 @@ interface ParameterBagInterface
      *
      * @return bool true if the parameter name is defined, false otherwise
      */
-    public function has(string $name);
+    public function has(string $name): bool;
 
     /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
@@ -87,12 +87,12 @@ interface ParameterBagInterface
      *
      * @return mixed
      */
-    public function escapeValue(mixed $value);
+    public function escapeValue(mixed $value): mixed;
 
     /**
      * Unescape parameter placeholders %.
      *
      * @return mixed
      */
-    public function unescapeValue(mixed $value);
+    public function unescapeValue(mixed $value): mixed;
 }

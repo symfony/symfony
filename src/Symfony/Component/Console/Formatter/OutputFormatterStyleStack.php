@@ -55,7 +55,7 @@ class OutputFormatterStyleStack implements ResetInterface
      *
      * @throws InvalidArgumentException When style tags incorrectly nested
      */
-    public function pop(OutputFormatterStyleInterface $style = null)
+    public function pop(OutputFormatterStyleInterface $style = null): OutputFormatterStyleInterface
     {
         if (empty($this->styles)) {
             return $this->emptyStyle;
@@ -81,7 +81,7 @@ class OutputFormatterStyleStack implements ResetInterface
      *
      * @return OutputFormatterStyle
      */
-    public function getCurrent()
+    public function getCurrent(): OutputFormatterStyle
     {
         if (empty($this->styles)) {
             return $this->emptyStyle;
@@ -93,7 +93,7 @@ class OutputFormatterStyleStack implements ResetInterface
     /**
      * @return $this
      */
-    public function setEmptyStyle(OutputFormatterStyleInterface $emptyStyle)
+    public function setEmptyStyle(OutputFormatterStyleInterface $emptyStyle): static
     {
         $this->emptyStyle = $emptyStyle;
 
@@ -103,7 +103,7 @@ class OutputFormatterStyleStack implements ResetInterface
     /**
      * @return OutputFormatterStyleInterface
      */
-    public function getEmptyStyle()
+    public function getEmptyStyle(): OutputFormatterStyleInterface
     {
         return $this->emptyStyle;
     }

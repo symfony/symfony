@@ -49,7 +49,7 @@ class ServiceReferenceGraphNode
      *
      * @return bool
      */
-    public function isAlias()
+    public function isAlias(): bool
     {
         return $this->value instanceof Alias;
     }
@@ -59,7 +59,7 @@ class ServiceReferenceGraphNode
      *
      * @return bool True if the value is a Definition instance
      */
-    public function isDefinition()
+    public function isDefinition(): bool
     {
         return $this->value instanceof Definition;
     }
@@ -69,7 +69,7 @@ class ServiceReferenceGraphNode
      *
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -79,7 +79,7 @@ class ServiceReferenceGraphNode
      *
      * @return ServiceReferenceGraphEdge[]
      */
-    public function getInEdges()
+    public function getInEdges(): array
     {
         return $this->inEdges;
     }
@@ -89,7 +89,7 @@ class ServiceReferenceGraphNode
      *
      * @return ServiceReferenceGraphEdge[]
      */
-    public function getOutEdges()
+    public function getOutEdges(): array
     {
         return $this->outEdges;
     }
@@ -99,7 +99,7 @@ class ServiceReferenceGraphNode
      *
      * @return mixed The value
      */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }

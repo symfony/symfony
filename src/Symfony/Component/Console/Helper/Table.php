@@ -117,7 +117,7 @@ class Table
      *
      * @return TableStyle
      */
-    public static function getStyleDefinition(string $name)
+    public static function getStyleDefinition(string $name): TableStyle
     {
         if (!self::$styles) {
             self::$styles = self::initStyles();
@@ -135,7 +135,7 @@ class Table
      *
      * @return $this
      */
-    public function setStyle(TableStyle|string $name)
+    public function setStyle(TableStyle|string $name): static
     {
         $this->style = $this->resolveStyle($name);
 
@@ -147,7 +147,7 @@ class Table
      *
      * @return TableStyle
      */
-    public function getStyle()
+    public function getStyle(): TableStyle
     {
         return $this->style;
     }
@@ -159,7 +159,7 @@ class Table
      *
      * @return $this
      */
-    public function setColumnStyle(int $columnIndex, TableStyle|string $name)
+    public function setColumnStyle(int $columnIndex, TableStyle|string $name): static
     {
         $this->columnStyles[$columnIndex] = $this->resolveStyle($name);
 
@@ -173,7 +173,7 @@ class Table
      *
      * @return TableStyle
      */
-    public function getColumnStyle(int $columnIndex)
+    public function getColumnStyle(int $columnIndex): TableStyle
     {
         return $this->columnStyles[$columnIndex] ?? $this->getStyle();
     }
@@ -183,7 +183,7 @@ class Table
      *
      * @return $this
      */
-    public function setColumnWidth(int $columnIndex, int $width)
+    public function setColumnWidth(int $columnIndex, int $width): static
     {
         $this->columnWidths[$columnIndex] = $width;
 
@@ -195,7 +195,7 @@ class Table
      *
      * @return $this
      */
-    public function setColumnWidths(array $widths)
+    public function setColumnWidths(array $widths): static
     {
         $this->columnWidths = [];
         foreach ($widths as $index => $width) {
@@ -213,7 +213,7 @@ class Table
      *
      * @return $this
      */
-    public function setColumnMaxWidth(int $columnIndex, int $width): self
+    public function setColumnMaxWidth(int $columnIndex, int $width): static
     {
         if (!$this->output->getFormatter() instanceof WrappableOutputFormatterInterface) {
             throw new \LogicException(sprintf('Setting a maximum column width is only supported when using a "%s" formatter, got "%s".', WrappableOutputFormatterInterface::class, get_debug_type($this->output->getFormatter())));

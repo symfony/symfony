@@ -38,7 +38,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
      *
      * @return string Escaped text
      */
-    public static function escape(string $text)
+    public static function escape(string $text): string
     {
         $text = preg_replace('/([^\\\\]?)</', '$1\\<', $text);
 
@@ -94,7 +94,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function isDecorated()
+    public function isDecorated(): bool
     {
         return $this->decorated;
     }
@@ -110,7 +110,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function hasStyle(string $name)
+    public function hasStyle(string $name): bool
     {
         return isset($this->styles[strtolower($name)]);
     }
@@ -118,7 +118,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function getStyle(string $name)
+    public function getStyle(string $name): OutputFormatterStyleInterface
     {
         if (!$this->hasStyle($name)) {
             throw new InvalidArgumentException(sprintf('Undefined style: "%s".', $name));
@@ -130,7 +130,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function format(?string $message)
+    public function format(?string $message): ?string
     {
         return $this->formatAndWrap($message, 0);
     }
@@ -188,7 +188,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     /**
      * @return OutputFormatterStyleStack
      */
-    public function getStyleStack()
+    public function getStyleStack(): OutputFormatterStyleStack
     {
         return $this->styleStack;
     }

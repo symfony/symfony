@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\CommandLoader;
 
+use Symfony\Component\Console\Command\Command;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
@@ -36,7 +37,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function get(string $name)
+    public function get(string $name): Command
     {
         if (!$this->has($name)) {
             throw new CommandNotFoundException(sprintf('Command "%s" does not exist.', $name));
@@ -48,7 +49,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return isset($this->commandMap[$name]) && $this->container->has($this->commandMap[$name]);
     }
@@ -56,7 +57,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getNames()
+    public function getNames(): array
     {
         return array_keys($this->commandMap);
     }

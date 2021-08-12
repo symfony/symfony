@@ -78,7 +78,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @return string|null The name of the attribute
      */
-    public function getKeyAttribute()
+    public function getKeyAttribute(): ?string
     {
         return $this->keyAttribute;
     }
@@ -94,7 +94,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * {@inheritdoc}
      */
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return true;
     }
@@ -119,7 +119,7 @@ class PrototypedArrayNode extends ArrayNode
      * The default value could be either explicited or derived from the prototype
      * default value.
      */
-    public function getDefaultValue()
+    public function getDefaultValue(): mixed
     {
         if (null !== $this->defaultChildren) {
             $default = $this->prototype->hasDefaultValue() ? $this->prototype->getDefaultValue() : [];
@@ -147,7 +147,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @return PrototypeNodeInterface The prototype
      */
-    public function getPrototype()
+    public function getPrototype(): PrototypeNodeInterface
     {
         return $this->prototype;
     }
@@ -165,7 +165,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * {@inheritdoc}
      */
-    protected function finalizeValue(mixed $value)
+    protected function finalizeValue(mixed $value): mixed
     {
         if (false === $value) {
             throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s.', $this->getPath(), json_encode($value)));
@@ -195,7 +195,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @throws DuplicateKeyException
      */
-    protected function normalizeValue(mixed $value)
+    protected function normalizeValue(mixed $value): mixed
     {
         if (false === $value) {
             return $value;
@@ -262,7 +262,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * {@inheritdoc}
      */
-    protected function mergeValues(mixed $leftSide, mixed $rightSide)
+    protected function mergeValues(mixed $leftSide, mixed $rightSide): mixed
     {
         if (false === $rightSide) {
             // if this is still false after the last config has been merged the

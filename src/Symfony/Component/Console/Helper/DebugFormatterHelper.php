@@ -29,7 +29,7 @@ class DebugFormatterHelper extends Helper
      *
      * @return string
      */
-    public function start(string $id, string $message, string $prefix = 'RUN')
+    public function start(string $id, string $message, string $prefix = 'RUN'): string
     {
         $this->started[$id] = ['border' => ++$this->count % \count($this->colors)];
 
@@ -41,7 +41,7 @@ class DebugFormatterHelper extends Helper
      *
      * @return string
      */
-    public function progress(string $id, string $buffer, bool $error = false, string $prefix = 'OUT', string $errorPrefix = 'ERR')
+    public function progress(string $id, string $buffer, bool $error = false, string $prefix = 'OUT', string $errorPrefix = 'ERR'): string
     {
         $message = '';
 
@@ -77,7 +77,7 @@ class DebugFormatterHelper extends Helper
      *
      * @return string
      */
-    public function stop(string $id, string $message, bool $successful, string $prefix = 'RES')
+    public function stop(string $id, string $message, bool $successful, string $prefix = 'RES'): string
     {
         $trailingEOL = isset($this->started[$id]['out']) || isset($this->started[$id]['err']) ? "\n" : '';
 
@@ -100,7 +100,7 @@ class DebugFormatterHelper extends Helper
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'debug_formatter';
     }

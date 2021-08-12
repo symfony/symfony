@@ -22,7 +22,7 @@ class Terminal
      *
      * @return int
      */
-    public function getWidth()
+    public function getWidth(): int
     {
         $width = getenv('COLUMNS');
         if (false !== $width) {
@@ -41,7 +41,7 @@ class Terminal
      *
      * @return int
      */
-    public function getHeight()
+    public function getHeight(): int
     {
         $height = getenv('LINES');
         if (false !== $height) {

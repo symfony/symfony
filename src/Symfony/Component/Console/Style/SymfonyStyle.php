@@ -256,7 +256,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function ask(string $question, string $default = null, callable $validator = null)
+    public function ask(string $question, string $default = null, callable $validator = null): mixed
     {
         $question = new Question($question, $default);
         $question->setValidator($validator);
@@ -267,7 +267,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function askHidden(string $question, callable $validator = null)
+    public function askHidden(string $question, callable $validator = null): mixed
     {
         $question = new Question($question);
 
@@ -280,7 +280,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function confirm(string $question, bool $default = true)
+    public function confirm(string $question, bool $default = true): bool
     {
         return $this->askQuestion(new ConfirmationQuestion($question, $default));
     }
@@ -288,7 +288,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function choice(string $question, array $choices, mixed $default = null)
+    public function choice(string $question, array $choices, mixed $default = null): mixed
     {
         if (null !== $default) {
             $values = array_flip($choices);
@@ -328,7 +328,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function createProgressBar(int $max = 0)
+    public function createProgressBar(int $max = 0): ProgressBar
     {
         $progressBar = parent::createProgressBar($max);
 
@@ -344,7 +344,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * @return mixed
      */
-    public function askQuestion(Question $question)
+    public function askQuestion(Question $question): mixed
     {
         if ($this->input->isInteractive()) {
             $this->autoPrependBlock();
@@ -405,10 +405,8 @@ class SymfonyStyle extends OutputStyle
 
     /**
      * Returns a new instance which makes use of stderr if available.
-     *
-     * @return self
      */
-    public function getErrorStyle()
+    public function getErrorStyle(): self
     {
         return new self($this->input, $this->getErrorOutput());
     }

@@ -46,7 +46,7 @@ class ScalarNode extends VariableNode
     /**
      * {@inheritdoc}
      */
-    protected function isValueEmpty(mixed $value)
+    protected function isValueEmpty(mixed $value): bool
     {
         // assume environment variables are never empty (which in practice is likely to be true during runtime)
         // not doing so breaks many configs that are valid today

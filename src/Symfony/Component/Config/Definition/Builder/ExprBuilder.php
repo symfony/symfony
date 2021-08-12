@@ -35,7 +35,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function always(\Closure $then = null)
+    public function always(\Closure $then = null): static
     {
         $this->ifPart = function () { return true; };
 
@@ -53,7 +53,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifTrue(\Closure $closure = null)
+    public function ifTrue(\Closure $closure = null): static
     {
         if (null === $closure) {
             $closure = function ($v) { return true === $v; };
@@ -69,7 +69,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifString()
+    public function ifString(): static
     {
         $this->ifPart = function ($v) { return \is_string($v); };
 
@@ -81,7 +81,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifNull()
+    public function ifNull(): static
     {
         $this->ifPart = function ($v) { return null === $v; };
 
@@ -90,10 +90,8 @@ class ExprBuilder
 
     /**
      * Tests if the value is empty.
-     *
-     * @return ExprBuilder
      */
-    public function ifEmpty()
+    public function ifEmpty(): self
     {
         $this->ifPart = function ($v) { return empty($v); };
 
@@ -105,7 +103,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifArray()
+    public function ifArray(): static
     {
         $this->ifPart = function ($v) { return \is_array($v); };
 
@@ -117,7 +115,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifInArray(array $array)
+    public function ifInArray(array $array): static
     {
         $this->ifPart = function ($v) use ($array) { return \in_array($v, $array, true); };
 
@@ -129,7 +127,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifNotInArray(array $array)
+    public function ifNotInArray(array $array): static
     {
         $this->ifPart = function ($v) use ($array) { return !\in_array($v, $array, true); };
 
@@ -141,7 +139,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function castToArray()
+    public function castToArray(): static
     {
         $this->ifPart = function ($v) { return !\is_array($v); };
         $this->thenPart = function ($v) { return [$v]; };
@@ -154,7 +152,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function then(\Closure $closure)
+    public function then(\Closure $closure): static
     {
         $this->thenPart = $closure;
 
@@ -166,7 +164,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function thenEmptyArray()
+    public function thenEmptyArray(): static
     {
         $this->thenPart = function () { return []; };
 
@@ -182,7 +180,7 @@ class ExprBuilder
      *
      * @throws \InvalidArgumentException
      */
-    public function thenInvalid(string $message)
+    public function thenInvalid(string $message): static
     {
         $this->thenPart = function ($v) use ($message) { throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
 
@@ -196,7 +194,7 @@ class ExprBuilder
      *
      * @throws UnsetKeyException
      */
-    public function thenUnset()
+    public function thenUnset(): static
     {
         $this->thenPart = function () { throw new UnsetKeyException('Unsetting key.'); };
 
@@ -210,7 +208,7 @@ class ExprBuilder
      *
      * @throws \RuntimeException
      */
-    public function end()
+    public function end(): NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
     {
         if (null === $this->ifPart) {
             throw new \RuntimeException('You must specify an if part.');
@@ -226,10 +224,8 @@ class ExprBuilder
      * Builds the expressions.
      *
      * @param ExprBuilder[] $expressions An array of ExprBuilder instances to build
-     *
-     * @return array
      */
-    public static function buildExpressions(array $expressions)
+    public static function buildExpressions(array $expressions): array
     {
         foreach ($expressions as $k => $expr) {
             if ($expr instanceof self) {

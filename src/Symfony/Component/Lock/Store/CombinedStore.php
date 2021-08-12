@@ -192,7 +192,7 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         $successCount = 0;
         $failureCount = 0;

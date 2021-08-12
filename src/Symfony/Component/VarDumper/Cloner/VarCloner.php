@@ -22,7 +22,7 @@ class VarCloner extends AbstractCloner
     /**
      * {@inheritdoc}
      */
-    protected function doClone(mixed $var)
+    protected function doClone(mixed $var): array
     {
         $len = 1;                       // Length of $queue
         $pos = 0;                       // Number of cloned items past the minimum depth

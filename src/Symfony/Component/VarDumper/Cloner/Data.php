@@ -38,7 +38,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return string|null The type of the value
      */
-    public function getType()
+    public function getType(): ?string
     {
         $item = $this->data[$this->position][$this->key];
 
@@ -69,7 +69,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return string|int|float|bool|array|Data[]|null A native representation of the original value
      */
-    public function getValue(array|bool $recursive = false)
+    public function getValue(array|bool $recursive = false): string|int|float|bool|array|null
     {
         $item = $this->data[$this->position][$this->key];
 
@@ -136,7 +136,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return bool
      */
-    public function __isset(string $key)
+    public function __isset(string $key): bool
     {
         return null !== $this->seek($key);
     }
@@ -177,7 +177,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return static
      */
-    public function withMaxDepth(int $maxDepth)
+    public function withMaxDepth(int $maxDepth): static
     {
         $data = clone $this;
         $data->maxDepth = (int) $maxDepth;
@@ -190,7 +190,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return static
      */
-    public function withMaxItemsPerDepth(int $maxItemsPerDepth)
+    public function withMaxItemsPerDepth(int $maxItemsPerDepth): static
     {
         $data = clone $this;
         $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
@@ -205,7 +205,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return static
      */
-    public function withRefHandles(bool $useRefHandles)
+    public function withRefHandles(bool $useRefHandles): static
     {
         $data = clone $this;
         $data->useRefHandles = $useRefHandles ? -1 : 0;
@@ -216,7 +216,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return static
      */
-    public function withContext(array $context)
+    public function withContext(array $context): static
     {
         $data = clone $this;
         $data->context = $context;
@@ -229,7 +229,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return static|null Null if the key is not set
      */
-    public function seek(string|int $key)
+    public function seek(string|int $key): ?static
     {
         $item = $this->data[$this->position][$this->key];
 

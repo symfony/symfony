@@ -147,7 +147,7 @@ class GenericRuntime implements RuntimeInterface
     /**
      * @return mixed
      */
-    protected function getArgument(\ReflectionParameter $parameter, ?string $type)
+    protected function getArgument(\ReflectionParameter $parameter, ?string $type): mixed
     {
         if ('array' === $type) {
             switch ($parameter->name) {

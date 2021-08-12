@@ -47,7 +47,7 @@ class Stopwatch implements ResetInterface
     /**
      * @return Section[]
      */
-    public function getSections()
+    public function getSections(): array
     {
         return $this->sections;
     }
@@ -98,7 +98,7 @@ class Stopwatch implements ResetInterface
      *
      * @return StopwatchEvent
      */
-    public function start(string $name, string $category = null)
+    public function start(string $name, string $category = null): StopwatchEvent
     {
         return end($this->activeSections)->startEvent($name, $category);
     }
@@ -108,7 +108,7 @@ class Stopwatch implements ResetInterface
      *
      * @return bool
      */
-    public function isStarted(string $name)
+    public function isStarted(string $name): bool
     {
         return end($this->activeSections)->isEventStarted($name);
     }
@@ -118,7 +118,7 @@ class Stopwatch implements ResetInterface
      *
      * @return StopwatchEvent
      */
-    public function stop(string $name)
+    public function stop(string $name): StopwatchEvent
     {
         return end($this->activeSections)->stopEvent($name);
     }
@@ -128,7 +128,7 @@ class Stopwatch implements ResetInterface
      *
      * @return StopwatchEvent
      */
-    public function lap(string $name)
+    public function lap(string $name): StopwatchEvent
     {
         return end($this->activeSections)->stopEvent($name)->start();
     }
@@ -138,7 +138,7 @@ class Stopwatch implements ResetInterface
      *
      * @return StopwatchEvent
      */
-    public function getEvent(string $name)
+    public function getEvent(string $name): StopwatchEvent
     {
         return end($this->activeSections)->getEvent($name);
     }
@@ -148,7 +148,7 @@ class Stopwatch implements ResetInterface
      *
      * @return StopwatchEvent[]
      */
-    public function getSectionEvents(string $id)
+    public function getSectionEvents(string $id): array
     {
         return isset($this->sections[$id]) ? $this->sections[$id]->getEvents() : [];
     }

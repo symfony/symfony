@@ -47,7 +47,7 @@ class Section
      *
      * @return self|null The child section or null when none found
      */
-    public function get(string $id)
+    public function get(string $id): ?self
     {
         foreach ($this->children as $child) {
             if ($id === $child->getId()) {
@@ -65,7 +65,7 @@ class Section
      *
      * @return self
      */
-    public function open(?string $id)
+    public function open(?string $id): self
     {
         if (null === $id || null === $session = $this->get($id)) {
             $session = $this->children[] = new self(microtime(true) * 1000, $this->morePrecision);
@@ -77,7 +77,7 @@ class Section
     /**
      * @return string|null The identifier of the section
      */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -87,7 +87,7 @@ class Section
      *
      * @return $this
      */
-    public function setId(string $id)
+    public function setId(string $id): static
     {
         $this->id = $id;
 
@@ -99,7 +99,7 @@ class Section
      *
      * @return StopwatchEvent The event
      */
-    public function startEvent(string $name, ?string $category)
+    public function startEvent(string $name, ?string $category): StopwatchEvent
     {
         if (!isset($this->events[$name])) {
             $this->events[$name] = new StopwatchEvent($this->origin ?: microtime(true) * 1000, $category, $this->morePrecision, $name);
@@ -113,7 +113,7 @@ class Section
      *
      * @return bool
      */
-    public function isEventStarted(string $name)
+    public function isEventStarted(string $name): bool
     {
         return isset($this->events[$name]) && $this->events[$name]->isStarted();
     }
@@ -125,7 +125,7 @@ class Section
      *
      * @throws \LogicException When the event has not been started
      */
-    public function stopEvent(string $name)
+    public function stopEvent(string $name): StopwatchEvent
     {
         if (!isset($this->events[$name])) {
             throw new \LogicException(sprintf('Event "%s" is not started.', $name));
@@ -141,7 +141,7 @@ class Section
      *
      * @throws \LogicException When the event has not been started
      */
-    public function lap(string $name)
+    public function lap(string $name): StopwatchEvent
     {
         return $this->stopEvent($name)->start();
     }
@@ -153,7 +153,7 @@ class Section
      *
      * @throws \LogicException When the event is not known
      */
-    public function getEvent(string $name)
+    public function getEvent(string $name): StopwatchEvent
     {
         if (!isset($this->events[$name])) {
             throw new \LogicException(sprintf('Event "%s" is not known.', $name));
@@ -167,7 +167,7 @@ class Section
      *
      * @return StopwatchEvent[]
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         return $this->events;
     }

@@ -26,7 +26,7 @@ trait ProxyTrait
     /**
      * {@inheritdoc}
      */
-    public function prune()
+    public function prune(): bool
     {
         return $this->pool instanceof PruneableInterface && $this->pool->prune();
     }

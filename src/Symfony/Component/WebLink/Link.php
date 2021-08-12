@@ -95,7 +95,7 @@ class Link implements EvolvableLinkInterface
      *
      * @return static
      */
-    public function withHref(string|\Stringable $href)
+    public function withHref(string|\Stringable $href): static
     {
         $that = clone $this;
         $that->href = $href;
@@ -108,7 +108,7 @@ class Link implements EvolvableLinkInterface
      *
      * @return static
      */
-    public function withRel(string $rel)
+    public function withRel(string $rel): static
     {
         $that = clone $this;
         $that->rel[$rel] = $rel;
@@ -121,7 +121,7 @@ class Link implements EvolvableLinkInterface
      *
      * @return static
      */
-    public function withoutRel(string $rel)
+    public function withoutRel(string $rel): static
     {
         $that = clone $this;
         unset($that->rel[$rel]);
@@ -134,7 +134,7 @@ class Link implements EvolvableLinkInterface
      *
      * @return static
      */
-    public function withAttribute(string $attribute, string|\Stringable|int|float|bool|array $value)
+    public function withAttribute(string $attribute, string|\Stringable|int|float|bool|array $value): static
     {
         $that = clone $this;
         $that->attributes[$attribute] = $value;
@@ -147,7 +147,7 @@ class Link implements EvolvableLinkInterface
      *
      * @return static
      */
-    public function withoutAttribute(string $attribute)
+    public function withoutAttribute(string $attribute): static
     {
         $that = clone $this;
         unset($that->attributes[$attribute]);

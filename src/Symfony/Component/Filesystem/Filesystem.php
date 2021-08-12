@@ -102,7 +102,7 @@ class Filesystem
      *
      * @return bool true if the file exists, false otherwise
      */
-    public function exists(string|iterable $files)
+    public function exists(string|iterable $files): bool
     {
         $maxPathLength = \PHP_MAXPATHLEN - 2;
 
@@ -399,10 +399,8 @@ class Filesystem
      * With $canonicalize = true
      *      - if $path does not exist, returns null
      *      - if $path exists, returns its absolute fully resolved final version
-     *
-     * @return string|null
      */
-    public function readlink(string $path, bool $canonicalize = false)
+    public function readlink(string $path, bool $canonicalize = false): ?string
     {
         if (!$canonicalize && !is_link($path)) {
             return null;
@@ -424,7 +422,7 @@ class Filesystem
      *
      * @return string Path of target relative to starting path
      */
-    public function makePathRelative(string $endPath, string $startPath)
+    public function makePathRelative(string $endPath, string $startPath): string
     {
         if (!$this->isAbsolutePath($startPath)) {
             throw new InvalidArgumentException(sprintf('The start path "%s" is not absolute.', $startPath));
@@ -570,10 +568,8 @@ class Filesystem
 
     /**
      * Returns whether the file path is an absolute path.
-     *
-     * @return bool
      */
-    public function isAbsolutePath(string $file)
+    public function isAbsolutePath(string $file): bool
     {
         return '' !== $file && (strspn($file, '/\\', 0, 1)
             || (\strlen($file) > 3 && ctype_alpha($file[0])
@@ -593,7 +589,7 @@ class Filesystem
      *
      * @return string The new temporary filename (with path), or throw an exception on failure
      */
-    public function tempnam(string $dir, string $prefix/*, string $suffix = ''*/)
+    public function tempnam(string $dir, string $prefix/*, string $suffix = ''*/): string
     {
         $suffix = \func_num_args() > 2 ? func_get_arg(2) : '';
         [$scheme, $hierarchy] = $this->getSchemeAndHierarchy($dir);

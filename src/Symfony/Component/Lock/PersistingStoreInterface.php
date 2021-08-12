@@ -40,7 +40,7 @@ interface PersistingStoreInterface
      *
      * @return bool
      */
-    public function exists(Key $key);
+    public function exists(Key $key): bool;
 
     /**
      * Extends the TTL of a resource.

@@ -148,7 +148,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         $store->delete($key);
     }
 
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         $sql = "SELECT count(*) FROM pg_locks WHERE locktype='advisory' AND objid=:key AND pid=pg_backend_pid()";
         $stmt = $this->getConnection()->prepare($sql);

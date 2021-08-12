@@ -41,7 +41,7 @@ class Registry
     /**
      * @return Workflow
      */
-    public function get(object $subject, string $workflowName = null)
+    public function get(object $subject, string $workflowName = null): Workflow
     {
         $matched = [];
 

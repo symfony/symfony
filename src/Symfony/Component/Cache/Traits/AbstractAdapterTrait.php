@@ -54,7 +54,7 @@ trait AbstractAdapterTrait
      *
      * @return array|\Traversable The corresponding values found in the cache
      */
-    abstract protected function doFetch(array $ids);
+    abstract protected function doFetch(array $ids): iterable;
 
     /**
      * Confirms if the cache contains specified cache item.
@@ -63,7 +63,7 @@ trait AbstractAdapterTrait
      *
      * @return bool True if item exists in the cache, false otherwise
      */
-    abstract protected function doHave(string $id);
+    abstract protected function doHave(string $id): bool;
 
     /**
      * Deletes all items in the pool.
@@ -72,7 +72,7 @@ trait AbstractAdapterTrait
      *
      * @return bool True if the pool was successfully cleared, false otherwise
      */
-    abstract protected function doClear(string $namespace);
+    abstract protected function doClear(string $namespace): bool;
 
     /**
      * Removes multiple items from the pool.
@@ -81,7 +81,7 @@ trait AbstractAdapterTrait
      *
      * @return bool True if the items were successfully removed, false otherwise
      */
-    abstract protected function doDelete(array $ids);
+    abstract protected function doDelete(array $ids): bool;
 
     /**
      * Persists several cache items immediately.
@@ -91,7 +91,7 @@ trait AbstractAdapterTrait
      *
      * @return array|bool The identifiers that failed to be cached or a boolean stating if caching succeeded or not
      */
-    abstract protected function doSave(array $values, int $lifetime);
+    abstract protected function doSave(array $values, int $lifetime): array|bool;
 
     /**
      * {@inheritdoc}
@@ -303,10 +303,7 @@ trait AbstractAdapterTrait
         $this->ids = [];
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }

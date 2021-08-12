@@ -39,7 +39,7 @@ class DoctrineAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doFetch(array $ids)
+    protected function doFetch(array $ids): iterable
     {
         $unserializeCallbackHandler = ini_set('unserialize_callback_func', parent::class.'::handleUnserializeCallback');
         try {
@@ -65,7 +65,7 @@ class DoctrineAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doHave(string $id)
+    protected function doHave(string $id): bool
     {
         return $this->provider->contains($id);
     }
@@ -73,7 +73,7 @@ class DoctrineAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doClear(string $namespace)
+    protected function doClear(string $namespace): bool
     {
         $namespace = $this->provider->getNamespace();
 
@@ -85,7 +85,7 @@ class DoctrineAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doDelete(array $ids)
+    protected function doDelete(array $ids): bool
     {
         $ok = true;
         foreach ($ids as $id) {
@@ -98,7 +98,7 @@ class DoctrineAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, int $lifetime)
+    protected function doSave(array $values, int $lifetime): array|bool
     {
         return $this->provider->saveMultiple($values, $lifetime);
     }

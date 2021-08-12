@@ -147,7 +147,7 @@ class StopwatchEvent
     /**
      * Gets all event periods.
      *
-     * @return StopwatchPeriod[] An array of StopwatchPeriod instances
+     * @return StopwatchPeriod[]
      */
     public function getPeriods()
     {

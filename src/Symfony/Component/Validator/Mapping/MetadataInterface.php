@@ -51,7 +51,7 @@ interface MetadataInterface
     /**
      * Returns all constraints of this element.
      *
-     * @return Constraint[] A list of Constraint instances
+     * @return Constraint[]
      */
     public function getConstraints();
 

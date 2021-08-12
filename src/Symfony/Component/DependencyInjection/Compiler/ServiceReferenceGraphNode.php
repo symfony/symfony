@@ -51,7 +51,7 @@ class ServiceReferenceGraphNode
     /**
      * Checks if the value of this node is an Alias.
      *
-     * @return bool True if the value is an Alias instance
+     * @return bool
      */
     public function isAlias()
     {

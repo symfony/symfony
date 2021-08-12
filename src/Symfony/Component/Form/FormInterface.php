@@ -172,7 +172,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the form's configuration.
      *
-     * @return FormConfigInterface The configuration instance
+     * @return FormConfigInterface
      */
     public function getConfig();
 
@@ -195,7 +195,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the property path that the form is mapped to.
      *
-     * @return PropertyPathInterface|null The property path instance
+     * @return PropertyPathInterface|null
      */
     public function getPropertyPath();
 
@@ -308,7 +308,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the root of the form tree.
      *
-     * @return self The root of the tree, may be the instance itself
+     * @return self
      */
     public function getRoot();
 

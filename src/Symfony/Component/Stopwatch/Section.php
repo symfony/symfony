@@ -176,7 +176,7 @@ class Section
     /**
      * Returns the events from this section.
      *
-     * @return StopwatchEvent[] An array of StopwatchEvent instances
+     * @return StopwatchEvent[]
      */
     public function getEvents()
     {

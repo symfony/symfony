@@ -313,7 +313,7 @@ class Application implements ResetInterface
     /**
      * Get the helper set associated with the command.
      *
-     * @return HelperSet The HelperSet instance associated with this command
+     * @return HelperSet
      */
     public function getHelperSet()
     {
@@ -332,7 +332,7 @@ class Application implements ResetInterface
     /**
      * Gets the InputDefinition related to this Application.
      *
-     * @return InputDefinition The InputDefinition instance
+     * @return InputDefinition
      */
     public function getDefinition()
     {
@@ -626,7 +626,7 @@ class Application implements ResetInterface
      * Contrary to get, this command tries to find the best
      * match if you give it an abbreviation of a name or alias.
      *
-     * @return Command A Command instance
+     * @return Command
      *
      * @throws CommandNotFoundException When command name is incorrect or ambiguous
      */
@@ -738,7 +738,7 @@ class Application implements ResetInterface
      *
      * The array keys are the full names and the values the command instances.
      *
-     * @return Command[] An array of Command instances
+     * @return Command[]
      */
     public function all(string $namespace = null)
     {
@@ -1030,7 +1030,7 @@ class Application implements ResetInterface
     /**
      * Gets the default input definition.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return InputDefinition
      */
     protected function getDefaultInputDefinition()
     {
@@ -1048,7 +1048,7 @@ class Application implements ResetInterface
     /**
      * Gets the default commands that should always be available.
      *
-     * @return Command[] An array of default Command instances
+     * @return Command[]
      */
     protected function getDefaultCommands()
     {
@@ -1058,7 +1058,7 @@ class Application implements ResetInterface
     /**
      * Gets the default helper set with the helpers that should always be available.
      *
-     * @return HelperSet A HelperSet instance
+     * @return HelperSet
      */
     protected function getDefaultHelperSet()
     {

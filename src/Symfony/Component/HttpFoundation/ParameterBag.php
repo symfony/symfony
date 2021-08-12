@@ -205,7 +205,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns an iterator for parameters.
      *
-     * @return \ArrayIterator An \ArrayIterator instance
+     * @return \ArrayIterator
      */
     #[\ReturnTypeWillChange]
     public function getIterator()

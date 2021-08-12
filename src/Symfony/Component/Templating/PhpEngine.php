@@ -265,7 +265,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets a helper value.
      *
-     * @return HelperInterface The helper instance
+     * @return HelperInterface
      *
      * @throws \InvalidArgumentException if the helper is not defined
      */
@@ -462,7 +462,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets the loader associated with this engine.
      *
-     * @return LoaderInterface A LoaderInterface instance
+     * @return LoaderInterface
      */
     public function getLoader()
     {
@@ -474,7 +474,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
-     * @return Storage A Storage instance
+     * @return Storage
      *
      * @throws \InvalidArgumentException if the template cannot be found
      */

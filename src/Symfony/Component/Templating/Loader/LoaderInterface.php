@@ -24,7 +24,7 @@ interface LoaderInterface
     /**
      * Loads a template.
      *
-     * @return Storage|false false if the template cannot be loaded, a Storage instance otherwise
+     * @return Storage|false
      */
     public function load(TemplateReferenceInterface $template);
 

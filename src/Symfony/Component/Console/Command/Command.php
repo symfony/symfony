@@ -153,7 +153,7 @@ class Command
     /**
      * Gets the helper set.
      *
-     * @return HelperSet|null A HelperSet instance
+     * @return HelperSet|null
      */
     public function getHelperSet()
     {
@@ -163,7 +163,7 @@ class Command
     /**
      * Gets the application instance for this command.
      *
-     * @return Application|null An Application instance
+     * @return Application|null
      */
     public function getApplication()
     {
@@ -391,7 +391,7 @@ class Command
     /**
      * Gets the InputDefinition attached to this Command.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return InputDefinition
      */
     public function getDefinition()
     {
@@ -406,7 +406,7 @@ class Command
      *
      * This method is not part of public API and should not be used directly.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return InputDefinition
      */
     public function getNativeDefinition()
     {

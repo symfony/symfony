@@ -118,9 +118,9 @@ class TokenStream
     }
 
     /**
-     * Returns nex identifier token.
+     * Returns next identifier token.
      *
-     * @return string The identifier token value
+     * @return string
      *
      * @throws SyntaxErrorException If next token is not an identifier
      */
@@ -136,9 +136,9 @@ class TokenStream
     }
 
     /**
-     * Returns nex identifier or star delimiter token.
+     * Returns next identifier or null if star delimiter token is found.
      *
-     * @return string|null The identifier token value or null if star found
+     * @return string|null
      *
      * @throws SyntaxErrorException If next token is not an identifier or a star delimiter
      */

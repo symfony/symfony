@@ -569,7 +569,7 @@ class Process implements \IteratorAggregate
     /**
      * Returns the current output of the process (STDOUT).
      *
-     * @return string The process output
+     * @return string
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
@@ -591,7 +591,7 @@ class Process implements \IteratorAggregate
      * In comparison with the getOutput method which always return the whole
      * output, this one returns the new output since the last call.
      *
-     * @return string The process output since the last call
+     * @return string
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
@@ -685,7 +685,7 @@ class Process implements \IteratorAggregate
     /**
      * Returns the current error output of the process (STDERR).
      *
-     * @return string The process error output
+     * @return string
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
@@ -708,7 +708,7 @@ class Process implements \IteratorAggregate
      * whole error output, this one returns the new error output since the last
      * call.
      *
-     * @return string The process error output since the last call
+     * @return string
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
@@ -776,7 +776,7 @@ class Process implements \IteratorAggregate
     /**
      * Checks if the process ended successfully.
      *
-     * @return bool true if the process ended successfully, false otherwise
+     * @return bool
      */
     public function isSuccessful()
     {
@@ -855,7 +855,7 @@ class Process implements \IteratorAggregate
     /**
      * Checks if the process is currently running.
      *
-     * @return bool true if the process is currently running, false otherwise
+     * @return bool
      */
     public function isRunning()
     {
@@ -871,7 +871,7 @@ class Process implements \IteratorAggregate
     /**
      * Checks if the process has been started with no regard to the current state.
      *
-     * @return bool true if status is ready, false otherwise
+     * @return bool
      */
     public function isStarted()
     {
@@ -881,7 +881,7 @@ class Process implements \IteratorAggregate
     /**
      * Checks if the process is terminated.
      *
-     * @return bool true if process is terminated, false otherwise
+     * @return bool
      */
     public function isTerminated()
     {
@@ -895,7 +895,7 @@ class Process implements \IteratorAggregate
      *
      * The status is one of: ready, started, terminated.
      *
-     * @return string The current process status
+     * @return string
      */
     public function getStatus()
     {
@@ -972,7 +972,7 @@ class Process implements \IteratorAggregate
     /**
      * Gets the last output time in seconds.
      *
-     * @return float|null The last output time in seconds or null if it isn't started
+     * @return float|null
      */
     public function getLastOutputTime(): ?float
     {
@@ -982,7 +982,7 @@ class Process implements \IteratorAggregate
     /**
      * Gets the command line to be executed.
      *
-     * @return string The command to execute
+     * @return string
      */
     public function getCommandLine()
     {
@@ -990,9 +990,9 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Gets the process timeout (max. runtime).
+     * Gets the process timeout in seconds (max. runtime).
      *
-     * @return float|null The timeout in seconds or null if it's disabled
+     * @return float|null
      */
     public function getTimeout()
     {
@@ -1000,9 +1000,9 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Gets the process idle timeout (max. time since last output).
+     * Gets the process idle timeout in seconds (max. time since last output).
      *
-     * @return float|null The timeout in seconds or null if it's disabled
+     * @return float|null
      */
     public function getIdleTimeout()
     {
@@ -1071,7 +1071,7 @@ class Process implements \IteratorAggregate
     /**
      * Checks if the TTY mode is enabled.
      *
-     * @return bool true if the TTY mode is enabled, false otherwise
+     * @return bool
      */
     public function isTty()
     {
@@ -1103,7 +1103,7 @@ class Process implements \IteratorAggregate
     /**
      * Gets the working directory.
      *
-     * @return string|null The current working directory or null on failure
+     * @return string|null
      */
     public function getWorkingDirectory()
     {
@@ -1131,7 +1131,7 @@ class Process implements \IteratorAggregate
     /**
      * Gets the environment variables.
      *
-     * @return array The current environment variables
+     * @return array
      */
     public function getEnv()
     {
@@ -1168,7 +1168,7 @@ class Process implements \IteratorAggregate
     /**
      * Gets the Process input.
      *
-     * @return resource|string|\Iterator|null The Process input
+     * @return resource|string|\Iterator|null
      */
     public function getInput()
     {
@@ -1321,7 +1321,7 @@ class Process implements \IteratorAggregate
      *
      * @param callable|null $callback The user defined PHP callback
      *
-     * @return \Closure A PHP closure
+     * @return \Closure
      */
     protected function buildCallback(callable $callback = null)
     {
@@ -1504,7 +1504,7 @@ class Process implements \IteratorAggregate
      * @param int  $signal         A valid POSIX signal (see https://php.net/pcntl.constants)
      * @param bool $throwException Whether to throw exception in case signal failed
      *
-     * @return bool True if the signal was sent successfully, false otherwise
+     * @return bool
      *
      * @throws LogicException   In case the process is not running
      * @throws RuntimeException In case --enable-sigchild is activated and the process can't be killed

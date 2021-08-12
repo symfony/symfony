@@ -221,7 +221,7 @@ class DebugClassLoader
     /**
      * Gets the wrapped class loader.
      *
-     * @return callable The wrapped class loader
+     * @return callable
      */
     public function getClassLoader(): callable
     {

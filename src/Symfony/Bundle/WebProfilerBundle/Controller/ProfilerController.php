@@ -371,7 +371,7 @@ class ProfilerController
     /**
      * Gets the Template Manager.
      *
-     * @return TemplateManager The Template Manager
+     * @return TemplateManager
      */
     protected function getTemplateManager()
     {

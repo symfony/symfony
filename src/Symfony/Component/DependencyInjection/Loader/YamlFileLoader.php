@@ -709,7 +709,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When errors occur
      *
-     * @return string|array|Reference A parsed callable
+     * @return string|array|Reference
      */
     private function parseCallable($callable, string $parameter, string $id, string $file)
     {
@@ -743,7 +743,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a YAML file.
      *
-     * @return array The file content
+     * @return array
      *
      * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
      */

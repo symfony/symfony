@@ -210,7 +210,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Returns the token attributes.
      *
-     * @return array The token attributes
+     * @return array
      */
     public function getAttributes()
     {
@@ -230,7 +230,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Returns true if the attribute exists.
      *
-     * @return bool true if the attribute exists, false otherwise
+     * @return bool
      */
     public function hasAttribute(string $name)
     {
@@ -240,7 +240,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Returns an attribute value.
      *
-     * @return mixed The attribute value
+     * @return mixed
      *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */

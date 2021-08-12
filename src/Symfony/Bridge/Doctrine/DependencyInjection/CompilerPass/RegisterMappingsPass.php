@@ -165,7 +165,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * Get the service name of the metadata chain driver that the mappings
      * should be registered with.
      *
-     * @return string The name of the chain driver service
+     * @return string
      *
      * @throws InvalidArgumentException if non of the managerParameters has a
      *                                  non-empty value
@@ -181,7 +181,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @param ContainerBuilder $container Passed on in case an extending class
      *                                    needs access to the container
      *
-     * @return Definition|Reference the metadata driver to add to all chain drivers
+     * @return Definition|Reference
      */
     protected function getDriver(ContainerBuilder $container)
     {
@@ -228,7 +228,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * This default implementation checks if the class has the enabledParameter
      * configured and if so if that parameter is present in the container.
      *
-     * @return bool whether this compiler pass really should register the mappings
+     * @return bool
      */
     protected function enabled(ContainerBuilder $container)
     {

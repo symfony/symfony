@@ -293,7 +293,7 @@ class RouteCompiler implements RouteCompilerInterface
      * @param int   $index         The index of the current token
      * @param int   $firstOptional The index of the first optional token
      *
-     * @return string The regexp pattern for a single token
+     * @return string
      */
     private static function computeRegexp(array $tokens, int $index, int $firstOptional): string
     {

@@ -27,7 +27,7 @@ class UlidToStringTransformer implements DataTransformerInterface
      *
      * @param Ulid $value A Ulid object
      *
-     * @return string|null A value as produced by Uid component
+     * @return string|null
      *
      * @throws TransformationFailedException If the given value is not a Ulid object
      */

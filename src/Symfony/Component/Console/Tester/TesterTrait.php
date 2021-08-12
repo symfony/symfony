@@ -33,7 +33,7 @@ trait TesterTrait
      *
      * @throws \RuntimeException If it's called before the execute method
      *
-     * @return string The display
+     * @return string
      */
     public function getDisplay(bool $normalize = false)
     {
@@ -101,7 +101,7 @@ trait TesterTrait
      *
      * @throws \RuntimeException If it's called before the execute method
      *
-     * @return int The status code
+     * @return int
      */
     public function getStatusCode()
     {

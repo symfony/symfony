@@ -50,7 +50,7 @@ class HelperSet implements \IteratorAggregate
     /**
      * Returns true if the helper if defined.
      *
-     * @return bool true if the helper is defined, false otherwise
+     * @return bool
      */
     public function has(string $name)
     {

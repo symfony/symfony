@@ -33,7 +33,7 @@ interface HelperInterface
     /**
      * Returns the canonical name of this helper.
      *
-     * @return string The canonical name
+     * @return string
      */
     public function getName();
 }

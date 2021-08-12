@@ -91,7 +91,7 @@ class AppVariable
     /**
      * Returns the current request.
      *
-     * @return Request|null The HTTP request object
+     * @return Request|null
      */
     public function getRequest()
     {
@@ -105,7 +105,7 @@ class AppVariable
     /**
      * Returns the current session.
      *
-     * @return Session|null The session
+     * @return Session|null
      */
     public function getSession()
     {
@@ -120,7 +120,7 @@ class AppVariable
     /**
      * Returns the current app environment.
      *
-     * @return string The current environment string (e.g 'dev')
+     * @return string
      */
     public function getEnvironment()
     {
@@ -134,7 +134,7 @@ class AppVariable
     /**
      * Returns the current app debug mode.
      *
-     * @return bool The current debug mode
+     * @return bool
      */
     public function getDebug()
     {

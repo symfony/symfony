@@ -252,7 +252,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * Can be used to distinguish between a new session and one that expired due to inactivity.
      *
-     * @return bool Whether current session expired
+     * @return bool
      */
     public function isSessionExpired()
     {

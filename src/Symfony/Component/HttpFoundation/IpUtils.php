@@ -32,7 +32,7 @@ class IpUtils
      *
      * @param string|array $ips List of IPs or subnets (can be a string if only a single one)
      *
-     * @return bool Whether the IP is valid
+     * @return bool
      */
     public static function checkIp(?string $requestIp, $ips)
     {
@@ -102,7 +102,7 @@ class IpUtils
      *
      * @param string $ip IPv6 address or subnet in CIDR notation
      *
-     * @return bool Whether the IP is valid
+     * @return bool
      *
      * @throws \RuntimeException When IPV6 support is not enabled
      */

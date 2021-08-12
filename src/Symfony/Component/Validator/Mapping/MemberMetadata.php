@@ -173,8 +173,6 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * Creates a new reflection instance for accessing the member's value.
      *
-     * Must be implemented by subclasses.
-     *
      * @param object|string $objectOrClassName The object or the class name
      *
      * @return \ReflectionMethod|\ReflectionProperty

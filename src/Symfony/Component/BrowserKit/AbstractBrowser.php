@@ -639,7 +639,7 @@ abstract class AbstractBrowser
     /**
      * Takes a URI and converts it to absolute if it is not already absolute.
      *
-     * @return string An absolute URI
+     * @return string
      */
     protected function getAbsoluteUri(string $uri)
     {

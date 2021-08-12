@@ -151,7 +151,7 @@ class ParameterBag implements ParameterBagInterface
      * @param mixed $value     A value
      * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
      *
-     * @return mixed The resolved value
+     * @return mixed
      *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
@@ -180,7 +180,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
      *
-     * @return mixed The resolved string
+     * @return mixed
      *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected

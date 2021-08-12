@@ -166,7 +166,7 @@ class Store implements StoreInterface
      * Existing entries are read and any that match the response are removed. This
      * method calls write with the new list of cache entries.
      *
-     * @return string The key under which the response is stored
+     * @return string
      *
      * @throws \RuntimeException
      */
@@ -418,7 +418,7 @@ class Store implements StoreInterface
      * headers, use a Vary header to indicate them, and each representation will
      * be stored independently under the same cache key.
      *
-     * @return string A key for the given Request
+     * @return string
      */
     protected function generateCacheKey(Request $request)
     {

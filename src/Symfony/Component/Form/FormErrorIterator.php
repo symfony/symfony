@@ -60,7 +60,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns all iterated error messages as string.
      *
-     * @return string The iterated error messages
+     * @return string
      */
     public function __toString()
     {
@@ -82,7 +82,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns the iterated form.
      *
-     * @return FormInterface The form whose errors are iterated by this object
+     * @return FormInterface
      */
     public function getForm()
     {
@@ -112,7 +112,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns the current position of the iterator.
      *
-     * @return int The 0-indexed position
+     * @return int
      */
     #[\ReturnTypeWillChange]
     public function key()
@@ -123,7 +123,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns whether the iterator's position is valid.
      *
-     * @return bool Whether the iterator is valid
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function valid()
@@ -148,7 +148,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @param int $position The position
      *
-     * @return bool Whether that position exists
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function offsetExists($position)
@@ -161,7 +161,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @param int $position The position
      *
-     * @return FormError|FormErrorIterator The element at the given position
+     * @return FormError|FormErrorIterator
      *
      * @throws OutOfBoundsException If the given position does not exist
      */
@@ -242,7 +242,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      *     $count = count($form->getErrors(true, true));
      *
-     * @return int The number of iterated elements
+     * @return int
      */
     #[\ReturnTypeWillChange]
     public function count()

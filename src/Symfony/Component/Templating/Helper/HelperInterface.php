@@ -21,7 +21,7 @@ interface HelperInterface
     /**
      * Returns the canonical name of this helper.
      *
-     * @return string The canonical name
+     * @return string
      */
     public function getName();
 
@@ -33,7 +33,7 @@ interface HelperInterface
     /**
      * Gets the default charset.
      *
-     * @return string The default charset
+     * @return string
      */
     public function getCharset();
 }

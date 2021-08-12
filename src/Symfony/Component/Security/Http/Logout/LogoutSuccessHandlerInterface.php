@@ -35,7 +35,7 @@ interface LogoutSuccessHandlerInterface
     /**
      * Creates a Response object to send upon a successful logout.
      *
-     * @return Response never null
+     * @return Response
      */
     public function onLogoutSuccess(Request $request);
 }

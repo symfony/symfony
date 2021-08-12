@@ -44,7 +44,7 @@ class CustomFilterIterator extends \FilterIterator
     /**
      * Filters the iterator values.
      *
-     * @return bool true if the value should be kept, false otherwise
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function accept()

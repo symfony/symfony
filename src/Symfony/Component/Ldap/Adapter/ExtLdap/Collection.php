@@ -33,7 +33,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         if (null === $this->entries) {
             $this->entries = iterator_to_array($this->getIterator(), false);

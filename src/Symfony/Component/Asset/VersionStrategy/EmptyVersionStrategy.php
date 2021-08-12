@@ -21,7 +21,7 @@ class EmptyVersionStrategy implements VersionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getVersion(string $path)
+    public function getVersion(string $path): string
     {
         return '';
     }
@@ -29,7 +29,7 @@ class EmptyVersionStrategy implements VersionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function applyVersion(string $path)
+    public function applyVersion(string $path): string
     {
         return $path;
     }

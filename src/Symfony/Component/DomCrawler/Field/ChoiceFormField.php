@@ -30,7 +30,7 @@ class ChoiceFormField extends FormField
      *
      * @return bool true if the field should be included in the submitted values, false otherwise
      */
-    public function hasValue()
+    public function hasValue(): bool
     {
         // don't send a value for unchecked checkboxes
         if (\in_array($this->type, ['checkbox', 'radio']) && null === $this->value) {
@@ -42,10 +42,8 @@ class ChoiceFormField extends FormField
 
     /**
      * Check if the current selected option is disabled.
-     *
-     * @return bool
      */
-    public function isDisabled()
+    public function isDisabled(): bool
     {
         if (parent::isDisabled() && 'select' === $this->type) {
             return true;
@@ -162,7 +160,7 @@ class ChoiceFormField extends FormField
      *
      * @return string The type
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -172,7 +170,7 @@ class ChoiceFormField extends FormField
      *
      * @return bool true if the field accepts multiple values, false otherwise
      */
-    public function isMultiple()
+    public function isMultiple(): bool
     {
         return $this->multiple;
     }

@@ -117,7 +117,7 @@ class Translator implements TranslatorInterface
     /**
      * @return $this
      */
-    public function registerExtension(Extension\ExtensionInterface $extension): self
+    public function registerExtension(Extension\ExtensionInterface $extension): static
     {
         $this->extensions[$extension->getName()] = $extension;
 
@@ -145,7 +145,7 @@ class Translator implements TranslatorInterface
     /**
      * @return $this
      */
-    public function registerParserShortcut(ParserInterface $shortcut): self
+    public function registerParserShortcut(ParserInterface $shortcut): static
     {
         $this->shortcutParsers[] = $shortcut;
 

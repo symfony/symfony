@@ -117,7 +117,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
      *
      * @return bool true when the stream is rewindable, false otherwise
      */
-    public function isRewindable()
+    public function isRewindable(): bool
     {
         if (null !== $this->rewindable) {
             return $this->rewindable;

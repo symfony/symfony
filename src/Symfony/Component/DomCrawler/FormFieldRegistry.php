@@ -69,7 +69,7 @@ class FormFieldRegistry
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function &get(string $name)
+    public function &get(string $name): FormField|array
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;

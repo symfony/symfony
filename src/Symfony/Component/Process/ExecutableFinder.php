@@ -46,7 +46,7 @@ class ExecutableFinder
      *
      * @return string|null The executable path or default value
      */
-    public function find(string $name, string $default = null, array $extraDirs = [])
+    public function find(string $name, string $default = null, array $extraDirs = []): ?string
     {
         if (ini_get('open_basedir')) {
             $searchPath = array_merge(explode(\PATH_SEPARATOR, ini_get('open_basedir')), $extraDirs);

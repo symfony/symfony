@@ -22,7 +22,7 @@ class DisabledException extends AccountStatusException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Account is disabled.';
     }

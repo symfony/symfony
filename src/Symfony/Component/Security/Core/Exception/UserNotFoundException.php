@@ -24,7 +24,7 @@ class UserNotFoundException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Username could not be found.';
     }
@@ -48,7 +48,7 @@ class UserNotFoundException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function getMessageData()
+    public function getMessageData(): array
     {
         return ['{{ username }}' => $this->identifier, '{{ user_identifier }}' => $this->identifier];
     }

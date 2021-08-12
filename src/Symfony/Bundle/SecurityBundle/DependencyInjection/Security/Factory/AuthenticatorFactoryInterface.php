@@ -27,10 +27,8 @@ interface AuthenticatorFactoryInterface
     /**
      * Defines the configuration key used to reference the provider
      * in the firewall configuration.
-     *
-     * @return string
      */
-    public function getKey();
+    public function getKey(): string;
 
     public function addConfiguration(NodeDefinition $builder);
 

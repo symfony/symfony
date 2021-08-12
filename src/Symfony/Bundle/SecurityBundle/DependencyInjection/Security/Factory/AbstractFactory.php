@@ -48,7 +48,7 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
         'failure_path_parameter' => '_failure_path',
     ];
 
-    final public function addOption(string $name, mixed $default = null)
+    final public function addOption(string $name, mixed $default = null): void
     {
         $this->options[$name] = $default;
     }

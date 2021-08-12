@@ -28,7 +28,7 @@ class NullToken implements TokenInterface
         return [];
     }
 
-    public function getUser()
+    public function getUser(): ?UserInterface
     {
         return null;
     }
@@ -47,7 +47,7 @@ class NullToken implements TokenInterface
     {
     }
 
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return [];
     }
@@ -57,12 +57,12 @@ class NullToken implements TokenInterface
         throw new \BadMethodCallException('Cannot set attributes of NullToken.');
     }
 
-    public function hasAttribute(string $name)
+    public function hasAttribute(string $name): bool
     {
         return false;
     }
 
-    public function getAttribute(string $name)
+    public function getAttribute(string $name): mixed
     {
         return null;
     }

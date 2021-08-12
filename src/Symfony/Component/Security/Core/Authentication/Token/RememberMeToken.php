@@ -51,10 +51,7 @@ class RememberMeToken extends AbstractToken
         return $this->firewallName;
     }
 
-    /**
-     * @return string
-     */
-    public function getSecret()
+    public function getSecret(): string
     {
         return $this->secret;
     }

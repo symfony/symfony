@@ -25,7 +25,7 @@ class InMemoryTokenProvider implements TokenProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadTokenBySeries(string $series)
+    public function loadTokenBySeries(string $series): PersistentTokenInterface
     {
         if (!isset($this->tokens[$series])) {
             throw new TokenNotFoundException('No token found.');

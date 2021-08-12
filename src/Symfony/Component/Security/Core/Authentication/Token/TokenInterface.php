@@ -40,11 +40,9 @@ interface TokenInterface
     /**
      * Returns a user representation.
      *
-     * @return UserInterface|null
-     *
      * @see AbstractToken::setUser()
      */
-    public function getUser();
+    public function getUser(): ?UserInterface;
 
     /**
      * Sets the authenticated user in the token.
@@ -58,27 +56,19 @@ interface TokenInterface
      */
     public function eraseCredentials();
 
-    /**
-     * @return array
-     */
-    public function getAttributes();
+    public function getAttributes(): array;
 
     /**
      * @param array $attributes The token attributes
      */
     public function setAttributes(array $attributes);
 
-    /**
-     * @return bool
-     */
-    public function hasAttribute(string $name);
+    public function hasAttribute(string $name): bool;
 
     /**
-     * @return mixed
-     *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */
-    public function getAttribute(string $name);
+    public function getAttribute(string $name): mixed;
 
     public function setAttribute(string $name, mixed $value);
 

@@ -34,10 +34,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         $this->providers = $providers;
     }
 
-    /**
-     * @return array
-     */
-    public function getProviders()
+    public function getProviders(): array
     {
         if ($this->providers instanceof \Traversable) {
             return iterator_to_array($this->providers);
@@ -49,7 +46,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     /**
      * @internal for compatibility with Symfony 5.4
      */
-    public function loadUserByUsername(string $username)
+    public function loadUserByUsername(string $username): UserInterface
     {
         return $this->loadUserByIdentifier($username);
     }
@@ -72,7 +69,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     /**
      * {@inheritdoc}
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         $supportedUserFound = false;
 
@@ -104,7 +101,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     /**
      * {@inheritdoc}
      */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         foreach ($this->providers as $provider) {
             if ($provider->supportsClass($class)) {

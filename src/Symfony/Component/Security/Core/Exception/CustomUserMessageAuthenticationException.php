@@ -45,12 +45,12 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
         $this->messageData = $messageData;
     }
 
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return $this->messageKey;
     }
 
-    public function getMessageData()
+    public function getMessageData(): array
     {
         return $this->messageData;
     }

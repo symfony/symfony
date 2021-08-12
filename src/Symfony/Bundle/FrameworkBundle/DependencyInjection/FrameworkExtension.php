@@ -2424,6 +2424,14 @@ class FrameworkExtension extends Extension
             $container->getDefinition('notifier.channel.sms')->setArgument(0, null);
         }
 
+        $maxRetries = $config['retry_failed']['max_retries'] ?? null;
+
+        if ($maxRetries) {
+            $container->register('http_client.retryable', RetryableHttpClient::class)
+                ->setArguments([new Reference('http_client'), null, $maxRetries, new Reference('logger')]);
+            $container->getDefinition('notifier.transport_factory.abstract')->replaceArgument(1, $container->getDefinition('http_client.retryable'));
+        }
+
         $container->getDefinition('notifier.channel_policy')->setArgument(0, $config['channel_policy']);
 
         $classToServices = [

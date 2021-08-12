@@ -33,7 +33,7 @@ class CookieJar
      * (this behavior ensures a BC behavior with previous versions of
      * Symfony).
      *
-     * @return Cookie|null A Cookie instance or null if the cookie does not exist
+     * @return Cookie|null
      */
     public function get(string $name, string $path = '/', string $domain = null)
     {

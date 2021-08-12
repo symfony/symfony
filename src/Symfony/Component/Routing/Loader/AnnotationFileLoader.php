@@ -40,7 +40,7 @@ class AnnotationFileLoader extends FileLoader
     /**
      * Loads from annotations from a file.
      *
-     * @return RouteCollection|null A RouteCollection instance
+     * @return RouteCollection|null
      *
      * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
      */

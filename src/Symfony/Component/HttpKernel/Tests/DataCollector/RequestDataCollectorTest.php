@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
@@ -268,6 +269,8 @@ class RequestDataCollectorTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $session->method('getMetadataBag')->willReturnCallback(static function () use ($collector) {
             $collector->collectSessionUsage();
+
+            return new MetadataBag();
         });
         $session->getMetadataBag();
 

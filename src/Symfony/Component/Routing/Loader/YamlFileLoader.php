@@ -39,7 +39,7 @@ class YamlFileLoader extends FileLoader
     private $yamlParser;
 
     /**
-     * @return RouteCollection A RouteCollection instance
+     * @return RouteCollection
      *
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
      */

@@ -56,7 +56,7 @@ abstract class AbstractUriElement
     /**
      * Gets the node associated with this link.
      *
-     * @return \DOMElement A \DOMElement instance
+     * @return \DOMElement
      */
     public function getNode()
     {

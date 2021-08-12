@@ -66,6 +66,8 @@ class XmlFileLoader extends FileLoader
                 }
             }
         }
+
+        return null;
     }
 
     private function loadXml(\DOMDocument $xml, string $path, \DOMNode $root = null): void

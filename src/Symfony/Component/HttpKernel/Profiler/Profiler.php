@@ -63,7 +63,7 @@ class Profiler implements ResetInterface
     /**
      * Loads the Profile for the given Response.
      *
-     * @return Profile|null A Profile instance
+     * @return Profile|null
      */
     public function loadProfileFromResponse(Response $response)
     {
@@ -77,7 +77,7 @@ class Profiler implements ResetInterface
     /**
      * Loads the Profile for the given token.
      *
-     * @return Profile|null A Profile instance
+     * @return Profile|null
      */
     public function loadProfile(string $token)
     {
@@ -132,7 +132,7 @@ class Profiler implements ResetInterface
     /**
      * Collects data for the given Response.
      *
-     * @return Profile|null A Profile instance or null if the profiler is disabled
+     * @return Profile|null
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
@@ -223,7 +223,7 @@ class Profiler implements ResetInterface
      *
      * @param string $name A collector name
      *
-     * @return DataCollectorInterface A DataCollectorInterface instance
+     * @return DataCollectorInterface
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */

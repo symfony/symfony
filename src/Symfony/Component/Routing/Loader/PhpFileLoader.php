@@ -30,7 +30,7 @@ class PhpFileLoader extends FileLoader
     /**
      * Loads a PHP file.
      *
-     * @return RouteCollection A RouteCollection instance
+     * @return RouteCollection
      */
     public function load(mixed $file, string $type = null)
     {

@@ -332,7 +332,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Instantiate and configure the node according to this definition.
      *
-     * @return NodeInterface The node instance
+     * @return NodeInterface
      *
      * @throws InvalidDefinitionException When the definition is invalid
      */

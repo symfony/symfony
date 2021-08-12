@@ -74,7 +74,7 @@ class Profile
     /**
      * Returns the parent profile.
      *
-     * @return self
+     * @return self|null
      */
     public function getParent()
     {
@@ -208,7 +208,7 @@ class Profile
     /**
      * Gets a Collector by name.
      *
-     * @return DataCollectorInterface A DataCollectorInterface instance
+     * @return DataCollectorInterface
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */

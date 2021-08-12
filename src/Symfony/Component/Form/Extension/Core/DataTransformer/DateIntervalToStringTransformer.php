@@ -62,7 +62,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @param string $value An ISO 8601 or date string like date interval presentation
      *
-     * @return \DateInterval|null An instance of \DateInterval
+     * @return \DateInterval|null
      *
      * @throws UnexpectedTypeException       if the given value is not a string
      * @throws TransformationFailedException if the date interval could not be parsed

@@ -213,7 +213,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Returns the button's configuration.
      *
-     * @return FormConfigInterface The configuration instance
+     * @return FormConfigInterface
      */
     public function getConfig()
     {

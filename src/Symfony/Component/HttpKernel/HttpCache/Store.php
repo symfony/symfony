@@ -125,7 +125,7 @@ class Store implements StoreInterface
     /**
      * Locates a cached Response for the Request provided.
      *
-     * @return Response|null A Response instance, or null if no cache entry was found
+     * @return Response|null
      */
     public function lookup(Request $request)
     {

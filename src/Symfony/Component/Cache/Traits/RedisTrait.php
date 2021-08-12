@@ -77,7 +77,7 @@ trait RedisTrait
      *
      * @param array $options See self::$defaultConnectionOptions
      *
-     * @return \Redis|\RedisCluster|RedisClusterProxy|RedisProxy|\Predis\ClientInterface According to the "class" option
+     * @return \Redis|\RedisArray|\RedisCluster|RedisClusterProxy|RedisProxy|\Predis\ClientInterface According to the "class" option
      *
      * @throws InvalidArgumentException when the DSN is invalid
      */

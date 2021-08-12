@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -339,8 +340,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * Gets the parsed controller.
      *
-     * @return array|string The controller as a string or array of data
-     *                      with keys 'class', 'method', 'file' and 'line'
+     * @return array|string|Data The controller as a string or array of data
+     *                           with keys 'class', 'method', 'file' and 'line'
      */
     public function getController()
     {
@@ -350,8 +351,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * Gets the previous request attributes.
      *
-     * @return array|bool A legacy array of data from the previous redirection response
-     *                    or false otherwise
+     * @return array|Data|false A legacy array of data from the previous redirection response
+     *                          or false otherwise
      */
     public function getRedirect()
     {

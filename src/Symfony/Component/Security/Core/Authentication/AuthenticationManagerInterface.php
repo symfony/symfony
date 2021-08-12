@@ -27,7 +27,7 @@ interface AuthenticationManagerInterface
     /**
      * Attempts to authenticate a TokenInterface object.
      *
-     * @return TokenInterface An authenticated TokenInterface instance, never null
+     * @return TokenInterface
      *
      * @throws AuthenticationException if the authentication fails
      */

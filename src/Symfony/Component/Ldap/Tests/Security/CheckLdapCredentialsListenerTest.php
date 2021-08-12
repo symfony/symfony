@@ -147,7 +147,12 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function testQueryForDn()
     {
-        $collection = new \ArrayIterator([new Entry('')]);
+        $collection = new class([new Entry('')]) extends \ArrayObject implements CollectionInterface {
+            public function toArray(): array
+            {
+                return $this->getArrayCopy();
+            }
+        };
 
         $query = $this->createMock(QueryInterface::class);
         $query->expects($this->once())->method('execute')->willReturn($collection);

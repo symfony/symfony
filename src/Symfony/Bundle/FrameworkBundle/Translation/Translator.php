@@ -100,7 +100,7 @@ class Translator extends BaseTranslator implements WarmableInterface
     {
         // skip warmUp when translator doesn't use cache
         if (null === $this->options['cache_dir']) {
-            return;
+            return [];
         }
 
         $localesToWarmUp = $this->enabledLocales ?: array_merge($this->getFallbackLocales(), [$this->getLocale()], $this->resourceLocales);

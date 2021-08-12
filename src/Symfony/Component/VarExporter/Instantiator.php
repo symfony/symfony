@@ -53,7 +53,7 @@ final class Instantiator
      * @param array  $privateProperties The private properties to set on the instance,
      *                                  keyed by their declaring class
      *
-     * @return object The created instance
+     * @return object
      *
      * @throws ExceptionInterface When the instance cannot be created
      */

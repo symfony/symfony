@@ -188,7 +188,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns an extension by alias or namespace.
      *
-     * @return ExtensionInterface An extension instance
+     * @return ExtensionInterface
      *
      * @throws LogicException if the extension is not registered
      */
@@ -830,7 +830,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @return Alias An Alias instance
+     * @return Alias
      *
      * @throws InvalidArgumentException if the alias does not exist
      */
@@ -849,7 +849,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * This methods allows for simple registration of service definition
      * with a fluid interface.
      *
-     * @return Definition A Definition instance
+     * @return Definition
      */
     public function register(string $id, string $class = null)
     {
@@ -895,7 +895,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets all service definitions.
      *
-     * @return Definition[] An array of Definition instances
+     * @return Definition[]
      */
     public function getDefinitions()
     {
@@ -937,7 +937,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets a service definition.
      *
-     * @return Definition A Definition instance
+     * @return Definition
      *
      * @throws ServiceNotFoundException if the service definition does not exist
      */
@@ -955,7 +955,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * The method "unaliases" recursively to return a Definition instance.
      *
-     * @return Definition A Definition instance
+     * @return Definition
      *
      * @throws ServiceNotFoundException if the service definition does not exist
      */

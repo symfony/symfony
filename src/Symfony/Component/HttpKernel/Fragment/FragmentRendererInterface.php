@@ -25,7 +25,7 @@ interface FragmentRendererInterface
     /**
      * Renders a URI and returns the Response content.
      *
-     * @return Response A Response instance
+     * @return Response
      */
     public function render(string|ControllerReference $uri, Request $request, array $options = []);
 

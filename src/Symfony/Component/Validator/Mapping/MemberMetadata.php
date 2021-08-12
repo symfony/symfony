@@ -150,7 +150,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * Returns the reflection instance for accessing the member's value.
      *
-     * @return \ReflectionMethod|\ReflectionProperty The reflection instance
+     * @return \ReflectionMethod|\ReflectionProperty
      */
     public function getReflectionMember(object|string $objectOrClassName)
     {
@@ -165,9 +165,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * Creates a new reflection instance for accessing the member's value.
      *
-     * Must be implemented by subclasses.
-     *
-     * @return \ReflectionMethod|\ReflectionProperty The reflection instance
+     * @return \ReflectionMethod|\ReflectionProperty
      */
     abstract protected function newReflectionMember(object|string $objectOrClassName);
 

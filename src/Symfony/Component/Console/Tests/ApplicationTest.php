@@ -1880,11 +1880,17 @@ class ApplicationTest extends TestCase
 
 class CustomApplication extends Application
 {
+    /**
+     * Overwrites the default input definition.
+     */
     protected function getDefaultInputDefinition(): InputDefinition
     {
         return new InputDefinition([new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.')]);
     }
 
+    /**
+     * Gets the default helper set with the helpers that should always be available.
+     */
     protected function getDefaultHelperSet(): HelperSet
     {
         return new HelperSet([new FormatterHelper()]);

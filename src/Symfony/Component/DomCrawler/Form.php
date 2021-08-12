@@ -44,7 +44,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets the form node associated with this form.
      *
-     * @return \DOMElement A \DOMElement instance
+     * @return \DOMElement
      */
     public function getFormNode()
     {

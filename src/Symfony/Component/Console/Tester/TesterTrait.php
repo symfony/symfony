@@ -79,7 +79,7 @@ trait TesterTrait
     /**
      * Gets the input instance used by the last execution of the command or application.
      *
-     * @return InputInterface The current input instance
+     * @return InputInterface
      */
     public function getInput()
     {
@@ -89,7 +89,7 @@ trait TesterTrait
     /**
      * Gets the output instance used by the last execution of the command or application.
      *
-     * @return OutputInterface The current output instance
+     * @return OutputInterface
      */
     public function getOutput()
     {

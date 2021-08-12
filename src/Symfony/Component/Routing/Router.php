@@ -298,7 +298,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Gets the UrlGenerator instance associated with this Router.
      *
-     * @return UrlGeneratorInterface A UrlGeneratorInterface instance
+     * @return UrlGeneratorInterface
      */
     public function getGenerator()
     {

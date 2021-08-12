@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Doctrine\Tests\IdGenerator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Factory\UuidFactory;
-use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV6;
@@ -35,7 +34,7 @@ class UuidGeneratorTest extends TestCase
 
     public function testCustomUuidfactory()
     {
-        $uuid = new NilUuid();
+        $uuid = new UuidV4();
         $em = new EntityManager();
         $factory = $this->createMock(UuidFactory::class);
         $factory->expects($this->any())

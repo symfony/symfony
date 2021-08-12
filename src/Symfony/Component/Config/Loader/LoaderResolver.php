@@ -59,7 +59,7 @@ class LoaderResolver implements LoaderResolverInterface
     /**
      * Returns the registered loaders.
      *
-     * @return LoaderInterface[] An array of LoaderInterface instances
+     * @return LoaderInterface[]
      */
     public function getLoaders()
     {

@@ -111,7 +111,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * Registers the types.
      *
-     * @return FormTypeInterface[] An array of FormTypeInterface instances
+     * @return FormTypeInterface[]
      */
     protected function loadTypes()
     {
@@ -121,7 +121,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * Registers the type extensions.
      *
-     * @return FormTypeExtensionInterface[] An array of FormTypeExtensionInterface instances
+     * @return FormTypeExtensionInterface[]
      */
     protected function loadTypeExtensions()
     {

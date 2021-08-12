@@ -70,6 +70,8 @@ class PhpFileLoader extends FileLoader
             $this->instanceof = [];
             $this->registerAliasesForSinglyImplementedInterfaces();
         }
+
+        return null;
     }
 
     /**

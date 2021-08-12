@@ -927,7 +927,7 @@ class Request
      *
      * The "X-Forwarded-Port" header must contain the client port.
      *
-     * @return int|string can be a string if fetched from the server bag
+     * @return int|string|null Can be a string if fetched from the server bag
      */
     public function getPort()
     {

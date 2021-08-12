@@ -433,7 +433,7 @@ class Route implements \Serializable
     /**
      * Compiles the route.
      *
-     * @return CompiledRoute A CompiledRoute instance
+     * @return CompiledRoute
      *
      * @throws \LogicException If the Route cannot be compiled because the
      *                         path or host pattern is invalid

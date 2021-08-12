@@ -49,7 +49,7 @@ class UlidToStringTransformer implements DataTransformerInterface
      *
      * @param string $value A ULID string
      *
-     * @return Ulid|null An instance of Ulid
+     * @return Ulid|null
      *
      * @throws TransformationFailedException If the given value is not a string,
      *                                       or could not be transformed

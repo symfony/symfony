@@ -97,7 +97,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets the service container parameter bag.
      *
-     * @return ParameterBagInterface A ParameterBagInterface instance
+     * @return ParameterBagInterface
      */
     public function getParameterBag()
     {

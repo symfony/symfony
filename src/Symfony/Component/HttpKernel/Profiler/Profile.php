@@ -74,7 +74,7 @@ class Profile
     /**
      * Returns the parent profile.
      *
-     * @return self
+     * @return self|null
      */
     public function getParent()
     {

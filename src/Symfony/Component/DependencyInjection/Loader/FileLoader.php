@@ -63,7 +63,7 @@ abstract class FileLoader extends BaseFileLoader
         }
 
         try {
-            parent::import(...$args);
+            return parent::import(...$args);
         } catch (LoaderLoadException $e) {
             if (!$ignoreNotFound || !($prev = $e->getPrevious()) instanceof FileLocatorFileNotFoundException) {
                 throw $e;
@@ -79,6 +79,8 @@ abstract class FileLoader extends BaseFileLoader
                 throw $e;
             }
         }
+
+        return null;
     }
 
     /**

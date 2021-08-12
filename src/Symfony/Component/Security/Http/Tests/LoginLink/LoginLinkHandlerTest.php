@@ -203,40 +203,6 @@ class LoginLinkHandlerTest extends TestCase
     }
 }
 
-class TestLoginLinkHandlerUserProvider implements UserProviderInterface
-{
-    private $users = [];
-
-    public function createUser(TestLoginLinkHandlerUser $user): void
-    {
-        $this->users[$user->getUserIdentifier()] = $user;
-    }
-
-    public function loadUserByUsername($username): TestLoginLinkHandlerUser
-    {
-        return $this->loadUserByIdentifier($username);
-    }
-
-    public function loadUserByIdentifier(string $userIdentifier): TestLoginLinkHandlerUser
-    {
-        if (!isset($this->users[$userIdentifier])) {
-            throw new UserNotFoundException();
-        }
-
-        return clone $this->users[$userIdentifier];
-    }
-
-    public function refreshUser(UserInterface $user)
-    {
-        return $this->users[$username];
-    }
-
-    public function supportsClass(string $class)
-    {
-        return TestLoginLinkHandlerUser::class === $class;
-    }
-}
-
 class TestLoginLinkHandlerUser implements UserInterface
 {
     public $username;
@@ -279,5 +245,39 @@ class TestLoginLinkHandlerUser implements UserInterface
 
     public function eraseCredentials()
     {
+    }
+}
+
+class TestLoginLinkHandlerUserProvider implements UserProviderInterface
+{
+    private $users = [];
+
+    public function createUser(TestLoginLinkHandlerUser $user): void
+    {
+        $this->users[$user->getUserIdentifier()] = $user;
+    }
+
+    public function loadUserByUsername($username): TestLoginLinkHandlerUser
+    {
+        return $this->loadUserByIdentifier($username);
+    }
+
+    public function loadUserByIdentifier(string $userIdentifier): TestLoginLinkHandlerUser
+    {
+        if (!isset($this->users[$userIdentifier])) {
+            throw new UserNotFoundException();
+        }
+
+        return clone $this->users[$userIdentifier];
+    }
+
+    public function refreshUser(UserInterface $user)
+    {
+        return $this->users[$username];
+    }
+
+    public function supportsClass(string $class)
+    {
+        return TestLoginLinkHandlerUser::class === $class;
     }
 }

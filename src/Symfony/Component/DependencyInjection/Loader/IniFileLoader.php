@@ -50,6 +50,8 @@ class IniFileLoader extends FileLoader
                 $this->container->setParameter($key, $this->phpize($value));
             }
         }
+
+        return null;
     }
 
     /**

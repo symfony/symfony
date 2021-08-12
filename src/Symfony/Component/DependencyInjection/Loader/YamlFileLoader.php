@@ -126,7 +126,7 @@ class YamlFileLoader extends FileLoader
 
         // empty file
         if (null === $content) {
-            return;
+            return null;
         }
 
         $this->loadContent($content, $path);
@@ -145,6 +145,8 @@ class YamlFileLoader extends FileLoader
                 $this->env = $env;
             }
         }
+
+        return null;
     }
 
     private function loadContent(array $content, string $path)

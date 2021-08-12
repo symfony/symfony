@@ -812,7 +812,7 @@ class Definition
     /**
      * Gets the configurator to call after the service is fully initialized.
      *
-     * @return callable|array|null
+     * @return string|array|null
      */
     public function getConfigurator()
     {

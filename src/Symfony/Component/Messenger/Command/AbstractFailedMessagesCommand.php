@@ -58,7 +58,7 @@ abstract class AbstractFailedMessagesCommand extends Command
     /**
      * @return mixed
      */
-    protected function getMessageId(Envelope $envelope)
+    protected function getMessageId(Envelope $envelope): mixed
     {
         /** @var TransportMessageIdStamp $stamp */
         $stamp = $envelope->last(TransportMessageIdStamp::class);

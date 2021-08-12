@@ -47,7 +47,7 @@ class UuidFactory
     /**
      * @return UuidV6|UuidV4|UuidV1
      */
-    public function create(): Uuid
+    public function create(): UuidV6|UuidV4|UuidV1
     {
         $class = $this->defaultClass;
 

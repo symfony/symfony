@@ -69,7 +69,7 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         $failureSender->send($envelope);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             WorkerMessageFailedEvent::class => ['onMessageFailed', -100],

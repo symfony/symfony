@@ -78,7 +78,7 @@ class UploadedFile extends File
      *
      * @return string The original name
      */
-    public function getClientOriginalName()
+    public function getClientOriginalName(): string
     {
         return $this->originalName;
     }
@@ -91,7 +91,7 @@ class UploadedFile extends File
      *
      * @return string The extension
      */
-    public function getClientOriginalExtension()
+    public function getClientOriginalExtension(): string
     {
         return pathinfo($this->originalName, \PATHINFO_EXTENSION);
     }
@@ -109,7 +109,7 @@ class UploadedFile extends File
      *
      * @see getMimeType()
      */
-    public function getClientMimeType()
+    public function getClientMimeType(): string
     {
         return $this->mimeType;
     }
@@ -131,7 +131,7 @@ class UploadedFile extends File
      * @see guessExtension()
      * @see getClientMimeType()
      */
-    public function guessClientExtension()
+    public function guessClientExtension(): ?string
     {
         if (!class_exists(MimeTypes::class)) {
             throw new \LogicException('You cannot guess the extension as the Mime component is not installed. Try running "composer require symfony/mime".');
@@ -148,7 +148,7 @@ class UploadedFile extends File
      *
      * @return int The upload error
      */
-    public function getError()
+    public function getError(): int
     {
         return $this->error;
     }
@@ -158,7 +158,7 @@ class UploadedFile extends File
      *
      * @return bool True if the file has been uploaded with HTTP and no error occurred
      */
-    public function isValid()
+    public function isValid(): bool
     {
         $isOk = \UPLOAD_ERR_OK === $this->error;
 
@@ -172,7 +172,7 @@ class UploadedFile extends File
      *
      * @throws FileException if, for any reason, the file could not have been moved
      */
-    public function move(string $directory, string $name = null)
+    public function move(string $directory, string $name = null): File
     {
         if ($this->isValid()) {
             if ($this->test) {
@@ -218,7 +218,7 @@ class UploadedFile extends File
      *
      * @return int|float The maximum size of an uploaded file in bytes (returns float if size > PHP_INT_MAX)
      */
-    public static function getMaxFilesize()
+    public static function getMaxFilesize(): int|float
     {
         $sizePostMax = self::parseFilesize(ini_get('post_max_size'));
         $sizeUploadMax = self::parseFilesize(ini_get('upload_max_filesize'));
@@ -261,7 +261,7 @@ class UploadedFile extends File
      *
      * @return string The error message regarding the specified error code
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): string
     {
         static $errors = [
             \UPLOAD_ERR_INI_SIZE => 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d KiB).',

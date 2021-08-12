@@ -26,7 +26,7 @@ interface LoaderInterface
      *
      * @return Storage|false
      */
-    public function load(TemplateReferenceInterface $template);
+    public function load(TemplateReferenceInterface $template): Storage|false;
 
     /**
      * Returns true if the template is still fresh.
@@ -35,5 +35,5 @@ interface LoaderInterface
      *
      * @return bool
      */
-    public function isFresh(TemplateReferenceInterface $template, int $time);
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool;
 }

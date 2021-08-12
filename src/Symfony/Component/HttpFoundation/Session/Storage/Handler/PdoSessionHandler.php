@@ -254,7 +254,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * @return bool Whether current session expired
      */
-    public function isSessionExpired()
+    public function isSessionExpired(): bool
     {
         return $this->sessionExpired;
     }
@@ -293,7 +293,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * {@inheritdoc}
      */
-    protected function doDestroy(string $sessionId)
+    protected function doDestroy(string $sessionId): bool
     {
         // delete the record associated with this id
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id";
@@ -314,7 +314,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * {@inheritdoc}
      */
-    protected function doWrite(string $sessionId, string $data)
+    protected function doWrite(string $sessionId, string $data): bool
     {
         $maxlifetime = (int) ini_get('session.gc_maxlifetime');
 
@@ -604,7 +604,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * @return string
      */
-    protected function doRead(string $sessionId)
+    protected function doRead(string $sessionId): string
     {
         if (self::LOCK_ADVISORY === $this->lockMode) {
             $this->unlockStatements[] = $this->doAdvisoryLock($sessionId);
@@ -884,7 +884,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * @return \PDO
      */
-    protected function getConnection()
+    protected function getConnection(): \PDO
     {
         if (null === $this->pdo) {
             $this->connect($this->dsn ?: ini_get('session.save_path'));

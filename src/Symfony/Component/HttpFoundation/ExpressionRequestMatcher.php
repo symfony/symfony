@@ -30,7 +30,7 @@ class ExpressionRequestMatcher extends RequestMatcher
         $this->expression = $expression;
     }
 
-    public function matches(Request $request)
+    public function matches(Request $request): bool
     {
         if (!$this->language) {
             throw new \LogicException('Unable to match the request as the expression language is not available.');

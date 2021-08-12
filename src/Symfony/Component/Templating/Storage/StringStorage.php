@@ -23,7 +23,7 @@ class StringStorage extends Storage
      *
      * @return string The template content
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->template;
     }

@@ -83,7 +83,7 @@ class SmtpTransport extends AbstractTransport
      *
      * @return $this
      */
-    public function setPingThreshold(int $seconds): self
+    public function setPingThreshold(int $seconds): static
     {
         $this->pingThreshold = $seconds;
 
@@ -343,7 +343,7 @@ class SmtpTransport extends AbstractTransport
     /**
      * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }

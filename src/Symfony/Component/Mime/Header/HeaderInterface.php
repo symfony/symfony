@@ -32,7 +32,7 @@ interface HeaderInterface
      *
      * @return mixed
      */
-    public function getBody();
+    public function getBody(): mixed;
 
     public function setCharset(string $charset);
 

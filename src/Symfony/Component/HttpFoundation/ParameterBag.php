@@ -37,7 +37,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return array An array of parameters
      */
-    public function all(/*string $key = null*/)
+    public function all(/*string $key = null*/): array
     {
         $key = \func_num_args() > 0 ? func_get_arg(0) : null;
 
@@ -57,7 +57,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return array An array of parameter keys
      */
-    public function keys()
+    public function keys(): array
     {
         return array_keys($this->parameters);
     }
@@ -78,10 +78,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
         $this->parameters = array_replace($this->parameters, $parameters);
     }
 
-    /**
-     * @return mixed
-     */
-    public function get(string $key, mixed $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return \array_key_exists($key, $this->parameters) ? $this->parameters[$key] : $default;
     }
@@ -96,7 +93,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return bool true if the parameter exists, false otherwise
      */
-    public function has(string $key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->parameters);
     }
@@ -114,7 +111,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return string The filtered value
      */
-    public function getAlpha(string $key, string $default = '')
+    public function getAlpha(string $key, string $default = ''): string
     {
         return preg_replace('/[^[:alpha:]]/', '', $this->get($key, $default));
     }
@@ -124,7 +121,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return string The filtered value
      */
-    public function getAlnum(string $key, string $default = '')
+    public function getAlnum(string $key, string $default = ''): string
     {
         return preg_replace('/[^[:alnum:]]/', '', $this->get($key, $default));
     }
@@ -134,7 +131,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return string The filtered value
      */
-    public function getDigits(string $key, string $default = '')
+    public function getDigits(string $key, string $default = ''): string
     {
         // we need to remove - and + because they're allowed in the filter
         return str_replace(['-', '+'], '', $this->filter($key, $default, \FILTER_SANITIZE_NUMBER_INT));
@@ -145,7 +142,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return int The filtered value
      */
-    public function getInt(string $key, int $default = 0)
+    public function getInt(string $key, int $default = 0): int
     {
         return (int) $this->get($key, $default);
     }
@@ -155,7 +152,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return bool The filtered value
      */
-    public function getBoolean(string $key, bool $default = false)
+    public function getBoolean(string $key, bool $default = false): bool
     {
         return $this->filter($key, $default, \FILTER_VALIDATE_BOOLEAN);
     }
@@ -166,10 +163,8 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * @param int $filter FILTER_* constant
      *
      * @see https://php.net/filter-var
-     *
-     * @return mixed
      */
-    public function filter(string $key, mixed $default = null, int $filter = \FILTER_DEFAULT, mixed $options = [])
+    public function filter(string $key, mixed $default = null, int $filter = \FILTER_DEFAULT, mixed $options = []): mixed
     {
         $value = $this->get($key, $default);
 

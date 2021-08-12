@@ -51,7 +51,7 @@ abstract class AbstractTransport implements TransportInterface
     /**
      * @return $this
      */
-    public function setHost(?string $host): self
+    public function setHost(?string $host): static
     {
         $this->host = $host;
 
@@ -61,7 +61,7 @@ abstract class AbstractTransport implements TransportInterface
     /**
      * @return $this
      */
-    public function setPort(?int $port): self
+    public function setPort(?int $port): static
     {
         $this->port = $port;
 

@@ -48,7 +48,7 @@ class MessageLoggerListener implements EventSubscriberInterface, ResetInterface
         return $this->events;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             MessageEvent::class => ['onMessage', -255],

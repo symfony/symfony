@@ -36,7 +36,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function render(string|TemplateReferenceInterface $name, array $parameters = [])
+    public function render(string|TemplateReferenceInterface $name, array $parameters = []): string
     {
         return $this->getEngine($name)->render($name, $parameters);
     }
@@ -57,7 +57,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(string|TemplateReferenceInterface $name)
+    public function exists(string|TemplateReferenceInterface $name): bool
     {
         return $this->getEngine($name)->exists($name);
     }
@@ -70,7 +70,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(string|TemplateReferenceInterface $name)
+    public function supports(string|TemplateReferenceInterface $name): bool
     {
         try {
             $this->getEngine($name);
@@ -88,7 +88,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      *
      * @throws \RuntimeException if no engine able to work with the template is found
      */
-    public function getEngine(string|TemplateReferenceInterface $name)
+    public function getEngine(string|TemplateReferenceInterface $name): EngineInterface
     {
         foreach ($this->engines as $engine) {
             if ($engine->supports($name)) {

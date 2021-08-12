@@ -52,7 +52,7 @@ class RedirectResponse extends Response
      *
      * @return string target URL
      */
-    public function getTargetUrl()
+    public function getTargetUrl(): string
     {
         return $this->targetUrl;
     }
@@ -64,7 +64,7 @@ class RedirectResponse extends Response
      *
      * @throws \InvalidArgumentException
      */
-    public function setTargetUrl(string $url)
+    public function setTargetUrl(string $url): static
     {
         if ('' === $url) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');

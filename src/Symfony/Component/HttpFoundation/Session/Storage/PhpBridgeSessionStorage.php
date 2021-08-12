@@ -33,7 +33,7 @@ class PhpBridgeSessionStorage extends NativeSessionStorage
     /**
      * {@inheritdoc}
      */
-    public function start()
+    public function start(): bool
     {
         if ($this->started) {
             return true;

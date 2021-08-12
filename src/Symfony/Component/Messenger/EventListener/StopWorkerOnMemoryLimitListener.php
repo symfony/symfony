@@ -46,7 +46,7 @@ class StopWorkerOnMemoryLimitListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             WorkerRunningEvent::class => 'onWorkerRunning',

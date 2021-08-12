@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Templating\Loader;
 
+use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
@@ -34,7 +35,7 @@ class FilesystemLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function load(TemplateReferenceInterface $template)
+    public function load(TemplateReferenceInterface $template): Storage|false
     {
         $file = $template->get('name');
 
@@ -75,7 +76,7 @@ class FilesystemLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function isFresh(TemplateReferenceInterface $template, int $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         if (false === $storage = $this->load($template)) {
             return false;
@@ -89,7 +90,7 @@ class FilesystemLoader extends Loader
      *
      * @return bool true if the path exists and is absolute, false otherwise
      */
-    protected static function isAbsolutePath(string $file)
+    protected static function isAbsolutePath(string $file): bool
     {
         if ('/' == $file[0] || '\\' == $file[0]
             || (\strlen($file) > 3 && ctype_alpha($file[0])

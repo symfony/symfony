@@ -47,7 +47,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function subject(string $subject)
+    public function subject(string $subject): static
     {
         return $this->setHeaderBody('Text', 'Subject', $subject);
     }
@@ -60,7 +60,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function date(\DateTimeInterface $dateTime)
+    public function date(\DateTimeInterface $dateTime): static
     {
         return $this->setHeaderBody('Date', 'Date', $dateTime);
     }
@@ -73,7 +73,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function returnPath(Address|string $address)
+    public function returnPath(Address|string $address): static
     {
         return $this->setHeaderBody('Path', 'Return-Path', Address::create($address));
     }
@@ -86,7 +86,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function sender(Address|string $address)
+    public function sender(Address|string $address): static
     {
         return $this->setHeaderBody('Mailbox', 'Sender', Address::create($address));
     }
@@ -99,7 +99,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function addFrom(Address|string ...$addresses)
+    public function addFrom(Address|string ...$addresses): static
     {
         return $this->addListAddressHeaderBody('From', $addresses);
     }
@@ -107,7 +107,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function from(Address|string ...$addresses)
+    public function from(Address|string ...$addresses): static
     {
         return $this->setListAddressHeaderBody('From', $addresses);
     }
@@ -123,7 +123,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function addReplyTo(Address|string ...$addresses)
+    public function addReplyTo(Address|string ...$addresses): static
     {
         return $this->addListAddressHeaderBody('Reply-To', $addresses);
     }
@@ -131,7 +131,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function replyTo(Address|string ...$addresses)
+    public function replyTo(Address|string ...$addresses): static
     {
         return $this->setListAddressHeaderBody('Reply-To', $addresses);
     }
@@ -147,7 +147,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function addTo(Address|string ...$addresses)
+    public function addTo(Address|string ...$addresses): static
     {
         return $this->addListAddressHeaderBody('To', $addresses);
     }
@@ -155,7 +155,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function to(Address|string ...$addresses)
+    public function to(Address|string ...$addresses): static
     {
         return $this->setListAddressHeaderBody('To', $addresses);
     }
@@ -171,7 +171,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function addCc(Address|string ...$addresses)
+    public function addCc(Address|string ...$addresses): static
     {
         return $this->addListAddressHeaderBody('Cc', $addresses);
     }
@@ -179,7 +179,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function cc(Address|string ...$addresses)
+    public function cc(Address|string ...$addresses): static
     {
         return $this->setListAddressHeaderBody('Cc', $addresses);
     }
@@ -195,7 +195,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function addBcc(Address|string ...$addresses)
+    public function addBcc(Address|string ...$addresses): static
     {
         return $this->addListAddressHeaderBody('Bcc', $addresses);
     }
@@ -203,7 +203,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function bcc(Address|string ...$addresses)
+    public function bcc(Address|string ...$addresses): static
     {
         return $this->setListAddressHeaderBody('Bcc', $addresses);
     }
@@ -223,7 +223,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function priority(int $priority)
+    public function priority(int $priority): static
     {
         if ($priority > 5) {
             $priority = 5;
@@ -252,7 +252,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function text($body, string $charset = 'utf-8')
+    public function text($body, string $charset = 'utf-8'): static
     {
         $this->text = $body;
         $this->textCharset = $charset;
@@ -278,7 +278,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function html($body, string $charset = 'utf-8')
+    public function html($body, string $charset = 'utf-8'): static
     {
         $this->html = $body;
         $this->htmlCharset = $charset;
@@ -304,7 +304,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function attach($body, string $name = null, string $contentType = null)
+    public function attach($body, string $name = null, string $contentType = null): static
     {
         $this->attachments[] = ['body' => $body, 'name' => $name, 'content-type' => $contentType, 'inline' => false];
 
@@ -314,7 +314,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function attachFromPath(string $path, string $name = null, string $contentType = null)
+    public function attachFromPath(string $path, string $name = null, string $contentType = null): static
     {
         $this->attachments[] = ['path' => $path, 'name' => $name, 'content-type' => $contentType, 'inline' => false];
 
@@ -326,7 +326,7 @@ class Email extends Message
      *
      * @return $this
      */
-    public function embed($body, string $name = null, string $contentType = null)
+    public function embed($body, string $name = null, string $contentType = null): static
     {
         $this->attachments[] = ['body' => $body, 'name' => $name, 'content-type' => $contentType, 'inline' => true];
 
@@ -336,7 +336,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function embedFromPath(string $path, string $name = null, string $contentType = null)
+    public function embedFromPath(string $path, string $name = null, string $contentType = null): static
     {
         $this->attachments[] = ['path' => $path, 'name' => $name, 'content-type' => $contentType, 'inline' => true];
 
@@ -346,7 +346,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function attachPart(DataPart $part)
+    public function attachPart(DataPart $part): static
     {
         $this->attachments[] = ['part' => $part];
 

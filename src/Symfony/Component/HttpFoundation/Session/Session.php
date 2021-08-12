@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 
@@ -54,7 +55,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function start()
+    public function start(): bool
     {
         return $this->storage->start();
     }
@@ -62,7 +63,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return $this->getAttributeBag()->has($name);
     }
@@ -70,7 +71,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function get(string $name, mixed $default = null)
+    public function get(string $name, mixed $default = null): mixed
     {
         return $this->getAttributeBag()->get($name, $default);
     }
@@ -86,7 +87,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(): array
     {
         return $this->getAttributeBag()->all();
     }
@@ -102,7 +103,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function remove(string $name)
+    public function remove(string $name): mixed
     {
         return $this->getAttributeBag()->remove($name);
     }
@@ -118,7 +119,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function isStarted()
+    public function isStarted(): bool
     {
         return $this->storage->isStarted();
     }
@@ -167,7 +168,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function invalidate(int $lifetime = null)
+    public function invalidate(int $lifetime = null): bool
     {
         $this->storage->clear();
 
@@ -177,7 +178,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function migrate(bool $destroy = false, int $lifetime = null)
+    public function migrate(bool $destroy = false, int $lifetime = null): bool
     {
         return $this->storage->regenerate($destroy, $lifetime);
     }
@@ -193,7 +194,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->storage->getId();
     }
@@ -211,7 +212,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->storage->getName();
     }
@@ -227,7 +228,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function getMetadataBag()
+    public function getMetadataBag(): MetadataBag
     {
         ++$this->usageIndex;
         if ($this->usageReporter && 0 <= $this->usageIndex) {
@@ -248,7 +249,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function getBag(string $name)
+    public function getBag(string $name): SessionBagInterface
     {
         $bag = $this->storage->getBag($name);
 
@@ -257,10 +258,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * Gets the flashbag interface.
-     *
-     * @return FlashBagInterface
      */
-    public function getFlashBag()
+    public function getFlashBag(): FlashBagInterface
     {
         return $this->getBag($this->flashName);
     }

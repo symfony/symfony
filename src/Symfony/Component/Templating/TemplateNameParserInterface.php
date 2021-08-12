@@ -24,5 +24,5 @@ interface TemplateNameParserInterface
      *
      * @return TemplateReferenceInterface A template
      */
-    public function parse(string|TemplateReferenceInterface $name);
+    public function parse(string|TemplateReferenceInterface $name): TemplateReferenceInterface;
 }

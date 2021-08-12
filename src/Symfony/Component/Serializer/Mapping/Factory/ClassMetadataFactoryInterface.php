@@ -34,16 +34,12 @@ interface ClassMetadataFactoryInterface
      * {@link \Symfony\Component\Serializer\Mapping\Loader\LoaderInterface::loadClassMetadata()} method for further
      * configuration. At last, the new object is returned.
      *
-     * @return ClassMetadataInterface
-     *
      * @throws InvalidArgumentException
      */
-    public function getMetadataFor(string|object $value);
+    public function getMetadataFor(string|object $value): ClassMetadataInterface;
 
     /**
      * Checks if class has metadata.
-     *
-     * @return bool
      */
-    public function hasMetadataFor(mixed $value);
+    public function hasMetadataFor(mixed $value): bool;
 }

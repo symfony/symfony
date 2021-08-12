@@ -170,11 +170,9 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * Detects if the configured circular reference limit is reached.
      *
-     * @return bool
-     *
      * @throws CircularReferenceException
      */
-    protected function isCircularReference(object $object, array &$context)
+    protected function isCircularReference(object $object, array &$context): bool
     {
         $objectHash = spl_object_hash($object);
 
@@ -223,7 +221,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return string[]|AttributeMetadataInterface[]|bool
      */
-    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false)
+    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
     {
         $allowExtraAttributes = $context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES];
         if (!$this->classMetadataFactory) {
@@ -270,10 +268,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
     /**
      * Is this attribute allowed?
-     *
-     * @return bool
      */
-    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = [])
+    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
     {
         $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
         if (\in_array($attribute, $ignoredAttributes)) {
@@ -296,10 +292,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * Normalizes the given data to an array. It's particularly useful during
      * the denormalization process.
-     *
-     * @return array
      */
-    protected function prepareForDenormalization(object|array|null $data)
+    protected function prepareForDenormalization(object|array|null $data): array
     {
         return (array) $data;
     }
@@ -307,10 +301,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * Returns the method to use to construct an object. This method must be either
      * the object constructor or static.
-     *
-     * @return \ReflectionMethod|null
      */
-    protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes)
+    protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes): ?\ReflectionMethod
     {
         return $reflectionClass->getConstructor();
     }
@@ -323,12 +315,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * is removed from the context before being returned to avoid side effects
      * when recursively normalizing an object graph.
      *
-     * @return object
-     *
      * @throws RuntimeException
      * @throws MissingConstructorArgumentsException
      */
-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
             unset($context[self::OBJECT_TO_POPULATE]);

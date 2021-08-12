@@ -82,7 +82,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @return FormInterface The form whose errors are iterated by this object
      */
-    public function getForm()
+    public function getForm(): FormInterface
     {
         return $this->form;
     }
@@ -239,10 +239,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * Creates iterator for errors with specific codes.
      *
      * @param string|string[] $codes The codes to find
-     *
-     * @return static
      */
-    public function findByCodes(string|array $codes)
+    public function findByCodes(string|array $codes): static
     {
         $codes = (array) $codes;
         $errors = [];

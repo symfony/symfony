@@ -15,12 +15,15 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
 
 class AttributeController
 {
-    public function action(#[Foo('bar')] string $baz) {
+    public function action(#[Foo('bar')] string $baz)
+    {
     }
 
-    public function multiAttributeArg(#[Foo('bar'), Undefined('bar')] string $baz) {
+    public function multiAttributeArg(#[Foo('bar'), Undefined('bar')] string $baz)
+    {
     }
 
-    public function issue41478(#[Foo('bar')] string $baz, string $bat) {
+    public function issue41478(#[Foo('bar')] string $baz, string $bat)
+    {
     }
 }

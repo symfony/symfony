@@ -23,7 +23,7 @@ class SubmitButton extends Button implements ClickableInterface
     /**
      * {@inheritdoc}
      */
-    public function isClicked()
+    public function isClicked(): bool
     {
         return $this->clicked;
     }
@@ -35,7 +35,7 @@ class SubmitButton extends Button implements ClickableInterface
      *
      * @throws Exception\AlreadySubmittedException if the form has already been submitted
      */
-    public function submit(array|string|null $submittedData, bool $clearMissing = true)
+    public function submit(array|string|null $submittedData, bool $clearMissing = true): static
     {
         if ($this->getConfig()->getDisabled()) {
             $this->clicked = false;

@@ -25,5 +25,5 @@ interface LoaderInterface
      *
      * @return bool Whether the loader succeeded
      */
-    public function loadClassMetadata(ClassMetadata $metadata);
+    public function loadClassMetadata(ClassMetadata $metadata): bool;
 }

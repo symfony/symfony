@@ -30,10 +30,7 @@ class MappingRule
         $this->targetPath = $targetPath;
     }
 
-    /**
-     * @return FormInterface
-     */
-    public function getOrigin()
+    public function getOrigin(): FormInterface
     {
         return $this->origin;
     }
@@ -46,7 +43,7 @@ class MappingRule
      *
      * @return FormInterface|null The mapped form or null
      */
-    public function match(string $propertyPath)
+    public function match(string $propertyPath): ?FormInterface
     {
         return $propertyPath === $this->propertyPath ? $this->getTarget() : null;
     }
@@ -56,7 +53,7 @@ class MappingRule
      *
      * @return bool Whether the property path is a prefix of the rule or not
      */
-    public function isPrefix(string $propertyPath)
+    public function isPrefix(string $propertyPath): bool
     {
         $length = \strlen($propertyPath);
         $prefix = substr($this->propertyPath, 0, $length);
@@ -66,11 +63,9 @@ class MappingRule
     }
 
     /**
-     * @return FormInterface
-     *
      * @throws ErrorMappingException
      */
-    public function getTarget()
+    public function getTarget(): FormInterface
     {
         $childNames = explode('.', $this->targetPath);
         $target = $this->origin;

@@ -28,10 +28,8 @@ class RequestEvent extends KernelEvent
 
     /**
      * Returns the response object.
-     *
-     * @return Response|null
      */
-    public function getResponse()
+    public function getResponse(): ?Response
     {
         return $this->response;
     }
@@ -51,7 +49,7 @@ class RequestEvent extends KernelEvent
      *
      * @return bool Whether a response was set
      */
-    public function hasResponse()
+    public function hasResponse(): bool
     {
         return null !== $this->response;
     }

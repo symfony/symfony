@@ -77,7 +77,7 @@ class RouterDataCollector extends DataCollector
     /**
      * @return bool Whether this request will result in a redirect
      */
-    public function getRedirect()
+    public function getRedirect(): bool
     {
         return $this->data['redirect'];
     }
@@ -85,7 +85,7 @@ class RouterDataCollector extends DataCollector
     /**
      * @return string|null The target URL
      */
-    public function getTargetUrl()
+    public function getTargetUrl(): ?string
     {
         return $this->data['url'];
     }
@@ -93,7 +93,7 @@ class RouterDataCollector extends DataCollector
     /**
      * @return string|null The target route
      */
-    public function getTargetRoute()
+    public function getTargetRoute(): ?string
     {
         return $this->data['route'];
     }
@@ -101,7 +101,7 @@ class RouterDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'router';
     }

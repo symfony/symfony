@@ -24,5 +24,5 @@ interface GroupSequenceProviderInterface
      *
      * @return string[]|string[][]|GroupSequence An array of validation groups
      */
-    public function getGroupSequence();
+    public function getGroupSequence(): array|GroupSequence;
 }

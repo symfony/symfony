@@ -47,7 +47,7 @@ class DataTransformerChain implements DataTransformerInterface
      *
      * @throws TransformationFailedException
      */
-    public function transform(mixed $value)
+    public function transform(mixed $value): mixed
     {
         foreach ($this->transformers as $transformer) {
             $value = $transformer->transform($value);
@@ -71,7 +71,7 @@ class DataTransformerChain implements DataTransformerInterface
      *
      * @throws TransformationFailedException
      */
-    public function reverseTransform(mixed $value)
+    public function reverseTransform(mixed $value): mixed
     {
         for ($i = \count($this->transformers) - 1; $i >= 0; --$i) {
             $value = $this->transformers[$i]->reverseTransform($value);
@@ -83,7 +83,7 @@ class DataTransformerChain implements DataTransformerInterface
     /**
      * @return DataTransformerInterface[]
      */
-    public function getTransformers()
+    public function getTransformers(): array
     {
         return $this->transformers;
     }

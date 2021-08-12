@@ -33,7 +33,7 @@ class XmlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         if (null === $this->classes) {
             $this->loadClassesFromXml();
@@ -55,7 +55,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return string[] The classes names
      */
-    public function getMappedClasses()
+    public function getMappedClasses(): array
     {
         if (null === $this->classes) {
             $this->loadClassesFromXml();
@@ -71,7 +71,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return Constraint[]
      */
-    protected function parseConstraints(\SimpleXMLElement $nodes)
+    protected function parseConstraints(\SimpleXMLElement $nodes): array
     {
         $constraints = [];
 
@@ -105,7 +105,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return array The values
      */
-    protected function parseValues(\SimpleXMLElement $nodes)
+    protected function parseValues(\SimpleXMLElement $nodes): array
     {
         $values = [];
 
@@ -139,7 +139,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return array The options
      */
-    protected function parseOptions(\SimpleXMLElement $nodes)
+    protected function parseOptions(\SimpleXMLElement $nodes): array
     {
         $options = [];
 
@@ -172,7 +172,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws MappingException If the file could not be loaded
      */
-    protected function parseFile(string $path)
+    protected function parseFile(string $path): \SimpleXMLElement
     {
         try {
             $dom = XmlUtils::loadFile($path, __DIR__.'/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd');

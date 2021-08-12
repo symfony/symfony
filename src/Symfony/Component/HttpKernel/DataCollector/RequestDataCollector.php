@@ -343,7 +343,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * @return array|string|Data The controller as a string or array of data
      *                           with keys 'class', 'method', 'file' and 'line'
      */
-    public function getController()
+    public function getController(): array|string|Data
     {
         return $this->data['controller'];
     }
@@ -354,7 +354,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * @return array|Data|false A legacy array of data from the previous redirection response
      *                          or false otherwise
      */
-    public function getRedirect()
+    public function getRedirect(): array|Data|false
     {
         return $this->data['redirect'] ?? false;
     }
@@ -432,7 +432,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      *
      * @return array|string An array of controller data or a simple string
      */
-    protected function parseController(array|object|string|null $controller)
+    protected function parseController(array|object|string|null $controller): array|string
     {
         if (\is_string($controller) && str_contains($controller, '::')) {
             $controller = explode('::', $controller);

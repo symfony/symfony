@@ -21,5 +21,5 @@ interface ArgumentMetadataFactoryInterface
     /**
      * @return ArgumentMetadata[]
      */
-    public function createArgumentMetadata(string|object|array $controller);
+    public function createArgumentMetadata(string|object|array $controller): array;
 }

@@ -46,7 +46,7 @@ class Choice extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'choices';
     }

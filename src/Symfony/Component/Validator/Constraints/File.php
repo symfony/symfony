@@ -117,7 +117,7 @@ class File extends Constraint
         parent::__set($option, $value);
     }
 
-    public function __get(string $option)
+    public function __get(string $option): mixed
     {
         if ('maxSize' === $option) {
             return $this->maxSize;
@@ -126,7 +126,7 @@ class File extends Constraint
         return parent::__get($option);
     }
 
-    public function __isset(string $option)
+    public function __isset(string $option): bool
     {
         if ('maxSize' === $option) {
             return true;

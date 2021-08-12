@@ -129,10 +129,8 @@ EOF;
 
     /**
      * {@inheritdoc}
-     *
-     * @return Request
      */
-    protected function filterRequest(DomRequest $request)
+    protected function filterRequest(DomRequest $request): Request
     {
         $httpRequest = Request::create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $server = $request->getServer(), $request->getContent());
         if (!isset($server['HTTP_ACCEPT'])) {
@@ -159,7 +157,7 @@ EOF;
      *
      * @return array An array with all uploaded files marked as already moved
      */
-    protected function filterFiles(array $files)
+    protected function filterFiles(array $files): array
     {
         $filtered = [];
         foreach ($files as $key => $value) {
@@ -193,10 +191,8 @@ EOF;
      * {@inheritdoc}
      *
      * @param Request $request
-     *
-     * @return DomResponse
      */
-    protected function filterResponse(object $response)
+    protected function filterResponse(object $response): DomResponse
     {
         // this is needed to support StreamedResponse
         ob_start();

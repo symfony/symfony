@@ -81,5 +81,5 @@ interface FormDataCollectorInterface extends DataCollectorInterface
      *
      * @return array|Data
      */
-    public function getData();
+    public function getData(): array|Data;
 }

@@ -86,7 +86,7 @@ interface ExecutionContextInterface
      *
      * @return ConstraintViolationBuilderInterface The violation builder
      */
-    public function buildViolation(string $message, array $parameters = []);
+    public function buildViolation(string $message, array $parameters = []): ConstraintViolationBuilderInterface;
 
     /**
      * Returns the validator.
@@ -103,10 +103,8 @@ interface ExecutionContextInterface
      *             // ...
      *         }
      *     }
-     *
-     * @return ValidatorInterface
      */
-    public function getValidator();
+    public function getValidator(): ValidatorInterface;
 
     /**
      * Returns the currently validated object.
@@ -120,7 +118,7 @@ interface ExecutionContextInterface
      *
      * @return object|null The currently validated object or null
      */
-    public function getObject();
+    public function getObject(): ?object;
 
     /**
      * Sets the currently validated value.
@@ -223,7 +221,7 @@ interface ExecutionContextInterface
      *
      * @return ConstraintViolationListInterface The constraint violation list
      */
-    public function getViolations();
+    public function getViolations(): ConstraintViolationListInterface;
 
     /**
      * Returns the value at which validation was started in the object graph.
@@ -236,7 +234,7 @@ interface ExecutionContextInterface
      *
      * @return mixed The root value of the validation
      */
-    public function getRoot();
+    public function getRoot(): mixed;
 
     /**
      * Returns the value that the validator is currently validating.
@@ -246,7 +244,7 @@ interface ExecutionContextInterface
      *
      * @return mixed The currently validated value
      */
-    public function getValue();
+    public function getValue(): mixed;
 
     /**
      * Returns the metadata for the currently validated value.
@@ -263,14 +261,14 @@ interface ExecutionContextInterface
      *
      * @return MetadataInterface|null The metadata of the currently validated value
      */
-    public function getMetadata();
+    public function getMetadata(): ?MetadataInterface;
 
     /**
      * Returns the validation group that is currently being validated.
      *
      * @return string|null The current validation group
      */
-    public function getGroup();
+    public function getGroup(): ?string;
 
     /**
      * Returns the class name of the current node.
@@ -281,7 +279,7 @@ interface ExecutionContextInterface
      *
      * @return string|null The class name or null, if no class name could be found
      */
-    public function getClassName();
+    public function getClassName(): ?string;
 
     /**
      * Returns the property name of the current node.
@@ -292,7 +290,7 @@ interface ExecutionContextInterface
      *
      * @return string|null The property name or null, if no property name could be found
      */
-    public function getPropertyName();
+    public function getPropertyName(): ?string;
 
     /**
      * Returns the property path to the value that the validator is currently
@@ -325,5 +323,5 @@ interface ExecutionContextInterface
      *                string if the validator is currently validating the
      *                root value of the validation graph.
      */
-    public function getPropertyPath(string $subPath = '');
+    public function getPropertyPath(string $subPath = ''): string;
 }

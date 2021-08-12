@@ -37,7 +37,7 @@ abstract class FilesLoader extends LoaderChain
      *
      * @return LoaderInterface[] The metadata loaders
      */
-    protected function getFileLoaders(array $paths)
+    protected function getFileLoaders(array $paths): array
     {
         $loaders = [];
 
@@ -53,5 +53,5 @@ abstract class FilesLoader extends LoaderChain
      *
      * @return LoaderInterface The created loader
      */
-    abstract protected function getFileLoaderInstance(string $path);
+    abstract protected function getFileLoaderInstance(string $path): LoaderInterface;
 }

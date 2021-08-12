@@ -25,7 +25,7 @@ interface DataAccessorInterface
      *
      * @throws Exception\AccessException If unable to read from the given form data
      */
-    public function getValue(object|array $viewData, FormInterface $form);
+    public function getValue(object|array $viewData, FormInterface $form): mixed;
 
     /**
      * Sets the value at the end of the property of the object graph.

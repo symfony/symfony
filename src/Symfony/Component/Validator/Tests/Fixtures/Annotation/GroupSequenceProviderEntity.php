@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Fixtures\Annotation;
 
-use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 /**

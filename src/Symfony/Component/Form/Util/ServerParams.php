@@ -27,10 +27,8 @@ class ServerParams
 
     /**
      * Returns true if the POST max size has been exceeded in the request.
-     *
-     * @return bool
      */
-    public function hasPostMaxSizeBeenExceeded()
+    public function hasPostMaxSizeBeenExceeded(): bool
     {
         $contentLength = $this->getContentLength();
         $maxContentLength = $this->getPostMaxSize();
@@ -40,10 +38,8 @@ class ServerParams
 
     /**
      * Returns maximum post size in bytes.
-     *
-     * @return int|null The maximum post size in bytes
      */
-    public function getPostMaxSize()
+    public function getPostMaxSize(): int|float|null
     {
         $iniMax = strtolower($this->getNormalizedIniPostMaxSize());
 
@@ -75,10 +71,8 @@ class ServerParams
 
     /**
      * Returns the normalized "post_max_size" ini setting.
-     *
-     * @return string
      */
-    public function getNormalizedIniPostMaxSize()
+    public function getNormalizedIniPostMaxSize(): string
     {
         return strtoupper(trim(ini_get('post_max_size')));
     }
@@ -88,7 +82,7 @@ class ServerParams
      *
      * @return mixed The request content length
      */
-    public function getContentLength()
+    public function getContentLength(): mixed
     {
         if (null !== $this->requestStack && null !== $request = $this->requestStack->getCurrentRequest()) {
             return $request->server->get('CONTENT_LENGTH');

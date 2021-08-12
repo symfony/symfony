@@ -13,9 +13,9 @@ namespace Symfony\Component\Validator\Tests\Fixtures\Attribute;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
 use Symfony\Component\Validator\Tests\Fixtures\CallbackClass;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
+use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
 
 #[
     ConstraintA,
@@ -106,9 +106,6 @@ class Entity extends EntityParent implements EntityInterfaceB
     {
     }
 
-    /**
-     * @return mixed
-     */
     public function getChildA(): mixed
     {
         return $this->childA;
@@ -122,9 +119,6 @@ class Entity extends EntityParent implements EntityInterfaceB
         $this->childA = $childA;
     }
 
-    /**
-     * @return mixed
-     */
     public function getChildB(): mixed
     {
         return $this->childB;

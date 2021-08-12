@@ -48,7 +48,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * @throws TransformationFailedException if the given value is not numeric
      *                                       or if the value can not be transformed
      */
-    public function transform(mixed $value)
+    public function transform(mixed $value): string
     {
         if (null === $value) {
             return '';
@@ -81,7 +81,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * @throws TransformationFailedException if the given value is not a string
      *                                       or if the value can not be transformed
      */
-    public function reverseTransform(mixed $value)
+    public function reverseTransform(mixed $value): int|float|null
     {
         if (null !== $value && !\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
@@ -154,10 +154,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Returns a preconfigured \NumberFormatter instance.
-     *
-     * @return \NumberFormatter
      */
-    protected function getNumberFormatter()
+    protected function getNumberFormatter(): \NumberFormatter
     {
         $formatter = new \NumberFormatter($this->locale ?? \Locale::getDefault(), \NumberFormatter::DECIMAL);
 

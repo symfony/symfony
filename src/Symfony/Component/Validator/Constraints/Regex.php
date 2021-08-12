@@ -66,7 +66,7 @@ class Regex extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'pattern';
     }
@@ -74,7 +74,7 @@ class Regex extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['pattern'];
     }
@@ -85,10 +85,8 @@ class Regex extends Constraint
      * However, if options are specified, it cannot be converted.
      *
      * @see http://dev.w3.org/html5/spec/single-page.html#the-pattern-attribute
-     *
-     * @return string|null
      */
-    public function getHtmlPattern()
+    public function getHtmlPattern(): ?string
     {
         // If htmlPattern is specified, use it
         if (null !== $this->htmlPattern) {

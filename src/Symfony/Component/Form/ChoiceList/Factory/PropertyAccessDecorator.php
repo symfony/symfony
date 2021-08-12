@@ -52,17 +52,15 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListFactoryInterface The decorated factory
      */
-    public function getDecoratedFactory()
+    public function getDecoratedFactory(): ChoiceListFactoryInterface
     {
         return $this->decoratedFactory;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return ChoiceListInterface
      */
-    public function createListFromChoices(iterable $choices, mixed $value = null, mixed $filter = null)
+    public function createListFromChoices(iterable $choices, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
         if (\is_string($value)) {
             $value = new PropertyPath($value);
@@ -95,10 +93,8 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return ChoiceListInterface
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, mixed $value = null, mixed $filter = null)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
         if (\is_string($value)) {
             $value = new PropertyPath($value);
@@ -131,10 +127,8 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return ChoiceListView
      */
-    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [])
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = []): ChoiceListView
     {
         $accessor = $this->propertyAccessor;
 

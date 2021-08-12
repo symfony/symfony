@@ -25,8 +25,6 @@ interface RequestHandlerInterface
 
     /**
      * Returns true if the given data is a file upload.
-     *
-     * @return bool
      */
-    public function isFileUpload(mixed $data);
+    public function isFileUpload(mixed $data): bool;
 }

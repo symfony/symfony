@@ -36,7 +36,7 @@ class CsrfExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    protected function loadTypeExtensions()
+    protected function loadTypeExtensions(): array
     {
         return [
             new Type\FormTypeCsrfExtension($this->tokenManager, true, '_token', $this->translator, $this->translationDomain),

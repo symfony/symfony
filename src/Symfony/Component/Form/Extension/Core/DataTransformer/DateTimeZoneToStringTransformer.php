@@ -31,7 +31,7 @@ class DateTimeZoneToStringTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform(mixed $dateTimeZone)
+    public function transform(mixed $dateTimeZone): mixed
     {
         if (null === $dateTimeZone) {
             return null;
@@ -55,7 +55,7 @@ class DateTimeZoneToStringTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform(mixed $value)
+    public function reverseTransform(mixed $value): mixed
     {
         if (null === $value) {
             return null;

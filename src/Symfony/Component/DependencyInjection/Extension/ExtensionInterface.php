@@ -48,5 +48,5 @@ interface ExtensionInterface
      *
      * @return string The alias
      */
-    public function getAlias(): string;
+    public function getAlias();
 }

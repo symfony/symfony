@@ -92,7 +92,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      */
-    public function getMessageTemplate()
+    public function getMessageTemplate(): string
     {
         return (string) $this->messageTemplate;
     }
@@ -100,7 +100,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
@@ -108,7 +108,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      */
-    public function getPlural()
+    public function getPlural(): ?int
     {
         return $this->plural;
     }
@@ -116,7 +116,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      */
-    public function getMessage()
+    public function getMessage(): string|\Stringable
     {
         return $this->message;
     }
@@ -124,7 +124,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      */
-    public function getRoot()
+    public function getRoot(): mixed
     {
         return $this->root;
     }
@@ -132,7 +132,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      */
-    public function getPropertyPath()
+    public function getPropertyPath(): string
     {
         return (string) $this->propertyPath;
     }
@@ -140,7 +140,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      */
-    public function getInvalidValue()
+    public function getInvalidValue(): mixed
     {
         return $this->invalidValue;
     }
@@ -150,17 +150,15 @@ class ConstraintViolation implements ConstraintViolationInterface
      *
      * @return Constraint|null The constraint or null if it is not known
      */
-    public function getConstraint()
+    public function getConstraint(): ?Constraint
     {
         return $this->constraint;
     }
 
     /**
      * Returns the cause of the violation.
-     *
-     * @return mixed
      */
-    public function getCause()
+    public function getCause(): mixed
     {
         return $this->cause;
     }
@@ -168,7 +166,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      */
-    public function getCode()
+    public function getCode(): ?string
     {
         return $this->code;
     }

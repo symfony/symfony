@@ -26,7 +26,7 @@ class ArrayToPartsTransformer implements DataTransformerInterface
         $this->partMapping = $partMapping;
     }
 
-    public function transform(mixed $array)
+    public function transform(mixed $array): mixed
     {
         if (null === $array) {
             $array = [];
@@ -49,7 +49,7 @@ class ArrayToPartsTransformer implements DataTransformerInterface
         return $result;
     }
 
-    public function reverseTransform(mixed $array)
+    public function reverseTransform(mixed $array): mixed
     {
         if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');

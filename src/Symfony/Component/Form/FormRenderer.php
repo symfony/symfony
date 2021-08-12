@@ -40,7 +40,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function getEngine()
+    public function getEngine(): FormRendererEngineInterface
     {
         return $this->engine;
     }
@@ -56,7 +56,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderCsrfToken(string $tokenId)
+    public function renderCsrfToken(string $tokenId): string
     {
         if (null === $this->csrfTokenManager) {
             throw new BadMethodCallException('CSRF tokens can only be generated if a CsrfTokenManagerInterface is injected in FormRenderer::__construct(). Try running "composer require symfony/security-csrf".');
@@ -68,7 +68,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, string $blockName, array $variables = [])
+    public function renderBlock(FormView $view, string $blockName, array $variables = []): string
     {
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
@@ -127,7 +127,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function searchAndRenderBlock(FormView $view, string $blockNameSuffix, array $variables = [])
+    public function searchAndRenderBlock(FormView $view, string $blockNameSuffix, array $variables = []): string
     {
         $renderOnlyOnce = 'row' === $blockNameSuffix || 'widget' === $blockNameSuffix;
 
@@ -280,7 +280,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function humanize(string $text)
+    public function humanize(string $text): string
     {
         return ucfirst(strtolower(trim(preg_replace(['/([A-Z])/', '/[_\s]+/'], ['_$1', ' '], $text))));
     }

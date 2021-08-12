@@ -39,7 +39,7 @@ class CoreExtension extends AbstractExtension
         $this->translator = $translator;
     }
 
-    protected function loadTypes()
+    protected function loadTypes(): array
     {
         return [
             new Type\FormType($this->propertyAccessor),
@@ -80,7 +80,7 @@ class CoreExtension extends AbstractExtension
         ];
     }
 
-    protected function loadTypeExtensions()
+    protected function loadTypeExtensions(): array
     {
         return [
             new TransformationFailureExtension($this->translator),

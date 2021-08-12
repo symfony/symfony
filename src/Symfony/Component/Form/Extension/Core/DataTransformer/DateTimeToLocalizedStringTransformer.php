@@ -75,7 +75,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException if the given value is not a \DateTimeInterface
      *                                       or if the date could not be transformed
      */
-    public function transform(mixed $dateTime)
+    public function transform(mixed $dateTime): string
     {
         if (null === $dateTime) {
             return '';
@@ -104,7 +104,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException if the given value is not a string,
      *                                       if the date could not be parsed
      */
-    public function reverseTransform(mixed $value)
+    public function reverseTransform(mixed $value): ?\DateTime
     {
         if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
@@ -163,11 +163,9 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @param bool $ignoreTimezone Use UTC regardless of the configured timezone
      *
-     * @return \IntlDateFormatter
-     *
      * @throws TransformationFailedException in case the date formatter can not be constructed
      */
-    protected function getIntlDateFormatter(bool $ignoreTimezone = false)
+    protected function getIntlDateFormatter(bool $ignoreTimezone = false): \IntlDateFormatter
     {
         $dateFormat = $this->dateFormat;
         $timeFormat = $this->timeFormat;
@@ -190,10 +188,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Checks if the pattern contains only a date.
-     *
-     * @return bool
      */
-    protected function isPatternDateOnly()
+    protected function isPatternDateOnly(): bool
     {
         if (null === $this->pattern) {
             return false;

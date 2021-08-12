@@ -62,12 +62,12 @@ class CardScheme extends Constraint
         $this->message = $message ?? $this->message;
     }
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'schemes';
     }
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['schemes'];
     }

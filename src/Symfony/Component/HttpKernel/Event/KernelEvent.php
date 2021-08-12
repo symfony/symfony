@@ -39,20 +39,16 @@ class KernelEvent extends Event
 
     /**
      * Returns the kernel in which this event was thrown.
-     *
-     * @return HttpKernelInterface
      */
-    public function getKernel()
+    public function getKernel(): HttpKernelInterface
     {
         return $this->kernel;
     }
 
     /**
      * Returns the request the kernel is currently processing.
-     *
-     * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -63,7 +59,7 @@ class KernelEvent extends Event
      * @return int One of HttpKernelInterface::MAIN_REQUEST and
      *             HttpKernelInterface::SUB_REQUEST
      */
-    public function getRequestType()
+    public function getRequestType(): int
     {
         return $this->requestType;
     }

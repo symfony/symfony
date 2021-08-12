@@ -31,5 +31,5 @@ interface ExecutionContextFactoryInterface
      *
      * @return ExecutionContextInterface The new execution context
      */
-    public function createContext(ValidatorInterface $validator, mixed $root);
+    public function createContext(ValidatorInterface $validator, mixed $root): ExecutionContextInterface;
 }

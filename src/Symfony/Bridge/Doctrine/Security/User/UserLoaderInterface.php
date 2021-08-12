@@ -30,9 +30,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 interface UserLoaderInterface
 {
     /**
-     * @return UserInterface|null
-     *
      * @deprecated since Symfony 5.3, use loadUserByIdentifier() instead
      */
-    public function loadUserByUsername(string $username);
+    public function loadUserByUsername(string $username): ?UserInterface;
 }

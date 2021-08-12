@@ -56,7 +56,7 @@ class AppVariable
      *
      * @throws \RuntimeException When the TokenStorage is not available
      */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         if (null === $tokenStorage = $this->tokenStorage) {
             throw new \RuntimeException('The "app.token" variable is not available.');
@@ -72,7 +72,7 @@ class AppVariable
      *
      * @see TokenInterface::getUser()
      */
-    public function getUser()
+    public function getUser(): ?object
     {
         if (null === $tokenStorage = $this->tokenStorage) {
             throw new \RuntimeException('The "app.user" variable is not available.');
@@ -92,7 +92,7 @@ class AppVariable
      *
      * @return Request|null The HTTP request object
      */
-    public function getRequest()
+    public function getRequest(): ?Request
     {
         if (null === $this->requestStack) {
             throw new \RuntimeException('The "app.request" variable is not available.');
@@ -106,7 +106,7 @@ class AppVariable
      *
      * @return Session|null The session
      */
-    public function getSession()
+    public function getSession(): ?Session
     {
         if (null === $this->requestStack) {
             throw new \RuntimeException('The "app.session" variable is not available.');
@@ -121,7 +121,7 @@ class AppVariable
      *
      * @return string The current environment string (e.g 'dev')
      */
-    public function getEnvironment()
+    public function getEnvironment(): string
     {
         if (null === $this->environment) {
             throw new \RuntimeException('The "app.environment" variable is not available.');
@@ -135,7 +135,7 @@ class AppVariable
      *
      * @return bool The current debug mode
      */
-    public function getDebug()
+    public function getDebug(): bool
     {
         if (null === $this->debug) {
             throw new \RuntimeException('The "app.debug" variable is not available.');
@@ -152,7 +152,7 @@ class AppVariable
      *
      * @return array
      */
-    public function getFlashes(string|array $types = null)
+    public function getFlashes(string|array $types = null): array
     {
         try {
             if (null === $session = $this->getSession()) {

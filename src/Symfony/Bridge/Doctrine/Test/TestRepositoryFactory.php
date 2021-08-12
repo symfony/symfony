@@ -30,10 +30,8 @@ class TestRepositoryFactory implements RepositoryFactory
 
     /**
      * {@inheritdoc}
-     *
-     * @return ObjectRepository
      */
-    public function getRepository(EntityManagerInterface $entityManager, $entityName)
+    public function getRepository(EntityManagerInterface $entityManager, $entityName): ObjectRepository
     {
         if (__CLASS__ === static::class) {
             trigger_deprecation('symfony/doctrine-bridge', '5.3', '"%s" is deprecated and will be removed in 6.0.', __CLASS__);

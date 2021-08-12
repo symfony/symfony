@@ -83,10 +83,8 @@ class ConsoleFormatter implements FormatterInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function formatBatch(array $records)
+    public function formatBatch(array $records): mixed
     {
         foreach ($records as $key => $record) {
             $records[$key] = $this->format($record);
@@ -97,10 +95,8 @@ class ConsoleFormatter implements FormatterInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function format(array $record)
+    public function format(array $record): mixed
     {
         $record = $this->replacePlaceHolder($record);
 

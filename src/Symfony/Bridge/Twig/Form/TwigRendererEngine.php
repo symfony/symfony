@@ -40,7 +40,7 @@ class TwigRendererEngine extends AbstractRendererEngine
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = [])
+    public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []): string
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
@@ -72,7 +72,7 @@ class TwigRendererEngine extends AbstractRendererEngine
      *
      * @return bool True if the resource could be loaded, false otherwise
      */
-    protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName)
+    protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool
     {
         // The caller guarantees that $this->resources[$cacheKey][$block] is
         // not set, but it doesn't have to check whether $this->resources[$cacheKey]

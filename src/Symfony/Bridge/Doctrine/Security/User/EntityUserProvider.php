@@ -49,7 +49,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
     /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername(string $username)
+    public function loadUserByUsername(string $username): UserInterface
     {
         trigger_deprecation('symfony/doctrine-bridge', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
 
@@ -89,7 +89,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
     /**
      * {@inheritdoc}
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         $class = $this->getClass();
         if (!$user instanceof $class) {
@@ -123,7 +123,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
     /**
      * {@inheritdoc}
      */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
     }

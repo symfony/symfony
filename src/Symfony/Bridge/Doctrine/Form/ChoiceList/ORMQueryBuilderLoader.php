@@ -41,7 +41,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntities()
+    public function getEntities(): array
     {
         return $this->queryBuilder->getQuery()->execute();
     }
@@ -49,7 +49,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntitiesByIds(string $identifier, array $values)
+    public function getEntitiesByIds(string $identifier, array $values): array
     {
         if (null !== $this->queryBuilder->getMaxResults() || null !== $this->queryBuilder->getFirstResult()) {
             // an offset or a limit would apply on results including the where clause with submitted id values

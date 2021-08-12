@@ -229,15 +229,10 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
 
     /**
      * Return the default loader object.
-     *
-     * @return EntityLoaderInterface
      */
-    abstract public function getLoader(ObjectManager $manager, object $queryBuilder, string $class);
+    abstract public function getLoader(ObjectManager $manager, object $queryBuilder, string $class): EntityLoaderInterface;
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

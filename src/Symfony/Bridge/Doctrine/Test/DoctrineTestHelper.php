@@ -31,10 +31,8 @@ class DoctrineTestHelper
 {
     /**
      * Returns an entity manager for testing.
-     *
-     * @return EntityManager
      */
-    public static function createTestEntityManager(Configuration $config = null)
+    public static function createTestEntityManager(Configuration $config = null): EntityManager
     {
         if (!\extension_loaded('pdo_sqlite')) {
             TestCase::markTestSkipped('Extension pdo_sqlite is required.');
@@ -56,10 +54,7 @@ class DoctrineTestHelper
         return EntityManager::create($params, $config);
     }
 
-    /**
-     * @return Configuration
-     */
-    public static function createTestConfiguration()
+    public static function createTestConfiguration(): Configuration
     {
         if (__CLASS__ === static::class) {
             trigger_deprecation('symfony/doctrine-bridge', '5.3', '"%s" is deprecated and will be removed in 6.0.', __CLASS__);
@@ -75,10 +70,7 @@ class DoctrineTestHelper
         return $config;
     }
 
-    /**
-     * @return Configuration
-     */
-    public static function createTestConfigurationWithXmlLoader()
+    public static function createTestConfigurationWithXmlLoader(): Configuration
     {
         if (__CLASS__ === static::class) {
             trigger_deprecation('symfony/doctrine-bridge', '5.3', '"%s" is deprecated and will be removed in 6.0.', __CLASS__);

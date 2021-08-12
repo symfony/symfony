@@ -92,7 +92,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * {@inheritdoc}
      */
-    public function getListeners(string $eventName = null)
+    public function getListeners(string $eventName = null): array
     {
         return $this->dispatcher->getListeners($eventName);
     }
@@ -100,7 +100,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * {@inheritdoc}
      */
-    public function getListenerPriority(string $eventName, callable|array $listener)
+    public function getListenerPriority(string $eventName, callable|array $listener): ?int
     {
         // we might have wrapped listeners for the event (if called while dispatching)
         // in that case get the priority by wrapper
@@ -118,7 +118,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * {@inheritdoc}
      */
-    public function hasListeners(string $eventName = null)
+    public function hasListeners(string $eventName = null): bool
     {
         return $this->dispatcher->hasListeners($eventName);
     }
@@ -163,10 +163,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         return $event;
     }
 
-    /**
-     * @return array
-     */
-    public function getCalledListeners(Request $request = null)
+    public function getCalledListeners(Request $request = null): array
     {
         if (null === $this->callStack) {
             return [];
@@ -184,10 +181,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         return $called;
     }
 
-    /**
-     * @return array
-     */
-    public function getNotCalledListeners(Request $request = null)
+    public function getNotCalledListeners(Request $request = null): array
     {
         try {
             $allListeners = $this->getListeners();
@@ -255,10 +249,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
      *
      * @param string $method    The method name
      * @param array  $arguments The method arguments
-     *
-     * @return mixed
      */
-    public function __call(string $method, array $arguments)
+    public function __call(string $method, array $arguments): mixed
     {
         return $this->dispatcher->{$method}(...$arguments);
     }

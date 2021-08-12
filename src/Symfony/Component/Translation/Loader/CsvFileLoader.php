@@ -27,7 +27,7 @@ class CsvFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    protected function loadResource(string $resource)
+    protected function loadResource(string $resource): array
     {
         $messages = [];
 

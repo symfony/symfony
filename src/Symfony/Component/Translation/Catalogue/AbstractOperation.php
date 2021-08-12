@@ -80,7 +80,7 @@ abstract class AbstractOperation implements OperationInterface
     /**
      * {@inheritdoc}
      */
-    public function getDomains()
+    public function getDomains(): array
     {
         if (null === $this->domains) {
             $this->domains = array_values(array_unique(array_merge($this->source->getDomains(), $this->target->getDomains())));
@@ -92,7 +92,7 @@ abstract class AbstractOperation implements OperationInterface
     /**
      * {@inheritdoc}
      */
-    public function getMessages(string $domain)
+    public function getMessages(string $domain): array
     {
         if (!\in_array($domain, $this->getDomains())) {
             throw new InvalidArgumentException(sprintf('Invalid domain: "%s".', $domain));
@@ -108,7 +108,7 @@ abstract class AbstractOperation implements OperationInterface
     /**
      * {@inheritdoc}
      */
-    public function getNewMessages(string $domain)
+    public function getNewMessages(string $domain): array
     {
         if (!\in_array($domain, $this->getDomains())) {
             throw new InvalidArgumentException(sprintf('Invalid domain: "%s".', $domain));
@@ -124,7 +124,7 @@ abstract class AbstractOperation implements OperationInterface
     /**
      * {@inheritdoc}
      */
-    public function getObsoleteMessages(string $domain)
+    public function getObsoleteMessages(string $domain): array
     {
         if (!\in_array($domain, $this->getDomains())) {
             throw new InvalidArgumentException(sprintf('Invalid domain: "%s".', $domain));
@@ -140,7 +140,7 @@ abstract class AbstractOperation implements OperationInterface
     /**
      * {@inheritdoc}
      */
-    public function getResult()
+    public function getResult(): MessageCatalogueInterface
     {
         foreach ($this->getDomains() as $domain) {
             if (!isset($this->messages[$domain])) {

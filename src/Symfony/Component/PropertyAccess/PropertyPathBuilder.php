@@ -158,7 +158,7 @@ class PropertyPathBuilder
      *
      * @return int The path length
      */
-    public function getLength()
+    public function getLength(): int
     {
         return \count($this->elements);
     }
@@ -168,7 +168,7 @@ class PropertyPathBuilder
      *
      * @return PropertyPathInterface|null The constructed property path
      */
-    public function getPropertyPath()
+    public function getPropertyPath(): ?PropertyPathInterface
     {
         $pathAsString = $this->__toString();
 

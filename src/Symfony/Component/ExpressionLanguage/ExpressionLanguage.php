@@ -48,7 +48,7 @@ class ExpressionLanguage
      *
      * @return string The compiled PHP source code
      */
-    public function compile(Expression|string $expression, array $names = [])
+    public function compile(Expression|string $expression, array $names = []): string
     {
         return $this->getCompiler()->compile($this->parse($expression, $names)->getNodes())->getSource();
     }
@@ -58,17 +58,15 @@ class ExpressionLanguage
      *
      * @return mixed The result of the evaluation of the expression
      */
-    public function evaluate(Expression|string $expression, array $values = [])
+    public function evaluate(Expression|string $expression, array $values = []): mixed
     {
         return $this->parse($expression, array_keys($values))->getNodes()->evaluate($this->functions, $values);
     }
 
     /**
      * Parses an expression.
-     *
-     * @return ParsedExpression
      */
-    public function parse(Expression|string $expression, array $names)
+    public function parse(Expression|string $expression, array $names): ParsedExpression
     {
         if ($expression instanceof ParsedExpression) {
             return $expression;

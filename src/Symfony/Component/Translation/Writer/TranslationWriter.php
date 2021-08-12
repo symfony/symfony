@@ -38,7 +38,7 @@ class TranslationWriter implements TranslationWriterInterface
      *
      * @return array
      */
-    public function getFormats()
+    public function getFormats(): array
     {
         return array_keys($this->dumpers);
     }

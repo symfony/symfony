@@ -23,5 +23,5 @@ interface RequestContextAwareInterface
      *
      * @return RequestContext The context
      */
-    public function getContext();
+    public function getContext(): RequestContext;
 }

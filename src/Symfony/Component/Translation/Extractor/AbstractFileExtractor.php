@@ -23,7 +23,7 @@ abstract class AbstractFileExtractor
     /**
      * @return iterable
      */
-    protected function extractFiles(string|iterable $resource)
+    protected function extractFiles(string|iterable $resource): iterable
     {
         if (is_iterable($resource)) {
             $files = [];
@@ -51,7 +51,7 @@ abstract class AbstractFileExtractor
      *
      * @throws InvalidArgumentException
      */
-    protected function isFile(string $file)
+    protected function isFile(string $file): bool
     {
         if (!is_file($file)) {
             throw new InvalidArgumentException(sprintf('The "%s" file does not exist.', $file));

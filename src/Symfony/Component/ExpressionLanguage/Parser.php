@@ -90,7 +90,7 @@ class Parser
      *
      * @throws SyntaxError
      */
-    public function parse(TokenStream $stream, array $names = [])
+    public function parse(TokenStream $stream, array $names = []): Node\Node
     {
         $this->lint = false;
 

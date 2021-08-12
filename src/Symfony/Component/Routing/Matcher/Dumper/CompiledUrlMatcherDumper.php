@@ -37,7 +37,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
     /**
      * {@inheritdoc}
      */
-    public function dump(array $options = [])
+    public function dump(array $options = []): string
     {
         return <<<EOF
 <?php

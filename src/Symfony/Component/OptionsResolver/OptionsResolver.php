@@ -191,7 +191,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function setDefault(string $option, mixed $value)
+    public function setDefault(string $option, mixed $value): static
     {
         // Setting is not possible once resolving starts, because then lazy
         // options could manipulate the state of the object, leading to
@@ -262,7 +262,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function setDefaults(array $defaults)
+    public function setDefaults(array $defaults): static
     {
         foreach ($defaults as $option => $value) {
             $this->setDefault($option, $value);
@@ -279,7 +279,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether a default value is set
      */
-    public function hasDefault(string $option)
+    public function hasDefault(string $option): bool
     {
         return \array_key_exists($option, $this->defaults);
     }
@@ -293,7 +293,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function setRequired(string|array $optionNames)
+    public function setRequired(string|array $optionNames): static
     {
         if ($this->locked) {
             throw new AccessException('Options cannot be made required from a lazy option or normalizer.');
@@ -314,7 +314,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether the option is required
      */
-    public function isRequired(string $option)
+    public function isRequired(string $option): bool
     {
         return isset($this->required[$option]);
     }
@@ -326,7 +326,7 @@ class OptionsResolver implements Options
      *
      * @see isRequired()
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return array_keys($this->required);
     }
@@ -340,7 +340,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether the option is missing
      */
-    public function isMissing(string $option)
+    public function isMissing(string $option): bool
     {
         return isset($this->required[$option]) && !\array_key_exists($option, $this->defaults);
     }
@@ -352,7 +352,7 @@ class OptionsResolver implements Options
      *
      * @see isMissing()
      */
-    public function getMissingOptions()
+    public function getMissingOptions(): array
     {
         return array_keys(array_diff_key($this->required, $this->defaults));
     }
@@ -370,7 +370,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function setDefined(string|array $optionNames)
+    public function setDefined(string|array $optionNames): static
     {
         if ($this->locked) {
             throw new AccessException('Options cannot be defined from a lazy option or normalizer.');
@@ -391,7 +391,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether the option is defined
      */
-    public function isDefined(string $option)
+    public function isDefined(string $option): bool
     {
         return isset($this->defined[$option]);
     }
@@ -403,7 +403,7 @@ class OptionsResolver implements Options
      *
      * @see isDefined()
      */
-    public function getDefinedOptions()
+    public function getDefinedOptions(): array
     {
         return array_keys($this->defined);
     }
@@ -534,7 +534,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function addNormalizer(string $option, \Closure $normalizer, bool $forcePrepend = false): self
+    public function addNormalizer(string $option, \Closure $normalizer, bool $forcePrepend = false): static
     {
         if ($this->locked) {
             throw new AccessException('Normalizers cannot be set from a lazy option or normalizer.');
@@ -733,7 +733,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setInfo(string $option, string $info): self
+    public function setInfo(string $option, string $info): static
     {
         if ($this->locked) {
             throw new AccessException('The Info message cannot be set from a lazy option or normalizer.');
@@ -767,7 +767,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException If called from a lazy option, a normalizer or a root definition
      */
-    public function setPrototype(bool $prototype): self
+    public function setPrototype(bool $prototype): static
     {
         if ($this->locked) {
             throw new AccessException('The prototype property cannot be set from a lazy option or normalizer.');
@@ -798,7 +798,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function remove(string|array $optionNames)
+    public function remove(string|array $optionNames): static
     {
         if ($this->locked) {
             throw new AccessException('Options cannot be removed from a lazy option or normalizer.');
@@ -819,7 +819,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function clear()
+    public function clear(): static
     {
         if ($this->locked) {
             throw new AccessException('Options cannot be cleared from a lazy option or normalizer.');
@@ -862,7 +862,7 @@ class OptionsResolver implements Options
      * @throws NoSuchOptionException     If a lazy option reads an unavailable option
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function resolve(array $options = [])
+    public function resolve(array $options = []): array
     {
         if ($this->locked) {
             throw new AccessException('Options cannot be resolved from a lazy option or normalizer.');

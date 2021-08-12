@@ -117,7 +117,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getLength()
+    public function getLength(): int
     {
         return $this->length;
     }
@@ -125,7 +125,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?PropertyPathInterface
     {
         if ($this->length <= 1) {
             return null;
@@ -152,7 +152,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getElements()
+    public function getElements(): array
     {
         return $this->elements;
     }
@@ -160,7 +160,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getElement(int $index)
+    public function getElement(int $index): string
     {
         if (!isset($this->elements[$index])) {
             throw new OutOfBoundsException(sprintf('The index "%s" is not within the property path.', $index));
@@ -172,7 +172,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function isProperty(int $index)
+    public function isProperty(int $index): bool
     {
         if (!isset($this->isIndex[$index])) {
             throw new OutOfBoundsException(sprintf('The index "%s" is not within the property path.', $index));
@@ -184,7 +184,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function isIndex(int $index)
+    public function isIndex(int $index): bool
     {
         if (!isset($this->isIndex[$index])) {
             throw new OutOfBoundsException(sprintf('The index "%s" is not within the property path.', $index));

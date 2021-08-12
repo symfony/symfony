@@ -106,7 +106,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
      *
      * @throws \InvalidArgumentException When route can't be parsed
      */
-    public function load(mixed $class, string $type = null)
+    public function load(mixed $class, string $type = null): RouteCollection
     {
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
@@ -237,7 +237,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(mixed $resource, string $type = null)
+    public function supports(mixed $resource, string $type = null): bool
     {
         return \is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (!$type || 'annotation' === $type);
     }
@@ -252,7 +252,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResolver()
+    public function getResolver(): LoaderResolverInterface
     {
     }
 

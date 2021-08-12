@@ -68,7 +68,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListeners(string $eventName = null)
+    public function getListeners(string $eventName = null): array
     {
         return $this->dispatcher->getListeners($eventName);
     }
@@ -76,7 +76,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListenerPriority(string $eventName, callable|array $listener)
+    public function getListenerPriority(string $eventName, callable|array $listener): ?int
     {
         return $this->dispatcher->getListenerPriority($eventName, $listener);
     }
@@ -84,7 +84,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function hasListeners(string $eventName = null)
+    public function hasListeners(string $eventName = null): bool
     {
         return $this->dispatcher->hasListeners($eventName);
     }

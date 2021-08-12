@@ -73,7 +73,7 @@ interface PropertyAccessorInterface
      * @throws Exception\UnexpectedTypeException  If a value within the path is neither object
      *                                            nor array
      */
-    public function getValue(object|array $objectOrArray, string|PropertyPathInterface $propertyPath);
+    public function getValue(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): mixed;
 
     /**
      * Returns whether a value can be written at a given property path.
@@ -85,7 +85,7 @@ interface PropertyAccessorInterface
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */
-    public function isWritable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath);
+    public function isWritable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool;
 
     /**
      * Returns whether a property path can be read from an object graph.
@@ -97,5 +97,5 @@ interface PropertyAccessorInterface
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */
-    public function isReadable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath);
+    public function isReadable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool;
 }

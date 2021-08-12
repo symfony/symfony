@@ -227,7 +227,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * {@inheritdoc}
      */
-    public function getCatalogue(string $locale = null)
+    public function getCatalogue(string $locale = null): MessageCatalogueInterface
     {
         if (!$locale) {
             $locale = $this->getLocale();
@@ -255,7 +255,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      *
      * @return array LoaderInterface[]
      */
-    protected function getLoaders()
+    protected function getLoaders(): array
     {
         return $this->loaders;
     }

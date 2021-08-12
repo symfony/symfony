@@ -67,9 +67,4 @@ class FormLoginLdapFactory extends FormLoginFactory
             ->end()
         ;
     }
-
-    public function getKey()
-    {
-        return 'form-login-ldap';
-    }
 }

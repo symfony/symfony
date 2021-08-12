@@ -84,9 +84,4 @@ class HttpBasicLdapFactory extends HttpBasicFactory
             ->end()
         ;
     }
-
-    public function getKey()
-    {
-        return 'http-basic-ldap';
-    }
 }

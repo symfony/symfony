@@ -39,7 +39,7 @@ class TestBrowserToken extends AbstractToken
         return $this->firewallName;
     }
 
-    public function getCredentials()
+    public function getCredentials(): mixed
     {
         return null;
     }

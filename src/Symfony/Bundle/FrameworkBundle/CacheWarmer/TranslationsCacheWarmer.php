@@ -38,7 +38,7 @@ class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
      *
      * @return string[]
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         if (null === $this->translator) {
             $this->translator = $this->container->get('translator');
@@ -54,7 +54,7 @@ class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
     /**
      * {@inheritdoc}
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }

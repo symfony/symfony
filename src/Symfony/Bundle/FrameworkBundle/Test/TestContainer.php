@@ -66,7 +66,7 @@ class TestContainer extends Container
      *
      * @return array|bool|float|int|string|null
      */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|float|int|string|null
     {
         return $this->getPublicContainer()->getParameter($name);
     }

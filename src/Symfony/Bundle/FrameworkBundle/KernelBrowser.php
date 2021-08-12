@@ -44,10 +44,8 @@ class KernelBrowser extends HttpKernelBrowser
 
     /**
      * Returns the container.
-     *
-     * @return ContainerInterface
      */
-    public function getContainer()
+    public function getContainer(): ContainerInterface
     {
         $container = $this->kernel->getContainer();
 
@@ -56,10 +54,8 @@ class KernelBrowser extends HttpKernelBrowser
 
     /**
      * Returns the kernel.
-     *
-     * @return KernelInterface
      */
-    public function getKernel()
+    public function getKernel(): KernelInterface
     {
         return $this->kernel;
     }
@@ -69,7 +65,7 @@ class KernelBrowser extends HttpKernelBrowser
      *
      * @return HttpProfile|false|null
      */
-    public function getProfile()
+    public function getProfile(): HttpProfile|false|null
     {
         if (null === $this->response || !$this->getContainer()->has('profiler')) {
             return false;
@@ -146,10 +142,8 @@ class KernelBrowser extends HttpKernelBrowser
      * {@inheritdoc}
      *
      * @param Request $request
-     *
-     * @return Response
      */
-    protected function doRequest(object $request)
+    protected function doRequest(object $request): Response
     {
         // avoid shutting down the Kernel if no request has been performed yet
         // WebTestCase::createClient() boots the Kernel but do not handle a request
@@ -173,10 +167,8 @@ class KernelBrowser extends HttpKernelBrowser
      * {@inheritdoc}
      *
      * @param Request $request
-     *
-     * @return Response
      */
-    protected function doRequestInProcess(object $request)
+    protected function doRequestInProcess(object $request): Response
     {
         $response = parent::doRequestInProcess($request);
 
@@ -194,10 +186,8 @@ class KernelBrowser extends HttpKernelBrowser
      * client and override this method.
      *
      * @param Request $request
-     *
-     * @return string
      */
-    protected function getScript(object $request)
+    protected function getScript(object $request): string
     {
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);

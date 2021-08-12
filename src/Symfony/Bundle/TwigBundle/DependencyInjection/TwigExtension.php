@@ -183,12 +183,12 @@ class TwigExtension extends Extension
     /**
      * {@inheritdoc}
      */
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|false
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return 'http://symfony.com/schema/dic/twig';
     }

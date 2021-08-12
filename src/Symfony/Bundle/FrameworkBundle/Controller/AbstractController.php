@@ -77,7 +77,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @return array|bool|float|int|string|null
      */
-    protected function getParameter(string $name)
+    protected function getParameter(string $name): array|bool|float|int|string|null
     {
         if (!$this->container->has('parameter_bag')) {
             throw new ServiceNotFoundException('parameter_bag.', null, null, [], sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', static::class));
@@ -399,7 +399,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @see TokenInterface::getUser()
      */
-    protected function getUser()
+    protected function getUser(): ?object
     {
         if (!$this->container->has('security.token_storage')) {
             throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');

@@ -40,7 +40,7 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
      *
      * @return string[] A list of template files to preload on PHP 7.4+
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         if (null === $this->twig) {
             $this->twig = $this->container->get('twig');
@@ -73,7 +73,7 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }

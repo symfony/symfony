@@ -62,7 +62,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
     /**
      * {@inheritdoc}
      */
-    public function getRouteCollection()
+    public function getRouteCollection(): RouteCollection
     {
         if (null === $this->collection) {
             $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
@@ -88,7 +88,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
      *
      * @return string[] A list of classes to preload on PHP 7.4+
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         $currentDir = $this->getOption('cache_dir');
 

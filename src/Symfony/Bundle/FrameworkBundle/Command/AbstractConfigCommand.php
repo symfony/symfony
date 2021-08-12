@@ -54,10 +54,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
     }
 
-    /**
-     * @return ExtensionInterface
-     */
-    protected function findExtension(string $name)
+    protected function findExtension(string $name): ExtensionInterface
     {
         $bundles = $this->initializeBundles();
         $minScore = \INF;

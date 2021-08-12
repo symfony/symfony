@@ -171,10 +171,7 @@ abstract class Descriptor implements DescriptorInterface
         return (string) $value;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function resolveServiceDefinition(ContainerBuilder $builder, string $serviceId)
+    protected function resolveServiceDefinition(ContainerBuilder $builder, string $serviceId): mixed
     {
         if ($builder->hasDefinition($serviceId)) {
             return $builder->getDefinition($serviceId);

@@ -204,7 +204,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * Returns whether the current element of the iterator can be recursed
      * into.
      *
-     * @return bool Whether the current element is an instance of this class
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function hasChildren()
@@ -274,7 +274,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @param string|string[] $codes The codes to find
      *
-     * @return static new instance which contains only specific errors
+     * @return static
      */
     public function findByCodes($codes)
     {

@@ -41,7 +41,7 @@ interface LoaderInterface
     /**
      * Gets the loader resolver.
      *
-     * @return LoaderResolverInterface A LoaderResolverInterface instance
+     * @return LoaderResolverInterface
      */
     public function getResolver();
 

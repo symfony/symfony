@@ -91,8 +91,7 @@ interface ClassMetadataInterface extends MetadataInterface
      *
      * @param string $property The property name
      *
-     * @return PropertyMetadataInterface[] A list of metadata instances. Empty if
-     *                                     no metadata exists for the property.
+     * @return PropertyMetadataInterface[]
      */
     public function getPropertyMetadata(string $property);
 

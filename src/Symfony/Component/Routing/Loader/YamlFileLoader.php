@@ -44,7 +44,7 @@ class YamlFileLoader extends FileLoader
      * @param string      $file A Yaml file path
      * @param string|null $type The resource type
      *
-     * @return RouteCollection A RouteCollection instance
+     * @return RouteCollection
      *
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
      */

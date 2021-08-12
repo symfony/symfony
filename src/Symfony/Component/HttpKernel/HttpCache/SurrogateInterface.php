@@ -26,7 +26,7 @@ interface SurrogateInterface
     /**
      * Returns a new cache strategy instance.
      *
-     * @return ResponseCacheStrategyInterface A ResponseCacheStrategyInterface instance
+     * @return ResponseCacheStrategyInterface
      */
     public function createCacheStrategy();
 

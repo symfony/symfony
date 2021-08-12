@@ -33,7 +33,7 @@ class PhpFileLoader extends FileLoader
      * @param string      $file A PHP file path
      * @param string|null $type The resource type
      *
-     * @return RouteCollection A RouteCollection instance
+     * @return RouteCollection
      */
     public function load($file, string $type = null)
     {

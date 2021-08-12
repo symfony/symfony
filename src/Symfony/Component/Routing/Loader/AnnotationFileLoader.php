@@ -43,7 +43,7 @@ class AnnotationFileLoader extends FileLoader
      * @param string      $file A PHP file path
      * @param string|null $type The resource type
      *
-     * @return RouteCollection|null A RouteCollection instance
+     * @return RouteCollection|null
      *
      * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
      */

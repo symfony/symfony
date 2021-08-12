@@ -52,7 +52,7 @@ class ProfilerController
     /**
      * Redirects to the last profiles.
      *
-     * @return RedirectResponse A RedirectResponse instance
+     * @return RedirectResponse
      *
      * @throws NotFoundHttpException
      */
@@ -66,7 +66,7 @@ class ProfilerController
     /**
      * Renders a profiler panel for the given token.
      *
-     * @return Response A Response instance
+     * @return Response
      *
      * @throws NotFoundHttpException
      */
@@ -125,7 +125,7 @@ class ProfilerController
     /**
      * Renders the Web Debug Toolbar.
      *
-     * @return Response A Response instance
+     * @return Response
      *
      * @throws NotFoundHttpException
      */
@@ -170,7 +170,7 @@ class ProfilerController
     /**
      * Renders the profiler search bar.
      *
-     * @return Response A Response instance
+     * @return Response
      *
      * @throws NotFoundHttpException
      */
@@ -224,7 +224,7 @@ class ProfilerController
     /**
      * Renders the search results.
      *
-     * @return Response A Response instance
+     * @return Response
      *
      * @throws NotFoundHttpException
      */
@@ -265,7 +265,7 @@ class ProfilerController
     /**
      * Narrows the search bar.
      *
-     * @return Response A Response instance
+     * @return Response
      *
      * @throws NotFoundHttpException
      */
@@ -316,7 +316,7 @@ class ProfilerController
     /**
      * Displays the PHP info.
      *
-     * @return Response A Response instance
+     * @return Response
      *
      * @throws NotFoundHttpException
      */
@@ -338,7 +338,7 @@ class ProfilerController
     /**
      * Displays the source of a file.
      *
-     * @return Response A Response instance
+     * @return Response
      *
      * @throws NotFoundHttpException
      */

@@ -72,7 +72,7 @@ class ExpressionLanguage
      *
      * @param Expression|string $expression The expression to parse
      *
-     * @return ParsedExpression A ParsedExpression instance
+     * @return ParsedExpression
      */
     public function parse($expression, array $names)
     {

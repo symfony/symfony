@@ -208,7 +208,7 @@ class Profile
     /**
      * Gets a Collector by name.
      *
-     * @return DataCollectorInterface A DataCollectorInterface instance
+     * @return DataCollectorInterface
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */

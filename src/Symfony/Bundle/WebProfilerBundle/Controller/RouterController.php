@@ -54,7 +54,7 @@ class RouterController
     /**
      * Renders the profiler panel for the given token.
      *
-     * @return Response A Response instance
+     * @return Response
      *
      * @throws NotFoundHttpException
      */

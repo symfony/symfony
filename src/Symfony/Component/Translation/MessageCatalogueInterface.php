@@ -120,7 +120,7 @@ interface MessageCatalogueInterface
     /**
      * Gets the fallback catalogue.
      *
-     * @return self|null A MessageCatalogueInterface instance or null when no fallback has been set
+     * @return self|null
      */
     public function getFallbackCatalogue();
 

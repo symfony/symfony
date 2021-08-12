@@ -58,7 +58,7 @@ class HttpKernelBrowser extends AbstractBrowser
      *
      * @param Request $request
      *
-     * @return Response A Response instance
+     * @return Response
      */
     protected function doRequest(object $request)
     {
@@ -130,7 +130,7 @@ EOF;
     /**
      * {@inheritdoc}
      *
-     * @return Request A Request instance
+     * @return Request
      */
     protected function filterRequest(DomRequest $request)
     {
@@ -194,7 +194,7 @@ EOF;
      *
      * @param Request $request
      *
-     * @return DomResponse A DomResponse instance
+     * @return DomResponse
      */
     protected function filterResponse(object $response)
     {

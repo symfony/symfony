@@ -40,7 +40,7 @@ interface HttpKernelInterface
      *                    (one of HttpKernelInterface::MAIN_REQUEST or HttpKernelInterface::SUB_REQUEST)
      * @param bool $catch Whether to catch exceptions or not
      *
-     * @return Response A Response instance
+     * @return Response
      *
      * @throws \Exception When an Exception occurs during processing
      */

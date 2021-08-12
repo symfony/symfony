@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -68,7 +69,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param \SimpleXMLElement $nodes The XML nodes
      *
-     * @return array The Constraint instances
+     * @return Constraint[]
      */
     protected function parseConstraints(\SimpleXMLElement $nodes)
     {

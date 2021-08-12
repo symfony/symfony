@@ -250,7 +250,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns an iterator for headers.
      *
-     * @return \ArrayIterator An \ArrayIterator instance
+     * @return \ArrayIterator
      */
     #[\ReturnTypeWillChange]
     public function getIterator()

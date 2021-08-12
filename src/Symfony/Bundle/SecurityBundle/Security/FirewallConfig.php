@@ -64,8 +64,13 @@ final class FirewallConfig
         return $this->securityEnabled;
     }
 
+    /**
+     * @deprecated since Symfony 5.4
+     */
     public function allowsAnonymous(): bool
     {
+        trigger_deprecation('symfony/security-bundle', '5.4', 'The "%s()" method is deprecated.', __METHOD__);
+
         return \in_array('anonymous', $this->listeners, true);
     }
 

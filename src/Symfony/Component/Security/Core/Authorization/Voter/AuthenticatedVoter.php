@@ -12,12 +12,13 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * AuthenticatedVoter votes if an attribute like IS_AUTHENTICATED_FULLY,
- * IS_AUTHENTICATED_REMEMBERED, or IS_AUTHENTICATED_ANONYMOUSLY is present.
+ * IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED is present.
  *
  * This list is most restrictive to least restrictive checking.
  *
@@ -28,8 +29,15 @@ class AuthenticatedVoter implements VoterInterface
 {
     public const IS_AUTHENTICATED_FULLY = 'IS_AUTHENTICATED_FULLY';
     public const IS_AUTHENTICATED_REMEMBERED = 'IS_AUTHENTICATED_REMEMBERED';
+    /**
+     * @deprecated since Symfony 5.4
+     */
     public const IS_AUTHENTICATED_ANONYMOUSLY = 'IS_AUTHENTICATED_ANONYMOUSLY';
+    /**
+     * @deprecated since Symfony 5.4
+     */
     public const IS_ANONYMOUS = 'IS_ANONYMOUS';
+    public const IS_AUTHENTICATED = 'IS_AUTHENTICATED';
     public const IS_IMPERSONATOR = 'IS_IMPERSONATOR';
     public const IS_REMEMBERED = 'IS_REMEMBERED';
     public const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
@@ -55,6 +63,7 @@ class AuthenticatedVoter implements VoterInterface
             if (null === $attribute || (self::IS_AUTHENTICATED_FULLY !== $attribute
                     && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
                     && self::IS_AUTHENTICATED_ANONYMOUSLY !== $attribute
+                    && self::IS_AUTHENTICATED !== $attribute
                     && self::IS_ANONYMOUS !== $attribute
                     && self::IS_IMPERSONATOR !== $attribute
                     && self::IS_REMEMBERED !== $attribute)) {
@@ -78,6 +87,16 @@ class AuthenticatedVoter implements VoterInterface
                 && ($this->authenticationTrustResolver->isAnonymous($token)
                     || $this->authenticationTrustResolver->isRememberMe($token)
                     || $this->authenticationTrustResolver->isFullFledged($token))) {
+                trigger_deprecation('symfony/security-core', '5.4', 'The "IS_AUTHENTICATED_ANONYMOUSLY" security attribute is deprecated, use "IS_AUTHENTICATED" or "IS_AUTHENTICATED_FULLY" instead if you want to check if the request is (fully) authenticated.');
+
+                return VoterInterface::ACCESS_GRANTED;
+            }
+
+            // @deprecated $this->authenticationTrustResolver must implement isAuthenticated() in 6.0
+            if (self::IS_AUTHENTICATED === $attribute
+                && (method_exists($this->authenticationTrustResolver, 'isAuthenticated')
+                    ? $this->authenticationTrustResolver->isAuthenticated($token)
+                    : (null !== $token && !$token instanceof NullToken))) {
                 return VoterInterface::ACCESS_GRANTED;
             }
 
@@ -86,6 +105,8 @@ class AuthenticatedVoter implements VoterInterface
             }
 
             if (self::IS_ANONYMOUS === $attribute && $this->authenticationTrustResolver->isAnonymous($token)) {
+                trigger_deprecation('symfony/security-core', '5.4', 'The "IS_ANONYMOUSLY" security attribute is deprecated, anonymous no longer exists in version 6.');
+
                 return VoterInterface::ACCESS_GRANTED;
             }
 

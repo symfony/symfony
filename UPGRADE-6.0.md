@@ -210,6 +210,30 @@ Security
  * Remove `AnonymousToken`
  * Remove `Token::getCredentials()`, tokens should no longer contain credentials (as they represent authenticated sessions)
  * Restrict the return type of `Token::getUser()` to `UserInterface` (removing `string|\Stringable`)
+ * Remove `AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY` and `AuthenticatedVoter::IS_ANONYMOUS`,
+   use `AuthenticatedVoter::PUBLIC_ACCESS` instead.
+
+   Before:
+   ```yaml
+   # config/packages/security.yaml
+   security:
+       # ...
+       access_control:
+           - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+   ```
+
+   After:
+   ```yaml
+   # config/packages/security.yaml
+   security:
+       # ...
+       access_control:
+           - { path: ^/login, roles: PUBLIC_ACCESS }
+   ```
+
+ * Remove `AuthenticationTrustResolverInterface::isAnonymous()` and the `is_anonymous()` expression function
+   as anonymous no longer exists in version 6, use the `isFullFledged()` or the new `isAuthenticated()` instead
+   if you want to check if the request is (fully) authenticated.
  * Remove the 4th and 5th argument of `AuthorizationChecker`
  * Remove the 5th argument of `AccessListener`
  * Remove class `User`, use `InMemoryUser` or your own implementation instead.

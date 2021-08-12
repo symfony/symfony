@@ -62,6 +62,30 @@ Security
  * Deprecate `AnonymousToken`, as the related authenticator was deprecated in 5.3
  * Deprecate `Token::getCredentials()`, tokens should no longer contain credentials (as they represent authenticated sessions)
  * Deprecate not returning an `UserInterface` from `Token::getUser()`
+ * Deprecate `AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY` and `AuthenticatedVoter::IS_ANONYMOUS`,
+   use `AuthenticatedVoter::PUBLIC_ACCESS` instead.
+
+   Before:
+   ```yaml
+   # config/packages/security.yaml
+   security:
+       # ...
+       access_control:
+           - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+   ```
+
+   After:
+   ```yaml
+   # config/packages/security.yaml
+   security:
+       # ...
+       access_control:
+           - { path: ^/login, roles: PUBLIC_ACCESS }
+   ```
+
+ * Deprecate `AuthenticationTrustResolverInterface::isAnonymous()` and the `is_anonymous()` expression function
+   as anonymous no longer exists in version 6, use the `isFullFledged()` or the new `isAuthenticated()` instead
+   if you want to check if the request is (fully) authenticated.
  * Deprecate the `$authManager` argument of `AccessListener`, the argument will be removed
  * Deprecate the `$authenticationManager` argument of the `AuthorizationChecker` constructor, the argument will be removed
  * Deprecate setting the `$alwaysAuthenticate` argument to `true` and not setting the

@@ -184,7 +184,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             if (null !== $firewallConfig) {
                 $this->data['firewall'] = [
                     'name' => $firewallConfig->getName(),
-                    'allows_anonymous' => $firewallConfig->allowsAnonymous(),
+                    'allows_anonymous' => $this->authenticatorManagerEnabled ? false : $firewallConfig->allowsAnonymous(),
                     'request_matcher' => $firewallConfig->getRequestMatcher(),
                     'security_enabled' => $firewallConfig->isSecurityEnabled(),
                     'stateless' => $firewallConfig->isStateless(),

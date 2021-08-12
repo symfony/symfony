@@ -16,9 +16,14 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\User;
 
 class AuthenticationTrustResolverTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testIsAnonymous()
     {
         $resolver = new AuthenticationTrustResolver();
@@ -50,6 +55,17 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isFullFledged(new FakeCustomToken()));
     }
 
+    public function testIsAuthenticated()
+    {
+        $resolver = new AuthenticationTrustResolver();
+        $this->assertFalse($resolver->isAuthenticated(null));
+        $this->assertTrue($resolver->isAuthenticated($this->getRememberMeToken()));
+        $this->assertTrue($resolver->isAuthenticated(new FakeCustomToken()));
+    }
+
+    /**
+     * @group legacy
+     */
     public function testIsAnonymousWithClassAsConstructorButStillExtending()
     {
         $resolver = $this->getResolver();
@@ -102,7 +118,7 @@ class AuthenticationTrustResolverTest extends TestCase
 
     protected function getAnonymousToken()
     {
-        return $this->getMockBuilder(AnonymousToken::class)->setConstructorArgs(['', ''])->getMock();
+        return new AnonymousToken('secret', 'anon.');
     }
 
     private function getRealCustomAnonymousToken()
@@ -116,7 +132,9 @@ class AuthenticationTrustResolverTest extends TestCase
 
     protected function getRememberMeToken()
     {
-        return $this->getMockBuilder(RememberMeToken::class)->setMethods(['setPersistent'])->disableOriginalConstructor()->getMock();
+        $user = class_exists(InMemoryUser::class) ? new InMemoryUser('wouter', '', ['ROLE_USER']) : new User('wouter', '', ['ROLE_USER']);
+
+        return new RememberMeToken($user, 'main', 'secret');
     }
 
     protected function getResolver()
@@ -176,6 +194,7 @@ class FakeCustomToken implements TokenInterface
 
     public function isAuthenticated(): bool
     {
+        return true;
     }
 
     public function setAuthenticated(bool $isAuthenticated)

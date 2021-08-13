@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by theofidry at 2021-07-05T06:29:55Z
+
+> Still pretty sure there are some places in core that could leverage this. That might be for another PR though.
+
+I am not familiar enough with the code-base to spot those. But as a rule of thumb, I would keep the current usages of `Filesystem::isAbsolutePath()` as it is a stronger check than `Path::isAbsolute()`
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-23T14:30:29Z
+
+Can you please target 🎯 6.0, as we are not allowed to introduce experimental classes in an LTS version.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-23T19:11:34Z
+
+> Can you please target 🎯 6.0, as we are not allowed to introduce experimental classes in an LTS version.
+
+@OskarStark is correct. We cannot have experimental code in LTS. However, we can make this new class non-experimental. It is a well used class outside of Symfony as the PR description tells.
+
+@theofidry, Do what you prefer.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-23T21:10:51Z
+
+Since this has already proven useful and it’s not controversial, I vote for 5.4 with no experimental flag.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-25T12:19:02Z
+
+Please rebase :) We cannot merge PRs that contain merge commits
+
+---------------------------------------------------------------------------
+
+by theofidry at 2021-07-25T12:22:36Z
+
+>Please rebase :) We cannot merge PRs that contain merge commits
+
+Is there a technical reason for that choice or is it just the process in place? Seems weird to have to rebase which requires  a force-push from the user and completely change the commits history (which messes up the GitHub discussions)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-07-25T12:31:59Z
+
+Yes, IIRC it's a limitation from the internal tool we use for merging, it doesn't play well with merge commits
+
+---------------------------------------------------------------------------
+
+by webmozart at 2021-08-13T12:34:00Z
+
+Just adding my two cents: This PR (including its predecessor #30969) has been open for over two years (!). It's not very motivating for a contributor to have their work pending for so long, and then being asked to make small changes, rebases etc. every few months.
+
+@theofidry rebased this 19 days ago. I think it would be a great appreciation of his work and endurance to merge this, rather than waiting again, asking for another rebase, adding more nitpick comments etc.

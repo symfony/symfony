@@ -170,7 +170,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @throws InvalidArgumentException if non of the managerParameters has a
      *                                  non-empty value
      */
-    protected function getChainDriverServiceName(ContainerBuilder $container)
+    protected function getChainDriverServiceName(ContainerBuilder $container): string
     {
         return sprintf($this->driverPattern, $this->getManagerName($container));
     }
@@ -183,7 +183,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @return Definition|Reference the metadata driver to add to all chain drivers
      */
-    protected function getDriver(ContainerBuilder $container)
+    protected function getDriver(ContainerBuilder $container): Definition|Reference
     {
         return $this->driver;
     }
@@ -230,7 +230,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @return bool whether this compiler pass really should register the mappings
      */
-    protected function enabled(ContainerBuilder $container)
+    protected function enabled(ContainerBuilder $container): bool
     {
         return !$this->enabledParameter || $container->hasParameter($this->enabledParameter);
     }

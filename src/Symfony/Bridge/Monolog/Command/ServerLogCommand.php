@@ -36,7 +36,7 @@ class ServerLogCommand extends Command
     protected static $defaultName = 'server:log';
     protected static $defaultDescription = 'Start a log server that displays logs in real time';
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         if (!class_exists(ConsoleFormatter::class)) {
             return false;
@@ -76,7 +76,7 @@ EOF
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $filter = $input->getOption('filter');
         if ($filter) {

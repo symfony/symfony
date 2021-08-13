@@ -87,7 +87,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * @return bool
      */
-    protected function canBeExtracted(string $file)
+    protected function canBeExtracted(string $file): bool
     {
         return $this->isFile($file) && 'twig' === pathinfo($file, \PATHINFO_EXTENSION);
     }
@@ -95,7 +95,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * {@inheritdoc}
      */
-    protected function extractFromDirectory($directory)
+    protected function extractFromDirectory($directory): iterable
     {
         $finder = new Finder();
 

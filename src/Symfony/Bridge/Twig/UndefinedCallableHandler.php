@@ -71,7 +71,7 @@ class UndefinedCallableHandler
     /**
      * @return TwigFilter|false
      */
-    public static function onUndefinedFilter(string $name)
+    public static function onUndefinedFilter(string $name): TwigFilter|false
     {
         if (!isset(self::FILTER_COMPONENTS[$name])) {
             return false;
@@ -83,7 +83,7 @@ class UndefinedCallableHandler
     /**
      * @return TwigFunction|false
      */
-    public static function onUndefinedFunction(string $name)
+    public static function onUndefinedFunction(string $name): TwigFunction|false
     {
         if (!isset(self::FUNCTION_COMPONENTS[$name])) {
             return false;

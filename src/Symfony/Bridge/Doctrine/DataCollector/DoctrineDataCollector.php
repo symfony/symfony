@@ -114,7 +114,7 @@ class DoctrineDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'db';
     }
@@ -122,7 +122,7 @@ class DoctrineDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    protected function getCasters()
+    protected function getCasters(): array
     {
         return parent::getCasters() + [
             ObjectParameter::class => static function (ObjectParameter $o, array $a, Stub $s): array {

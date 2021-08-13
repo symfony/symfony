@@ -25,7 +25,7 @@ class TemplatedEmail extends Email
     /**
      * @return $this
      */
-    public function textTemplate(?string $template)
+    public function textTemplate(?string $template): static
     {
         $this->textTemplate = $template;
 
@@ -35,7 +35,7 @@ class TemplatedEmail extends Email
     /**
      * @return $this
      */
-    public function htmlTemplate(?string $template)
+    public function htmlTemplate(?string $template): static
     {
         $this->htmlTemplate = $template;
 
@@ -55,7 +55,7 @@ class TemplatedEmail extends Email
     /**
      * @return $this
      */
-    public function context(array $context)
+    public function context(array $context): static
     {
         $this->context = $context;
 

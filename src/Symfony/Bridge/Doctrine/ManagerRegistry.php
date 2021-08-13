@@ -30,20 +30,16 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
 
     /**
      * {@inheritdoc}
-     *
-     * @return object
      */
-    protected function getService($name)
+    protected function getService($name): object
     {
         return $this->container->get($name);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
-    protected function resetService($name)
+    protected function resetService($name): void
     {
         if (!$this->container->initialized($name)) {
             return;

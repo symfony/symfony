@@ -52,7 +52,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
     /**
      * {@inheritdoc}
      */
-    public function loadTokenBySeries(string $series)
+    public function loadTokenBySeries(string $series): PersistentTokenInterface
     {
         // the alias for lastUsed works around case insensitivity in PostgreSQL
         $sql = 'SELECT class, username, value, lastUsed AS last_used FROM rememberme_token WHERE series=:series';

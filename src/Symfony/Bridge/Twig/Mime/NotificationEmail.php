@@ -80,7 +80,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function markdown(string $content)
+    public function markdown(string $content): static
     {
         if (!class_exists(MarkdownExtension::class)) {
             throw new \LogicException(sprintf('You cannot use "%s" if the Markdown Twig extension is not available; try running "composer require twig/markdown-extra".', __METHOD__));
@@ -94,7 +94,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function content(string $content, bool $raw = false)
+    public function content(string $content, bool $raw = false): static
     {
         $this->context['content'] = $content;
         $this->context['raw'] = $raw;
@@ -105,7 +105,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function action(string $text, string $url)
+    public function action(string $text, string $url): static
     {
         $this->context['action_text'] = $text;
         $this->context['action_url'] = $url;
@@ -116,7 +116,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function importance(string $importance)
+    public function importance(string $importance): static
     {
         $this->context['importance'] = $importance;
 
@@ -126,7 +126,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function exception(\Throwable|FlattenException $exception)
+    public function exception(\Throwable|FlattenException $exception): static
     {
         $exceptionAsString = $this->getExceptionAsString($exception);
 
@@ -144,7 +144,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function theme(string $theme)
+    public function theme(string $theme): static
     {
         $this->theme = $theme;
 

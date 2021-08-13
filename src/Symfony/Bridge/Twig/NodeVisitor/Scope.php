@@ -30,7 +30,7 @@ class Scope
      *
      * @return self
      */
-    public function enter()
+    public function enter(): \Symfony\Bridge\Twig\NodeVisitor\Scope
     {
         return new self($this);
     }
@@ -40,7 +40,7 @@ class Scope
      *
      * @return self|null
      */
-    public function leave()
+    public function leave(): ?\Symfony\Bridge\Twig\NodeVisitor\Scope
     {
         $this->left = true;
 
@@ -54,7 +54,7 @@ class Scope
      *
      * @throws \LogicException
      */
-    public function set(string $key, mixed $value)
+    public function set(string $key, mixed $value): static
     {
         if ($this->left) {
             throw new \LogicException('Left scope is not mutable.');
@@ -70,7 +70,7 @@ class Scope
      *
      * @return bool
      */
-    public function has(string $key)
+    public function has(string $key): bool
     {
         if (\array_key_exists($key, $this->data)) {
             return true;
@@ -88,7 +88,7 @@ class Scope
      *
      * @return mixed
      */
-    public function get(string $key, mixed $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         if (\array_key_exists($key, $this->data)) {
             return $this->data[$key];

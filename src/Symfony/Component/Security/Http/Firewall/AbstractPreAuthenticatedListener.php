@@ -87,7 +87,7 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
         }
 
         if (null !== $token = $this->tokenStorage->getToken()) {
-            // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
             if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getFirewallName() && $token->isAuthenticated() && (method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername()) === $user) {
                 return;
             }

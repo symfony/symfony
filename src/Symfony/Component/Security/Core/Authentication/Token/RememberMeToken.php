@@ -64,7 +64,7 @@ class RememberMeToken extends AbstractToken
      *
      * @return string The provider secret
      *
-     * @deprecated since 5.2, use getFirewallName() instead
+     * @deprecated since Symfony 5.2, use getFirewallName() instead
      */
     public function getProviderKey()
     {

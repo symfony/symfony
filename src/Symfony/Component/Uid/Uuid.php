@@ -40,7 +40,7 @@ class Uuid extends AbstractUid
     /**
      * @return static
      */
-    public static function fromString(string $uuid): parent
+    public static function fromString(string $uuid): static
     {
         if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {
             $uuid = str_pad(BinaryUtil::fromBase($uuid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);

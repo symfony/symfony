@@ -62,7 +62,7 @@ class Ulid extends AbstractUid
     /**
      * {@inheritdoc}
      */
-    public static function fromString(string $ulid): parent
+    public static function fromString(string $ulid): static
     {
         if (36 === \strlen($ulid) && Uuid::isValid($ulid)) {
             $ulid = (new Uuid($ulid))->toBinary();

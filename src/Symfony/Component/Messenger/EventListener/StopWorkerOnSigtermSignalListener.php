@@ -26,7 +26,7 @@ class StopWorkerOnSigtermSignalListener implements EventSubscriberInterface
         });
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         if (!\function_exists('pcntl_signal')) {
             return [];

@@ -32,7 +32,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -53,7 +53,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function getStorageKey()
+    public function getStorageKey(): string
     {
         return $this->storageKey;
     }
@@ -61,7 +61,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return \array_key_exists($name, $this->attributes);
     }
@@ -69,7 +69,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function get(string $name, mixed $default = null)
+    public function get(string $name, mixed $default = null): mixed
     {
         return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
@@ -85,7 +85,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(): array
     {
         return $this->attributes;
     }
@@ -104,7 +104,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function remove(string $name)
+    public function remove(string $name): mixed
     {
         $retval = null;
         if (\array_key_exists($name, $this->attributes)) {
@@ -118,7 +118,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): mixed
     {
         $return = $this->attributes;
         $this->attributes = [];

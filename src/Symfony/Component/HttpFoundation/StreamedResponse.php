@@ -46,7 +46,7 @@ class StreamedResponse extends Response
      *
      * @return $this
      */
-    public function setCallback(callable $callback)
+    public function setCallback(callable $callback): static
     {
         $this->callback = $callback;
 
@@ -60,7 +60,7 @@ class StreamedResponse extends Response
      *
      * @return $this
      */
-    public function sendHeaders()
+    public function sendHeaders(): static
     {
         if ($this->headersSent) {
             return $this;
@@ -78,7 +78,7 @@ class StreamedResponse extends Response
      *
      * @return $this
      */
-    public function sendContent()
+    public function sendContent(): static
     {
         if ($this->streamed) {
             return $this;
@@ -102,7 +102,7 @@ class StreamedResponse extends Response
      *
      * @return $this
      */
-    public function setContent(?string $content)
+    public function setContent(?string $content): static
     {
         if (null !== $content) {
             throw new \LogicException('The content cannot be set on a StreamedResponse instance.');
@@ -116,7 +116,7 @@ class StreamedResponse extends Response
     /**
      * {@inheritdoc}
      */
-    public function getContent()
+    public function getContent(): string|false
     {
         return false;
     }

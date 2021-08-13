@@ -44,10 +44,8 @@ class RequestStack
      *
      * This method should generally not be called directly as the stack
      * management should be taken care of by the application itself.
-     *
-     * @return Request|null
      */
-    public function pop()
+    public function pop(): ?Request
     {
         if (!$this->requests) {
             return null;
@@ -56,10 +54,7 @@ class RequestStack
         return array_pop($this->requests);
     }
 
-    /**
-     * @return Request|null
-     */
-    public function getCurrentRequest()
+    public function getCurrentRequest(): ?Request
     {
         return end($this->requests) ?: null;
     }
@@ -88,10 +83,8 @@ class RequestStack
      * like ESI support.
      *
      * If current Request is the main request, it returns null.
-     *
-     * @return Request|null
      */
-    public function getParentRequest()
+    public function getParentRequest(): ?Request
     {
         $pos = \count($this->requests) - 2;
 

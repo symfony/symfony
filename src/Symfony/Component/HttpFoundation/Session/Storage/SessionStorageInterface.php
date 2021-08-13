@@ -28,21 +28,21 @@ interface SessionStorageInterface
      *
      * @throws \RuntimeException if something goes wrong starting the session
      */
-    public function start();
+    public function start(): bool;
 
     /**
      * Checks if the session is started.
      *
      * @return bool True if started, false otherwise
      */
-    public function isStarted();
+    public function isStarted(): bool;
 
     /**
      * Returns the session ID.
      *
      * @return string The session ID or empty
      */
-    public function getId();
+    public function getId(): string;
 
     /**
      * Sets the session ID.
@@ -54,7 +54,7 @@ interface SessionStorageInterface
      *
      * @return string The session name
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Sets the session name.
@@ -90,7 +90,7 @@ interface SessionStorageInterface
      *
      * @throws \RuntimeException If an error occurs while regenerating this storage
      */
-    public function regenerate(bool $destroy = false, int $lifetime = null);
+    public function regenerate(bool $destroy = false, int $lifetime = null): bool;
 
     /**
      * Force the session to be saved and closed.
@@ -117,7 +117,7 @@ interface SessionStorageInterface
      *
      * @throws \InvalidArgumentException If the bag does not exist
      */
-    public function getBag(string $name);
+    public function getBag(string $name): SessionBagInterface;
 
     /**
      * Registers a SessionBagInterface for use.
@@ -127,5 +127,5 @@ interface SessionStorageInterface
     /**
      * @return MetadataBag
      */
-    public function getMetadataBag();
+    public function getMetadataBag(): MetadataBag;
 }

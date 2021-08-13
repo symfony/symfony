@@ -87,7 +87,7 @@ class MetadataBag implements SessionBagInterface
      *
      * @return int
      */
-    public function getLifetime()
+    public function getLifetime(): int
     {
         return $this->meta[self::LIFETIME];
     }
@@ -108,7 +108,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function getStorageKey()
+    public function getStorageKey(): string
     {
         return $this->storageKey;
     }
@@ -118,7 +118,7 @@ class MetadataBag implements SessionBagInterface
      *
      * @return int Unix timestamp
      */
-    public function getCreated()
+    public function getCreated(): int
     {
         return $this->meta[self::CREATED];
     }
@@ -128,7 +128,7 @@ class MetadataBag implements SessionBagInterface
      *
      * @return int Unix timestamp
      */
-    public function getLastUsed()
+    public function getLastUsed(): int
     {
         return $this->lastUsed;
     }
@@ -136,7 +136,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): mixed
     {
         // nothing to do
         return null;
@@ -145,7 +145,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

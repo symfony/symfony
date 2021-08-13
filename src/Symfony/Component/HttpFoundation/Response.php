@@ -254,7 +254,7 @@ class Response
      *
      * @return $this
      */
-    public function prepare(Request $request)
+    public function prepare(Request $request): static
     {
         $headers = $this->headers;
 
@@ -324,7 +324,7 @@ class Response
      *
      * @return $this
      */
-    public function sendHeaders()
+    public function sendHeaders(): static
     {
         // headers have already been sent by the developer
         if (headers_sent()) {
@@ -355,7 +355,7 @@ class Response
      *
      * @return $this
      */
-    public function sendContent()
+    public function sendContent(): static
     {
         echo $this->content;
 
@@ -367,7 +367,7 @@ class Response
      *
      * @return $this
      */
-    public function send()
+    public function send(): static
     {
         $this->sendHeaders();
         $this->sendContent();
@@ -390,7 +390,7 @@ class Response
      *
      * @throws \UnexpectedValueException
      */
-    public function setContent(?string $content)
+    public function setContent(?string $content): static
     {
         $this->content = $content ?? '';
 
@@ -402,7 +402,7 @@ class Response
      *
      * @return string|false
      */
-    public function getContent()
+    public function getContent(): string|false
     {
         return $this->content;
     }
@@ -669,7 +669,7 @@ class Response
      *
      * @return $this
      */
-    public function expire()
+    public function expire(): static
     {
         if ($this->isFresh()) {
             $this->headers->set('Age', $this->getMaxAge());

@@ -122,7 +122,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @return AbstractProxy|\SessionHandlerInterface
      */
-    public function getSaveHandler()
+    public function getSaveHandler(): AbstractProxy|\SessionHandlerInterface
     {
         return $this->saveHandler;
     }
@@ -130,7 +130,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function start()
+    public function start(): bool
     {
         if ($this->started) {
             return true;
@@ -157,7 +157,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->saveHandler->getId();
     }
@@ -173,7 +173,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->saveHandler->getName();
     }
@@ -189,7 +189,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function regenerate(bool $destroy = false, int $lifetime = null)
+    public function regenerate(bool $destroy = false, int $lifetime = null): bool
     {
         // Cannot regenerate the session ID for non-active sessions.
         if (\PHP_SESSION_ACTIVE !== session_status()) {
@@ -287,7 +287,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getBag(string $name)
+    public function getBag(string $name): SessionBagInterface
     {
         if (!isset($this->bags[$name])) {
             throw new \InvalidArgumentException(sprintf('The SessionBagInterface "%s" is not registered.', $name));
@@ -316,7 +316,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @return MetadataBag
      */
-    public function getMetadataBag()
+    public function getMetadataBag(): MetadataBag
     {
         return $this->metadataBag;
     }
@@ -324,7 +324,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function isStarted()
+    public function isStarted(): bool
     {
         return $this->started;
     }

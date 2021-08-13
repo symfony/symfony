@@ -125,7 +125,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
         return $envelope;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // must have higher priority than SendFailedMessageToFailureTransportListener

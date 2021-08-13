@@ -63,7 +63,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \InvalidArgumentException if the template does not exist
      */
-    public function render(string|TemplateReferenceInterface $name, array $parameters = [])
+    public function render(string|TemplateReferenceInterface $name, array $parameters = []): string
     {
         $storage = $this->load($name);
         $key = hash('sha256', serialize($storage));
@@ -94,7 +94,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function exists(string|TemplateReferenceInterface $name)
+    public function exists(string|TemplateReferenceInterface $name): bool
     {
         try {
             $this->load($name);
@@ -108,7 +108,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function supports(string|TemplateReferenceInterface $name)
+    public function supports(string|TemplateReferenceInterface $name): bool
     {
         $template = $this->parser->parse($name);
 
@@ -122,7 +122,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \InvalidArgumentException
      */
-    protected function evaluate(Storage $template, array $parameters = [])
+    protected function evaluate(Storage $template, array $parameters = []): string|false
     {
         $this->evalTemplate = $template;
         $this->evalParameters = $parameters;
@@ -236,7 +236,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @return bool true if the helper is defined, false otherwise
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return isset($this->helpers[$name]);
     }
@@ -248,7 +248,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \InvalidArgumentException if the helper is not defined
      */
-    public function get(string $name)
+    public function get(string $name): HelperInterface
     {
         if (!isset($this->helpers[$name])) {
             throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
@@ -270,7 +270,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @return mixed The escaped value
      */
-    public function escape(mixed $value, string $context = 'html')
+    public function escape(mixed $value, string $context = 'html'): mixed
     {
         if (is_numeric($value)) {
             return $value;
@@ -309,7 +309,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @return string The current charset
      */
-    public function getCharset()
+    public function getCharset(): string
     {
         return $this->charset;
     }
@@ -330,7 +330,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \InvalidArgumentException
      */
-    public function getEscaper(string $context)
+    public function getEscaper(string $context): callable
     {
         if (!isset($this->escapers[$context])) {
             throw new \InvalidArgumentException(sprintf('No registered escaper for context "%s".', $context));
@@ -349,7 +349,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @return array
      */
-    public function getGlobals()
+    public function getGlobals(): array
     {
         return $this->globals;
     }
@@ -438,7 +438,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @return LoaderInterface
      */
-    public function getLoader()
+    public function getLoader(): LoaderInterface
     {
         return $this->loader;
     }
@@ -450,7 +450,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \InvalidArgumentException if the template cannot be found
      */
-    protected function load(string|TemplateReferenceInterface $name)
+    protected function load(string|TemplateReferenceInterface $name): Storage
     {
         $template = $this->parser->parse($name);
 

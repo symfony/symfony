@@ -62,7 +62,7 @@ class BinaryFileResponse extends Response
      *
      * @throws FileException
      */
-    public function setFile(\SplFileInfo|string $file, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
+    public function setFile(\SplFileInfo|string $file, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true): static
     {
         if (!$file instanceof File) {
             if ($file instanceof \SplFileInfo) {
@@ -98,7 +98,7 @@ class BinaryFileResponse extends Response
      *
      * @return File The file to stream
      */
-    public function getFile()
+    public function getFile(): File
     {
         return $this->file;
     }
@@ -132,7 +132,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function setContentDisposition(string $disposition, string $filename = '', string $filenameFallback = '')
+    public function setContentDisposition(string $disposition, string $filename = '', string $filenameFallback = ''): static
     {
         if ('' === $filename) {
             $filename = $this->file->getFilename();
@@ -161,7 +161,7 @@ class BinaryFileResponse extends Response
     /**
      * {@inheritdoc}
      */
-    public function prepare(Request $request)
+    public function prepare(Request $request): static
     {
         if (!$this->headers->has('Content-Type')) {
             $this->headers->set('Content-Type', $this->file->getMimeType() ?: 'application/octet-stream');
@@ -269,7 +269,7 @@ class BinaryFileResponse extends Response
      *
      * {@inheritdoc}
      */
-    public function sendContent()
+    public function sendContent(): static
     {
         if (!$this->isSuccessful()) {
             return parent::sendContent();
@@ -299,7 +299,7 @@ class BinaryFileResponse extends Response
      *
      * @throws \LogicException when the content is not null
      */
-    public function setContent(?string $content)
+    public function setContent(?string $content): static
     {
         if (null !== $content) {
             throw new \LogicException('The content cannot be set on a BinaryFileResponse instance.');
@@ -311,7 +311,7 @@ class BinaryFileResponse extends Response
     /**
      * {@inheritdoc}
      */
-    public function getContent()
+    public function getContent(): string|false
     {
         return false;
     }
@@ -330,7 +330,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function deleteFileAfterSend(bool $shouldDelete = true)
+    public function deleteFileAfterSend(bool $shouldDelete = true): static
     {
         $this->deleteFileAfterSend = $shouldDelete;
 

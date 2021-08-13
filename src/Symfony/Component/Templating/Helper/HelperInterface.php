@@ -23,7 +23,7 @@ interface HelperInterface
      *
      * @return string The canonical name
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Sets the default charset.
@@ -35,5 +35,5 @@ interface HelperInterface
      *
      * @return string The default charset
      */
-    public function getCharset();
+    public function getCharset(): string;
 }

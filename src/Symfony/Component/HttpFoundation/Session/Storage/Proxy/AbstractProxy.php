@@ -33,7 +33,7 @@ abstract class AbstractProxy
      *
      * @return string|null
      */
-    public function getSaveHandlerName()
+    public function getSaveHandlerName(): ?string
     {
         return $this->saveHandlerName;
     }
@@ -43,7 +43,7 @@ abstract class AbstractProxy
      *
      * @return bool
      */
-    public function isSessionHandlerInterface()
+    public function isSessionHandlerInterface(): bool
     {
         return $this instanceof \SessionHandlerInterface;
     }
@@ -53,7 +53,7 @@ abstract class AbstractProxy
      *
      * @return bool
      */
-    public function isWrapper()
+    public function isWrapper(): bool
     {
         return $this->wrapper;
     }
@@ -63,7 +63,7 @@ abstract class AbstractProxy
      *
      * @return bool
      */
-    public function isActive()
+    public function isActive(): bool
     {
         return \PHP_SESSION_ACTIVE === session_status();
     }
@@ -73,7 +73,7 @@ abstract class AbstractProxy
      *
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return session_id();
     }
@@ -97,7 +97,7 @@ abstract class AbstractProxy
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return session_name();
     }

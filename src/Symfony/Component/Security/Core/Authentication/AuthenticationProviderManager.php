@@ -110,7 +110,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
                 $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($result), AuthenticationEvents::AUTHENTICATION_SUCCESS);
             }
 
-            // @deprecated since 5.3
+            // @deprecated since Symfony 5.3
             if ($user = $result->getUser() instanceof UserInterface && !method_exists($result->getUser(), 'getUserIdentifier')) {
                 trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "getUserIdentifier(): string" in user class "%s" is deprecated. This method will replace "getUsername()" in Symfony 6.0.', get_debug_type($result->getUser()));
             }

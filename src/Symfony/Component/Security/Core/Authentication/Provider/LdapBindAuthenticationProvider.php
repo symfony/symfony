@@ -70,7 +70,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
             throw new UserNotFoundException('User identifier can not be null.');
         }
 
-        // @deprecated since 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+        // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
         if (method_exists($this->userProvider, 'loadUserByIdentifier')) {
             return $this->userProvider->loadUserByIdentifier($userIdentifier);
         } else {
@@ -85,7 +85,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
      */
     protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
     {
-        // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+        // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
         $userIdentifier = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername();
         $password = $token->getCredentials();
 

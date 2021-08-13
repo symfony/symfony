@@ -30,7 +30,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 
     protected $httpUtils;
     protected $options;
-    /** @deprecated since 5.2, use $firewallName instead */
+    /** @deprecated since Symfony 5.2, use $firewallName instead */
     protected $providerKey;
     protected $firewallName;
     protected $defaultOptions = [
@@ -78,7 +78,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      *
      * @return string
      *
-     * @deprecated since 5.2, use getFirewallName() instead
+     * @deprecated since Symfony 5.2, use getFirewallName() instead
      */
     public function getProviderKey()
     {

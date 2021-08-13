@@ -50,7 +50,7 @@ class PreAuthenticatedToken extends AbstractToken
      *
      * @return string The provider key
      *
-     * @deprecated since 5.2, use getFirewallName() instead
+     * @deprecated since Symfony 5.2, use getFirewallName() instead
      */
     public function getProviderKey()
     {

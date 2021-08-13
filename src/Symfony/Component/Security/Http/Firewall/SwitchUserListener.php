@@ -140,7 +140,7 @@ class SwitchUserListener extends AbstractListener
         $originalToken = $this->getOriginalToken($token);
 
         if (null !== $originalToken) {
-            // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
             if ((method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername()) === $username) {
                 return $token;
             }
@@ -149,7 +149,7 @@ class SwitchUserListener extends AbstractListener
             $token = $this->attemptExitUser($request);
         }
 
-        // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+        // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
         $currentUsername = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername();
         $nonExistentUsername = '_'.md5(random_bytes(8).$username);
 

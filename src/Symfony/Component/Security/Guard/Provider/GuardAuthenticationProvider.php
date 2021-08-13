@@ -117,7 +117,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
         if (null === $user) {
             $e = new UserNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($guardAuthenticator)));
-            // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
             $e->setUserIdentifier(method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername());
 
             throw $e;

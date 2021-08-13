@@ -83,7 +83,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
                 } else {
                     throw new LogicException('Using the "query_string" config without using a "search_dn" and a "search_password" is not supported.');
                 }
-                // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+                // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
                 $username = $ldap->escape(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), '', LdapInterface::ESCAPE_FILTER);
                 $query = str_replace('{username}', $username, $ldapBadge->getQueryString());
                 $result = $ldap->query($ldapBadge->getDnString(), $query)->execute();
@@ -93,7 +93,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
 
                 $dn = $result[0]->getDn();
             } else {
-                // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+                // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
                 $username = $ldap->escape(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), '', LdapInterface::ESCAPE_DN);
                 $dn = str_replace('{username}', $username, $ldapBadge->getDnString());
             }

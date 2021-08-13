@@ -41,7 +41,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
         }
         try {
             $userProvider = $this->getUserProvider($class);
-            // @deprecated since 5.3, change to $userProvider->loadUserByIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $userProvider->loadUserByIdentifier() in 6.0
             if (method_exists($userProvider, 'loadUserByIdentifier')) {
                 $user = $userProvider->loadUserByIdentifier($userIdentifier);
             } else {
@@ -79,7 +79,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     {
         $user = $token->getUser();
         $expires = time() + $this->options['lifetime'];
-        // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+        // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
         $value = $this->generateCookieValue(\get_class($user), method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), $expires, $user->getPassword());
 
         $response->headers->setCookie(

@@ -46,7 +46,7 @@ class ParseException extends RuntimeException
      *
      * @return string The snippet of code
      */
-    public function getSnippet()
+    public function getSnippet(): string
     {
         return $this->snippet;
     }
@@ -68,7 +68,7 @@ class ParseException extends RuntimeException
      *
      * @return string The filename
      */
-    public function getParsedFile()
+    public function getParsedFile(): string
     {
         return $this->parsedFile;
     }
@@ -88,7 +88,7 @@ class ParseException extends RuntimeException
      *
      * @return int The file line
      */
-    public function getParsedLine()
+    public function getParsedLine(): int
     {
         return $this->parsedLine;
     }

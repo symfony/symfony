@@ -39,7 +39,7 @@ class StopwatchPeriod
      *
      * @return int|float The time (in milliseconds)
      */
-    public function getStartTime()
+    public function getStartTime(): int|float
     {
         return $this->start;
     }
@@ -49,7 +49,7 @@ class StopwatchPeriod
      *
      * @return int|float The time (in milliseconds)
      */
-    public function getEndTime()
+    public function getEndTime(): int|float
     {
         return $this->end;
     }
@@ -59,7 +59,7 @@ class StopwatchPeriod
      *
      * @return int|float The period duration (in milliseconds)
      */
-    public function getDuration()
+    public function getDuration(): int|float
     {
         return $this->end - $this->start;
     }
@@ -69,7 +69,7 @@ class StopwatchPeriod
      *
      * @return int The memory usage (in bytes)
      */
-    public function getMemory()
+    public function getMemory(): int
     {
         return $this->memory;
     }

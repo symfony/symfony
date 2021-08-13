@@ -138,7 +138,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
      *
      * @return bool True if the items were successfully removed, false otherwise
      */
-    abstract protected function doDelete(array $ids);
+    abstract protected function doDelete(array $ids): bool;
 
     /**
      * Removes relations between tags and deleted items.

@@ -64,7 +64,7 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
      *
      * @return static
      */
-    public function withLink(LinkInterface $link)
+    public function withLink(LinkInterface $link): static
     {
         $that = clone $this;
         $that->links[spl_object_id($link)] = $link;
@@ -77,7 +77,7 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
      *
      * @return static
      */
-    public function withoutLink(LinkInterface $link)
+    public function withoutLink(LinkInterface $link): static
     {
         $that = clone $this;
         unset($that->links[spl_object_id($link)]);

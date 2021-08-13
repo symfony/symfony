@@ -33,7 +33,7 @@ class CodePointString extends AbstractUnicodeString
         $this->string = $string;
     }
 
-    public function append(string ...$suffix): AbstractString
+    public function append(string ...$suffix): static
     {
         $str = clone $this;
         $str->string .= 1 >= \count($suffix) ? ($suffix[0] ?? '') : implode('', $suffix);
@@ -153,7 +153,7 @@ class CodePointString extends AbstractUnicodeString
         return mb_strlen($this->string, 'UTF-8');
     }
 
-    public function prepend(string ...$prefix): AbstractString
+    public function prepend(string ...$prefix): static
     {
         $str = clone $this;
         $str->string = (1 >= \count($prefix) ? ($prefix[0] ?? '') : implode('', $prefix)).$this->string;
@@ -165,7 +165,7 @@ class CodePointString extends AbstractUnicodeString
         return $str;
     }
 
-    public function replace(string $from, string $to): AbstractString
+    public function replace(string $from, string $to): static
     {
         $str = clone $this;
 
@@ -186,7 +186,7 @@ class CodePointString extends AbstractUnicodeString
         return $str;
     }
 
-    public function slice(int $start = 0, int $length = null): AbstractString
+    public function slice(int $start = 0, int $length = null): static
     {
         $str = clone $this;
         $str->string = mb_substr($this->string, $start, $length, 'UTF-8');
@@ -194,7 +194,7 @@ class CodePointString extends AbstractUnicodeString
         return $str;
     }
 
-    public function splice(string $replacement, int $start = 0, int $length = null): AbstractString
+    public function splice(string $replacement, int $start = 0, int $length = null): static
     {
         if (!preg_match('//u', $replacement)) {
             throw new InvalidArgumentException('Invalid UTF-8 string.');

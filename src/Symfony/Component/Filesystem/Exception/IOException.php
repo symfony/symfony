@@ -32,7 +32,7 @@ class IOException extends \RuntimeException implements IOExceptionInterface
     /**
      * {@inheritdoc}
      */
-    public function getPath()
+    public function getPath(): ?string
     {
         return $this->path;
     }

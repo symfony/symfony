@@ -35,7 +35,7 @@ class Transition
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -43,7 +43,7 @@ class Transition
     /**
      * @return string[]
      */
-    public function getFroms()
+    public function getFroms(): array
     {
         return $this->froms;
     }
@@ -51,7 +51,7 @@ class Transition
     /**
      * @return string[]
      */
-    public function getTos()
+    public function getTos(): array
     {
         return $this->tos;
     }

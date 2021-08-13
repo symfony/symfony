@@ -218,7 +218,7 @@ class RedisStore implements SharedLockStoreInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         $script = '
             local key = KEYS[1]

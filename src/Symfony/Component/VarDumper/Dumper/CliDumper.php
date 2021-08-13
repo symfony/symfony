@@ -437,7 +437,7 @@ class CliDumper extends AbstractDumper
      *
      * @return string The value with style decoration
      */
-    protected function style(string $style, string $value, array $attr = [])
+    protected function style(string $style, string $value, array $attr = []): string
     {
         if (null === $this->colors) {
             $this->colors = $this->supportsColors();
@@ -513,7 +513,7 @@ class CliDumper extends AbstractDumper
     /**
      * @return bool Tells if the current output stream supports ANSI colors or not
      */
-    protected function supportsColors()
+    protected function supportsColors(): bool
     {
         if ($this->outputStream !== static::$defaultOutput) {
             return $this->hasColorSupport($this->outputStream);

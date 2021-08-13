@@ -21,7 +21,7 @@ class UnanimousStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function isMet(int $numberOfSuccess, int $numberOfItems)
+    public function isMet(int $numberOfSuccess, int $numberOfItems): bool
     {
         return $numberOfSuccess === $numberOfItems;
     }
@@ -29,7 +29,7 @@ class UnanimousStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function canBeMet(int $numberOfFailure, int $numberOfItems)
+    public function canBeMet(int $numberOfFailure, int $numberOfItems): bool
     {
         return 0 === $numberOfFailure;
     }

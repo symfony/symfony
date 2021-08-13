@@ -28,7 +28,7 @@ class StoreFactory
     /**
      * @return PersistingStoreInterface
      */
-    public static function createStore(object|string $connection)
+    public static function createStore(object|string $connection): PersistingStoreInterface
     {
         switch (true) {
             case $connection instanceof \Redis:

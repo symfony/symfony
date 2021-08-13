@@ -212,7 +212,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     /**
      * {@inheritdoc}
      */
-    public function prune()
+    public function prune(): bool
     {
         if (!$this->pool instanceof PruneableInterface) {
             return false;

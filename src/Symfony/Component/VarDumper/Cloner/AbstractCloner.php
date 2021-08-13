@@ -260,7 +260,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return Data The cloned variable represented by a Data object
      */
-    public function cloneVar(mixed $var, int $filter = 0)
+    public function cloneVar(mixed $var, int $filter = 0): Data
     {
         $this->prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) {
             if (\E_RECOVERABLE_ERROR === $type || \E_USER_ERROR === $type) {
@@ -295,7 +295,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return array The cloned variable represented in an array
      */
-    abstract protected function doClone(mixed $var);
+    abstract protected function doClone(mixed $var): array;
 
     /**
      * Casts an object to an array representation.
@@ -304,7 +304,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return array The object casted as array
      */
-    protected function castObject(Stub $stub, bool $isNested)
+    protected function castObject(Stub $stub, bool $isNested): array
     {
         $obj = $stub->value;
         $class = $stub->class;
@@ -363,7 +363,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return array The resource casted as array
      */
-    protected function castResource(Stub $stub, bool $isNested)
+    protected function castResource(Stub $stub, bool $isNested): array
     {
         $a = [];
         $res = $stub->value;

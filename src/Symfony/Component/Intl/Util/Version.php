@@ -40,7 +40,7 @@ class Version
      *
      * @see normalize()
      */
-    public static function compare(string $version1, string $version2, string $operator, int $precision = null)
+    public static function compare(string $version1, string $version2, string $operator, int $precision = null): bool
     {
         $version1 = self::normalize($version1, $precision);
         $version2 = self::normalize($version2, $precision);
@@ -66,7 +66,7 @@ class Version
      * @return string|null the normalized version or NULL if it couldn't be
      *                     normalized
      */
-    public static function normalize(string $version, ?int $precision)
+    public static function normalize(string $version, ?int $precision): ?string
     {
         if (null === $precision) {
             return $version;

@@ -21,5 +21,5 @@ interface ClonerInterface
      *
      * @return Data The cloned variable represented by a Data object
      */
-    public function cloneVar(mixed $var);
+    public function cloneVar(mixed $var): Data;
 }

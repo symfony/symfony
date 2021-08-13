@@ -92,11 +92,9 @@ This conversation was marked as resolved by lstrojny
      * @param array[]|string|string[] $servers An array of servers, a DSN, or an array of DSNs
      * @param array                   $options An array of options
      *
-     * @return \Memcached
-     *
      * @throws \ErrorException When invalid options or servers are provided
      */
-    public static function createConnection(array|string $servers, array $options = [])
+    public static function createConnection(array|string $servers, array $options = []): \Memcached
     {
         if (\is_string($servers)) {
             $servers = [$servers];
@@ -243,7 +241,7 @@ This conversation was marked as resolved by lstrojny
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, int $lifetime)
+    protected function doSave(array $values, int $lifetime): array|bool
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {
             return $failed;
@@ -264,7 +262,7 @@ This conversation was marked as resolved by lstrojny
     /**
      * {@inheritdoc}
      */
-    protected function doFetch(array $ids)
+    protected function doFetch(array $ids): iterable
     {
         try {
             $encodedIds = array_map('self::encodeKey', $ids);
@@ -285,7 +283,7 @@ This conversation was marked as resolved by lstrojny
     /**
      * {@inheritdoc}
      */
-    protected function doHave(string $id)
+    protected function doHave(string $id): bool
     {
         return false !== $this->getClient()->get(self::encodeKey($id)) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
     }
@@ -293,7 +291,7 @@ This conversation was marked as resolved by lstrojny
     /**
      * {@inheritdoc}
      */
-    protected function doDelete(array $ids)
+    protected function doDelete(array $ids): bool
     {
         $ok = true;
         $encodedIds = array_map('self::encodeKey', $ids);
@@ -309,7 +307,7 @@ This conversation was marked as resolved by lstrojny
     /**
      * {@inheritdoc}
      */
-    protected function doClear(string $namespace)
+    protected function doClear(string $namespace): bool
     {
         return '' === $namespace && $this->getClient()->flush();
     }

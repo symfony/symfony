@@ -134,7 +134,7 @@ class MemcachedStore implements PersistingStoreInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         return $this->memcached->get((string) $key) === $this->getUniqueToken($key);
     }

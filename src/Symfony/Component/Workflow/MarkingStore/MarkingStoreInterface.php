@@ -29,7 +29,7 @@ interface MarkingStoreInterface
      *
      * @return Marking The marking
      */
-    public function getMarking(object $subject);
+    public function getMarking(object $subject): Marking;
 
     /**
      * Sets a Marking to a subject.

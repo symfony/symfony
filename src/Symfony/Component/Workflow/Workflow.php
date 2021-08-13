@@ -79,7 +79,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function getMarking(object $subject, array $context = [])
+    public function getMarking(object $subject, array $context = []): Marking
     {
         $marking = $this->markingStore->getMarking($subject);
 
@@ -125,7 +125,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function can(object $subject, string $transitionName)
+    public function can(object $subject, string $transitionName): bool
     {
         $transitions = $this->definition->getTransitions();
         $marking = $this->getMarking($subject);
@@ -184,7 +184,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(object $subject, string $transitionName, array $context = [])
+    public function apply(object $subject, string $transitionName, array $context = []): Marking
     {
         $marking = $this->getMarking($subject, $context);
 
@@ -252,7 +252,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function getEnabledTransitions(object $subject)
+    public function getEnabledTransitions(object $subject): array
     {
         $enabledTransitions = [];
         $marking = $this->getMarking($subject);
@@ -289,7 +289,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -297,7 +297,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function getDefinition()
+    public function getDefinition(): Definition
     {
         return $this->definition;
     }
@@ -305,7 +305,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function getMarkingStore()
+    public function getMarkingStore(): MarkingStoreInterface
     {
         return $this->markingStore;
     }

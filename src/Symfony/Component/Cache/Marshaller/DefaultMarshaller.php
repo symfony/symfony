@@ -57,7 +57,7 @@ class DefaultMarshaller implements MarshallerInterface
     /**
      * {@inheritdoc}
      */
-    public function unmarshall(string $value)
+    public function unmarshall(string $value): mixed
     {
         if ('b:0;' === $value) {
             return false;

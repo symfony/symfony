@@ -42,7 +42,7 @@ class DeflateMarshaller implements MarshallerInterface
     /**
      * {@inheritdoc}
      */
-    public function unmarshall(string $value)
+    public function unmarshall(string $value): mixed
     {
         if (false !== $inflatedValue = @gzinflate($value)) {
             $value = $inflatedValue;

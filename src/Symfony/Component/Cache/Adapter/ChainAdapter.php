@@ -292,7 +292,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function prune()
+    public function prune(): bool
     {
         $pruned = true;
 

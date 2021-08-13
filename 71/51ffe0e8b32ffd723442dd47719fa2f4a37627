@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-11T14:13:03Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by hluup at 2021-08-11T14:25:53Z
+
+Closing as requested.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-11T17:52:20Z
+
+Hi @hluup. Thanks for this contribution. I think it's OK to leave this open, but without the draft status.
+It's already great to have some messages translated already, you don't have to do all of them in a single PR.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-08-11T18:32:14Z
+
+Awesome!
+Thank you @hluup for working on this.
+
+---------------------------------------------------------------------------
+
+by hluup at 2021-08-13T11:44:23Z
+
+Everything should be translated now.

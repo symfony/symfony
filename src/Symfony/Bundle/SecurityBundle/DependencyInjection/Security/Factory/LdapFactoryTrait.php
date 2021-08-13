@@ -27,6 +27,11 @@ use Symfony\Component\Ldap\Security\LdapAuthenticator;
  */
 trait LdapFactoryTrait
 {
+    public function getKey(): string
+    {
+        return parent::getKey().'-ldap';
+    }
+
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         $key = str_replace('-', '_', $this->getKey());

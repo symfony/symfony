@@ -177,6 +177,22 @@ class ServiceLocatorTagPassTest extends TestCase
         static::assertFalse($locator->has(Decorated::class));
         static::assertInstanceOf(Decorated::class, $locator->get(Service::class));
     }
+
+    public function testDefinitionOrderIsTheSame()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service-1');
+        $container->register('service-2');
+
+        $locator = ServiceLocatorTagPass::register($container, [
+            'service-2' => new Reference('service-2'),
+            'service-1' => new Reference('service-1'),
+        ]);
+        $locator = $container->getDefinition($locator);
+        $factories = $locator->getArguments()[0];
+
+        static::assertSame(['service-2', 'service-1'], array_keys($factories));
+    }
 }
 
 class Locator

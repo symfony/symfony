@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-12T14:34:02Z
+
+:green_apple:
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-12T18:57:39Z
+
+Similar to #42513, if these changes are automated, I would appreciate if we can block this merge until #41613 is merged (to avoid merge conflicts in that big PR). Maybe it's good to move the SecurityBundle in the other PR, to unlock the other bundles.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-13T07:32:13Z
+
+SecurityBundle now moved to #42513

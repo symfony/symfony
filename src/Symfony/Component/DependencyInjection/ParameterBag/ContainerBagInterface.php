@@ -26,7 +26,7 @@ interface ContainerBagInterface extends ContainerInterface
      *
      * @return array An array of parameters
      */
-    public function all();
+    public function all(): array;
 
     /**
      * Replaces parameter placeholders (%name%) by their values.
@@ -40,12 +40,12 @@ interface ContainerBagInterface extends ContainerInterface
      *
      * @return mixed
      */
-    public function escapeValue(mixed $value);
+    public function escapeValue(mixed $value): mixed;
 
     /**
      * Unescape parameter placeholders %.
      *
      * @return mixed
      */
-    public function unescapeValue(mixed $value);
+    public function unescapeValue(mixed $value): mixed;
 }

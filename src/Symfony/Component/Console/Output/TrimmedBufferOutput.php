@@ -38,7 +38,7 @@ class TrimmedBufferOutput extends Output
      *
      * @return string
      */
-    public function fetch()
+    public function fetch(): string
     {
         $content = $this->buffer;
         $this->buffer = '';

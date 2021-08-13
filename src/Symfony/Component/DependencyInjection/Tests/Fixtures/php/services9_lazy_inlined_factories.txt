@@ -77,10 +77,7 @@ class ProjectServiceContainer extends Container
         return new \Bar\FooClass(new \Bar\FooLazyClass());
     }
 
-    /**
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|string|int|float|bool|null
     {
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];

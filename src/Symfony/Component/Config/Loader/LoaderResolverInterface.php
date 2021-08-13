@@ -25,5 +25,5 @@ interface LoaderResolverInterface
      *
      * @return LoaderInterface|false The loader or false if none is able to load the resource
      */
-    public function resolve(mixed $resource, string $type = null);
+    public function resolve(mixed $resource, string $type = null): LoaderInterface|false;
 }

@@ -32,7 +32,7 @@ class ResourceCheckerConfigCacheFactory implements ConfigCacheFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function cache(string $file, callable $callable)
+    public function cache(string $file, callable $callable): ConfigCacheInterface
     {
         $cache = new ResourceCheckerConfigCache($file, $this->resourceCheckers);
         if (!$cache->isFresh()) {

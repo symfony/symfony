@@ -100,7 +100,7 @@ class PassConfig
      *
      * @return CompilerPassInterface[]
      */
-    public function getPasses()
+    public function getPasses(): array
     {
         return array_merge(
             [$this->mergePass],
@@ -137,7 +137,7 @@ class PassConfig
      *
      * @return CompilerPassInterface[]
      */
-    public function getAfterRemovingPasses()
+    public function getAfterRemovingPasses(): array
     {
         return $this->sortPasses($this->afterRemovingPasses);
     }
@@ -147,7 +147,7 @@ class PassConfig
      *
      * @return CompilerPassInterface[]
      */
-    public function getBeforeOptimizationPasses()
+    public function getBeforeOptimizationPasses(): array
     {
         return $this->sortPasses($this->beforeOptimizationPasses);
     }
@@ -157,7 +157,7 @@ class PassConfig
      *
      * @return CompilerPassInterface[]
      */
-    public function getBeforeRemovingPasses()
+    public function getBeforeRemovingPasses(): array
     {
         return $this->sortPasses($this->beforeRemovingPasses);
     }
@@ -167,7 +167,7 @@ class PassConfig
      *
      * @return CompilerPassInterface[]
      */
-    public function getOptimizationPasses()
+    public function getOptimizationPasses(): array
     {
         return $this->sortPasses($this->optimizationPasses);
     }
@@ -177,7 +177,7 @@ class PassConfig
      *
      * @return CompilerPassInterface[]
      */
-    public function getRemovingPasses()
+    public function getRemovingPasses(): array
     {
         return $this->sortPasses($this->removingPasses);
     }
@@ -187,7 +187,7 @@ class PassConfig
      *
      * @return CompilerPassInterface
      */
-    public function getMergePass()
+    public function getMergePass(): CompilerPassInterface
     {
         return $this->mergePass;
     }

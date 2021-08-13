@@ -37,7 +37,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormatter()
+    public function getFormatter(): OutputFormatterInterface
     {
         if ($this->formatter) {
             return $this->formatter;
@@ -57,7 +57,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function isDecorated()
+    public function isDecorated(): bool
     {
         return false;
     }
@@ -73,7 +73,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function getVerbosity()
+    public function getVerbosity(): int
     {
         return self::VERBOSITY_QUIET;
     }
@@ -81,7 +81,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function isQuiet()
+    public function isQuiet(): bool
     {
         return true;
     }
@@ -89,7 +89,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function isVerbose()
+    public function isVerbose(): bool
     {
         return false;
     }
@@ -97,7 +97,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function isVeryVerbose()
+    public function isVeryVerbose(): bool
     {
         return false;
     }
@@ -105,7 +105,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function isDebug()
+    public function isDebug(): bool
     {
         return false;
     }

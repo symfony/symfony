@@ -48,5 +48,5 @@ interface OutputFormatterStyleInterface
      *
      * @return string
      */
-    public function apply(string $text);
+    public function apply(string $text): string;
 }

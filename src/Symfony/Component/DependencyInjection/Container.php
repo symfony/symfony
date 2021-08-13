@@ -89,7 +89,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @return bool
      */
-    public function isCompiled()
+    public function isCompiled(): bool
     {
         return $this->compiled;
     }
@@ -99,7 +99,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @return ParameterBagInterface
      */
-    public function getParameterBag()
+    public function getParameterBag(): ParameterBagInterface
     {
         return $this->parameterBag;
     }
@@ -119,7 +119,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * @return bool The presence of parameter in container
      */
-    public function hasParameter(string $name)
+    public function hasParameter(string $name): bool
     {
         return $this->parameterBag->has($name);
     }
@@ -199,7 +199,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @see Reference
      */
-    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
+    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE): ?object
     {
         return $this->services[$id]
             ?? $this->services[$id = $this->aliases[$id] ?? $id]
@@ -266,7 +266,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @return bool true if service has already been initialized, false otherwise
      */
-    public function initialized(string $id)
+    public function initialized(string $id): bool
     {
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
@@ -303,7 +303,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @return string[] An array of all defined service ids
      */
-    public function getServiceIds()
+    public function getServiceIds(): array
     {
         return array_map('strval', array_unique(array_merge(['service_container'], array_keys($this->fileMap), array_keys($this->methodMap), array_keys($this->aliases), array_keys($this->services))));
     }
@@ -313,7 +313,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @return array
      */
-    public function getRemovedIds()
+    public function getRemovedIds(): array
     {
         return [];
     }
@@ -323,7 +323,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @return string The camelized string
      */
-    public static function camelize(string $id)
+    public static function camelize(string $id): string
     {
         return strtr(ucwords(strtr($id, ['_' => ' ', '.' => '_ ', '\\' => '_ '])), [' ' => '']);
     }
@@ -333,7 +333,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @return string The underscored string
      */
-    public static function underscore(string $id)
+    public static function underscore(string $id): string
     {
         return strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], str_replace('_', '.', $id)));
     }
@@ -353,7 +353,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @throws EnvNotFoundException When the environment variable is not found and has no default value
      */
-    protected function getEnv(string $name)
+    protected function getEnv(string $name): mixed
     {
         if (isset($this->resolving[$envName = "env($name)"])) {
             throw new ParameterCircularReferenceException(array_keys($this->resolving));

@@ -39,7 +39,7 @@ class XmlDumper extends Dumper
      *
      * @return string An xml string representing of the service container
      */
-    public function dump(array $options = [])
+    public function dump(array $options = []): string
     {
         $this->document = new \DOMDocument('1.0', 'utf-8');
         $this->document->formatOutput = true;

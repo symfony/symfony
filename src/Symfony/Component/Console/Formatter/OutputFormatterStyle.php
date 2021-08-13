@@ -92,7 +92,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(string $text)
+    public function apply(string $text): string
     {
         if (null === $this->handlesHrefGracefully) {
             $this->handlesHrefGracefully = 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR')

@@ -34,7 +34,7 @@ abstract class Helper implements HelperInterface
     /**
      * {@inheritdoc}
      */
-    public function getHelperSet()
+    public function getHelperSet(): ?HelperSet
     {
         return $this->helperSet;
     }
@@ -82,7 +82,7 @@ abstract class Helper implements HelperInterface
      *
      * @return string The string subset
      */
-    public static function substr(?string $string, int $from, int $length = null)
+    public static function substr(?string $string, int $from, int $length = null): string
     {
         $string ?? $string = '';
 

@@ -32,7 +32,7 @@ class TreeBuilder implements NodeParentInterface
     /**
      * @return NodeDefinition|ArrayNodeDefinition The root node (as an ArrayNodeDefinition when the type is 'array')
      */
-    public function getRootNode(): NodeDefinition
+    public function getRootNode(): NodeDefinition|ArrayNodeDefinition
     {
         return $this->root;
     }
@@ -40,11 +40,9 @@ class TreeBuilder implements NodeParentInterface
     /**
      * Builds the tree.
      *
-     * @return NodeInterface
-     *
      * @throws \RuntimeException
      */
-    public function buildTree()
+    public function buildTree(): NodeInterface
     {
         if (null !== $this->tree) {
             return $this->tree;

@@ -25,19 +25,19 @@ interface DumperInterface
      *
      * @return bool
      */
-    public function isProxyCandidate(Definition $definition);
+    public function isProxyCandidate(Definition $definition): bool;
 
     /**
      * Generates the code to be used to instantiate a proxy in the dumped factory code.
      *
      * @return string
      */
-    public function getProxyFactoryCode(Definition $definition, string $id, string $factoryCode);
+    public function getProxyFactoryCode(Definition $definition, string $id, string $factoryCode): string;
 
     /**
      * Generates the code for the lazy proxy.
      *
      * @return string
      */
-    public function getProxyCode(Definition $definition);
+    public function getProxyCode(Definition $definition): string;
 }

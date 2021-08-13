@@ -54,7 +54,7 @@ class TableCell
      *
      * @return int
      */
-    public function getColspan()
+    public function getColspan(): int
     {
         return (int) $this->options['colspan'];
     }
@@ -64,7 +64,7 @@ class TableCell
      *
      * @return int
      */
-    public function getRowspan()
+    public function getRowspan(): int
     {
         return (int) $this->options['rowspan'];
     }

@@ -51,7 +51,7 @@ class ConfigCache extends ResourceCheckerConfigCache
      *
      * @return bool true if the cache is fresh, false otherwise
      */
-    public function isFresh()
+    public function isFresh(): bool
     {
         if (!$this->debug && is_file($this->getPath())) {
             return true;

@@ -48,10 +48,7 @@ class ProjectServiceContainer extends Container
         return $this->services['test'] = new \stdClass(('file://'.\dirname(__DIR__, 1)), [('file://'.\dirname(__DIR__, 1)) => (\dirname(__DIR__, 2).'/')]);
     }
 
-    /**
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|string|int|float|bool|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));

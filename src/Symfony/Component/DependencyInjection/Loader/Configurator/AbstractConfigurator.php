@@ -44,7 +44,7 @@ abstract class AbstractConfigurator
     /**
      * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -61,7 +61,7 @@ abstract class AbstractConfigurator
      *
      * @return mixed the value, optionally cast to a Definition/Reference
      */
-    public static function processValue(mixed $value, bool $allowServices = false)
+    public static function processValue(mixed $value, bool $allowServices = false): mixed
     {
         if (\is_array($value)) {
             foreach ($value as $k => $v) {

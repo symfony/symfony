@@ -36,7 +36,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return $this->defaultValueSet;
     }
@@ -44,7 +44,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getDefaultValue()
+    public function getDefaultValue(): mixed
     {
         $v = $this->defaultValue;
 
@@ -79,7 +79,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    protected function finalizeValue(mixed $value)
+    protected function finalizeValue(mixed $value): mixed
     {
         // deny environment variables only when using custom validators
         // this avoids ever passing an empty value to final validation closures
@@ -109,7 +109,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    protected function normalizeValue(mixed $value)
+    protected function normalizeValue(mixed $value): mixed
     {
         return $value;
     }
@@ -117,7 +117,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    protected function mergeValues(mixed $leftSide, mixed $rightSide)
+    protected function mergeValues(mixed $leftSide, mixed $rightSide): mixed
     {
         return $rightSide;
     }
@@ -133,7 +133,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      *
      * @see finalizeValue()
      */
-    protected function isValueEmpty(mixed $value)
+    protected function isValueEmpty(mixed $value): bool
     {
         return empty($value);
     }

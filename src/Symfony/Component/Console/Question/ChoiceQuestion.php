@@ -48,7 +48,7 @@ class ChoiceQuestion extends Question
      *
      * @return array
      */
-    public function getChoices()
+    public function getChoices(): array
     {
         return $this->choices;
     }
@@ -60,7 +60,7 @@ class ChoiceQuestion extends Question
      *
      * @return $this
      */
-    public function setMultiselect(bool $multiselect)
+    public function setMultiselect(bool $multiselect): static
     {
         $this->multiselect = $multiselect;
         $this->setValidator($this->getDefaultValidator());
@@ -73,7 +73,7 @@ class ChoiceQuestion extends Question
      *
      * @return bool
      */
-    public function isMultiselect()
+    public function isMultiselect(): bool
     {
         return $this->multiselect;
     }
@@ -83,7 +83,7 @@ class ChoiceQuestion extends Question
      *
      * @return string
      */
-    public function getPrompt()
+    public function getPrompt(): string
     {
         return $this->prompt;
     }
@@ -93,7 +93,7 @@ class ChoiceQuestion extends Question
      *
      * @return $this
      */
-    public function setPrompt(string $prompt)
+    public function setPrompt(string $prompt): static
     {
         $this->prompt = $prompt;
 
@@ -107,7 +107,7 @@ class ChoiceQuestion extends Question
      *
      * @return $this
      */
-    public function setErrorMessage(string $errorMessage)
+    public function setErrorMessage(string $errorMessage): static
     {
         $this->errorMessage = $errorMessage;
         $this->setValidator($this->getDefaultValidator());

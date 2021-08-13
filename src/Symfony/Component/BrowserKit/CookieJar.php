@@ -32,10 +32,8 @@ class CookieJar
      * this method returns the first cookie for the given name/path
      * (this behavior ensures a BC behavior with previous versions of
      * Symfony).
-     *
-     * @return Cookie|null
      */
-    public function get(string $name, string $path = '/', string $domain = null)
+    public function get(string $name, string $path = '/', string $domain = null): ?Cookie
     {
         $this->flushExpiredCookies();
 
@@ -143,7 +141,7 @@ class CookieJar
      *
      * @return Cookie[] An array of cookies
      */
-    public function all()
+    public function all(): array
     {
         $this->flushExpiredCookies();
 
@@ -164,7 +162,7 @@ class CookieJar
      *
      * @return array An array of cookie values
      */
-    public function allValues(string $uri, bool $returnsRawValue = false)
+    public function allValues(string $uri, bool $returnsRawValue = false): array
     {
         $this->flushExpiredCookies();
 
@@ -201,7 +199,7 @@ class CookieJar
      *
      * @return array An array of cookie values
      */
-    public function allRawValues(string $uri)
+    public function allRawValues(string $uri): array
     {
         return $this->allValues($uri, true);
     }

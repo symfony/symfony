@@ -23,12 +23,12 @@ use Symfony\Component\Config\ResourceCheckerInterface;
  */
 class SelfCheckingResourceChecker implements ResourceCheckerInterface
 {
-    public function supports(ResourceInterface $metadata)
+    public function supports(ResourceInterface $metadata): bool
     {
         return $metadata instanceof SelfCheckingResourceInterface;
     }
 
-    public function isFresh(ResourceInterface $resource, int $timestamp)
+    public function isFresh(ResourceInterface $resource, int $timestamp): bool
     {
         /* @var SelfCheckingResourceInterface $resource */
         return $resource->isFresh($timestamp);

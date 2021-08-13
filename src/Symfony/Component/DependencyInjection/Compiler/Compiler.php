@@ -34,7 +34,7 @@ class Compiler
     /**
      * @return PassConfig
      */
-    public function getPassConfig()
+    public function getPassConfig(): PassConfig
     {
         return $this->passConfig;
     }
@@ -42,7 +42,7 @@ class Compiler
     /**
      * @return ServiceReferenceGraph
      */
-    public function getServiceReferenceGraph()
+    public function getServiceReferenceGraph(): ServiceReferenceGraph
     {
         return $this->serviceReferenceGraph;
     }
@@ -67,7 +67,7 @@ class Compiler
     /**
      * @return array
      */
-    public function getLog()
+    public function getLog(): array
     {
         return $this->log;
     }

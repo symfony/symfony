@@ -21,7 +21,7 @@ interface ArgumentInterface
     /**
      * @return array
      */
-    public function getValues();
+    public function getValues(): array;
 
     public function setValues(array $values);
 }

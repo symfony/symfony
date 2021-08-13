@@ -125,7 +125,7 @@ class PhpDumper extends Dumper
      *
      * @throws EnvParameterException When an env var exists but has not been dumped
      */
-    public function dump(array $options = [])
+    public function dump(array $options = []): string|array
     {
         $this->locatedIds = [];
         $this->targetDirRegex = null;
@@ -1499,10 +1499,7 @@ EOF;
 
         $code = <<<'EOF'
 
-    /**
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|string|int|float|bool|null
     {
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];

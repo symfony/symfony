@@ -37,7 +37,7 @@ class Reference
      *
      * @return int
      */
-    public function getInvalidBehavior()
+    public function getInvalidBehavior(): int
     {
         return $this->invalidBehavior;
     }

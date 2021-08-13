@@ -30,7 +30,7 @@ class ContainerParametersResourceChecker implements ResourceCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(ResourceInterface $metadata)
+    public function supports(ResourceInterface $metadata): bool
     {
         return $metadata instanceof ContainerParametersResource;
     }
@@ -38,7 +38,7 @@ class ContainerParametersResourceChecker implements ResourceCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh(ResourceInterface $resource, int $timestamp)
+    public function isFresh(ResourceInterface $resource, int $timestamp): bool
     {
         foreach ($resource->getParameters() as $key => $value) {
             if (!$this->container->hasParameter($key) || $this->container->getParameter($key) !== $value) {

@@ -38,7 +38,7 @@ class ServiceLocator implements ServiceProviderInterface
      *
      * @return mixed
      */
-    public function get(string $id)
+    public function get(string $id): mixed
     {
         if (!$this->externalId) {
             return $this->doGet($id);

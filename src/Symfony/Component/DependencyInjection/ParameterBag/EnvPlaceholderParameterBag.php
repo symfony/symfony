@@ -29,7 +29,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function get(string $name)
+    public function get(string $name): array|bool|string|int|float|null
     {
         if (str_starts_with($name, 'env(') && str_ends_with($name, ')') && 'env()' !== $name) {
             $env = substr($name, 4, -1);
@@ -80,7 +80,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
      *
      * @return string[][] A map of env var names to their placeholders
      */
-    public function getEnvPlaceholders()
+    public function getEnvPlaceholders(): array
     {
         return $this->envPlaceholders;
     }
@@ -130,7 +130,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
      *
      * @return string[][]
      */
-    public function getProvidedTypes()
+    public function getProvidedTypes(): array
     {
         return $this->providedTypes;
     }

@@ -119,11 +119,9 @@ class Cookie
     /**
      * Creates a Cookie instance from a Set-Cookie header value.
      *
-     * @return static
-     *
      * @throws \InvalidArgumentException
      */
-    public static function fromString(string $cookie, string $url = null)
+    public static function fromString(string $cookie, string $url = null): static
     {
         $parts = explode(';', $cookie);
 
@@ -222,7 +220,7 @@ class Cookie
      *
      * @return string The cookie name
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -232,7 +230,7 @@ class Cookie
      *
      * @return string The cookie value
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
@@ -242,7 +240,7 @@ class Cookie
      *
      * @return string The cookie value
      */
-    public function getRawValue()
+    public function getRawValue(): string
     {
         return $this->rawValue;
     }
@@ -252,7 +250,7 @@ class Cookie
      *
      * @return string|null The cookie expires time
      */
-    public function getExpiresTime()
+    public function getExpiresTime(): ?string
     {
         return $this->expires;
     }
@@ -262,7 +260,7 @@ class Cookie
      *
      * @return string The cookie path
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
@@ -272,7 +270,7 @@ class Cookie
      *
      * @return string The cookie domain
      */
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
@@ -282,7 +280,7 @@ class Cookie
      *
      * @return bool The cookie secure flag
      */
-    public function isSecure()
+    public function isSecure(): bool
     {
         return $this->secure;
     }
@@ -292,7 +290,7 @@ class Cookie
      *
      * @return bool The cookie httponly flag
      */
-    public function isHttpOnly()
+    public function isHttpOnly(): bool
     {
         return $this->httponly;
     }
@@ -302,7 +300,7 @@ class Cookie
      *
      * @return bool true if the cookie has expired, false otherwise
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
         return null !== $this->expires && 0 != $this->expires && $this->expires <= time();
     }

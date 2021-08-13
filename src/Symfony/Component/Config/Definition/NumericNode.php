@@ -33,7 +33,7 @@ class NumericNode extends ScalarNode
     /**
      * {@inheritdoc}
      */
-    protected function finalizeValue(mixed $value)
+    protected function finalizeValue(mixed $value): mixed
     {
         $value = parent::finalizeValue($value);
 
@@ -56,7 +56,7 @@ class NumericNode extends ScalarNode
     /**
      * {@inheritdoc}
      */
-    protected function isValueEmpty(mixed $value)
+    protected function isValueEmpty(mixed $value): bool
     {
         // a numeric value cannot be empty
         return false;

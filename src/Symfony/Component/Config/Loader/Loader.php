@@ -31,7 +31,7 @@ abstract class Loader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResolver()
+    public function getResolver(): LoaderResolverInterface
     {
         return $this->resolver;
     }
@@ -61,7 +61,7 @@ abstract class Loader implements LoaderInterface
      *
      * @throws LoaderLoadException If no loader is found
      */
-    public function resolve(mixed $resource, string $type = null)
+    public function resolve(mixed $resource, string $type = null): static|LoaderInterface
     {
         if ($this->supports($resource, $type)) {
             return $this;

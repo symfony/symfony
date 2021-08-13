@@ -43,7 +43,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     /**
      * {@inheritdoc}
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->file;
     }
@@ -59,7 +59,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      *
      * @return bool true if the cache is fresh, false otherwise
      */
-    public function isFresh()
+    public function isFresh(): bool
     {
         if (!is_file($this->file)) {
             return false;

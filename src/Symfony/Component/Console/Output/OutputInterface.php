@@ -55,35 +55,35 @@ interface OutputInterface
      *
      * @return int The current level of verbosity (one of the VERBOSITY constants)
      */
-    public function getVerbosity();
+    public function getVerbosity(): int;
 
     /**
      * Returns whether verbosity is quiet (-q).
      *
      * @return bool true if verbosity is set to VERBOSITY_QUIET, false otherwise
      */
-    public function isQuiet();
+    public function isQuiet(): bool;
 
     /**
      * Returns whether verbosity is verbose (-v).
      *
      * @return bool true if verbosity is set to VERBOSITY_VERBOSE, false otherwise
      */
-    public function isVerbose();
+    public function isVerbose(): bool;
 
     /**
      * Returns whether verbosity is very verbose (-vv).
      *
      * @return bool true if verbosity is set to VERBOSITY_VERY_VERBOSE, false otherwise
      */
-    public function isVeryVerbose();
+    public function isVeryVerbose(): bool;
 
     /**
      * Returns whether verbosity is debug (-vvv).
      *
      * @return bool true if verbosity is set to VERBOSITY_DEBUG, false otherwise
      */
-    public function isDebug();
+    public function isDebug(): bool;
 
     /**
      * Sets the decorated flag.
@@ -95,7 +95,7 @@ interface OutputInterface
      *
      * @return bool true if the output will decorate messages, false otherwise
      */
-    public function isDecorated();
+    public function isDecorated(): bool;
 
     public function setFormatter(OutputFormatterInterface $formatter);
 
@@ -104,5 +104,5 @@ interface OutputInterface
      *
      * @return OutputFormatterInterface
      */
-    public function getFormatter();
+    public function getFormatter(): OutputFormatterInterface;
 }

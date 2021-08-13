@@ -27,7 +27,7 @@ class AutowireRequiredPropertiesPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue(mixed $value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         $value = parent::processValue($value, $isRoot);
 

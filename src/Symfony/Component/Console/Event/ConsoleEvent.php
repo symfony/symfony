@@ -40,7 +40,7 @@ class ConsoleEvent extends Event
      *
      * @return Command|null
      */
-    public function getCommand()
+    public function getCommand(): ?Command
     {
         return $this->command;
     }
@@ -50,7 +50,7 @@ class ConsoleEvent extends Event
      *
      * @return InputInterface
      */
-    public function getInput()
+    public function getInput(): InputInterface
     {
         return $this->input;
     }
@@ -60,7 +60,7 @@ class ConsoleEvent extends Event
      *
      * @return OutputInterface
      */
-    public function getOutput()
+    public function getOutput(): OutputInterface
     {
         return $this->output;
     }

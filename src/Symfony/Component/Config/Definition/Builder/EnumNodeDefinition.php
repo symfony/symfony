@@ -25,7 +25,7 @@ class EnumNodeDefinition extends ScalarNodeDefinition
     /**
      * @return $this
      */
-    public function values(array $values)
+    public function values(array $values): static
     {
         $values = array_unique($values);
 
@@ -45,7 +45,7 @@ class EnumNodeDefinition extends ScalarNodeDefinition
      *
      * @throws \RuntimeException
      */
-    protected function instantiateNode()
+    protected function instantiateNode(): EnumNode
     {
         if (!isset($this->values)) {
             throw new \RuntimeException('You must call ->values() on enum nodes.');

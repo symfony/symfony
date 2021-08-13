@@ -29,7 +29,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
 {
     private array $currentPath;
 
-    protected function processValue(mixed $value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Definition) {
             return parent::processValue($value, $isRoot);

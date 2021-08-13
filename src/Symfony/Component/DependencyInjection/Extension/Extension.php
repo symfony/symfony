@@ -64,7 +64,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      *
      * @throws BadMethodCallException When the extension name does not follow conventions
      */
-    public function getAlias()
+    public function getAlias(): string
     {
         $className = static::class;
         if (!str_ends_with($className, 'Extension')) {
@@ -128,7 +128,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      *
      * @throws InvalidArgumentException When the config is not enableable
      */
-    protected function isConfigEnabled(ContainerBuilder $container, array $config)
+    protected function isConfigEnabled(ContainerBuilder $container, array $config): bool
     {
         if (!\array_key_exists('enabled', $config)) {
             throw new InvalidArgumentException("The config array has no 'enabled' key.");

@@ -28,6 +28,7 @@ class ExpressionLanguageTest extends TestCase
 {
     /**
      * @dataProvider provider
+     * @dataProvider legacyProvider
      */
     public function testIsAuthenticated($token, $expression, $result)
     {
@@ -51,21 +52,14 @@ class ExpressionLanguageTest extends TestCase
         $user = new InMemoryUser('username', 'password', $roles);
 
         $noToken = null;
-        $anonymousToken = new AnonymousToken('firewall', 'anon.');
         $rememberMeToken = new RememberMeToken($user, 'firewall-name', 'firewall');
-        $usernamePasswordToken = new UsernamePasswordToken('username', 'password', 'firewall-name', $roles);
+        $usernamePasswordToken = new UsernamePasswordToken($user, 'firewall-name', $roles);
 
         return [
             [$noToken, 'is_anonymous()', false],
             [$noToken, 'is_authenticated()', false],
             [$noToken, 'is_fully_authenticated()', false],
             [$noToken, 'is_remember_me()', false],
-
-            [$anonymousToken, 'is_anonymous()', true],
-            [$anonymousToken, 'is_authenticated()', false],
-            [$anonymousToken, 'is_fully_authenticated()', false],
-            [$anonymousToken, 'is_remember_me()', false],
-            [$anonymousToken, "is_granted('ROLE_USER')", false],
 
             [$rememberMeToken, 'is_anonymous()', false],
             [$rememberMeToken, 'is_authenticated()', true],
@@ -80,6 +74,22 @@ class ExpressionLanguageTest extends TestCase
             [$usernamePasswordToken, 'is_remember_me()', false],
             [$usernamePasswordToken, "is_granted('ROLE_FOO')", false],
             [$usernamePasswordToken, "is_granted('ROLE_USER')", true],
+        ];
+    }
+
+    /**
+     * @group legacy
+     */
+    public function legacyProvider()
+    {
+        $anonymousToken = new AnonymousToken('firewall', 'anon.');
+
+        return [
+            [$anonymousToken, 'is_anonymous()', true],
+            [$anonymousToken, 'is_authenticated()', false],
+            [$anonymousToken, 'is_fully_authenticated()', false],
+            [$anonymousToken, 'is_remember_me()', false],
+            [$anonymousToken, "is_granted('ROLE_USER')", false],
         ];
     }
 }

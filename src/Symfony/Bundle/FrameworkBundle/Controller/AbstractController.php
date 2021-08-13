@@ -395,7 +395,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Get a user from the Security Token Storage.
      *
-     * @return UserInterface|object|null
+     * @return UserInterface|null
      *
      * @throws \LogicException If SecurityBundle is not available
      *
@@ -411,6 +411,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             return null;
         }
 
+        // @deprecated since 5.4, $user will always be a UserInterface instance
         if (!\is_object($user = $token->getUser())) {
             // e.g. anonymous authentication
             return null;

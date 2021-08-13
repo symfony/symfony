@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class AuthorizationCheckerTest extends TestCase
 {
@@ -106,7 +107,7 @@ class AuthorizationCheckerTest extends TestCase
      */
     public function testIsGranted($decide)
     {
-        $token = new UsernamePasswordToken('username', 'password', 'provider', ['ROLE_USER']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
 
         $this->accessDecisionManager
             ->expects($this->once())
@@ -125,7 +126,7 @@ class AuthorizationCheckerTest extends TestCase
     {
         $attribute = new \stdClass();
 
-        $token = new UsernamePasswordToken('username', 'password', 'provider', ['ROLE_USER']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
 
         $this->accessDecisionManager
             ->expects($this->once())

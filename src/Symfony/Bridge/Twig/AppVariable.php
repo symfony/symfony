@@ -84,6 +84,7 @@ class AppVariable
 
         $user = $token->getUser();
 
+        // @deprecated since 5.4, $user will always be a UserInterface instance
         return \is_object($user) ? $user : null;
     }
 

@@ -38,7 +38,7 @@ class RememberMeAuthenticatorTest extends TestCase
 
     public function testSupportsTokenStorageWithToken()
     {
-        $this->tokenStorage->setToken(new UsernamePasswordToken('username', 'credentials', 'main'));
+        $this->tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('username', 'credentials'), 'main'));
 
         $this->assertFalse($this->authenticator->supports(Request::create('/')));
     }

@@ -77,7 +77,7 @@ class BasicAuthenticationListener extends AbstractListener
         }
 
         if (null !== $token = $this->tokenStorage->getToken()) {
-            // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
             if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && (method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername()) === $username) {
                 return;
             }

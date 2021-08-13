@@ -75,7 +75,7 @@ abstract class AbstractToken implements TokenInterface
         }
 
         if ($this->user instanceof UserInterface) {
-            // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
             return method_exists($this->user, 'getUserIdentifier') ? $this->user->getUserIdentifier() : $this->user->getUsername();
         }
 

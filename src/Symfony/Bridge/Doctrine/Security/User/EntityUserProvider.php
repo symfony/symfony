@@ -66,7 +66,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
                 throw new \InvalidArgumentException(sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, get_debug_type($repository)));
             }
 
-            // @deprecated since 5.3, change to $repository->loadUserByIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $repository->loadUserByIdentifier() in 6.0
             if (method_exists($repository, 'loadUserByIdentifier')) {
                 $user = $repository->loadUserByIdentifier($identifier);
             } else {

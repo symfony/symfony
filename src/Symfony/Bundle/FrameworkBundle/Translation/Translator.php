@@ -96,7 +96,7 @@ class Translator extends BaseTranslator implements WarmableInterface
      *
      * @return string[]
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         // skip warmUp when translator doesn't use cache
         if (null === $this->options['cache_dir']) {

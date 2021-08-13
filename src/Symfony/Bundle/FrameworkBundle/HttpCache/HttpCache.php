@@ -65,7 +65,7 @@ class HttpCache extends BaseHttpCache
     /**
      * {@inheritdoc}
      */
-    protected function forward(Request $request, bool $catch = false, Response $entry = null)
+    protected function forward(Request $request, bool $catch = false, Response $entry = null): Response
     {
         $this->getKernel()->boot();
         $this->getKernel()->getContainer()->set('cache', $this);
@@ -78,7 +78,7 @@ class HttpCache extends BaseHttpCache
      *
      * @return array An array of options
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         return [];
     }

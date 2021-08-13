@@ -43,10 +43,8 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Gets the form node associated with this form.
-     *
-     * @return \DOMElement
      */
-    public function getFormNode()
+    public function getFormNode(): \DOMElement
     {
         return $this->node;
     }
@@ -58,7 +56,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return $this
      */
-    public function setValues(array $values)
+    public function setValues(array $values): static
     {
         foreach ($values as $name => $value) {
             $this->fields->set($name, $value);
@@ -74,7 +72,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of field values
      */
-    public function getValues()
+    public function getValues(): array
     {
         $values = [];
         foreach ($this->fields->all() as $name => $field) {
@@ -95,7 +93,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of file field values
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         if (!\in_array($this->getMethod(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
             return [];
@@ -124,7 +122,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of field values
      */
-    public function getPhpValues()
+    public function getPhpValues(): array
     {
         $values = [];
         foreach ($this->getValues() as $name => $value) {
@@ -151,7 +149,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of file field values
      */
-    public function getPhpFiles()
+    public function getPhpFiles(): array
     {
         $values = [];
         foreach ($this->getFiles() as $name => $value) {
@@ -187,7 +185,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return string The URI
      */
-    public function getUri()
+    public function getUri(): string
     {
         $uri = parent::getUri();
 
@@ -208,7 +206,7 @@ class Form extends Link implements \ArrayAccess
         return $uri;
     }
 
-    protected function getRawUri()
+    protected function getRawUri(): string
     {
         // If the form was created from a button rather than the form node, check for HTML5 action overrides
         if ($this->button !== $this->node && $this->button->getAttribute('formaction')) {
@@ -225,7 +223,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return string The method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         if (null !== $this->method) {
             return $this->method;
@@ -254,7 +252,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return bool true if the field exists, false otherwise
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return $this->fields->has($name);
     }
@@ -274,7 +272,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
-    public function get(string $name)
+    public function get(string $name): FormField|array
     {
         return $this->fields->get($name);
     }
@@ -292,7 +290,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return FormField[]
      */
-    public function all()
+    public function all(): array
     {
         return $this->fields->all();
     }
@@ -346,10 +344,8 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Disables validation.
-     *
-     * @return self
      */
-    public function disableValidation()
+    public function disableValidation(): self
     {
         foreach ($this->fields->all() as $field) {
             if ($field instanceof Field\ChoiceFormField) {

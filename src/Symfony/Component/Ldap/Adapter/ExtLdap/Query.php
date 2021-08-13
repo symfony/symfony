@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
+use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\AbstractQuery;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
@@ -41,7 +43,7 @@ class Query extends AbstractQuery
     /**
      * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -74,7 +76,7 @@ class Query extends AbstractQuery
     /**
      * {@inheritdoc}
      */
-    public function execute()
+    public function execute(): CollectionInterface
     {
         if (null === $this->results) {
             // If the connection is not bound, throw an exception. Users should use an explicit bind call first.

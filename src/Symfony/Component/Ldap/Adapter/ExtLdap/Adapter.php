@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
+use Symfony\Component\Ldap\Adapter\QueryInterface;
+use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
+use Symfony\Component\Ldap\Adapter\ConnectionInterface;
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Exception\LdapException;
 
@@ -35,7 +38,7 @@ class Adapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getConnection()
+    public function getConnection(): ConnectionInterface
     {
         if (null === $this->connection) {
             $this->connection = new Connection($this->config);
@@ -47,7 +50,7 @@ class Adapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntryManager()
+    public function getEntryManager(): EntryManagerInterface
     {
         if (null === $this->entryManager) {
             $this->entryManager = new EntryManager($this->getConnection());
@@ -59,7 +62,7 @@ class Adapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function createQuery(string $dn, string $query, array $options = [])
+    public function createQuery(string $dn, string $query, array $options = []): QueryInterface
     {
         return new Query($this->getConnection(), $dn, $query, $options);
     }
@@ -67,7 +70,7 @@ class Adapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function escape(string $subject, string $ignore = '', int $flags = 0)
+    public function escape(string $subject, string $ignore = '', int $flags = 0): string
     {
         $value = ldap_escape($subject, $ignore, $flags);
 

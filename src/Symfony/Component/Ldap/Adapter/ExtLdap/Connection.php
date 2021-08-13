@@ -38,7 +38,7 @@ class Connection extends AbstractConnection
     /**
      * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -56,7 +56,7 @@ class Connection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function isBound()
+    public function isBound(): bool
     {
         return $this->bound;
     }

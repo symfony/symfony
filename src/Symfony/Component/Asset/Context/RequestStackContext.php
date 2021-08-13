@@ -34,7 +34,7 @@ class RequestStackContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getBasePath()
+    public function getBasePath(): string
     {
         if (!$request = $this->requestStack->getMainRequest()) {
             return $this->basePath;
@@ -46,7 +46,7 @@ class RequestStackContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function isSecure()
+    public function isSecure(): bool
     {
         if (!$request = $this->requestStack->getMainRequest()) {
             return $this->secure;

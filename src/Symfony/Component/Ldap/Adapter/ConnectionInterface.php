@@ -25,7 +25,7 @@ interface ConnectionInterface
      *
      * @return bool
      */
-    public function isBound();
+    public function isBound(): bool;
 
     /**
      * Binds the connection against a user's DN and password.

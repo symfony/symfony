@@ -66,7 +66,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername(string $username)
+    public function loadUserByUsername(string $username): UserInterface
     {
         trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
 
@@ -119,7 +119,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     /**
      * {@inheritdoc}
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof LdapUser) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
@@ -155,7 +155,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return LdapUser::class === $class;
     }
@@ -165,7 +165,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
      *
      * @return UserInterface
      */
-    protected function loadUser(string $identifier, Entry $entry)
+    protected function loadUser(string $identifier, Entry $entry): UserInterface
     {
         $password = null;
         $extraFields = [];

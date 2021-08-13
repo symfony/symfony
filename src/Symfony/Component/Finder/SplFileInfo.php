@@ -40,7 +40,7 @@ class SplFileInfo extends \SplFileInfo
      *
      * @return string the relative path
      */
-    public function getRelativePath()
+    public function getRelativePath(): string
     {
         return $this->relativePath;
     }
@@ -52,7 +52,7 @@ class SplFileInfo extends \SplFileInfo
      *
      * @return string the relative path name
      */
-    public function getRelativePathname()
+    public function getRelativePathname(): string
     {
         return $this->relativePathname;
     }
@@ -71,7 +71,7 @@ class SplFileInfo extends \SplFileInfo
      *
      * @throws \RuntimeException
      */
-    public function getContents()
+    public function getContents(): string
     {
         set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
         $content = file_get_contents($this->getPathname());

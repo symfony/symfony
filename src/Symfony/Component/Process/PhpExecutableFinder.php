@@ -31,7 +31,7 @@ class PhpExecutableFinder
      *
      * @return string|false The PHP executable path or false if it cannot be found
      */
-    public function find(bool $includeArgs = true)
+    public function find(bool $includeArgs = true): string|false
     {
         if ($php = getenv('PHP_BINARY')) {
             if (!is_executable($php)) {
@@ -87,7 +87,7 @@ class PhpExecutableFinder
      *
      * @return array The PHP executable arguments
      */
-    public function findArguments()
+    public function findArguments(): array
     {
         $arguments = [];
         if ('phpdbg' === \PHP_SAPI) {

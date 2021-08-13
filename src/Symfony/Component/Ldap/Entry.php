@@ -37,7 +37,7 @@ class Entry
      *
      * @return string
      */
-    public function getDn()
+    public function getDn(): string
     {
         return $this->dn;
     }
@@ -50,7 +50,7 @@ class Entry
      *
      * @return bool
      */
-    public function hasAttribute(string $name, bool $caseSensitive = true)
+    public function hasAttribute(string $name, bool $caseSensitive = true): bool
     {
         $attributeKey = $this->getAttributeKey($name, $caseSensitive);
 
@@ -72,7 +72,7 @@ class Entry
      *
      * @return array|null
      */
-    public function getAttribute(string $name, bool $caseSensitive = true)
+    public function getAttribute(string $name, bool $caseSensitive = true): ?array
     {
         $attributeKey = $this->getAttributeKey($name, $caseSensitive);
 
@@ -88,7 +88,7 @@ class Entry
      *
      * @return array
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }

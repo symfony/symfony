@@ -63,7 +63,7 @@ class Reader
     /**
      * @return array|false
      */
-    public function findPattern(string $pattern)
+    public function findPattern(string $pattern): array|false
     {
         $source = substr($this->source, $this->position);
 

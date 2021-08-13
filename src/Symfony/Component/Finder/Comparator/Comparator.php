@@ -34,7 +34,7 @@ class Comparator
      *
      * @return string The target value
      */
-    public function getTarget()
+    public function getTarget(): string
     {
         return $this->target;
     }
@@ -44,17 +44,15 @@ class Comparator
      *
      * @return string The operator
      */
-    public function getOperator()
+    public function getOperator(): string
     {
         return $this->operator;
     }
 
     /**
      * Tests against the target.
-     *
-     * @return bool
      */
-    public function test(mixed $test)
+    public function test(mixed $test): bool
     {
         switch ($this->operator) {
             case '>':

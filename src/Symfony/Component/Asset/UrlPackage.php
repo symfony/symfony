@@ -67,7 +67,7 @@ class UrlPackage extends Package
     /**
      * {@inheritdoc}
      */
-    public function getUrl(string $path)
+    public function getUrl(string $path): string
     {
         if ($this->isAbsoluteUrl($path)) {
             return $path;
@@ -95,7 +95,7 @@ class UrlPackage extends Package
      *
      * @return string The base URL
      */
-    public function getBaseUrl(string $path)
+    public function getBaseUrl(string $path): string
     {
         if (1 === \count($this->baseUrls)) {
             return $this->baseUrls[0];
@@ -112,7 +112,7 @@ class UrlPackage extends Package
      *
      * @return int The base URL index for the given path
      */
-    protected function chooseBaseUrl(string $path)
+    protected function chooseBaseUrl(string $path): int
     {
         return (int) fmod(hexdec(substr(hash('sha256', $path), 0, 10)), \count($this->baseUrls));
     }

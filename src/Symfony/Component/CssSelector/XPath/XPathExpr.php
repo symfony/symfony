@@ -77,7 +77,7 @@ class XPathExpr
      *
      * @return $this
      */
-    public function join(string $combiner, self $expr): self
+    public function join(string $combiner, self $expr): static
     {
         $path = $this->__toString().$combiner;
 

@@ -109,7 +109,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Returns true if the service id is defined.
      *
-     * @deprecated since 5.4, use method or constructor injection in your controller instead
+     * @deprecated since Symfony 5.4, use method or constructor injection in your controller instead
      */
     protected function has(string $id): bool
     {
@@ -123,7 +123,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @return object The service
      *
-     * @deprecated since 5.4, use method or constructor injection in your controller instead
+     * @deprecated since Symfony 5.4, use method or constructor injection in your controller instead
      */
     protected function get(string $id): object
     {
@@ -379,7 +379,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @throws \LogicException If DoctrineBundle is not available
      *
-     * @deprecated since 5.4, inject an instance of ManagerRegistry in your controller instead
+     * @deprecated since Symfony 5.4, inject an instance of ManagerRegistry in your controller instead
      */
     protected function getDoctrine(): ManagerRegistry
     {
@@ -439,7 +439,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @param object|Envelope $message The message or the message pre-wrapped in an envelope
      *
-     * @deprecated since 5.4, inject an instance of MessageBusInterface in your controller instead
+     * @deprecated since Symfony 5.4, inject an instance of MessageBusInterface in your controller instead
      */
     protected function dispatchMessage(object $message, array $stamps = []): Envelope
     {

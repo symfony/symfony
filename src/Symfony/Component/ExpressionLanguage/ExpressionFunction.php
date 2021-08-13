@@ -46,26 +46,17 @@ class ExpressionFunction
         $this->evaluator = $evaluator instanceof \Closure ? $evaluator : \Closure::fromCallable($evaluator);
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return \Closure
-     */
-    public function getCompiler()
+    public function getCompiler(): \Closure
     {
         return $this->compiler;
     }
 
-    /**
-     * @return \Closure
-     */
-    public function getEvaluator()
+    public function getEvaluator(): \Closure
     {
         return $this->evaluator;
     }
@@ -75,13 +66,11 @@ class ExpressionFunction
      *
      * @param string|null $expressionFunctionName The expression function name (default: same than the PHP function name)
      *
-     * @return self
-     *
      * @throws \InvalidArgumentException if given PHP function name does not exist
      * @throws \InvalidArgumentException if given PHP function name is in namespace
      *                                   and expression function name is not defined
      */
-    public static function fromPhp(string $phpFunctionName, string $expressionFunctionName = null)
+    public static function fromPhp(string $phpFunctionName, string $expressionFunctionName = null): self
     {
         $phpFunctionName = ltrim($phpFunctionName, '\\');
         if (!\function_exists($phpFunctionName)) {

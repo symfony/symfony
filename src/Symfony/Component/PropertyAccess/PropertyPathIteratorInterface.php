@@ -19,16 +19,12 @@ interface PropertyPathIteratorInterface extends \Iterator, \SeekableIterator
     /**
      * Returns whether the current element in the property path is an array
      * index.
-     *
-     * @return bool
      */
-    public function isIndex();
+    public function isIndex(): bool;
 
     /**
      * Returns whether the current element in the property path is a property
      * name.
-     *
-     * @return bool
      */
-    public function isProperty();
+    public function isProperty(): bool;
 }

@@ -170,7 +170,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function getOption(string $key)
+    public function getOption(string $key): mixed
     {
         if (!\array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
@@ -209,7 +209,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getContext()
+    public function getContext(): RequestContext
     {
         return $this->context;
     }
@@ -225,7 +225,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH)
+    public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
     {
         return $this->getGenerator()->generate($name, $parameters, $referenceType);
     }
@@ -233,7 +233,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function match(string $pathinfo)
+    public function match(string $pathinfo): array
     {
         return $this->getMatcher()->match($pathinfo);
     }
@@ -241,7 +241,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function matchRequest(Request $request)
+    public function matchRequest(Request $request): array
     {
         $matcher = $this->getMatcher();
         if (!$matcher instanceof RequestMatcherInterface) {
@@ -257,7 +257,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @return UrlMatcherInterface|RequestMatcherInterface
      */
-    public function getMatcher()
+    public function getMatcher(): UrlMatcherInterface|RequestMatcherInterface
     {
         if (null !== $this->matcher) {
             return $this->matcher;
@@ -300,7 +300,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @return UrlGeneratorInterface
      */
-    public function getGenerator()
+    public function getGenerator(): UrlGeneratorInterface
     {
         if (null !== $this->generator) {
             return $this->generator;
@@ -340,7 +340,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * @return GeneratorDumperInterface
      */
-    protected function getGeneratorDumperInstance()
+    protected function getGeneratorDumperInstance(): GeneratorDumperInterface
     {
         return new $this->options['generator_dumper_class']($this->getRouteCollection());
     }
@@ -348,7 +348,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * @return MatcherDumperInterface
      */
-    protected function getMatcherDumperInstance()
+    protected function getMatcherDumperInstance(): MatcherDumperInterface
     {
         return new $this->options['matcher_dumper_class']($this->getRouteCollection());
     }

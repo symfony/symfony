@@ -40,7 +40,7 @@ class XmlFileLoader extends FileLoader
      * @throws \InvalidArgumentException when the file cannot be loaded or when the XML cannot be
      *                                   parsed because it does not validate against the scheme
      */
-    public function load(mixed $file, string $type = null)
+    public function load(mixed $file, string $type = null): RouteCollection
     {
         $path = $this->locator->locate($file);
 
@@ -97,7 +97,7 @@ class XmlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports(mixed $resource, string $type = null)
+    public function supports(mixed $resource, string $type = null): bool
     {
         return \is_string($resource) && 'xml' === pathinfo($resource, \PATHINFO_EXTENSION) && (!$type || 'xml' === $type);
     }
@@ -220,7 +220,7 @@ class XmlFileLoader extends FileLoader
      *                                   or when the XML structure is not as expected by the scheme -
      *                                   see validate()
      */
-    protected function loadFile(string $file)
+    protected function loadFile(string $file): \DOMDocument
     {
         return XmlUtils::loadFile($file, __DIR__.static::SCHEME_PATH);
     }

@@ -37,7 +37,7 @@ class MethodNotAllowedException extends \RuntimeException implements ExceptionIn
      *
      * @return string[]
      */
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return $this->allowedMethods;
     }

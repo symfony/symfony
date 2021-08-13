@@ -38,7 +38,7 @@ class Compiler implements ResetInterface
      *
      * @return string The PHP code
      */
-    public function getSource()
+    public function getSource(): string
     {
         return $this->source;
     }
@@ -55,7 +55,7 @@ class Compiler implements ResetInterface
      *
      * @return $this
      */
-    public function compile(Node\Node $node)
+    public function compile(Node\Node $node): static
     {
         $node->compile($this);
 
@@ -80,7 +80,7 @@ class Compiler implements ResetInterface
      *
      * @return $this
      */
-    public function raw(string $string)
+    public function raw(string $string): static
     {
         $this->source .= $string;
 
@@ -92,7 +92,7 @@ class Compiler implements ResetInterface
      *
      * @return $this
      */
-    public function string(string $value)
+    public function string(string $value): static
     {
         $this->source .= sprintf('"%s"', addcslashes($value, "\0\t\"\$\\"));
 
@@ -104,7 +104,7 @@ class Compiler implements ResetInterface
      *
      * @return $this
      */
-    public function repr(mixed $value)
+    public function repr(mixed $value): static
     {
         if (\is_int($value) || \is_float($value)) {
             if (false !== $locale = setlocale(\LC_NUMERIC, 0)) {

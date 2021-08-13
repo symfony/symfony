@@ -85,7 +85,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @return Route[] An array of routes
      */
-    public function all()
+    public function all(): array
     {
         if ($this->priorities) {
             $priorities = $this->priorities;
@@ -103,7 +103,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @return Route|null
      */
-    public function get(string $name)
+    public function get(string $name): ?Route
     {
         return $this->routes[$name] ?? null;
     }
@@ -277,7 +277,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @return ResourceInterface[] An array of resources
      */
-    public function getResources()
+    public function getResources(): array
     {
         return array_values($this->resources);
     }

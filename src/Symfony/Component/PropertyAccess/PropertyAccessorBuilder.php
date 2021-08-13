@@ -67,7 +67,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function enableMagicCall()
+    public function enableMagicCall(): static
     {
         $this->magicMethods |= PropertyAccessor::MAGIC_CALL;
 
@@ -99,7 +99,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function disableMagicCall()
+    public function disableMagicCall(): static
     {
         $this->magicMethods &= ~PropertyAccessor::MAGIC_CALL;
 
@@ -129,7 +129,7 @@ class PropertyAccessorBuilder
     /**
      * @return bool whether the use of "__call" by the PropertyAccessor is enabled
      */
-    public function isMagicCallEnabled()
+    public function isMagicCallEnabled(): bool
     {
         return (bool) ($this->magicMethods & PropertyAccessor::MAGIC_CALL);
     }
@@ -158,7 +158,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function enableExceptionOnInvalidIndex()
+    public function enableExceptionOnInvalidIndex(): static
     {
         $this->throwExceptionOnInvalidIndex = true;
 
@@ -172,7 +172,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function disableExceptionOnInvalidIndex()
+    public function disableExceptionOnInvalidIndex(): static
     {
         $this->throwExceptionOnInvalidIndex = false;
 
@@ -182,7 +182,7 @@ class PropertyAccessorBuilder
     /**
      * @return bool whether an exception is thrown or null is returned when reading a non-existing index
      */
-    public function isExceptionOnInvalidIndexEnabled()
+    public function isExceptionOnInvalidIndexEnabled(): bool
     {
         return $this->throwExceptionOnInvalidIndex;
     }
@@ -195,7 +195,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function enableExceptionOnInvalidPropertyPath()
+    public function enableExceptionOnInvalidPropertyPath(): static
     {
         $this->throwExceptionOnInvalidPropertyPath = true;
 
@@ -209,7 +209,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function disableExceptionOnInvalidPropertyPath()
+    public function disableExceptionOnInvalidPropertyPath(): static
     {
         $this->throwExceptionOnInvalidPropertyPath = false;
 
@@ -219,7 +219,7 @@ class PropertyAccessorBuilder
     /**
      * @return bool whether an exception is thrown or null is returned when reading a non-existing property
      */
-    public function isExceptionOnInvalidPropertyPath()
+    public function isExceptionOnInvalidPropertyPath(): bool
     {
         return $this->throwExceptionOnInvalidPropertyPath;
     }
@@ -229,7 +229,7 @@ class PropertyAccessorBuilder
      *
      * @return PropertyAccessorBuilder The builder object
      */
-    public function setCacheItemPool(CacheItemPoolInterface $cacheItemPool = null)
+    public function setCacheItemPool(CacheItemPoolInterface $cacheItemPool = null): self
     {
         $this->cacheItemPool = $cacheItemPool;
 
@@ -238,10 +238,8 @@ class PropertyAccessorBuilder
 
     /**
      * Gets the used cache system.
-     *
-     * @return CacheItemPoolInterface|null
      */
-    public function getCacheItemPool()
+    public function getCacheItemPool(): ?CacheItemPoolInterface
     {
         return $this->cacheItemPool;
     }
@@ -249,7 +247,7 @@ class PropertyAccessorBuilder
     /**
      * @return $this
      */
-    public function setReadInfoExtractor(?PropertyReadInfoExtractorInterface $readInfoExtractor)
+    public function setReadInfoExtractor(?PropertyReadInfoExtractorInterface $readInfoExtractor): static
     {
         $this->readInfoExtractor = $readInfoExtractor;
 
@@ -264,7 +262,7 @@ class PropertyAccessorBuilder
     /**
      * @return $this
      */
-    public function setWriteInfoExtractor(?PropertyWriteInfoExtractorInterface $writeInfoExtractor)
+    public function setWriteInfoExtractor(?PropertyWriteInfoExtractorInterface $writeInfoExtractor): static
     {
         $this->writeInfoExtractor = $writeInfoExtractor;
 
@@ -281,7 +279,7 @@ class PropertyAccessorBuilder
      *
      * @return PropertyAccessorInterface The built PropertyAccessor
      */
-    public function getPropertyAccessor()
+    public function getPropertyAccessor(): PropertyAccessorInterface
     {
         $throw = PropertyAccessor::DO_NOT_THROW;
 

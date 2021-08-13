@@ -67,10 +67,8 @@ class TokenStream
 
     /**
      * Checks if end of stream was reached.
-     *
-     * @return bool
      */
-    public function isEOF()
+    public function isEOF(): bool
     {
         return Token::EOF_TYPE === $this->current->type;
     }

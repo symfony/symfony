@@ -31,7 +31,7 @@ class RegisterListenersPass implements CompilerPassInterface
     /**
      * @return $this
      */
-    public function setHotPathEvents(array $hotPathEvents)
+    public function setHotPathEvents(array $hotPathEvents): static
     {
         $this->hotPathEvents = array_flip($hotPathEvents);
 
@@ -41,7 +41,7 @@ class RegisterListenersPass implements CompilerPassInterface
     /**
      * @return $this
      */
-    public function setNoPreloadEvents(array $noPreloadEvents): self
+    public function setNoPreloadEvents(array $noPreloadEvents): static
     {
         $this->noPreloadEvents = array_flip($noPreloadEvents);
 

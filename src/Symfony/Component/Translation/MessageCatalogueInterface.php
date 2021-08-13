@@ -27,14 +27,14 @@ interface MessageCatalogueInterface
      *
      * @return string The locale
      */
-    public function getLocale();
+    public function getLocale(): string;
 
     /**
      * Gets the domains.
      *
      * @return array An array of domains
      */
-    public function getDomains();
+    public function getDomains(): array;
 
     /**
      * Gets the messages within a given domain.
@@ -45,7 +45,7 @@ interface MessageCatalogueInterface
      *
      * @return array An array of messages
      */
-    public function all(string $domain = null);
+    public function all(string $domain = null): array;
 
     /**
      * Sets a message translation.
@@ -64,7 +64,7 @@ interface MessageCatalogueInterface
      *
      * @return bool true if the message has a translation, false otherwise
      */
-    public function has(string $id, string $domain = 'messages');
+    public function has(string $id, string $domain = 'messages'): bool;
 
     /**
      * Checks if a message has a translation (it does not take into account the fallback mechanism).
@@ -74,7 +74,7 @@ interface MessageCatalogueInterface
      *
      * @return bool true if the message has a translation, false otherwise
      */
-    public function defines(string $id, string $domain = 'messages');
+    public function defines(string $id, string $domain = 'messages'): bool;
 
     /**
      * Gets a message translation.
@@ -84,7 +84,7 @@ interface MessageCatalogueInterface
      *
      * @return string The message translation
      */
-    public function get(string $id, string $domain = 'messages');
+    public function get(string $id, string $domain = 'messages'): string;
 
     /**
      * Sets translations for a given domain.
@@ -119,17 +119,15 @@ interface MessageCatalogueInterface
 
     /**
      * Gets the fallback catalogue.
-     *
-     * @return self|null
      */
-    public function getFallbackCatalogue();
+    public function getFallbackCatalogue(): ?self;
 
     /**
      * Returns an array of resources loaded to build this collection.
      *
      * @return ResourceInterface[] An array of resources
      */
-    public function getResources();
+    public function getResources(): array;
 
     /**
      * Adds a resource for this collection.

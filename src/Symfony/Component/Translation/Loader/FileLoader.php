@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Loader;
 
+use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
@@ -23,7 +24,7 @@ abstract class FileLoader extends ArrayLoader
     /**
      * {@inheritdoc}
      */
-    public function load(mixed $resource, string $locale, string $domain = 'messages')
+    public function load(mixed $resource, string $locale, string $domain = 'messages'): MessageCatalogue
     {
         if (!stream_is_local($resource)) {
             throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
@@ -59,5 +60,5 @@ abstract class FileLoader extends ArrayLoader
      *
      * @throws InvalidResourceException if stream content has an invalid format
      */
-    abstract protected function loadResource(string $resource);
+    abstract protected function loadResource(string $resource): array;
 }

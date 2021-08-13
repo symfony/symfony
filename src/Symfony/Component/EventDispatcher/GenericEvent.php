@@ -42,7 +42,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @return mixed The observer subject
      */
-    public function getSubject()
+    public function getSubject(): mixed
     {
         return $this->subject;
     }
@@ -54,7 +54,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @throws \InvalidArgumentException if key is not found
      */
-    public function getArgument(string $key)
+    public function getArgument(string $key): mixed
     {
         if ($this->hasArgument($key)) {
             return $this->arguments[$key];
@@ -68,7 +68,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @return $this
      */
-    public function setArgument(string $key, mixed $value)
+    public function setArgument(string $key, mixed $value): static
     {
         $this->arguments[$key] = $value;
 
@@ -77,10 +77,8 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Getter for all arguments.
-     *
-     * @return array
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
@@ -90,7 +88,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @return $this
      */
-    public function setArguments(array $args = [])
+    public function setArguments(array $args = []): static
     {
         $this->arguments = $args;
 
@@ -99,10 +97,8 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Has argument.
-     *
-     * @return bool
      */
-    public function hasArgument(string $key)
+    public function hasArgument(string $key): bool
     {
         return \array_key_exists($key, $this->arguments);
     }

@@ -96,7 +96,7 @@ class CompiledRoute implements \Serializable
      *
      * @return string The static prefix
      */
-    public function getStaticPrefix()
+    public function getStaticPrefix(): string
     {
         return $this->staticPrefix;
     }
@@ -106,7 +106,7 @@ class CompiledRoute implements \Serializable
      *
      * @return string The regex
      */
-    public function getRegex()
+    public function getRegex(): string
     {
         return $this->regex;
     }
@@ -116,7 +116,7 @@ class CompiledRoute implements \Serializable
      *
      * @return string|null The host regex or null
      */
-    public function getHostRegex()
+    public function getHostRegex(): ?string
     {
         return $this->hostRegex;
     }
@@ -126,7 +126,7 @@ class CompiledRoute implements \Serializable
      *
      * @return array The tokens
      */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
@@ -136,7 +136,7 @@ class CompiledRoute implements \Serializable
      *
      * @return array The tokens
      */
-    public function getHostTokens()
+    public function getHostTokens(): array
     {
         return $this->hostTokens;
     }
@@ -146,7 +146,7 @@ class CompiledRoute implements \Serializable
      *
      * @return array The variables
      */
-    public function getVariables()
+    public function getVariables(): array
     {
         return $this->variables;
     }
@@ -156,7 +156,7 @@ class CompiledRoute implements \Serializable
      *
      * @return array The variables
      */
-    public function getPathVariables()
+    public function getPathVariables(): array
     {
         return $this->pathVariables;
     }
@@ -166,7 +166,7 @@ class CompiledRoute implements \Serializable
      *
      * @return array The variables
      */
-    public function getHostVariables()
+    public function getHostVariables(): array
     {
         return $this->hostVariables;
     }

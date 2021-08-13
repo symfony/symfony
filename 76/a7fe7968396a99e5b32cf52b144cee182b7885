@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-08T15:40:31Z
+
+Psalm disliking the old signatures in the legacy integrations/tests is to be expected, this PR is ready imho

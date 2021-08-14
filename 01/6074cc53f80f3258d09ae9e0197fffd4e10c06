@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-12T20:01:27Z
+
+Thanks for the reviews @Nyholm!
+
+> Just waiting for it to remove WIP
+
+The WIP is just because of the intentionally broken tests. Everything except `ExpressionLanguageTest` is in the final state as far as I'm concerned.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-13T10:32:58Z
+
+The most common usage of `IS_AUTHENTICATED_ANONYMOUSLY` looks like:
+
+```yaml
+firewalls:
+    main:
+        pattern: ^/
+        form_login:
+            login_path: login
+            check_path: login
+
+access_control:
+    - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/another_public_resource, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+```
+
+What is the new way to achieve that? How should one allow a single route to be accessed without being authenticated?
+I think having such before/after example in the UPGRADE file would be useful.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-13T16:23:21Z
+
+#42423 has been merged now.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-14T09:33:38Z
+
+Good idea @chalasr. The great thing: this made me realize that I was suggesting a wrong replacement. I've added your example to the UPGRADE guide.
+
+Meanwhile, I also fixed the tests and updated the `isAuthenticated()` check to take into account deprecated features (and also make sure to be forward compatible by returning `false` for anonymous).
+
+---
+
+I think I have to disagree with fabbot here, their suggestion doesn't make sense: (I know we like to use the pixels at the right side of the screen, but I'm going to need a much much wider screen to be able to read this line :smile: )
+
+```diff
+diff -ru src/Symfony/Component/Security/Http/Tests/Firewall/ContextListenerTest.php src/Symfony/Component/Security/Http/Tests/Firewall/ContextListenerTest.php
+--- src/Symfony/Component/Security/Http/Tests/Firewall/ContextListenerTest.php	2021-08-14 09:17:15.170647398 +0000
++++ src/Symfony/Component/Security/Http/Tests/Firewall/ContextListenerTest.php	2021-08-14 09:17:18.381551885 +0000
+@@ -416,11 +416,9 @@
+
+         $tokenStorage = new TokenStorage();
+         $usageIndex = $session->getUsageIndex();
+-        $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class(
+-            (new \ReflectionClass(UsageTrackingTokenStorage::class))->hasMethod('getSession') ? [
+-                'request_stack' => function () use ($requestStack) {
+-                return $requestStack;
+-            }] : [
++        $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class((new \ReflectionClass(UsageTrackingTokenStorage::class))->hasMethod('getSession') ? ['request_stack' => function () use ($requestStack) {
++            return $requestStack;
++        }] : [
+                 // BC for symfony/framework-bundle < 5.3
+                 'session' => function () use ($session) {
+                     return $session;
+```

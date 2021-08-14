@@ -141,7 +141,6 @@ class SecurityDataCollectorTest extends TestCase
         $collected = $collector->getFirewall();
 
         $this->assertSame($firewallConfig->getName(), $collected['name']);
-        $this->assertSame($firewallConfig->allowsAnonymous(), $collected['allows_anonymous']);
         $this->assertSame($firewallConfig->getRequestMatcher(), $collected['request_matcher']);
         $this->assertSame($firewallConfig->isSecurityEnabled(), $collected['security_enabled']);
         $this->assertSame($firewallConfig->isStateless(), $collected['stateless']);

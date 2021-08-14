@@ -28,7 +28,6 @@ class ExpressionLanguageTest extends TestCase
 {
     /**
      * @dataProvider provider
-     * @dataProvider legacyProvider
      */
     public function testIsAuthenticated($token, $expression, $result)
     {
@@ -56,19 +55,16 @@ class ExpressionLanguageTest extends TestCase
         $usernamePasswordToken = new UsernamePasswordToken($user, 'firewall-name', $roles);
 
         return [
-            [$noToken, 'is_anonymous()', false],
             [$noToken, 'is_authenticated()', false],
             [$noToken, 'is_fully_authenticated()', false],
             [$noToken, 'is_remember_me()', false],
 
-            [$rememberMeToken, 'is_anonymous()', false],
             [$rememberMeToken, 'is_authenticated()', true],
             [$rememberMeToken, 'is_fully_authenticated()', false],
             [$rememberMeToken, 'is_remember_me()', true],
             [$rememberMeToken, "is_granted('ROLE_FOO')", false],
             [$rememberMeToken, "is_granted('ROLE_USER')", true],
 
-            [$usernamePasswordToken, 'is_anonymous()', false],
             [$usernamePasswordToken, 'is_authenticated()', true],
             [$usernamePasswordToken, 'is_fully_authenticated()', true],
             [$usernamePasswordToken, 'is_remember_me()', false],
@@ -78,10 +74,21 @@ class ExpressionLanguageTest extends TestCase
     }
 
     /**
+     * @dataProvider legacyProvider
+     * @group legacy
+     */
+    public function testLegacyIsAuthenticated($token, $expression, $result)
+    {
+        $this->testIsAuthenticated($token, $expression, $result);
+    }
+
+    /**
      * @group legacy
      */
     public function legacyProvider()
     {
+        $roles = ['ROLE_USER', 'ROLE_ADMIN'];
+        $user = new InMemoryUser('username', 'password', $roles);
         $anonymousToken = new AnonymousToken('firewall', 'anon.');
 
         return [
@@ -90,6 +97,10 @@ class ExpressionLanguageTest extends TestCase
             [$anonymousToken, 'is_fully_authenticated()', false],
             [$anonymousToken, 'is_remember_me()', false],
             [$anonymousToken, "is_granted('ROLE_USER')", false],
+
+            [null, 'is_anonymous()', false],
+            [new RememberMeToken($user, 'firewall-name', 'firewall'), 'is_anonymous()', false],
+            [new UsernamePasswordToken($user, 'firewall-name', $roles), 'is_anonymous()', false],
         ];
     }
 }

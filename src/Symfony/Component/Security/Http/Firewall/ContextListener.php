@@ -187,7 +187,9 @@ class ContextListener extends AbstractListener
         $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : null;
         $token = $this->tokenStorage->getToken();
 
-        if (null === $token || $this->trustResolver->isAnonymous($token)) {
+        // @deprecated always use isAuthenticated() in 6.0
+        $notAuthenticated = method_exists($this->trustResolver, 'isAuthenticated') ? !$this->trustResolver->isAuthenticated($token) : (null === $token || $this->trustResolver->isAnonymous($token));
+        if ($notAuthenticated) {
             if ($request->hasPreviousSession()) {
                 $session->remove($this->sessionKey);
             }

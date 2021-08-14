@@ -40,17 +40,11 @@ class AuthenticatedVoterTest extends TestCase
             ['remembered', [], VoterInterface::ACCESS_ABSTAIN],
             ['remembered', ['FOO'], VoterInterface::ACCESS_ABSTAIN],
 
-            ['fully', ['IS_AUTHENTICATED_ANONYMOUSLY'], VoterInterface::ACCESS_GRANTED],
-            ['remembered', ['IS_AUTHENTICATED_ANONYMOUSLY'], VoterInterface::ACCESS_GRANTED],
-
             ['fully', ['IS_AUTHENTICATED_REMEMBERED'], VoterInterface::ACCESS_GRANTED],
             ['remembered', ['IS_AUTHENTICATED_REMEMBERED'], VoterInterface::ACCESS_GRANTED],
 
             ['fully', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_GRANTED],
             ['remembered', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_DENIED],
-
-            ['fully', ['IS_ANONYMOUS'], VoterInterface::ACCESS_DENIED],
-            ['remembered', ['IS_ANONYMOUS'], VoterInterface::ACCESS_DENIED],
 
             ['fully', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
             ['remembered', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
@@ -77,6 +71,14 @@ class AuthenticatedVoterTest extends TestCase
             ['anonymously', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_DENIED],
             ['anonymously', ['IS_ANONYMOUS'], VoterInterface::ACCESS_GRANTED],
             ['anonymously', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
+
+            ['fully', ['IS_ANONYMOUS'], VoterInterface::ACCESS_DENIED],
+            ['remembered', ['IS_ANONYMOUS'], VoterInterface::ACCESS_DENIED],
+            ['anonymously', ['IS_ANONYMOUS'], VoterInterface::ACCESS_GRANTED],
+
+            ['fully', ['IS_AUTHENTICATED_ANONYMOUSLY'], VoterInterface::ACCESS_GRANTED],
+            ['remembered', ['IS_AUTHENTICATED_ANONYMOUSLY'], VoterInterface::ACCESS_GRANTED],
+            ['anonymously', ['IS_AUTHENTICATED_ANONYMOUSLY'], VoterInterface::ACCESS_GRANTED],
         ];
     }
 

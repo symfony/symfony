@@ -18,7 +18,7 @@ class FirewallConfigTest extends TestCase
 {
     public function testGetters()
     {
-        $listeners = ['logout', 'remember_me', 'anonymous'];
+        $listeners = ['logout', 'remember_me'];
         $options = [
             'request_matcher' => 'foo_request_matcher',
             'security' => false,
@@ -57,7 +57,6 @@ class FirewallConfigTest extends TestCase
         $this->assertSame($options['access_denied_handler'], $config->getAccessDeniedHandler());
         $this->assertSame($options['access_denied_url'], $config->getAccessDeniedUrl());
         $this->assertSame($options['user_checker'], $config->getUserChecker());
-        $this->assertTrue($config->allowsAnonymous());
         $this->assertSame($listeners, $config->getListeners());
         $this->assertSame($options['switch_user'], $config->getSwitchUser());
     }

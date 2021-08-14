@@ -63,7 +63,7 @@ class ContextListenerTest extends TestCase
     public function testOnKernelResponseWillAddSession()
     {
         $session = $this->runSessionOnKernelResponse(
-            new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit'),
+            new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']),
             null
         );
 
@@ -75,7 +75,7 @@ class ContextListenerTest extends TestCase
     public function testOnKernelResponseWillReplaceSession()
     {
         $session = $this->runSessionOnKernelResponse(
-            new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit'),
+            new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']),
             'C:10:"serialized"'
         );
 
@@ -107,7 +107,7 @@ class ContextListenerTest extends TestCase
     public function testOnKernelResponseWithoutSession()
     {
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit'));
+        $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']));
         $request = new Request();
         $request->attributes->set('_security_firewall_run', '_security_session');
         $session = new Session(new MockArraySessionStorage());

@@ -58,7 +58,8 @@ class LintCommand extends Command
             ->setDescription(self::$defaultDescription)
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format')
-            ->addOption('parse-tags', null, InputOption::VALUE_NONE, 'Parse custom tags')
+            ->addOption('exclude', 'e', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Path(s) to exclude')
+            ->addOption('parse-tags', null, InputOption::VALUE_NEGATABLE, 'Parse custom tags', null)
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints a YAML file and outputs to STDOUT
 the first encountered syntax error.
@@ -76,6 +77,10 @@ Or of a whole directory:
   <info>php %command.full_name% dirname</info>
   <info>php %command.full_name% dirname --format=json</info>
 
+You can also exclude one or more specific files:
+
+  <info>php %command.full_name% dirname --exclude="dirname/foo.yaml" --exclude="dirname/bar.yaml"</info>
+
 EOF
             )
         ;
@@ -85,7 +90,9 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $filenames = (array) $input->getArgument('filename');
+        $excludes = $input->getOption('exclude');
         $this->format = $input->getOption('format');
+        $flags = $input->getOption('parse-tags');
 
         if ('github' === $this->format && !class_exists(GithubActionReporter::class)) {
             throw new \InvalidArgumentException('The "github" format is only available since "symfony/console" >= 5.3.');
@@ -96,8 +103,9 @@ EOF
             $this->format = class_exists(GithubActionReporter::class) && GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt';
         }
 
+        $flags = $flags ? Yaml::PARSE_CUSTOM_TAGS : 0;
+
         $this->displayCorrectFiles = $output->isVerbose();
-        $flags = $input->getOption('parse-tags') ? Yaml::PARSE_CUSTOM_TAGS : 0;
 
         if (['-'] === $filenames) {
             return $this->display($io, [$this->validate(file_get_contents('php://stdin'), $flags)]);
@@ -114,7 +122,9 @@ EOF
             }
 
             foreach ($this->getFiles($filename) as $file) {
-                $filesInfo[] = $this->validate(file_get_contents($file), $flags, $file);
+                if (!\in_array($file->getPathname(), $excludes, true)) {
+                    $filesInfo[] = $this->validate(file_get_contents($file), $flags, $file);
+                }
             }
         }
 

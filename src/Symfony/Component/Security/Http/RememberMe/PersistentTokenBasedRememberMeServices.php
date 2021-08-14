@@ -94,7 +94,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         );
 
         $userProvider = $this->getUserProvider($persistentToken->getClass());
-        // @deprecated since 5.3, change to $persistentToken->getUserIdentifier() in 6.0
+        // @deprecated since Symfony 5.3, change to $persistentToken->getUserIdentifier() in 6.0
         if (method_exists($persistentToken, 'getUserIdentifier')) {
             $userIdentifier = $persistentToken->getUserIdentifier();
         } else {
@@ -103,7 +103,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             $userIdentifier = $persistentToken->getUsername();
         }
 
-        // @deprecated since 5.3, change to $userProvider->loadUserByIdentifier() in 6.0
+        // @deprecated since Symfony 5.3, change to $userProvider->loadUserByIdentifier() in 6.0
         if (method_exists($userProvider, 'loadUserByIdentifier')) {
             return $userProvider->loadUserByIdentifier($userIdentifier);
         } else {
@@ -124,7 +124,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         $this->tokenProvider->createNewToken(
             new PersistentToken(
                 \get_class($user = $token->getUser()),
-                // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+                // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
                 method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(),
                 $series,
                 $this->generateHash($tokenValue),

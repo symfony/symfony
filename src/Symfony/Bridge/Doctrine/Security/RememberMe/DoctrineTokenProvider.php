@@ -117,7 +117,7 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
         $sql = 'INSERT INTO rememberme_token (class, username, series, value, lastUsed) VALUES (:class, :username, :series, :value, :lastUsed)';
         $paramValues = [
             'class' => $token->getClass(),
-            // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
             'username' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername(),
             'series' => $token->getSeries(),
             'value' => $token->getTokenValue(),

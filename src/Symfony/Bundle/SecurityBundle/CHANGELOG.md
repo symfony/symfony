@@ -16,6 +16,7 @@ CHANGELOG
 5.4
 ---
 
+ * Deprecate `FirewallConfig::allowsAnonymous()` and the `allows_anonymous` from the data collector data, there will be no anonymous concept as of version 6.
  * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`
  * Deprecate `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of
    `AuthenticatorFactoryInterface` and `SecurityExtension::addAuthenticatorFactory()`

@@ -132,6 +132,7 @@ class LogoutUrlGenerator
         if (null !== $this->tokenStorage) {
             $token = $this->tokenStorage->getToken();
 
+            // @deprecated since 5.4
             if ($token instanceof AnonymousToken) {
                 throw new \InvalidArgumentException('Unable to generate a logout url for an anonymous token.');
             }

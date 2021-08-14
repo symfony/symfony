@@ -22,6 +22,30 @@ class SwitchUserTokenTest extends TestCase
 {
     public function testSerialize()
     {
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('user', 'foo', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']), 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
+        $token = new SwitchUserToken(new InMemoryUser('admin', 'bar', ['ROLE_USER']), 'provider-key', ['ROLE_USER'], $originalToken, 'https://symfony.com/blog');
+
+        $unserializedToken = unserialize(serialize($token));
+
+        $this->assertInstanceOf(SwitchUserToken::class, $unserializedToken);
+        $this->assertSame('admin', $unserializedToken->getUserIdentifier());
+        $this->assertSame('provider-key', $unserializedToken->getFirewallName());
+        $this->assertEquals(['ROLE_USER'], $unserializedToken->getRoleNames());
+        $this->assertSame('https://symfony.com/blog', $unserializedToken->getOriginatedFromUri());
+
+        $unserializedOriginalToken = $unserializedToken->getOriginalToken();
+
+        $this->assertInstanceOf(UsernamePasswordToken::class, $unserializedOriginalToken);
+        $this->assertSame('user', $unserializedOriginalToken->getUserIdentifier());
+        $this->assertSame('provider-key', $unserializedOriginalToken->getFirewallName());
+        $this->assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacySerialize()
+    {
         $originalToken = new UsernamePasswordToken('user', 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
         $token = new SwitchUserToken('admin', 'bar', 'provider-key', ['ROLE_USER'], $originalToken, 'https://symfony.com/blog');
 
@@ -87,6 +111,19 @@ class SwitchUserTokenTest extends TestCase
 
     public function testSerializeNullImpersonateUrl()
     {
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('user', 'foo', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']), 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
+        $token = new SwitchUserToken(new InMemoryUser('admin', 'bar', ['ROLE_USER']), 'provider-key', ['ROLE_USER'], $originalToken);
+
+        $unserializedToken = unserialize(serialize($token));
+
+        $this->assertNull($unserializedToken->getOriginatedFromUri());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacySerializeNullImpersonateUrl()
+    {
         $originalToken = new UsernamePasswordToken('user', 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
         $token = new SwitchUserToken('admin', 'bar', 'provider-key', ['ROLE_USER'], $originalToken);
 
@@ -113,6 +150,8 @@ class SwitchUserTokenTest extends TestCase
      *         )
      *     )
      * )
+     *
+     * @group legacy
      */
     public function testUnserializeOldToken()
     {

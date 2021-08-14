@@ -76,7 +76,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
         }
 
         if ($this->user instanceof UserInterface) {
-            // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
             return method_exists($this->user, 'getUserIdentifier') ? $this->user->getUserIdentifier() : $this->user->getUsername();
         }
 
@@ -96,6 +96,10 @@ abstract class AbstractToken implements TokenInterface, \Serializable
      */
     public function setUser(string|\Stringable|UserInterface $user)
     {
+        if (!$user instanceof UserInterface) {
+            trigger_deprecation('symfony/security-core', '5.4', 'Using an object that is not an instance of "%s" as $user in "%s" is deprecated.', UserInterface::class, static::class);
+        }
+
         // @deprecated since Symfony 5.4, remove the whole block if/elseif/else block in 6.0
         if (1 < \func_num_args() && !func_get_arg(1)) {
             // ContextListener checks if the user has changed on its own and calls `setAuthenticated()` subsequently,

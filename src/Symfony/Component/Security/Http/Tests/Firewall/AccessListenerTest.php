@@ -310,7 +310,7 @@ class AccessListenerTest extends TestCase
 
     public function testHandleWhenPublicAccessWhileAuthenticated()
     {
-        $token = new UsernamePasswordToken(new InMemoryUser('Wouter', null, ['ROLE_USER']), null, 'main', ['ROLE_USER']);
+        $token = new UsernamePasswordToken(new InMemoryUser('Wouter', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
         $request = new Request();
@@ -350,7 +350,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar', 'bar' => 'baz'], null])
         ;
 
-        $authenticatedToken = new UsernamePasswordToken('test', 'test', 'test', ['ROLE_USER']);
+        $authenticatedToken = new UsernamePasswordToken(new InMemoryUser('test', 'test', ['ROLE_USER']), 'test', ['ROLE_USER']);
 
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($authenticatedToken);

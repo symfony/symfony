@@ -23,8 +23,16 @@ class UsernamePasswordToken extends AbstractToken
     private $credentials;
     private $firewallName;
 
-    public function __construct(string|\Stringable|UserInterface $user, mixed $credentials, string $firewallName, array $roles = [])
+    public function __construct(string|\Stringable|UserInterface $user, /*string*/ $firewallName, /*array*/ $roles = [])
     {
+        if (\is_string($roles)) {
+            trigger_deprecation('symfony/security-core', '5.4', 'The $credentials argument of "%s" is deprecated.', static::class.'::__construct');
+
+            $credentials = $firewallName;
+            $firewallName = $roles;
+            $roles = \func_num_args() > 3 ? func_get_arg(3) : [];
+        }
+
         parent::__construct($roles);
 
         if ('' === $firewallName) {
@@ -32,7 +40,7 @@ class UsernamePasswordToken extends AbstractToken
         }
 
         $this->setUser($user);
-        $this->credentials = $credentials;
+        $this->credentials = $credentials ?? null;
         $this->firewallName = $firewallName;
 
         parent::setAuthenticated(\count($roles) > 0, false);
@@ -55,6 +63,8 @@ class UsernamePasswordToken extends AbstractToken
      */
     public function getCredentials()
     {
+        trigger_deprecation('symfony/security-core', '5.4', 'Method "%s" is deprecated.', __METHOD__);
+
         return $this->credentials;
     }
 
@@ -63,7 +73,7 @@ class UsernamePasswordToken extends AbstractToken
      *
      * @return string The provider key
      *
-     * @deprecated since 5.2, use getFirewallName() instead
+     * @deprecated since Symfony 5.2, use getFirewallName() instead
      */
     public function getProviderKey()
     {

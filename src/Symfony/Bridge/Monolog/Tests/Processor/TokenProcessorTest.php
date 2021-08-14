@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\TokenProcessor;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 /**
  * Tests the TokenProcessor.
@@ -23,6 +24,9 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  */
 class TokenProcessorTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testLegacyProcessor()
     {
         if (method_exists(UsernamePasswordToken::class, 'getUserIdentifier')) {
@@ -48,7 +52,7 @@ class TokenProcessorTest extends TestCase
             $this->markTestSkipped('This test requires symfony/security-core 5.3+');
         }
 
-        $token = new UsernamePasswordToken('user', 'password', 'provider', ['ROLE_USER']);
+        $token = new UsernamePasswordToken(new InMemoryUser('user', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->method('getToken')->willReturn($token);
 

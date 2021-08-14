@@ -104,7 +104,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $impersonatorUser = null;
             if ($token instanceof SwitchUserToken) {
                 $originalToken = $token->getOriginalToken();
-                // @deprecated since 5.3, change to $originalToken->getUserIdentifier() in 6.0
+                // @deprecated since Symfony 5.3, change to $originalToken->getUserIdentifier() in 6.0
                 $impersonatorUser = method_exists($originalToken, 'getUserIdentifier') ? $originalToken->getUserIdentifier() : $originalToken->getUsername();
             }
 
@@ -134,7 +134,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'token' => $token,
                 'token_class' => $this->hasVarDumper ? new ClassStub(\get_class($token)) : \get_class($token),
                 'logout_url' => $logoutUrl,
-                // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+                // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
                 'user' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername(),
                 'roles' => $assignedRoles,
                 'inherited_roles' => array_unique($inheritedRoles),
@@ -184,7 +184,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             if (null !== $firewallConfig) {
                 $this->data['firewall'] = [
                     'name' => $firewallConfig->getName(),
-                    'allows_anonymous' => $firewallConfig->allowsAnonymous(),
+                    'allows_anonymous' => $this->authenticatorManagerEnabled ? false : $firewallConfig->allowsAnonymous(),
                     'request_matcher' => $firewallConfig->getRequestMatcher(),
                     'security_enabled' => $firewallConfig->isSecurityEnabled(),
                     'stateless' => $firewallConfig->isStateless(),

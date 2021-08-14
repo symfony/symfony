@@ -902,7 +902,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * @deprecated since 5.4, use "addAuthenticatorFactory()" instead
+     * @deprecated since Symfony 5.4, use "addAuthenticatorFactory()" instead
      */
     public function addSecurityListenerFactory(SecurityFactoryInterface $factory)
     {

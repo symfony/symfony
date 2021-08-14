@@ -51,35 +51,56 @@ class ExpressionLanguageTest extends TestCase
         $user = new InMemoryUser('username', 'password', $roles);
 
         $noToken = null;
-        $anonymousToken = new AnonymousToken('firewall', 'anon.');
         $rememberMeToken = new RememberMeToken($user, 'firewall-name', 'firewall');
-        $usernamePasswordToken = new UsernamePasswordToken('username', 'password', 'firewall-name', $roles);
+        $usernamePasswordToken = new UsernamePasswordToken($user, 'firewall-name', $roles);
 
         return [
-            [$noToken, 'is_anonymous()', false],
             [$noToken, 'is_authenticated()', false],
             [$noToken, 'is_fully_authenticated()', false],
             [$noToken, 'is_remember_me()', false],
 
-            [$anonymousToken, 'is_anonymous()', true],
-            [$anonymousToken, 'is_authenticated()', false],
-            [$anonymousToken, 'is_fully_authenticated()', false],
-            [$anonymousToken, 'is_remember_me()', false],
-            [$anonymousToken, "is_granted('ROLE_USER')", false],
-
-            [$rememberMeToken, 'is_anonymous()', false],
             [$rememberMeToken, 'is_authenticated()', true],
             [$rememberMeToken, 'is_fully_authenticated()', false],
             [$rememberMeToken, 'is_remember_me()', true],
             [$rememberMeToken, "is_granted('ROLE_FOO')", false],
             [$rememberMeToken, "is_granted('ROLE_USER')", true],
 
-            [$usernamePasswordToken, 'is_anonymous()', false],
             [$usernamePasswordToken, 'is_authenticated()', true],
             [$usernamePasswordToken, 'is_fully_authenticated()', true],
             [$usernamePasswordToken, 'is_remember_me()', false],
             [$usernamePasswordToken, "is_granted('ROLE_FOO')", false],
             [$usernamePasswordToken, "is_granted('ROLE_USER')", true],
+        ];
+    }
+
+    /**
+     * @dataProvider legacyProvider
+     * @group legacy
+     */
+    public function testLegacyIsAuthenticated($token, $expression, $result)
+    {
+        $this->testIsAuthenticated($token, $expression, $result);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function legacyProvider()
+    {
+        $roles = ['ROLE_USER', 'ROLE_ADMIN'];
+        $user = new InMemoryUser('username', 'password', $roles);
+        $anonymousToken = new AnonymousToken('firewall', 'anon.');
+
+        return [
+            [$anonymousToken, 'is_anonymous()', true],
+            [$anonymousToken, 'is_authenticated()', false],
+            [$anonymousToken, 'is_fully_authenticated()', false],
+            [$anonymousToken, 'is_remember_me()', false],
+            [$anonymousToken, "is_granted('ROLE_USER')", false],
+
+            [null, 'is_anonymous()', false],
+            [new RememberMeToken($user, 'firewall-name', 'firewall'), 'is_anonymous()', false],
+            [new UsernamePasswordToken($user, 'firewall-name', $roles), 'is_anonymous()', false],
         ];
     }
 }

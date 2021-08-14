@@ -63,7 +63,7 @@ class ContextListenerTest extends TestCase
     public function testOnKernelResponseWillAddSession()
     {
         $session = $this->runSessionOnKernelResponse(
-            new UsernamePasswordToken('test1', 'pass1', 'phpunit'),
+            new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']),
             null
         );
 
@@ -75,7 +75,7 @@ class ContextListenerTest extends TestCase
     public function testOnKernelResponseWillReplaceSession()
     {
         $session = $this->runSessionOnKernelResponse(
-            new UsernamePasswordToken('test1', 'pass1', 'phpunit'),
+            new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']),
             'C:10:"serialized"'
         );
 
@@ -94,6 +94,9 @@ class ContextListenerTest extends TestCase
         $this->assertFalse($session->has('_security_session'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testOnKernelResponseWillRemoveSessionOnAnonymousToken()
     {
         $session = $this->runSessionOnKernelResponse(new AnonymousToken('secret', 'anon.'), 'C:10:"serialized"');
@@ -104,7 +107,7 @@ class ContextListenerTest extends TestCase
     public function testOnKernelResponseWithoutSession()
     {
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken('test1', 'pass1', 'phpunit'));
+        $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']));
         $request = new Request();
         $request->attributes->set('_security_firewall_run', '_security_session');
         $session = new Session(new MockArraySessionStorage());
@@ -299,7 +302,7 @@ class ContextListenerTest extends TestCase
 
         $user = new InMemoryUser('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
-        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, '', 'context_key', ['ROLE_USER'])));
+        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, 'context_key', ['ROLE_USER'])));
 
         $request = new Request();
         $request->setSession($session);
@@ -403,7 +406,7 @@ class ContextListenerTest extends TestCase
     {
         $tokenUser = $user ?? new InMemoryUser('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
-        $session->set('_security_context_key', serialize(new UsernamePasswordToken($tokenUser, '', 'context_key', ['ROLE_USER'])));
+        $session->set('_security_context_key', serialize(new UsernamePasswordToken($tokenUser, 'context_key', ['ROLE_USER'])));
 
         $request = new Request();
         $request->setSession($session);

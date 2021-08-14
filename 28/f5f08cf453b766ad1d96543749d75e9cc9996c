@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-12-28T18:50:59Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by christingruber at 2021-01-05T11:30:27Z
+
+> I think we should also add a test that handles a call of the command with a config file being passed as well as other options.
+
+I've added a simple mixed test, ~~settings from yaml config will have priority in this case~~
+
+---------------------------------------------------------------------------
+
+by christingruber at 2021-01-05T20:49:08Z
+
+I have changed the load order to allow overrides by console args...
+
+---------------------------------------------------------------------------
+
+by christingruber at 2021-01-12T09:07:55Z
+
+A short overview for the last changes:
+
+I have added some tests which handles mixed arguments from config and options from console. I have also changed the load order to allow overrides by console options. With that it is possible to override the values ​​provided from lint config by console options. @xabbuh
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-02-19T15:36:38Z
+
+I'm divided about this proposal. I love the new options that you added to the command but I'm not sure about providing support for a new config file specifically to run this command.
+
+Just asking: if we keep all the new command options, could a makefile task be an alternative to this config file? You would add the values of all the command options to create a very long command ... but since it's a Makefile, you don't have to actually type or remember the long command, only a short alias. Maybe it's not possible, I don't know.
+
+As a poor version of the Makefile, a simple `lint.sh` or `lint.bat` script in the `bin/` dir of the project could work too to avoid passing all the long option values. Cheers!
+
+---------------------------------------------------------------------------
+
+by christingruber at 2021-02-26T16:03:24Z
+
+@javiereguiluz Thanks for your feedback.
+
+No problem I think we can hold the `--exclude` option and drop the config part. If so, I can refactor and rebase the branch in the next days. OK?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-02-26T16:08:46Z
+
+@christingruber thanks ... but maybe we should wait for other comments from @symfony/mergers first. The reason is that in my previous comment I only gave my opinion ... and a single person opinion is not important. Better see what's the general consensus about what to do here. Thanks!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-26T16:22:47Z
+
+Thanks for your work on this.
+
+> I would be happy to see this PR with only the exclude feature.
+
+Same for me :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-04T20:32:34Z
+
+Hi @christingruber 👋
+
+Are you open to finish this PR for `5.4` 🎯 ?
+
+Cheers
+
+---------------------------------------------------------------------------
+
+by christingruber at 2021-08-05T08:41:44Z
+
+@OskarStark All or only the exclude option?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-05T09:29:00Z
+
+Only the exclude please
+
+---------------------------------------------------------------------------
+
+by christingruber at 2021-08-13T13:53:12Z
+
+> I added some questions. Also, can you make sure the PR description is up to date?...
+
+Hi @Nyholm,
+
+thanks for your Feedback, I updated the MR description / changelog and the composer deps. (See my further comments)

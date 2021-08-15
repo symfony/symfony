@@ -30,9 +30,6 @@ use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
- * @group legacy
- */
 class SwitchUserListenerTest extends TestCase
 {
     private $tokenStorage;
@@ -85,7 +82,7 @@ class SwitchUserListenerTest extends TestCase
     public function testExitUserThrowsAuthenticationExceptionIfOriginalTokenCannotBeFound()
     {
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
-        $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
@@ -96,8 +93,8 @@ class SwitchUserListenerTest extends TestCase
 
     public function testExitUserUpdatesToken()
     {
-        $originalToken = new UsernamePasswordToken('username', '', 'key', []);
-        $this->tokenStorage->setToken(new SwitchUserToken('username', '', 'key', ['ROLE_USER'], $originalToken));
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('username', '', []), 'key', []);
+        $this->tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('username', '', ['ROLE_USER']), 'key', ['ROLE_USER'], $originalToken));
 
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
@@ -121,8 +118,8 @@ class SwitchUserListenerTest extends TestCase
             ->method('refreshUser')
             ->with($this->identicalTo($originalUser))
             ->willReturn($refreshedUser);
-        $originalToken = new UsernamePasswordToken($originalUser, '', 'key');
-        $this->tokenStorage->setToken(new SwitchUserToken('username', '', 'key', ['ROLE_USER'], $originalToken));
+        $originalToken = new UsernamePasswordToken($originalUser, 'key');
+        $this->tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('username', '', ['ROLE_USER']), 'key', ['ROLE_USER'], $originalToken));
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -141,6 +138,9 @@ class SwitchUserListenerTest extends TestCase
         $listener($this->event);
     }
 
+    /**
+     * @group legacy
+     */
     public function testExitUserDoesNotDispatchEventWithStringUser()
     {
         $originalUser = 'anon.';
@@ -148,7 +148,7 @@ class SwitchUserListenerTest extends TestCase
         $userProvider
             ->expects($this->never())
             ->method('refreshUser');
-        $originalToken = new UsernamePasswordToken($originalUser, '', 'key');
+        $originalToken = new UsernamePasswordToken($originalUser, 'key');
         $this->tokenStorage->setToken(new SwitchUserToken('username', '', 'key', ['ROLE_USER'], $originalToken));
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
@@ -165,7 +165,7 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUserIsDisallowed()
     {
         $this->expectException(AccessDeniedException::class);
-        $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
         $user = new InMemoryUser('username', 'password', []);
 
         $this->tokenStorage->setToken($token);
@@ -182,7 +182,7 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUserTurnsAuthenticationExceptionTo403()
     {
         $this->expectException(AccessDeniedException::class);
-        $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_ALLOWED_TO_SWITCH']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_ALLOWED_TO_SWITCH']), 'key', ['ROLE_ALLOWED_TO_SWITCH']);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'not-existing');
@@ -196,7 +196,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUser()
     {
-        $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'kuba');
@@ -218,8 +218,8 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserAlreadySwitched()
     {
-        $originalToken = new UsernamePasswordToken('original', null, 'key', ['ROLE_FOO']);
-        $alreadySwitchedToken = new SwitchUserToken('switched_1', null, 'key', ['ROLE_BAR'], $originalToken);
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('original', null, ['ROLE_FOO']), 'key', ['ROLE_FOO']);
+        $alreadySwitchedToken = new SwitchUserToken(new InMemoryUser('switched_1', null, ['ROLE_BAR']), 'key', ['ROLE_BAR'], $originalToken);
 
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($alreadySwitchedToken);
@@ -246,7 +246,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserWorksWithFalsyUsernames()
     {
-        $token = new UsernamePasswordToken('kuba', '', 'key', ['ROLE_FOO']);
+        $token = new UsernamePasswordToken(new InMemoryUser('kuba', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', '0');
@@ -270,7 +270,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserKeepsOtherQueryStringParameters()
     {
-        $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->replace([
@@ -297,10 +297,10 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUserWithReplacedToken()
     {
         $user = new InMemoryUser('username', 'password', []);
-        $token = new UsernamePasswordToken($user, '', 'provider123', ['ROLE_FOO']);
+        $token = new UsernamePasswordToken($user, 'provider123', ['ROLE_FOO']);
 
         $user = new InMemoryUser('replaced', 'password', []);
-        $replacedToken = new UsernamePasswordToken($user, '', 'provider123', ['ROLE_BAR']);
+        $replacedToken = new UsernamePasswordToken($user, 'provider123', ['ROLE_BAR']);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'kuba');
@@ -342,7 +342,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserStateless()
     {
-        $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'kuba');
@@ -372,8 +372,8 @@ class SwitchUserListenerTest extends TestCase
             ->method('refreshUser')
             ->with($this->identicalTo($originalUser))
             ->willReturn($refreshedOriginalUser);
-        $originalToken = new UsernamePasswordToken($originalUser, '', 'key');
-        $this->tokenStorage->setToken(new SwitchUserToken('username', '', 'key', ['ROLE_USER'], $originalToken));
+        $originalToken = new UsernamePasswordToken($originalUser, 'key');
+        $this->tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('username', '', ['ROLE_USER']), 'key', ['ROLE_USER'], $originalToken));
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);

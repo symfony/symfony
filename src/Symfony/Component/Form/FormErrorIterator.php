@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Validator\ConstraintViolation;
 
@@ -186,11 +187,13 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
         return current($this->errors) instanceof self;
     }
 
-    /**
-     * Alias of {@link current()}.
-     */
     public function getChildren(): self
     {
+        if (!$this->hasChildren()) {
+            trigger_deprecation('symfony/form', '5.4', 'Calling "%s()" if the current element is not iterable is deprecated, call "%s" to get the current element.', __METHOD__, self::class.'::current()');
+            // throw new LogicException(sprintf('The current element is not iterable. Use "%s" to get the current element.', self::class.'::current()'));
+        }
+
         return current($this->errors);
     }
 

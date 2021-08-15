@@ -69,6 +69,7 @@ Finder
 Form
 ----
 
+ * `FormErrorIterator::children()` throws an exception if the current element is not iterable.
  * The default value of the `rounding_mode` option of the `PercentType` has been changed to `\NumberFormatter::ROUND_HALFUP`.
  * The default rounding mode of the `PercentToLocalizedStringTransformer` has been changed to `\NumberFormatter::ROUND_HALFUP`.
  * Added the `getIsEmptyCallback()` method to the `FormConfigInterface`.
@@ -363,7 +364,7 @@ Security
  * Remove `CookieClearingLogoutHandler`, `SessionLogoutHandler` and `CsrfTokenClearingLogoutHandler`.
    Use `CookieClearingLogoutListener`, `SessionLogoutListener` and `CsrfTokenClearingLogoutListener` instead
  * Remove `AuthenticatorInterface::createAuthenticatedToken()`, use `AuthenticatorInterface::createToken()` instead
- * Remove `PassportInterface` and `UserPassportInterface`, use `Passport` instead.
+ * Remove `PassportInterface`, `UserPassportInterface` and `PassportTrait`, use `Passport` instead.
    Also, the return type declaration of `AuthenticatorInterface::authenticate()` was changed to `Passport`
 
    Before:

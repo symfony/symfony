@@ -142,6 +142,17 @@ YAML;
         $this->assertSame(1, $ret, 'lint:yaml exits with code 1 in case of error');
     }
 
+    public function testLintWithExclude()
+    {
+        $tester = $this->createCommandTester();
+        $filename1 = $this->createFile('foo: bar');
+        $filename2 = $this->createFile('bar: baz');
+
+        $ret = $tester->execute(['filename' => [$filename1, $filename2], '--exclude' => [$filename1]], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+        $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
+        $this->assertStringContainsString('All 1 YAML files contain valid syntax.', trim($tester->getDisplay()));
+    }
+
     public function testLintFileNotReadable()
     {
         $this->expectException(\RuntimeException::class);

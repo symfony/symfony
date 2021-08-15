@@ -45,6 +45,9 @@ class UserCheckerListenerTest extends TestCase
         $this->listener->preCheckCredentials($this->createCheckPassportEvent());
     }
 
+    /**
+     * @group legacy
+     */
     public function testPreAuthNoUser()
     {
         $this->userChecker->expects($this->never())->method('checkPreAuth');

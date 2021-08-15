@@ -72,7 +72,7 @@ class LdapAuthenticator implements AuthenticatorInterface
         return $this->createToken($passport, $firewallName);
     }
 
-    public function createToken(PassportInterface $passport, string $firewallName): TokenInterface
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         // @deprecated since Symfony 5.4, in 6.0 change to:
         // return $this->authenticator->createToken($passport, $firewallName);

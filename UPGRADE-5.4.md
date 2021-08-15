@@ -104,7 +104,7 @@ Security
  * Deprecate `CookieClearingLogoutHandler`, `SessionLogoutHandler` and `CsrfTokenClearingLogoutHandler`.
    Use `CookieClearingLogoutListener`, `SessionLogoutListener` and `CsrfTokenClearingLogoutListener` instead
  * Deprecate `AuthenticatorInterface::createAuthenticatedToken()`, use `AuthenticatorInterface::createToken()` instead
- * Deprecate `PassportInterface` and `UserPassportInterface`, use `Passport` instead.
+ * Deprecate `PassportInterface`, `UserPassportInterface` and `PassportTrait`, use `Passport` instead.
    As such, the return type declaration of `AuthenticatorInterface::authenticate()` will change to `Passport` in 6.0
 
    Before:

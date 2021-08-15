@@ -13,8 +13,12 @@ namespace Symfony\Component\Security\Http\Authenticator\Passport;
 
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" trait is deprecated, you must extend from "%s" instead.', PassportTrait::class, Passport::class);
+
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @deprecated since Symfony 5.4, use {@see Passport} instead
  */
 trait PassportTrait
 {

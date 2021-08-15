@@ -16,10 +16,14 @@ use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated.', RememberMeLogoutListener::class);
+
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
+ *
+ * @deprecated since Symfony 5.4
  */
 class RememberMeLogoutListener implements EventSubscriberInterface
 {

@@ -21,12 +21,16 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated, use "%s" instead.', PersistentTokenBasedRememberMeServices::class, PersistentRememberMeHandler::class);
+
 /**
  * Concrete implementation of the RememberMeServicesInterface which needs
  * an implementation of TokenProviderInterface for providing remember-me
  * capabilities.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.4, use {@see PersistentRememberMeHandler} instead
  */
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {

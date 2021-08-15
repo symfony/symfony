@@ -39,6 +39,7 @@ use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Component\Console\EventListener\ErrorListener;
+use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
@@ -126,6 +127,13 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 null,
                 service('debug.file_link_formatter')->nullOnInvalid(),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.dotenv_debug', DotenvDebugCommand::class)
+            ->args([
+                param('kernel.environment'),
+                param('kernel.project_dir'),
             ])
             ->tag('console.command')
 

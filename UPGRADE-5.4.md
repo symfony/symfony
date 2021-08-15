@@ -12,6 +12,11 @@ Finder
  * Deprecate `Comparator::setTarget()` and `Comparator::setOperator()`
  * Add a constructor to `Comparator` that allows setting target and operator
 
+Form
+------
+
+ * Deprecate calling `FormErrorIterator::children()` if the current element is not iterable.
+
 FrameworkBundle
 ---------------
 

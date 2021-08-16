@@ -214,6 +214,9 @@ Routing
 Security
 --------
 
+ * Remove the `$authenticationEntryPoint` argument of `ChannelListener`
+ * Remove `RetryAuthenticationEntryPoint`, this code was inlined in the `ChannelListener`
+ * Remove `FormAuthenticationEntryPoint` and `BasicAuthenticationEntryPoint`, the `FormLoginAuthenticator` and `HttpBasicAuthenticator` should be used instead.
  * Remove `AnonymousToken`
  * Remove `Token::getCredentials()`, tokens should no longer contain credentials (as they represent authenticated sessions)
  * Restrict the return type of `Token::getUser()` to `UserInterface` (removing `string|\Stringable`)
@@ -390,6 +393,8 @@ Security
 SecurityBundle
 --------------
 
+ * Remove `security.authentication.basic_entry_point` and `security.authentication.retry_entry_point` services,
+   the logic is moved into the `HttpBasicAuthenticator` and `ChannelListener` respectively
  * Remove `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of
    `AuthenticatorFactoryInterface` and `SecurityExtension::addAuthenticatorFactory()`
  * Add `AuthenticatorFactoryInterface::getPriority()` which replaces `SecurityFactoryInterface::getPosition()`.

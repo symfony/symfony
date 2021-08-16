@@ -19,6 +19,9 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\HttpUtils;
 
+/**
+ * @group legacy
+ */
 class FormAuthenticationEntryPointTest extends TestCase
 {
     public function testStart()

@@ -32,19 +32,22 @@ use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 return static function (ContainerConfigurator $container) {
     $container->services()
 
+        ->set('security.authentication.basic_entry_point', BasicAuthenticationEntryPoint::class)
+            ->deprecate('symfony/security-bundle', '5.4', 'The "%service_id%" service is deprecated, the logic is contained in the authenticators.')
+
         ->set('security.authentication.retry_entry_point', RetryAuthenticationEntryPoint::class)
+            ->deprecate('symfony/security-bundle', '5.4', 'The "%service_id%" service is deprecated, the logic is integrated directly in "security.channel_listener".')
             ->args([
                 inline_service('int')->factory([service('router.request_context'), 'getHttpPort']),
                 inline_service('int')->factory([service('router.request_context'), 'getHttpsPort']),
             ])
 
-        ->set('security.authentication.basic_entry_point', BasicAuthenticationEntryPoint::class)
-
         ->set('security.channel_listener', ChannelListener::class)
             ->args([
                 service('security.access_map'),
-                service('security.authentication.retry_entry_point'),
                 service('logger')->nullOnInvalid(),
+                inline_service('int')->factory([service('router.request_context'), 'getHttpPort']),
+                inline_service('int')->factory([service('router.request_context'), 'getHttpsPort']),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 

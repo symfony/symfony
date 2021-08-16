@@ -43,6 +43,8 @@ Messenger
 SecurityBundle
 --------------
 
+ * Deprecate `security.authentication.basic_entry_point` and `security.authentication.retry_entry_point` services, the logic is moved into the
+   `HttpBasicAuthenticator` and `ChannelListener` respectively
  * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`
  * Deprecate `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of
    `AuthenticatorFactoryInterface` and `SecurityExtension::addAuthenticatorFactory()`
@@ -64,6 +66,10 @@ SecurityBundle
 Security
 --------
 
+ * Deprecate the `$authenticationEntryPoint` argument of `ChannelListener`, and add `$httpPort` and `$httpsPort` arguments
+ * Deprecate `RetryAuthenticationEntryPoint`, this code is now inlined in the `ChannelListener`
+ * Deprecate `FormAuthenticationEntryPoint` and `BasicAuthenticationEntryPoint`, in the new system the `FormLoginAuthenticator`
+   and `HttpBasicAuthenticator` should be used instead
  * Deprecate `AnonymousToken`, as the related authenticator was deprecated in 5.3
  * Deprecate `Token::getCredentials()`, tokens should no longer contain credentials (as they represent authenticated sessions)
  * Deprecate not returning an `UserInterface` from `Token::getUser()`

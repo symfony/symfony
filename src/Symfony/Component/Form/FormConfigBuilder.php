@@ -53,8 +53,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private mixed $data = null;
     private ?string $dataClass;
     private bool $dataLocked = false;
-    private ?FormFactoryInterface $formFactory = null;
-    private string $action;
+    private FormFactoryInterface $formFactory;
+    private string $action = '';
     private string $method = 'POST';
     private RequestHandlerInterface $requestHandler;
     private bool $autoInitialize = false;

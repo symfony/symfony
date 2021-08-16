@@ -15,6 +15,8 @@ CHANGELOG
  * Deprecate `RetryAuthenticationEntryPoint`, this code is now inlined in the `ChannelListener`
  * Deprecate `FormAuthenticationEntryPoint` and `BasicAuthenticationEntryPoint`, in the new system the `FormLoginAuthenticator`
    and `HttpBasicAuthenticator` should be used instead
+ * Deprecate `AbstractRememberMeServices`, `PersistentTokenBasedRememberMeServices`, `RememberMeServicesInterface`,
+   `TokenBasedRememberMeServices`, use the remember me handler alternatives instead
  * Deprecate the `$authManager` argument of `AccessListener`
  * Deprecate not setting the `$exceptionOnNoToken` argument of `AccessListener` to `false`
  * Deprecate `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead

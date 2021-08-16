@@ -54,7 +54,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private ?string $dataClass;
     private bool $dataLocked = false;
     private ?FormFactoryInterface $formFactory = null;
-    private ?string $action = null;
+    private string $action;
     private string $method = 'POST';
     private RequestHandlerInterface $requestHandler;
     private bool $autoInitialize = false;
@@ -353,6 +353,10 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getFormFactory()
     {
+        if (!isset($this->formFactory)) {
+            throw new BadMethodCallException('The form factory must be set before retrieving it.');
+        }
+
         return $this->formFactory;
     }
 

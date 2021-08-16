@@ -412,10 +412,12 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @throws BadMethodCallException
      */
     public function getEventDispatcher()
     {
-        return null;
+        throw new BadMethodCallException('Buttons do not support event dispatching.');
     }
 
     /**
@@ -606,26 +608,32 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
+     *
+     * @throws BadMethodCallException
      */
     public function getAction()
     {
-        return null;
+        throw new BadMethodCallException('Buttons do not support actions.');
     }
 
     /**
      * Unsupported method.
+     *
+     * @throws BadMethodCallException
      */
     public function getMethod()
     {
-        return null;
+        throw new BadMethodCallException('Buttons do not support methods.');
     }
 
     /**
      * Unsupported method.
+     *
+     * @throws BadMethodCallException
      */
     public function getRequestHandler()
     {
-        return null;
+        throw new BadMethodCallException('Buttons do not support request handlers.');
     }
 
     /**

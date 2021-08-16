@@ -19,11 +19,15 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated, use "%s" instead.', TokenBasedRememberMeServices::class, SignatureRememberMeHandler::class);
+
 /**
  * Concrete implementation of the RememberMeServicesInterface providing
  * remember-me capabilities without requiring a TokenProvider.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.4, use {@see SignatureRememberMeHandler} instead
  */
 class TokenBasedRememberMeServices extends AbstractRememberMeServices
 {

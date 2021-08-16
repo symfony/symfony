@@ -112,15 +112,12 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function isFileUpload(mixed $data)
+    public function isFileUpload(mixed $data): bool
     {
         return $data instanceof File;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getUploadFileError(mixed $data)
+    public function getUploadFileError(mixed $data): ?int
     {
         if (!$data instanceof UploadedFile || $data->isValid()) {
             return null;

@@ -24,22 +24,22 @@ class Sequentially extends Composite
 {
     public $constraints = [];
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'constraints';
     }
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['constraints'];
     }
 
-    protected function getCompositeOption()
+    protected function getCompositeOption(): string
     {
         return 'constraints';
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT];
     }

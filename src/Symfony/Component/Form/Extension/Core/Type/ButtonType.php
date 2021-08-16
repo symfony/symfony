@@ -24,7 +24,7 @@ class ButtonType extends BaseType implements ButtonTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return null;
     }
@@ -32,7 +32,7 @@ class ButtonType extends BaseType implements ButtonTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'button';
     }

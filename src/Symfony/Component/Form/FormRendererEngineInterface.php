@@ -43,7 +43,7 @@ interface FormRendererEngineInterface
      *
      * @return mixed the renderer resource or false, if none was found
      */
-    public function getResourceForBlockName(FormView $view, string $blockName);
+    public function getResourceForBlockName(FormView $view, string $blockName): mixed;
 
     /**
      * Returns the resource for a block hierarchy.
@@ -79,7 +79,7 @@ interface FormRendererEngineInterface
      *
      * @return mixed The renderer resource or false, if none was found
      */
-    public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, int $hierarchyLevel);
+    public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): mixed;
 
     /**
      * Returns the hierarchy level at which a resource can be found.
@@ -117,7 +117,7 @@ interface FormRendererEngineInterface
      *
      * @return int|bool The hierarchy level or false, if no resource was found
      */
-    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel);
+    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): int|bool;
 
     /**
      * Renders a block in the given renderer resource.

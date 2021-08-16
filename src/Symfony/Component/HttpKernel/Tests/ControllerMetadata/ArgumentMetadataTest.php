@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\Tests\ControllerMetadata;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\HttpKernel\Attribute\ArgumentInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
 

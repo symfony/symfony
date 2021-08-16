@@ -280,7 +280,7 @@ class DateIntervalType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'dateinterval';
     }

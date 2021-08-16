@@ -78,7 +78,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function get(int $offset)
+    public function get(int $offset): ConstraintViolationInterface
     {
         if (!isset($this->violations[$offset])) {
             throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $offset));
@@ -90,7 +90,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function has(int $offset)
+    public function has(int $offset): bool
     {
         return isset($this->violations[$offset]);
     }
@@ -154,10 +154,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
      * Creates iterator for errors with specific codes.
      *
      * @param string|string[] $codes The codes to find
-     *
-     * @return static
      */
-    public function findByCodes(string|array $codes)
+    public function findByCodes(string|array $codes): static
     {
         $codes = (array) $codes;
         $violations = [];

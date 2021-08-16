@@ -235,7 +235,7 @@ class FormType extends BaseType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return null;
     }
@@ -243,7 +243,7 @@ class FormType extends BaseType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'form';
     }

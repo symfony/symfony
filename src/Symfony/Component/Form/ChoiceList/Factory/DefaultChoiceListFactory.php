@@ -33,7 +33,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createListFromChoices(iterable $choices, callable $value = null, callable $filter = null)
+    public function createListFromChoices(iterable $choices, callable $value = null, callable $filter = null): ChoiceListInterface
     {
         if ($filter) {
             // filter the choice list lazily
@@ -50,7 +50,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null, callable $filter = null)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null, callable $filter = null): ChoiceListInterface
     {
         if ($filter) {
             $loader = new FilterChoiceLoaderDecorator($loader, $filter);
@@ -62,7 +62,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, array|callable $preferredChoices = null, callable|false $label = null, callable $index = null, callable $groupBy = null, array|callable $attr = null, array|callable $labelTranslationParameters = [])
+    public function createView(ChoiceListInterface $list, array|callable $preferredChoices = null, callable|false $label = null, callable $index = null, callable $groupBy = null, array|callable $attr = null, array|callable $labelTranslationParameters = []): ChoiceListView
     {
         $preferredViews = [];
         $preferredViewsOrder = [];

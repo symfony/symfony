@@ -59,7 +59,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return bool Whether this view's widget is rendered
      */
-    public function isRendered()
+    public function isRendered(): bool
     {
         if (true === $this->rendered || 0 === \count($this->children)) {
             return $this->rendered;
@@ -79,17 +79,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return $this
      */
-    public function setRendered()
+    public function setRendered(): static
     {
         $this->rendered = true;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isMethodRendered()
+    public function isMethodRendered(): bool
     {
         return $this->methodRendered;
     }

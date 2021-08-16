@@ -177,7 +177,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return bool|string true if debug is enabled, false otherwise or a string if no kernel was set
      */
-    public function isDebug()
+    public function isDebug(): bool|string
     {
         return $this->data['debug'];
     }

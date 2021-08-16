@@ -56,10 +56,7 @@ abstract class FormPerformanceTestCase extends FormIntegrationTestCase
         $this->maxRunningTime = $maxRunningTime;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxRunningTime()
+    public function getMaxRunningTime(): int
     {
         return $this->maxRunningTime;
     }

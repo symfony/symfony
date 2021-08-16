@@ -54,7 +54,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return string The type of the value
      */
-    protected function formatTypeOf(mixed $value)
+    protected function formatTypeOf(mixed $value): string
     {
         return get_debug_type($value);
     }
@@ -80,7 +80,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return string The string representation of the passed value
      */
-    protected function formatValue(mixed $value, int $format = 0)
+    protected function formatValue(mixed $value, int $format = 0): string
     {
         if (($format & self::PRETTY_DATE) && $value instanceof \DateTimeInterface) {
             if (class_exists(\IntlDateFormatter::class)) {
@@ -144,7 +144,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @see formatValue()
      */
-    protected function formatValues(array $values, int $format = 0)
+    protected function formatValues(array $values, int $format = 0): string
     {
         foreach ($values as $key => $value) {
             $values[$key] = $this->formatValue($value, $format);

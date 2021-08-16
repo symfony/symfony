@@ -29,7 +29,7 @@ interface KernelInterface extends HttpKernelInterface
      *
      * @return iterable|BundleInterface[]
      */
-    public function registerBundles();
+    public function registerBundles(): iterable;
 
     /**
      * Loads the container configuration.
@@ -53,16 +53,14 @@ interface KernelInterface extends HttpKernelInterface
      *
      * @return BundleInterface[]
      */
-    public function getBundles();
+    public function getBundles(): array;
 
     /**
      * Returns a bundle.
      *
-     * @return BundleInterface
-     *
      * @throws \InvalidArgumentException when the bundle is not enabled
      */
-    public function getBundle(string $name);
+    public function getBundle(string $name): BundleInterface;
 
     /**
      * Returns the file path for a given bundle resource.
@@ -81,42 +79,38 @@ interface KernelInterface extends HttpKernelInterface
      * @throws \InvalidArgumentException if the file cannot be found or the name is not valid
      * @throws \RuntimeException         if the name contains invalid/unsafe characters
      */
-    public function locateResource(string $name);
+    public function locateResource(string $name): string;
 
     /**
      * Gets the environment.
      *
      * @return string The current environment
      */
-    public function getEnvironment();
+    public function getEnvironment(): string;
 
     /**
      * Checks if debug mode is enabled.
      *
      * @return bool true if debug mode is enabled, false otherwise
      */
-    public function isDebug();
+    public function isDebug(): bool;
 
     /**
      * Gets the project dir (path of the project's composer file).
-     *
-     * @return string
      */
-    public function getProjectDir();
+    public function getProjectDir(): string;
 
     /**
      * Gets the current container.
-     *
-     * @return ContainerInterface
      */
-    public function getContainer();
+    public function getContainer(): ContainerInterface;
 
     /**
      * Gets the request start time (not available if debug is disabled).
      *
      * @return float The request start timestamp
      */
-    public function getStartTime();
+    public function getStartTime(): float;
 
     /**
      * Gets the cache directory.
@@ -127,7 +121,7 @@ interface KernelInterface extends HttpKernelInterface
      *
      * @return string The cache directory
      */
-    public function getCacheDir();
+    public function getCacheDir(): string;
 
     /**
      * Returns the build directory.
@@ -142,12 +136,12 @@ interface KernelInterface extends HttpKernelInterface
      *
      * @return string The log directory
      */
-    public function getLogDir();
+    public function getLogDir(): string;
 
     /**
      * Gets the charset of the application.
      *
      * @return string The charset
      */
-    public function getCharset();
+    public function getCharset(): string;
 }

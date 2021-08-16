@@ -132,7 +132,7 @@ abstract class Composite extends Constraint
      *
      * @return string The property name
      */
-    abstract protected function getCompositeOption();
+    abstract protected function getCompositeOption(): string;
 
     /**
      * @internal Used by metadata

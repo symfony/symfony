@@ -23,12 +23,7 @@ class StringToFloatTransformer implements DataTransformerInterface
         $this->scale = $scale;
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return float|null
-     */
-    public function transform(mixed $value)
+    public function transform(mixed $value): ?float
     {
         if (null === $value) {
             return null;
@@ -41,12 +36,7 @@ class StringToFloatTransformer implements DataTransformerInterface
         return (float) $value;
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return string|null
-     */
-    public function reverseTransform(mixed $value)
+    public function reverseTransform(mixed $value): ?string
     {
         if (null === $value) {
             return null;

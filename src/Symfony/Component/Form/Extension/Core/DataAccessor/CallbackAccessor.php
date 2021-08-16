@@ -25,7 +25,7 @@ class CallbackAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue(object|array $data, FormInterface $form)
+    public function getValue(object|array $data, FormInterface $form): mixed
     {
         if (null === $getter = $form->getConfig()->getOption('getter')) {
             throw new AccessException('Unable to read from the given form data as no getter is defined.');

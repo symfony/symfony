@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Validator;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\FormRendererInterface;
+use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -51,12 +52,12 @@ class ValidatorExtension extends AbstractExtension
         $this->translator = $translator;
     }
 
-    public function loadTypeGuesser()
+    public function loadTypeGuesser(): ?FormTypeGuesserInterface
     {
         return new ValidatorTypeGuesser($this->validator);
     }
 
-    protected function loadTypeExtensions()
+    protected function loadTypeExtensions(): array
     {
         return [
             new Type\FormTypeValidatorExtension($this->validator, $this->legacyErrorMessages, $this->formRenderer, $this->translator),

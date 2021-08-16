@@ -35,7 +35,7 @@ class ValueGuess extends Guess
      *
      * @return string|int|bool|null
      */
-    public function getValue()
+    public function getValue(): string|int|bool|null
     {
         return $this->value;
     }

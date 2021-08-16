@@ -127,7 +127,7 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function isFileUpload(mixed $data)
+    public function isFileUpload(mixed $data): bool
     {
         // POST data will always be strings or arrays of strings. Thus, we can be sure
         // that the submitted data is a file upload if the "error" value is an integer
@@ -135,10 +135,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         return \is_array($data) && isset($data['error']) && \is_int($data['error']);
     }
 
-    /**
-     * @return int|null
-     */
-    public function getUploadFileError(mixed $data)
+    public function getUploadFileError(mixed $data): ?int
     {
         if (!\is_array($data)) {
             return null;

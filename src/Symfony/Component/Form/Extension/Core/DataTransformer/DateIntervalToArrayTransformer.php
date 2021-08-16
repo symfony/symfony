@@ -61,7 +61,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
      *
      * @throws UnexpectedTypeException if the given value is not a \DateInterval instance
      */
-    public function transform(mixed $dateInterval)
+    public function transform(mixed $dateInterval): array
     {
         if (null === $dateInterval) {
             return array_intersect_key(
@@ -108,7 +108,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
      * @throws UnexpectedTypeException       if the given value is not an array
      * @throws TransformationFailedException if the value could not be transformed
      */
-    public function reverseTransform(mixed $value)
+    public function reverseTransform(mixed $value): ?\DateInterval
     {
         if (null === $value) {
             return null;

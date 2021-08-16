@@ -87,7 +87,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addEventListener(string $eventName, callable $listener, int $priority = 0)
+    public function addEventListener(string $eventName, callable $listener, int $priority = 0): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -101,7 +101,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addEventSubscriber(EventSubscriberInterface $subscriber)
+    public function addEventSubscriber(EventSubscriberInterface $subscriber): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -115,7 +115,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addViewTransformer(DataTransformerInterface $viewTransformer, bool $forcePrepend = false)
+    public function addViewTransformer(DataTransformerInterface $viewTransformer, bool $forcePrepend = false): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -133,7 +133,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function resetViewTransformers()
+    public function resetViewTransformers(): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -147,7 +147,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addModelTransformer(DataTransformerInterface $modelTransformer, bool $forceAppend = false)
+    public function addModelTransformer(DataTransformerInterface $modelTransformer, bool $forceAppend = false): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -165,7 +165,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function resetModelTransformers()
+    public function resetModelTransformers(): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -179,7 +179,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEventDispatcher()
+    public function getEventDispatcher(): EventDispatcherInterface
     {
         if ($this->locked && !$this->dispatcher instanceof ImmutableEventDispatcher) {
             $this->dispatcher = new ImmutableEventDispatcher($this->dispatcher);
@@ -191,7 +191,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -199,7 +199,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getPropertyPath()
+    public function getPropertyPath(): ?PropertyPathInterface
     {
         return $this->propertyPath;
     }
@@ -207,7 +207,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getMapped()
+    public function getMapped(): bool
     {
         return $this->mapped;
     }
@@ -215,7 +215,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getByReference()
+    public function getByReference(): bool
     {
         return $this->byReference;
     }
@@ -223,7 +223,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getInheritData()
+    public function getInheritData(): bool
     {
         return $this->inheritData;
     }
@@ -231,7 +231,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCompound()
+    public function getCompound(): bool
     {
         return $this->compound;
     }
@@ -239,7 +239,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getType()
+    public function getType(): ResolvedFormTypeInterface
     {
         return $this->type;
     }
@@ -247,7 +247,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getViewTransformers()
+    public function getViewTransformers(): array
     {
         return $this->viewTransformers;
     }
@@ -255,7 +255,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getModelTransformers()
+    public function getModelTransformers(): array
     {
         return $this->modelTransformers;
     }
@@ -263,7 +263,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataMapper()
+    public function getDataMapper(): ?DataMapperInterface
     {
         return $this->dataMapper;
     }
@@ -271,7 +271,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getRequired()
+    public function getRequired(): bool
     {
         return $this->required;
     }
@@ -279,7 +279,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getDisabled()
+    public function getDisabled(): bool
     {
         return $this->disabled;
     }
@@ -287,7 +287,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getErrorBubbling()
+    public function getErrorBubbling(): bool
     {
         return $this->errorBubbling;
     }
@@ -295,7 +295,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEmptyData()
+    public function getEmptyData(): mixed
     {
         return $this->emptyData;
     }
@@ -303,7 +303,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -311,7 +311,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function hasAttribute(string $name)
+    public function hasAttribute(string $name): bool
     {
         return \array_key_exists($name, $this->attributes);
     }
@@ -319,7 +319,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttribute(string $name, mixed $default = null)
+    public function getAttribute(string $name, mixed $default = null): mixed
     {
         return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
@@ -327,7 +327,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getData()
+    public function getData(): mixed
     {
         return $this->data;
     }
@@ -335,7 +335,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataClass()
+    public function getDataClass(): ?string
     {
         return $this->dataClass;
     }
@@ -343,7 +343,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataLocked()
+    public function getDataLocked(): bool
     {
         return $this->dataLocked;
     }
@@ -351,7 +351,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormFactory()
+    public function getFormFactory(): FormFactoryInterface
     {
         if (!isset($this->formFactory)) {
             throw new BadMethodCallException('The form factory must be set before retrieving it.');
@@ -363,7 +363,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->action;
     }
@@ -371,7 +371,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -379,7 +379,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getRequestHandler()
+    public function getRequestHandler(): RequestHandlerInterface
     {
         return $this->requestHandler ??= self::$nativeRequestHandler ??= new NativeRequestHandler();
     }
@@ -387,7 +387,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getAutoInitialize()
+    public function getAutoInitialize(): bool
     {
         return $this->autoInitialize;
     }
@@ -395,7 +395,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -403,7 +403,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function hasOption(string $name)
+    public function hasOption(string $name): bool
     {
         return \array_key_exists($name, $this->options);
     }
@@ -411,7 +411,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getOption(string $name, mixed $default = null)
+    public function getOption(string $name, mixed $default = null): mixed
     {
         return \array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
@@ -427,7 +427,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setAttribute(string $name, mixed $value)
+    public function setAttribute(string $name, mixed $value): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -441,7 +441,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setAttributes(array $attributes)
+    public function setAttributes(array $attributes): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -455,7 +455,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDataMapper(DataMapperInterface $dataMapper = null)
+    public function setDataMapper(DataMapperInterface $dataMapper = null): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -469,7 +469,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDisabled(bool $disabled)
+    public function setDisabled(bool $disabled): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -483,7 +483,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setEmptyData(mixed $emptyData)
+    public function setEmptyData(mixed $emptyData): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -497,7 +497,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setErrorBubbling(bool $errorBubbling)
+    public function setErrorBubbling(bool $errorBubbling): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -511,7 +511,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setRequired(bool $required)
+    public function setRequired(bool $required): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -525,7 +525,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setPropertyPath(string|PropertyPathInterface|null $propertyPath)
+    public function setPropertyPath(string|PropertyPathInterface|null $propertyPath): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -543,7 +543,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setMapped(bool $mapped)
+    public function setMapped(bool $mapped): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -557,7 +557,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setByReference(bool $byReference)
+    public function setByReference(bool $byReference): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -571,7 +571,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setInheritData(bool $inheritData)
+    public function setInheritData(bool $inheritData): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -585,7 +585,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setCompound(bool $compound)
+    public function setCompound(bool $compound): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -599,7 +599,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setType(ResolvedFormTypeInterface $type)
+    public function setType(ResolvedFormTypeInterface $type): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -613,7 +613,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setData(mixed $data)
+    public function setData(mixed $data): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -627,7 +627,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDataLocked(bool $locked)
+    public function setDataLocked(bool $locked): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -655,7 +655,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setAction(string $action)
+    public function setAction(string $action): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('The config builder cannot be modified anymore.');
@@ -669,7 +669,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setMethod(string $method)
+    public function setMethod(string $method): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('The config builder cannot be modified anymore.');
@@ -683,7 +683,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setRequestHandler(RequestHandlerInterface $requestHandler)
+    public function setRequestHandler(RequestHandlerInterface $requestHandler): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('The config builder cannot be modified anymore.');
@@ -697,7 +697,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setAutoInitialize(bool $initialize)
+    public function setAutoInitialize(bool $initialize): static
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -711,7 +711,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormConfig()
+    public function getFormConfig(): FormConfigInterface
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');

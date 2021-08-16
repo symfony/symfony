@@ -70,7 +70,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * {@inheritdoc}
      */
-    public function addConstraint(Constraint $constraint)
+    public function addConstraint(Constraint $constraint): static
     {
         $this->checkConstraint($constraint);
 
@@ -82,7 +82,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * {@inheritdoc}
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return array_merge(parent::__sleep(), [
             'class',
@@ -93,10 +93,8 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
 
     /**
      * Returns the name of the member.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -112,37 +110,31 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * {@inheritdoc}
      */
-    public function getPropertyName()
+    public function getPropertyName(): string
     {
         return $this->property;
     }
 
     /**
      * Returns whether this member is public.
-     *
-     * @return bool
      */
-    public function isPublic(object|string $objectOrClassName)
+    public function isPublic(object|string $objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isPublic();
     }
 
     /**
      * Returns whether this member is protected.
-     *
-     * @return bool
      */
-    public function isProtected(object|string $objectOrClassName)
+    public function isProtected(object|string $objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isProtected();
     }
 
     /**
      * Returns whether this member is private.
-     *
-     * @return bool
      */
-    public function isPrivate(object|string $objectOrClassName)
+    public function isPrivate(object|string $objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isPrivate();
     }
@@ -152,7 +144,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      *
      * @return \ReflectionMethod|\ReflectionProperty
      */
-    public function getReflectionMember(object|string $objectOrClassName)
+    public function getReflectionMember(object|string $objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
         $className = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);
         if (!isset($this->reflMember[$className])) {
@@ -167,7 +159,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      *
      * @return \ReflectionMethod|\ReflectionProperty
      */
-    abstract protected function newReflectionMember(object|string $objectOrClassName);
+    abstract protected function newReflectionMember(object|string $objectOrClassName): \ReflectionMethod|\ReflectionProperty;
 
     private function checkConstraint(Constraint $constraint)
     {

@@ -74,7 +74,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
      *
      * @return ChoiceListFactoryInterface The decorated factory
      */
-    public function getDecoratedFactory()
+    public function getDecoratedFactory(): ChoiceListFactoryInterface
     {
         return $this->decoratedFactory;
     }
@@ -82,7 +82,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      */
-    public function createListFromChoices(iterable $choices, mixed $value = null, mixed $filter = null)
+    public function createListFromChoices(iterable $choices, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
@@ -118,7 +118,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, mixed $value = null, mixed $filter = null)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
         $cache = true;
 
@@ -156,7 +156,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [])
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = []): ChoiceListView
     {
         $cache = true;
 

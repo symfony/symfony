@@ -21,17 +21,17 @@ class All extends Composite
 {
     public $constraints = [];
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'constraints';
     }
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['constraints'];
     }
 
-    protected function getCompositeOption()
+    protected function getCompositeOption(): string
     {
         return 'constraints';
     }

@@ -44,21 +44,21 @@ interface BundleInterface extends ContainerAwareInterface
      *
      * @return ExtensionInterface|null The default extension or null if there is none
      */
-    public function getContainerExtension();
+    public function getContainerExtension(): ?ExtensionInterface;
 
     /**
      * Returns the bundle name (the class short name).
      *
      * @return string The Bundle name
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Gets the Bundle namespace.
      *
      * @return string The Bundle namespace
      */
-    public function getNamespace();
+    public function getNamespace(): string;
 
     /**
      * Gets the Bundle directory path.
@@ -67,5 +67,5 @@ interface BundleInterface extends ContainerAwareInterface
      *
      * @return string The Bundle absolute path
      */
-    public function getPath();
+    public function getPath(): string;
 }

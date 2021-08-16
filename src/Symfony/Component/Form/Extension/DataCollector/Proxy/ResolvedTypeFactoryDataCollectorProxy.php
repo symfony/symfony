@@ -36,7 +36,7 @@ class ResolvedTypeFactoryDataCollectorProxy implements ResolvedFormTypeFactoryIn
     /**
      * {@inheritdoc}
      */
-    public function createResolvedType(FormTypeInterface $type, array $typeExtensions, ResolvedFormTypeInterface $parent = null)
+    public function createResolvedType(FormTypeInterface $type, array $typeExtensions, ResolvedFormTypeInterface $parent = null): ResolvedFormTypeInterface
     {
         return new ResolvedTypeDataCollectorProxy(
             $this->proxiedFactory->createResolvedType($type, $typeExtensions, $parent),

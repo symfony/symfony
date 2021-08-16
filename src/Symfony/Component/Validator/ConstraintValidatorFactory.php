@@ -33,7 +33,7 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getInstance(Constraint $constraint)
+    public function getInstance(Constraint $constraint): ConstraintValidatorInterface
     {
         $className = $constraint->validatedBy();
 

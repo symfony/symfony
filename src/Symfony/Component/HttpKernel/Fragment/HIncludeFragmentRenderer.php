@@ -45,7 +45,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      *
      * @return bool true if the templating engine has been set, false otherwise
      */
-    public function hasTemplating()
+    public function hasTemplating(): bool
     {
         return null !== $this->twig;
     }
@@ -59,7 +59,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      *  * id:         An optional hx:include tag id attribute
      *  * attributes: An optional array of hx:include tag attributes
      */
-    public function render(string|ControllerReference $uri, Request $request, array $options = [])
+    public function render(string|ControllerReference $uri, Request $request, array $options = []): Response
     {
         if ($uri instanceof ControllerReference) {
             $uri = (new FragmentUriGenerator($this->fragmentPath, $this->signer))->generate($uri, $request);
@@ -97,7 +97,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'hinclude';
     }

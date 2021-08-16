@@ -55,7 +55,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function atPath(string $path)
+    public function atPath(string $path): static
     {
         $this->propertyPath = PropertyPath::append($this->propertyPath, $path);
 
@@ -65,7 +65,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setParameter(string $key, string $value)
+    public function setParameter(string $key, string $value): static
     {
         $this->parameters[$key] = $value;
 
@@ -75,7 +75,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setParameters(array $parameters)
+    public function setParameters(array $parameters): static
     {
         $this->parameters = $parameters;
 
@@ -85,7 +85,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setTranslationDomain(string $translationDomain)
+    public function setTranslationDomain(string $translationDomain): static
     {
         $this->translationDomain = $translationDomain;
 
@@ -95,7 +95,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setInvalidValue(mixed $invalidValue)
+    public function setInvalidValue(mixed $invalidValue): static
     {
         $this->invalidValue = $invalidValue;
 
@@ -105,7 +105,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setPlural(int $number)
+    public function setPlural(int $number): static
     {
         $this->plural = $number;
 
@@ -115,7 +115,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setCode(?string $code)
+    public function setCode(?string $code): static
     {
         $this->code = $code;
 
@@ -125,7 +125,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setCause(mixed $cause)
+    public function setCause(mixed $cause): static
     {
         $this->cause = $cause;
 

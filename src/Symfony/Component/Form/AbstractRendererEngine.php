@@ -79,7 +79,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceForBlockName(FormView $view, string $blockName)
+    public function getResourceForBlockName(FormView $view, string $blockName): mixed
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
@@ -93,7 +93,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, int $hierarchyLevel)
+    public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): mixed
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
         $blockName = $blockNameHierarchy[$hierarchyLevel];
@@ -108,7 +108,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel)
+    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): int|bool
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
         $blockName = $blockNameHierarchy[$hierarchyLevel];

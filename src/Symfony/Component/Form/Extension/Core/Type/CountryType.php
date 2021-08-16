@@ -53,7 +53,7 @@ class CountryType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
@@ -61,7 +61,7 @@ class CountryType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'country';
     }

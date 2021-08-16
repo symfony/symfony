@@ -56,40 +56,32 @@ class FormError
 
     /**
      * Returns the error message.
-     *
-     * @return string
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
     /**
      * Returns the error message template.
-     *
-     * @return string
      */
-    public function getMessageTemplate()
+    public function getMessageTemplate(): string
     {
         return $this->messageTemplate;
     }
 
     /**
      * Returns the parameters to be inserted in the message template.
-     *
-     * @return array
      */
-    public function getMessageParameters()
+    public function getMessageParameters(): array
     {
         return $this->messageParameters;
     }
 
     /**
      * Returns the value for error message pluralization.
-     *
-     * @return int|null
      */
-    public function getMessagePluralization()
+    public function getMessagePluralization(): ?int
     {
         return $this->messagePluralization;
     }
@@ -99,7 +91,7 @@ class FormError
      *
      * @return mixed The cause of this error
      */
-    public function getCause()
+    public function getCause(): mixed
     {
         return $this->cause;
     }
@@ -125,7 +117,7 @@ class FormError
      *
      * @return FormInterface|null The form that caused this error
      */
-    public function getOrigin()
+    public function getOrigin(): ?FormInterface
     {
         return $this->origin;
     }

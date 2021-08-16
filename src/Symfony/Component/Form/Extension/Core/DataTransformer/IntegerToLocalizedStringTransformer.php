@@ -36,7 +36,7 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform(mixed $value)
+    public function reverseTransform(mixed $value): int|float|null
     {
         $decimalSeparator = $this->getNumberFormatter()->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
 

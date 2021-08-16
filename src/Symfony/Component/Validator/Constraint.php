@@ -65,7 +65,7 @@ abstract class Constraint
      *
      * @throws InvalidArgumentException If the error code does not exist
      */
-    public static function getErrorName(string $errorCode)
+    public static function getErrorName(string $errorCode): string
     {
         if (!isset(static::$errorNames[$errorCode])) {
             throw new InvalidArgumentException(sprintf('The error code "%s" does not exist for constraint of type "%s".', $errorCode, static::class));
@@ -203,7 +203,7 @@ abstract class Constraint
      *
      * @throws InvalidOptionsException If an invalid option name is given
      */
-    public function __get(string $option)
+    public function __get(string $option): mixed
     {
         if ('groups' === $option) {
             $this->groups = [self::DEFAULT_GROUP];
@@ -214,10 +214,7 @@ abstract class Constraint
         throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint "%s".', $option, static::class), [$option]);
     }
 
-    /**
-     * @return bool
-     */
-    public function __isset(string $option)
+    public function __isset(string $option): bool
     {
         return 'groups' === $option;
     }
@@ -290,8 +287,6 @@ abstract class Constraint
 
     /**
      * Optimizes the serialized value to minimize storage space.
-     *
-     * @return array
      *
      * @internal
      */

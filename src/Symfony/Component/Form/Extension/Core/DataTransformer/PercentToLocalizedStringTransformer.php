@@ -70,7 +70,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      * @throws TransformationFailedException if the given value is not numeric or
      *                                       if the value could not be transformed
      */
-    public function transform(mixed $value)
+    public function transform(mixed $value): string
     {
         if (null === $value) {
             return '';
@@ -100,12 +100,10 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param string $value Percentage value
      *
-     * @return int|float|null
-     *
      * @throws TransformationFailedException if the given value is not a string or
      *                                       if the value could not be transformed
      */
-    public function reverseTransform(mixed $value)
+    public function reverseTransform(mixed $value): int|float|null
     {
         if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
@@ -171,10 +169,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
     /**
      * Returns a preconfigured \NumberFormatter instance.
-     *
-     * @return \NumberFormatter
      */
-    protected function getNumberFormatter()
+    protected function getNumberFormatter(): \NumberFormatter
     {
         // Values used in HTML5 number inputs should be formatted as in "1234.5", ie. 'en' format without grouping,
         // according to https://www.w3.org/TR/html51/sec-forms.html#date-time-and-number-formats

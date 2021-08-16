@@ -46,7 +46,7 @@ class PropertyMetadata extends MemberMetadata
     /**
      * {@inheritdoc}
      */
-    public function getPropertyValue(mixed $object)
+    public function getPropertyValue(mixed $object): mixed
     {
         $reflProperty = $this->getReflectionMember($object);
 
@@ -73,7 +73,7 @@ class PropertyMetadata extends MemberMetadata
     /**
      * {@inheritdoc}
      */
-    protected function newReflectionMember(object|string $objectOrClassName)
+    protected function newReflectionMember(object|string $objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
         $originalClass = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);
 

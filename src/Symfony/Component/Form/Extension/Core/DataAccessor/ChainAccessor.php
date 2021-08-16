@@ -33,7 +33,7 @@ class ChainAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue(object|array $data, FormInterface $form)
+    public function getValue(object|array $data, FormInterface $form): mixed
     {
         foreach ($this->accessors as $accessor) {
             if ($accessor->isReadable($data, $form)) {

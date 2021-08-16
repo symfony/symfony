@@ -43,10 +43,8 @@ abstract class DataCollector implements DataCollectorInterface
      *
      * This array can be displayed in the template using
      * the VarDumper component.
-     *
-     * @return Data
      */
-    protected function cloneVar(mixed $var)
+    protected function cloneVar(mixed $var): Data
     {
         if ($var instanceof Data) {
             return $var;
@@ -82,10 +80,7 @@ abstract class DataCollector implements DataCollectorInterface
         return $casters;
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['data'];
     }

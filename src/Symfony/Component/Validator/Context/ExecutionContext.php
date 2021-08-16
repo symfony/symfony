@@ -200,7 +200,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getRoot()
+    public function getRoot(): mixed
     {
         return $this->root;
     }
@@ -208,7 +208,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue()
+    public function getValue(): mixed
     {
         if ($this->value instanceof LazyProperty) {
             return $this->value->getPropertyValue();
@@ -220,7 +220,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getObject()
+    public function getObject(): ?object
     {
         return $this->object;
     }

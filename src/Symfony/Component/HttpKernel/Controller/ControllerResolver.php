@@ -33,7 +33,7 @@ class ControllerResolver implements ControllerResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getController(Request $request)
+    public function getController(Request $request): callable|false
     {
         if (!$controller = $request->attributes->get('_controller')) {
             if (null !== $this->logger) {
@@ -95,7 +95,7 @@ class ControllerResolver implements ControllerResolverInterface
      *
      * @throws \InvalidArgumentException When the controller cannot be created
      */
-    protected function createController(string $controller)
+    protected function createController(string $controller): callable
     {
         if (!str_contains($controller, '::')) {
             $controller = $this->instantiateController($controller);
@@ -132,10 +132,8 @@ class ControllerResolver implements ControllerResolverInterface
 
     /**
      * Returns an instantiated controller.
-     *
-     * @return object
      */
-    protected function instantiateController(string $class)
+    protected function instantiateController(string $class): object
     {
         return new $class();
     }

@@ -44,7 +44,7 @@ class ExpressionLanguageSyntax extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return $this->service ?? static::class.'Validator';
     }

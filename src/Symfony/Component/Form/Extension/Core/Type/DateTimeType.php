@@ -351,7 +351,7 @@ class DateTimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'datetime';
     }

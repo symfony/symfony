@@ -48,7 +48,7 @@ class DateTime extends Constraint
         $this->message = $message ?? $this->message;
     }
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'format';
     }

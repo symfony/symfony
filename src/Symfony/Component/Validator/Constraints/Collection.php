@@ -73,12 +73,12 @@ class Collection extends Composite
         }
     }
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['fields'];
     }
 
-    protected function getCompositeOption()
+    protected function getCompositeOption(): string
     {
         return 'fields';
     }

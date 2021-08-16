@@ -38,7 +38,7 @@ class PropertyPathAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue(object|array $data, FormInterface $form)
+    public function getValue(object|array $data, FormInterface $form): mixed
     {
         if (null === $propertyPath = $form->getPropertyPath()) {
             throw new AccessException('Unable to read from the given form data as no property path is defined.');

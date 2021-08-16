@@ -31,7 +31,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
      *
      * @return array The array
      */
-    public function transform(mixed $value)
+    public function transform(mixed $value): array
     {
         $result = [];
 
@@ -48,7 +48,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
      * @throws TransformationFailedException if the given value is not an array or
      *                                       if the given array can not be transformed
      */
-    public function reverseTransform(mixed $array)
+    public function reverseTransform(mixed $array): mixed
     {
         if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');

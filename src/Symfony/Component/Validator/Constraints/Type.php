@@ -47,7 +47,7 @@ class Type extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'type';
     }
@@ -55,7 +55,7 @@ class Type extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['type'];
     }

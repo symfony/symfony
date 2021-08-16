@@ -111,8 +111,6 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
      * Gets the session object.
      *
      * @deprecated since Symfony 5.4, will be removed in 6.0.
-     *
-     * @return SessionInterface|null
      */
-    abstract protected function getSession();
+    abstract protected function getSession(): ?SessionInterface;
 }

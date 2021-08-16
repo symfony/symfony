@@ -37,7 +37,7 @@ abstract class AbstractChoiceLoader implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadChoicesForValues(array $values, callable $value = null)
+    public function loadChoicesForValues(array $values, callable $value = null): array
     {
         if (!$values) {
             return [];
@@ -53,7 +53,7 @@ abstract class AbstractChoiceLoader implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadValuesForChoices(array $choices, callable $value = null)
+    public function loadValuesForChoices(array $choices, callable $value = null): array
     {
         if (!$choices) {
             return [];

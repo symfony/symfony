@@ -94,7 +94,7 @@ class GenericMetadata implements MetadataInterface
      *
      * @return string[]
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return [
             'constraints',
@@ -136,7 +136,7 @@ class GenericMetadata implements MetadataInterface
      * @throws ConstraintDefinitionException When trying to add the {@link Cascade}
      *                                       or {@link Traverse} constraint
      */
-    public function addConstraint(Constraint $constraint)
+    public function addConstraint(Constraint $constraint): static
     {
         if ($constraint instanceof Traverse || $constraint instanceof Cascade) {
             throw new ConstraintDefinitionException(sprintf('The constraint "%s" can only be put on classes. Please use "Symfony\Component\Validator\Constraints\Valid" instead.', get_debug_type($constraint)));
@@ -177,7 +177,7 @@ class GenericMetadata implements MetadataInterface
      *
      * @return $this
      */
-    public function addConstraints(array $constraints)
+    public function addConstraints(array $constraints): static
     {
         foreach ($constraints as $constraint) {
             $this->addConstraint($constraint);
@@ -189,17 +189,15 @@ class GenericMetadata implements MetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getConstraints()
+    public function getConstraints(): array
     {
         return $this->constraints;
     }
 
     /**
      * Returns whether this element has any constraints.
-     *
-     * @return bool
      */
-    public function hasConstraints()
+    public function hasConstraints(): bool
     {
         return \count($this->constraints) > 0;
     }
@@ -209,7 +207,7 @@ class GenericMetadata implements MetadataInterface
      *
      * Aware of the global group (* group).
      */
-    public function findConstraints(string $group)
+    public function findConstraints(string $group): array
     {
         return $this->constraintsByGroup[$group] ?? [];
     }
@@ -217,7 +215,7 @@ class GenericMetadata implements MetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getCascadingStrategy()
+    public function getCascadingStrategy(): int
     {
         return $this->cascadingStrategy;
     }
@@ -225,7 +223,7 @@ class GenericMetadata implements MetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getTraversalStrategy()
+    public function getTraversalStrategy(): int
     {
         return $this->traversalStrategy;
     }

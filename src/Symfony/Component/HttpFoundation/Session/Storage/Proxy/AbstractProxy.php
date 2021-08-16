@@ -30,8 +30,6 @@ abstract class AbstractProxy
 
     /**
      * Gets the session.save_handler name.
-     *
-     * @return string|null
      */
     public function getSaveHandlerName(): ?string
     {
@@ -40,8 +38,6 @@ abstract class AbstractProxy
 
     /**
      * Is this proxy handler and instance of \SessionHandlerInterface.
-     *
-     * @return bool
      */
     public function isSessionHandlerInterface(): bool
     {
@@ -50,8 +46,6 @@ abstract class AbstractProxy
 
     /**
      * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler.
-     *
-     * @return bool
      */
     public function isWrapper(): bool
     {
@@ -60,8 +54,6 @@ abstract class AbstractProxy
 
     /**
      * Has a session started?
-     *
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -70,8 +62,6 @@ abstract class AbstractProxy
 
     /**
      * Gets the session ID.
-     *
-     * @return string
      */
     public function getId(): string
     {
@@ -94,8 +84,6 @@ abstract class AbstractProxy
 
     /**
      * Gets the session name.
-     *
-     * @return string
      */
     public function getName(): string
     {

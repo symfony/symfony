@@ -184,8 +184,6 @@ class PassConfig
 
     /**
      * Gets the Merge pass.
-     *
-     * @return CompilerPassInterface
      */
     public function getMergePass(): CompilerPassInterface
     {

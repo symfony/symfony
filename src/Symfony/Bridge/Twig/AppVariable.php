@@ -52,8 +52,6 @@ class AppVariable
     /**
      * Returns the current token.
      *
-     * @return TokenInterface|null
-     *
      * @throws \RuntimeException When the TokenStorage is not available
      */
     public function getToken(): ?TokenInterface
@@ -67,8 +65,6 @@ class AppVariable
 
     /**
      * Returns the current user.
-     *
-     * @return object|null
      *
      * @see TokenInterface::getUser()
      */
@@ -150,8 +146,6 @@ class AppVariable
      *  * getFlashes() returns all the flash messages
      *  * getFlashes('notice') returns a simple array with flash messages of that type
      *  * getFlashes(['notice', 'error']) returns a nested array of type => messages.
-     *
-     * @return array
      */
     public function getFlashes(string|array $types = null): array
     {

@@ -33,8 +33,6 @@ interface ContainerInterface extends PsrContainerInterface
     public function set(string $id, ?object $service);
 
     /**
-     * @return object|null
-     *
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined
      *
@@ -61,9 +59,6 @@ interface ContainerInterface extends PsrContainerInterface
      */
     public function getParameter(string $name);
 
-    /**
-     * @return bool
-     */
     public function hasParameter(string $name): bool;
 
     public function setParameter(string $name, array|bool|string|int|float|null $value);

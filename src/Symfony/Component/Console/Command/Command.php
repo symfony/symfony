@@ -152,8 +152,6 @@ class Command
 
     /**
      * Gets the helper set.
-     *
-     * @return HelperSet|null
      */
     public function getHelperSet(): ?HelperSet
     {
@@ -162,8 +160,6 @@ class Command
 
     /**
      * Gets the application instance for this command.
-     *
-     * @return Application|null
      */
     public function getApplication(): ?Application
     {
@@ -388,8 +384,6 @@ class Command
 
     /**
      * Gets the InputDefinition attached to this Command.
-     *
-     * @return InputDefinition
      */
     public function getDefinition(): InputDefinition
     {
@@ -403,8 +397,6 @@ class Command
      * be changed by merging with the application InputDefinition.
      *
      * This method is not part of public API and should not be used directly.
-     *
-     * @return InputDefinition
      */
     public function getNativeDefinition(): InputDefinition
     {
@@ -494,8 +486,6 @@ class Command
 
     /**
      * Returns the command name.
-     *
-     * @return string|null
      */
     public function getName(): ?string
     {
@@ -658,8 +648,6 @@ class Command
 
     /**
      * Returns alternative usages of the command.
-     *
-     * @return array
      */
     public function getUsages(): array
     {

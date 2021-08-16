@@ -84,9 +84,6 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
         $visitor->disable();
     }
 
-    /**
-     * @return bool
-     */
     protected function canBeExtracted(string $file): bool
     {
         return $this->isFile($file) && 'twig' === pathinfo($file, \PATHINFO_EXTENSION);

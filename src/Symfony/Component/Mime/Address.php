@@ -90,7 +90,7 @@ final class Address
         return sprintf('"%s"', preg_replace('/"/u', '\"', $this->getName()));
     }
 
-    public static function create(Address|string $address): self
+    public static function create(self|string $address): self
     {
         if ($address instanceof self) {
             return $address;

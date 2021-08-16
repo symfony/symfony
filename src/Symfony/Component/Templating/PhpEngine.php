@@ -244,8 +244,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets a helper value.
      *
-     * @return HelperInterface
-     *
      * @throws \InvalidArgumentException if the helper is not defined
      */
     public function get(string $name): HelperInterface
@@ -346,8 +344,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Returns the assigned globals.
-     *
-     * @return array
      */
     public function getGlobals(): array
     {
@@ -435,8 +431,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Gets the loader associated with this engine.
-     *
-     * @return LoaderInterface
      */
     public function getLoader(): LoaderInterface
     {
@@ -445,8 +439,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Loads the given template.
-     *
-     * @return Storage
      *
      * @throws \InvalidArgumentException if the template cannot be found
      */

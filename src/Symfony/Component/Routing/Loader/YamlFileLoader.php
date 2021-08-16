@@ -39,8 +39,6 @@ class YamlFileLoader extends FileLoader
     private $yamlParser;
 
     /**
-     * @return RouteCollection
-     *
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
      */
     public function load(mixed $file, string $type = null): RouteCollection

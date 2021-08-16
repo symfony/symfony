@@ -60,8 +60,6 @@ class SlotsHelper extends Helper
 
     /**
      * Returns true if the slot exists.
-     *
-     * @return bool
      */
     public function has(string $name): bool
     {

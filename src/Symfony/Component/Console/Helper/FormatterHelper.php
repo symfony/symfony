@@ -66,8 +66,6 @@ class FormatterHelper extends Helper
 
     /**
      * Truncates a message to the given length.
-     *
-     * @return string
      */
     public function truncate(string $message, int $length, string $suffix = '...'): string
     {

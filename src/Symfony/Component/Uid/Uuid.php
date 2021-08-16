@@ -37,9 +37,6 @@ class Uuid extends AbstractUid
         $this->uid = strtolower($uuid);
     }
 
-    /**
-     * @return static
-     */
     public static function fromString(string $uuid): static
     {
         if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {

@@ -37,8 +37,6 @@ class ConsoleEvent extends Event
 
     /**
      * Gets the command that is executed.
-     *
-     * @return Command|null
      */
     public function getCommand(): ?Command
     {
@@ -47,8 +45,6 @@ class ConsoleEvent extends Event
 
     /**
      * Gets the input instance.
-     *
-     * @return InputInterface
      */
     public function getInput(): InputInterface
     {
@@ -57,8 +53,6 @@ class ConsoleEvent extends Event
 
     /**
      * Gets the output instance.
-     *
-     * @return OutputInterface
      */
     public function getOutput(): OutputInterface
     {

@@ -26,8 +26,6 @@ class DebugFormatterHelper extends Helper
 
     /**
      * Starts a debug formatting session.
-     *
-     * @return string
      */
     public function start(string $id, string $message, string $prefix = 'RUN'): string
     {
@@ -38,8 +36,6 @@ class DebugFormatterHelper extends Helper
 
     /**
      * Adds progress to a formatting session.
-     *
-     * @return string
      */
     public function progress(string $id, string $buffer, bool $error = false, string $prefix = 'OUT', string $errorPrefix = 'ERR'): string
     {
@@ -74,8 +70,6 @@ class DebugFormatterHelper extends Helper
 
     /**
      * Stops a formatting session.
-     *
-     * @return string
      */
     public function stop(string $id, string $message, bool $successful, string $prefix = 'RES'): string
     {

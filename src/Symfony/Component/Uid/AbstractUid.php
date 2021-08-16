@@ -29,15 +29,11 @@ abstract class AbstractUid implements \JsonSerializable
     /**
      * Creates an AbstractUid from an identifier represented in any of the supported formats.
      *
-     * @return static
-     *
      * @throws \InvalidArgumentException When the passed value is not valid
      */
     abstract public static function fromString(string $uid): static;
 
     /**
-     * @return static
-     *
      * @throws \InvalidArgumentException When the passed value is not valid
      */
     public static function fromBinary(string $uid): static
@@ -50,8 +46,6 @@ abstract class AbstractUid implements \JsonSerializable
     }
 
     /**
-     * @return static
-     *
      * @throws \InvalidArgumentException When the passed value is not valid
      */
     public static function fromBase58(string $uid): static
@@ -64,8 +58,6 @@ abstract class AbstractUid implements \JsonSerializable
     }
 
     /**
-     * @return static
-     *
      * @throws \InvalidArgumentException When the passed value is not valid
      */
     public static function fromBase32(string $uid): static
@@ -78,8 +70,6 @@ abstract class AbstractUid implements \JsonSerializable
     }
 
     /**
-     * @return static
-     *
      * @throws \InvalidArgumentException When the passed value is not valid
      */
     public static function fromRfc4122(string $uid): static

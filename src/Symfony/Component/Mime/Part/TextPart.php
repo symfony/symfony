@@ -184,9 +184,6 @@ class TextPart extends AbstractPart
         return 'quoted-printable';
     }
 
-    /**
-     * @return array
-     */
     public function __sleep(): array
     {
         // convert resources to strings for serialization

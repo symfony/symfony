@@ -62,7 +62,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * @throws InvalidArgumentException     If the given path is not a string
      * @throws InvalidPropertyPathException If the syntax of the property path is not valid
      */
-    public function __construct(PropertyPath|string $propertyPath)
+    public function __construct(self|string $propertyPath)
     {
         // Can be used as copy constructor
         if ($propertyPath instanceof self) {

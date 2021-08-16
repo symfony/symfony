@@ -35,9 +35,6 @@ class UnstructuredHeader extends AbstractHeader
         $this->setValue($body);
     }
 
-    /**
-     * @return string
-     */
     public function getBody(): string
     {
         return $this->getValue();

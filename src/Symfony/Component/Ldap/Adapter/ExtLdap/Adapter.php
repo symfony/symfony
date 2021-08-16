@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
-use Symfony\Component\Ldap\Adapter\QueryInterface;
-use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
-use Symfony\Component\Ldap\Adapter\ConnectionInterface;
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
+use Symfony\Component\Ldap\Adapter\ConnectionInterface;
+use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
+use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Exception\LdapException;
 
 /**

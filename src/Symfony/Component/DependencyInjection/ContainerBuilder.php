@@ -188,8 +188,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns an extension by alias or namespace.
      *
-     * @return ExtensionInterface
-     *
      * @throws LogicException if the extension is not registered
      */
     public function getExtension(string $name): ExtensionInterface
@@ -751,8 +749,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Gets removed service or alias ids.
-     *
-     * @return array
      */
     public function getRemovedIds(): array
     {
@@ -780,8 +776,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets an alias for an existing service.
-     *
-     * @return Alias
      *
      * @throws InvalidArgumentException if the id is not a string or an Alias
      * @throws InvalidArgumentException if the alias is for itself
@@ -830,8 +824,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @return Alias
-     *
      * @throws InvalidArgumentException if the alias does not exist
      */
     public function getAlias(string $id): Alias
@@ -848,8 +840,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * This methods allows for simple registration of service definition
      * with a fluid interface.
-     *
-     * @return Definition
      */
     public function register(string $id, string $class = null): Definition
     {
@@ -937,8 +927,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets a service definition.
      *
-     * @return Definition
-     *
      * @throws ServiceNotFoundException if the service definition does not exist
      */
     public function getDefinition(string $id): Definition
@@ -954,8 +942,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Gets a service definition by id or alias.
      *
      * The method "unaliases" recursively to return a Definition instance.
-     *
-     * @return Definition
      *
      * @throws ServiceNotFoundException if the service definition does not exist
      */
@@ -1258,8 +1244,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns a ChildDefinition that will be used for autoconfiguring the interface/class.
-     *
-     * @return ChildDefinition
      */
     public function registerForAutoconfiguration(string $interface): ChildDefinition
     {
@@ -1510,8 +1494,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Computes a reasonably unique hash of a serializable value.
-     *
-     * @return string
      */
     public static function hash(mixed $value): string
     {

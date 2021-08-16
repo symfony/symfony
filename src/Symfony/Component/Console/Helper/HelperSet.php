@@ -60,8 +60,6 @@ class HelperSet implements \IteratorAggregate
     /**
      * Gets a helper value.
      *
-     * @return HelperInterface
-     *
      * @throws InvalidArgumentException if the helper is not defined
      */
     public function get(string $name): HelperInterface
@@ -80,8 +78,6 @@ class HelperSet implements \IteratorAggregate
 
     /**
      * Gets the command associated with this helper set.
-     *
-     * @return Command
      */
     public function getCommand(): Command
     {

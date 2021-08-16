@@ -25,8 +25,6 @@ class ClosureLoader extends Loader
 {
     /**
      * Loads a Closure.
-     *
-     * @return RouteCollection
      */
     public function load(mixed $closure, string $type = null): RouteCollection
     {

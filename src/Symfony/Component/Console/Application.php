@@ -312,8 +312,6 @@ class Application implements ResetInterface
 
     /**
      * Get the helper set associated with the command.
-     *
-     * @return HelperSet
      */
     public function getHelperSet(): HelperSet
     {
@@ -331,8 +329,6 @@ class Application implements ResetInterface
 
     /**
      * Gets the InputDefinition related to this Application.
-     *
-     * @return InputDefinition
      */
     public function getDefinition(): InputDefinition
     {
@@ -1019,8 +1015,6 @@ class Application implements ResetInterface
 
     /**
      * Gets the name of the command based on input.
-     *
-     * @return string|null
      */
     protected function getCommandName(InputInterface $input): ?string
     {
@@ -1029,8 +1023,6 @@ class Application implements ResetInterface
 
     /**
      * Gets the default input definition.
-     *
-     * @return InputDefinition
      */
     protected function getDefaultInputDefinition(): InputDefinition
     {
@@ -1057,8 +1049,6 @@ class Application implements ResetInterface
 
     /**
      * Gets the default helper set with the helpers that should always be available.
-     *
-     * @return HelperSet
      */
     protected function getDefaultHelperSet(): HelperSet
     {

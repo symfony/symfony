@@ -32,9 +32,6 @@ class Transition
         $this->tos = (array) $tos;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;

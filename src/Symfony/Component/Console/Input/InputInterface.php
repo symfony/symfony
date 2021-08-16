@@ -83,8 +83,6 @@ interface InputInterface
     /**
      * Returns the argument value for a given argument name.
      *
-     * @return mixed
-     *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
     public function getArgument(string $name): mixed;
@@ -113,8 +111,6 @@ interface InputInterface
     /**
      * Returns the option value for a given option name.
      *
-     * @return mixed
-     *
      * @throws InvalidArgumentException When option given doesn't exist
      */
     public function getOption(string $name): mixed;
@@ -135,8 +131,6 @@ interface InputInterface
 
     /**
      * Is this input means interactive?
-     *
-     * @return bool
      */
     public function isInteractive(): bool;
 

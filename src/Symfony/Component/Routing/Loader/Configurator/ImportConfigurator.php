@@ -30,9 +30,6 @@ class ImportConfigurator
         $this->route = $route;
     }
 
-    /**
-     * @return array
-     */
     public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

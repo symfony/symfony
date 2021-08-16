@@ -102,8 +102,6 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * Loads from annotations from a class.
      *
-     * @return RouteCollection
-     *
      * @throws \InvalidArgumentException When route can't be parsed
      */
     public function load(mixed $class, string $type = null): RouteCollection

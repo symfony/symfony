@@ -30,7 +30,7 @@ class Scope
      *
      * @return self
      */
-    public function enter(): \Symfony\Bridge\Twig\NodeVisitor\Scope
+    public function enter(): self
     {
         return new self($this);
     }
@@ -40,7 +40,7 @@ class Scope
      *
      * @return self|null
      */
-    public function leave(): ?\Symfony\Bridge\Twig\NodeVisitor\Scope
+    public function leave(): ?self
     {
         $this->left = true;
 
@@ -67,8 +67,6 @@ class Scope
 
     /**
      * Tests if a data is visible from current scope.
-     *
-     * @return bool
      */
     public function has(string $key): bool
     {
@@ -85,8 +83,6 @@ class Scope
 
     /**
      * Returns data visible from current scope.
-     *
-     * @return mixed
      */
     public function get(string $key, mixed $default = null): mixed
     {

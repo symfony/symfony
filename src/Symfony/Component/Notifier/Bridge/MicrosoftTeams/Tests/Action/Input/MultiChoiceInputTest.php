@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Tests\Action\Input;
 
-use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input\AbstractInput;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input\MultiChoiceInput;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Test\Action\Input\AbstractInputTestCase;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;

@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
@@ -56,8 +56,6 @@ abstract class FileLoader extends ArrayLoader
     }
 
     /**
-     * @return array
-     *
      * @throws InvalidResourceException if stream content has an invalid format
      */
     abstract protected function loadResource(string $resource): array;

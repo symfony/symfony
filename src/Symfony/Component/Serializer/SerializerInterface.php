@@ -30,8 +30,6 @@ interface SerializerInterface
     /**
      * Deserializes data into the given type.
      *
-     * @param mixed $data
-     *
      * @return mixed
      */
     public function deserialize(mixed $data, string $type, string $format, array $context = []);

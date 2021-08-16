@@ -38,8 +38,6 @@ class XmlUtils
      * @param string               $content          An XML string
      * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
      *
-     * @return \DOMDocument
-     *
      * @throws XmlParsingException When parsing of XML file returns error
      * @throws InvalidXmlException When parsing of XML with schema or callable produces any errors unrelated to the XML parsing itself
      * @throws \RuntimeException   When DOM extension is missing
@@ -110,8 +108,6 @@ class XmlUtils
      * @param string               $file             An XML file path
      * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
      *
-     * @return \DOMDocument
-     *
      * @throws \InvalidArgumentException When loading of XML file returns error
      * @throws XmlParsingException       When XML parsing returns any errors
      * @throws \RuntimeException         When DOM extension is missing
@@ -156,8 +152,6 @@ class XmlUtils
      *
      * @param \DOMElement $element     A \DOMElement instance
      * @param bool        $checkPrefix Check prefix in an element or an attribute name
-     *
-     * @return mixed
      */
     public static function convertDomElementToArray(\DOMElement $element, bool $checkPrefix = true): mixed
     {
@@ -212,8 +206,6 @@ class XmlUtils
 
     /**
      * Converts an xml value to a PHP type.
-     *
-     * @return mixed
      */
     public static function phpize(string|\Stringable $value): mixed
     {

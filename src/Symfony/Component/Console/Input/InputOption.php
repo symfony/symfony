@@ -211,8 +211,6 @@ class InputOption
 
     /**
      * Checks whether the given option equals this one.
-     *
-     * @return bool
      */
     public function equals(self $option): bool
     {

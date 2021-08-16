@@ -55,9 +55,6 @@ abstract class AbstractFailedMessagesCommand extends Command
         return $this->globalFailureReceiverName;
     }
 
-    /**
-     * @return mixed
-     */
     protected function getMessageId(Envelope $envelope): mixed
     {
         /** @var TransportMessageIdStamp $stamp */

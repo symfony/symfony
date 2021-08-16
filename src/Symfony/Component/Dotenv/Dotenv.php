@@ -84,10 +84,10 @@ final class Dotenv
      * .env.local is always ignored in test env because tests should produce the same results for everyone.
      * .env.dist is loaded when it exists and .env is not found.
      *
-     * @param string      $path        A file to load
-     * @param string|null $envKey The name of the env vars that defines the app env
-     * @param string      $defaultEnv  The app env to use when none is defined
-     * @param array       $testEnvs    A list of app envs for which .env.local should be ignored
+     * @param string      $path       A file to load
+     * @param string|null $envKey     The name of the env vars that defines the app env
+     * @param string      $defaultEnv The app env to use when none is defined
+     * @param array       $testEnvs   A list of app envs for which .env.local should be ignored
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable

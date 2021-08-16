@@ -100,8 +100,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
 
     /**
      * Gets a route by name.
-     *
-     * @return Route|null
      */
     public function get(string $name): ?Route
     {

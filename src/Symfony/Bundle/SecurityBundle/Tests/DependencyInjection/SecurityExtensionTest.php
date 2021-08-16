@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
-use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
@@ -37,6 +36,7 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface as GuardAuthenticatorInterface;
+use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;

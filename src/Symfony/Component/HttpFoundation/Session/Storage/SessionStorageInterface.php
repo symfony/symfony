@@ -113,8 +113,6 @@ interface SessionStorageInterface
     /**
      * Gets a SessionBagInterface by name.
      *
-     * @return SessionBagInterface
-     *
      * @throws \InvalidArgumentException If the bag does not exist
      */
     public function getBag(string $name): SessionBagInterface;
@@ -124,8 +122,5 @@ interface SessionStorageInterface
      */
     public function registerBag(SessionBagInterface $bag);
 
-    /**
-     * @return MetadataBag
-     */
     public function getMetadataBag(): MetadataBag;
 }

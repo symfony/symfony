@@ -23,8 +23,6 @@ use Symfony\Component\Routing\RouteCollection;
 class AnnotationDirectoryLoader extends AnnotationFileLoader
 {
     /**
-     * @return RouteCollection
-     *
      * @throws \InvalidArgumentException When the directory does not exist or its routes cannot be parsed
      */
     public function load(mixed $path, string $type = null): RouteCollection

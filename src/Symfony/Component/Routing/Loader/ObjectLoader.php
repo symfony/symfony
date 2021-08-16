@@ -27,15 +27,11 @@ abstract class ObjectLoader extends Loader
      *
      * For example, if your application uses a service container,
      * the $id may be a service id.
-     *
-     * @return object
      */
     abstract protected function getObject(string $id): object;
 
     /**
      * Calls the object method that will load the routes.
-     *
-     * @return RouteCollection
      */
     public function load(mixed $resource, string $type = null): RouteCollection
     {

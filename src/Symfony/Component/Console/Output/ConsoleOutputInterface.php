@@ -21,8 +21,6 @@ interface ConsoleOutputInterface extends OutputInterface
 {
     /**
      * Gets the OutputInterface for errors.
-     *
-     * @return OutputInterface
      */
     public function getErrorOutput(): OutputInterface;
 

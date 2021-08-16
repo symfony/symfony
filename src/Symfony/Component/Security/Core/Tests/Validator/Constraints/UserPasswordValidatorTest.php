@@ -94,7 +94,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     {
         yield 'Doctrine style' => [new UserPassword(['message' => 'myMessage'])];
 
-        yield 'named arguments' => [new UserPassword(message: "myMessage")];
+        yield 'named arguments' => [new UserPassword(message: 'myMessage')];
     }
 
     /**

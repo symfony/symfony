@@ -216,8 +216,6 @@ class Definition
 
     /**
      * Gets the properties to define when creating the service.
-     *
-     * @return array
      */
     public function getProperties(): array
     {
@@ -366,8 +364,6 @@ class Definition
 
     /**
      * Check if the current definition has a given method to call after service initialization.
-     *
-     * @return bool
      */
     public function hasMethodCall(string $method): bool
     {
@@ -428,9 +424,6 @@ class Definition
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isAutoconfigured(): bool
     {
         return $this->autoconfigured;
@@ -482,8 +475,6 @@ class Definition
 
     /**
      * Whether this definition has a tag with the given name.
-     *
-     * @return bool
      */
     public function hasTag(string $name): bool
     {
@@ -554,8 +545,6 @@ class Definition
 
     /**
      * Whether this service is shared.
-     *
-     * @return bool
      */
     public function isShared(): bool
     {
@@ -578,8 +567,6 @@ class Definition
 
     /**
      * Whether this service is public facing.
-     *
-     * @return bool
      */
     public function isPublic(): bool
     {
@@ -588,8 +575,6 @@ class Definition
 
     /**
      * Whether this service is private.
-     *
-     * @return bool
      */
     public function isPrivate(): bool
     {
@@ -612,8 +597,6 @@ class Definition
 
     /**
      * Whether this service is lazy.
-     *
-     * @return bool
      */
     public function isLazy(): bool
     {
@@ -640,8 +623,6 @@ class Definition
     /**
      * Whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
-     *
-     * @return bool
      */
     public function isSynthetic(): bool
     {
@@ -664,8 +645,6 @@ class Definition
     /**
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
-     *
-     * @return bool
      */
     public function isAbstract(): bool
     {
@@ -705,8 +684,6 @@ class Definition
     /**
      * Whether this definition is deprecated, that means it should not be called
      * anymore.
-     *
-     * @return bool
      */
     public function isDeprecated(): bool
     {
@@ -759,8 +736,6 @@ class Definition
 
     /**
      * Is the definition autowired?
-     *
-     * @return bool
      */
     public function isAutowired(): bool
     {
@@ -835,8 +810,6 @@ class Definition
 
     /**
      * Returns any errors that occurred while building this Definition.
-     *
-     * @return array
      */
     public function getErrors(): array
     {

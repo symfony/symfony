@@ -66,8 +66,6 @@ class TableStyle
 
     /**
      * Gets padding character, used for cell padding.
-     *
-     * @return string
      */
     public function getPaddingChar(): string
     {
@@ -193,8 +191,6 @@ class TableStyle
 
     /**
      * Gets crossing character.
-     *
-     * @return string
      */
     public function getCrossingChar(): string
     {
@@ -238,8 +234,6 @@ class TableStyle
 
     /**
      * Gets header cell format.
-     *
-     * @return string
      */
     public function getCellHeaderFormat(): string
     {
@@ -260,8 +254,6 @@ class TableStyle
 
     /**
      * Gets row cell format.
-     *
-     * @return string
      */
     public function getCellRowFormat(): string
     {
@@ -282,8 +274,6 @@ class TableStyle
 
     /**
      * Gets row cell content format.
-     *
-     * @return string
      */
     public function getCellRowContentFormat(): string
     {
@@ -304,8 +294,6 @@ class TableStyle
 
     /**
      * Gets table border format.
-     *
-     * @return string
      */
     public function getBorderFormat(): string
     {
@@ -330,8 +318,6 @@ class TableStyle
 
     /**
      * Gets cell padding type.
-     *
-     * @return int
      */
     public function getPadType(): int
     {

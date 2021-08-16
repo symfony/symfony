@@ -45,8 +45,6 @@ interface LockInterface
 
     /**
      * Returns whether or not the lock is acquired.
-     *
-     * @return bool
      */
     public function isAcquired(): bool;
 
@@ -57,9 +55,6 @@ interface LockInterface
      */
     public function release();
 
-    /**
-     * @return bool
-     */
     public function isExpired(): bool;
 
     /**

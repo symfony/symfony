@@ -590,8 +590,6 @@ class XmlFileLoader extends FileLoader
     /**
      * Validates a documents XML schema.
      *
-     * @return bool
-     *
      * @throws RuntimeException When extension references a non-existent XSD file
      */
     public function validateSchema(\DOMDocument $dom): bool
@@ -767,8 +765,6 @@ EOF
      *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
      *
      * @param \DOMElement $element A \DOMElement instance
-     *
-     * @return mixed
      */
     public static function convertDomElementToArray(\DOMElement $element): mixed
     {

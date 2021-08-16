@@ -110,8 +110,6 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Returns true if current environment supports writing console output to
      * STDOUT.
-     *
-     * @return bool
      */
     protected function hasStdoutSupport(): bool
     {
@@ -121,8 +119,6 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Returns true if current environment supports writing console output to
      * STDERR.
-     *
-     * @return bool
      */
     protected function hasStderrSupport(): bool
     {

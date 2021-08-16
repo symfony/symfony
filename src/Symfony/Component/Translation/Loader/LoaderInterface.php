@@ -25,8 +25,6 @@ interface LoaderInterface
     /**
      * Loads a locale.
      *
-     * @return MessageCatalogue
-     *
      * @throws NotFoundResourceException when the resource cannot be found
      * @throws InvalidResourceException  when the resource cannot be loaded
      */

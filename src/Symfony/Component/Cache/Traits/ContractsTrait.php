@@ -42,7 +42,7 @@ trait ContractsTrait
     public function setCallbackWrapper(?callable $callbackWrapper): callable
     {
         $previousWrapper = $this->callbackWrapper ??= \Closure::fromCallable([LockRegistry::class, 'compute']);
-        if ($callbackWrapper !== null && !$callbackWrapper instanceof \Closure) {
+        if (null !== $callbackWrapper && !$callbackWrapper instanceof \Closure) {
             $callbackWrapper = \Closure::fromCallable($callbackWrapper);
         }
 

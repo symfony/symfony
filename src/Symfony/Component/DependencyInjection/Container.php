@@ -86,8 +86,6 @@ class Container implements ContainerInterface, ResetInterface
 
     /**
      * Returns true if the container is compiled.
-     *
-     * @return bool
      */
     public function isCompiled(): bool
     {
@@ -96,8 +94,6 @@ class Container implements ContainerInterface, ResetInterface
 
     /**
      * Gets the service container parameter bag.
-     *
-     * @return ParameterBagInterface
      */
     public function getParameterBag(): ParameterBagInterface
     {
@@ -310,8 +306,6 @@ class Container implements ContainerInterface, ResetInterface
 
     /**
      * Gets service ids that existed at compile time.
-     *
-     * @return array
      */
     public function getRemovedIds(): array
     {

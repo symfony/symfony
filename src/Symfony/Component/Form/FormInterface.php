@@ -58,8 +58,6 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the child with the given name.
      *
-     * @return self
-     *
      * @throws Exception\OutOfBoundsException if the named child does not exist
      */
     public function get(string $name): self;
@@ -287,8 +285,6 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 
     /**
      * Returns the root of the form tree.
-     *
-     * @return self
      */
     public function getRoot(): self;
 

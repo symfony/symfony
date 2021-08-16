@@ -22,8 +22,6 @@ class LazyString implements \Stringable, \JsonSerializable
 
     /**
      * @param callable|array $callback A callable or a [Closure, method] lazy-callable
-     *
-     * @return static
      */
     public static function fromCallable(callable|array $callback, mixed ...$arguments): static
     {
@@ -49,9 +47,6 @@ class LazyString implements \Stringable, \JsonSerializable
         return $lazyString;
     }
 
-    /**
-     * @return static
-     */
     public static function fromStringable(string|int|float|bool|\Stringable $value): static
     {
         if (\is_object($value)) {

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Console\CommandLoader;
 
-use Symfony\Component\Console\Command\Command;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 /**

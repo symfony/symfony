@@ -50,9 +50,6 @@ abstract class AbstractUnicodeString extends AbstractString
 
     private static $transliterators = [];
 
-    /**
-     * @return static
-     */
     public static function fromCodePoints(int ...$codes): static
     {
         $string = '';
@@ -252,9 +249,6 @@ abstract class AbstractUnicodeString extends AbstractString
         return $matches;
     }
 
-    /**
-     * @return static
-     */
     public function normalize(int $form = self::NFC): static
     {
         if (!\in_array($form, [self::NFC, self::NFD, self::NFKC, self::NFKD])) {

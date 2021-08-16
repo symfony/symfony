@@ -101,8 +101,6 @@ interface OutputInterface
 
     /**
      * Returns current output formatter instance.
-     *
-     * @return OutputFormatterInterface
      */
     public function getFormatter(): OutputFormatterInterface;
 }

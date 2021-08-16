@@ -84,8 +84,6 @@ class MetadataBag implements SessionBagInterface
 
     /**
      * Gets the lifetime that the session cookie was set with.
-     *
-     * @return int
      */
     public function getLifetime(): int
     {

@@ -30,8 +30,6 @@ interface MatcherDumperInterface
 
     /**
      * Gets the routes to dump.
-     *
-     * @return RouteCollection
      */
     public function getRoutes(): RouteCollection;
 }

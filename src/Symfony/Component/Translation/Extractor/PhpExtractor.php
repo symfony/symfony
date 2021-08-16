@@ -155,8 +155,6 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 
     /**
      * Normalizes a token.
-     *
-     * @return string|null
      */
     protected function normalizeToken(mixed $token): ?string
     {
@@ -313,8 +311,6 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     }
 
     /**
-     * @return bool
-     *
      * @throws \InvalidArgumentException
      */
     protected function canBeExtracted(string $file): bool

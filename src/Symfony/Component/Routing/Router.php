@@ -297,8 +297,6 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     /**
      * Gets the UrlGenerator instance associated with this Router.
-     *
-     * @return UrlGeneratorInterface
      */
     public function getGenerator(): UrlGeneratorInterface
     {
@@ -337,17 +335,11 @@ class Router implements RouterInterface, RequestMatcherInterface
         $this->expressionLanguageProviders[] = $provider;
     }
 
-    /**
-     * @return GeneratorDumperInterface
-     */
     protected function getGeneratorDumperInstance(): GeneratorDumperInterface
     {
         return new $this->options['generator_dumper_class']($this->getRouteCollection());
     }
 
-    /**
-     * @return MatcherDumperInterface
-     */
     protected function getMatcherDumperInstance(): MatcherDumperInterface
     {
         return new $this->options['matcher_dumper_class']($this->getRouteCollection());

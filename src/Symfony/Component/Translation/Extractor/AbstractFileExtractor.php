@@ -20,9 +20,6 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
  */
 abstract class AbstractFileExtractor
 {
-    /**
-     * @return iterable
-     */
     protected function extractFiles(string|iterable $resource): iterable
     {
         if (is_iterable($resource)) {
@@ -47,8 +44,6 @@ abstract class AbstractFileExtractor
     }
 
     /**
-     * @return bool
-     *
      * @throws InvalidArgumentException
      */
     protected function isFile(string $file): bool

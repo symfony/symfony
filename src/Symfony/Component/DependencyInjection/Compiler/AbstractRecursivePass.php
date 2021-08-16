@@ -102,8 +102,6 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     }
 
     /**
-     * @return \ReflectionFunctionAbstract|null
-     *
      * @throws RuntimeException
      */
     protected function getConstructor(Definition $definition, bool $required): ?\ReflectionFunctionAbstract
@@ -163,8 +161,6 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
 
     /**
      * @throws RuntimeException
-     *
-     * @return \ReflectionFunctionAbstract
      */
     protected function getReflectionMethod(Definition $definition, string $method): \ReflectionFunctionAbstract
     {

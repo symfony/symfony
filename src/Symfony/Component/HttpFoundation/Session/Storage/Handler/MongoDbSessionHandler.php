@@ -166,9 +166,6 @@ class MongoDbSessionHandler extends AbstractSessionHandler
         return $this->collection;
     }
 
-    /**
-     * @return \MongoDB\Client
-     */
     protected function getMongo(): \MongoDB\Client
     {
         return $this->mongo;

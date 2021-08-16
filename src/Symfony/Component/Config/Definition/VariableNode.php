@@ -129,8 +129,6 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      * method may be overridden by subtypes to better match their understanding
      * of empty data.
      *
-     * @return bool
-     *
      * @see finalizeValue()
      */
     protected function isValueEmpty(mixed $value): bool

@@ -114,8 +114,6 @@ class Table
 
     /**
      * Gets a style definition by name.
-     *
-     * @return TableStyle
      */
     public static function getStyleDefinition(string $name): TableStyle
     {
@@ -144,8 +142,6 @@ class Table
 
     /**
      * Gets the current table style.
-     *
-     * @return TableStyle
      */
     public function getStyle(): TableStyle
     {
@@ -170,8 +166,6 @@ class Table
      * Gets the current style for a column.
      *
      * If style was not set, it returns the global table style.
-     *
-     * @return TableStyle
      */
     public function getColumnStyle(int $columnIndex): TableStyle
     {

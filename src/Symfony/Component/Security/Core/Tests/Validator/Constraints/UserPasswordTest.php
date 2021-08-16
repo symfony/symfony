@@ -37,7 +37,7 @@ class UserPasswordTest extends TestCase
     {
         yield 'Doctrine style' => [new UserPassword(['service' => 'my_service'])];
 
-        yield 'named arguments' => [new UserPassword(service: "my_service")];
+        yield 'named arguments' => [new UserPassword(service: 'my_service')];
 
         $metadata = new ClassMetadata(UserPasswordDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));

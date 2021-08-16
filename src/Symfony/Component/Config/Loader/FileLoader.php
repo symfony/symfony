@@ -47,8 +47,6 @@ abstract class FileLoader extends Loader
 
     /**
      * Returns the file locator used by this loader.
-     *
-     * @return FileLocatorInterface
      */
     public function getLocator(): FileLocatorInterface
     {

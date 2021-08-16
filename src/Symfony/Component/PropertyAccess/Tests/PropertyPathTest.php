@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 

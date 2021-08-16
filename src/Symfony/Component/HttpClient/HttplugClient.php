@@ -22,7 +22,6 @@ use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Message\RequestFactory;
 use Http\Message\StreamFactory;
 use Http\Message\UriFactory;
-use Http\Promise\Promise;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Uri;

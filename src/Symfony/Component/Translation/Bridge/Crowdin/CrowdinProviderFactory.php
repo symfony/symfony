@@ -18,7 +18,6 @@ use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\AbstractProviderFactory;
 use Symfony\Component\Translation\Provider\Dsn;
-use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**

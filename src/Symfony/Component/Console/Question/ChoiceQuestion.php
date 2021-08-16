@@ -45,8 +45,6 @@ class ChoiceQuestion extends Question
 
     /**
      * Returns available choices.
-     *
-     * @return array
      */
     public function getChoices(): array
     {
@@ -70,8 +68,6 @@ class ChoiceQuestion extends Question
 
     /**
      * Returns whether the choices are multiselect.
-     *
-     * @return bool
      */
     public function isMultiselect(): bool
     {
@@ -80,8 +76,6 @@ class ChoiceQuestion extends Question
 
     /**
      * Gets the prompt for choices.
-     *
-     * @return string
      */
     public function getPrompt(): string
     {

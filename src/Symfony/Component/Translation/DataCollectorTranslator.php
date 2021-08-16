@@ -123,9 +123,6 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         return $this->translator->{$method}(...$args);
     }
 
-    /**
-     * @return array
-     */
     public function getCollectedMessages(): array
     {
         return $this->messages;

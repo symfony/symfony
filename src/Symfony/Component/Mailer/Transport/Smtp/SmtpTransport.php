@@ -340,9 +340,6 @@ class SmtpTransport extends AbstractTransport
         $this->restartCounter = 0;
     }
 
-    /**
-     * @return array
-     */
     public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

@@ -37,9 +37,6 @@ class DefinitionBuilder
         $this->addTransitions($transitions);
     }
 
-    /**
-     * @return Definition
-     */
     public function build(): Definition
     {
         return new Definition($this->places, $this->transitions, $this->initialPlaces, $this->metadataStore);

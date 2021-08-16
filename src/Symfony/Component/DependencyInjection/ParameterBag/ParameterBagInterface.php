@@ -84,15 +84,11 @@ interface ParameterBagInterface
 
     /**
      * Escape parameter placeholders %.
-     *
-     * @return mixed
      */
     public function escapeValue(mixed $value): mixed;
 
     /**
      * Unescape parameter placeholders %.
-     *
-     * @return mixed
      */
     public function unescapeValue(mixed $value): mixed;
 }

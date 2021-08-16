@@ -35,8 +35,6 @@ class XmlFileLoader extends FileLoader
     public const SCHEME_PATH = '/schema/routing/routing-1.0.xsd';
 
     /**
-     * @return RouteCollection
-     *
      * @throws \InvalidArgumentException when the file cannot be loaded or when the XML cannot be
      *                                   parsed because it does not validate against the scheme
      */
@@ -214,8 +212,6 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * @return \DOMDocument
-     *
      * @throws \InvalidArgumentException When loading of XML file fails because of syntax errors
      *                                   or when the XML structure is not as expected by the scheme -
      *                                   see validate()

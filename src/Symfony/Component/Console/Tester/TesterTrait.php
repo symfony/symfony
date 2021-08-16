@@ -56,8 +56,6 @@ trait TesterTrait
      * Gets the output written to STDERR by the application.
      *
      * @param bool $normalize Whether to normalize end of lines to \n or not
-     *
-     * @return string
      */
     public function getErrorOutput(bool $normalize = false): string
     {
@@ -78,8 +76,6 @@ trait TesterTrait
 
     /**
      * Gets the input instance used by the last execution of the command or application.
-     *
-     * @return InputInterface
      */
     public function getInput(): InputInterface
     {
@@ -88,8 +84,6 @@ trait TesterTrait
 
     /**
      * Gets the output instance used by the last execution of the command or application.
-     *
-     * @return OutputInterface
      */
     public function getOutput(): OutputInterface
     {

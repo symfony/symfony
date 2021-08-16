@@ -2,7 +2,6 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Functional;
 
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;

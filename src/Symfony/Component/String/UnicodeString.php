@@ -189,9 +189,6 @@ class UnicodeString extends AbstractUnicodeString
         return grapheme_strlen($this->string);
     }
 
-    /**
-     * @return static
-     */
     public function normalize(int $form = self::NFC): static
     {
         $str = clone $this;

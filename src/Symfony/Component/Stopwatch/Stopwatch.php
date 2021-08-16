@@ -95,8 +95,6 @@ class Stopwatch implements ResetInterface
 
     /**
      * Starts an event.
-     *
-     * @return StopwatchEvent
      */
     public function start(string $name, string $category = null): StopwatchEvent
     {
@@ -105,8 +103,6 @@ class Stopwatch implements ResetInterface
 
     /**
      * Checks if the event was started.
-     *
-     * @return bool
      */
     public function isStarted(string $name): bool
     {
@@ -115,8 +111,6 @@ class Stopwatch implements ResetInterface
 
     /**
      * Stops an event.
-     *
-     * @return StopwatchEvent
      */
     public function stop(string $name): StopwatchEvent
     {
@@ -125,8 +119,6 @@ class Stopwatch implements ResetInterface
 
     /**
      * Stops then restarts an event.
-     *
-     * @return StopwatchEvent
      */
     public function lap(string $name): StopwatchEvent
     {
@@ -135,8 +127,6 @@ class Stopwatch implements ResetInterface
 
     /**
      * Returns a specific event by name.
-     *
-     * @return StopwatchEvent
      */
     public function getEvent(string $name): StopwatchEvent
     {

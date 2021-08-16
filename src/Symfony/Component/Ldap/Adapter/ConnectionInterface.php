@@ -22,8 +22,6 @@ interface ConnectionInterface
 {
     /**
      * Checks whether the connection was already bound or not.
-     *
-     * @return bool
      */
     public function isBound(): bool;
 

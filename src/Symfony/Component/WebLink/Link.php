@@ -92,8 +92,6 @@ class Link implements EvolvableLinkInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
     public function withHref(string|\Stringable $href): static
     {
@@ -105,8 +103,6 @@ class Link implements EvolvableLinkInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
     public function withRel(string $rel): static
     {
@@ -118,8 +114,6 @@ class Link implements EvolvableLinkInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
     public function withoutRel(string $rel): static
     {
@@ -131,8 +125,6 @@ class Link implements EvolvableLinkInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
     public function withAttribute(string $attribute, string|\Stringable|int|float|bool|array $value): static
     {
@@ -144,8 +136,6 @@ class Link implements EvolvableLinkInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
     public function withoutAttribute(string $attribute): static
     {

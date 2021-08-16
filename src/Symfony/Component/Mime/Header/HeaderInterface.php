@@ -29,8 +29,6 @@ interface HeaderInterface
      * Gets the body.
      *
      * The return type depends on the Header concrete class.
-     *
-     * @return mixed
      */
     public function getBody(): mixed;
 

@@ -34,8 +34,6 @@ class Entry
 
     /**
      * Returns the entry's DN.
-     *
-     * @return string
      */
     public function getDn(): string
     {
@@ -47,8 +45,6 @@ class Entry
      *
      * @param string $name          The name of the attribute
      * @param bool   $caseSensitive Whether the check should be case-sensitive
-     *
-     * @return bool
      */
     public function hasAttribute(string $name, bool $caseSensitive = true): bool
     {
@@ -69,8 +65,6 @@ class Entry
      *
      * @param string $name          The name of the attribute
      * @param bool   $caseSensitive Whether the attribute name is case-sensitive
-     *
-     * @return array|null
      */
     public function getAttribute(string $name, bool $caseSensitive = true): ?array
     {
@@ -85,8 +79,6 @@ class Entry
 
     /**
      * Returns the complete list of attributes.
-     *
-     * @return array
      */
     public function getAttributes(): array
     {

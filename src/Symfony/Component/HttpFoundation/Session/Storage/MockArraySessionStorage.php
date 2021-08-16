@@ -215,8 +215,6 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * Gets the MetadataBag.
-     *
-     * @return MetadataBag
      */
     public function getMetadataBag(): MetadataBag
     {
@@ -228,8 +226,6 @@ class MockArraySessionStorage implements SessionStorageInterface
      *
      * This doesn't need to be particularly cryptographically secure since this is just
      * a mock.
-     *
-     * @return string
      */
     protected function generateId(): string
     {

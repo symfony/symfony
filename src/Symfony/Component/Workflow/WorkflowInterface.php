@@ -57,19 +57,10 @@ interface WorkflowInterface
      */
     public function getEnabledTransitions(object $subject): array;
 
-    /**
-     * @return string
-     */
     public function getName(): string;
 
-    /**
-     * @return Definition
-     */
     public function getDefinition(): Definition;
 
-    /**
-     * @return MarkingStoreInterface
-     */
     public function getMarkingStore(): MarkingStoreInterface;
 
     public function getMetadataStore(): MetadataStoreInterface;

@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Templating\Tests\Loader;
 
-use Symfony\Component\Templating\Storage\Storage;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Templating\Loader\CacheLoader;
 use Symfony\Component\Templating\Loader\Loader;
+use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\TemplateReference;
 use Symfony\Component\Templating\TemplateReferenceInterface;

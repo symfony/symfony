@@ -44,8 +44,6 @@ class Question
 
     /**
      * Returns the question.
-     *
-     * @return string
      */
     public function getQuestion(): string
     {
@@ -84,8 +82,6 @@ class Question
 
     /**
      * Returns whether the user response must be hidden.
-     *
-     * @return bool
      */
     public function isHidden(): bool
     {
@@ -112,8 +108,6 @@ class Question
 
     /**
      * In case the response can not be hidden, whether to fallback on non-hidden question or not.
-     *
-     * @return bool
      */
     public function isHiddenFallback(): bool
     {
@@ -134,8 +128,6 @@ class Question
 
     /**
      * Gets values for the autocompleter.
-     *
-     * @return iterable|null
      */
     public function getAutocompleterValues(): ?iterable
     {
@@ -211,8 +203,6 @@ class Question
 
     /**
      * Gets the validator for the question.
-     *
-     * @return callable|null
      */
     public function getValidator(): ?callable
     {
@@ -246,8 +236,6 @@ class Question
      * Gets the maximum number of attempts.
      *
      * Null means an unlimited number of attempts.
-     *
-     * @return int|null
      */
     public function getMaxAttempts(): ?int
     {
@@ -272,8 +260,6 @@ class Question
      * Gets the normalizer for the response.
      *
      * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
-     *
-     * @return callable|null
      */
     public function getNormalizer(): ?callable
     {

@@ -185,9 +185,6 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         return str_replace('\\<', '<', $output);
     }
 
-    /**
-     * @return OutputFormatterStyleStack
-     */
     public function getStyleStack(): OutputFormatterStyleStack
     {
         return $this->styleStack;

@@ -345,7 +345,6 @@ class ContextListener extends AbstractListener
             return !(bool) $originalUser->isEqualTo($refreshedUser);
         }
 
-
         if ($originalUser instanceof PasswordAuthenticatedUserInterface || $refreshedUser instanceof PasswordAuthenticatedUserInterface) {
             if (!$originalUser instanceof PasswordAuthenticatedUserInterface || !$refreshedUser instanceof PasswordAuthenticatedUserInterface || $originalUser->getPassword() !== $refreshedUser->getPassword()) {
                 return true;

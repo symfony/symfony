@@ -133,9 +133,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return null;
     }
 
-    /**
-     * @return bool
-     */
     public function __isset(string $key): bool
     {
         return null !== $this->seek($key);
@@ -174,8 +171,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 
     /**
      * Returns a depth limited clone of $this.
-     *
-     * @return static
      */
     public function withMaxDepth(int $maxDepth): static
     {
@@ -187,8 +182,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 
     /**
      * Limits the number of elements per depth level.
-     *
-     * @return static
      */
     public function withMaxItemsPerDepth(int $maxItemsPerDepth): static
     {
@@ -202,8 +195,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      * Enables/disables objects' identifiers tracking.
      *
      * @param bool $useRefHandles False to hide global ref. handles
-     *
-     * @return static
      */
     public function withRefHandles(bool $useRefHandles): static
     {
@@ -213,9 +204,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return $data;
     }
 
-    /**
-     * @return static
-     */
     public function withContext(array $context): static
     {
         $data = clone $this;

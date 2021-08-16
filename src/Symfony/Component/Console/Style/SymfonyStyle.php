@@ -341,9 +341,6 @@ class SymfonyStyle extends OutputStyle
         return $progressBar;
     }
 
-    /**
-     * @return mixed
-     */
     public function askQuestion(Question $question): mixed
     {
         if ($this->input->isInteractive()) {

@@ -29,8 +29,6 @@ class PhpFileLoader extends FileLoader
 {
     /**
      * Loads a PHP file.
-     *
-     * @return RouteCollection
      */
     public function load(mixed $file, string $type = null): RouteCollection
     {

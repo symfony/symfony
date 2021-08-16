@@ -28,8 +28,7 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
     public function __construct(
         private bool $resolveArrays = true,
         private bool $throwOnResolveException = true,
-    )
-    {
+    ) {
     }
 
     /**

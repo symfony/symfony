@@ -28,7 +28,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 
     public function __construct(callable $serviceCompiler = null)
     {
-        $this->serviceCompiler = $serviceCompiler !== null && !$serviceCompiler instanceof \Closure ? \Closure::fromCallable($serviceCompiler) : $serviceCompiler;
+        $this->serviceCompiler = null !== $serviceCompiler && !$serviceCompiler instanceof \Closure ? \Closure::fromCallable($serviceCompiler) : $serviceCompiler;
     }
 
     public function getFunctions(): array

@@ -601,8 +601,6 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * We need to make sure we do not return session data that is already considered garbage according
      * to the session.gc_maxlifetime setting because gc() is called after read() and only sometimes.
-     *
-     * @return string
      */
     protected function doRead(string $sessionId): string
     {
@@ -881,8 +879,6 @@ class PdoSessionHandler extends AbstractSessionHandler
 
     /**
      * Return a PDO instance.
-     *
-     * @return \PDO
      */
     protected function getConnection(): \PDO
     {

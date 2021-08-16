@@ -62,8 +62,6 @@ class Section
      * Creates or re-opens a child section.
      *
      * @param string|null $id Null to create a new section, the identifier to re-open an existing one
-     *
-     * @return self
      */
     public function open(?string $id): self
     {
@@ -110,8 +108,6 @@ class Section
 
     /**
      * Checks if the event was started.
-     *
-     * @return bool
      */
     public function isEventStarted(string $name): bool
     {

@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
-use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\AbstractQuery;
+use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 
@@ -40,9 +39,6 @@ class Query extends AbstractQuery
         parent::__construct($connection, $dn, $query, $options);
     }
 
-    /**
-     * @return array
-     */
     public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);

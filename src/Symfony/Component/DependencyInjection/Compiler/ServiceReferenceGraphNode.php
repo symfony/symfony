@@ -46,8 +46,6 @@ class ServiceReferenceGraphNode
 
     /**
      * Checks if the value of this node is an Alias.
-     *
-     * @return bool
      */
     public function isAlias(): bool
     {
@@ -66,8 +64,6 @@ class ServiceReferenceGraphNode
 
     /**
      * Returns the identifier.
-     *
-     * @return string
      */
     public function getId(): string
     {

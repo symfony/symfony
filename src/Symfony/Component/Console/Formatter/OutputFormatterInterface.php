@@ -37,15 +37,11 @@ interface OutputFormatterInterface
 
     /**
      * Checks if output formatter has style with specified name.
-     *
-     * @return bool
      */
     public function hasStyle(string $name): bool;
 
     /**
      * Gets style options from style with specified name.
-     *
-     * @return OutputFormatterStyleInterface
      *
      * @throws \InvalidArgumentException When style isn't defined
      */
@@ -53,8 +49,6 @@ interface OutputFormatterInterface
 
     /**
      * Formats a message according to the given styles.
-     *
-     * @return string|null
      */
     public function format(?string $message): ?string;
 }

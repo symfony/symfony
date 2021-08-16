@@ -102,8 +102,6 @@ class StopwatchEvent
 
     /**
      * Checks if the event was started.
-     *
-     * @return bool
      */
     public function isStarted(): bool
     {

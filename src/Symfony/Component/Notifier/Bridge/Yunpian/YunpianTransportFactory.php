@@ -20,9 +20,6 @@ use Symfony\Component\Notifier\Transport\Dsn;
  */
 class YunpianTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return YunpianTransport
-     */
     public function create(Dsn $dsn): YunpianTransport
     {
         if ('yunpian' !== $dsn->getScheme()) {

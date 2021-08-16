@@ -41,7 +41,7 @@ class ServerParams
     /**
      * Returns maximum post size in bytes.
      *
-     * @return int|null The maximum post size in bytes
+     * @return int|float|null The maximum post size in bytes
      */
     public function getPostMaxSize()
     {

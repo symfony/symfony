@@ -4,6 +4,8 @@ CHANGELOG
 5.4
 ---
 
+ * Deprecate `security.authentication.basic_entry_point` and `security.authentication.retry_entry_point` services, the logic is moved into the
+   `HttpBasicAuthenticator` and `ChannelListener` respectively
  * Deprecate `FirewallConfig::allowsAnonymous()` and the `allows_anonymous` from the data collector data, there will be no anonymous concept as of version 6.
  * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`
  * Deprecate `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of

@@ -64,8 +64,6 @@ class RingBuffer implements \ArrayAccess
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -81,8 +79,6 @@ class RingBuffer implements \ArrayAccess
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function offsetUnset($key): void
     {

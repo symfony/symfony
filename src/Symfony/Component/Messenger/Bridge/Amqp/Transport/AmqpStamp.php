@@ -64,9 +64,9 @@ final class AmqpStamp implements NonSendableStampInterface
         $attr['reply_to'] = $attr['reply_to'] ?? $amqpEnvelope->getReplyTo();
 
         if (null === $retryRoutingKey) {
-            $stamp = new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? AMQP_NOPARAM, $attr);
+            $stamp = new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? \AMQP_NOPARAM, $attr);
         } else {
-            $stamp = new self($retryRoutingKey, $previousStamp->flags ?? AMQP_NOPARAM, $attr);
+            $stamp = new self($retryRoutingKey, $previousStamp->flags ?? \AMQP_NOPARAM, $attr);
             $stamp->isRetryAttempt = true;
         }
 

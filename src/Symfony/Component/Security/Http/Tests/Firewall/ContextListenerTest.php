@@ -242,6 +242,9 @@ class ContextListenerTest extends TestCase
         $this->assertSame($goodRefreshedUser, $tokenStorage->getToken()->getUser());
     }
 
+    /**
+     * @group legacy
+     */
     public function testRememberMeGetsCanceledIfTokenIsDeauthenticated()
     {
         $tokenStorage = new TokenStorage();

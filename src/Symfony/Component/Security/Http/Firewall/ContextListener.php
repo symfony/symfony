@@ -387,8 +387,13 @@ class ContextListener extends AbstractListener
         throw new \ErrorException('Class not found: '.$class, 0x37313bc);
     }
 
+    /**
+     * @deprecated since Symfony 5.4
+     */
     public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
     {
+        trigger_deprecation('symfony/security-http', '5.4', 'Method "%s()" is deprecated, use the new remember me handlers instead.', __METHOD__);
+
         $this->rememberMeServices = $rememberMeServices;
     }
 }

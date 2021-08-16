@@ -17,6 +17,9 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\EventListener\RememberMeLogoutListener;
 use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
 
+/**
+ * @group legacy
+ */
 class RememberMeLogoutListenerTest extends TestCase
 {
     public function testOnLogoutDoesNothingIfNoToken()

@@ -66,6 +66,7 @@ SecurityBundle
 Security
 --------
 
+ * Deprecate `AuthenticationEvents::AUTHENTICATION_FAILURE`, use the `LoginFailureEvent` instead
  * Deprecate the `$authenticationEntryPoint` argument of `ChannelListener`, and add `$httpPort` and `$httpsPort` arguments
  * Deprecate `RetryAuthenticationEntryPoint`, this code is now inlined in the `ChannelListener`
  * Deprecate `FormAuthenticationEntryPoint` and `BasicAuthenticationEntryPoint`, in the new system the `FormLoginAuthenticator`

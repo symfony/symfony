@@ -229,5 +229,9 @@
             <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
             <tag name="console.command" command="secrets:encrypt-from-local" />
         </service>
+
+        <service id="console.command.symfony_dump_env" class="Symfony\Bundle\FrameworkBundle\Command\DumpEnvCommand">
+            <tag name="console.command" command="env:dump" />
+        </service>
     </services>
 </container>

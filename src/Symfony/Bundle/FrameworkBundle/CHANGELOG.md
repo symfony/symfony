@@ -3,7 +3,7 @@ CHANGELOG
 
 4.4.0
 -----
-
+ * Added `env:dump` command to compiles the contents of the .env* files into a PHP-optimized file called .env.local.php. Copied from symfony/flex.
  * Added `lint:container` command to check that services wiring matches type declarations
  * Added `MailerAssertionsTrait`
  * Deprecated support for `templating` engine in `TemplateController`, use Twig instead

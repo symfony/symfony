@@ -29,7 +29,7 @@ interface RequestMatcherInterface
      * If the matcher can not find information, it must throw one of the exceptions documented
      * below.
      *
-     * @return array An array of parameters
+     * @return array
      *
      * @throws NoConfigurationException  If no routing configuration could be found
      * @throws ResourceNotFoundException If no matching resource could be found

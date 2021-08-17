@@ -52,7 +52,7 @@ trait AbstractAdapterTrait
      *
      * @param array $ids The cache identifiers to fetch
      *
-     * @return array|\Traversable The corresponding values found in the cache
+     * @return array|\Traversable
      */
     abstract protected function doFetch(array $ids);
 
@@ -61,7 +61,7 @@ trait AbstractAdapterTrait
      *
      * @param string $id The identifier for which to check existence
      *
-     * @return bool True if item exists in the cache, false otherwise
+     * @return bool
      */
     abstract protected function doHave(string $id);
 
@@ -70,7 +70,7 @@ trait AbstractAdapterTrait
      *
      * @param string $namespace The prefix used for all identifiers managed by this pool
      *
-     * @return bool True if the pool was successfully cleared, false otherwise
+     * @return bool
      */
     abstract protected function doClear(string $namespace);
 
@@ -79,7 +79,7 @@ trait AbstractAdapterTrait
      *
      * @param array $ids An array of identifiers that should be removed from the pool
      *
-     * @return bool True if the items were successfully removed, false otherwise
+     * @return bool
      */
     abstract protected function doDelete(array $ids);
 

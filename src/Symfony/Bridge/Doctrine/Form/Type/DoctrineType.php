@@ -86,9 +86,6 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      * @param object $queryBuilder A query builder, type declaration is not present here as there
      *                             is no common base class for the different implementations
      *
-     * @return array|null Array with important QueryBuilder parts or null if
-     *                    they can't be determined
-     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */

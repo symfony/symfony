@@ -86,7 +86,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      *
      * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
-     * @return EngineInterface The engine
+     * @return EngineInterface
      *
      * @throws \RuntimeException if no engine able to work with the template is found
      */

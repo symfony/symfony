@@ -34,7 +34,7 @@ interface FragmentRendererInterface
     /**
      * Gets the name of the strategy.
      *
-     * @return string The strategy name
+     * @return string
      */
     public function getName();
 }

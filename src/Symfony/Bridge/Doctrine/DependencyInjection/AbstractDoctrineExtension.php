@@ -259,7 +259,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Detects what metadata driver to use for the supplied directory.
      *
-     * @return string|null A metadata driver short name, if one can be detected
+     * @return string|null
      */
     protected function detectMetadataDriver(string $dir, ContainerBuilder $container)
     {
@@ -379,7 +379,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * The manager called $autoMappedManager will map all bundles that are not mapped by other managers.
      *
-     * @return array The modified version of $managerConfigs
+     * @return array
      */
     protected function fixManagersAutoMappings(array $managerConfigs, array $bundles)
     {

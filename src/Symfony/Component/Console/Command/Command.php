@@ -61,7 +61,7 @@ class Command
     private $helperSet;
 
     /**
-     * @return string|null The default command name or null when no default name is set
+     * @return string|null
      */
     public static function getDefaultName()
     {
@@ -77,7 +77,7 @@ class Command
     }
 
     /**
-     * @return string|null The default command description or null when no default description is set
+     * @return string|null
      */
     public static function getDefaultDescription(): ?string
     {
@@ -542,7 +542,7 @@ class Command
     /**
      * Returns the description for the command.
      *
-     * @return string The description for the command
+     * @return string
      */
     public function getDescription()
     {
@@ -564,7 +564,7 @@ class Command
     /**
      * Returns the help for the command.
      *
-     * @return string The help for the command
+     * @return string
      */
     public function getHelp()
     {
@@ -575,7 +575,7 @@ class Command
      * Returns the processed help for the command replacing the %command.name% and
      * %command.full_name% patterns with the real values dynamically.
      *
-     * @return string The processed help for the command
+     * @return string
      */
     public function getProcessedHelp()
     {
@@ -620,7 +620,7 @@ class Command
     /**
      * Returns the aliases for the command.
      *
-     * @return array An array of aliases for the command
+     * @return array
      */
     public function getAliases()
     {
@@ -632,7 +632,7 @@ class Command
      *
      * @param bool $short Whether to show the short version of the synopsis (with options folded) or not
      *
-     * @return string The synopsis
+     * @return string
      */
     public function getSynopsis(bool $short = false)
     {
@@ -674,7 +674,7 @@ class Command
     /**
      * Gets a helper instance by name.
      *
-     * @return mixed The helper value
+     * @return mixed
      *
      * @throws LogicException           if no HelperSet is defined
      * @throws InvalidArgumentException if the helper is not defined

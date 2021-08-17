@@ -55,7 +55,7 @@ interface ChoiceListInterface
      * Null and false MUST NOT conflict when being casted to string.
      * For this some default incremented values SHOULD be computed.
      *
-     * @return string[] The choice values
+     * @return string[]
      */
     public function getValues();
 
@@ -86,7 +86,7 @@ interface ChoiceListInterface
      * this method SHOULD be equivalent to {@link getValues()}.
      * The $groupBy callback parameter SHOULD be used instead.
      *
-     * @return string[] The choice values
+     * @return string[]
      */
     public function getStructuredValues();
 
@@ -121,7 +121,7 @@ interface ChoiceListInterface
      * @param string[] $values An array of choice values. Non-existing values in
      *                         this array are ignored
      *
-     * @return array An array of choices
+     * @return array
      */
     public function getChoicesForValues(array $values);
 
@@ -134,7 +134,7 @@ interface ChoiceListInterface
      * @param array $choices An array of choices. Non-existing choices in this
      *                       array are ignored
      *
-     * @return string[] An array of choice values
+     * @return string[]
      */
     public function getValuesForChoices(array $choices);
 }

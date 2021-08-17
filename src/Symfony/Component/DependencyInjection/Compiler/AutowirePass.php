@@ -188,7 +188,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Autowires the constructor or a method.
      *
-     * @return array The autowired arguments
+     * @return array
      *
      * @throws AutowiringFailedException
      */

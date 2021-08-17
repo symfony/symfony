@@ -321,7 +321,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses the "default" elements.
      *
-     * @return array|bool|float|int|string|null The parsed value of the "default" element
+     * @return array|bool|float|int|string|null
      */
     private function parseDefaultsConfig(\DOMElement $element, string $path)
     {
@@ -353,7 +353,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Recursively parses the value of a "default" element.
      *
-     * @return array|bool|float|int|string|null The parsed value
+     * @return array|bool|float|int|string|null
      *
      * @throws \InvalidArgumentException when the XML is invalid
      */

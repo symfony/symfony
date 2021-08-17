@@ -976,7 +976,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @param string $name The name of the child
      *
-     * @return FormInterface The child form
+     * @return FormInterface
      *
      * @throws OutOfBoundsException if the named child does not exist
      */
@@ -1034,7 +1034,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the number of form children (implements the \Countable interface).
      *
-     * @return int The number of embedded form children
+     * @return int
      */
     #[\ReturnTypeWillChange]
     public function count()

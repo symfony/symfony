@@ -28,12 +28,12 @@ interface UserPasswordEncoderInterface
     /**
      * Encodes the plain password.
      *
-     * @return string The encoded password
+     * @return string
      */
     public function encodePassword(UserInterface $user, string $plainPassword);
 
     /**
-     * @return bool true if the password is valid, false otherwise
+     * @return bool
      */
     public function isPasswordValid(UserInterface $user, string $raw);
 

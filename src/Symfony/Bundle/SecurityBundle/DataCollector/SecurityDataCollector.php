@@ -233,7 +233,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Checks if security is enabled.
      *
-     * @return bool true if security is enabled, false otherwise
+     * @return bool
      */
     public function isEnabled()
     {
@@ -243,7 +243,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Gets the user.
      *
-     * @return string The user
+     * @return string
      */
     public function getUser()
     {
@@ -274,7 +274,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      * Checks if the data contains information about inherited roles. Still the inherited
      * roles can be an empty array.
      *
-     * @return bool true if the profile was contains inherited role information
+     * @return bool
      */
     public function supportsRoleHierarchy()
     {
@@ -284,7 +284,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Checks if the user is authenticated or not.
      *
-     * @return bool true if the user is authenticated, false otherwise
+     * @return bool
      */
     public function isAuthenticated()
     {
@@ -318,7 +318,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Get the class name of the security token.
      *
-     * @return string|Data|null The token
+     * @return string|Data|null
      */
     public function getTokenClass()
     {
@@ -338,7 +338,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Get the logout URL.
      *
-     * @return string|null The logout URL
+     * @return string|null
      */
     public function getLogoutUrl()
     {

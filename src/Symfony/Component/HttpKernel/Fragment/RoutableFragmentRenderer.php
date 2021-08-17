@@ -43,7 +43,7 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
      * @param bool $absolute Whether to generate an absolute URL or not
      * @param bool $strict   Whether to allow non-scalar attributes or not
      *
-     * @return string A fragment URI
+     * @return string
      */
     protected function generateFragmentUri(ControllerReference $reference, Request $request, bool $absolute = false, bool $strict = true)
     {

@@ -36,7 +36,7 @@ final class VarExporter
      * @param bool  &$isStaticValue Set to true after execution if the provided value is static, false otherwise
      * @param bool  &$classes       Classes found in the value are added to this list as both keys and values
      *
-     * @return string The value exported as PHP code
+     * @return string
      *
      * @throws ExceptionInterface When the provided value cannot be serialized
      */

@@ -47,7 +47,7 @@ class ExceptionDataCollector extends DataCollector
     /**
      * Checks if the exception is not null.
      *
-     * @return bool true if the exception is not null, false otherwise
+     * @return bool
      */
     public function hasException()
     {
@@ -67,7 +67,7 @@ class ExceptionDataCollector extends DataCollector
     /**
      * Gets the exception message.
      *
-     * @return string The exception message
+     * @return string
      */
     public function getMessage()
     {
@@ -77,7 +77,7 @@ class ExceptionDataCollector extends DataCollector
     /**
      * Gets the exception code.
      *
-     * @return int The exception code
+     * @return int
      */
     public function getCode()
     {
@@ -87,7 +87,7 @@ class ExceptionDataCollector extends DataCollector
     /**
      * Gets the status code.
      *
-     * @return int The status code
+     * @return int
      */
     public function getStatusCode()
     {
@@ -97,7 +97,7 @@ class ExceptionDataCollector extends DataCollector
     /**
      * Gets the exception trace.
      *
-     * @return array The exception trace
+     * @return array
      */
     public function getTrace()
     {

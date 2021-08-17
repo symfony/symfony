@@ -572,7 +572,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the attribute value of the first node of the list.
      *
-     * @return string|null The attribute value or null if the attribute does not exist
+     * @return string|null
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -590,7 +590,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the node name of the first node of the list.
      *
-     * @return string The node name
+     * @return string
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -611,7 +611,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * @param string|null $default             When not null: the value to return when the current node is empty
      * @param bool        $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
      *
-     * @return string The node value
+     * @return string
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -639,7 +639,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @param string|null $default When not null: the value to return when the current node is empty
      *
-     * @return string The node html
+     * @return string
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -721,7 +721,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      *     $crawler->filter('h1 a')->extract(['_text', 'href']);
      *
-     * @return array An array of extracted values
+     * @return array
      */
     public function extract(array $attributes)
     {
@@ -962,7 +962,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *     echo Crawler::xpathLiteral('a\'b"c');
      *     //prints concat('a', "'", 'b"c')
      *
-     * @return string Converted string
+     * @return string
      */
     public static function xpathLiteral(string $s)
     {

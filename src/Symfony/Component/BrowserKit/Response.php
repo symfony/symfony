@@ -38,7 +38,7 @@ final class Response
     /**
      * Converts the response object to string containing all headers and the response content.
      *
-     * @return string The response with headers and content
+     * @return string
      */
     public function __toString(): string
     {
@@ -59,7 +59,7 @@ final class Response
     /**
      * Gets the response content.
      *
-     * @return string The response content
+     * @return string
      */
     public function getContent(): string
     {
@@ -74,7 +74,7 @@ final class Response
     /**
      * Gets the response headers.
      *
-     * @return array The response headers
+     * @return array
      */
     public function getHeaders(): array
     {

@@ -227,7 +227,7 @@ final class Dotenv
      * @param string $data The data to be parsed
      * @param string $path The original file name where data where stored (used for more meaningful error messages)
      *
-     * @return array An array of env variables
+     * @return array
      *
      * @throws FormatException when a file has a syntax error
      */

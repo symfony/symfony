@@ -48,7 +48,7 @@ interface EventDispatcherInterface extends ContractsEventDispatcherInterface
     /**
      * Gets the listeners of a specific event or all listeners sorted by descending priority.
      *
-     * @return array The event listeners for the specified event, or all event listeners by event name
+     * @return array<callable[]|callable>
      */
     public function getListeners(string $eventName = null);
 
@@ -57,14 +57,14 @@ interface EventDispatcherInterface extends ContractsEventDispatcherInterface
      *
      * Returns null if the event or the listener does not exist.
      *
-     * @return int|null The event listener priority
+     * @return int|null
      */
     public function getListenerPriority(string $eventName, callable $listener);
 
     /**
      * Checks whether an event has any registered listeners.
      *
-     * @return bool true if the specified event has any listeners, false otherwise
+     * @return bool
      */
     public function hasListeners(string $eventName = null);
 }

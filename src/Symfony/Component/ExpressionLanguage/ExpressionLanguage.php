@@ -48,7 +48,7 @@ class ExpressionLanguage
      *
      * @param Expression|string $expression The expression to compile
      *
-     * @return string The compiled PHP source code
+     * @return string
      */
     public function compile($expression, array $names = [])
     {
@@ -60,7 +60,7 @@ class ExpressionLanguage
      *
      * @param Expression|string $expression The expression to compile
      *
-     * @return mixed The result of the evaluation of the expression
+     * @return mixed
      */
     public function evaluate($expression, array $values = [])
     {

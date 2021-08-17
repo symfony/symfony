@@ -118,7 +118,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Evaluates a template.
      *
-     * @return string|false The evaluated template, or false if the engine is unable to render the template
+     * @return string|false
      *
      * @throws \InvalidArgumentException
      */
@@ -167,7 +167,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name The helper name
      *
-     * @return HelperInterface The helper value
+     * @return HelperInterface
      *
      * @throws \InvalidArgumentException if the helper is not defined
      */
@@ -182,7 +182,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name The helper name
      *
-     * @return bool true if the helper is defined, false otherwise
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function offsetExists($name)
@@ -255,7 +255,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Returns true if the helper if defined.
      *
-     * @return bool true if the helper is defined, false otherwise
+     * @return bool
      */
     public function has(string $name)
     {
@@ -291,7 +291,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param mixed $value A variable to escape
      *
-     * @return mixed The escaped value
+     * @return mixed
      */
     public function escape($value, string $context = 'html')
     {
@@ -330,7 +330,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets the current charset.
      *
-     * @return string The current charset
+     * @return string
      */
     public function getCharset()
     {
@@ -349,7 +349,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets an escaper for a given context.
      *
-     * @return callable A PHP callable
+     * @return callable
      *
      * @throws \InvalidArgumentException
      */
@@ -408,7 +408,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  *
                  * @param string $value The value to escape
                  *
-                 * @return string the escaped value
+                 * @return string
                  */
                 function ($value) use ($flags) {
                     // Numbers and Boolean values get turned into strings which can cause problems
@@ -423,7 +423,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  *
                  * @param string $value The value to escape
                  *
-                 * @return string the escaped value
+                 * @return string
                  */
                 function ($value) {
                     if ('UTF-8' != $this->getCharset()) {

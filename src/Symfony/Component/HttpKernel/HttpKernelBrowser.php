@@ -157,7 +157,7 @@ EOF;
      *
      * @see UploadedFile
      *
-     * @return array An array with all uploaded files marked as already moved
+     * @return array
      */
     protected function filterFiles(array $files)
     {

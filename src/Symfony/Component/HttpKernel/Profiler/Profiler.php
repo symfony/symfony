@@ -120,7 +120,7 @@ class Profiler implements ResetInterface
      * @param string|null $start The start date to search from
      * @param string|null $end   The end date to search to
      *
-     * @return array An array of tokens
+     * @return array
      *
      * @see https://php.net/datetime.formats for the supported date/time formats
      */
@@ -178,7 +178,7 @@ class Profiler implements ResetInterface
     /**
      * Gets the Collectors associated with this profiler.
      *
-     * @return array An array of collectors
+     * @return array
      */
     public function all()
     {

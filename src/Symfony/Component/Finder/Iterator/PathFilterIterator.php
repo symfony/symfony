@@ -22,7 +22,7 @@ class PathFilterIterator extends MultiplePcreFilterIterator
     /**
      * Filters the iterator values.
      *
-     * @return bool true if the value should be kept, false otherwise
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function accept()
@@ -48,7 +48,7 @@ class PathFilterIterator extends MultiplePcreFilterIterator
      *
      * @param string $str Pattern: regexp or dirname
      *
-     * @return string regexp corresponding to a given string or regexp
+     * @return string
      */
     protected function toRegex(string $str)
     {

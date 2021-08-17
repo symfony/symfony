@@ -43,7 +43,7 @@ class History
     /**
      * Returns true if the history is empty.
      *
-     * @return bool true if the history is empty, false otherwise
+     * @return bool
      */
     public function isEmpty()
     {

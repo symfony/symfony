@@ -38,7 +38,7 @@ class ContainerParametersResource implements ResourceInterface
     }
 
     /**
-     * @return array Tracked parameters
+     * @return array
      */
     public function getParameters(): array
     {

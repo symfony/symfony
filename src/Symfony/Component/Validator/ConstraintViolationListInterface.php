@@ -33,7 +33,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      *
      * @param int $offset The offset of the violation
      *
-     * @return ConstraintViolationInterface The violation
+     * @return ConstraintViolationInterface
      *
      * @throws \OutOfBoundsException if the offset does not exist
      */
@@ -44,7 +44,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      *
      * @param int $offset The violation offset
      *
-     * @return bool Whether the offset exists
+     * @return bool
      */
     public function has(int $offset);
 

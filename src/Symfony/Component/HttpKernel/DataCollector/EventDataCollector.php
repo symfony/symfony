@@ -85,7 +85,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * Gets the called listeners.
      *
-     * @return array An array of called listeners
+     * @return array
      *
      * @see TraceableEventDispatcher
      */
@@ -131,7 +131,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * Gets the orphaned events.
      *
-     * @return array An array of orphaned events
+     * @return array
      *
      * @see TraceableEventDispatcher
      */

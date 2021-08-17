@@ -32,7 +32,7 @@ class ProcessHelper extends Helper
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
-     * @return Process The process that ran
+     * @return Process
      */
     public function run(OutputInterface $output, $cmd, string $error = null, callable $callback = null, int $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE): Process
     {
@@ -96,7 +96,7 @@ class ProcessHelper extends Helper
      * @param callable|null  $callback A PHP callback to run whenever there is some
      *                                 output available on STDOUT or STDERR
      *
-     * @return Process The process that ran
+     * @return Process
      *
      * @throws ProcessFailedException
      *

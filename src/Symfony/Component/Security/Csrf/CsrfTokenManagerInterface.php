@@ -28,7 +28,7 @@ interface CsrfTokenManagerInterface
      * @param string $tokenId The token ID. You may choose an arbitrary value
      *                        for the ID
      *
-     * @return CsrfToken The CSRF token
+     * @return CsrfToken
      */
     public function getToken(string $tokenId);
 
@@ -42,7 +42,7 @@ interface CsrfTokenManagerInterface
      * @param string $tokenId The token ID. You may choose an arbitrary value
      *                        for the ID
      *
-     * @return CsrfToken The CSRF token
+     * @return CsrfToken
      */
     public function refreshToken(string $tokenId);
 
@@ -57,7 +57,7 @@ interface CsrfTokenManagerInterface
     /**
      * Returns whether the given CSRF token is valid.
      *
-     * @return bool Returns true if the token is valid, false otherwise
+     * @return bool
      */
     public function isTokenValid(CsrfToken $token);
 }

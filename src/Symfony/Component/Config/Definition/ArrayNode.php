@@ -323,7 +323,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Remaps multiple singular values to a single plural value.
      *
-     * @return array The remapped values
+     * @return array
      */
     protected function remapXml(array $value)
     {

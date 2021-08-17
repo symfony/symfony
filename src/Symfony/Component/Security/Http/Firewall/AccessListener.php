@@ -75,7 +75,13 @@ class AccessListener extends AbstractListener
         $attributes = $request->attributes->get('_access_control_attributes');
         $request->attributes->remove('_access_control_attributes');
 
-        if (!$attributes || ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] === $attributes && $event instanceof LazyResponseEvent)) {
+        if (
+            !$attributes
+            || (
+                ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] === $attributes || [AuthenticatedVoter::PUBLIC_ACCESS] === $attributes)
+                && $event instanceof LazyResponseEvent
+            )
+        ) {
             return;
         }
 

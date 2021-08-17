@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-12T14:25:40Z
+
+You removed all ~param~ return descriptions from the codebase and added back the ones that make sense, right? I can't believe this is automated 😛
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-12T14:28:25Z
+
+> You removed all param descriptions from the codebase and added back the ones that make sense, right?
+
+correct :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-12T14:29:08Z
+
+If psalm errors make sense to anyone, suggestions welcome to fix them :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-12T15:30:28Z
+
+psalm should be happy now, thanks for the help!
+
+---------------------------------------------------------------------------
+
+by Tobion at 2021-08-12T22:55:49Z
+
+All the adding of return types in 6.0 like #42504 should probably be done after this one has been merged upwards.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-13T10:03:27Z
+
+Thanks for the reviews, PR updated accordingly.
+
+> All the adding of return types in 6.0 like #42504 should probably be done after this one has been merged upwards.
+
+I'll deal with the conflicts. I prefer decoupling PRs.

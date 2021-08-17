@@ -223,12 +223,12 @@ class TestLoginLinkHandlerUser implements UserInterface
         return [];
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
         return $this->passwordProperty;
     }
 
-    public function getSalt(): ?string
+    public function getSalt(): string
     {
         return '';
     }
@@ -243,7 +243,7 @@ class TestLoginLinkHandlerUser implements UserInterface
         return $this->username;
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 }
@@ -271,7 +271,7 @@ class TestLoginLinkHandlerUserProvider implements UserProviderInterface
         return clone $this->users[$userIdentifier];
     }
 
-    public function refreshUser(UserInterface $user): UserInterface
+    public function refreshUser(UserInterface $user): TestLoginLinkHandlerUser
     {
         return $this->users[$username];
     }

@@ -166,10 +166,12 @@ class AccessListenerTest extends TestCase
         ;
 
         $token = $this->createMock(TokenInterface::class);
-        $token
-            ->expects($this->never())
-            ->method('isAuthenticated')
-        ;
+        if (method_exists(TokenInterface::class, 'isAuthenticated')) {
+            $token
+                ->expects($this->never())
+                ->method('isAuthenticated')
+            ;
+        }
 
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage
@@ -371,5 +373,42 @@ class AccessListenerTest extends TestCase
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+    }
+
+    public function testLazyPublicPagesShouldNotAccessTokenStorage()
+    {
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage->expects($this->never())->method('getToken');
+
+        $request = new Request();
+        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap->expects($this->any())
+            ->method('getPatterns')
+            ->with($this->equalTo($request))
+            ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
+        ;
+
+        $listener = new AccessListener($tokenStorage, $this->createMock(AccessDecisionManagerInterface::class), $accessMap, false);
+        $listener(new LazyResponseEvent(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyLazyPublicPagesShouldNotAccessTokenStorage()
+    {
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage->expects($this->never())->method('getToken');
+
+        $request = new Request();
+        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap->expects($this->any())
+            ->method('getPatterns')
+            ->with($this->equalTo($request))
+            ->willReturn([[AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY], null])
+        ;
+
+        $listener = new AccessListener($tokenStorage, $this->createMock(AccessDecisionManagerInterface::class), $accessMap, false);
+        $listener(new LazyResponseEvent(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
     }
 }

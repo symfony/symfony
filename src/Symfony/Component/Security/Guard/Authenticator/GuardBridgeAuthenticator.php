@@ -121,6 +121,11 @@ class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, Aut
         return $this->guard->createAuthenticatedToken($passport->getUser(), $firewallName);
     }
 
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
+    {
+        return $this->guard->createAuthenticatedToken($passport->getUser(), $firewallName);
+    }
+
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return $this->guard->onAuthenticationSuccess($request, $token, $firewallName);

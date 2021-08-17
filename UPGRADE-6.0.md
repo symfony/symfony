@@ -214,6 +214,7 @@ Routing
 Security
 --------
 
+ * Remove `AuthenticationEvents::AUTHENTICATION_FAILURE`, use the `LoginFailureEvent` instead
  * Remove the `$authenticationEntryPoint` argument of `ChannelListener`
  * Remove `RetryAuthenticationEntryPoint`, this code was inlined in the `ChannelListener`
  * Remove `FormAuthenticationEntryPoint` and `BasicAuthenticationEntryPoint`, the `FormLoginAuthenticator` and `HttpBasicAuthenticator` should be used instead.

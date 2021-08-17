@@ -3,7 +3,7 @@ CHANGELOG
 
 5.4
 ---
-
+ * Added `env:dump` command to compiles the contents of the .env* files into a PHP-optimized file called .env.local.php. Copied from symfony/flex.
  * Add autowiring alias for `HttpCache\StoreInterface`
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private

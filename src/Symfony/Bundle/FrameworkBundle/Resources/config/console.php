@@ -24,6 +24,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerLintCommand;
 use Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand;
+use Symfony\Bundle\FrameworkBundle\Command\DumpEnvCommand;
 use Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
@@ -314,6 +315,9 @@ return static function (ContainerConfigurator $container) {
                 service('secrets.vault'),
                 service('secrets.local_vault'),
             ])
+            ->tag('console.command')
+
+        ->set('console.command.env_dump', DumpEnvCommand::class)
             ->tag('console.command')
     ;
 };

@@ -20,7 +20,7 @@ use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * A console command to compiles the contents of the .env* files into a PHP-optimized file called .env.local.php
+ * A console command to compiles the contents of the .env* files into a PHP-optimized file called .env.local.php.
  *
  * @internal
  */
@@ -53,7 +53,6 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
 
@@ -86,13 +85,10 @@ EOF;
         $output->writeln('Successfully dumped .env files in <info>.env.local.php</>');
 
         return 0;
-
-
     }
 
     private function loadEnv(string $path, ?string $env): array
     {
-
         $globalsBackup = [$_SERVER, $_ENV];
         unset($_SERVER['APP_ENV']);
         $_ENV = ['APP_ENV' => $env];
@@ -136,7 +132,7 @@ EOF;
             unset($_ENV['SYMFONY_DOTENV_VARS']);
             $env = $_ENV;
         } finally {
-            list($_SERVER, $_ENV) = $globalsBackup;
+            [$_SERVER, $_ENV] = $globalsBackup;
         }
 
         return $env;

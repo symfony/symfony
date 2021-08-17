@@ -102,15 +102,11 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
 
     /**
      * Compares the two given values to find if their relationship is valid.
-     *
-     * @return bool true if the relationship is valid, false otherwise
      */
     abstract protected function compareValues(mixed $value1, mixed $value2): bool;
 
     /**
      * Returns the error code used if the comparison fails.
-     *
-     * @return string|null The error code or `null` if no code should be set
      */
     protected function getErrorCode(): ?string
     {

@@ -28,8 +28,6 @@ interface FormFactoryInterface
      *
      * @param mixed $data The initial data
      *
-     * @return FormInterface The form named after the type
-     *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
     public function create(string $type = FormType::class, mixed $data = null, array $options = []): FormInterface;
@@ -40,8 +38,6 @@ interface FormFactoryInterface
      * @see createNamedBuilder()
      *
      * @param mixed $data The initial data
-     *
-     * @return FormInterface The form
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -56,8 +52,6 @@ interface FormFactoryInterface
      * @param string $property The name of the property to guess for
      * @param mixed  $data     The initial data
      *
-     * @return FormInterface The form named after the property
-     *
      * @throws InvalidOptionsException if any given option is not applicable to the form type
      */
     public function createForProperty(string $class, string $property, mixed $data = null, array $options = []): FormInterface;
@@ -67,8 +61,6 @@ interface FormFactoryInterface
      *
      * @param mixed $data The initial data
      *
-     * @return FormBuilderInterface The form builder
-     *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
     public function createBuilder(string $type = FormType::class, mixed $data = null, array $options = []): FormBuilderInterface;
@@ -77,8 +69,6 @@ interface FormFactoryInterface
      * Returns a form builder.
      *
      * @param mixed $data The initial data
-     *
-     * @return FormBuilderInterface The form builder
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -93,8 +83,6 @@ interface FormFactoryInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      * @param mixed  $data     The initial data
-     *
-     * @return FormBuilderInterface The form builder named after the property
      *
      * @throws InvalidOptionsException if any given option is not applicable to the form type
      */

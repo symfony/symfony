@@ -733,8 +733,6 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a YAML file.
      *
-     * @return array The file content
-     *
      * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
      */
     protected function loadFile(string $file): array

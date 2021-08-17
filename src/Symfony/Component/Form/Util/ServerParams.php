@@ -79,8 +79,6 @@ class ServerParams
 
     /**
      * Returns the content length of the request.
-     *
-     * @return mixed The request content length
      */
     public function getContentLength(): mixed
     {

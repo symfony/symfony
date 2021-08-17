@@ -115,7 +115,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     /**
      * Retrieves the user from an implementation-specific location.
      *
-     * @return UserInterface The user
+     * @return UserInterface
      *
      * @throws AuthenticationException if the credentials could not be validated
      */

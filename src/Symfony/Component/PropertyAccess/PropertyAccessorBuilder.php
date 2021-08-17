@@ -226,8 +226,6 @@ class PropertyAccessorBuilder
 
     /**
      * Sets a cache system.
-     *
-     * @return PropertyAccessorBuilder The builder object
      */
     public function setCacheItemPool(CacheItemPoolInterface $cacheItemPool = null): self
     {
@@ -276,8 +274,6 @@ class PropertyAccessorBuilder
 
     /**
      * Builds and returns a new PropertyAccessor object.
-     *
-     * @return PropertyAccessorInterface The built PropertyAccessor
      */
     public function getPropertyAccessor(): PropertyAccessorInterface
     {

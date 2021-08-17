@@ -109,8 +109,6 @@ class InputOption
 
     /**
      * Returns the option shortcut.
-     *
-     * @return string|null The shortcut
      */
     public function getShortcut(): ?string
     {
@@ -119,8 +117,6 @@ class InputOption
 
     /**
      * Returns the option name.
-     *
-     * @return string The name
      */
     public function getName(): string
     {
@@ -201,8 +197,6 @@ class InputOption
 
     /**
      * Returns the description text.
-     *
-     * @return string The description text
      */
     public function getDescription(): string
     {

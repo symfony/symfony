@@ -57,8 +57,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * Returns the headers.
      *
      * @param string|null $key The name of the headers to return or null to get them all
-     *
-     * @return array An array of headers
      */
     public function all(string $key = null): array
     {
@@ -71,8 +69,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the parameter keys.
-     *
-     * @return array An array of parameter keys
      */
     public function keys(): array
     {
@@ -99,9 +95,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns a header value by name.
-     *
-     * @return string|null The first header value or default value
+     * Returns the first header by name or the default one.
      */
     public function get(string $key, string $default = null): ?string
     {
@@ -151,8 +145,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns true if the HTTP header is defined.
-     *
-     * @return bool true if the parameter exists, false otherwise
      */
     public function has(string $key): bool
     {
@@ -161,8 +153,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns true if the given HTTP header contains the given value.
-     *
-     * @return bool true if the value is contained in the header, false otherwise
      */
     public function contains(string $key, string $value): bool
     {
@@ -185,8 +175,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the HTTP header value converted to a date.
-     *
-     * @return \DateTimeInterface|null The parsed DateTime or the default value if the header does not exist
      *
      * @throws \RuntimeException When the HTTP header is not parseable
      */
@@ -215,8 +203,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns true if the Cache-Control directive is defined.
-     *
-     * @return bool true if the directive exists, false otherwise
      */
     public function hasCacheControlDirective(string $key): bool
     {
@@ -225,8 +211,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns a Cache-Control directive value by name.
-     *
-     * @return bool|string|null The directive value if defined, null otherwise
      */
     public function getCacheControlDirective(string $key): bool|string|null
     {
@@ -268,8 +252,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Parses a Cache-Control HTTP header.
-     *
-     * @return array An array representing the attribute values
      */
     protected function parseCacheControl(string $header): array
     {

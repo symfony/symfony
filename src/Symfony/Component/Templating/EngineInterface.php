@@ -33,8 +33,6 @@ interface EngineInterface
     /**
      * Renders a template.
      *
-     * @return string The evaluated template as a string
-     *
      * @throws \RuntimeException if the template cannot be rendered
      */
     public function render(string|TemplateReferenceInterface $name, array $parameters = []): string;
@@ -42,16 +40,12 @@ interface EngineInterface
     /**
      * Returns true if the template exists.
      *
-     * @return bool true if the template exists, false otherwise
-     *
      * @throws \RuntimeException if the engine cannot handle the template name
      */
     public function exists(string|TemplateReferenceInterface $name): bool;
 
     /**
      * Returns true if this class is able to render the given template.
-     *
-     * @return bool true if this class supports the given template, false otherwise
      */
     public function supports(string|TemplateReferenceInterface $name): bool;
 }

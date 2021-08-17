@@ -310,7 +310,7 @@ class Deprecation
     }
 
     /**
-     * @return string[] an array of paths
+     * @return string[]
      */
     private static function getVendors()
     {

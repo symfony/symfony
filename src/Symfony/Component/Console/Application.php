@@ -348,8 +348,6 @@ class Application implements ResetInterface
 
     /**
      * Gets the help message.
-     *
-     * @return string A help message
      */
     public function getHelp(): string
     {
@@ -358,8 +356,6 @@ class Application implements ResetInterface
 
     /**
      * Gets whether to catch exceptions or not during commands execution.
-     *
-     * @return bool Whether to catch exceptions or not during commands execution
      */
     public function areExceptionsCaught(): bool
     {
@@ -376,8 +372,6 @@ class Application implements ResetInterface
 
     /**
      * Gets whether to automatically exit after a command execution or not.
-     *
-     * @return bool Whether to automatically exit after a command execution or not
      */
     public function isAutoExitEnabled(): bool
     {
@@ -394,8 +388,6 @@ class Application implements ResetInterface
 
     /**
      * Gets the name of the application.
-     *
-     * @return string The application name
      */
     public function getName(): string
     {
@@ -412,8 +404,6 @@ class Application implements ResetInterface
 
     /**
      * Gets the application version.
-     *
-     * @return string The application version
      */
     public function getVersion(): string
     {
@@ -431,7 +421,7 @@ class Application implements ResetInterface
     /**
      * Returns the long version of the application.
      *
-     * @return string The long application version
+     * @return string
      */
     public function getLongVersion()
     {
@@ -448,8 +438,6 @@ class Application implements ResetInterface
 
     /**
      * Registers a new command.
-     *
-     * @return Command The newly created command
      */
     public function register(string $name): Command
     {
@@ -476,7 +464,7 @@ class Application implements ResetInterface
      * If a command with the same name already exists, it will be overridden.
      * If the command is not enabled it will not be added.
      *
-     * @return Command|null The registered command if enabled or null
+     * @return Command|null
      */
     public function add(Command $command)
     {
@@ -511,7 +499,7 @@ class Application implements ResetInterface
     /**
      * Returns a registered command by name or alias.
      *
-     * @return Command A Command object
+     * @return Command
      *
      * @throws CommandNotFoundException When given command name does not exist
      */
@@ -544,8 +532,6 @@ class Application implements ResetInterface
 
     /**
      * Returns true if the command exists, false otherwise.
-     *
-     * @return bool true if the command exists, false otherwise
      */
     public function has(string $name): bool
     {
@@ -559,7 +545,7 @@ class Application implements ResetInterface
      *
      * It does not return the global namespace which always exists.
      *
-     * @return string[] An array of namespaces
+     * @return string[]
      */
     public function getNamespaces(): array
     {
@@ -581,8 +567,6 @@ class Application implements ResetInterface
 
     /**
      * Finds a registered namespace by a name or an abbreviation.
-     *
-     * @return string A registered namespace
      *
      * @throws NamespaceNotFoundException When namespace is incorrect or ambiguous
      */
@@ -776,7 +760,7 @@ class Application implements ResetInterface
     /**
      * Returns an array of possible abbreviations given a set of names.
      *
-     * @return string[][] An array of abbreviations
+     * @return string[][]
      */
     public static function getAbbreviations(array $names): array
     {
@@ -1072,8 +1056,6 @@ class Application implements ResetInterface
      * Returns the namespace part of the command name.
      *
      * This method is not part of public API and should not be used directly.
-     *
-     * @return string The namespace of the command
      */
     public function extractNamespace(string $name, int $limit = null): string
     {
@@ -1086,7 +1068,7 @@ class Application implements ResetInterface
      * Finds alternative of $name among $collection,
      * if nothing is found in $collection, try in $abbrevs.
      *
-     * @return string[] A sorted array of similar string
+     * @return string[]
      */
     private function findAlternatives(string $name, iterable $collection): array
     {
@@ -1194,7 +1176,7 @@ class Application implements ResetInterface
     /**
      * Returns all namespaces of the command name.
      *
-     * @return string[] The namespaces of the command
+     * @return string[]
      */
     private function extractAllNamespaces(string $name): array
     {

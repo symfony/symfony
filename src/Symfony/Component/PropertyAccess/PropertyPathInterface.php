@@ -26,7 +26,7 @@ interface PropertyPathInterface extends \Traversable
     /**
      * Returns the length of the property path, i.e. the number of elements.
      *
-     * @return int The path length
+     * @return int
      */
     public function getLength();
 
@@ -38,14 +38,14 @@ interface PropertyPathInterface extends \Traversable
      *
      * If this property path only contains one item, null is returned.
      *
-     * @return self|null The parent path or null
+     * @return self|null
      */
     public function getParent();
 
     /**
      * Returns the elements of the property path as array.
      *
-     * @return array An array of property/index names
+     * @return array
      */
     public function getElements();
 
@@ -54,7 +54,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @param int $index The index key
      *
-     * @return string A property or index name
+     * @return string
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */
@@ -65,7 +65,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @param int $index The index in the property path
      *
-     * @return bool Whether the element at this index is a property
+     * @return bool
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */
@@ -76,7 +76,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @param int $index The index in the property path
      *
-     * @return bool Whether the element at this index is an array index
+     * @return bool
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */

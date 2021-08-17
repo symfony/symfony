@@ -35,9 +35,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         $this->data = $data;
     }
 
-    /**
-     * @return string|null The type of the value
-     */
     public function getType(): ?string
     {
         $item = $this->data[$this->position][$this->key];
@@ -65,9 +62,11 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
+     * Returns a native representation of the original value.
+     *
      * @param array|bool $recursive Whether values should be resolved recursively or not
      *
-     * @return string|int|float|bool|array|Data[]|null A native representation of the original value
+     * @return string|int|float|bool|array|Data[]|null
      */
     public function getValue(array|bool $recursive = false): string|int|float|bool|array|null
     {
@@ -214,8 +213,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 
     /**
      * Seeks to a specific key in nested data structures.
-     *
-     * @return static|null Null if the key is not set
      */
     public function seek(string|int $key): ?static
     {

@@ -88,8 +88,6 @@ class FormError
 
     /**
      * Returns the cause of this error.
-     *
-     * @return mixed The cause of this error
      */
     public function getCause(): mixed
     {
@@ -114,8 +112,6 @@ class FormError
 
     /**
      * Returns the form that caused this error.
-     *
-     * @return FormInterface|null The form that caused this error
      */
     public function getOrigin(): ?FormInterface
     {

@@ -25,8 +25,6 @@ interface SharedLockInterface extends LockInterface
      * Acquires the lock for reading. If the lock is acquired by someone else in write mode, the parameter `blocking`
      * determines whether or not the call should block until the release of the lock.
      *
-     * @return bool whether or not the lock had been acquired
-     *
      * @throws LockConflictedException If the lock is acquired by someone else in blocking mode
      * @throws LockAcquiringException  If the lock can not be acquired
      */

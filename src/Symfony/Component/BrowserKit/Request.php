@@ -51,8 +51,6 @@ class Request
 
     /**
      * Gets the request URI.
-     *
-     * @return string The request URI
      */
     public function getUri(): string
     {
@@ -61,8 +59,6 @@ class Request
 
     /**
      * Gets the request HTTP method.
-     *
-     * @return string The request HTTP method
      */
     public function getMethod(): string
     {
@@ -71,8 +67,6 @@ class Request
 
     /**
      * Gets the request parameters.
-     *
-     * @return array The request parameters
      */
     public function getParameters(): array
     {
@@ -81,8 +75,6 @@ class Request
 
     /**
      * Gets the request server files.
-     *
-     * @return array The request files
      */
     public function getFiles(): array
     {
@@ -91,8 +83,6 @@ class Request
 
     /**
      * Gets the request cookies.
-     *
-     * @return array The request cookies
      */
     public function getCookies(): array
     {
@@ -101,8 +91,6 @@ class Request
 
     /**
      * Gets the request server parameters.
-     *
-     * @return array The request server parameters
      */
     public function getServer(): array
     {
@@ -111,8 +99,6 @@ class Request
 
     /**
      * Gets the request raw body data.
-     *
-     * @return string|null The request raw body data
      */
     public function getContent(): ?string
     {

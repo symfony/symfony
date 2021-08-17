@@ -295,7 +295,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Get the class name of the security token.
      *
-     * @return string|Data|null The token
+     * @return string|Data|null
      */
     public function getTokenClass()
     {

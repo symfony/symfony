@@ -68,8 +68,6 @@ class SlotsHelper extends Helper
 
     /**
      * Gets the slot value.
-     *
-     * @return string The slot content
      */
     public function get(string $name, bool|string $default = false): string
     {
@@ -108,8 +106,6 @@ class SlotsHelper extends Helper
 
     /**
      * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
      */
     public function getName(): string
     {

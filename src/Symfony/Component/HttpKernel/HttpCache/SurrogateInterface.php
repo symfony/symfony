@@ -28,8 +28,6 @@ interface SurrogateInterface
 
     /**
      * Checks that at least one surrogate has Surrogate capability.
-     *
-     * @return bool true if one surrogate has Surrogate capability, false otherwise
      */
     public function hasSurrogateCapability(Request $request): bool;
 
@@ -47,8 +45,6 @@ interface SurrogateInterface
 
     /**
      * Checks that the Response needs to be parsed for Surrogate tags.
-     *
-     * @return bool true if the Response needs to be parsed, false otherwise
      */
     public function needsParsing(Response $response): bool;
 

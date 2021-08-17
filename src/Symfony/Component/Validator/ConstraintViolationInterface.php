@@ -35,8 +35,6 @@ interface ConstraintViolationInterface
 {
     /**
      * Returns the violation message.
-     *
-     * @return string|\Stringable The violation message as a string or a stringable object
      */
     public function getMessage(): string|\Stringable;
 
@@ -46,8 +44,6 @@ interface ConstraintViolationInterface
      * The raw violation message contains placeholders for the parameters
      * returned by {@link getParameters}. Typically you'll pass the
      * message template and parameters to a translation engine.
-     *
-     * @return string The raw violation message
      */
     public function getMessageTemplate(): string;
 
@@ -74,8 +70,6 @@ interface ConstraintViolationInterface
      *
      * This method returns the value of the parameter for choosing the right
      * pluralization form (in this case "choices").
-     *
-     * @return int|null The number to use to pluralize of the message
      */
     public function getPlural(): ?int;
 
@@ -113,8 +107,6 @@ interface ConstraintViolationInterface
 
     /**
      * Returns a machine-digestible error code for the violation.
-     *
-     * @return string|null The error code
      */
     public function getCode(): ?string;
 }

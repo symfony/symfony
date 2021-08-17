@@ -31,8 +31,6 @@ class Comparator
 
     /**
      * Gets the target value.
-     *
-     * @return string The target value
      */
     public function getTarget(): string
     {
@@ -41,8 +39,6 @@ class Comparator
 
     /**
      * Gets the comparison operator.
-     *
-     * @return string The operator
      */
     public function getOperator(): string
     {

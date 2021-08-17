@@ -167,8 +167,6 @@ class SmtpTransport extends AbstractTransport
      *
      * @param int[] $codes
      *
-     * @return string The server response
-     *
      * @throws TransportException when an invalid response if received
      *
      * @internal

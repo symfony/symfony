@@ -36,7 +36,7 @@ interface ClassMetadataInterface extends MetadataInterface
     /**
      * Returns the names of all constrained properties.
      *
-     * @return string[] A list of property names
+     * @return string[]
      */
     public function getConstrainedProperties(): array;
 
@@ -44,18 +44,12 @@ interface ClassMetadataInterface extends MetadataInterface
      * Returns whether the "Default" group is overridden by a group sequence.
      *
      * If it is, you can access the group sequence with {@link getGroupSequence()}.
-     *
-     * @return bool Returns true if the "Default" group is overridden
-     *
-     * @see GroupSequence
      */
     public function hasGroupSequence(): bool;
 
     /**
      * Returns the group sequence that overrides the "Default" group for this
      * class.
-     *
-     * @return GroupSequence|null The group sequence or null
      */
     public function getGroupSequence(): ?GroupSequence;
 
@@ -67,11 +61,6 @@ interface ClassMetadataInterface extends MetadataInterface
      * {@link GroupSequenceProviderInterface}.
      * This interface will be used to obtain the group sequence when an object
      * of this class is validated.
-     *
-     * @return bool Returns true if the "Default" group is overridden by
-     *              a dynamic group sequence
-     *
-     * @see GroupSequenceProviderInterface
      */
     public function isGroupSequenceProvider(): bool;
 
@@ -96,8 +85,6 @@ interface ClassMetadataInterface extends MetadataInterface
 
     /**
      * Returns the name of the backing PHP class.
-     *
-     * @return string The name of the backing class
      */
     public function getClassName(): string;
 }

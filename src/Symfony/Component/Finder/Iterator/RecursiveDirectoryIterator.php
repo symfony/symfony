@@ -114,8 +114,6 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 
     /**
      * Checks if the stream is rewindable.
-     *
-     * @return bool true when the stream is rewindable, false otherwise
      */
     public function isRewindable(): bool
     {

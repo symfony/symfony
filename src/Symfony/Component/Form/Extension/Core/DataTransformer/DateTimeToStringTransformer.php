@@ -69,8 +69,6 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
-     * @return string A value as produced by PHP's date() function
-     *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
     public function transform(mixed $dateTime): string

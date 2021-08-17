@@ -57,8 +57,6 @@ class ChildDefinition extends Definition
      * If replaceArgument() has been used to replace an argument, this method
      * will return the replacement value.
      *
-     * @return mixed The argument value
-     *
      * @throws OutOfBoundsException When the argument does not exist
      */
     public function getArgument(int|string $index): mixed

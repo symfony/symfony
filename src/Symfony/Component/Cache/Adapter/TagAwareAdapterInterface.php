@@ -25,8 +25,6 @@ interface TagAwareAdapterInterface extends AdapterInterface
      *
      * @param string[] $tags An array of tags to invalidate
      *
-     * @return bool True on success
-     *
      * @throws InvalidArgumentException When $tags is not valid
      */
     public function invalidateTags(array $tags): bool;

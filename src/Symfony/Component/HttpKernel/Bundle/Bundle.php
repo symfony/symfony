@@ -58,8 +58,6 @@ abstract class Bundle implements BundleInterface
     /**
      * Returns the bundle's container extension.
      *
-     * @return ExtensionInterface|null The container extension
-     *
      * @throws \LogicException
      */
     public function getContainerExtension(): ?ExtensionInterface

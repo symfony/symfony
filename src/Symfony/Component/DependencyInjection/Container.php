@@ -112,9 +112,6 @@ class Container implements ContainerInterface, ResetInterface
         return $this->parameterBag->get($name);
     }
 
-    /**
-     * @return bool The presence of parameter in container
-     */
     public function hasParameter(string $name): bool
     {
         return $this->parameterBag->has($name);
@@ -187,8 +184,6 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a service.
      *
-     * @return object|null The associated service
-     *
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined
      * @throws \Exception                        if an exception has been thrown when the service has been resolved
@@ -259,8 +254,6 @@ class Container implements ContainerInterface, ResetInterface
 
     /**
      * Returns true if the given service has actually been initialized.
-     *
-     * @return bool true if service has already been initialized, false otherwise
      */
     public function initialized(string $id): bool
     {
@@ -297,7 +290,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets all service ids.
      *
-     * @return string[] An array of all defined service ids
+     * @return string[]
      */
     public function getServiceIds(): array
     {
@@ -314,8 +307,6 @@ class Container implements ContainerInterface, ResetInterface
 
     /**
      * Camelizes a string.
-     *
-     * @return string The camelized string
      */
     public static function camelize(string $id): string
     {
@@ -324,8 +315,6 @@ class Container implements ContainerInterface, ResetInterface
 
     /**
      * A string to underscore.
-     *
-     * @return string The underscored string
      */
     public static function underscore(string $id): string
     {
@@ -342,8 +331,6 @@ class Container implements ContainerInterface, ResetInterface
 
     /**
      * Fetches a variable from the environment.
-     *
-     * @return mixed The value to use for the provided environment variable name
      *
      * @throws EnvNotFoundException When the environment variable is not found and has no default value
      */

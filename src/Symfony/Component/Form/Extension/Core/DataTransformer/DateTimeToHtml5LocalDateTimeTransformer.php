@@ -31,8 +31,6 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
      *
-     * @return string The formatted date
-     *
      * @throws TransformationFailedException If the given value is not an
      *                                       instance of \DateTime or \DateTimeInterface
      */
@@ -65,8 +63,6 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
      * https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#parse-a-local-date-and-time-string
      *
      * @param string $dateTimeLocal Formatted string
-     *
-     * @return \DateTime|null Normalized date
      *
      * @throws TransformationFailedException If the given value is not a string,
      *                                       if the value could not be transformed

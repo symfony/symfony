@@ -199,8 +199,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * Gets filename to store data, associated to the token.
-     *
-     * @return string The profile filename
      */
     protected function getFilename(string $token): string
     {
@@ -213,8 +211,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * Gets the index filename.
-     *
-     * @return string The index filename
      */
     protected function getIndexFilename(): string
     {
@@ -227,8 +223,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * This function automatically skips the empty lines and do not include the line return in result value.
      *
      * @param resource $file The file resource, with the pointer placed at the end of the line to read
-     *
-     * @return mixed A string representing the line or null if beginning of file is reached
      */
     protected function readLineFromFile($file): mixed
     {

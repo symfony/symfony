@@ -154,8 +154,6 @@ EOF;
      * an invalid UploadedFile is returned with an error set to UPLOAD_ERR_INI_SIZE.
      *
      * @see UploadedFile
-     *
-     * @return array An array with all uploaded files marked as already moved
      */
     protected function filterFiles(array $files): array
     {

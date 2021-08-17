@@ -164,8 +164,6 @@ class Store implements StoreInterface
      * Existing entries are read and any that match the response are removed. This
      * method calls write with the new list of cache entries.
      *
-     * @return string The key under which the response is stored
-     *
      * @throws \RuntimeException
      */
     public function write(Request $request, Response $response): string
@@ -413,8 +411,6 @@ class Store implements StoreInterface
      * If the same URI can have more than one representation, based on some
      * headers, use a Vary header to indicate them, and each representation will
      * be stored independently under the same cache key.
-     *
-     * @return string A key for the given Request
      */
     protected function generateCacheKey(Request $request): string
     {

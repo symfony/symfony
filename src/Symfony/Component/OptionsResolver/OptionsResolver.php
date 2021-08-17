@@ -276,8 +276,6 @@ class OptionsResolver implements Options
      *
      * Returns true if {@link setDefault()} was called for this option.
      * An option is also considered set if it was set to null.
-     *
-     * @return bool Whether a default value is set
      */
     public function hasDefault(string $option): bool
     {
@@ -311,8 +309,6 @@ class OptionsResolver implements Options
      * Returns whether an option is required.
      *
      * An option is required if it was passed to {@link setRequired()}.
-     *
-     * @return bool Whether the option is required
      */
     public function isRequired(string $option): bool
     {
@@ -322,7 +318,7 @@ class OptionsResolver implements Options
     /**
      * Returns the names of all required options.
      *
-     * @return string[] The names of the required options
+     * @return string[]
      *
      * @see isRequired()
      */
@@ -337,8 +333,6 @@ class OptionsResolver implements Options
      * An option is missing if it was passed to {@link setRequired()}, but not
      * to {@link setDefault()}. This option must be passed explicitly to
      * {@link resolve()}, otherwise an exception will be thrown.
-     *
-     * @return bool Whether the option is missing
      */
     public function isMissing(string $option): bool
     {
@@ -348,9 +342,7 @@ class OptionsResolver implements Options
     /**
      * Returns the names of all options missing a default value.
      *
-     * @return string[] The names of the missing options
-     *
-     * @see isMissing()
+     * @return string[]
      */
     public function getMissingOptions(): array
     {
@@ -388,8 +380,6 @@ class OptionsResolver implements Options
      *
      * Returns true for any option passed to {@link setDefault()},
      * {@link setRequired()} or {@link setDefined()}.
-     *
-     * @return bool Whether the option is defined
      */
     public function isDefined(string $option): bool
     {
@@ -399,7 +389,7 @@ class OptionsResolver implements Options
     /**
      * Returns the names of all defined options.
      *
-     * @return string[] The names of the defined options
+     * @return string[]
      *
      * @see isDefined()
      */
@@ -850,8 +840,6 @@ class OptionsResolver implements Options
      *  - Required options are missing;
      *  - Options have invalid types;
      *  - Options have invalid values.
-     *
-     * @return array The merged and validated options
      *
      * @throws UndefinedOptionsException If an option name is undefined
      * @throws InvalidOptionsException   If an option doesn't fulfill the

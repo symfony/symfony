@@ -75,8 +75,6 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Retrieves the name of the attribute which value should be used as key.
-     *
-     * @return string|null The name of the attribute
      */
     public function getKeyAttribute(): ?string
     {
@@ -144,8 +142,6 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Retrieves the prototype.
-     *
-     * @return PrototypeNodeInterface The prototype
      */
     public function getPrototype(): PrototypeNodeInterface
     {

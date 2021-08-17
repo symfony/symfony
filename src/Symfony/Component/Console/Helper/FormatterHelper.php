@@ -22,8 +22,6 @@ class FormatterHelper extends Helper
 {
     /**
      * Formats a message within a section.
-     *
-     * @return string The format section
      */
     public function formatSection(string $section, string $message, string $style = 'info'): string
     {
@@ -32,8 +30,6 @@ class FormatterHelper extends Helper
 
     /**
      * Formats a message as a block of text.
-     *
-     * @return string The formatter message
      */
     public function formatBlock(string|array $messages, string $style, bool $large = false): string
     {

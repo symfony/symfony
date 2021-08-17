@@ -23,8 +23,6 @@ class VariableNodeDefinition extends NodeDefinition
 {
     /**
      * Instantiate a Node.
-     *
-     * @return VariableNode The node
      */
     protected function instantiateNode(): VariableNode
     {

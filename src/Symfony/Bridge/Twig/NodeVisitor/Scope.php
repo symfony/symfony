@@ -27,8 +27,6 @@ class Scope
 
     /**
      * Opens a new child scope.
-     *
-     * @return self
      */
     public function enter(): self
     {
@@ -37,8 +35,6 @@ class Scope
 
     /**
      * Closes current scope and returns parent one.
-     *
-     * @return self|null
      */
     public function leave(): ?self
     {

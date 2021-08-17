@@ -24,9 +24,7 @@ interface OutputFormatterInterface
     public function setDecorated(bool $decorated);
 
     /**
-     * Gets the decorated flag.
-     *
-     * @return bool true if the output will decorate messages, false otherwise
+     * Whether the output will decorate messages.
      */
     public function isDecorated(): bool;
 

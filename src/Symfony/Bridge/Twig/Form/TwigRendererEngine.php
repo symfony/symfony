@@ -69,8 +69,6 @@ class TwigRendererEngine extends AbstractRendererEngine
      * case that the function "block()" is used in the Twig template.
      *
      * @see getResourceForBlock()
-     *
-     * @return bool True if the resource could be loaded, false otherwise
      */
     protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool
     {

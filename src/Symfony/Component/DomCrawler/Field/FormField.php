@@ -76,8 +76,6 @@ abstract class FormField
 
     /**
      * Returns the name of the field.
-     *
-     * @return string The name of the field
      */
     public function getName(): string
     {
@@ -102,8 +100,6 @@ abstract class FormField
 
     /**
      * Returns true if the field should be included in the submitted values.
-     *
-     * @return bool true if the field should be included in the submitted values, false otherwise
      */
     public function hasValue(): bool
     {

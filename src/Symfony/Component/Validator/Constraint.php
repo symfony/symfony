@@ -61,8 +61,6 @@ abstract class Constraint
     /**
      * Returns the name of the given error code.
      *
-     * @return string The name of the error code
-     *
      * @throws InvalidArgumentException If the error code does not exist
      */
     public static function getErrorName(string $errorCode): string
@@ -198,8 +196,6 @@ abstract class Constraint
      * Corresponding properties are added to the object on first access. Hence
      * this method will be called at most once per constraint instance and
      * option name.
-     *
-     * @return mixed The value of the option
      *
      * @throws InvalidOptionsException If an invalid option name is given
      */

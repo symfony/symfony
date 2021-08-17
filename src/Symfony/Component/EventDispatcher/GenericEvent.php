@@ -39,8 +39,6 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Getter for subject property.
-     *
-     * @return mixed The observer subject
      */
     public function getSubject(): mixed
     {
@@ -49,8 +47,6 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Get argument by key.
-     *
-     * @return mixed Contents of array key
      *
      * @throws \InvalidArgumentException if key is not found
      */

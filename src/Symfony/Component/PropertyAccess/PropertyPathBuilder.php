@@ -155,8 +155,6 @@ class PropertyPathBuilder
 
     /**
      * Returns the length of the current path.
-     *
-     * @return int The path length
      */
     public function getLength(): int
     {
@@ -165,8 +163,6 @@ class PropertyPathBuilder
 
     /**
      * Returns the current property path.
-     *
-     * @return PropertyPathInterface|null The constructed property path
      */
     public function getPropertyPath(): ?PropertyPathInterface
     {

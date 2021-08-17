@@ -38,8 +38,6 @@ abstract class Storage
 
     /**
      * Returns the content of the template.
-     *
-     * @return string The template content
      */
     abstract public function getContent(): string;
 }

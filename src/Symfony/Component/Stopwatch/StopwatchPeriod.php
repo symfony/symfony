@@ -35,9 +35,7 @@ class StopwatchPeriod
     }
 
     /**
-     * Gets the relative time of the start of the period.
-     *
-     * @return int|float The time (in milliseconds)
+     * Gets the relative time of the start of the period in milliseconds.
      */
     public function getStartTime(): int|float
     {
@@ -45,9 +43,7 @@ class StopwatchPeriod
     }
 
     /**
-     * Gets the relative time of the end of the period.
-     *
-     * @return int|float The time (in milliseconds)
+     * Gets the relative time of the end of the period in milliseconds.
      */
     public function getEndTime(): int|float
     {
@@ -55,9 +51,7 @@ class StopwatchPeriod
     }
 
     /**
-     * Gets the time spent in this period.
-     *
-     * @return int|float The period duration (in milliseconds)
+     * Gets the time spent in this period in milliseconds.
      */
     public function getDuration(): int|float
     {
@@ -65,9 +59,7 @@ class StopwatchPeriod
     }
 
     /**
-     * Gets the memory usage.
-     *
-     * @return int The memory usage (in bytes)
+     * Gets the memory usage in bytes.
      */
     public function getMemory(): int
     {

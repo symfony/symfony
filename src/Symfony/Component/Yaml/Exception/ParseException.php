@@ -43,8 +43,6 @@ class ParseException extends RuntimeException
 
     /**
      * Gets the snippet of code near the error.
-     *
-     * @return string The snippet of code
      */
     public function getSnippet(): string
     {
@@ -65,8 +63,6 @@ class ParseException extends RuntimeException
      * Gets the filename where the error occurred.
      *
      * This method returns null if a string is parsed.
-     *
-     * @return string The filename
      */
     public function getParsedFile(): string
     {
@@ -85,8 +81,6 @@ class ParseException extends RuntimeException
 
     /**
      * Gets the line where the error occurred.
-     *
-     * @return int The file line
      */
     public function getParsedLine(): int
     {

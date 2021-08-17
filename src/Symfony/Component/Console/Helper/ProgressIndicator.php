@@ -133,8 +133,6 @@ class ProgressIndicator
 
     /**
      * Gets the format for a given name.
-     *
-     * @return string|null A format string
      */
     public static function getFormatDefinition(string $name): ?string
     {
@@ -161,8 +159,6 @@ class ProgressIndicator
 
     /**
      * Gets the placeholder formatter for a given name (including the delimiter char like %).
-     *
-     * @return callable|null A PHP callable
      */
     public static function getPlaceholderFormatterDefinition(string $name): ?callable
     {

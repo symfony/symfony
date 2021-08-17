@@ -21,8 +21,6 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
 {
     /**
      * Filters the iterator values.
-     *
-     * @return bool true if the value should be kept, false otherwise
      */
     public function accept(): bool
     {
@@ -48,8 +46,6 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
      * Converts string to regexp if necessary.
      *
      * @param string $str Pattern: string or regexp
-     *
-     * @return string regexp corresponding to a given string or regexp
      */
     protected function toRegex(string $str): string
     {

@@ -160,8 +160,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Checks if resources are tracked.
-     *
-     * @return bool true If resources are tracked, false otherwise
      */
     public function isTrackingResources(): bool
     {
@@ -206,7 +204,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all registered extensions.
      *
-     * @return ExtensionInterface[] An array of ExtensionInterface
+     * @return ExtensionInterface[]
      */
     public function getExtensions(): array
     {
@@ -215,8 +213,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Checks if we have an extension.
-     *
-     * @return bool If the extension exists
      */
     public function hasExtension(string $name): bool
     {
@@ -226,7 +222,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns an array of resources loaded to build this configuration.
      *
-     * @return ResourceInterface[] An array of resources
+     * @return ResourceInterface[]
      */
     public function getResources(): array
     {
@@ -443,8 +439,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns the compiler pass config which can then be modified.
-     *
-     * @return PassConfig The compiler pass config
      */
     public function getCompilerPassConfig(): PassConfig
     {
@@ -453,8 +447,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns the compiler.
-     *
-     * @return Compiler The compiler
      */
     public function getCompiler(): Compiler
     {
@@ -495,8 +487,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @return object|null The associated service
-     *
      * @throws InvalidArgumentException          when no definitions are available
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined
@@ -654,8 +644,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns the configuration array for the given extension.
-     *
-     * @return array An array of configuration
      */
     public function getExtensionConfig(string $name): array
     {
@@ -807,16 +795,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
     }
 
-    /**
-     * @return bool true if the alias exists, false otherwise
-     */
     public function hasAlias(string $id): bool
     {
         return isset($this->aliasDefinitions[$id]);
     }
 
     /**
-     * @return Alias[] An array of aliases
+     * @return Alias[]
      */
     public function getAliases(): array
     {
@@ -851,8 +836,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * This method implements a shortcut for using setDefinition() with
      * an autowired definition.
-     *
-     * @return Definition The created definition
      */
     public function autowire(string $id, string $class = null): Definition
     {
@@ -895,8 +878,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets a service definition.
      *
-     * @return Definition the service definition
-     *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
     public function setDefinition(string $id, Definition $definition): Definition
@@ -916,8 +897,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns true if a service definition exists under the given identifier.
-     *
-     * @return bool true if the service definition exists, false otherwise
      */
     public function hasDefinition(string $id): bool
     {
@@ -1206,8 +1185,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns all tags the defined services use.
-     *
-     * @return array An array of tags
      */
     public function findTags(): array
     {
@@ -1222,7 +1199,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all tags not queried by findTaggedServiceIds.
      *
-     * @return string[] An array of tags
+     * @return string[]
      */
     public function findUnusedTags(): array
     {

@@ -42,8 +42,6 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 
     /**
      * Checks if a templating engine has been set.
-     *
-     * @return bool true if the templating engine has been set, false otherwise
      */
     public function hasTemplating(): bool
     {

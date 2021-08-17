@@ -47,8 +47,6 @@ class File extends \SplFileInfo
      * This method uses the mime type as guessed by getMimeType()
      * to guess the file extension.
      *
-     * @return string|null The guessed extension or null if it cannot be guessed
-     *
      * @see MimeTypes
      * @see getMimeType()
      */
@@ -68,8 +66,6 @@ class File extends \SplFileInfo
      * which uses finfo_file() then the "file" system binary,
      * depending on which of those are available.
      *
-     * @return string|null The guessed mime type (e.g. "application/pdf")
-     *
      * @see MimeTypes
      */
     public function getMimeType(): ?string
@@ -83,8 +79,6 @@ class File extends \SplFileInfo
 
     /**
      * Moves the file to a new location.
-     *
-     * @return self A File object representing the new file
      *
      * @throws FileException if the target file could not be created
      */

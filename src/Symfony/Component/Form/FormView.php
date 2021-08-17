@@ -56,8 +56,6 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Returns whether the view was already rendered.
-     *
-     * @return bool Whether this view's widget is rendered
      */
     public function isRendered(): bool
     {
@@ -139,7 +137,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns an iterator to iterate over children (implements \IteratorAggregate).
      *
-     * @return \ArrayIterator<string, FormView> The iterator
+     * @return \ArrayIterator<string, FormView>
      */
     public function getIterator(): \ArrayIterator
     {

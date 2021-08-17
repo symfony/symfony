@@ -1022,8 +1022,6 @@ class Response
      * If the Response is not modified, it sets the status code to 304 and
      * removes the actual content by calling the setNotModified() method.
      *
-     * @return bool true if the Response validators match the Request, false otherwise
-     *
      * @final
      */
     public function isNotModified(Request $request): bool

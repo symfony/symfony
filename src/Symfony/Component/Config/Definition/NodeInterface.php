@@ -27,36 +27,26 @@ interface NodeInterface
 {
     /**
      * Returns the name of the node.
-     *
-     * @return string The name of the node
      */
     public function getName(): string;
 
     /**
      * Returns the path of the node.
-     *
-     * @return string The node path
      */
     public function getPath(): string;
 
     /**
      * Returns true when the node is required.
-     *
-     * @return bool If the node is required
      */
     public function isRequired(): bool;
 
     /**
      * Returns true when the node has a default value.
-     *
-     * @return bool If the node has a default value
      */
     public function hasDefaultValue(): bool;
 
     /**
      * Returns the default value of the node.
-     *
-     * @return mixed The default value
      *
      * @throws \RuntimeException if the node has no default value
      */
@@ -65,16 +55,12 @@ interface NodeInterface
     /**
      * Normalizes a value.
      *
-     * @return mixed The normalized value
-     *
      * @throws InvalidTypeException if the value type is invalid
      */
     public function normalize(mixed $value): mixed;
 
     /**
      * Merges two values together.
-     *
-     * @return mixed The merged value
      *
      * @throws ForbiddenOverwriteException if the configuration path cannot be overwritten
      * @throws InvalidTypeException        if the value type is invalid
@@ -83,8 +69,6 @@ interface NodeInterface
 
     /**
      * Finalizes a value.
-     *
-     * @return mixed The finalized value
      *
      * @throws InvalidTypeException          if the value type is invalid
      * @throws InvalidConfigurationException if the value is invalid configuration

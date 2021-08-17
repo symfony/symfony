@@ -22,8 +22,6 @@ class IntegerNodeDefinition extends NumericNodeDefinition
 {
     /**
      * Instantiates a Node.
-     *
-     * @return IntegerNode The node
      */
     protected function instantiateNode(): IntegerNode
     {

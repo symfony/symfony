@@ -26,8 +26,6 @@ interface MarkingStoreInterface
 {
     /**
      * Gets a Marking from a subject.
-     *
-     * @return Marking The marking
      */
     public function getMarking(object $subject): Marking;
 

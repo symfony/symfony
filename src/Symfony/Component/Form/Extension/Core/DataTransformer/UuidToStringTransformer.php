@@ -27,8 +27,6 @@ class UuidToStringTransformer implements DataTransformerInterface
      *
      * @param Uuid $value A Uuid object
      *
-     * @return string|null A value as produced by Uid component
-     *
      * @throws TransformationFailedException If the given value is not a Uuid object
      */
     public function transform(mixed $value): ?string

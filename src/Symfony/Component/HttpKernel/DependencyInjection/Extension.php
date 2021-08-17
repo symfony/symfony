@@ -24,8 +24,6 @@ abstract class Extension extends BaseExtension
 
     /**
      * Gets the annotated classes to cache.
-     *
-     * @return array An array of classes
      */
     public function getAnnotatedClassesToCompile(): array
     {

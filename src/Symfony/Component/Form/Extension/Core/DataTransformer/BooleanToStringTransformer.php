@@ -44,8 +44,6 @@ class BooleanToStringTransformer implements DataTransformerInterface
      *
      * @param bool $value Boolean value
      *
-     * @return string|null String value
-     *
      * @throws TransformationFailedException if the given value is not a Boolean
      */
     public function transform(mixed $value): ?string
@@ -65,8 +63,6 @@ class BooleanToStringTransformer implements DataTransformerInterface
      * Transforms a string into a Boolean.
      *
      * @param string $value String value
-     *
-     * @return bool Boolean value
      *
      * @throws TransformationFailedException if the given value is not a string
      */

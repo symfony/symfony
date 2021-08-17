@@ -28,8 +28,6 @@ class PropertyPath
      * squared opening bracket ("["), the concatenation of the two paths is
      * returned. Otherwise, the concatenation of the two paths is returned,
      * separated by a dot (".").
-     *
-     * @return string The concatenation of the two property paths
      */
     public static function append(string $basePath, string $subPath): string
     {

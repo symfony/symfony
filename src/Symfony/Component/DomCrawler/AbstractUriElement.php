@@ -63,8 +63,6 @@ abstract class AbstractUriElement
 
     /**
      * Gets the method associated with this link.
-     *
-     * @return string The method
      */
     public function getMethod(): string
     {
@@ -73,8 +71,6 @@ abstract class AbstractUriElement
 
     /**
      * Gets the URI associated with this link.
-     *
-     * @return string The URI
      */
     public function getUri(): string
     {

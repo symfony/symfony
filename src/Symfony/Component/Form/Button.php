@@ -37,8 +37,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function offsetExists(mixed $offset): bool
     {
@@ -129,8 +127,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function has(string $name): bool
     {
@@ -204,8 +200,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return array Always returns an empty array
      */
     public function getExtraData(): array
     {
@@ -222,8 +216,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Returns whether the button is submitted.
-     *
-     * @return bool true if the button was submitted
      */
     public function isSubmitted(): bool
     {
@@ -232,8 +224,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Returns the name by which the button is identified in forms.
-     *
-     * @return string The name of the button
      */
     public function getName(): string
     {
@@ -260,8 +250,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns true
      */
     public function isValid(): bool
     {
@@ -270,8 +258,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function isRequired(): bool
     {
@@ -292,8 +278,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns true
      */
     public function isEmpty(): bool
     {
@@ -302,8 +286,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns true
      */
     public function isSynchronized(): bool
     {
@@ -394,8 +376,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return int Always returns 0
      */
     public function count(): int
     {
@@ -404,8 +384,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return \EmptyIterator Always returns an empty iterator
      */
     public function getIterator(): \EmptyIterator
     {

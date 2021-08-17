@@ -40,8 +40,6 @@ class MappingRule
      *
      * If the rule matches, the form mapped by the rule is returned.
      * Otherwise this method returns false.
-     *
-     * @return FormInterface|null The mapped form or null
      */
     public function match(string $propertyPath): ?FormInterface
     {
@@ -50,8 +48,6 @@ class MappingRule
 
     /**
      * Matches a property path against a prefix of the rule path.
-     *
-     * @return bool Whether the property path is a prefix of the rule or not
      */
     public function isPrefix(string $propertyPath): bool
     {

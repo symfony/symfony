@@ -60,9 +60,6 @@ class Command
     private $usages = [];
     private $helperSet;
 
-    /**
-     * @return string|null The default command name or null when no default name is set
-     */
     public static function getDefaultName(): ?string
     {
         $class = static::class;
@@ -76,9 +73,6 @@ class Command
         return $class === $r->class ? static::$defaultName : null;
     }
 
-    /**
-     * @return string|null The default command description or null when no default description is set
-     */
     public static function getDefaultDescription(): ?string
     {
         $class = static::class;
@@ -526,8 +520,6 @@ class Command
 
     /**
      * Returns the description for the command.
-     *
-     * @return string The description for the command
      */
     public function getDescription(): string
     {
@@ -548,8 +540,6 @@ class Command
 
     /**
      * Returns the help for the command.
-     *
-     * @return string The help for the command
      */
     public function getHelp(): string
     {
@@ -559,8 +549,6 @@ class Command
     /**
      * Returns the processed help for the command replacing the %command.name% and
      * %command.full_name% patterns with the real values dynamically.
-     *
-     * @return string The processed help for the command
      */
     public function getProcessedHelp(): string
     {
@@ -604,8 +592,6 @@ class Command
 
     /**
      * Returns the aliases for the command.
-     *
-     * @return array An array of aliases for the command
      */
     public function getAliases(): array
     {
@@ -616,8 +602,6 @@ class Command
      * Returns the synopsis for the command.
      *
      * @param bool $short Whether to show the short version of the synopsis (with options folded) or not
-     *
-     * @return string The synopsis
      */
     public function getSynopsis(bool $short = false): string
     {
@@ -656,8 +640,6 @@ class Command
 
     /**
      * Gets a helper instance by name.
-     *
-     * @return mixed The helper value
      *
      * @throws LogicException           if no HelperSet is defined
      * @throws InvalidArgumentException if the helper is not defined

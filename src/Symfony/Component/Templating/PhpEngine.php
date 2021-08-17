@@ -118,8 +118,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Evaluates a template.
      *
-     * @return string|false The evaluated template, or false if the engine is unable to render the template
-     *
      * @throws \InvalidArgumentException
      */
     protected function evaluate(Storage $template, array $parameters = []): string|false
@@ -233,8 +231,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Returns true if the helper if defined.
-     *
-     * @return bool true if the helper is defined, false otherwise
      */
     public function has(string $name): bool
     {
@@ -265,8 +261,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Escapes a string by using the current charset.
-     *
-     * @return mixed The escaped value
      */
     public function escape(mixed $value, string $context = 'html'): mixed
     {
@@ -304,8 +298,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Gets the current charset.
-     *
-     * @return string The current charset
      */
     public function getCharset(): string
     {
@@ -323,8 +315,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Gets an escaper for a given context.
-     *
-     * @return callable A PHP callable
      *
      * @throws \InvalidArgumentException
      */
@@ -378,7 +368,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  *
                  * @param string $value The value to escape
                  *
-                 * @return string the escaped value
+                 * @return string
                  */
                 function ($value) use ($flags) {
                     // Numbers and Boolean values get turned into strings which can cause problems
@@ -393,7 +383,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  *
                  * @param string $value The value to escape
                  *
-                 * @return string the escaped value
+                 * @return string
                  */
                 function ($value) {
                     if ('UTF-8' != $this->getCharset()) {

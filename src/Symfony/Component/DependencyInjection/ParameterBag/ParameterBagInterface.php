@@ -37,8 +37,6 @@ interface ParameterBagInterface
 
     /**
      * Gets the service container parameters.
-     *
-     * @return array An array of parameters
      */
     public function all(): array;
 
@@ -65,8 +63,6 @@ interface ParameterBagInterface
 
     /**
      * Returns true if a parameter name is defined.
-     *
-     * @return bool true if the parameter name is defined, false otherwise
      */
     public function has(string $name): bool;
 

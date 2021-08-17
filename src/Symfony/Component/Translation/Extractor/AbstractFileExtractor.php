@@ -61,7 +61,7 @@ abstract class AbstractFileExtractor
     abstract protected function canBeExtracted(string $file);
 
     /**
-     * @return iterable files to be extracted
+     * @return iterable
      */
     abstract protected function extractFromDirectory(string|array $resource);
 }

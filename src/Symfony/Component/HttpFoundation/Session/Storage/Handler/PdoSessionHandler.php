@@ -251,8 +251,6 @@ class PdoSessionHandler extends AbstractSessionHandler
      * Returns true when the current session exists but expired according to session.gc_maxlifetime.
      *
      * Can be used to distinguish between a new session and one that expired due to inactivity.
-     *
-     * @return bool Whether current session expired
      */
     public function isSessionExpired(): bool
     {

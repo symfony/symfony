@@ -166,8 +166,6 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Gets an option value.
      *
-     * @return mixed The value
-     *
      * @throws \InvalidArgumentException
      */
     public function getOption(string $key): mixed

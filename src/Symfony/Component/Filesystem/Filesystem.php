@@ -99,8 +99,6 @@ class Filesystem
 
     /**
      * Checks the existence of files or directories.
-     *
-     * @return bool true if the file exists, false otherwise
      */
     public function exists(string|iterable $files): bool
     {
@@ -419,8 +417,6 @@ class Filesystem
 
     /**
      * Given an existing path, convert it to a path relative to a given starting path.
-     *
-     * @return string Path of target relative to starting path
      */
     public function makePathRelative(string $endPath, string $startPath): string
     {

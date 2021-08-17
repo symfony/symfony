@@ -23,16 +23,12 @@ interface WorkflowInterface
     /**
      * Returns the object's Marking.
      *
-     * @return Marking The Marking
-     *
      * @throws LogicException
      */
     public function getMarking(object $subject): Marking;
 
     /**
      * Returns true if the transition is enabled.
-     *
-     * @return bool true if the transition is enabled
      */
     public function can(object $subject, string $transitionName): bool;
 
@@ -44,8 +40,6 @@ interface WorkflowInterface
     /**
      * Fire a transition.
      *
-     * @return Marking The new Marking
-     *
      * @throws LogicException If the transition is not applicable
      */
     public function apply(object $subject, string $transitionName, array $context = []): Marking;
@@ -53,7 +47,7 @@ interface WorkflowInterface
     /**
      * Returns all enabled transitions.
      *
-     * @return Transition[] All enabled transitions
+     * @return Transition[]
      */
     public function getEnabledTransitions(object $subject): array;
 

@@ -31,9 +31,6 @@ class AssetNotFoundException extends RuntimeException
         $this->alternatives = $alternatives;
     }
 
-    /**
-     * @return array A list of similar defined names
-     */
     public function getAlternatives(): array
     {
         return $this->alternatives;

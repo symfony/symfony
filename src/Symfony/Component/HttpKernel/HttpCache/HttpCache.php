@@ -113,8 +113,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
     /**
      * Returns an array of events that took place during processing of the last request.
-     *
-     * @return array An array of events
      */
     public function getTraces(): array
     {
@@ -140,8 +138,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
     /**
      * Returns a log message for the events of the last request processing.
-     *
-     * @return string A log message
      */
     public function getLog(): string
     {
@@ -519,8 +515,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
     /**
      * Checks whether the cache entry is "fresh enough" to satisfy the Request.
-     *
-     * @return bool true if the cache entry if fresh enough, false otherwise
      */
     protected function isFreshEnough(Request $request, Response $entry): bool
     {

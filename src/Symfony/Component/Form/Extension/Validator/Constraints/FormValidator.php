@@ -203,7 +203,7 @@ class FormValidator extends ConstraintValidator
     /**
      * Returns the validation groups of the given form.
      *
-     * @return string|GroupSequence|array<string|GroupSequence> The validation groups
+     * @return string|GroupSequence|array<string|GroupSequence>
      */
     private function getValidationGroups(FormInterface $form): string|GroupSequence|array
     {
@@ -244,7 +244,7 @@ class FormValidator extends ConstraintValidator
      *
      * @param string|GroupSequence|array<string|GroupSequence>|callable $groups The validation groups
      *
-     * @return GroupSequence|array<string|GroupSequence> The validation groups
+     * @return GroupSequence|array<string|GroupSequence>
      */
     private static function resolveValidationGroups(string|GroupSequence|array|callable $groups, FormInterface $form): GroupSequence|array
     {

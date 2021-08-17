@@ -973,8 +973,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * Returns the number of form children (implements the \Countable interface).
-     *
-     * @return int The number of embedded form children
      */
     public function count(): int
     {

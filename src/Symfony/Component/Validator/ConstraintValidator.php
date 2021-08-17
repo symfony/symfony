@@ -51,8 +51,6 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * message parameter to a constraint violation. Note that such
      * parameters should usually not be included in messages aimed at
      * non-technical people.
-     *
-     * @return string The type of the value
      */
     protected function formatTypeOf(mixed $value): string
     {
@@ -77,8 +75,6 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * confused by the violation message.
      *
      * @param int $format A bitwise combination of the format constants in this class
-     *
-     * @return string The string representation of the passed value
      */
     protected function formatValue(mixed $value, int $format = 0): string
     {
@@ -139,8 +135,6 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * @param array $values A list of values
      * @param int   $format A bitwise combination of the format
      *                      constants in this class
-     *
-     * @return string The string representation of the value list
      *
      * @see formatValue()
      */

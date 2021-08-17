@@ -49,8 +49,6 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
 
     /**
      * Filters the iterator values.
-     *
-     * @return bool True if the value should be kept, false otherwise
      */
     public function accept(): bool
     {

@@ -82,17 +82,11 @@ class RouterDataCollector extends DataCollector
         return $this->data['redirect'];
     }
 
-    /**
-     * @return string|null The target URL
-     */
     public function getTargetUrl(): ?string
     {
         return $this->data['url'];
     }
 
-    /**
-     * @return string|null The target route
-     */
     public function getTargetRoute(): ?string
     {
         return $this->data['route'];

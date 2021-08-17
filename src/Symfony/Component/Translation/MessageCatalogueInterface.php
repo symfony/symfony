@@ -24,15 +24,11 @@ interface MessageCatalogueInterface
 
     /**
      * Gets the catalogue locale.
-     *
-     * @return string The locale
      */
     public function getLocale(): string;
 
     /**
      * Gets the domains.
-     *
-     * @return array An array of domains
      */
     public function getDomains(): array;
 
@@ -42,8 +38,6 @@ interface MessageCatalogueInterface
      * If $domain is null, it returns all messages.
      *
      * @param string $domain The domain name
-     *
-     * @return array An array of messages
      */
     public function all(string $domain = null): array;
 
@@ -61,8 +55,6 @@ interface MessageCatalogueInterface
      *
      * @param string $id     The message id
      * @param string $domain The domain name
-     *
-     * @return bool true if the message has a translation, false otherwise
      */
     public function has(string $id, string $domain = 'messages'): bool;
 
@@ -71,8 +63,6 @@ interface MessageCatalogueInterface
      *
      * @param string $id     The message id
      * @param string $domain The domain name
-     *
-     * @return bool true if the message has a translation, false otherwise
      */
     public function defines(string $id, string $domain = 'messages'): bool;
 
@@ -81,8 +71,6 @@ interface MessageCatalogueInterface
      *
      * @param string $id     The message id
      * @param string $domain The domain name
-     *
-     * @return string The message translation
      */
     public function get(string $id, string $domain = 'messages'): string;
 
@@ -125,7 +113,7 @@ interface MessageCatalogueInterface
     /**
      * Returns an array of resources loaded to build this collection.
      *
-     * @return ResourceInterface[] An array of resources
+     * @return ResourceInterface[]
      */
     public function getResources(): array;
 

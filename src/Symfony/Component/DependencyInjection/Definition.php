@@ -71,8 +71,6 @@ class Definition
 
     /**
      * Returns all changes tracked for the Definition object.
-     *
-     * @return array An array of changes for this Definition
      */
     public function getChanges(): array
     {
@@ -182,8 +180,6 @@ class Definition
 
     /**
      * Gets the service class.
-     *
-     * @return string|null The service class
      */
     public function getClass(): ?string
     {
@@ -286,8 +282,6 @@ class Definition
 
     /**
      * Gets the arguments to pass to the service constructor/factory method.
-     *
-     * @return array The array of arguments
      */
     public function getArguments(): array
     {
@@ -296,8 +290,6 @@ class Definition
 
     /**
      * Gets an argument to pass to the service constructor/factory method.
-     *
-     * @return mixed The argument value
      *
      * @throws OutOfBoundsException When the argument does not exist
      */
@@ -378,8 +370,6 @@ class Definition
 
     /**
      * Gets the methods to call after service initialization.
-     *
-     * @return array An array of method calls
      */
     public function getMethodCalls(): array
     {
@@ -443,8 +433,6 @@ class Definition
 
     /**
      * Returns all tags.
-     *
-     * @return array An array of tags
      */
     public function getTags(): array
     {
@@ -453,8 +441,6 @@ class Definition
 
     /**
      * Gets a tag by name.
-     *
-     * @return array An array of attributes
      */
     public function getTag(string $name): array
     {
@@ -521,8 +507,6 @@ class Definition
 
     /**
      * Gets the file to require before creating the service.
-     *
-     * @return string|null The full pathname to include
      */
     public function getFile(): ?string
     {

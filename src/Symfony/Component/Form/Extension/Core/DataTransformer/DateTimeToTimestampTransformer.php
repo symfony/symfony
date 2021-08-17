@@ -26,8 +26,6 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
-     * @return int|null A timestamp
-     *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
     public function transform(mixed $dateTime): ?int
@@ -47,8 +45,6 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      * Transforms a timestamp in the configured timezone into a DateTime object.
      *
      * @param string $value A timestamp
-     *
-     * @return \DateTime|null A \DateTime object
      *
      * @throws TransformationFailedException If the given value is not a timestamp
      *                                       or if the given timestamp is invalid

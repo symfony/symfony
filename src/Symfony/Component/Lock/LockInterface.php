@@ -26,8 +26,6 @@ interface LockInterface
      * Acquires the lock. If the lock is acquired by someone else, the parameter `blocking` determines whether or not
      * the call should block until the release of the lock.
      *
-     * @return bool whether or not the lock had been acquired
-     *
      * @throws LockConflictedException If the lock is acquired by someone else in blocking mode
      * @throws LockAcquiringException  If the lock can not be acquired
      */
@@ -58,9 +56,7 @@ interface LockInterface
     public function isExpired(): bool;
 
     /**
-     * Returns the remaining lifetime.
-     *
-     * @return float|null Remaining lifetime in seconds. Null when the lock won't expire.
+     * Returns the remaining lifetime in seconds.
      */
     public function getRemainingLifetime(): ?float;
 }

@@ -21,8 +21,6 @@ interface DataAccessorInterface
     /**
      * Returns the value at the end of the property of the object graph.
      *
-     * @return mixed The value at the end of the property
-     *
      * @throws Exception\AccessException If unable to read from the given form data
      */
     public function getValue(object|array $viewData, FormInterface $form): mixed;
@@ -39,8 +37,6 @@ interface DataAccessorInterface
      *
      * Whenever this method returns true, {@link getValue()} is guaranteed not
      * to throw an exception when called with the same arguments.
-     *
-     * @return bool Whether the value can be read
      */
     public function isReadable(object|array $viewData, FormInterface $form): bool;
 
@@ -49,8 +45,6 @@ interface DataAccessorInterface
      *
      * Whenever this method returns true, {@link setValue()} is guaranteed not
      * to throw an exception when called with the same arguments.
-     *
-     * @return bool Whether the value can be set
      */
     public function isWritable(object|array $viewData, FormInterface $form): bool;
 }

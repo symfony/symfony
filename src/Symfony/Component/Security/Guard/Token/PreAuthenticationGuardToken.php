@@ -54,7 +54,7 @@ class PreAuthenticationGuardToken extends AbstractToken implements GuardTokenInt
      * Returns the user credentials, which might be an array of anything you
      * wanted to put in there (e.g. username, password, favoriteColor).
      *
-     * @return mixed The user credentials
+     * @return mixed
      */
     public function getCredentials()
     {

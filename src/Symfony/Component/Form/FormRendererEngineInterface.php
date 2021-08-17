@@ -114,10 +114,8 @@ interface FormRendererEngineInterface
      * @param int      $hierarchyLevel     The level in the hierarchy at which to start
      *                                     looking. Level 0 indicates the root block, i.e.
      *                                     the first element of $blockNameHierarchy.
-     *
-     * @return int|bool The hierarchy level or false, if no resource was found
      */
-    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): int|bool;
+    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): int|false;
 
     /**
      * Renders a block in the given renderer resource.
@@ -130,7 +128,7 @@ interface FormRendererEngineInterface
      * @param mixed    $resource  The renderer resource
      * @param array    $variables The variables to pass to the template
      *
-     * @return string The HTML markup
+     * @return string
      */
     public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []);
 }

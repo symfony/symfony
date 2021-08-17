@@ -20,8 +20,6 @@ interface FormRendererInterface
 {
     /**
      * Returns the engine used by this renderer.
-     *
-     * @return FormRendererEngineInterface The renderer engine
      */
     public function getEngine(): FormRendererEngineInterface;
 
@@ -41,8 +39,6 @@ interface FormRendererInterface
      *
      * @param FormView $view      The view for which to render the block
      * @param array    $variables The variables to pass to the template
-     *
-     * @return string The HTML markup
      */
     public function renderBlock(FormView $view, string $blockName, array $variables = []): string;
 
@@ -58,8 +54,6 @@ interface FormRendererInterface
      *
      * @param FormView $view      The view for which to render the block
      * @param array    $variables The variables to pass to the template
-     *
-     * @return string The HTML markup
      */
     public function searchAndRenderBlock(FormView $view, string $blockNameSuffix, array $variables = []): string;
 
@@ -77,8 +71,6 @@ interface FormRendererInterface
      *     if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
      *         throw new \RuntimeException('CSRF attack detected.');
      *     }
-     *
-     * @return string A CSRF token
      */
     public function renderCsrfToken(string $tokenId): string;
 
@@ -88,8 +80,6 @@ interface FormRendererInterface
      * Sequences of underscores are replaced by single spaces. The first letter
      * of the resulting string is capitalized, while all other letters are
      * turned to lowercase.
-     *
-     * @return string The humanized text
      */
     public function humanize(string $text): string;
 }

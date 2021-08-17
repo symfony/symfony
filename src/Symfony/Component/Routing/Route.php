@@ -111,9 +111,6 @@ class Route implements \Serializable
         $this->__unserialize(unserialize($serialized));
     }
 
-    /**
-     * @return string The path pattern
-     */
     public function getPath(): string
     {
         return $this->path;
@@ -134,9 +131,6 @@ class Route implements \Serializable
         return $this;
     }
 
-    /**
-     * @return string The host pattern
-     */
     public function getHost(): string
     {
         return $this->host;
@@ -157,7 +151,7 @@ class Route implements \Serializable
      * Returns the lowercased schemes this route is restricted to.
      * So an empty array means that any scheme is allowed.
      *
-     * @return string[] The schemes
+     * @return string[]
      */
     public function getSchemes(): array
     {
@@ -182,8 +176,6 @@ class Route implements \Serializable
 
     /**
      * Checks if a scheme requirement has been set.
-     *
-     * @return bool true if the scheme requirement exists, otherwise false
      */
     public function hasScheme(string $scheme): bool
     {
@@ -194,7 +186,7 @@ class Route implements \Serializable
      * Returns the uppercased HTTP methods this route is restricted to.
      * So an empty array means that any method is allowed.
      *
-     * @return string[] The methods
+     * @return string[]
      */
     public function getMethods(): array
     {
@@ -217,9 +209,6 @@ class Route implements \Serializable
         return $this;
     }
 
-    /**
-     * @return array The options
-     */
     public function getOptions(): array
     {
         return $this->options;
@@ -264,24 +253,18 @@ class Route implements \Serializable
     }
 
     /**
-     * @return mixed The option value or null when not given
+     * Returns the option value or null when not found.
      */
     public function getOption(string $name): mixed
     {
         return $this->options[$name] ?? null;
     }
 
-    /**
-     * @return bool true if the option is set, false otherwise
-     */
     public function hasOption(string $name): bool
     {
         return \array_key_exists($name, $this->options);
     }
 
-    /**
-     * @return array The defaults
-     */
     public function getDefaults(): array
     {
         return $this->defaults;
@@ -314,17 +297,11 @@ class Route implements \Serializable
         return $this;
     }
 
-    /**
-     * @return mixed The default value or null when not given
-     */
     public function getDefault(string $name): mixed
     {
         return $this->defaults[$name] ?? null;
     }
 
-    /**
-     * @return bool true if the default value is set, false otherwise
-     */
     public function hasDefault(string $name): bool
     {
         return \array_key_exists($name, $this->defaults);
@@ -345,9 +322,6 @@ class Route implements \Serializable
         return $this;
     }
 
-    /**
-     * @return array The requirements
-     */
     public function getRequirements(): array
     {
         return $this->requirements;
@@ -380,17 +354,11 @@ class Route implements \Serializable
         return $this;
     }
 
-    /**
-     * @return string|null The regex or null when not given
-     */
     public function getRequirement(string $key): ?string
     {
         return $this->requirements[$key] ?? null;
     }
 
-    /**
-     * @return bool true if a requirement is specified, false otherwise
-     */
     public function hasRequirement(string $key): bool
     {
         return \array_key_exists($key, $this->requirements);
@@ -411,9 +379,6 @@ class Route implements \Serializable
         return $this;
     }
 
-    /**
-     * @return string The condition
-     */
     public function getCondition(): string
     {
         return $this->condition;

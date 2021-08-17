@@ -23,8 +23,6 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
      *
      * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
-     * @return string The formatted date
-     *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
     public function transform(mixed $dateTime): string
@@ -52,8 +50,6 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
      * Transforms a formatted string following RFC 3339 into a normalized date.
      *
      * @param string $rfc3339 Formatted string
-     *
-     * @return \DateTime|null Normalized date
      *
      * @throws TransformationFailedException If the given value is not a string,
      *                                       if the value could not be transformed

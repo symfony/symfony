@@ -217,8 +217,6 @@ class Cookie
 
     /**
      * Gets the name of the cookie.
-     *
-     * @return string The cookie name
      */
     public function getName(): string
     {
@@ -227,8 +225,6 @@ class Cookie
 
     /**
      * Gets the value of the cookie.
-     *
-     * @return string The cookie value
      */
     public function getValue(): string
     {
@@ -237,8 +233,6 @@ class Cookie
 
     /**
      * Gets the raw value of the cookie.
-     *
-     * @return string The cookie value
      */
     public function getRawValue(): string
     {
@@ -247,8 +241,6 @@ class Cookie
 
     /**
      * Gets the expires time of the cookie.
-     *
-     * @return string|null The cookie expires time
      */
     public function getExpiresTime(): ?string
     {
@@ -257,8 +249,6 @@ class Cookie
 
     /**
      * Gets the path of the cookie.
-     *
-     * @return string The cookie path
      */
     public function getPath(): string
     {
@@ -267,8 +257,6 @@ class Cookie
 
     /**
      * Gets the domain of the cookie.
-     *
-     * @return string The cookie domain
      */
     public function getDomain(): string
     {
@@ -277,8 +265,6 @@ class Cookie
 
     /**
      * Returns the secure flag of the cookie.
-     *
-     * @return bool The cookie secure flag
      */
     public function isSecure(): bool
     {
@@ -287,8 +273,6 @@ class Cookie
 
     /**
      * Returns the httponly flag of the cookie.
-     *
-     * @return bool The cookie httponly flag
      */
     public function isHttpOnly(): bool
     {
@@ -297,8 +281,6 @@ class Cookie
 
     /**
      * Returns true if the cookie has expired.
-     *
-     * @return bool true if the cookie has expired, false otherwise
      */
     public function isExpired(): bool
     {
@@ -307,8 +289,6 @@ class Cookie
 
     /**
      * Gets the samesite attribute of the cookie.
-     *
-     * @return string|null The cookie samesite attribute
      */
     public function getSameSite(): ?string
     {

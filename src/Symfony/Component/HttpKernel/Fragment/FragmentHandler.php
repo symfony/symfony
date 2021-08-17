@@ -61,8 +61,6 @@ class FragmentHandler
      *
      *  * ignore_errors: true to return an empty string in case of an error
      *
-     * @return string|null The Response content or null when the Response is streamed
-     *
      * @throws \InvalidArgumentException when the renderer does not exist
      * @throws \LogicException           when no main request is being handled
      */

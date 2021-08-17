@@ -329,8 +329,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      *
      * @param string $basePath   The base path
      * @param string $targetPath The target path
-     *
-     * @return string The relative target path
      */
     public static function getRelativePath(string $basePath, string $targetPath): string
     {

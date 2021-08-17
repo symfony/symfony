@@ -70,8 +70,6 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
-     * @return string Localized date string
-     *
      * @throws TransformationFailedException if the given value is not a \DateTimeInterface
      *                                       or if the date could not be transformed
      */
@@ -98,8 +96,6 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * Transforms a localized date string/array into a normalized date.
      *
      * @param string|array $value Localized date string/array
-     *
-     * @return \DateTime|null Normalized date
      *
      * @throws TransformationFailedException if the given value is not a string,
      *                                       if the date could not be parsed

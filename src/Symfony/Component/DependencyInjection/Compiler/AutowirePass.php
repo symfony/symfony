@@ -185,8 +185,6 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Autowires the constructor or a method.
      *
-     * @return array The autowired arguments
-     *
      * @throws AutowiringFailedException
      */
     private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments, bool $checkAttributes): array

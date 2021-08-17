@@ -36,8 +36,6 @@ class FileTypeFilterIterator extends \FilterIterator
 
     /**
      * Filters the iterator values.
-     *
-     * @return bool true if the value should be kept, false otherwise
      */
     public function accept(): bool
     {

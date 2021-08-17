@@ -147,8 +147,6 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * Returns the constraint whose validation caused the violation.
-     *
-     * @return Constraint|null The constraint or null if it is not known
      */
     public function getConstraint(): ?Constraint
     {

@@ -510,8 +510,6 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the attribute value of the first node of the list.
      *
-     * @return string|null The attribute value or null if the attribute does not exist
-     *
      * @throws \InvalidArgumentException When current node is empty
      */
     public function attr(string $attribute): ?string
@@ -527,8 +525,6 @@ class Crawler implements \Countable, \IteratorAggregate
 
     /**
      * Returns the node name of the first node of the list.
-     *
-     * @return string The node name
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -548,8 +544,6 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @param string|null $default             When not null: the value to return when the current node is empty
      * @param bool        $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
-     *
-     * @return string The node value
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -576,8 +570,6 @@ class Crawler implements \Countable, \IteratorAggregate
      * Returns the first node of the list as HTML.
      *
      * @param string|null $default When not null: the value to return when the current node is empty
-     *
-     * @return string The node html
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -658,8 +650,6 @@ class Crawler implements \Countable, \IteratorAggregate
      * Example:
      *
      *     $crawler->filter('h1 a')->extract(['_text', 'href']);
-     *
-     * @return array An array of extracted values
      */
     public function extract(array $attributes): array
     {
@@ -883,8 +873,6 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      *     echo Crawler::xpathLiteral('a\'b"c');
      *     //prints concat('a', "'", 'b"c')
-     *
-     * @return string Converted string
      */
     public static function xpathLiteral(string $s): string
     {

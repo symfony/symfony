@@ -55,8 +55,6 @@ class Profile
 
     /**
      * Gets the token.
-     *
-     * @return string The token
      */
     public function getToken(): string
     {
@@ -81,8 +79,6 @@ class Profile
 
     /**
      * Returns the parent token.
-     *
-     * @return string|null The parent token
      */
     public function getParentToken(): ?string
     {
@@ -91,8 +87,6 @@ class Profile
 
     /**
      * Returns the IP.
-     *
-     * @return string|null The IP
      */
     public function getIp(): ?string
     {
@@ -106,8 +100,6 @@ class Profile
 
     /**
      * Returns the request method.
-     *
-     * @return string|null The request method
      */
     public function getMethod(): ?string
     {
@@ -121,8 +113,6 @@ class Profile
 
     /**
      * Returns the URL.
-     *
-     * @return string|null The URL
      */
     public function getUrl(): ?string
     {
@@ -134,9 +124,6 @@ class Profile
         $this->url = $url;
     }
 
-    /**
-     * @return int The time
-     */
     public function getTime(): int
     {
         return $this->time ?? 0;

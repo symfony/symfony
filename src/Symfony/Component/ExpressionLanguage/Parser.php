@@ -86,8 +86,6 @@ class Parser
      * variable 'container' can be used in the expression
      * but the compiled code will use 'this'.
      *
-     * @return Node\Node A node tree
-     *
      * @throws SyntaxError
      */
     public function parse(TokenStream $stream, array $names = []): Node\Node

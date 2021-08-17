@@ -56,8 +56,6 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      *
      * The first ResourceChecker that supports a given resource is considered authoritative.
      * Resources with no matching ResourceChecker will silently be ignored and considered fresh.
-     *
-     * @return bool true if the cache is fresh, false otherwise
      */
     public function isFresh(): bool
     {

@@ -30,8 +30,6 @@ class ArrayConverter
      * For example this array('foo.bar' => 'value') will be converted to ['foo' => ['bar' => 'value']].
      *
      * @param array $messages Linear messages array
-     *
-     * @return array Tree-like messages array
      */
     public static function expandToTree(array $messages): array
     {

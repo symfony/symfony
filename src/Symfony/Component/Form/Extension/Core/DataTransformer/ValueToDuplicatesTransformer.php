@@ -28,8 +28,6 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
 
     /**
      * Duplicates the given value through the array.
-     *
-     * @return array The array
      */
     public function transform(mixed $value): array
     {

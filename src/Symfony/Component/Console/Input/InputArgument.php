@@ -55,8 +55,6 @@ class InputArgument
 
     /**
      * Returns the argument name.
-     *
-     * @return string The argument name
      */
     public function getName(): string
     {
@@ -117,8 +115,6 @@ class InputArgument
 
     /**
      * Returns the description text.
-     *
-     * @return string The description text
      */
     public function getDescription(): string
     {

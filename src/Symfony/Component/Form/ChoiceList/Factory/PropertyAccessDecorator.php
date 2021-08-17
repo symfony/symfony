@@ -49,8 +49,6 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
     /**
      * Returns the decorated factory.
-     *
-     * @return ChoiceListFactoryInterface The decorated factory
      */
     public function getDecoratedFactory(): ChoiceListFactoryInterface
     {

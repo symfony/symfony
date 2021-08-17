@@ -79,8 +79,6 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 
     /**
      * Returns the iterated form.
-     *
-     * @return FormInterface The form whose errors are iterated by this object
      */
     public function getForm(): FormInterface
     {
@@ -105,8 +103,6 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 
     /**
      * Returns the current position of the iterator.
-     *
-     * @return int The 0-indexed position
      */
     public function key(): int
     {

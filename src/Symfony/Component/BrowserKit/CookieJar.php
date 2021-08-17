@@ -139,7 +139,7 @@ class CookieJar
     /**
      * Returns not yet expired cookies.
      *
-     * @return Cookie[] An array of cookies
+     * @return Cookie[]
      */
     public function all(): array
     {
@@ -159,8 +159,6 @@ class CookieJar
 
     /**
      * Returns not yet expired cookie values for the given URI.
-     *
-     * @return array An array of cookie values
      */
     public function allValues(string $uri, bool $returnsRawValue = false): array
     {
@@ -196,8 +194,6 @@ class CookieJar
 
     /**
      * Returns not yet expired raw cookie values for the given URI.
-     *
-     * @return array An array of cookie values
      */
     public function allRawValues(string $uri): array
     {

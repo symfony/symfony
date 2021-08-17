@@ -63,8 +63,6 @@ class PathPackage extends Package
 
     /**
      * Returns the base path.
-     *
-     * @return string The base path
      */
     public function getBasePath(): string
     {

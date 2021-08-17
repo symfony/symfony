@@ -43,8 +43,6 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param int|float|null $value Number value
      *
-     * @return string Localized value
-     *
      * @throws TransformationFailedException if the given value is not numeric
      *                                       or if the value can not be transformed
      */
@@ -75,8 +73,6 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * Transforms a localized number into an integer or float.
      *
      * @param string $value The localized value
-     *
-     * @return int|float|null The numeric value
      *
      * @throws TransformationFailedException if the given value is not a string
      *                                       or if the value can not be transformed

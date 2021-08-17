@@ -75,8 +75,6 @@ class UploadedFile extends File
      *
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
-     *
-     * @return string The original name
      */
     public function getClientOriginalName(): string
     {
@@ -88,8 +86,6 @@ class UploadedFile extends File
      *
      * It is extracted from the original file name that was uploaded.
      * Then it should not be considered as a safe value.
-     *
-     * @return string The extension
      */
     public function getClientOriginalExtension(): string
     {
@@ -104,8 +100,6 @@ class UploadedFile extends File
      *
      * For a trusted mime type, use getMimeType() instead (which guesses the mime
      * type based on the file content).
-     *
-     * @return string The mime type
      *
      * @see getMimeType()
      */
@@ -126,8 +120,6 @@ class UploadedFile extends File
      * For a trusted extension, use guessExtension() instead (which guesses
      * the extension based on the guessed mime type for the file).
      *
-     * @return string|null The guessed extension or null if it cannot be guessed
-     *
      * @see guessExtension()
      * @see getClientMimeType()
      */
@@ -145,8 +137,6 @@ class UploadedFile extends File
      *
      * If the upload was successful, the constant UPLOAD_ERR_OK is returned.
      * Otherwise one of the other UPLOAD_ERR_XXX constants is returned.
-     *
-     * @return int The upload error
      */
     public function getError(): int
     {
@@ -154,9 +144,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns whether the file was uploaded successfully.
-     *
-     * @return bool True if the file has been uploaded with HTTP and no error occurred
+     * Returns whether the file has been uploaded with HTTP and no error occurred.
      */
     public function isValid(): bool
     {
@@ -167,8 +155,6 @@ class UploadedFile extends File
 
     /**
      * Moves the file to a new location.
-     *
-     * @return File A File object representing the new file
      *
      * @throws FileException if, for any reason, the file could not have been moved
      */
@@ -258,8 +244,6 @@ class UploadedFile extends File
 
     /**
      * Returns an informative upload error message.
-     *
-     * @return string The error message regarding the specified error code
      */
     public function getErrorMessage(): string
     {

@@ -83,8 +83,6 @@ class RequestContext
 
     /**
      * Gets the base URL.
-     *
-     * @return string The base URL
      */
     public function getBaseUrl(): string
     {
@@ -105,8 +103,6 @@ class RequestContext
 
     /**
      * Gets the path info.
-     *
-     * @return string The path info
      */
     public function getPathInfo(): string
     {
@@ -129,8 +125,6 @@ class RequestContext
      * Gets the HTTP method.
      *
      * The method is always an uppercased string.
-     *
-     * @return string The HTTP method
      */
     public function getMethod(): string
     {
@@ -153,8 +147,6 @@ class RequestContext
      * Gets the HTTP host.
      *
      * The host is always lowercased because it must be treated case-insensitive.
-     *
-     * @return string The HTTP host
      */
     public function getHost(): string
     {
@@ -175,8 +167,6 @@ class RequestContext
 
     /**
      * Gets the HTTP scheme.
-     *
-     * @return string The HTTP scheme
      */
     public function getScheme(): string
     {
@@ -197,8 +187,6 @@ class RequestContext
 
     /**
      * Gets the HTTP port.
-     *
-     * @return int The HTTP port
      */
     public function getHttpPort(): int
     {
@@ -219,8 +207,6 @@ class RequestContext
 
     /**
      * Gets the HTTPS port.
-     *
-     * @return int The HTTPS port
      */
     public function getHttpsPort(): int
     {
@@ -240,9 +226,7 @@ class RequestContext
     }
 
     /**
-     * Gets the query string.
-     *
-     * @return string The query string without the "?"
+     * Gets the query string without the "?".
      */
     public function getQueryString(): string
     {
@@ -264,8 +248,6 @@ class RequestContext
 
     /**
      * Returns the parameters.
-     *
-     * @return array The parameters
      */
     public function getParameters(): array
     {
@@ -288,8 +270,6 @@ class RequestContext
 
     /**
      * Gets a parameter value.
-     *
-     * @return mixed The parameter value or null if nonexistent
      */
     public function getParameter(string $name): mixed
     {
@@ -298,8 +278,6 @@ class RequestContext
 
     /**
      * Checks if a parameter value is set for the given parameter.
-     *
-     * @return bool True if the parameter value is set, false otherwise
      */
     public function hasParameter(string $name): bool
     {

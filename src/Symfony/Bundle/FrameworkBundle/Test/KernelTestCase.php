@@ -52,8 +52,6 @@ abstract class KernelTestCase extends TestCase
     }
 
     /**
-     * @return string The Kernel class name
-     *
      * @throws \RuntimeException
      * @throws \LogicException
      */

@@ -43,8 +43,6 @@ class DataTransformerChain implements DataTransformerInterface
      *
      * @param mixed $value The original value
      *
-     * @return mixed The transformed value
-     *
      * @throws TransformationFailedException
      */
     public function transform(mixed $value): mixed
@@ -66,8 +64,6 @@ class DataTransformerChain implements DataTransformerInterface
      * by this method.
      *
      * @param mixed $value The transformed value
-     *
-     * @return mixed The reverse-transformed value
      *
      * @throws TransformationFailedException
      */

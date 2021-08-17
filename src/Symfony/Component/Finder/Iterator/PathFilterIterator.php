@@ -21,8 +21,6 @@ class PathFilterIterator extends MultiplePcreFilterIterator
 {
     /**
      * Filters the iterator values.
-     *
-     * @return bool true if the value should be kept, false otherwise
      */
     public function accept(): bool
     {
@@ -46,8 +44,6 @@ class PathFilterIterator extends MultiplePcreFilterIterator
      * Use only / as directory separator (on Windows also).
      *
      * @param string $str Pattern: regexp or dirname
-     *
-     * @return string regexp corresponding to a given string or regexp
      */
     protected function toRegex(string $str): string
     {

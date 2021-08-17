@@ -44,8 +44,6 @@ class Section
 
     /**
      * Returns the child section.
-     *
-     * @return self|null The child section or null when none found
      */
     public function get(string $id): ?self
     {
@@ -72,9 +70,6 @@ class Section
         return $session;
     }
 
-    /**
-     * @return string|null The identifier of the section
-     */
     public function getId(): ?string
     {
         return $this->id;
@@ -94,8 +89,6 @@ class Section
 
     /**
      * Starts an event.
-     *
-     * @return StopwatchEvent The event
      */
     public function startEvent(string $name, ?string $category): StopwatchEvent
     {
@@ -117,8 +110,6 @@ class Section
     /**
      * Stops an event.
      *
-     * @return StopwatchEvent The event
-     *
      * @throws \LogicException When the event has not been started
      */
     public function stopEvent(string $name): StopwatchEvent
@@ -133,8 +124,6 @@ class Section
     /**
      * Stops then restarts an event.
      *
-     * @return StopwatchEvent The event
-     *
      * @throws \LogicException When the event has not been started
      */
     public function lap(string $name): StopwatchEvent
@@ -144,8 +133,6 @@ class Section
 
     /**
      * Returns a specific event by name.
-     *
-     * @return StopwatchEvent The event
      *
      * @throws \LogicException When the event is not known
      */

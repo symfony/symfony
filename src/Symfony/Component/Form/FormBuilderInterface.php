@@ -64,8 +64,6 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
 
     /**
      * Creates the form.
-     *
-     * @return FormInterface The form
      */
     public function getForm(): FormInterface;
 }

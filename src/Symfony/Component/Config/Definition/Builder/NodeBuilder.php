@@ -48,8 +48,6 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child array node.
-     *
-     * @return ArrayNodeDefinition The child node
      */
     public function arrayNode(string $name): ArrayNodeDefinition
     {
@@ -58,8 +56,6 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child scalar node.
-     *
-     * @return ScalarNodeDefinition The child node
      */
     public function scalarNode(string $name): ScalarNodeDefinition
     {
@@ -68,8 +64,6 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child Boolean node.
-     *
-     * @return BooleanNodeDefinition The child node
      */
     public function booleanNode(string $name): BooleanNodeDefinition
     {
@@ -78,8 +72,6 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child integer node.
-     *
-     * @return IntegerNodeDefinition The child node
      */
     public function integerNode(string $name): IntegerNodeDefinition
     {
@@ -88,8 +80,6 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child float node.
-     *
-     * @return FloatNodeDefinition The child node
      */
     public function floatNode(string $name): FloatNodeDefinition
     {
@@ -106,8 +96,6 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child variable node.
-     *
-     * @return VariableNodeDefinition The builder of the child node
      */
     public function variableNode(string $name): VariableNodeDefinition
     {
@@ -117,7 +105,7 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Returns the parent node.
      *
-     * @return NodeDefinition&ParentNodeDefinitionInterface The parent node
+     * @return NodeDefinition&ParentNodeDefinitionInterface
      */
     public function end()
     {
@@ -126,8 +114,6 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child node.
-     *
-     * @return NodeDefinition The child node
      *
      * @throws \RuntimeException When the node type is not registered
      * @throws \RuntimeException When the node class is not found
@@ -192,8 +178,6 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Returns the class name of the node definition.
-     *
-     * @return string The node definition class name
      *
      * @throws \RuntimeException When the node type is not registered
      * @throws \RuntimeException When the node class is not found

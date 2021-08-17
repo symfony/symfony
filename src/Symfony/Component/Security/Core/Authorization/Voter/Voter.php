@@ -59,7 +59,7 @@ abstract class Voter implements VoterInterface
      *
      * @param $subject The subject to secure, e.g. an object the user wants to access or any other PHP type
      *
-     * @return bool True if the attribute and subject are supported, false otherwise
+     * @return bool
      */
     abstract protected function supports(string $attribute, mixed $subject);
 

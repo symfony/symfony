@@ -45,8 +45,6 @@ class ExpressionLanguage
 
     /**
      * Compiles an expression source code.
-     *
-     * @return string The compiled PHP source code
      */
     public function compile(Expression|string $expression, array $names = []): string
     {
@@ -55,8 +53,6 @@ class ExpressionLanguage
 
     /**
      * Evaluate an expression.
-     *
-     * @return mixed The result of the evaluation of the expression
      */
     public function evaluate(Expression|string $expression, array $values = []): mixed
     {

@@ -52,8 +52,6 @@ class StopwatchEvent
 
     /**
      * Gets the category.
-     *
-     * @return string The category
      */
     public function getCategory(): string
     {
@@ -61,9 +59,7 @@ class StopwatchEvent
     }
 
     /**
-     * Gets the origin.
-     *
-     * @return float The origin in milliseconds
+     * Gets the origin in milliseconds.
      */
     public function getOrigin(): float
     {
@@ -139,9 +135,7 @@ class StopwatchEvent
     }
 
     /**
-     * Gets the relative time of the start of the first period.
-     *
-     * @return int|float The time (in milliseconds)
+     * Gets the relative time of the start of the first period in milliseconds.
      */
     public function getStartTime(): int|float
     {
@@ -157,9 +151,7 @@ class StopwatchEvent
     }
 
     /**
-     * Gets the relative time of the end of the last period.
-     *
-     * @return int|float The time (in milliseconds)
+     * Gets the relative time of the end of the last period in milliseconds.
      */
     public function getEndTime(): int|float
     {
@@ -169,9 +161,7 @@ class StopwatchEvent
     }
 
     /**
-     * Gets the duration of the events (including all periods).
-     *
-     * @return int|float The duration (in milliseconds)
+     * Gets the duration of the events in milliseconds (including all periods).
      */
     public function getDuration(): int|float
     {
@@ -191,9 +181,7 @@ class StopwatchEvent
     }
 
     /**
-     * Gets the max memory usage of all periods.
-     *
-     * @return int The memory usage (in bytes)
+     * Gets the max memory usage of all periods in bytes.
      */
     public function getMemory(): int
     {
@@ -208,9 +196,7 @@ class StopwatchEvent
     }
 
     /**
-     * Return the current time relative to origin.
-     *
-     * @return float Time in ms
+     * Return the current time relative to origin in milliseconds.
      */
     protected function getNow(): float
     {

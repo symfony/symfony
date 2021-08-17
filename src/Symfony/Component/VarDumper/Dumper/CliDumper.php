@@ -434,8 +434,6 @@ class CliDumper extends AbstractDumper
      * @param string $style The type of style being applied
      * @param string $value The value being styled
      * @param array  $attr  Optional context information
-     *
-     * @return string The value with style decoration
      */
     protected function style(string $style, string $value, array $attr = []): string
     {
@@ -510,9 +508,6 @@ class CliDumper extends AbstractDumper
         return $value;
     }
 
-    /**
-     * @return bool Tells if the current output stream supports ANSI colors or not
-     */
     protected function supportsColors(): bool
     {
         if ($this->outputStream !== static::$defaultOutput) {

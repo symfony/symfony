@@ -91,8 +91,6 @@ interface FormFactoryBuilderInterface
 
     /**
      * Builds and returns the factory.
-     *
-     * @return FormFactoryInterface The form factory
      */
     public function getFormFactory(): FormFactoryInterface;
 }

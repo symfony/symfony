@@ -157,8 +157,6 @@ class ChoiceFormField extends FormField
 
     /**
      * Returns the type of the choice field (radio, select, or checkbox).
-     *
-     * @return string The type
      */
     public function getType(): string
     {
@@ -167,8 +165,6 @@ class ChoiceFormField extends FormField
 
     /**
      * Returns true if the field accepts multiple values.
-     *
-     * @return bool true if the field accepts multiple values, false otherwise
      */
     public function isMultiple(): bool
     {

@@ -54,7 +54,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @see all()
      *
-     * @return \ArrayIterator<string, Route> An \ArrayIterator object for iterating over routes
+     * @return \ArrayIterator<string, Route>
      */
     public function getIterator(): \ArrayIterator
     {
@@ -83,7 +83,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Returns all routes in this collection.
      *
-     * @return Route[] An array of routes
+     * @return Route[]
      */
     public function all(): array
     {
@@ -273,7 +273,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Returns an array of resources loaded to build this collection.
      *
-     * @return ResourceInterface[] An array of resources
+     * @return ResourceInterface[]
      */
     public function getResources(): array
     {

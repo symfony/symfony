@@ -93,8 +93,6 @@ class CompiledRoute implements \Serializable
 
     /**
      * Returns the static prefix.
-     *
-     * @return string The static prefix
      */
     public function getStaticPrefix(): string
     {
@@ -103,8 +101,6 @@ class CompiledRoute implements \Serializable
 
     /**
      * Returns the regex.
-     *
-     * @return string The regex
      */
     public function getRegex(): string
     {
@@ -113,8 +109,6 @@ class CompiledRoute implements \Serializable
 
     /**
      * Returns the host regex.
-     *
-     * @return string|null The host regex or null
      */
     public function getHostRegex(): ?string
     {
@@ -123,8 +117,6 @@ class CompiledRoute implements \Serializable
 
     /**
      * Returns the tokens.
-     *
-     * @return array The tokens
      */
     public function getTokens(): array
     {
@@ -133,8 +125,6 @@ class CompiledRoute implements \Serializable
 
     /**
      * Returns the host tokens.
-     *
-     * @return array The tokens
      */
     public function getHostTokens(): array
     {
@@ -143,8 +133,6 @@ class CompiledRoute implements \Serializable
 
     /**
      * Returns the variables.
-     *
-     * @return array The variables
      */
     public function getVariables(): array
     {
@@ -153,8 +141,6 @@ class CompiledRoute implements \Serializable
 
     /**
      * Returns the path variables.
-     *
-     * @return array The variables
      */
     public function getPathVariables(): array
     {
@@ -163,8 +149,6 @@ class CompiledRoute implements \Serializable
 
     /**
      * Returns the host variables.
-     *
-     * @return array The variables
      */
     public function getHostVariables(): array
     {

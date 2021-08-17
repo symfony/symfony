@@ -50,9 +50,8 @@ class Inline
     /**
      * Converts a YAML string to a PHP value.
      *
-     * @param string|null $value      A YAML string
-     * @param int         $flags      A bit field of PARSE_* constants to customize the YAML parser behavior
-     * @param array       $references Mapping of variable names to values
+     * @param int   $flags      A bit field of PARSE_* constants to customize the YAML parser behavior
+     * @param array $references Mapping of variable names to values
      *
      * @throws ParseException
      */

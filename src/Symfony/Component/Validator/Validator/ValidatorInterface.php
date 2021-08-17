@@ -73,8 +73,6 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * The returned validator collects all violations generated within its
      * context. You can access these violations with the
      * {@link ContextualValidatorInterface::getViolations()} method.
-     *
-     * @return ContextualValidatorInterface The validator for the new context
      */
     public function startContext(): ContextualValidatorInterface;
 
@@ -83,8 +81,6 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *
      * The returned validator adds all generated violations to the given
      * context.
-     *
-     * @return ContextualValidatorInterface The validator for that context
      */
     public function inContext(ExecutionContextInterface $context): ContextualValidatorInterface;
 }

@@ -31,8 +31,6 @@ interface UrlMatcherInterface extends RequestContextAwareInterface
      *
      * @param string $pathinfo The path info to be parsed (raw format, i.e. not urldecoded)
      *
-     * @return array An array of parameters
-     *
      * @throws NoConfigurationException  If no routing configuration could be found
      * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed

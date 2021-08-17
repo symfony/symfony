@@ -22,22 +22,16 @@ interface ResolvedFormTypeInterface
 {
     /**
      * Returns the prefix of the template block name for this type.
-     *
-     * @return string The prefix of the template block name
      */
     public function getBlockPrefix(): string;
 
     /**
      * Returns the parent type.
-     *
-     * @return self|null The parent type or null
      */
     public function getParent(): ?self;
 
     /**
      * Returns the wrapped form type.
-     *
-     * @return FormTypeInterface The wrapped form type
      */
     public function getInnerType(): FormTypeInterface;
 
@@ -52,15 +46,11 @@ interface ResolvedFormTypeInterface
      * Creates a new form builder for this type.
      *
      * @param string $name The name for the builder
-     *
-     * @return FormBuilderInterface The created form builder
      */
     public function createBuilder(FormFactoryInterface $factory, string $name, array $options = []): FormBuilderInterface;
 
     /**
      * Creates a new form view for a form of this type.
-     *
-     * @return FormView The created form view
      */
     public function createView(FormInterface $form, FormView $parent = null): FormView;
 
@@ -85,8 +75,6 @@ interface ResolvedFormTypeInterface
 
     /**
      * Returns the configured options resolver used for this type.
-     *
-     * @return OptionsResolver The options resolver
      */
     public function getOptionsResolver(): OptionsResolver;
 }

@@ -71,8 +71,6 @@ interface UrlGeneratorInterface extends RequestContextAwareInterface
      *
      * The special parameter _fragment will be used as the document fragment suffixed to the final URL.
      *
-     * @return string The generated URL
-     *
      * @throws RouteNotFoundException              If the named route doesn't exist
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because

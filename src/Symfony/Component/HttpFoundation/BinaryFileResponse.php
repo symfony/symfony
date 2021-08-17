@@ -95,8 +95,6 @@ class BinaryFileResponse extends Response
 
     /**
      * Gets the file.
-     *
-     * @return File The file to stream
      */
     public function getFile(): File
     {

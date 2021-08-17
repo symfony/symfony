@@ -89,8 +89,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function has(string $name): bool
     {
@@ -99,8 +97,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Returns the children.
-     *
-     * @return array Always returns an empty array
      */
     public function all(): array
     {
@@ -109,8 +105,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Creates the button.
-     *
-     * @return Button The button
      */
     public function getForm(): Button
     {
@@ -437,8 +431,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function getMapped(): bool
     {
@@ -447,8 +439,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function getByReference(): bool
     {
@@ -457,8 +447,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function getCompound(): bool
     {
@@ -467,8 +455,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Returns the form type used to construct the button.
-     *
-     * @return ResolvedFormTypeInterface The button's type
      */
     public function getType(): ResolvedFormTypeInterface
     {
@@ -477,8 +463,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return array Always returns an empty array
      */
     public function getViewTransformers(): array
     {
@@ -487,8 +471,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return array Always returns an empty array
      */
     public function getModelTransformers(): array
     {
@@ -505,8 +487,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function getRequired(): bool
     {
@@ -515,8 +495,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Returns whether the button is disabled.
-     *
-     * @return bool Whether the button is disabled
      */
     public function getDisabled(): bool
     {
@@ -525,8 +503,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function getErrorBubbling(): bool
     {
@@ -543,8 +519,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Returns additional attributes of the button.
-     *
-     * @return array An array of key-value combinations
      */
     public function getAttributes(): array
     {
@@ -553,8 +527,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Returns whether the attribute with the given name exists.
-     *
-     * @return bool Whether the attribute exists
      */
     public function hasAttribute(string $name): bool
     {
@@ -563,8 +535,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Returns the value of the given attribute.
-     *
-     * @return mixed The attribute value
      */
     public function getAttribute(string $name, mixed $default = null): mixed
     {
@@ -589,8 +559,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function getDataLocked(): bool
     {
@@ -637,8 +605,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function getAutoInitialize(): bool
     {
@@ -647,8 +613,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return bool Always returns false
      */
     public function getInheritData(): bool
     {
@@ -657,8 +621,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Returns all options passed during the construction of the button.
-     *
-     * @return array The passed options
      */
     public function getOptions(): array
     {
@@ -667,8 +629,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Returns whether a specific option exists.
-     *
-     * @return bool Whether the option exists
      */
     public function hasOption(string $name): bool
     {
@@ -677,8 +637,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Returns the value of a specific option.
-     *
-     * @return mixed The option value
      */
     public function getOption(string $name, mixed $default = null): mixed
     {
@@ -697,8 +655,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return int Always returns 0
      */
     public function count(): int
     {
@@ -707,8 +663,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return \EmptyIterator Always returns an empty iterator
      */
     public function getIterator(): \EmptyIterator
     {

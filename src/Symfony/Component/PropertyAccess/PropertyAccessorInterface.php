@@ -66,8 +66,6 @@ interface PropertyAccessorInterface
      *
      * If none of them are found, an exception is thrown.
      *
-     * @return mixed The value at the end of the property path
-     *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      * @throws Exception\AccessException          If a property/index does not exist or is not public
      * @throws Exception\UnexpectedTypeException  If a value within the path is neither object
@@ -81,8 +79,6 @@ interface PropertyAccessorInterface
      * Whenever this method returns true, {@link setValue()} is guaranteed not
      * to throw an exception when called with the same arguments.
      *
-     * @return bool Whether the value can be set
-     *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */
     public function isWritable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool;
@@ -92,8 +88,6 @@ interface PropertyAccessorInterface
      *
      * Whenever this method returns true, {@link getValue()} is guaranteed not
      * to throw an exception when called with the same arguments.
-     *
-     * @return bool Whether the property path can be read
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */

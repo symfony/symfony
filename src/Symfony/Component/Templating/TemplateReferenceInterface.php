@@ -20,8 +20,6 @@ interface TemplateReferenceInterface
 {
     /**
      * Gets the template parameters.
-     *
-     * @return array An array of parameters
      */
     public function all(): array;
 
@@ -37,8 +35,6 @@ interface TemplateReferenceInterface
     /**
      * Gets a template parameter.
      *
-     * @return string The parameter value
-     *
      * @throws \InvalidArgumentException if the parameter name is not supported
      */
     public function get(string $name): string;
@@ -47,8 +43,6 @@ interface TemplateReferenceInterface
      * Returns the path to the template.
      *
      * By default, it just returns the template name.
-     *
-     * @return string A path to the template or a resource
      */
     public function getPath(): string;
 
@@ -56,8 +50,6 @@ interface TemplateReferenceInterface
      * Returns the "logical" template name.
      *
      * The template name acts as a unique identifier for the template.
-     *
-     * @return string The template name
      */
     public function getLogicalName(): string;
 

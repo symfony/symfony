@@ -31,7 +31,7 @@ final class Countries extends ResourceBundle
      *
      * This list only contains "officially assigned ISO 3166-1 alpha-2" country codes.
      *
-     * @return string[] an array of canonical ISO 3166 alpha-2 country codes
+     * @return string[]
      */
     public static function getCountryCodes(): array
     {
@@ -45,7 +45,7 @@ final class Countries extends ResourceBundle
      *
      * This list only contains "officially assigned ISO 3166-1 alpha-3" country codes.
      *
-     * @return string[] an array of canonical ISO 3166 alpha-3 country codes
+     * @return string[]
      */
     public static function getAlpha3Codes(): array
     {

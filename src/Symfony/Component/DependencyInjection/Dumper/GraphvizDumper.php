@@ -53,8 +53,6 @@ class GraphvizDumper extends Dumper
      *  * node.instance: The default options for services that are defined directly by object instances
      *  * node.definition: The default options for services that are defined via service definition instances
      *  * node.missing: The default options for missing services
-     *
-     * @return string The dot representation of the service container
      */
     public function dump(array $options = []): string
     {

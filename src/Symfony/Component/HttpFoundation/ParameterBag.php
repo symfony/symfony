@@ -34,8 +34,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * Returns the parameters.
      *
      * @param string|null $key The name of the parameter to return or null to get them all
-     *
-     * @return array An array of parameters
      */
     public function all(/*string $key = null*/): array
     {
@@ -54,8 +52,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the parameter keys.
-     *
-     * @return array An array of parameter keys
      */
     public function keys(): array
     {
@@ -90,8 +86,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns true if the parameter is defined.
-     *
-     * @return bool true if the parameter exists, false otherwise
      */
     public function has(string $key): bool
     {
@@ -108,8 +102,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the alphabetic characters of the parameter value.
-     *
-     * @return string The filtered value
      */
     public function getAlpha(string $key, string $default = ''): string
     {
@@ -118,8 +110,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the alphabetic characters and digits of the parameter value.
-     *
-     * @return string The filtered value
      */
     public function getAlnum(string $key, string $default = ''): string
     {
@@ -128,8 +118,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the digits of the parameter value.
-     *
-     * @return string The filtered value
      */
     public function getDigits(string $key, string $default = ''): string
     {
@@ -139,8 +127,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the parameter value converted to integer.
-     *
-     * @return int The filtered value
      */
     public function getInt(string $key, int $default = 0): int
     {
@@ -149,8 +135,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the parameter value converted to boolean.
-     *
-     * @return bool The filtered value
      */
     public function getBoolean(string $key, bool $default = false): bool
     {

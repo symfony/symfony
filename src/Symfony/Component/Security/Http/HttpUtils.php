@@ -138,7 +138,7 @@ class HttpUtils
      *
      * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
-     * @return string An absolute URL
+     * @return string
      *
      * @throws \LogicException
      */

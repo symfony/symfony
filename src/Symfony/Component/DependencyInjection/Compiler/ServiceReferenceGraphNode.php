@@ -54,8 +54,6 @@ class ServiceReferenceGraphNode
 
     /**
      * Checks if the value of this node is a Definition.
-     *
-     * @return bool True if the value is a Definition instance
      */
     public function isDefinition(): bool
     {
@@ -92,8 +90,6 @@ class ServiceReferenceGraphNode
 
     /**
      * Returns the value of this Node.
-     *
-     * @return mixed The value
      */
     public function getValue(): mixed
     {

@@ -35,8 +35,6 @@ class Compiler implements ResetInterface
 
     /**
      * Gets the current PHP code after compilation.
-     *
-     * @return string The PHP code
      */
     public function getSource(): string
     {

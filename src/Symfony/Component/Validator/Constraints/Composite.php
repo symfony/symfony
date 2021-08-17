@@ -129,8 +129,6 @@ abstract class Composite extends Constraint
 
     /**
      * Returns the name of the property that contains the nested constraints.
-     *
-     * @return string The property name
      */
     abstract protected function getCompositeOption(): string;
 

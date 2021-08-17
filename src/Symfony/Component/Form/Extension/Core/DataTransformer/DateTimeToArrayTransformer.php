@@ -45,8 +45,6 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
-     * @return array Localized date
-     *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
     public function transform(mixed $dateTime): array
@@ -99,8 +97,6 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * Transforms a localized date into a normalized date.
      *
      * @param array $value Localized date
-     *
-     * @return \DateTime|null Normalized date
      *
      * @throws TransformationFailedException If the given value is not an array,
      *                                       if the value could not be transformed

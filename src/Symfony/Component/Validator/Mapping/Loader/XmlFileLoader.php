@@ -53,7 +53,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[] The classes names
+     * @return string[]
      */
     public function getMappedClasses(): array
     {
@@ -102,8 +102,6 @@ class XmlFileLoader extends FileLoader
      * Parses a collection of "value" XML nodes.
      *
      * @param \SimpleXMLElement $nodes The XML nodes
-     *
-     * @return array The values
      */
     protected function parseValues(\SimpleXMLElement $nodes): array
     {
@@ -136,8 +134,6 @@ class XmlFileLoader extends FileLoader
      * Parses a collection of "option" XML nodes.
      *
      * @param \SimpleXMLElement $nodes The XML nodes
-     *
-     * @return array The options
      */
     protected function parseOptions(\SimpleXMLElement $nodes): array
     {
@@ -167,8 +163,6 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Loads the XML class descriptions from the given file.
-     *
-     * @return \SimpleXMLElement The class descriptions
      *
      * @throws MappingException If the file could not be loaded
      */

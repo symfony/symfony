@@ -54,7 +54,7 @@ class WebProfilerBundleKernel extends Kernel
         ]);
     }
 
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sys_get_temp_dir().'/cache-'.spl_object_hash($this);
     }

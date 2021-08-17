@@ -240,7 +240,9 @@ class ContextListener extends AbstractListener
                 if ($this->hasUserChanged($user, $newToken)) {
                     $userDeauthenticated = true;
                     // @deprecated since Symfony 5.4
-                    $newToken->setAuthenticated(false, false);
+                    if (method_exists($newToken, 'setAuthenticated')) {
+                        $newToken->setAuthenticated(false, false);
+                    }
 
                     if (null !== $this->logger) {
                         // @deprecated since Symfony 5.3, change to $refreshedUser->getUserIdentifier() in 6.0

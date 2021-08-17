@@ -177,20 +177,20 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
     /**
      * {@inheritdoc}
      */
-    public function getSalt()
+    public function getSalt(): string
     {
-        return null;
+        return '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         return $this->username;
     }
@@ -198,7 +198,7 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonExpired()
+    public function isAccountNonExpired(): bool
     {
         return $this->accountNonExpired;
     }
@@ -206,7 +206,7 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonLocked()
+    public function isAccountNonLocked(): bool
     {
         return $this->accountNonLocked;
     }
@@ -214,7 +214,7 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
     /**
      * {@inheritdoc}
      */
-    public function isCredentialsNonExpired()
+    public function isCredentialsNonExpired(): bool
     {
         return $this->credentialsNonExpired;
     }
@@ -222,7 +222,7 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
     /**
      * {@inheritdoc}
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->enabled;
     }
@@ -230,7 +230,7 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
     /**
      * {@inheritdoc}
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 }

@@ -48,7 +48,7 @@ class UserPasswordHasher implements UserPasswordHasherInterface
         if ($user instanceof LegacyPasswordAuthenticatedUserInterface) {
             $salt = $user->getSalt();
         } elseif ($user instanceof UserInterface) {
-            $salt = $user->getSalt();
+            $salt = method_exists($user, 'getSalt') ? $user->getSalt() : null;
 
             if ($salt) {
                 trigger_deprecation('symfony/password-hasher', '5.3', 'Returning a string from "getSalt()" without implementing the "%s" interface is deprecated, the "%s" class should implement it.', LegacyPasswordAuthenticatedUserInterface::class, get_debug_type($user));

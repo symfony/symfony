@@ -123,7 +123,10 @@ class KernelBrowser extends HttpKernelBrowser
         }
 
         $token = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
-        $token->setAuthenticated(true, false);
+        // @deprecated since Symfony 5.4
+        if (method_exists($token, 'isAuthenticated')) {
+            $token->setAuthenticated(true, false);
+        }
 
         $container = $this->getContainer();
         $container->get('security.untracked_token_storage')->setToken($token);

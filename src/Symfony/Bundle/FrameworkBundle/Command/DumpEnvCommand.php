@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -54,8 +55,9 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var KernelInterface $kernel */
-        $kernel = $this->getApplication()->getKernel();
+        /** @var Application $application */
+        $application = $this->getApplication();
+        $kernel = $application->getKernel();
 
         if ($env = $input->getArgument('env')) {
             $_SERVER['APP_ENV'] = $env;
@@ -97,11 +99,7 @@ EOF;
         putenv('SYMFONY_DOTENV_VARS='.$_SERVER['SYMFONY_DOTENV_VARS']);
 
         try {
-            if (method_exists(Dotenv::class, 'usePutenv')) {
-                $dotenv = new Dotenv();
-            } else {
-                $dotenv = new Dotenv(false);
-            }
+            $dotenv = new Dotenv();
 
             if (!$env && file_exists($p = "$path.local")) {
                 $env = $_ENV['APP_ENV'] = $dotenv->parse(file_get_contents($p), $p)['APP_ENV'] ?? null;
@@ -111,26 +109,7 @@ EOF;
                 throw new \RuntimeException('Please provide the name of the environment either by passing it as command line argument or by defining the "APP_ENV" variable in the ".env.local" file.');
             }
 
-            if (method_exists($dotenv, 'loadEnv')) {
-                $dotenv->loadEnv($path);
-            } else {
-                // fallback code in case your Dotenv component is not 4.2 or higher (when loadEnv() was added)
-                $dotenv->load(file_exists($path) || !file_exists($p = "$path.dist") ? $path : $p);
-
-                if ('test' !== $env && file_exists($p = "$path.local")) {
-                    $dotenv->load($p);
-                }
-
-                if (file_exists($p = "$path.$env")) {
-                    $dotenv->load($p);
-                }
-
-                if (file_exists($p = "$path.$env.local")) {
-                    $dotenv->load($p);
-                }
-            }
-
-            unset($_ENV['SYMFONY_DOTENV_VARS']);
+            $dotenv->loadEnv($path);
             $env = $_ENV;
         } finally {
             [$_SERVER, $_ENV] = $globalsBackup;

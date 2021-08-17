@@ -41,7 +41,7 @@ final class Inflector
      *
      * @param string $plural A word in plural form
      *
-     * @return string|array The singular form or an array of possible singular forms
+     * @return string|array
      */
     public static function singularize(string $plural)
     {
@@ -60,7 +60,7 @@ final class Inflector
      *
      * @param string $singular A word in singular form
      *
-     * @return string|array The plural form or an array of possible plural forms
+     * @return string|array
      */
     public static function pluralize(string $singular)
     {

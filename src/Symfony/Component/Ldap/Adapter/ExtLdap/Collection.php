@@ -65,6 +65,7 @@ class Collection implements CollectionInterface
     /**
      * @return \Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         if (0 === $this->count()) {
@@ -91,6 +92,7 @@ class Collection implements CollectionInterface
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         $this->toArray();
@@ -101,6 +103,7 @@ class Collection implements CollectionInterface
     /**
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         $this->toArray();
@@ -111,6 +114,7 @@ class Collection implements CollectionInterface
     /**
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->toArray();
@@ -121,6 +125,7 @@ class Collection implements CollectionInterface
     /**
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->toArray();

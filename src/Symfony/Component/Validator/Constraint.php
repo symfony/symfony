@@ -61,7 +61,7 @@ abstract class Constraint
     /**
      * Returns the name of the given error code.
      *
-     * @return string The name of the error code
+     * @return string
      *
      * @throws InvalidArgumentException If the error code does not exist
      */
@@ -201,7 +201,7 @@ abstract class Constraint
      * this method will be called at most once per constraint instance and
      * option name.
      *
-     * @return mixed The value of the option
+     * @return mixed
      *
      * @throws InvalidOptionsException If an invalid option name is given
      */

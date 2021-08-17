@@ -158,7 +158,7 @@ class UserPasswordHasherTest extends TestCase
 
         $passwordHasher = new UserPasswordHasher($mockPasswordHasherFactory);
 
-        \Closure::bind(function () use ($passwordHasher) { $this->password = $passwordHasher->hashPassword($this, 'foo', 'salt'); }, $user, User::class)();
+        \Closure::bind(function () use ($passwordHasher) { $this->password = $passwordHasher->hashPassword($this, 'foo', 'salt'); }, $user, class_exists(User::class) ? User::class : InMemoryUser::class)();
         $this->assertFalse($passwordHasher->needsRehash($user));
         $this->assertTrue($passwordHasher->needsRehash($user));
         $this->assertFalse($passwordHasher->needsRehash($user));

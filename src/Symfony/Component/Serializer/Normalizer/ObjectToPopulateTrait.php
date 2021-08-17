@@ -21,7 +21,7 @@ trait ObjectToPopulateTrait
      * @param string|null $key   They in which to look for the object to populate.
      *                           Keeps backwards compatibility with `AbstractNormalizer`.
      *
-     * @return object|null an object if things check out, null otherwise
+     * @return object|null
      */
     protected function extractObjectToPopulate(string $class, array $context, string $key = null): ?object
     {

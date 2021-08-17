@@ -116,12 +116,23 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
         // no password credentials
         yield [new SelfValidatingPassport(new UserBadge('test'), [new LdapBadge('app.ldap')])];
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyWrongPassport()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('LDAP authentication requires a passport containing a user and password credentials, authenticator "'.TestAuthenticator::class.'" does not fulfill these requirements.');
 
         // no user passport
         $passport = $this->createMock(PassportInterface::class);
         $passport->expects($this->any())->method('hasBadge')->with(LdapBadge::class)->willReturn(true);
         $passport->expects($this->any())->method('getBadge')->with(LdapBadge::class)->willReturn(new LdapBadge('app.ldap'));
-        yield [$passport];
+
+        $listener = $this->createListener();
+        $listener->onCheckPassport(new CheckPassportEvent(new TestAuthenticator(), $passport));
     }
 
     public function testEmptyPasswordShouldThrowAnException()
@@ -147,7 +158,12 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function testQueryForDn()
     {
-        $collection = new \ArrayIterator([new Entry('')]);
+        $collection = new class([new Entry('')]) extends \ArrayObject implements CollectionInterface {
+            public function toArray(): array
+            {
+                return $this->getArrayCopy();
+            }
+        };
 
         $query = $this->createMock(QueryInterface::class);
         $query->expects($this->once())->method('execute')->willReturn($collection);
@@ -226,6 +242,10 @@ if (interface_exists(AuthenticatorInterface::class)) {
         }
 
         public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+        {
+        }
+
+        public function createToken(Passport $passport, string $firewallName): TokenInterface
         {
         }
     }

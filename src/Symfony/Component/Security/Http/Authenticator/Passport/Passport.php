@@ -23,10 +23,9 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\Credentia
  */
 class Passport implements UserPassportInterface
 {
-    use PassportTrait;
-
     protected $user;
 
+    private $badges = [];
     private $attributes = [];
 
     /**
@@ -57,6 +56,34 @@ class Passport implements UserPassportInterface
         }
 
         return $this->user;
+    }
+
+    /**
+     * @return $this
+     */
+    public function addBadge(BadgeInterface $badge): PassportInterface
+    {
+        $this->badges[\get_class($badge)] = $badge;
+
+        return $this;
+    }
+
+    public function hasBadge(string $badgeFqcn): bool
+    {
+        return isset($this->badges[$badgeFqcn]);
+    }
+
+    public function getBadge(string $badgeFqcn): ?BadgeInterface
+    {
+        return $this->badges[$badgeFqcn] ?? null;
+    }
+
+    /**
+     * @return array<class-string<BadgeInterface>, BadgeInterface>
+     */
+    public function getBadges(): array
+    {
+        return $this->badges;
     }
 
     /**

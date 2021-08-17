@@ -50,7 +50,7 @@ class HelperSet implements \IteratorAggregate
     /**
      * Returns true if the helper if defined.
      *
-     * @return bool true if the helper is defined, false otherwise
+     * @return bool
      */
     public function has(string $name)
     {
@@ -60,7 +60,7 @@ class HelperSet implements \IteratorAggregate
     /**
      * Gets a helper value.
      *
-     * @return HelperInterface The helper instance
+     * @return HelperInterface
      *
      * @throws InvalidArgumentException if the helper is not defined
      */
@@ -81,7 +81,7 @@ class HelperSet implements \IteratorAggregate
     /**
      * Gets the command associated with this helper set.
      *
-     * @return Command A Command instance
+     * @return Command
      */
     public function getCommand()
     {

@@ -38,6 +38,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface as GuardAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
 class SecurityExtensionTest extends TestCase
@@ -841,7 +842,7 @@ class TestAuthenticator implements AuthenticatorInterface
     {
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
     }
 
@@ -854,6 +855,10 @@ class TestAuthenticator implements AuthenticatorInterface
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    {
+    }
+
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
     }
 }

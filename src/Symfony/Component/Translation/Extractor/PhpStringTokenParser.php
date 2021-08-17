@@ -65,7 +65,7 @@ class PhpStringTokenParser
      *
      * @param string $str String token content
      *
-     * @return string The parsed string
+     * @return string
      */
     public static function parse(string $str)
     {
@@ -91,7 +91,7 @@ class PhpStringTokenParser
      * @param string      $str   String without quotes
      * @param string|null $quote Quote type
      *
-     * @return string String with escape sequences parsed
+     * @return string
      */
     public static function parseEscapeSequences(string $str, string $quote = null)
     {
@@ -125,7 +125,7 @@ class PhpStringTokenParser
      * @param string $startToken Doc string start token content (<<<SMTHG)
      * @param string $str        String token content
      *
-     * @return string Parsed string
+     * @return string
      */
     public static function parseDocString(string $startToken, string $str)
     {

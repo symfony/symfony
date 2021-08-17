@@ -92,7 +92,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * Gets the request events.
      *
-     * @return StopwatchEvent[] The request events
+     * @return StopwatchEvent[]
      */
     public function getEvents()
     {
@@ -102,7 +102,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * Gets the request elapsed time.
      *
-     * @return float The elapsed time
+     * @return float
      */
     public function getDuration()
     {
@@ -120,7 +120,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
      *
      * This is the time spent until the beginning of the request handling.
      *
-     * @return float The elapsed time
+     * @return float
      */
     public function getInitTime()
     {
@@ -142,7 +142,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     }
 
     /**
-     * @return bool whether or not the stopwatch component is installed
+     * @return bool
      */
     public function isStopwatchInstalled()
     {

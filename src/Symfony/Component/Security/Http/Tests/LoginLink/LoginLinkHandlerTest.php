@@ -203,6 +203,51 @@ class LoginLinkHandlerTest extends TestCase
     }
 }
 
+class TestLoginLinkHandlerUser implements UserInterface
+{
+    public $username;
+    public $emailProperty;
+    public $passwordProperty;
+    public $lastAuthenticatedAt;
+
+    public function __construct($username, $emailProperty, $passwordProperty, $lastAuthenticatedAt = null)
+    {
+        $this->username = $username;
+        $this->emailProperty = $emailProperty;
+        $this->passwordProperty = $passwordProperty;
+        $this->lastAuthenticatedAt = $lastAuthenticatedAt;
+    }
+
+    public function getRoles(): array
+    {
+        return [];
+    }
+
+    public function getPassword(): string
+    {
+        return $this->passwordProperty;
+    }
+
+    public function getSalt(): string
+    {
+        return '';
+    }
+
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    public function eraseCredentials(): void
+    {
+    }
+}
+
 class TestLoginLinkHandlerUserProvider implements UserProviderInterface
 {
     private $users = [];
@@ -226,58 +271,13 @@ class TestLoginLinkHandlerUserProvider implements UserProviderInterface
         return clone $this->users[$userIdentifier];
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): TestLoginLinkHandlerUser
     {
         return $this->users[$username];
     }
 
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return TestLoginLinkHandlerUser::class === $class;
-    }
-}
-
-class TestLoginLinkHandlerUser implements UserInterface
-{
-    public $username;
-    public $emailProperty;
-    public $passwordProperty;
-    public $lastAuthenticatedAt;
-
-    public function __construct($username, $emailProperty, $passwordProperty, $lastAuthenticatedAt = null)
-    {
-        $this->username = $username;
-        $this->emailProperty = $emailProperty;
-        $this->passwordProperty = $passwordProperty;
-        $this->lastAuthenticatedAt = $lastAuthenticatedAt;
-    }
-
-    public function getRoles()
-    {
-        return [];
-    }
-
-    public function getPassword()
-    {
-        return $this->passwordProperty;
-    }
-
-    public function getSalt()
-    {
-        return '';
-    }
-
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    public function getUserIdentifier()
-    {
-        return $this->username;
-    }
-
-    public function eraseCredentials()
-    {
     }
 }

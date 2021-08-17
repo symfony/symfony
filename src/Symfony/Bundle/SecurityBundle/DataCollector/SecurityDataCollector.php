@@ -104,7 +104,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $impersonatorUser = null;
             if ($token instanceof SwitchUserToken) {
                 $originalToken = $token->getOriginalToken();
-                // @deprecated since 5.3, change to $originalToken->getUserIdentifier() in 6.0
+                // @deprecated since Symfony 5.3, change to $originalToken->getUserIdentifier() in 6.0
                 $impersonatorUser = method_exists($originalToken, 'getUserIdentifier') ? $originalToken->getUserIdentifier() : $originalToken->getUsername();
             }
 
@@ -127,14 +127,14 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
             $this->data = [
                 'enabled' => true,
-                'authenticated' => $token->isAuthenticated(false),
+                'authenticated' => method_exists($token, 'isAuthenticated') ? $token->isAuthenticated(false) : true,
                 'impersonated' => null !== $impersonatorUser,
                 'impersonator_user' => $impersonatorUser,
                 'impersonation_exit_path' => null,
                 'token' => $token,
                 'token_class' => $this->hasVarDumper ? new ClassStub(\get_class($token)) : \get_class($token),
                 'logout_url' => $logoutUrl,
-                // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+                // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
                 'user' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername(),
                 'roles' => $assignedRoles,
                 'inherited_roles' => array_unique($inheritedRoles),
@@ -184,7 +184,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             if (null !== $firewallConfig) {
                 $this->data['firewall'] = [
                     'name' => $firewallConfig->getName(),
-                    'allows_anonymous' => $firewallConfig->allowsAnonymous(),
+                    'allows_anonymous' => $this->authenticatorManagerEnabled ? false : $firewallConfig->allowsAnonymous(),
                     'request_matcher' => $firewallConfig->getRequestMatcher(),
                     'security_enabled' => $firewallConfig->isSecurityEnabled(),
                     'stateless' => $firewallConfig->isStateless(),
@@ -233,7 +233,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Checks if security is enabled.
      *
-     * @return bool true if security is enabled, false otherwise
+     * @return bool
      */
     public function isEnabled()
     {
@@ -243,7 +243,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Gets the user.
      *
-     * @return string The user
+     * @return string
      */
     public function getUser()
     {
@@ -274,7 +274,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      * Checks if the data contains information about inherited roles. Still the inherited
      * roles can be an empty array.
      *
-     * @return bool true if the profile was contains inherited role information
+     * @return bool
      */
     public function supportsRoleHierarchy()
     {
@@ -284,7 +284,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Checks if the user is authenticated or not.
      *
-     * @return bool true if the user is authenticated, false otherwise
+     * @return bool
      */
     public function isAuthenticated()
     {
@@ -318,7 +318,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Get the class name of the security token.
      *
-     * @return string|Data|null The token
+     * @return string|Data|null
      */
     public function getTokenClass()
     {
@@ -338,7 +338,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Get the logout URL.
      *
-     * @return string|null The logout URL
+     * @return string|null
      */
     public function getLogoutUrl()
     {

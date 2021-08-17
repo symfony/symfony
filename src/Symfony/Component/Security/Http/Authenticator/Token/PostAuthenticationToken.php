@@ -35,8 +35,10 @@ class PostAuthenticationToken extends AbstractToken
         $this->firewallName = $firewallName;
 
         // @deprecated since Symfony 5.4
-        // this token is meant to be used after authentication success, so it is always authenticated
-        $this->setAuthenticated(true, false);
+        if (method_exists($this, 'setAuthenticated')) {
+            // this token is meant to be used after authentication success, so it is always authenticated
+            $this->setAuthenticated(true, false);
+        }
     }
 
     /**

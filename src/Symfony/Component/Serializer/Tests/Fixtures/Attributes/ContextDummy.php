@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Context;
 class ContextDummy extends ContextDummyParent
 {
     #[Context(['foo' => 'value', 'bar' => 'value', 'nested' => [
-        'nested_key' => 'nested_value'
+        'nested_key' => 'nested_value',
     ], 'array' => ['first', 'second']])]
     #[Context(context: ['bar' => 'value_for_group_a'], groups: ['a'])]
     public $foo;

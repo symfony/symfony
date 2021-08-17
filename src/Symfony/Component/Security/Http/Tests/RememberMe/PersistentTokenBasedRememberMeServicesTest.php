@@ -28,6 +28,9 @@ use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
+/**
+ * @group legacy
+ */
 class PersistentTokenBasedRememberMeServicesTest extends TestCase
 {
     public static function setUpBeforeClass(): void

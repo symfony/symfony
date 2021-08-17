@@ -33,7 +33,7 @@ interface ProfilerStorageInterface
      * @param int|null $start The start date to search from
      * @param int|null $end   The end date to search to
      *
-     * @return array An array of tokens
+     * @return array
      */
     public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null): array;
 
@@ -42,14 +42,14 @@ interface ProfilerStorageInterface
      *
      * The method returns false if the token does not exist in the storage.
      *
-     * @return Profile|null The profile associated with token
+     * @return Profile|null
      */
     public function read(string $token): ?Profile;
 
     /**
      * Saves a Profile.
      *
-     * @return bool Write operation successful
+     * @return bool
      */
     public function write(Profile $profile): bool;
 

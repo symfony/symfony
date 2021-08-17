@@ -28,7 +28,7 @@ class Expression
     /**
      * Gets the expression.
      *
-     * @return string The expression
+     * @return string
      */
     public function __toString()
     {

@@ -496,7 +496,7 @@ class ConnectionTest extends TestCase
         $delayExchange = $this->createMock(\AMQPExchange::class);
         $delayExchange->expects($this->once())
             ->method('publish')
-            ->with('{}', 'delay_messages__5000_delay', AMQP_NOPARAM, [
+            ->with('{}', 'delay_messages__5000_delay', \AMQP_NOPARAM, [
                 'headers' => ['x-some-headers' => 'foo'],
                 'delivery_mode' => 2,
                 'timestamp' => time(),
@@ -511,7 +511,7 @@ class ConnectionTest extends TestCase
         $delayExchange = $this->createMock(\AMQPExchange::class);
         $delayExchange->expects($this->once())
             ->method('publish')
-            ->with('{}', 'delay_messages__5000_retry', AMQP_NOPARAM);
+            ->with('{}', 'delay_messages__5000_retry', \AMQP_NOPARAM);
         $connection = $this->createDelayOrRetryConnection($delayExchange, '', 'delay_messages__5000_retry');
 
         $amqpEnvelope = $this->createMock(\AMQPEnvelope::class);

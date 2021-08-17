@@ -42,7 +42,7 @@ interface PassportInterface
     public function getBadge(string $badgeFqcn): ?BadgeInterface;
 
     /**
-     * @return array<class-string<BadgeInterface>, BadgeInterface> An array of badge instances indexed by class name
+     * @return array<class-string<BadgeInterface>, BadgeInterface>
      */
     public function getBadges(): array;
 }

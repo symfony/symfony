@@ -76,7 +76,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Retrieves the name of the attribute which value should be used as key.
      *
-     * @return string|null The name of the attribute
+     * @return string|null
      */
     public function getKeyAttribute()
     {
@@ -145,7 +145,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Retrieves the prototype.
      *
-     * @return PrototypeNodeInterface The prototype
+     * @return PrototypeNodeInterface
      */
     public function getPrototype()
     {
@@ -338,7 +338,7 @@ class PrototypedArrayNode extends ArrayNode
      * Now, the key becomes 'name001' and the child node becomes 'value001' and
      * the prototype of child node 'name001' should be a ScalarNode instead of an ArrayNode instance.
      *
-     * @return mixed The prototype instance
+     * @return mixed
      */
     private function getPrototypeForChild(string $key)
     {

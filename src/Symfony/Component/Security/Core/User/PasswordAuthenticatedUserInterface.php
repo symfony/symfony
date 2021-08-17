@@ -24,7 +24,7 @@ interface PasswordAuthenticatedUserInterface
      *
      * Usually on authentication, a plain-text password will be compared to this value.
      *
-     * @return string|null The hashed password or null (if not set or erased)
+     * @return string|null
      */
     public function getPassword(): ?string;
 }

@@ -42,11 +42,11 @@ abstract class AbstractTokenProcessor
 
         if (null !== $token = $this->getToken()) {
             $record['extra'][$this->getKey()] = [
-                'authenticated' => $token->isAuthenticated(false), // @deprecated since Symfony 5.4, always true in 6.0
+                'authenticated' => method_exists($token, 'isAuthenticated') ? $token->isAuthenticated(false) : true, // @deprecated since Symfony 5.4, always true in 6.0
                 'roles' => $token->getRoleNames(),
             ];
 
-            // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
             if (method_exists($token, 'getUserIdentifier')) {
                 $record['extra'][$this->getKey()]['username'] = $record['extra'][$this->getKey()]['user_identifier'] = $token->getUserIdentifier();
             } else {

@@ -25,7 +25,7 @@ interface LegacyPasswordHasherInterface extends PasswordHasherInterface
     /**
      * Hashes a plain password.
      *
-     * @return string The hashed password
+     * @return string
      *
      * @throws InvalidPasswordException If the plain password is invalid, e.g. excessively long
      */

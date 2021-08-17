@@ -56,7 +56,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     /**
      * Return an instance of SplFileInfo with support for relative paths.
      *
-     * @return SplFileInfo File information
+     * @return SplFileInfo
      */
     #[\ReturnTypeWillChange]
     public function current()
@@ -127,7 +127,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     /**
      * Checks if the stream is rewindable.
      *
-     * @return bool true when the stream is rewindable, false otherwise
+     * @return bool
      */
     public function isRewindable()
     {

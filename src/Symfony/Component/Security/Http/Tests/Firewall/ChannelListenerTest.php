@@ -12,10 +12,9 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Http\AccessMapInterface;
@@ -41,15 +40,9 @@ class ChannelListenerTest extends TestCase
             ->willReturn([[], 'http'])
         ;
 
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint
-            ->expects($this->never())
-            ->method('start')
-        ;
-
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $listener = new ChannelListener($accessMap, $entryPoint);
+        $listener = new ChannelListener($accessMap);
         $listener($event);
 
         $this->assertNull($event->getResponse());
@@ -72,15 +65,9 @@ class ChannelListenerTest extends TestCase
             ->willReturn([[], 'https'])
         ;
 
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint
-            ->expects($this->never())
-            ->method('start')
-        ;
-
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $listener = new ChannelListener($accessMap, $entryPoint);
+        $listener = new ChannelListener($accessMap);
         $listener($event);
 
         $this->assertNull($event->getResponse());
@@ -95,8 +82,6 @@ class ChannelListenerTest extends TestCase
             ->willReturn(false)
         ;
 
-        $response = new Response();
-
         $accessMap = $this->createMock(AccessMapInterface::class);
         $accessMap
             ->expects($this->any())
@@ -105,20 +90,14 @@ class ChannelListenerTest extends TestCase
             ->willReturn([[], 'https'])
         ;
 
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint
-            ->expects($this->once())
-            ->method('start')
-            ->with($this->equalTo($request))
-            ->willReturn($response)
-        ;
-
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $listener = new ChannelListener($accessMap, $entryPoint);
+        $listener = new ChannelListener($accessMap);
         $listener($event);
 
-        $this->assertSame($response, $event->getResponse());
+        $response = $event->getResponse();
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertEquals('https://', $response->getTargetUrl());
     }
 
     public function testHandleWithSecuredRequestAndHttpChannel()
@@ -130,8 +109,6 @@ class ChannelListenerTest extends TestCase
             ->willReturn(true)
         ;
 
-        $response = new Response();
-
         $accessMap = $this->createMock(AccessMapInterface::class);
         $accessMap
             ->expects($this->any())
@@ -140,20 +117,14 @@ class ChannelListenerTest extends TestCase
             ->willReturn([[], 'http'])
         ;
 
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint
-            ->expects($this->once())
-            ->method('start')
-            ->with($this->equalTo($request))
-            ->willReturn($response)
-        ;
-
         $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $listener = new ChannelListener($accessMap, $entryPoint);
+        $listener = new ChannelListener($accessMap);
         $listener($event);
 
-        $this->assertSame($response, $event->getResponse());
+        $response = $event->getResponse();
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertEquals('http://', $response->getTargetUrl());
     }
 
     public function testSupportsWithoutHeaders()
@@ -174,10 +145,46 @@ class ChannelListenerTest extends TestCase
             ->willReturn([[], 'https'])
         ;
 
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-
-        $listener = new ChannelListener($accessMap, $entryPoint, new NullLogger());
+        $listener = new ChannelListener($accessMap);
 
         $this->assertTrue($listener->supports($request));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyHandleWithEntryPoint()
+    {
+        $request = $this->createMock(Request::class);
+        $request
+            ->expects($this->any())
+            ->method('isSecure')
+            ->willReturn(false)
+        ;
+
+        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap
+            ->expects($this->any())
+            ->method('getPatterns')
+            ->with($this->equalTo($request))
+            ->willReturn([[], 'https'])
+        ;
+
+        $response = new RedirectResponse('/redirected');
+
+        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
+        $entryPoint
+            ->expects($this->once())
+            ->method('start')
+            ->with($this->equalTo($request))
+            ->willReturn($response)
+        ;
+
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $listener = new ChannelListener($accessMap, $entryPoint);
+        $listener($event);
+
+        $this->assertSame($response, $event->getResponse());
     }
 }

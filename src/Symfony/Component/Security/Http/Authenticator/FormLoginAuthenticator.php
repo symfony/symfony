@@ -81,7 +81,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         $credentials = $this->getCredentials($request);
 
-        // @deprecated since 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+        // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
         $method = 'loadUserByIdentifier';
         if (!method_exists($this->userProvider, 'loadUserByIdentifier')) {
             trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
@@ -120,7 +120,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
      */
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        return new UsernamePasswordToken($passport->getUser(), null, $firewallName, $passport->getUser()->getRoles());
+        return new UsernamePasswordToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response

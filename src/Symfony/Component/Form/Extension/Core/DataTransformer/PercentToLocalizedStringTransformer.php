@@ -69,7 +69,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param int|float $value Normalized value
      *
-     * @return string Percentage value
+     * @return string
      *
      * @throws TransformationFailedException if the given value is not numeric or
      *                                       if the value could not be transformed
@@ -104,7 +104,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param string $value Percentage value
      *
-     * @return int|float Normalized value
+     * @return int|float|null
      *
      * @throws TransformationFailedException if the given value is not a string or
      *                                       if the value could not be transformed
@@ -202,7 +202,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param int|float $number A number
      *
-     * @return int|float The rounded number
+     * @return int|float
      */
     private function round($number)
     {

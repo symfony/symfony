@@ -1882,8 +1882,6 @@ class CustomApplication extends Application
 {
     /**
      * Overwrites the default input definition.
-     *
-     * @return InputDefinition An InputDefinition instance
      */
     protected function getDefaultInputDefinition(): InputDefinition
     {
@@ -1892,8 +1890,6 @@ class CustomApplication extends Application
 
     /**
      * Gets the default helper set with the helpers that should always be available.
-     *
-     * @return HelperSet A HelperSet instance
      */
     protected function getDefaultHelperSet(): HelperSet
     {

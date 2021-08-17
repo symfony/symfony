@@ -32,7 +32,7 @@ class Comparator
     /**
      * Gets the target value.
      *
-     * @return string The target value
+     * @return string
      */
     public function getTarget()
     {
@@ -56,7 +56,7 @@ class Comparator
     /**
      * Gets the comparison operator.
      *
-     * @return string The operator
+     * @return string
      */
     public function getOperator()
     {

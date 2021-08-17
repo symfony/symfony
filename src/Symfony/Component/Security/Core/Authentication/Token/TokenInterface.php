@@ -35,33 +35,32 @@ interface TokenInterface extends \Serializable
     /**
      * Returns the user roles.
      *
-     * @return string[] The associated roles
+     * @return string[]
      */
     public function getRoleNames(): array;
 
     /**
      * Returns the user credentials.
      *
-     * @return mixed The user credentials
+     * @return mixed
+     *
+     * @deprecated since 5.4
      */
     public function getCredentials();
 
     /**
      * Returns a user representation.
      *
-     * @return string|\Stringable|UserInterface
+     * @return UserInterface
      *
      * @see AbstractToken::setUser()
      */
     public function getUser();
 
     /**
-     * Sets the user in the token.
+     * Sets the authenticated user in the token.
      *
-     * The user can be a UserInterface instance, or an object implementing
-     * a __toString method or the username as a regular string.
-     *
-     * @param string|\Stringable|UserInterface $user
+     * @param UserInterface $user
      *
      * @throws \InvalidArgumentException
      */
@@ -91,7 +90,7 @@ interface TokenInterface extends \Serializable
     /**
      * Returns the token attributes.
      *
-     * @return array The token attributes
+     * @return array
      */
     public function getAttributes();
 
@@ -105,14 +104,14 @@ interface TokenInterface extends \Serializable
     /**
      * Returns true if the attribute exists.
      *
-     * @return bool true if the attribute exists, false otherwise
+     * @return bool
      */
     public function hasAttribute(string $name);
 
     /**
      * Returns an attribute value.
      *
-     * @return mixed The attribute value
+     * @return mixed
      *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */

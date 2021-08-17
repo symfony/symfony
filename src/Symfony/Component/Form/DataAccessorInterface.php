@@ -24,7 +24,7 @@ interface DataAccessorInterface
      * @param object|array  $viewData The view data of the compound form
      * @param FormInterface $form     The {@link FormInterface()} instance to check
      *
-     * @return mixed The value at the end of the property
+     * @return mixed
      *
      * @throws Exception\AccessException If unable to read from the given form data
      */
@@ -50,7 +50,7 @@ interface DataAccessorInterface
      * @param object|array  $viewData The view data of the compound form
      * @param FormInterface $form     The {@link FormInterface()} instance to check
      *
-     * @return bool Whether the value can be read
+     * @return bool
      */
     public function isReadable($viewData, FormInterface $form): bool;
 
@@ -63,7 +63,7 @@ interface DataAccessorInterface
      * @param object|array  $viewData The view data of the compound form
      * @param FormInterface $form     The {@link FormInterface()} instance to check
      *
-     * @return bool Whether the value can be set
+     * @return bool
      */
     public function isWritable($viewData, FormInterface $form): bool;
 }

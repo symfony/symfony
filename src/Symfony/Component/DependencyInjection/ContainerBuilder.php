@@ -177,7 +177,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Checks if resources are tracked.
      *
-     * @return bool true If resources are tracked, false otherwise
+     * @return bool
      */
     public function isTrackingResources()
     {
@@ -204,7 +204,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns an extension by alias or namespace.
      *
-     * @return ExtensionInterface An extension instance
+     * @return ExtensionInterface
      *
      * @throws LogicException if the extension is not registered
      */
@@ -224,7 +224,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all registered extensions.
      *
-     * @return ExtensionInterface[] An array of ExtensionInterface
+     * @return ExtensionInterface[]
      */
     public function getExtensions()
     {
@@ -234,7 +234,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Checks if we have an extension.
      *
-     * @return bool If the extension exists
+     * @return bool
      */
     public function hasExtension(string $name)
     {
@@ -244,7 +244,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns an array of resources loaded to build this configuration.
      *
-     * @return ResourceInterface[] An array of resources
+     * @return ResourceInterface[]
      */
     public function getResources()
     {
@@ -462,7 +462,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns the compiler pass config which can then be modified.
      *
-     * @return PassConfig The compiler pass config
+     * @return PassConfig
      */
     public function getCompilerPassConfig()
     {
@@ -472,7 +472,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns the compiler.
      *
-     * @return Compiler The compiler
+     * @return Compiler
      */
     public function getCompiler()
     {
@@ -516,7 +516,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $id The service identifier
      *
-     * @return bool true if the service is defined, false otherwise
+     * @return bool
      */
     public function has(string $id)
     {
@@ -524,7 +524,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @return object|null The associated service
+     * @return object|null
      *
      * @throws InvalidArgumentException          when no definitions are available
      * @throws ServiceCircularReferenceException When a circular reference is detected
@@ -684,7 +684,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns the configuration array for the given extension.
      *
-     * @return array An array of configuration
+     * @return array
      */
     public function getExtensionConfig(string $name)
     {
@@ -846,7 +846,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @return bool true if the alias exists, false otherwise
+     * @return bool
      */
     public function hasAlias(string $id)
     {
@@ -854,7 +854,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @return Alias[] An array of aliases
+     * @return Alias[]
      */
     public function getAliases()
     {
@@ -862,7 +862,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @return Alias An Alias instance
+     * @return Alias
      *
      * @throws InvalidArgumentException if the alias does not exist
      */
@@ -881,7 +881,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * This methods allows for simple registration of service definition
      * with a fluid interface.
      *
-     * @return Definition A Definition instance
+     * @return Definition
      */
     public function register(string $id, string $class = null)
     {
@@ -894,7 +894,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * This method implements a shortcut for using setDefinition() with
      * an autowired definition.
      *
-     * @return Definition The created definition
+     * @return Definition
      */
     public function autowire(string $id, string $class = null)
     {
@@ -927,7 +927,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets all service definitions.
      *
-     * @return Definition[] An array of Definition instances
+     * @return Definition[]
      */
     public function getDefinitions()
     {
@@ -937,7 +937,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets a service definition.
      *
-     * @return Definition the service definition
+     * @return Definition
      *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
@@ -959,7 +959,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns true if a service definition exists under the given identifier.
      *
-     * @return bool true if the service definition exists, false otherwise
+     * @return bool
      */
     public function hasDefinition(string $id)
     {
@@ -969,7 +969,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets a service definition.
      *
-     * @return Definition A Definition instance
+     * @return Definition
      *
      * @throws ServiceNotFoundException if the service definition does not exist
      */
@@ -987,7 +987,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * The method "unaliases" recursively to return a Definition instance.
      *
-     * @return Definition A Definition instance
+     * @return Definition
      *
      * @throws ServiceNotFoundException if the service definition does not exist
      */
@@ -1014,7 +1014,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Creates a service for a service definition.
      *
-     * @return mixed The service described by the service definition
+     * @return mixed
      *
      * @throws RuntimeException         When the factory definition is incomplete
      * @throws RuntimeException         When the service is a synthetic service
@@ -1257,7 +1257,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all tags the defined services use.
      *
-     * @return array An array of tags
+     * @return array
      */
     public function findTags()
     {
@@ -1272,7 +1272,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all tags not queried by findTaggedServiceIds.
      *
-     * @return string[] An array of tags
+     * @return string[]
      */
     public function findUnusedTags()
     {

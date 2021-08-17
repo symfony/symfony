@@ -52,7 +52,7 @@ class Packages
      *
      * @param string $name The name of the package or null for the default package
      *
-     * @return PackageInterface An asset package
+     * @return PackageInterface
      *
      * @throws InvalidArgumentException If there is no package by that name
      * @throws LogicException           If no default package is defined
@@ -80,7 +80,7 @@ class Packages
      * @param string $path        A public path
      * @param string $packageName A package name
      *
-     * @return string The current version
+     * @return string
      */
     public function getVersion(string $path, string $packageName = null)
     {

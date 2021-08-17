@@ -45,7 +45,7 @@ class UserProviderListener
             return;
         }
 
-        // @deprecated since 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+        // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
         if (method_exists($this->userProvider, 'loadUserByIdentifier')) {
             $badge->setUserLoader([$this->userProvider, 'loadUserByIdentifier']);
         } else {

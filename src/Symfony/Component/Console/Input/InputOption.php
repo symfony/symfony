@@ -110,7 +110,7 @@ class InputOption
     /**
      * Returns the option shortcut.
      *
-     * @return string|null The shortcut
+     * @return string|null
      */
     public function getShortcut()
     {
@@ -120,7 +120,7 @@ class InputOption
     /**
      * Returns the option name.
      *
-     * @return string The name
+     * @return string
      */
     public function getName()
     {
@@ -205,7 +205,7 @@ class InputOption
     /**
      * Returns the description text.
      *
-     * @return string The description text
+     * @return string
      */
     public function getDescription()
     {

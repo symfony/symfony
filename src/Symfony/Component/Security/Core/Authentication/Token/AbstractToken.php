@@ -75,7 +75,7 @@ abstract class AbstractToken implements TokenInterface
         }
 
         if ($this->user instanceof UserInterface) {
-            // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+            // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
             return method_exists($this->user, 'getUserIdentifier') ? $this->user->getUserIdentifier() : $this->user->getUsername();
         }
 
@@ -97,6 +97,10 @@ abstract class AbstractToken implements TokenInterface
     {
         if (!($user instanceof UserInterface || (\is_object($user) && method_exists($user, '__toString')) || \is_string($user))) {
             throw new \InvalidArgumentException('$user must be an instanceof UserInterface, an object implementing a __toString method, or a primitive string.');
+        }
+
+        if (!$user instanceof UserInterface) {
+            trigger_deprecation('symfony/security-core', '5.4', 'Using an object that is not an instance of "%s" as $user in "%s" is deprecated.', UserInterface::class, static::class);
         }
 
         // @deprecated since Symfony 5.4, remove the whole block if/elseif/else block in 6.0
@@ -206,7 +210,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Returns the token attributes.
      *
-     * @return array The token attributes
+     * @return array
      */
     public function getAttributes()
     {
@@ -226,7 +230,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Returns true if the attribute exists.
      *
-     * @return bool true if the attribute exists, false otherwise
+     * @return bool
      */
     public function hasAttribute(string $name)
     {
@@ -236,7 +240,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Returns an attribute value.
      *
-     * @return mixed The attribute value
+     * @return mixed
      *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */

@@ -112,7 +112,7 @@ class TestMemberMetadata extends MemberMetadata
     {
     }
 
-    protected function newReflectionMember($object): object
+    protected function newReflectionMember($object): \ReflectionMethod
     {
     }
 }

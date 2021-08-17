@@ -21,6 +21,9 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
+/**
+ * @group legacy
+ */
 class AbstractRememberMeServicesTest extends TestCase
 {
     public function testGetRememberMeParameter()

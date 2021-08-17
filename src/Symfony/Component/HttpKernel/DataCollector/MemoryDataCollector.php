@@ -58,7 +58,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Gets the memory.
      *
-     * @return int The memory
+     * @return int
      */
     public function getMemory()
     {
@@ -68,7 +68,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Gets the PHP memory limit.
      *
-     * @return int The memory limit
+     * @return int
      */
     public function getMemoryLimit()
     {

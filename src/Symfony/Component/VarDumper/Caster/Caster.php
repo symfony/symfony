@@ -42,7 +42,7 @@ class Caster
      *
      * @param bool $hasDebugInfo Whether the __debugInfo method exists on $obj or not
      *
-     * @return array The array-cast of the object, with prefixed dynamic properties
+     * @return array
      */
     public static function castObject(object $obj, string $class, bool $hasDebugInfo = false, string $debugClass = null): array
     {
@@ -119,7 +119,7 @@ class Caster
      * @param string[] $listedProperties List of properties to exclude when Caster::EXCLUDE_VERBOSE is set, and to preserve when Caster::EXCLUDE_NOT_IMPORTANT is set
      * @param int      &$count           Set to the number of removed properties
      *
-     * @return array The filtered array
+     * @return array
      */
     public static function filter(array $a, int $filter, array $listedProperties = [], ?int &$count = 0): array
     {

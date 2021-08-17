@@ -619,6 +619,9 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
 
 class NotSerializable
 {
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         if (class_exists(\Error::class)) {

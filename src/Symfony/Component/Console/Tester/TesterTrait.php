@@ -33,7 +33,7 @@ trait TesterTrait
      *
      * @throws \RuntimeException If it's called before the execute method
      *
-     * @return string The display
+     * @return string
      */
     public function getDisplay(bool $normalize = false)
     {
@@ -79,7 +79,7 @@ trait TesterTrait
     /**
      * Gets the input instance used by the last execution of the command or application.
      *
-     * @return InputInterface The current input instance
+     * @return InputInterface
      */
     public function getInput()
     {
@@ -89,7 +89,7 @@ trait TesterTrait
     /**
      * Gets the output instance used by the last execution of the command or application.
      *
-     * @return OutputInterface The current output instance
+     * @return OutputInterface
      */
     public function getOutput()
     {
@@ -101,7 +101,7 @@ trait TesterTrait
      *
      * @throws \RuntimeException If it's called before the execute method
      *
-     * @return int The status code
+     * @return int
      */
     public function getStatusCode()
     {

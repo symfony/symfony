@@ -63,18 +63,38 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals('fabien', $token->getUserIdentifier());
     }
 
-    public function testGetUserIdentifier()
+    /**
+     * @dataProvider provideUsers
+     */
+    public function testGetUserIdentifier($user, string $username)
     {
         $token = new ConcreteToken(['ROLE_FOO']);
-        $token->setUser('fabien');
-        $this->assertEquals('fabien', $token->getUserIdentifier());
-
-        $token->setUser(new TestUser('fabien'));
-        $this->assertEquals('fabien', $token->getUserIdentifier());
-
-        $user = new InMemoryUser('fabien', null);
         $token->setUser($user);
-        $this->assertEquals('fabien', $token->getUserIdentifier());
+        $this->assertEquals($username, $token->getUserIdentifier());
+    }
+
+    public function provideUsers()
+    {
+        yield [new InMemoryUser('fabien', null), 'fabien'];
+    }
+
+    /**
+     * @dataProvider provideLegacyUsers
+     * @group legacy
+     */
+    public function testLegacyGetUserIdentifier($user, string $username)
+    {
+        $token = new ConcreteToken(['ROLE_FOO']);
+        $token->setUser($user);
+        $this->assertEquals($username, $token->getUserIdentifier());
+    }
+
+    public function provideLegacyUsers()
+    {
+        return [
+            [new TestUser('fabien'), 'fabien'],
+            ['fabien', 'fabien'],
+        ];
     }
 
     public function testEraseCredentials()
@@ -143,22 +163,13 @@ class AbstractTokenTest extends TestCase
     }
 
     /**
-     * @dataProvider getUsers
+     * @dataProvider provideUsers
      */
     public function testSetUser($user)
     {
         $token = new ConcreteToken();
         $token->setUser($user);
         $this->assertSame($user, $token->getUser());
-    }
-
-    public function getUsers()
-    {
-        return [
-            [new InMemoryUser('foo', null)],
-            [new TestUser('foo')],
-            ['foo'],
-        ];
     }
 
     /**
@@ -196,7 +207,8 @@ class AbstractTokenTest extends TestCase
 
     /**
      * @group legacy
-     * @dataProvider getUsers
+     * @dataProvider provideUsers
+     * @dataProvider provideLegacyUsers
      */
     public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)
     {

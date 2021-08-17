@@ -203,7 +203,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      * In this example, "address" and "office" map to forms, while
      * "street does not.
      *
-     * @return bool Whether the element maps to a form
+     * @return bool
      *
      * @throws OutOfBoundsException if the offset is invalid
      */

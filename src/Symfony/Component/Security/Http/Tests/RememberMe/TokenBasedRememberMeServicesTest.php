@@ -23,6 +23,9 @@ use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices;
 
+/**
+ * @group legacy
+ */
 class TokenBasedRememberMeServicesTest extends TestCase
 {
     public function testAutoLoginReturnsNullWhenNoCookie()

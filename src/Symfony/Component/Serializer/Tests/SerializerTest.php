@@ -805,7 +805,7 @@ class DummyList implements \Countable, \IteratorAggregate
         return \count($this->list);
     }
 
-    public function getIterator():\Traversable
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->list);
     }

@@ -257,7 +257,7 @@ class Cookie
     /**
      * Returns the cookie as a string.
      *
-     * @return string The cookie
+     * @return string
      */
     public function __toString()
     {

@@ -94,7 +94,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Gets the token.
      *
-     * @return string|null The token
+     * @return string|null
      */
     public function getToken()
     {
@@ -104,7 +104,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Gets the Symfony version.
      *
-     * @return string The Symfony version
+     * @return string
      */
     public function getSymfonyVersion()
     {
@@ -165,7 +165,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Gets the PHP version.
      *
-     * @return string The PHP version
+     * @return string
      */
     public function getPhpVersion()
     {
@@ -175,7 +175,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Gets the PHP version extra part.
      *
-     * @return string|null The extra part
+     * @return string|null
      */
     public function getPhpVersionExtra()
     {
@@ -209,7 +209,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Gets the environment.
      *
-     * @return string The environment
+     * @return string
      */
     public function getEnv()
     {
@@ -229,7 +229,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Returns true if the XDebug is enabled.
      *
-     * @return bool true if XDebug is enabled, false otherwise
+     * @return bool
      */
     public function hasXDebug()
     {
@@ -239,7 +239,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Returns true if APCu is enabled.
      *
-     * @return bool true if APCu is enabled, false otherwise
+     * @return bool
      */
     public function hasApcu()
     {
@@ -249,7 +249,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Returns true if Zend OPcache is enabled.
      *
-     * @return bool true if Zend OPcache is enabled, false otherwise
+     * @return bool
      */
     public function hasZendOpcache()
     {
@@ -264,7 +264,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Gets the PHP SAPI name.
      *
-     * @return string The environment
+     * @return string
      */
     public function getSapiName()
     {

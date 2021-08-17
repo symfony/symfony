@@ -21,7 +21,7 @@ class Lexer
     /**
      * Tokenizes an expression.
      *
-     * @return TokenStream A token stream instance
+     * @return TokenStream
      *
      * @throws SyntaxError
      */

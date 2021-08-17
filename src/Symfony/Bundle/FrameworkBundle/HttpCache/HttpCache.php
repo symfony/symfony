@@ -76,7 +76,7 @@ class HttpCache extends BaseHttpCache
     /**
      * Returns an array of options to customize the Cache configuration.
      *
-     * @return array An array of options
+     * @return array
      */
     protected function getOptions()
     {

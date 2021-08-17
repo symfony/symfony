@@ -353,7 +353,7 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @param Key lock state container
      *
-     * @return string token
+     * @return string
      */
     private function getUniqueToken(Key $key): string
     {

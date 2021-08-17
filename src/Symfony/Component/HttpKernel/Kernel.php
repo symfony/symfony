@@ -278,7 +278,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Gets the application root dir (path of the project's composer file).
      *
-     * @return string The project root dir
+     * @return string
      */
     public function getProjectDir()
     {
@@ -403,7 +403,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @throws \InvalidArgumentException If the generated classname is invalid
      *
-     * @return string The container class
+     * @return string
      */
     protected function getContainerClass()
     {
@@ -592,7 +592,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Returns the kernel parameters.
      *
-     * @return array An array of kernel parameters
+     * @return array
      */
     protected function getKernelParameters()
     {
@@ -625,7 +625,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Builds the service container.
      *
-     * @return ContainerBuilder The compiled service container
+     * @return ContainerBuilder
      *
      * @throws \RuntimeException
      */
@@ -752,7 +752,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Returns a loader for the container.
      *
-     * @return DelegatingLoader The loader
+     * @return DelegatingLoader
      */
     protected function getContainerLoader(ContainerInterface $container)
     {
@@ -804,7 +804,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * We don't use the PHP php_strip_whitespace() function
      * as we want the content to be readable and well-formatted.
      *
-     * @return string The PHP string with the comments removed
+     * @return string
      */
     public static function stripComments(string $source)
     {

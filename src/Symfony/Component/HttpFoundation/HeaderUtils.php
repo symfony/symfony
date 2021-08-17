@@ -154,7 +154,7 @@ class HeaderUtils
      *                                 is semantically equivalent to $filename. If the filename is already ASCII,
      *                                 it can be omitted, or just copied from $filename
      *
-     * @return string A string suitable for use as a Content-Disposition field-value
+     * @return string
      *
      * @throws \InvalidArgumentException
      *

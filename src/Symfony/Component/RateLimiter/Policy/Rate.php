@@ -62,9 +62,7 @@ final class Rate
     }
 
     /**
-     * Calculates the time needed to free up the provided number of tokens.
-     *
-     * @return int the time in seconds
+     * Calculates the time needed to free up the provided number of tokens in seconds.
      */
     public function calculateTimeForTokens(int $tokens): int
     {
@@ -75,8 +73,6 @@ final class Rate
 
     /**
      * Calculates the next moment of token availability.
-     *
-     * @return \DateTimeImmutable the next moment a token will be available
      */
     public function calculateNextTokenAvailability(): \DateTimeImmutable
     {

@@ -115,7 +115,7 @@ final class ProgressBar
      *
      * @param string $name The placeholder name (including the delimiter char like %)
      *
-     * @return callable|null A PHP callable
+     * @return callable|null
      */
     public static function getPlaceholderFormatterDefinition(string $name): ?callable
     {
@@ -148,7 +148,7 @@ final class ProgressBar
      *
      * @param string $name The format name
      *
-     * @return string|null A format string
+     * @return string|null
      */
     public static function getFormatDefinition(string $name): ?string
     {

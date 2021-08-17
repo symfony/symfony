@@ -21,12 +21,16 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated, use "%s" instead.', PersistentTokenBasedRememberMeServices::class, PersistentRememberMeHandler::class);
+
 /**
  * Concrete implementation of the RememberMeServicesInterface which needs
  * an implementation of TokenProviderInterface for providing remember-me
  * capabilities.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.4, use {@see PersistentRememberMeHandler} instead
  */
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {
@@ -94,7 +98,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         );
 
         $userProvider = $this->getUserProvider($persistentToken->getClass());
-        // @deprecated since 5.3, change to $persistentToken->getUserIdentifier() in 6.0
+        // @deprecated since Symfony 5.3, change to $persistentToken->getUserIdentifier() in 6.0
         if (method_exists($persistentToken, 'getUserIdentifier')) {
             $userIdentifier = $persistentToken->getUserIdentifier();
         } else {
@@ -103,7 +107,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             $userIdentifier = $persistentToken->getUsername();
         }
 
-        // @deprecated since 5.3, change to $userProvider->loadUserByIdentifier() in 6.0
+        // @deprecated since Symfony 5.3, change to $userProvider->loadUserByIdentifier() in 6.0
         if (method_exists($userProvider, 'loadUserByIdentifier')) {
             return $userProvider->loadUserByIdentifier($userIdentifier);
         } else {
@@ -124,7 +128,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         $this->tokenProvider->createNewToken(
             new PersistentToken(
                 \get_class($user = $token->getUser()),
-                // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+                // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
                 method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(),
                 $series,
                 $this->generateHash($tokenValue),

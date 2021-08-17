@@ -104,7 +104,7 @@ class Filesystem
      *
      * @param string|iterable $files A filename, an array of files, or a \Traversable instance to check
      *
-     * @return bool true if the file exists, false otherwise
+     * @return bool
      */
     public function exists($files)
     {
@@ -440,7 +440,7 @@ class Filesystem
     /**
      * Given an existing path, convert it to a path relative to a given starting path.
      *
-     * @return string Path of target relative to starting path
+     * @return string
      */
     public function makePathRelative(string $endPath, string $startPath)
     {

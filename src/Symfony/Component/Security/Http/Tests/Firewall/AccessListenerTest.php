@@ -52,6 +52,9 @@ class AccessListenerTest extends TestCase
                 return true;
             }
 
+            /**
+             * @return mixed
+             */
             public function getCredentials()
             {
             }
@@ -163,10 +166,12 @@ class AccessListenerTest extends TestCase
         ;
 
         $token = $this->createMock(TokenInterface::class);
-        $token
-            ->expects($this->never())
-            ->method('isAuthenticated')
-        ;
+        if (method_exists(TokenInterface::class, 'isAuthenticated')) {
+            $token
+                ->expects($this->never())
+                ->method('isAuthenticated')
+            ;
+        }
 
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage
@@ -307,7 +312,7 @@ class AccessListenerTest extends TestCase
 
     public function testHandleWhenPublicAccessWhileAuthenticated()
     {
-        $token = new UsernamePasswordToken(new InMemoryUser('Wouter', null, ['ROLE_USER']), null, 'main', ['ROLE_USER']);
+        $token = new UsernamePasswordToken(new InMemoryUser('Wouter', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
         $request = new Request();
@@ -347,7 +352,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar', 'bar' => 'baz'], null])
         ;
 
-        $authenticatedToken = new UsernamePasswordToken('test', 'test', 'test', ['ROLE_USER']);
+        $authenticatedToken = new UsernamePasswordToken(new InMemoryUser('test', 'test', ['ROLE_USER']), 'test', ['ROLE_USER']);
 
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($authenticatedToken);
@@ -368,5 +373,42 @@ class AccessListenerTest extends TestCase
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+    }
+
+    public function testLazyPublicPagesShouldNotAccessTokenStorage()
+    {
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage->expects($this->never())->method('getToken');
+
+        $request = new Request();
+        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap->expects($this->any())
+            ->method('getPatterns')
+            ->with($this->equalTo($request))
+            ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
+        ;
+
+        $listener = new AccessListener($tokenStorage, $this->createMock(AccessDecisionManagerInterface::class), $accessMap, false);
+        $listener(new LazyResponseEvent(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyLazyPublicPagesShouldNotAccessTokenStorage()
+    {
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage->expects($this->never())->method('getToken');
+
+        $request = new Request();
+        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap->expects($this->any())
+            ->method('getPatterns')
+            ->with($this->equalTo($request))
+            ->willReturn([[AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY], null])
+        ;
+
+        $listener = new AccessListener($tokenStorage, $this->createMock(AccessDecisionManagerInterface::class), $accessMap, false);
+        $listener(new LazyResponseEvent(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
     }
 }

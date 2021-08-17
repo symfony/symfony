@@ -14,7 +14,7 @@ class FooLockCommand extends Command
         $this->setName('foo:lock');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
             return 1;

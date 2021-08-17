@@ -215,12 +215,16 @@ class DoctrineExtractorTest extends TestCase
 
     public function testGetPropertiesCatchException()
     {
-        $this->assertNull($this->createExtractor()->getProperties('Not\Exist'));
+        $extractor = $this->createExtractor();
+        $this->assertNull($extractor->getProperties(get_class(new class{})));
+        $this->assertNull($extractor->getProperties('Not\Exist'));
     }
 
     public function testGetTypesCatchException()
     {
-        $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
+        $extractor = $this->createExtractor();
+        $this->assertNull($extractor->getProperties(get_class(new class{})));
+        $this->assertNull($extractor->getTypes('Not\Exist', 'baz'));
     }
 
     public function testGeneratedValueNotWritable()

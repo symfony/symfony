@@ -74,7 +74,7 @@ class CheckCredentialsListener implements EventSubscriberInterface
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 
-            $salt = $user->getSalt();
+            $salt = method_exists($user, 'getSalt') ? $user->getSalt() : '';
             if ($salt && !$user instanceof LegacyPasswordAuthenticatedUserInterface) {
                 trigger_deprecation('symfony/security-http', '5.3', 'Returning a string from "getSalt()" without implementing the "%s" interface is deprecated, the "%s" class should implement it.', LegacyPasswordAuthenticatedUserInterface::class, get_debug_type($user));
             }

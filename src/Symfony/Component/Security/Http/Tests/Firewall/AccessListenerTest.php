@@ -52,10 +52,7 @@ class AccessListenerTest extends TestCase
                 return true;
             }
 
-            /**
-             * @return mixed
-             */
-            public function getCredentials()
+            public function getCredentials(): mixed
             {
             }
         };

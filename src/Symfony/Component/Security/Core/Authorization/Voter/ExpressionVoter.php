@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
@@ -74,7 +75,7 @@ class ExpressionVoter implements VoterInterface
 
         $variables = [
             'token' => $token,
-            'user' => $token->getUser(),
+            'user' => $token instanceof NullToken ? '' : $token->getUser(),
             'object' => $subject,
             'subject' => $subject,
             'role_names' => $roleNames,

@@ -488,9 +488,6 @@ class RootDummy
         return $this->grandChildren;
     }
 
-    /**
-     * @return array
-     */
     public function getIntMatrix(): array
     {
         return $this->intMatrix;

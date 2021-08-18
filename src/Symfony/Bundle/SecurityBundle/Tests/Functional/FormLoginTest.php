@@ -111,7 +111,7 @@ class FormLoginTest extends AbstractWebTestCase
      */
     public function testLoginThrottling()
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml', 'enable_authenticator_manager' => true]);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml']);
 
         $attempts = [
             ['johannes', 'wrong'],

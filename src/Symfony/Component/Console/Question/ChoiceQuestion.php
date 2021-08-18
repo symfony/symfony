@@ -20,10 +20,10 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  */
 class ChoiceQuestion extends Question
 {
-    private $choices;
-    private $multiselect = false;
-    private $prompt = ' > ';
-    private $errorMessage = 'Value "%s" is invalid';
+    private array $choices;
+    private bool $multiselect = false;
+    private string $prompt = ' > ';
+    private string $errorMessage = 'Value "%s" is invalid';
 
     /**
      * @param string $question The question to ask to the user

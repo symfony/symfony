@@ -45,20 +45,20 @@ class Command
      */
     protected static $defaultDescription;
 
-    private $application;
-    private $name;
-    private $processTitle;
-    private $aliases = [];
-    private $definition;
-    private $hidden = false;
-    private $help = '';
-    private $description = '';
-    private $fullDefinition;
-    private $ignoreValidationErrors = false;
-    private $code;
-    private $synopsis = [];
-    private $usages = [];
-    private $helperSet;
+    private ?Application $application = null;
+    private ?string $name = null;
+    private ?string $processTitle = null;
+    private array $aliases = [];
+    private InputDefinition $definition;
+    private bool $hidden = false;
+    private string $help = '';
+    private string $description = '';
+    private ?InputDefinition $fullDefinition = null;
+    private bool $ignoreValidationErrors = false;
+    private ?\Closure $code = null;
+    private array $synopsis = [];
+    private array $usages = [];
+    private ?HelperSet $helperSet = null;
 
     public static function getDefaultName(): ?string
     {
@@ -324,6 +324,8 @@ class Command
                     restore_error_handler();
                 }
             }
+        } else {
+            $code = \Closure::fromCallable($code);
         }
 
         $this->code = $code;
@@ -394,11 +396,7 @@ class Command
      */
     public function getNativeDefinition(): InputDefinition
     {
-        if (null === $this->definition) {
-            throw new LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', static::class));
-        }
-
-        return $this->definition;
+        return $this->definition ?? throw new LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', static::class));
     }
 
     /**

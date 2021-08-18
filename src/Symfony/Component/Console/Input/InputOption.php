@@ -46,11 +46,11 @@ class InputOption
      */
     public const VALUE_NEGATABLE = 16;
 
-    private $name;
-    private $shortcut;
-    private $mode;
-    private $default;
-    private $description;
+    private string $name;
+    private string|array|null $shortcut;
+    private int $mode;
+    private string|int|bool|array|null|float $default;
+    private string $description;
 
     /**
      * @param string|array|null                $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts

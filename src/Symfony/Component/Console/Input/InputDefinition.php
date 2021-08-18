@@ -28,13 +28,13 @@ use Symfony\Component\Console\Exception\LogicException;
  */
 class InputDefinition
 {
-    private $arguments;
-    private $requiredCount;
-    private $lastArrayArgument;
-    private $lastOptionalArgument;
-    private $options;
-    private $negations;
-    private $shortcuts;
+    private array $arguments = [];
+    private int $requiredCount = 0;
+    private ?InputArgument $lastArrayArgument = null;
+    private ?InputArgument $lastOptionalArgument = null;
+    private array $options = [];
+    private array $negations = [];
+    private array $shortcuts = [];
 
     /**
      * @param array $definition An array of InputArgument and InputOption instance

@@ -31,20 +31,20 @@ class ProgressIndicator
         'very_verbose_no_ansi' => ' %message% (%elapsed:6s%, %memory:6s%)',
     ];
 
-    private $output;
-    private $startTime;
-    private $format;
-    private $message;
-    private $indicatorValues;
-    private $indicatorCurrent;
-    private $indicatorChangeInterval;
-    private $indicatorUpdateTime;
-    private $started = false;
+    private OutputInterface $output;
+    private int $startTime;
+    private ?string $format = null;
+    private ?string $message = null;
+    private array $indicatorValues;
+    private int $indicatorCurrent;
+    private int $indicatorChangeInterval;
+    private float $indicatorUpdateTime;
+    private bool $started = false;
 
     /**
      * @var array<string, callable>
      */
-    private static $formatters;
+    private static array $formatters;
 
     /**
      * @param int        $indicatorChangeInterval Change interval in milliseconds
@@ -159,9 +159,7 @@ class ProgressIndicator
      */
     public static function setPlaceholderFormatterDefinition(string $name, callable $callable)
     {
-        if (!self::$formatters) {
-            self::$formatters = self::initPlaceholderFormatters();
-        }
+        self::$formatters ??= self::initPlaceholderFormatters();
 
         self::$formatters[$name] = $callable;
     }
@@ -171,9 +169,7 @@ class ProgressIndicator
      */
     public static function getPlaceholderFormatterDefinition(string $name): ?callable
     {
-        if (!self::$formatters) {
-            self::$formatters = self::initPlaceholderFormatters();
-        }
+        self::$formatters ??= self::initPlaceholderFormatters();
 
         return self::$formatters[$name] ?? null;
     }
@@ -225,6 +221,9 @@ class ProgressIndicator
         return round(microtime(true) * 1000);
     }
 
+    /**
+     * @return array<string, \Closure>
+     */
     private static function initPlaceholderFormatters(): array
     {
         return [

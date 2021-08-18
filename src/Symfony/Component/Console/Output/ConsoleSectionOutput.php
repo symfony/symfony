@@ -21,10 +21,10 @@ use Symfony\Component\Console\Terminal;
  */
 class ConsoleSectionOutput extends StreamOutput
 {
-    private $content = [];
-    private $lines = 0;
-    private $sections;
-    private $terminal;
+    private array $content = [];
+    private int $lines = 0;
+    private array $sections;
+    private Terminal $terminal;
 
     /**
      * @param resource               $stream

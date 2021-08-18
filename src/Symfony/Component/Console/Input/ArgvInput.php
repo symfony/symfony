@@ -40,8 +40,8 @@ use Symfony\Component\Console\Exception\RuntimeException;
  */
 class ArgvInput extends Input
 {
-    private $tokens;
-    private $parsed;
+    private array $tokens;
+    private array $parsed;
 
     public function __construct(array $argv = null, InputDefinition $definition = null)
     {

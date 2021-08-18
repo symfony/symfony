@@ -32,7 +32,7 @@ class TableCellStyle
         'right' => \STR_PAD_LEFT,
     ];
 
-    private $options = [
+    private array $options = [
         'fg' => 'default',
         'bg' => 'default',
         'options' => null,

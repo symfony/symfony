@@ -20,9 +20,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SingleCommandApplication extends Command
 {
-    private $version = 'UNKNOWN';
-    private $autoExit = true;
-    private $running = false;
+    private string $version = 'UNKNOWN';
+    private bool $autoExit = true;
+    private bool $running = false;
 
     public function setVersion(string $version): self
     {

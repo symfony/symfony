@@ -18,8 +18,8 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  */
 class TableCell
 {
-    private $value;
-    private $options = [
+    private string $value;
+    private array $options = [
         'rowspan' => 1,
         'colspan' => 1,
         'style' => null,

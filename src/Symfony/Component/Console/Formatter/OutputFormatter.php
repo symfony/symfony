@@ -21,9 +21,9 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  */
 class OutputFormatter implements WrappableOutputFormatterInterface
 {
-    private $decorated;
-    private $styles = [];
-    private $styleStack;
+    private bool $decorated;
+    private array $styles = [];
+    private OutputFormatterStyleStack $styleStack;
 
     public function __clone()
     {

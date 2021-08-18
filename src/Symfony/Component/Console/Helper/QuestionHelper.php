@@ -38,8 +38,8 @@ class QuestionHelper extends Helper
      */
     private $inputStream;
 
-    private static $stty = true;
-    private static $stdinIsInteractive;
+    private static bool $stty = true;
+    private static bool $stdinIsInteractive;
 
     /**
      * Asks a question to the user.
@@ -473,7 +473,7 @@ class QuestionHelper extends Helper
             return false;
         }
 
-        if (null !== self::$stdinIsInteractive) {
+        if (isset(self::$stdinIsInteractive)) {
             return self::$stdinIsInteractive;
         }
 

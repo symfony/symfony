@@ -25,10 +25,10 @@ class InputArgument
     public const OPTIONAL = 2;
     public const IS_ARRAY = 4;
 
-    private $name;
-    private $mode;
-    private $default;
-    private $description;
+    private string $name;
+    private int $mode;
+    private string|int|bool|array|null|float $default;
+    private string $description;
 
     /**
      * @param string                           $name        The argument name

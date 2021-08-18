@@ -23,14 +23,11 @@ use Symfony\Component\Console\Tester\Constraint\CommandIsSuccessful;
  */
 trait TesterTrait
 {
-    /** @var StreamOutput */
-    private $output;
-    private $inputs = [];
-    private $captureStreamsIndependently = false;
-    /** @var InputInterface */
-    private $input;
-    /** @var int */
-    private $statusCode;
+    private StreamOutput $output;
+    private array $inputs = [];
+    private bool $captureStreamsIndependently = false;
+    private InputInterface $input;
+    private int $statusCode;
 
     /**
      * Gets the display returned by the last execution of the command or application.
@@ -39,7 +36,7 @@ trait TesterTrait
      */
     public function getDisplay(bool $normalize = false): string
     {
-        if (null === $this->output) {
+        if (!isset($this->output)) {
             throw new \RuntimeException('Output not initialized, did you execute the command before requesting the display?');
         }
 
@@ -99,11 +96,7 @@ trait TesterTrait
      */
     public function getStatusCode(): int
     {
-        if (null === $this->statusCode) {
-            throw new \RuntimeException('Status code not initialized, did you execute the command before requesting the status code?');
-        }
-
-        return $this->statusCode;
+        return $this->statusCode ?? throw new \RuntimeException('Status code not initialized, did you execute the command before requesting the status code?');
     }
 
     public function assertCommandIsSuccessful(string $message = ''): void

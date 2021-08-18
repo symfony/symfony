@@ -20,12 +20,12 @@ use Symfony\Component\Console\Color;
  */
 class OutputFormatterStyle implements OutputFormatterStyleInterface
 {
-    private $color;
-    private $foreground;
-    private $background;
-    private $options;
-    private $href;
-    private $handlesHrefGracefully;
+    private Color $color;
+    private string $foreground;
+    private string $background;
+    private array $options;
+    private ?string $href = null;
+    private bool $handlesHrefGracefully;
 
     /**
      * Initializes output formatter style.
@@ -94,10 +94,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      */
     public function apply(string $text): string
     {
-        if (null === $this->handlesHrefGracefully) {
-            $this->handlesHrefGracefully = 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR')
-                && (!getenv('KONSOLE_VERSION') || (int) getenv('KONSOLE_VERSION') > 201100);
-        }
+        $this->handlesHrefGracefully ??= 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR')
+            && (!getenv('KONSOLE_VERSION') || (int) getenv('KONSOLE_VERSION') > 201100);
 
         if (null !== $this->href && $this->handlesHrefGracefully) {
             $text = "\033]8;;$this->href\033\\$text\033]8;;\033\\";

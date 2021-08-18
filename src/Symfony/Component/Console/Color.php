@@ -49,9 +49,9 @@ final class Color
         'conceal' => ['set' => 8, 'unset' => 28],
     ];
 
-    private $foreground;
-    private $background;
-    private $options = [];
+    private string $foreground;
+    private string $background;
+    private array $options = [];
 
     public function __construct(string $foreground = '', string $background = '', array $options = [])
     {

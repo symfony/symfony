@@ -354,8 +354,3 @@ interface PasswordUpgraderProvider extends UserProviderInterface, PasswordUpgrad
 
     public function loadUserByIdentifier(string $identifier): UserInterface;
 }
-
-interface DaoAuthenticationProviderTest_UserProvider extends UserProviderInterface
-{
-    public function loadUserByUsername($username): UserInterface;
-}

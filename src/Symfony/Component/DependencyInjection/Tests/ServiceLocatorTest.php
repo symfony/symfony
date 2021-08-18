@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
@@ -21,7 +22,7 @@ use Symfony\Contracts\Service\Test\ServiceLocatorTest as BaseServiceLocatorTest;
 
 class ServiceLocatorTest extends BaseServiceLocatorTest
 {
-    public function getServiceLocator(array $factories): ServiceLocator
+    public function getServiceLocator(array $factories): ContainerInterface
     {
         return new ServiceLocator($factories);
     }

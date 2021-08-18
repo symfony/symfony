@@ -176,7 +176,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function getUser(): string|\Stringable|UserInterface
+    public function getUser(): UserInterface
     {
     }
 

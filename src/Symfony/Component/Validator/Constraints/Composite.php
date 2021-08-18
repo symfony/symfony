@@ -51,9 +51,9 @@ abstract class Composite extends Constraint
      * cached. When constraints are loaded from the cache, no more group
      * checks need to be done.
      */
-    public function __construct($options = null)
+    public function __construct($options = null, array $groups = null, $payload = null)
     {
-        parent::__construct($options);
+        parent::__construct($options, $groups, $payload);
 
         $this->initializeNestedConstraints();
 

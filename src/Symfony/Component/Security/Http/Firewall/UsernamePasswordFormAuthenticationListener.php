@@ -76,7 +76,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         if (null !== $this->csrfTokenManager) {
             $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $this->options['csrf_parameter']);
 
-            if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['csrf_token_id'], $csrfToken))) {
+            if (!\is_string($csrfToken) || false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['csrf_token_id'], $csrfToken))) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');
             }
         }

@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -21,18 +20,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class AuthenticationTrustResolverTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testIsAnonymous()
-    {
-        $resolver = new AuthenticationTrustResolver();
-        $this->assertFalse($resolver->isAnonymous(null));
-        $this->assertFalse($resolver->isAnonymous($this->getToken()));
-        $this->assertFalse($resolver->isAnonymous($this->getRememberMeToken()));
-        $this->assertFalse($resolver->isAnonymous(new FakeCustomToken()));
-    }
-
     public function testIsRememberMe()
     {
         $resolver = new AuthenticationTrustResolver();
@@ -63,71 +50,9 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isAuthenticated(new FakeCustomToken()));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testIsAnonymousWithClassAsConstructorButStillExtending()
-    {
-        $resolver = $this->getResolver();
-
-        $this->assertFalse($resolver->isAnonymous(null));
-        $this->assertFalse($resolver->isAnonymous($this->getToken()));
-        $this->assertFalse($resolver->isAnonymous($this->getRememberMeToken()));
-    }
-
-    public function testIsRememberMeWithClassAsConstructorButStillExtending()
-    {
-        $resolver = $this->getResolver();
-
-        $this->assertFalse($resolver->isRememberMe(null));
-        $this->assertFalse($resolver->isRememberMe($this->getToken()));
-        $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
-        $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
-    }
-
-    public function testisFullFledgedWithClassAsConstructorButStillExtending()
-    {
-        $resolver = $this->getResolver();
-
-        $this->assertFalse($resolver->isFullFledged(null));
-        $this->assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
-        $this->assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
-        $this->assertTrue($resolver->isFullFledged($this->getToken()));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacy()
-    {
-        $resolver = $this->getResolver();
-
-        $this->assertTrue($resolver->isAnonymous($this->getAnonymousToken()));
-        $this->assertTrue($resolver->isAnonymous($this->getRealCustomAnonymousToken()));
-
-        $this->assertFalse($resolver->isRememberMe($this->getAnonymousToken()));
-
-        $this->assertFalse($resolver->isFullFledged($this->getAnonymousToken()));
-        $this->assertFalse($resolver->isFullFledged($this->getRealCustomAnonymousToken()));
-    }
-
     protected function getToken()
     {
         return $this->createMock(TokenInterface::class);
-    }
-
-    protected function getAnonymousToken()
-    {
-        return new AnonymousToken('secret', 'anon.');
-    }
-
-    private function getRealCustomAnonymousToken()
-    {
-        return new class() extends AnonymousToken {
-            public function __construct()
-            {
-            }
-        };
     }
 
     protected function getRememberMeToken()
@@ -135,14 +60,6 @@ class AuthenticationTrustResolverTest extends TestCase
         $user = new InMemoryUser('wouter', '', ['ROLE_USER']);
 
         return new RememberMeToken($user, 'main', 'secret');
-    }
-
-    protected function getResolver()
-    {
-        return new AuthenticationTrustResolver(
-            AnonymousToken::class,
-            RememberMeToken::class
-        );
     }
 }
 
@@ -189,15 +106,6 @@ class FakeCustomToken implements TokenInterface
     }
 
     public function getUserIdentifier(): string
-    {
-    }
-
-    public function isAuthenticated(): bool
-    {
-        return true;
-    }
-
-    public function setAuthenticated(bool $isAuthenticated)
     {
     }
 

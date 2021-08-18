@@ -23,7 +23,6 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class AuthorizationCheckerTest extends TestCase
 {
-    private $authenticationManager;
     private $accessDecisionManager;
     private $authorizationChecker;
     private $tokenStorage;
@@ -33,73 +32,16 @@ class AuthorizationCheckerTest extends TestCase
         $this->accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $this->tokenStorage = new TokenStorage();
 
-        $this->authorizationChecker = new AuthorizationChecker(
-            $this->tokenStorage,
-            $this->accessDecisionManager,
-            false,
-            false
-        );
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testVoteAuthenticatesTokenIfNecessary()
-    {
-        $token = new UsernamePasswordToken('username', 'password', 'provider');
-        $this->tokenStorage->setToken($token);
-
-        $newToken = new UsernamePasswordToken('username', 'password', 'provider');
-
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
-        $this->authorizationChecker = new AuthorizationChecker($this->tokenStorage, $authenticationManager, $this->accessDecisionManager, false, false);
-        $authenticationManager
-            ->expects($this->once())
-            ->method('authenticate')
-            ->with($this->equalTo($token))
-            ->willReturn($newToken);
-
-        // default with() isn't a strict check
-        $tokenComparison = function ($value) use ($newToken) {
-            // make sure that the new token is used in "decide()" and not the old one
-            return $value === $newToken;
-        };
-
-        $this->accessDecisionManager
-            ->expects($this->once())
-            ->method('decide')
-            ->with($this->callback($tokenComparison))
-            ->willReturn(true);
-
-        // first run the token has not been re-authenticated yet, after isGranted is called, it should be equal
-        $this->assertNotSame($newToken, $this->tokenStorage->getToken());
-        $this->assertTrue($this->authorizationChecker->isGranted('foo'));
-        $this->assertSame($newToken, $this->tokenStorage->getToken());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyVoteWithoutAuthenticationToken()
-    {
-        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager);
-
-        $this->expectException(AuthenticationCredentialsNotFoundException::class);
-
-        $authorizationChecker->isGranted('ROLE_FOO');
+        $this->authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager);
     }
 
     public function testVoteWithoutAuthenticationToken()
     {
-        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager, false, false);
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager);
 
-        $this->accessDecisionManager
-            ->expects($this->once())
-            ->method('decide')
-            ->with($this->isInstanceOf(NullToken::class))
-            ->willReturn(true);
+        $this->accessDecisionManager->expects($this->once())->method('decide')->with($this->isInstanceOf(NullToken::class))->willReturn(false);
 
-        $this->assertTrue($authorizationChecker->isGranted('ANONYMOUS'));
+        $authorizationChecker->isGranted('ROLE_FOO');
     }
 
     /**

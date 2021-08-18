@@ -25,7 +25,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
@@ -37,7 +36,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class ContextListenerTest extends TestCase
@@ -90,16 +88,6 @@ class ContextListenerTest extends TestCase
             null,
             'C:10:"serialized"'
         );
-
-        $this->assertFalse($session->has('_security_session'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testOnKernelResponseWillRemoveSessionOnAnonymousToken()
-    {
-        $session = $this->runSessionOnKernelResponse(new AnonymousToken('secret', 'anon.'), 'C:10:"serialized"');
 
         $this->assertFalse($session->has('_security_session'));
     }
@@ -242,22 +230,6 @@ class ContextListenerTest extends TestCase
         $this->assertSame($goodRefreshedUser, $tokenStorage->getToken()->getUser());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testRememberMeGetsCanceledIfTokenIsDeauthenticated()
-    {
-        $tokenStorage = new TokenStorage();
-        $refreshedUser = new InMemoryUser('foobar', 'baz');
-
-        $rememberMeServices = $this->createMock(RememberMeServicesInterface::class);
-        $rememberMeServices->expects($this->once())->method('loginFail');
-
-        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)], null, $rememberMeServices);
-
-        $this->assertNull($tokenStorage->getToken());
-    }
-
     public function testTryAllUserProvidersUntilASupportingUserProviderIsFound()
     {
         $refreshedUser = new InMemoryUser('foobar', 'baz');
@@ -293,36 +265,6 @@ class ContextListenerTest extends TestCase
         $tokenStorage = $this->handleEventWithPreviousSession(new \ArrayObject([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)]), $refreshedUser);
 
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDeauthenticatedEvent()
-    {
-        $tokenStorage = new TokenStorage();
-        $refreshedUser = new InMemoryUser('foobar', 'baz');
-
-        $user = new InMemoryUser('foo', 'bar');
-        $session = new Session(new MockArraySessionStorage());
-        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, 'context_key', ['ROLE_USER'])));
-
-        $request = new Request();
-        $request->setSession($session);
-        $request->cookies->set('MOCKSESSID', true);
-
-        $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addListener(DeauthenticatedEvent::class, function (DeauthenticatedEvent $event) use ($user) {
-            $this->assertTrue($event->getOriginalToken()->isAuthenticated());
-            $this->assertEquals($event->getOriginalToken()->getUser(), $user);
-            $this->assertFalse($event->getRefreshedToken()->isAuthenticated());
-            $this->assertNotEquals($event->getRefreshedToken()->getUser(), $user);
-        });
-
-        $listener = new ContextListener($tokenStorage, [new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)], 'context_key', null, $eventDispatcher);
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
-
-        $this->assertNull($tokenStorage->getToken());
     }
 
     public function testWithPreviousNotStartedSession()
@@ -405,7 +347,7 @@ class ContextListenerTest extends TestCase
         return $session;
     }
 
-    private function handleEventWithPreviousSession($userProviders, UserInterface $user = null, RememberMeServicesInterface $rememberMeServices = null)
+    private function handleEventWithPreviousSession($userProviders, UserInterface $user = null)
     {
         $tokenUser = $user ?? new InMemoryUser('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
@@ -436,9 +378,6 @@ class ContextListenerTest extends TestCase
 
         $listener = new ContextListener($tokenStorage, $userProviders, 'context_key', null, null, null, $sessionTrackerEnabler);
 
-        if ($rememberMeServices) {
-            $listener->setRememberMeServices($rememberMeServices);
-        }
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
 
         if (null !== $user) {

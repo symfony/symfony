@@ -47,12 +47,10 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     }
 
     /**
-     * {@inheritdoc}
+     * @internal for compatibility with Symfony 5.4
      */
     public function loadUserByUsername(string $username)
     {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
-
         return $this->loadUserByIdentifier($username);
     }
 
@@ -60,13 +58,6 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     {
         foreach ($this->providers as $provider) {
             try {
-                // @deprecated since Symfony 5.3, change to $provider->loadUserByIdentifier() in 6.0
-                if (!method_exists($provider, 'loadUserByIdentifier')) {
-                    trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($provider));
-
-                    return $provider->loadUserByUsername($identifier);
-                }
-
                 return $provider->loadUserByIdentifier($identifier);
             } catch (UserNotFoundException $e) {
                 // try next one
@@ -101,8 +92,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         }
 
         if ($supportedUserFound) {
-            // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
-            $username = method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername();
+            $username = $user->getUserIdentifier();
             $e = new UserNotFoundException(sprintf('There is no user with name "%s".', $username));
             $e->setUserIdentifier($username);
             throw $e;

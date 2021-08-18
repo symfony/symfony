@@ -44,22 +44,6 @@ class InMemoryUserProviderTest extends TestCase
         $this->assertFalse($refreshedUser->isEnabled());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testRefreshWithLegacyUser()
-    {
-        $user = new User('fabien', 'bar');
-
-        $provider = $this->createProvider();
-
-        $refreshedUser = $provider->refreshUser($user);
-        $this->assertEquals('foo', $refreshedUser->getPassword());
-        $this->assertEquals(['ROLE_USER'], $refreshedUser->getRoles());
-        $this->assertFalse($refreshedUser->isEnabled());
-        $this->assertFalse($refreshedUser->isCredentialsNonExpired());
-    }
-
     protected function createProvider(): InMemoryUserProvider
     {
         return new InMemoryUserProvider([

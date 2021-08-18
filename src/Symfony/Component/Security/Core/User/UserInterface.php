@@ -26,8 +26,6 @@ namespace Symfony\Component\Security\Core\User;
  *
  * @see UserProviderInterface
  *
- * @method string getUserIdentifier() returns the identifier for this user (e.g. its username or e-mailaddress)
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface UserInterface
@@ -57,9 +55,7 @@ interface UserInterface
     public function eraseCredentials();
 
     /**
-     * @return string
-     *
-     * @deprecated since Symfony 5.3, use getUserIdentifier() instead
+     * Returns the identifier for this user (e.g. its username or e-mailaddress).
      */
-    public function getUsername();
+    public function getUserIdentifier(): string;
 }

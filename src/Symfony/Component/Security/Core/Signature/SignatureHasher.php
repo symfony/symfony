@@ -79,7 +79,7 @@ class SignatureHasher
      */
     public function computeSignatureHash(UserInterface $user, int $expires): string
     {
-        $signatureFields = [base64_encode(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername()), $expires];
+        $signatureFields = [base64_encode($user->getUserIdentifier()), $expires];
 
         foreach ($this->signatureProperties as $property) {
             $value = $this->propertyAccessor->getValue($user, $property) ?? '';

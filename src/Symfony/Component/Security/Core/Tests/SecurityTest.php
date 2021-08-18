@@ -39,7 +39,6 @@ class SecurityTest extends TestCase
 
     /**
      * @dataProvider getUserTests
-     * @dataProvider getLegacyUserTests
      */
     public function testGetUser($userInToken, $expectedUser)
     {
@@ -65,16 +64,6 @@ class SecurityTest extends TestCase
 
         $user = new InMemoryUser('nice_user', 'foo');
         yield [$user, $user];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function getLegacyUserTests()
-    {
-        yield ['string_username', null];
-
-        yield [new StringishUser(), null];
     }
 
     public function testIsGranted()

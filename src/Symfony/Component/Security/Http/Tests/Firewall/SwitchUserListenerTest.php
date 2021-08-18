@@ -138,30 +138,6 @@ class SwitchUserListenerTest extends TestCase
         $listener($this->event);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testExitUserDoesNotDispatchEventWithStringUser()
-    {
-        $originalUser = 'anon.';
-        $userProvider = $this->createMock(InMemoryUserProvider::class);
-        $userProvider
-            ->expects($this->never())
-            ->method('refreshUser');
-        $originalToken = new UsernamePasswordToken($originalUser, 'key');
-        $this->tokenStorage->setToken(new SwitchUserToken('username', '', 'key', ['ROLE_USER'], $originalToken));
-        $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
-
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher
-            ->expects($this->never())
-            ->method('dispatch')
-        ;
-
-        $listener = new SwitchUserListener($this->tokenStorage, $userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
-        $listener($this->event);
-    }
-
     public function testSwitchUserIsDisallowed()
     {
         $this->expectException(AccessDeniedException::class);

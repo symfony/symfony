@@ -38,15 +38,6 @@ interface TokenInterface
     public function getRoleNames(): array;
 
     /**
-     * Returns the user credentials.
-     *
-     * @return mixed
-     *
-     * @deprecated since 5.4
-     */
-    public function getCredentials();
-
-    /**
      * Returns a user representation.
      *
      * @return UserInterface
@@ -60,23 +51,7 @@ interface TokenInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function setUser(string|\Stringable|UserInterface $user);
-
-    /**
-     * Returns whether the user is authenticated or not.
-     *
-     * @return bool true if the token has been authenticated, false otherwise
-     *
-     * @deprecated since Symfony 5.4. In 6.0, security tokens will always be considered authenticated
-     */
-    public function isAuthenticated();
-
-    /**
-     * Sets the authenticated flag.
-     *
-     * @deprecated since Symfony 5.4. In 6.0, security tokens will always be considered authenticated
-     */
-    public function setAuthenticated(bool $isAuthenticated);
+    public function setUser(UserInterface $user);
 
     /**
      * Removes sensitive information from the token.
@@ -127,11 +102,4 @@ interface TokenInterface
      * Restores the object state from an array given by __serialize().
      */
     public function __unserialize(array $data): void;
-
-    /**
-     * @return string
-     *
-     * @deprecated since Symfony 5.3, use getUserIdentifier() instead
-     */
-    public function getUsername();
 }

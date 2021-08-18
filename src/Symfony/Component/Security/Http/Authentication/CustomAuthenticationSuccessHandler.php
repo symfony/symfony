@@ -33,10 +33,6 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
 
         if (method_exists($handler, 'setFirewallName')) {
             $this->handler->setFirewallName($firewallName);
-        } elseif (method_exists($handler, 'setProviderKey')) {
-            trigger_deprecation('symfony/security-http', '5.2', 'Method "%s::setProviderKey()" is deprecated, rename the method to "setFirewallName()" instead.', \get_class($handler));
-
-            $this->handler->setProviderKey($firewallName);
         }
     }
 

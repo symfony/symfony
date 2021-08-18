@@ -28,7 +28,7 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
@@ -75,9 +75,8 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
     {
         // create an authentication token for the User
-        // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
-        $passport = new SelfValidatingPassport(new UserBadge(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), function () use ($user) { return $user; }), $badges);
-        $token = method_exists($authenticator, 'createToken') ? $authenticator->createToken($passport, $this->firewallName) : $authenticator->createAuthenticatedToken($passport, $this->firewallName);
+        $passport = new SelfValidatingPassport(new UserBadge($user->getUserIdentifier(), function () use ($user) { return $user; }), $badges);
+        $token = $authenticator->createToken($passport, $this->firewallName);
 
         // announce the authentication token
         $token = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($token, $passport))->getAuthenticatedToken();
@@ -191,7 +190,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             }
 
             // create the authentication token
-            $authenticatedToken = method_exists($authenticator, 'createToken') ? $authenticator->createToken($passport, $this->firewallName) : $authenticator->createAuthenticatedToken($passport, $this->firewallName);
+            $authenticatedToken = $authenticator->createToken($passport, $this->firewallName);
 
             // announce the authentication token
             $authenticatedToken = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($authenticatedToken, $passport))->getAuthenticatedToken();
@@ -228,14 +227,8 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         return null;
     }
 
-    private function handleAuthenticationSuccess(TokenInterface $authenticatedToken, PassportInterface $passport, Request $request, AuthenticatorInterface $authenticator): ?Response
+    private function handleAuthenticationSuccess(TokenInterface $authenticatedToken, Passport $passport, Request $request, AuthenticatorInterface $authenticator): ?Response
     {
-        // @deprecated since Symfony 5.3
-        $user = $authenticatedToken->getUser();
-        if ($user instanceof UserInterface && !method_exists($user, 'getUserIdentifier')) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "getUserIdentifier(): string" in user class "%s" is deprecated. This method will replace "getUsername()" in Symfony 6.0.', get_debug_type($authenticatedToken->getUser()));
-        }
-
         $this->tokenStorage->setToken($authenticatedToken);
 
         $response = $authenticator->onAuthenticationSuccess($request, $authenticatedToken, $this->firewallName);
@@ -252,7 +245,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     /**
      * Handles an authentication failure and returns the Response for the authenticator.
      */
-    private function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $authenticator, ?PassportInterface $passport): ?Response
+    private function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $authenticator, ?Passport $passport): ?Response
     {
         if (null !== $this->logger) {
             $this->logger->info('Authenticator failed.', ['exception' => $authenticationException, 'authenticator' => \get_class($authenticator)]);

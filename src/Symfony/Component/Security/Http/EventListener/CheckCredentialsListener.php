@@ -19,7 +19,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
-use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
@@ -42,7 +41,7 @@ class CheckCredentialsListener implements EventSubscriberInterface
     public function checkPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();
-        if ($passport instanceof UserPassportInterface && $passport->hasBadge(PasswordCredentials::class)) {
+        if ($passport->hasBadge(PasswordCredentials::class)) {
             // Use the password hasher to validate the credentials
             $user = $passport->getUser();
 

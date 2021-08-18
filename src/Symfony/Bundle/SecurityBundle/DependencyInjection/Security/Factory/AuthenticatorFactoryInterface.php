@@ -15,21 +15,17 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @method int getPriority() defines the position at which the authenticator is called
- *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
 interface AuthenticatorFactoryInterface
 {
     /**
-     * Creates the authenticator service(s) for the provided configuration.
-     *
-     * @return string|string[] The authenticator service ID(s) to be used by the firewall
+     * Defines the priority at which the authenticator is called.
      */
-    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId);
+    public function getPriority(): int;
 
     /**
-     * Defines the configuration key used to reference the authenticator
+     * Defines the configuration key used to reference the provider
      * in the firewall configuration.
      *
      * @return string
@@ -37,4 +33,11 @@ interface AuthenticatorFactoryInterface
     public function getKey();
 
     public function addConfiguration(NodeDefinition $builder);
+
+    /**
+     * Creates the authenticator service(s) for the provided configuration.
+     *
+     * @return string|string[] The authenticator service ID(s) to be used by the firewall
+     */
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string|array;
 }

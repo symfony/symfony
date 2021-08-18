@@ -39,7 +39,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -144,19 +143,6 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($this->getContainerWithTokenStorage($token));
 
         $this->assertSame($controller->getUser(), $user);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetUserAnonymousUserConvertedToNull()
-    {
-        $token = new AnonymousToken('default', 'anon.');
-
-        $controller = $this->createController();
-        $controller->setContainer($this->getContainerWithTokenStorage($token));
-
-        $this->assertNull($controller->getUser());
     }
 
     public function testGetUserWithEmptyTokenStorage()

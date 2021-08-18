@@ -149,42 +149,4 @@ class ChannelListenerTest extends TestCase
 
         $this->assertTrue($listener->supports($request));
     }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyHandleWithEntryPoint()
-    {
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects($this->any())
-            ->method('isSecure')
-            ->willReturn(false)
-        ;
-
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap
-            ->expects($this->any())
-            ->method('getPatterns')
-            ->with($this->equalTo($request))
-            ->willReturn([[], 'https'])
-        ;
-
-        $response = new RedirectResponse('/redirected');
-
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint
-            ->expects($this->once())
-            ->method('start')
-            ->with($this->equalTo($request))
-            ->willReturn($response)
-        ;
-
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
-
-        $listener = new ChannelListener($accessMap, $entryPoint);
-        $listener($event);
-
-        $this->assertSame($response, $event->getResponse());
-    }
 }

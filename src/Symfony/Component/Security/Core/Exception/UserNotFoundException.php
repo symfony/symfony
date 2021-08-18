@@ -38,33 +38,11 @@ class UserNotFoundException extends AuthenticationException
     }
 
     /**
-     * @return string
-     *
-     * @deprecated
-     */
-    public function getUsername()
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
-
-        return $this->identifier;
-    }
-
-    /**
      * Set the user identifier (e.g. username or e-mailaddress).
      */
     public function setUserIdentifier(string $identifier): void
     {
         $this->identifier = $identifier;
-    }
-
-    /**
-     * @deprecated
-     */
-    public function setUsername(string $username)
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use setUserIdentifier() instead.', __METHOD__);
-
-        $this->identifier = $username;
     }
 
     /**

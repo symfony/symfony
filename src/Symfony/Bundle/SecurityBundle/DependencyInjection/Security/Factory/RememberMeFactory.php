@@ -20,18 +20,16 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Security\Core\Authentication\RememberMe\CacheTokenVerifier;
-use Symfony\Component\Security\Http\EventListener\RememberMeLogoutListener;
 
 /**
  * @internal
  */
-class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface, PrependExtensionInterface
+class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensionInterface
 {
     public const PRIORITY = -50;
 
@@ -46,61 +44,6 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         'always_remember_me' => false,
         'remember_me_parameter' => '_remember_me',
     ];
-
-    public function create(ContainerBuilder $container, string $id, array $config, ?string $userProvider, ?string $defaultEntryPoint): array
-    {
-        // authentication provider
-        $authProviderId = 'security.authentication.provider.rememberme.'.$id;
-        $container
-            ->setDefinition($authProviderId, new ChildDefinition('security.authentication.provider.rememberme'))
-            ->replaceArgument(0, new Reference('security.user_checker.'.$id))
-            ->addArgument($config['secret'])
-            ->addArgument($id)
-        ;
-
-        // remember me services
-        $templateId = $this->generateRememberMeServicesTemplateId($config, $id);
-        $rememberMeServicesId = $templateId.'.'.$id;
-
-        // attach to remember-me aware listeners
-        $userProviders = [];
-        foreach ($container->findTaggedServiceIds('security.remember_me_aware') as $serviceId => $attributes) {
-            foreach ($attributes as $attribute) {
-                if (!isset($attribute['id']) || $attribute['id'] !== $id) {
-                    continue;
-                }
-
-                if (!isset($attribute['provider'])) {
-                    throw new \RuntimeException('Each "security.remember_me_aware" tag must have a provider attribute.');
-                }
-
-                // context listeners don't need a provider
-                if ('none' !== $attribute['provider']) {
-                    $userProviders[] = new Reference($attribute['provider']);
-                }
-
-                $container
-                    ->getDefinition($serviceId)
-                    ->addMethodCall('setRememberMeServices', [new Reference($rememberMeServicesId)])
-                ;
-            }
-        }
-
-        $this->createRememberMeServices($container, $id, $templateId, $userProviders, $config);
-
-        // remember-me listener
-        $listenerId = 'security.authentication.listener.rememberme.'.$id;
-        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.rememberme'));
-        $listener->replaceArgument(1, new Reference($rememberMeServicesId));
-        $listener->replaceArgument(5, $config['catch_exceptions']);
-
-        // remember-me logout listener
-        $container->setDefinition('security.logout.listener.remember_me.'.$id, new Definition(RememberMeLogoutListener::class))
-            ->addArgument(new Reference($rememberMeServicesId))
-            ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$id]);
-
-        return [$authProviderId, $listenerId, $defaultEntryPoint];
-    }
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
@@ -177,11 +120,6 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         }
 
         return $authenticatorId;
-    }
-
-    public function getPosition(): string
-    {
-        return 'remember_me';
     }
 
     public function getPriority(): int

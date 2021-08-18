@@ -140,8 +140,8 @@ jobs:
         run: |
           sed -i 's/"\*\*\/Tests\/"//' composer.json
           composer install -q --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php # ensure the script is idempotent
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=1&php=7.2' php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=1&php=7.2' php .github/patch-types.php # ensure the script is idempotent
           echo PHPUNIT="$PHPUNIT,legacy" >> $GITHUB_ENV
 
       - name: Run tests

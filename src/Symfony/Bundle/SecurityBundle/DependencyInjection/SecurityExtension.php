@@ -505,7 +505,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $userProvider = $this->getUserProvider($container, $id, $firewall, $key, $defaultProvider, $providerIds, $contextListenerId);
 
                 if (!$factory instanceof AuthenticatorFactoryInterface) {
-                    throw new InvalidConfigurationException(sprintf('Cannot configure AuthenticatorManager as "%s" authentication does not support it, set "security.enable_authenticator_manager" to `false`.', $key));
+                    throw new InvalidConfigurationException(sprintf('Authenticator factory "%s" ("%s") must implement "%s".', get_debug_type($factory), $key, AuthenticatorFactoryInterface::class));
                 }
 
                 $authenticators = $factory->createAuthenticator($container, $id, $firewall[$key], $userProvider);
@@ -525,8 +525,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                         $listeners[] = new Reference($firewallListenerId);
                     }
                 }
-
-                $hasListeners = true;
             }
         }
 

@@ -63,7 +63,7 @@ class FormLoginFactory extends AbstractFactory
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         if (isset($config['csrf_token_generator'])) {
-            throw new InvalidConfigurationException('The "csrf_token_generator" option of "form_login" is only available when "security.enable_authenticator_manager" is set to "false", use "enable_csrf" instead.');
+            throw new InvalidConfigurationException('The "csrf_token_generator" on "form_login" does not exist, use "enable_csrf" instead.');
         }
 
         $authenticatorId = 'security.authenticator.form_login.'.$firewallName;

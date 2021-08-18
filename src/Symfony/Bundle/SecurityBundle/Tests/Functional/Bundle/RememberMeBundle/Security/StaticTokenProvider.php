@@ -29,7 +29,7 @@ class StaticTokenProvider implements TokenProviderInterface
         }
     }
 
-    public function loadTokenBySeries(string $series)
+    public function loadTokenBySeries(string $series): PersistentTokenInterface
     {
         $token = self::$db[$series] ?? false;
         if (!$token) {

@@ -176,7 +176,7 @@ class TestLoader implements LoaderInterface
 
 class PropertyGetterInterfaceConstraintLoader implements LoaderInterface
 {
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         if (PropertyGetterInterface::class === $metadata->getClassName()) {
             $metadata->addGetterConstraint('property', new NotBlank());

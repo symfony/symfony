@@ -152,5 +152,5 @@ abstract class TestPasswordAuthenticatedUser implements UserInterface, PasswordA
 {
     abstract public function getPassword(): ?string;
 
-    abstract public function getSalt();
+    abstract public function getSalt(): ?string;
 }

@@ -156,10 +156,8 @@ class Cookie
      * Converts expires formats to a unix timestamp.
      *
      * @param int|string|\DateTimeInterface $expire
-     *
-     * @return int
      */
-    private static function expiresTimestamp($expire = 0)
+    private static function expiresTimestamp($expire = 0): int
     {
         // convert expiration time to a Unix timestamp
         if ($expire instanceof \DateTimeInterface) {

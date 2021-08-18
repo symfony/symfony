@@ -268,22 +268,22 @@ class SerializableUser implements UserInterface, \Serializable
         $this->roles = $roles;
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->name;
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         return $this->name;
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return '***';
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         if (empty($this->roles)) {
             return ['ROLE_USER'];
@@ -296,7 +296,7 @@ class SerializableUser implements UserInterface, \Serializable
     {
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return null;
     }

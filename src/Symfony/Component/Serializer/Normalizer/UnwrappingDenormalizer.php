@@ -54,7 +54,7 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, string $format = null, array $context = [])
+    public function supportsDenormalization($data, $type, string $format = null, array $context = []): bool
     {
         return \array_key_exists(self::UNWRAP_PATH, $context) && !isset($context['unwrapped']);
     }

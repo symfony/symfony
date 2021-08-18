@@ -42,9 +42,6 @@ class ParentTestService
     {
     }
 
-    /**
-     * @return ?ContainerInterface
-     */
     public function setContainer(ContainerInterface $container)
     {
         return $container;

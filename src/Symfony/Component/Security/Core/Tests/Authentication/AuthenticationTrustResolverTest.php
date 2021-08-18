@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication;
 
+use Symfony\Component\Security\Core\User\UserInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -176,7 +177,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function getUser()
+    public function getUser(): UserInterface
     {
     }
 

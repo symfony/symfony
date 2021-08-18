@@ -46,7 +46,7 @@ final class TestApplication extends Application
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultCommands()
+    protected function getDefaultCommands(): array
     {
         return [];
     }

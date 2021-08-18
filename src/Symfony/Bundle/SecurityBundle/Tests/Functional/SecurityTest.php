@@ -161,7 +161,7 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->roles;
     }

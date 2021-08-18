@@ -622,7 +622,7 @@ class NotSerializable
     /**
      * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         if (class_exists(\Error::class)) {
             throw new \Error('not serializable');

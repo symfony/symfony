@@ -912,7 +912,7 @@ class Request
      *
      * @return string The raw URL (i.e. not urldecoded)
      */
-    private function getBaseUrlReal()
+    private function getBaseUrlReal(): string
     {
         if (null === $this->baseUrl) {
             $this->baseUrl = $this->prepareBaseUrl();

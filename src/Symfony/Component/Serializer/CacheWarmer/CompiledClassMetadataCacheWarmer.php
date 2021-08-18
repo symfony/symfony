@@ -40,7 +40,7 @@ final class CompiledClassMetadataCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): array
     {
         $metadatas = [];
 
@@ -58,7 +58,7 @@ final class CompiledClassMetadataCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritdoc}
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }

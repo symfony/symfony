@@ -121,12 +121,12 @@ class PropertyCompositeConstraint extends Composite
 {
     public $nested;
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return $this->getCompositeOption();
     }
 
-    protected function getCompositeOption()
+    protected function getCompositeOption(): string
     {
         return 'nested';
     }

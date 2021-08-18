@@ -26,7 +26,7 @@ class UserChangingUserProvider implements UserProviderInterface
         $this->inner = $inner;
     }
 
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): UserInterface
     {
         return $this->inner->loadUserByUsername($username);
     }
@@ -36,7 +36,7 @@ class UserChangingUserProvider implements UserProviderInterface
         return $this->inner->loadUserByIdentifier($userIdentifier);
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         $user = $this->inner->refreshUser($user);
 
@@ -46,7 +46,7 @@ class UserChangingUserProvider implements UserProviderInterface
         return $user;
     }
 
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return $this->inner->supportsClass($class);
     }

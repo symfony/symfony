@@ -52,7 +52,7 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
     /**
      * @return array
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }

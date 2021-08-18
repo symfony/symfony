@@ -1947,7 +1947,7 @@ class SignableCommand extends Command implements SignalableCommandInterface
         $this->signaled = true;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         for ($i = 0; $i < $this->loop; ++$i) {
             usleep(100);

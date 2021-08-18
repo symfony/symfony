@@ -93,7 +93,7 @@ class CustomAuthenticator extends AbstractAuthenticator implements Authenticatio
         ], JsonResponse::HTTP_FORBIDDEN);
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null): Response
     {
     }
 }

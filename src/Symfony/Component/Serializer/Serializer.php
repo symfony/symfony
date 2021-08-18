@@ -316,7 +316,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function encode($data, string $format, array $context = [])
+    final public function encode($data, string $format, array $context = []): string
     {
         return $this->encoder->encode($data, $format, $context);
     }

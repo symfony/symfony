@@ -483,7 +483,7 @@ class RootDummy
     /**
      * @return Dummy[][][]
      */
-    public function getGrandChildren()
+    public function getGrandChildren(): array
     {
         return $this->grandChildren;
     }
@@ -491,7 +491,7 @@ class RootDummy
     /**
      * @return array
      */
-    public function getIntMatrix()
+    public function getIntMatrix(): array
     {
         return $this->intMatrix;
     }

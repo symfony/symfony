@@ -53,7 +53,7 @@ final class MessageDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'mailer';
     }

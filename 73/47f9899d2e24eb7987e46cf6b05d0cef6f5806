@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-22T12:58:12Z
+
+PR updated. It now contains a script that parses the source code of PHP 8.1 to extract all new tentative return types. This is used to generate the new internal `TentativeTypes` class, which is in turn used to trigger deprecations when a method misses a return type or annotation.
+
+As you can see, this makes tests fail because we're missing many such annotations.
+
+In a next step, we should add the missing annotations and add also the missing `#[\ReturnTypeWillChange]` attributes. The code shouldn't be that far from being able to do it on its own.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-23T16:24:05Z
+
+I'm going on a break for the following 2 weeks and will be mostly AFK.
+The code in this PR is working, but needs more testing.
+
+If you want to play locally with it, check it out, empty `exclude-from-classmap` in `composer.json`, then run `composer i -o`. The `-o` is important as that's how existing classes are discovered.
+
+Then run `SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php` to add return types, or `SYMFONY_PATCH_TYPE_DECLARATIONS=force=docblock php .github/patch-types.php` to add phpdoc.
+
+What is missing here:
+- [x] fix tests
+- [x] make `DebugClassLoader` able to add `#[ReturnTypeWillChange]` attributes where needed for PHP 8.1
+- [x] look at current failures in the CI and figure out which annotations/return types are missing. E.g. anonymous classes aren't parsed right now but would need to.
+
+The plan I have in mind for Symfony 6 relies heavily on this work.
+
+I want to help the community by providing in 5.4 a `DebugClassLoader` that they can turn on in their CI to spot where they're missing return-types (or `@return` annotations before breaking BC.)
+
+The plan for the OSS community would then be: turn this on, fix deprecations, plan a major version bump if needed, then allow Symfony 6 in their composer.json file.
+
+I fear that allowing Symfony 6.0 right now in OSS libraries might create a huge WTF moment for the community: the day we'll add the return types in our 6.0 branch, we'll potentially break all those libs that allowed `^6`.
+
+We might need a similar approach for public properties btw. Help wanted on all those topics.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-10T15:16:13Z
+
+Deprecations should be fixed by https://github.com/Nyholm/psr7/pull/187, https://github.com/twigphp/Twig/pull/3554, https://github.com/doctrine/collections/pull/280, https://github.com/doctrine/persistence/pull/202, https://github.com/doctrine/orm/pull/8905 and https://github.com/mongodb/mongo-php-library/pull/855
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-11T13:31:22Z
+
+PR is ready. It requires the last two PRs listed above to be green for tests. Psalm/fabbot reports are false positives.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-17T16:46:04Z
+
+This PR is ready, remaining failures are false positives.

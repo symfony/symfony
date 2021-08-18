@@ -139,7 +139,10 @@ class LogoutListenerTest extends TestCase
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    public function testCsrfValidationFails()
+    /**
+     * @dataProvider provideInvalidCsrfTokens
+     */
+    public function testCsrfValidationFails($invalidToken)
     {
         $this->expectException(LogoutException::class);
         $tokenManager = $this->getTokenManager();
@@ -147,18 +150,29 @@ class LogoutListenerTest extends TestCase
         [$listener, , $httpUtils, $options] = $this->getListener(null, $tokenManager);
 
         $request = new Request();
-        $request->query->set('_csrf_token', 'token');
+        if (null !== $invalidToken) {
+            $request->query->set('_csrf_token', $invalidToken);
+        }
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
             ->with($request, $options['logout_path'])
             ->willReturn(true);
 
-        $tokenManager->expects($this->once())
+        $tokenManager
             ->method('isTokenValid')
             ->willReturn(false);
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+    }
+
+    public function provideInvalidCsrfTokens(): array
+    {
+        return [
+            ['invalid'],
+            [['in' => 'valid']],
+            [null],
+        ];
     }
 
     private function getTokenManager()

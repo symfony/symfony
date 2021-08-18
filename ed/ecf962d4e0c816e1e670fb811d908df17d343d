@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-06T11:15:57Z
+
+Hey!
+
+I think @przemyslaw-bogusz has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-07-06T21:00:20Z
+
+As this is a new feature it should target `5.4` branch
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-07-09T12:48:30Z
+
+Alright, I'll rebase to 5.4!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-07-19T13:15:10Z
+
+Added missing tests for `Sequentially` and `AtLeastOneOf` attributes.
+Added support for `Collection` as well (https://github.com/symfony/symfony/pull/41994/files#diff-d9f229d35c24533de28e1e630ee4e74afa4ce27d7af8f137d788898e0b9efc73R41).
+Added documentation pull-request.
+
+`Required` and `Optional` don't need update. I still added them in AnnotationLeaderTest.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-26T10:43:08Z
+
+In order to get the PHP 8.0 testsuite green, you need to exclude your new fixtures in `.github/patch-types.php`.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-07-27T07:16:05Z
+
+> In order to get the PHP 8.0 testsuite green, you need to exclude your new fixtures in `.github/patch-types.php`.
+
+Will do, thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-18T14:48:59Z
+
+This is now available in the 8.1 PHP branch.

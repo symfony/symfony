@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
@@ -25,7 +24,6 @@ class HelperSet implements \IteratorAggregate
      * @var Helper[]
      */
     private $helpers = [];
-    private $command;
 
     /**
      * @param Helper[] $helpers An array of helper
@@ -67,28 +65,6 @@ class HelperSet implements \IteratorAggregate
         }
 
         return $this->helpers[$name];
-    }
-
-    /**
-     * @deprecated since Symfony 5.4
-     */
-    public function setCommand(Command $command = null)
-    {
-        trigger_deprecation('symfony/console', '5.4', 'Method "%s()" is deprecated.', __METHOD__);
-
-        $this->command = $command;
-    }
-
-    /**
-     * Gets the command associated with this helper set.
-     *
-     * @deprecated since Symfony 5.4
-     */
-    public function getCommand(): Command
-    {
-        trigger_deprecation('symfony/console', '5.4', 'Method "%s()" is deprecated.', __METHOD__);
-
-        return $this->command;
     }
 
     /**

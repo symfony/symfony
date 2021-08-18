@@ -17,9 +17,9 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransf
 
 class DateTimeToStringTransformerTest extends TestCase
 {
-    public function dataProvider()
+    public function dataProvider(): array
     {
-        $data = [
+        return [
             ['Y-m-d H:i:s', '2010-02-03 16:05:06', '2010-02-03 16:05:06 UTC'],
             ['Y-m-d H:i:00', '2010-02-03 16:05:00', '2010-02-03 16:05:00 UTC'],
             ['Y-m-d H:i', '2010-02-03 16:05', '2010-02-03 16:05:00 UTC'],
@@ -36,7 +36,6 @@ class DateTimeToStringTransformerTest extends TestCase
 
             // different day representations
             ['Y-m-j', '2010-02-3', '2010-02-03 00:00:00 UTC'],
-            ['z', '33', '1970-02-03 00:00:00 UTC'],
 
             // not bijective
             // this will not work as PHP will use actual date to replace missing info
@@ -63,8 +62,6 @@ class DateTimeToStringTransformerTest extends TestCase
 
             ['Y-z', '2010-33', '2010-02-03 00:00:00 UTC'],
         ];
-
-        return $data;
     }
 
     /**

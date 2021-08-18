@@ -202,3 +202,11 @@ function env(string $name): EnvConfigurator
 {
     return new EnvConfigurator($name);
 }
+
+/**
+ * Creates a closure service reference.
+ */
+function service_closure(string $serviceId): ClosureReferenceConfigurator
+{
+    return new ClosureReferenceConfigurator($serviceId);
+}

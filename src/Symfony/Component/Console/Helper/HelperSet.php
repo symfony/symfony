@@ -73,8 +73,13 @@ class HelperSet implements \IteratorAggregate
         return $this->helpers[$name];
     }
 
+    /**
+     * @deprecated since Symfony 5.4
+     */
     public function setCommand(Command $command = null)
     {
+        trigger_deprecation('symfony/console', '5.4', 'Method "%s()" is deprecated.', __METHOD__);
+
         $this->command = $command;
     }
 
@@ -82,9 +87,13 @@ class HelperSet implements \IteratorAggregate
      * Gets the command associated with this helper set.
      *
      * @return Command
+     *
+     * @deprecated since Symfony 5.4
      */
     public function getCommand()
     {
+        trigger_deprecation('symfony/console', '5.4', 'Method "%s()" is deprecated.', __METHOD__);
+
         return $this->command;
     }
 

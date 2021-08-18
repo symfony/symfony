@@ -30,6 +30,7 @@ Console
  * `Command::setHidden()` has a default value (`true`) for `$hidden` parameter
  * Remove `Helper::strlen()`, use `Helper::width()` instead.
  * Remove `Helper::strlenWithoutDecoration()`, use `Helper::removeDecoration()` instead.
+ * Remove `HelperSet::setCommand()` and `getCommand()` without replacement
 
 DependencyInjection
 -------------------

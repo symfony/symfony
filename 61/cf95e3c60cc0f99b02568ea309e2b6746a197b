@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-12T10:34:12Z
+
+Rebased to take into account all the work done since the creation of this PR. There are some failing tests in the SecurityBundle that are a bit scary.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-16T07:03:11Z
+
+Looks like we can move on with this one now that all related PRs on 5.4 have been merged.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-16T08:11:24Z
+
+Thank you for all the merges Fabien.
+
+I tried to fix as most checks as possible yesterday, only high-deps and low-deps are left to fix. There are some weird failures in there (and we probably need one more 5.4 PR to fix the flipped tests). I'm planning to work on this tomorrow.
+
+<details>
+<summary><i>no longer relevant - the bug is fixed</i></summary>
+
+This error is one I completely don't understand: (Deps=high)
+
+```
+PHP Fatal error:  Could not check compatibility between Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\TestAuthenticator::createToken(Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Passport $passport, string $firewallName): Symfony\Component\Security\Core\Authentication\Token\TokenInterface and Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface::createToken(Symfony\Component\Security\Http\Authenticator\Passport\Passport $passport, string $firewallName): Symfony\Component\Security\Core\Authentication\Token\TokenInterface, because class Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Passport is not available in /home/runner/work/symfony/symfony/src/Symfony/Bundle/SecurityBundle/Tests/DependencyInjection/SecurityExtensionTest.php on line 860
+```
+
+It somehow got an unqualified namespace in there: `Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Passport` But as far as I can see, there are no missing use statements in 5.4 and 6.0 for this test.</details>
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-16T08:12:19Z
+
+Oh and https://github.com/symfony/symfony/pull/42578 has to be merged as well
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-16T14:07:09Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-17T16:44:23Z
+
+:green_circle: !
+
+<s>The remaining deps=high failures are unrelated to changes in this PR.</s> Also updated the PR description, this is no longer a todo list :)
+Happy reviewing! :wink:

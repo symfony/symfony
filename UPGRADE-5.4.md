@@ -6,6 +6,11 @@ Cache
 
  * Deprecate `DoctrineProvider` because this class has been added to the `doctrine/cache` package`
 
+Console
+-------
+
+ * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
+
 Finder
 ------
 

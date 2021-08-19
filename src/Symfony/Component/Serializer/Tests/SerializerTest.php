@@ -791,13 +791,15 @@ class Baz
     }
 }
 
-class DummyList implements \Countable, \IteratorAggregate
+class DummyList extends \ArrayObject
 {
     public $list;
 
     public function __construct(array $list)
     {
         $this->list = $list;
+
+        $this->setFlags(\ArrayObject::STD_PROP_LIST);
     }
 
     public function count(): int

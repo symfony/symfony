@@ -38,10 +38,8 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
-    public function normalize(mixed $object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         if (!$object instanceof FlattenException) {
             throw new InvalidArgumentException(sprintf('The object must implement "%s".', FlattenException::class));

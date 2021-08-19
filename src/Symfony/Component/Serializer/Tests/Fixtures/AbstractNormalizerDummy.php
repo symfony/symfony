@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**

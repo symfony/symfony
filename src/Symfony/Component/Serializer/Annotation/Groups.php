@@ -51,7 +51,7 @@ class Groups
     /**
      * @return string[]
      */
-    public function getGroups()
+    public function getGroups(): array
     {
         return $this->groups;
     }

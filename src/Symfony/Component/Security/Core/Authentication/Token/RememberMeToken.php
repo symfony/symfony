@@ -81,8 +81,6 @@ class RememberMeToken extends AbstractToken
     }
 
     /**
-     * Returns the secret.
-     *
      * @return string
      */
     public function getSecret()

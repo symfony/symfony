@@ -66,6 +66,9 @@ abstract class AbstractToken implements TokenInterface
         return (string) $this->user;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getUserIdentifier(): string
     {
         // method returns "null" in non-legacy mode if not overridden
@@ -208,9 +211,7 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * Returns the token attributes.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getAttributes()
     {
@@ -218,9 +219,7 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * Sets the token attributes.
-     *
-     * @param array $attributes The token attributes
+     * {@inheritdoc}
      */
     public function setAttributes(array $attributes)
     {
@@ -228,9 +227,7 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * Returns true if the attribute exists.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasAttribute(string $name)
     {
@@ -238,11 +235,7 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * Returns an attribute value.
-     *
-     * @return mixed
-     *
-     * @throws \InvalidArgumentException When attribute doesn't exist for this token
+     * {@inheritdoc}
      */
     public function getAttribute(string $name)
     {
@@ -254,9 +247,7 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * Sets an attribute.
-     *
-     * @param mixed $value The attribute value
+     * {@inheritdoc}
      */
     public function setAttribute(string $name, $value)
     {

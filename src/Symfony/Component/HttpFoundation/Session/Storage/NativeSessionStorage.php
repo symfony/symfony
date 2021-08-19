@@ -157,7 +157,7 @@ class NativeSessionStorage implements SessionStorageInterface
         // Subsequent calls to session_start() cause PHP to unconditionally
         // [re-]set the cookie header, which may be undesirable.
         // @see https://bugs.php.net/bug.php?id=38104#1491877141
-        if (true === $this->closed) {
+        if ($this->closed) {
             $options['use_cookies'] = 0;
         }
         if (!session_start($options)) {

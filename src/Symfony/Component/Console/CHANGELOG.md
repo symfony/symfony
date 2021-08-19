@@ -8,6 +8,7 @@ CHANGELOG
  * Remove `Helper::strlen()`, use `Helper::width()` instead
  * Remove `Helper::strlenWithoutDecoration()`, use `Helper::removeDecoration()` instead
  * `AddConsoleCommandPass` can not be configured anymore
+ * Remove `HelperSet::setCommand()` and `getCommand()` without replacement
 
 5.4
 ---

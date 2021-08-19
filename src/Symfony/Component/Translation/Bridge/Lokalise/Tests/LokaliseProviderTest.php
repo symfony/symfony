@@ -69,14 +69,14 @@ class LokaliseProviderTest extends ProviderTestCase
 
             $this->assertSame('POST', $method);
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
-            $this->assertSame($expectedBody, $options['body']);
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse();
         };
 
         $getKeysIdsForMessagesDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedQuery = [
-                'filter_keys' => 'a',
+                'filter_keys' => 'young_dog',
                 'filter_filenames' => 'messages.xliff',
             ];
 
@@ -104,7 +104,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $expectedBody = json_encode([
                 'keys' => [
                     [
-                        'key_name' => 'a',
+                        'key_name' => 'young_dog',
                         'platforms' => ['web'],
                         'filenames' => [
                             'web' => 'messages.xliff',
@@ -117,11 +117,11 @@ class LokaliseProviderTest extends ProviderTestCase
             ]);
 
             $this->assertSame('POST', $method);
-            $this->assertSame($expectedBody, $options['body']);
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse(json_encode(['keys' => [
                 [
-                    'key_name' => ['web' => 'a'],
+                    'key_name' => ['web' => 'young_dog'],
                     'key_id' => 29,
                 ],
             ]]));
@@ -144,7 +144,7 @@ class LokaliseProviderTest extends ProviderTestCase
             ]);
 
             $this->assertSame('POST', $method);
-            $this->assertSame($expectedBody, $options['body']);
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse(json_encode(['keys' => [
                 [
@@ -153,8 +153,8 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]]));
         };
-
-        $updateTranslationsResponse = function (string $method, string $url, array $options = []): ResponseInterface {
+        $updateProcessed = false;
+        $updateTranslationsResponse = function (string $method, string $url, array $options = []) use (&$updateProcessed): ResponseInterface {
             $expectedBody = json_encode([
                 'keys' => [
                     [
@@ -169,11 +169,11 @@ class LokaliseProviderTest extends ProviderTestCase
                         'translations' => [
                             [
                                 'language_iso' => 'en',
-                                'translation' => 'trans_en_a',
+                                'translation' => 'puppy',
                             ],
                             [
                                 'language_iso' => 'fr',
-                                'translation' => 'trans_fr_a',
+                                'translation' => 'chiot',
                             ],
                         ],
                     ],
@@ -200,8 +200,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]);
 
+            $updateProcessed = true;
             $this->assertSame('PUT', $method);
-            $this->assertSame($expectedBody, $options['body']);
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse();
         };
@@ -221,15 +222,16 @@ class LokaliseProviderTest extends ProviderTestCase
 
         $translatorBag = new TranslatorBag();
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
-            'messages' => ['a' => 'trans_en_a'],
+            'messages' => ['young_dog' => 'puppy'],
             'validators' => ['post.num_comments' => '{count, plural, one {# comment} other {# comments}}'],
         ]));
         $translatorBag->addCatalogue(new MessageCatalogue('fr', [
-            'messages' => ['a' => 'trans_fr_a'],
+            'messages' => ['young_dog' => 'chiot'],
             'validators' => ['post.num_comments' => '{count, plural, one {# commentaire} other {# commentaires}}'],
         ]));
 
         $provider->write($translatorBag);
+        $this->assertTrue($updateProcessed, 'Translations update was not called.');
     }
 
     /**
@@ -248,7 +250,7 @@ class LokaliseProviderTest extends ProviderTestCase
 
             $this->assertSame('POST', $method);
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/files/export', $url);
-            $this->assertSame($expectedBody, $options['body']);
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse(json_encode([
                 'files' => [

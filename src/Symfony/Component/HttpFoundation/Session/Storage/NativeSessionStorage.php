@@ -160,6 +160,7 @@ class NativeSessionStorage implements SessionStorageInterface
         if ($this->closed) {
             $options['use_cookies'] = 0;
         }
+
         if (!session_start($options)) {
             throw new \RuntimeException('Failed to start the session.');
         }

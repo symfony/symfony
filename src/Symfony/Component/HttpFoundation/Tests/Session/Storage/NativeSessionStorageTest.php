@@ -245,7 +245,7 @@ class NativeSessionStorageTest extends TestCase
 
     public function testSessionCookieOnlySentOnce()
     {
-        if (!function_exists('xdebug_get_headers')) {
+        if (!\function_exists('xdebug_get_headers')) {
             $this->markTestSkipped('Test utilizes missing xdebug_get_headers() function.');
         }
         $storage = $this->getStorage();

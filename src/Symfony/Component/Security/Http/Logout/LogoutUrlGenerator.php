@@ -79,8 +79,6 @@ class LogoutUrlGenerator
 
     /**
      * Generates the logout URL for the firewall.
-     *
-     * @return string
      */
     private function generateLogoutUrl(?string $key, int $referenceType): string
     {

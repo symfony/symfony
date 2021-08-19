@@ -104,8 +104,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
      * Internally, if this method returns false, the authentication system
      * will throw an AccountExpiredException and prevent login.
      *
-     * @return bool
-     *
      * @see AccountExpiredException
      */
     public function isAccountNonExpired(): bool
@@ -118,8 +116,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
      *
      * Internally, if this method returns false, the authentication system
      * will throw a LockedException and prevent login.
-     *
-     * @return bool
      *
      * @see LockedException
      */
@@ -134,8 +130,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
      * Internally, if this method returns false, the authentication system
      * will throw a CredentialsExpiredException and prevent login.
      *
-     * @return bool
-     *
      * @see CredentialsExpiredException
      */
     public function isCredentialsNonExpired(): bool
@@ -148,8 +142,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
      *
      * Internally, if this method returns false, the authentication system
      * will throw a DisabledException and prevent login.
-     *
-     * @return bool
      *
      * @see DisabledException
      */

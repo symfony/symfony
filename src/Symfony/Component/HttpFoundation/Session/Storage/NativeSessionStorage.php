@@ -153,7 +153,14 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         // ok to try and start the session
-        if (!session_start()) {
+        $options = [];
+        // Subsequent calls to session_start() cause PHP to unconditionally
+        // [re-]set the cookie header, which may be undesirable.
+        // @see https://bugs.php.net/bug.php?id=38104#1491877141
+        if (true === $this->closed) {
+            $options['use_cookies'] = 0;
+        }
+        if (!session_start($options)) {
             throw new \RuntimeException('Failed to start the session.');
         }
 

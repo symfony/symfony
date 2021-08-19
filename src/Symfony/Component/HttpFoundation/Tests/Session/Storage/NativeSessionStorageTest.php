@@ -243,6 +243,22 @@ class NativeSessionStorageTest extends TestCase
         $storage->start();
     }
 
+    public function testSessionCookieOnlySentOnce()
+    {
+        if (!function_exists('xdebug_get_headers')) {
+            $this->markTestSkipped('Test utilizes missing xdebug_get_headers() function.');
+        }
+        $storage = $this->getStorage();
+        $storage->start();
+        $storage->getBag('attributes')->set('attribute', 1);
+        $storage->save();
+        $regex = '/^Set\-Cookie\: .*/';
+        $this->assertCount(1, preg_grep($regex, xdebug_get_headers()));
+        $storage->start();
+        $storage->save();
+        $this->assertCount(1, preg_grep($regex, xdebug_get_headers()));
+    }
+
     public function testRestart()
     {
         $storage = $this->getStorage();

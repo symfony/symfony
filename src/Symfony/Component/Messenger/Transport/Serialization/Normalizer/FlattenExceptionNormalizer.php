@@ -32,7 +32,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
      *
      * @throws InvalidArgumentException
      */
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = []): array
     {
         $normalized = [
             'message' => $object->getMessage(),
@@ -62,7 +62,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = []): FlattenException
     {
         $object = new FlattenException();
 

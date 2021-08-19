@@ -59,7 +59,7 @@ class NullToken implements TokenInterface
     public function isAuthenticated()
     {
         if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/security-core', '5.4', 'Method "%s()" is deprecated. In version 6.0, security tokens won\'t have an "authenticated" flag anymore and will always be considered authenticated.', __METHOD__);
+            trigger_deprecation('symfony/security-core', '5.4', 'Method "%s()" is deprecated, return null from "getUser()" instead when a token is not authenticated.', __METHOD__);
         }
 
         return true;

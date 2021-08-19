@@ -114,7 +114,7 @@ class AccessListener extends AbstractListener
 
         // @deprecated since Symfony 5.4
         if (method_exists($token, 'isAuthenticated') && !$token->isAuthenticated(false)) {
-            trigger_deprecation('symfony/core', '5.4', 'Returning false from "%s()" is deprecated and won\'t have any effect in Symfony 6.0 as security tokens will always be considered authenticated.');
+            trigger_deprecation('symfony/core', '5.4', 'Returning false from "%s()" is deprecated, return null from "getUser()" instead.');
 
             if ($this->authManager) {
                 $token = $this->authManager->authenticate($token);

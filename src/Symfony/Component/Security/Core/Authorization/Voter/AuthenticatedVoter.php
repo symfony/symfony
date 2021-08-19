@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
-use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -96,7 +95,7 @@ class AuthenticatedVoter implements VoterInterface
             if (self::IS_AUTHENTICATED === $attribute
                 && (method_exists($this->authenticationTrustResolver, 'isAuthenticated')
                     ? $this->authenticationTrustResolver->isAuthenticated($token)
-                    : (null !== $token && !$token instanceof NullToken))) {
+                    : ($token && $token->getUser()))) {
                 return VoterInterface::ACCESS_GRANTED;
             }
 

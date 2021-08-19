@@ -24,8 +24,6 @@ class AuthenticationException extends RuntimeException
     private $token;
 
     /**
-     * Get the token.
-     *
      * @return TokenInterface|null
      */
     public function getToken()

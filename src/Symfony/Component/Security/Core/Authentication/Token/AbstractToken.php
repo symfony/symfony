@@ -121,9 +121,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     }
 
     /**
-     * Returns the token attributes.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getAttributes()
     {
@@ -131,9 +129,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     }
 
     /**
-     * Sets the token attributes.
-     *
-     * @param array $attributes The token attributes
+     * {@inheritdoc}
      */
     public function setAttributes(array $attributes)
     {
@@ -141,9 +137,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     }
 
     /**
-     * Returns true if the attribute exists.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasAttribute(string $name)
     {
@@ -151,11 +145,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     }
 
     /**
-     * Returns an attribute value.
-     *
-     * @return mixed
-     *
-     * @throws \InvalidArgumentException When attribute doesn't exist for this token
+     * {@inheritdoc}
      */
     public function getAttribute(string $name)
     {
@@ -166,6 +156,9 @@ abstract class AbstractToken implements TokenInterface, \Serializable
         return $this->attributes[$name];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setAttribute(string $name, mixed $value)
     {
         $this->attributes[$name] = $value;

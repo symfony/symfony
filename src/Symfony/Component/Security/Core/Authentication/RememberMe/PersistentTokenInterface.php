@@ -48,7 +48,7 @@ interface PersistentTokenInterface
     public function getLastUsed();
 
     /**
-     * Returns the identifier used to authenticate (e.g. their e-mailaddress or username).
+     * Returns the identifier used to authenticate (e.g. their email address or username).
      */
     public function getUserIdentifier(): string;
 }

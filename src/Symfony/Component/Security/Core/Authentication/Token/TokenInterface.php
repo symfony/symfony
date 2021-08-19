@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * TokenInterface is the interface for the user authentication information.
  *
- * @method string getUserIdentifier() returns the user identifier used during authentication (e.g. a user's e-mailaddress or username)
+ * @method string getUserIdentifier() returns the user identifier used during authentication (e.g. a user's email address or username)
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -59,38 +59,27 @@ interface TokenInterface
     public function eraseCredentials();
 
     /**
-     * Returns the token attributes.
-     *
      * @return array
      */
     public function getAttributes();
 
     /**
-     * Sets the token attributes.
-     *
      * @param array $attributes The token attributes
      */
     public function setAttributes(array $attributes);
 
     /**
-     * Returns true if the attribute exists.
-     *
      * @return bool
      */
     public function hasAttribute(string $name);
 
     /**
-     * Returns an attribute value.
-     *
      * @return mixed
      *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */
     public function getAttribute(string $name);
 
-    /**
-     * Sets an attribute.
-     */
     public function setAttribute(string $name, mixed $value);
 
     /**

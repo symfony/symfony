@@ -1,0 +1,187 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-13T13:07:20Z
+
+Hey!
+
+I think @VincentLanglet has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-13T13:30:01Z
+
+ping @lyrixx as the failing tests seem related to your recent addition
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-13T13:52:11Z
+
+I noticed that when I added tests. There is a bug IMHO in the serializer, but if we fix it, it would be a BC break. So I let everything in place.
+
+---
+
+Reproducer with symfony **4.4.29** (yeah, branch 4.X to be sure it's "old")
+```php
+
+$serializer = new Symfony\Component\Serializer\Serializer(
+    [
+        new Symfony\Component\Serializer\Normalizer\ObjectNormalizer(),
+        new Symfony\Component\Serializer\Normalizer\ArrayDenormalizer(),
+    ],
+    [
+        'json' => new Symfony\Component\Serializer\Encoder\JsonEncoder(),
+    ]
+);
+
+class DummyList implements \Countable, \IteratorAggregate
+{
+    public $list;
+
+    public function __construct(array $list)
+    {
+        $this->list = $list;
+    }
+
+    public function count(): int
+    {
+        return \count($this->list);
+    }
+
+    public function getIterator():\Traversable
+    {
+        return new \ArrayIterator($this->list);
+    }
+}
+
+var_dump($serializer->serialize(new DummyList([]), 'json', [
+    Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
+]));
+
+var_dump($serializer->serialize(new DummyList(range('a', 'd')), 'json', [
+    Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
+]));
+```
+=>
+```
+string(11) "{"list":[]}"
+string(17) "["a","b","c","d"]"
+```
+
+As you can see, this is (IMHO) wrong.
+The shape is not the same when the collection is empty or not! it should  be `{}` in the first example.
+
+And to be 100% sure, with normalize instead of serialize:
+
+```
+object(DummyList)#15 (1) {
+  ["list"]=>
+  array(0) {
+  }
+}
+array(4) {
+  [0]=>
+  string(1) "a"
+  [1]=>
+  string(1) "b"
+  [2]=>
+  string(1) "c"
+  [3]=>
+  string(1) "d"
+}
+```
+
+---
+
+TL;DR: I did not broke anything (👼🏼) because I did not want to break the BC when I found this bug.
+And the bug (highlighted by this PR) exists for ages.
+
+I don't know what is the best way to deal with this :/ I can fix the bug if you want... (super easy)
+
+---
+ping @Foxprodev
+
+---------------------------------------------------------------------------
+
+by Foxprodev at 2021-08-14T08:31:31Z
+
+@lyrixx You are right.
+~~But countable is not always traversable like traversable is not always countable. I think that's why `PRESERVE_EMPTY_OBJECTS` just keeps object with count = 0.~~ Nvm, I've checked the serializer code and there is is_iterable check too.
+Latest PR does not change old behavior, that mixed return came from `PRESERVE_EMPTY_OBJECTS` support
+On the other side PHP does not support generic types and overloading so if we returning `mixed` $data the returning type unfortunately should be `mixed`
+
+---------------------------------------------------------------------------
+
+by Foxprodev at 2021-08-14T09:17:32Z
+
+~~I have a suggestion. Can we make `ArrayObject` (or `stdClass`) a normal form of non-traversable objects? I am sure that serializer should work with "normal forms" only. And the returing types is the list of "normal forms"~~
+Not the best idea :)
+Maybe the better idea is to remove this case in 6.0
+https://github.com/symfony/symfony/blob/29c40624ccc0ab85d6c4df6dc33fab86f97d73a0/src/Symfony/Component/Serializer/Serializer.php#L169-L171
+and return `stdClass` when data array is empty (additionally it is 8+ times faster than ArrayObject)
+https://github.com/symfony/symfony/blob/29c40624ccc0ab85d6c4df6dc33fab86f97d73a0/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L214-L216
+
+Yes.
+- It breaks BC a little (but when if not in the major version)
+- Solves source issue #23019
+- Makes object normalizing simplier (array is normal form of traversable and indexed array(stdClass for object without properties) is normal form of non-traversable)
+- Solves bug @lyrixx described before
+
+I will open PR if you like this option
+
+P.S. Currently in one of my projects I have normalizer, which just returns object as it is (for performance tuning). So it's possible only with mixed return type.
+I am still sure return type should be mixed or maybe the better OOP approach to return wrapper class like `NormalizedElement`, which can also contain additional meta for serializing (like the target type in json) and can be JsonSerializable. Not sure about another formats but meta is always useful
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-08-17T08:42:57Z
+
+@lyrixx AFAIK custom collection structures have never been supported and lead to undefined behaviors (as showed by your test). Only native collection structures are currently well-supported (`array` and `ArrayObject` IIRC). Supporting custom structures would be better, but IMHO it's a new feature and there are probably many other weird behaviors like the one you pointed out to support.
+
+@Foxprodev I agree that returning a structure containing the normalized/serialized data and the related metadata would be useful, we also need such metadata for API Platform (for instance to store the identifiers of serialized resources to generated cache tags, or to generate various HTTP headers). However, I fear that it's a huge change that would be made at the same time as the planned Serializer refactoring (having only 1 object normalizer using PropertyInfo and PropertyAccess under the hood etc): https://github.com/symfony/symfony/issues/30818
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-17T09:55:17Z
+
+PR welcome to fix the issue @lyrixx
+Branch 5.4 with a deprecation if possible, just in case.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-18T07:16:42Z
+
+Okay I'll do that
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-18T08:45:25Z
+
+@nicolas-grekas see #42619. I'll open a PR on 6.0 once merged to really fix the bug
+
+---------------------------------------------------------------------------
+
+by Foxprodev at 2021-08-18T19:05:35Z
+
+@dunglas So the `array|string|int|float|bool|\ArrayObject|null` returning type in `NormalizerInterface` is the final decision?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-08-18T22:38:32Z
+
+I would keep `mixed` for now to be honest. And I'm totally in favor of the new class giving access to metadata if there is an upgrade path (and I think that it's doable).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-18T22:57:23Z
+
+It's possible to widen, but it's going to be very hard to tighten without causing a BC break. Better start with narrow types.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-19T08:53:41Z
+
+PR is green, remaining failures are false positives.

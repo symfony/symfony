@@ -91,7 +91,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     }
 
     /**
-     * Returns the identifier for this user (e.g. its username or e-mailaddress).
+     * Returns the identifier for this user (e.g. its username or email address).
      */
     public function getUserIdentifier(): string
     {

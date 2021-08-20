@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-20T13:20:39Z
+
+By the way, should the `Transport` class be final actually?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-20T13:45:24Z
+
+> By the way, should the `Transport` class be final actually?
+
+You're right, it should be final. Same for the Notifier equivalent class.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-20T13:52:50Z
+
+Tests are broken.

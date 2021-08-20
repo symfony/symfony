@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-18T15:29:17Z
+
+@HypeMC Can you submit a PR on the docs? Or at least, give a full usage example in the PR description to help the doc team? Thank you.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2021-08-18T15:44:39Z
+
+@fabpot Sure, I'll submit a PR sometime tomorrow.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2021-08-19T15:40:50Z
+
+@fabpot PR(s) on the docs  added: https://github.com/symfony/symfony-docs/pull/15730 and https://github.com/symfony/symfony-docs/pull/15731

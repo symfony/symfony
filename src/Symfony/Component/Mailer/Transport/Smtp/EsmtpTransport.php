@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Mailer\Transport\Smtp;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\AuthenticatorInterface;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Sends Emails over SMTP with ESMTP support.

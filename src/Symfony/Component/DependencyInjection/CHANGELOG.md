@@ -10,6 +10,11 @@ CHANGELOG
  * Remove `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
  * Remove the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service
 
+5.4
+---
+
+ * Add `service_closure()` to the PHP-DSL
+
 5.3
 ---
 

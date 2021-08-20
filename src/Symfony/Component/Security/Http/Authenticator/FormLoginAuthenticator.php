@@ -96,9 +96,6 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         return $passport;
     }
 
-    /**
-     * @return UsernamePasswordToken
-     */
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         return new UsernamePasswordToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());

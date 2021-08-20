@@ -17,11 +17,14 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * Interface for resolving the authentication status of a given token.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- *
- * @method bool isAuthenticated(TokenInterface $token = null)
  */
 interface AuthenticationTrustResolverInterface
 {
+    /**
+     * Resolves whether the passed token implementation is authenticated.
+     */
+    public function isAuthenticated(TokenInterface $token = null): bool;
+
     /**
      * Resolves whether the passed token implementation is authenticated
      * using remember-me capabilities.

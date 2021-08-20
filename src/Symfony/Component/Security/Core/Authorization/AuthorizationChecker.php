@@ -32,7 +32,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 
     public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, bool $exceptionOnNoToken = false)
     {
-        if (false !== $exceptionOnNoToken) {
+        if ($exceptionOnNoToken) {
             throw new \LogicException('Argument $exceptionOnNoToken of "%s()" must be set to "false".', __METHOD__);
         }
 
@@ -48,7 +48,11 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      */
     final public function isGranted(mixed $attribute, mixed $subject = null): bool
     {
-        $token = $this->tokenStorage->getToken() ?? new NullToken();
+        $token = $this->tokenStorage->getToken();
+
+        if (!$token || !$token->getUser()) {
+            $token = new NullToken();
+        }
 
         return $this->accessDecisionManager->decide($token, [$attribute], $subject);
     }

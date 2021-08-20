@@ -29,7 +29,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         $normalized = [
             'message' => $object->getMessage(),
@@ -59,7 +59,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
     /**
      * {@inheritdoc}
      */
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): FlattenException
     {
         $object = new FlattenException();
 

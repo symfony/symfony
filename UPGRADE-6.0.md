@@ -365,8 +365,8 @@ Security
    `UsernamePasswordFormAuthenticationListener`, `UsernamePasswordJsonAuthenticationListener` and `X509AuthenticationListener`
    from security-http, use the new authenticator system instead
  * Remove the Guard component, use the new authenticator system instead
- * Remove `TokenInterface:isAuthenticated()` and `setAuthenticated()` methods without replacement.
-   Security tokens won't have an "authenticated" flag anymore, so they will always be considered authenticated
+ * Remove `TokenInterface:isAuthenticated()` and `setAuthenticated()`,
+   return `null` from `getUser()` instead when a token is not authenticated
  * Remove `DeauthenticatedEvent`, use `TokenDeauthenticatedEvent` instead
  * Remove `CookieClearingLogoutHandler`, `SessionLogoutHandler` and `CsrfTokenClearingLogoutHandler`.
    Use `CookieClearingLogoutListener`, `SessionLogoutListener` and `CsrfTokenClearingLogoutListener` instead

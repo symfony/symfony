@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Exposes some Symfony parameters and services as an "app" global variable.
@@ -68,7 +69,7 @@ class AppVariable
      *
      * @see TokenInterface::getUser()
      */
-    public function getUser(): ?object
+    public function getUser(): ?UserInterface
     {
         if (null === $tokenStorage = $this->tokenStorage) {
             throw new \RuntimeException('The "app.user" variable is not available.');

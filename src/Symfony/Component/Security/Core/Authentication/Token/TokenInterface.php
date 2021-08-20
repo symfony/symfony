@@ -40,7 +40,7 @@ interface TokenInterface
     /**
      * Returns a user representation.
      *
-     * @return UserInterface
+     * @return UserInterface|null
      *
      * @see AbstractToken::setUser()
      */

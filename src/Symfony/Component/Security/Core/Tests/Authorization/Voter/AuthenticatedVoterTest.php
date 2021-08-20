@@ -13,11 +13,13 @@ namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class AuthenticatedVoterTest extends TestCase
 {
@@ -53,12 +55,27 @@ class AuthenticatedVoterTest extends TestCase
 
     protected function getToken($authenticated)
     {
+        $user = new InMemoryUser('wouter', '', ['ROLE_USER']);
+
         if ('fully' === $authenticated) {
-            return $this->createMock(TokenInterface::class);
-        } elseif ('remembered' === $authenticated) {
-            return $this->getMockBuilder(RememberMeToken::class)->setMethods(['setPersistent'])->disableOriginalConstructor()->getMock();
-        } elseif ('impersonated' === $authenticated) {
+            $token = new class() extends AbstractToken {
+                public function getCredentials()
+                {
+                }
+            };
+            $token->setUser($user);
+
+            return $token;
+        }
+
+        if ('remembered' === $authenticated) {
+            return new RememberMeToken($user, 'foo', 'bar');
+        }
+
+        if ('impersonated' === $authenticated) {
             return $this->getMockBuilder(SwitchUserToken::class)->disableOriginalConstructor()->getMock();
         }
+
+        return new NullToken();
     }
 }

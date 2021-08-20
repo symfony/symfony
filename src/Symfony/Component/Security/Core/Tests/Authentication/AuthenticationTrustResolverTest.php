@@ -25,7 +25,6 @@ class AuthenticationTrustResolverTest extends TestCase
         $resolver = new AuthenticationTrustResolver();
 
         $this->assertFalse($resolver->isRememberMe(null));
-        $this->assertFalse($resolver->isRememberMe($this->getToken()));
         $this->assertFalse($resolver->isRememberMe(new FakeCustomToken()));
         $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
         $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
@@ -38,7 +37,6 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertFalse($resolver->isFullFledged(null));
         $this->assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
         $this->assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
-        $this->assertTrue($resolver->isFullFledged($this->getToken()));
         $this->assertTrue($resolver->isFullFledged(new FakeCustomToken()));
     }
 
@@ -50,9 +48,24 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isAuthenticated(new FakeCustomToken()));
     }
 
-    protected function getToken()
+    public function testIsRememberMeWithClassAsConstructorButStillExtending()
     {
-        return $this->createMock(TokenInterface::class);
+        $resolver = new AuthenticationTrustResolver();
+
+        $this->assertFalse($resolver->isRememberMe(null));
+        $this->assertFalse($resolver->isRememberMe(new FakeCustomToken()));
+        $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
+        $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
+    }
+
+    public function testisFullFledgedWithClassAsConstructorButStillExtending()
+    {
+        $resolver = new AuthenticationTrustResolver();
+
+        $this->assertFalse($resolver->isFullFledged(null));
+        $this->assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
+        $this->assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
+        $this->assertTrue($resolver->isFullFledged(new FakeCustomToken()));
     }
 
     protected function getRememberMeToken()
@@ -95,6 +108,7 @@ class FakeCustomToken implements TokenInterface
 
     public function getUser(): UserInterface
     {
+        return new InMemoryUser('wouter', '', ['ROLE_USER']);
     }
 
     public function setUser($user)

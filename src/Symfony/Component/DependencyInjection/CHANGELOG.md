@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+* Add `service_closure()` to the PHP-DSL
+
 5.3
 ---
 

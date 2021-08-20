@@ -1,0 +1,128 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-19T10:35:43Z
+
+I'm a bit lost when I read such things in deprecation messages:
+`In version 6.0, security tokens won\'t have an "authenticated" flag anymore and will always be considered authenticated.`
+
+It feels like this method shouldn't exist, and that neither `NullToken` should (aka `null` would be better to fulfill the promise of the deprecation message.)
+
+But I'm missing the bigger picture here, so that this might only be the expression of my ignorance of this subsystem :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-19T10:55:18Z
+
+Tokens don't hold an authenticated state anymore, that's what the deprecation message you linked tells. But `AccessListener` et al still need to deal with unauthenticated cases.
+
+I understand the confusion though. Basically, this method should return false when `$token` is `null` or is a special implementation that is not considered authenticated, like NullToken (which is mostly an internal implementation detail to me)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-19T11:19:10Z
+
+I'm not sold for 100% on `NullToken` either, but there is a specific (and common) use-case that I don't know how to fix otherwise:
+
+- Any token now represents an authenticated session (thus `$token->isAuthenticated()` doesn't make sense)
+- If you're not logged in as a user (i.e. the previous anonymous state), you now don't get a token
+- In the original 5.1 security rework PR, we simply considered "no token" as "no permissions"
+- This caused issues for "public" voting. E.g. if you have a `Post` entity that might be "premium" or "public" and only authenticated users should be able to view premium posts, you need a way to say "hey, even this unauthenticated user can view the public post".
+- This could not be fixed by passing `null` to the voter: `VoterInterface::vote(TokenInterface $token, $subject, array $attributes)`
+- Thus, we created a `NullToken` in #37620 which is only to be initialized by the `AuthorizationChecker` in case there is no token available.
+
+So I would say `NullToken` is part of the contract, just like `null` would be if the typehint was `?TokenInterface $token`. If there is an incredible smart way to use the normal `null` for token in a backwards compatible matter, I'm all ears :)
+
+I recently added `AuthenticationTrustResolverInterface::isAuthenticated()` as an abstraction of determining whether something is authenticated. This now abstracts a check for `null` and `NullToken`, but I can also imagine e.g. some 2FA implementations to return false for a "2fa in progress" token. And who knows what logic we introduce in the future (e.g. level of assurance) that might need to be considered. I think it's good to have a generic abstractions, so we don't force applications to continue updating all their authenticated checks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-19T12:46:07Z
+
+> Any token now represents an authenticated session (thus $token->isAuthenticated() doesn't make sense)
+
+> This could not be fixed by passing null to the voter: VoterInterface::vote(TokenInterface $token, $subject, array $attributes)
+
+It feels like these statements are contradictory. Another way to solve this would be to reintroduce `$token->isAuthenticated()`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-19T12:47:19Z
+
+> So I would say NullToken is part of the contract, just like null would be if the typehint was ?TokenInterface $token
+
+> NullToken (which is mostly an internal implementation detail to me)
+
+we need to converge on this also :)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-19T13:05:27Z
+
+New proposal: drop `NullToken` and make `TokenInterface $token` nullable in the `VoterInterface::vote()` method.
+
+Making something nullable while the interface doesn't yet is PHP compatible: https://3v4l.org/BWs0v In `AuthorizationVoter`, we can use reflection to find out if something is nullable: https://3v4l.org/R4NFb If this hurts performance to much, we can cache which voter FQCNs support null (the set of voters is always the same for the same deployment).
+
+---
+
+The only reason for `NullToken`'s existence is to work around this typehint. Making all tokens in user land conditionally authenticated because of this one token is not a good solution imho.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-19T13:07:29Z
+
+Other proposal: Drop `NullToken` and add an explicit `UnauthenticatedVoterInterface` with a custom method that is used to vote when there is no token (i.e. the session is unauthenticated).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-19T13:25:35Z
+
+I'd also fix that on the voter side rather than making `NullToken` part of any contract, that's just a workaround needed for BC reasons to me. It should be clear that by now, unauthenticated token really means no token.
+
+So 👍 to drop `NullToken` somehow, preferably by changing the problematic signature.
+@nicolas-grekas Do we have a way to smoothly make a parameter nullable in a method that is part of an interface?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-19T13:35:04Z
+
+I would also vote for a signature change and the removal of `NullToken` if possible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-19T14:03:11Z
+
+I don't see how to make `vote()` nor `decide()` accept `null` without a BC break.
+
+The only option I see is either to make `NullToken` part of the abstraction or to reintroduce `TokenInterface::isAuthenticated()` (but not `setAuthenticated()`.)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-19T14:26:37Z
+
+Any particular reasons my 2 proposals above won't be feasible as a BC way to introduce nullability?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-19T14:28:23Z
+
+> Any particular reasons my 2 proposals above won't be feasible as a BC way to introduce nullability?
+
+because implementations also are affected: they're not final (especially the abstract `Voter` class, but any others too.)
+
+and because then I wouldn't know what to do with voters that don't accept null: deny or abstain? Not sure there is one single answer to this question.
+
+> Making all tokens in user land conditionally authenticated because of this one token is not a good solution imho.
+
+at least keeping `isAuthenticated()` has the benefit of reducing the BC breaking surface.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-19T14:56:18Z
+
+An alternative might be to make `getUser()` nullable, as in `getUser(): ?UserInterface`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-19T16:46:55Z
+
+See #42650

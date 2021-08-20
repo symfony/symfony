@@ -143,6 +143,10 @@ class HttpKernelBrowserTest extends TestCase
 
     public function testUploadedFileWhenSizeExceedsUploadMaxFileSize()
     {
+        if (UploadedFile::getMaxFilesize() >= \PHP_INT_MAX) {
+            $this->markTestSkipped('Cannot test when post_max_size or upload_max_filesize are not configured in php.ini');
+        }
+
         $source = tempnam(sys_get_temp_dir(), 'source');
 
         $kernel = new TestHttpKernel();
@@ -157,11 +161,11 @@ class HttpKernelBrowserTest extends TestCase
         /* should be modified when the getClientSize will be removed */
         $file->expects($this->any())
             ->method('getSize')
-            ->willReturn(\PHP_INT_MAX)
+            ->willReturn(UploadedFile::getMaxFilesize() + 1)
         ;
         $file->expects($this->any())
             ->method('getClientSize')
-            ->willReturn(\PHP_INT_MAX)
+            ->willReturn(UploadedFile::getMaxFilesize() + 1)
         ;
 
         $client->request('POST', '/', [], [$file]);

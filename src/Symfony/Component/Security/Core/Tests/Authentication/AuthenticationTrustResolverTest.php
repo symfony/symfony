@@ -17,7 +17,6 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class AuthenticationTrustResolverTest extends TestCase
@@ -29,7 +28,6 @@ class AuthenticationTrustResolverTest extends TestCase
     {
         $resolver = new AuthenticationTrustResolver();
         $this->assertFalse($resolver->isAnonymous(null));
-        $this->assertFalse($resolver->isAnonymous($this->getToken()));
         $this->assertFalse($resolver->isAnonymous($this->getRememberMeToken()));
         $this->assertFalse($resolver->isAnonymous(new FakeCustomToken()));
     }
@@ -39,7 +37,6 @@ class AuthenticationTrustResolverTest extends TestCase
         $resolver = new AuthenticationTrustResolver();
 
         $this->assertFalse($resolver->isRememberMe(null));
-        $this->assertFalse($resolver->isRememberMe($this->getToken()));
         $this->assertFalse($resolver->isRememberMe(new FakeCustomToken()));
         $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
         $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
@@ -52,7 +49,6 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertFalse($resolver->isFullFledged(null));
         $this->assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
         $this->assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
-        $this->assertTrue($resolver->isFullFledged($this->getToken()));
         $this->assertTrue($resolver->isFullFledged(new FakeCustomToken()));
     }
 
@@ -72,7 +68,7 @@ class AuthenticationTrustResolverTest extends TestCase
         $resolver = $this->getResolver();
 
         $this->assertFalse($resolver->isAnonymous(null));
-        $this->assertFalse($resolver->isAnonymous($this->getToken()));
+        $this->assertFalse($resolver->isAnonymous(new FakeCustomToken()));
         $this->assertFalse($resolver->isAnonymous($this->getRememberMeToken()));
     }
 
@@ -81,7 +77,7 @@ class AuthenticationTrustResolverTest extends TestCase
         $resolver = $this->getResolver();
 
         $this->assertFalse($resolver->isRememberMe(null));
-        $this->assertFalse($resolver->isRememberMe($this->getToken()));
+        $this->assertFalse($resolver->isRememberMe(new FakeCustomToken()));
         $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
         $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
     }
@@ -93,7 +89,7 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertFalse($resolver->isFullFledged(null));
         $this->assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
         $this->assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
-        $this->assertTrue($resolver->isFullFledged($this->getToken()));
+        $this->assertTrue($resolver->isFullFledged(new FakeCustomToken()));
     }
 
     /**
@@ -112,11 +108,6 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertFalse($resolver->isFullFledged($this->getRealCustomAnonymousToken()));
     }
 
-    protected function getToken()
-    {
-        return $this->createMock(TokenInterface::class);
-    }
-
     protected function getAnonymousToken()
     {
         return new AnonymousToken('secret', 'anon.');
@@ -133,7 +124,7 @@ class AuthenticationTrustResolverTest extends TestCase
 
     protected function getRememberMeToken()
     {
-        $user = class_exists(InMemoryUser::class) ? new InMemoryUser('wouter', '', ['ROLE_USER']) : new User('wouter', '', ['ROLE_USER']);
+        $user = new InMemoryUser('wouter', '', ['ROLE_USER']);
 
         return new RememberMeToken($user, 'main', 'secret');
     }
@@ -179,6 +170,7 @@ class FakeCustomToken implements TokenInterface
 
     public function getUser(): UserInterface
     {
+        return new InMemoryUser('wouter', '', ['ROLE_USER']);
     }
 
     public function setUser($user)

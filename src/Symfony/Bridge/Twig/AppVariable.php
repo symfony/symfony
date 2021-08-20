@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Exposes some Symfony parameters and services as an "app" global variable.
@@ -68,7 +69,7 @@ class AppVariable
     /**
      * Returns the current user.
      *
-     * @return object|null
+     * @return UserInterface|null
      *
      * @see TokenInterface::getUser()
      */
@@ -84,7 +85,7 @@ class AppVariable
 
         $user = $token->getUser();
 
-        // @deprecated since 5.4, $user will always be a UserInterface instance
+        // @deprecated since Symfony 5.4, $user will always be a UserInterface instance
         return \is_object($user) ? $user : null;
     }
 

@@ -51,7 +51,7 @@ interface TokenInterface extends \Serializable
     /**
      * Returns a user representation.
      *
-     * @return UserInterface
+     * @return UserInterface|null
      *
      * @see AbstractToken::setUser()
      */
@@ -71,14 +71,14 @@ interface TokenInterface extends \Serializable
      *
      * @return bool true if the token has been authenticated, false otherwise
      *
-     * @deprecated since Symfony 5.4. In 6.0, security tokens will always be considered authenticated
+     * @deprecated since Symfony 5.4, return null from "getUser()" instead when a token is not authenticated
      */
     public function isAuthenticated();
 
     /**
      * Sets the authenticated flag.
      *
-     * @deprecated since Symfony 5.4. In 6.0, security tokens will always be considered authenticated
+     * @deprecated since Symfony 5.4
      */
     public function setAuthenticated(bool $isAuthenticated);
 

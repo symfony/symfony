@@ -1,0 +1,137 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-19T17:22:51Z
+
+What about keeping isAuthenticated + a throwing getUser?
+
+(i tend to prefer a random UnauthenticatedTokenException, rather than a random null value)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-19T18:03:07Z
+
+> (i tend to prefer a random UnauthenticatedTokenException, rather than a random null value)
+
+We should then make that `UnauthenticatedTokenException` part of the abstraction, and there could be specific implementation bugs (eg when isAuthenticated returns true while getUser throws).
+
+I think I prefer making getUser nullable personally.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-19T18:09:29Z
+
+Also we come from `getUser(): string|Stringable|UserInterface` where `string` can mean `anon.`. Going with `UserInterface|null` looks like a smaller gap
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-19T18:26:54Z
+
+Thanks! I surely prefer a nullable user over reintroducing `isAuthenticated()`/throwing an exception.
+
+Nullable return types are not optimal. However, in this case 99% of the apps I see already do something like `assert($user instanceof AppUser);` or `/** @var AppUser $user */`, as the `UserInterface` contract is often not the useful contract for applications. This means that nullable isn't that bad as they already check for nullability.
+
+Btw, I'm personally not sure if adding a new `UnauthenticatedVoterInterface::votePublicAccess(array $attributes, mixed $subject)` and removing `NullToken` is better than this one. But I don't have the time to try this out myself, so I'm ok with this PR if others agree.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-19T18:47:52Z
+
+> when isAuthenticated returns true while getUser throws
+
+it be a contract violation. I proposed it because of less deprecation hassle actually :sweat_smile: but yes, it's a try/catch shortcut sure.
+
+going from a non-nulllable to nullable is a bigger gap IMHO.
+
+> However, in this case 99% of the apps I see already do something like assert($user instanceof AppUser);
+
+hence my proposal.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-19T18:59:48Z
+
+> and there could be specific implementation bugs
+> it's a try/catch shortcut sure
+
+actually, if isAuthenticated() is public API specific tokens can do a more sophisticated check. Where isAuthenticated is leveraged in getUser().
+
+(this can be achieved in both styles btw, but i still tend to prefer explicit isAuthenticated/UnauthenticatedTokenException somewhat :/)
+
+even without isAuthenticated, a voter doing the try/catch is still 100% explicit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-20T07:27:52Z
+
+A try/catch is not a nice API to me. nullability works just great. I tend to prefer APIs that don't open traps for implementation bugs with to-enforce correlations between their methods. isAuthenticated should not be used in getUser because they are different views of the same state - and not just correlated states.
+
+> votePublicAccess(array $attributes, mixed $subject)
+
+that would require knowing about both interfaces to cover the domain, and that would require another interface for `AccessDecisionManagerInterface::decide()`. nullability packs everything together in a simple to discover API.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-20T07:47:26Z
+
+sorry, im not convinced (yet). Still i believe as a consumer i'd prefer
+
+> tend to prefer a random UnauthenticatedTokenException, rather than a random null value
+
+But we'll be null checking in 99% of authentcated cases :+1:
+
+https://symfony.com/doc/current/security.html#retrieving-the-user-object null check is missing here btw.
+
+I think if Security/Controller::getUser can convey authenticated yes/no thru nullability, im not sure the tokenstorage needs to.
+
+Nevertheless a nullable Security/Controller::getUser is also pesky :)
+
+From the tokenstorage layer i think TokenNotFoundException + new UnauthenticatedTokenException fits yes.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-20T07:58:23Z
+
+basically what im saying is, if you want a boolean value there's a access decision manager for it. But 99% the check is encapsulated IMHO.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-20T08:01:15Z
+
+> symfony.com/doc/current/security.html#retrieving-the-user-object null check is missing here btw.
+
+not needed because of the call to denyAccessUnlessGranted
+
+> I think if Security/Controller::getUser can convey authenticated yes/no thru nullability, im not sure the tokenstorage needs to.
+
+Can you be more explicit about that please? Do you mean to always return a NullToken instead of throwing?
+
+> Nevertheless a nullable Security/Controller::getUser is also pesky :)
+
+yep, we already have this nullable API elsewhere
+
+> From the tokenstorage layer i think TokenNotFoundException + new UnauthenticatedTokenException fits yes.
+
+That's technically possible, I'm just not convinced it's better.
+You tell about missing nullability checks, but with your proposal phpstorm will complain about missing try/catch :)
+
+Another opinion or argument to help decide?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-20T08:09:00Z
+
+> but with your proposal phpstorm will complain about missing try/catch
+
+it's about runtime. Do we want to halt, or let a null value bubble unexpectedly.
+
+btw im 100% aligned with
+
+>  this might only be the expression of my ignorance of this subsystem :)
+
+Here we put such wisdom on real tiles :) (https://en.wikipedia.org/wiki/Tegelspreuken)
+
+https://github.com/symfony/symfony/blob/53215e24dac791bf86ad4cedcfc0da579bb8b05e/src/Symfony/Component/Security/Core/Authentication/Token/Storage/TokenStorageInterface.php#L23-L28
+
+could we infer unauthenticated state here already? (edit: right, this will trigger our voter + NullToken issue)
+
+what if we go back to an UnauthenticatedToken for internal usage (mostly)?

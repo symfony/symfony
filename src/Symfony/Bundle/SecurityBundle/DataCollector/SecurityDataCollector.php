@@ -230,20 +230,16 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Gets the roles of the user.
-     *
-     * @return array|Data
      */
-    public function getRoles()
+    public function getRoles(): array|Data
     {
         return $this->data['roles'];
     }
 
     /**
      * Gets the inherited roles of the user.
-     *
-     * @return array|Data
      */
-    public function getInheritedRoles()
+    public function getInheritedRoles(): array|Data
     {
         return $this->data['inherited_roles'];
     }
@@ -282,10 +278,8 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Get the class name of the security token.
-     *
-     * @return string|Data|null
      */
-    public function getTokenClass()
+    public function getTokenClass(): string|Data|null
     {
         return $this->data['token_class'];
     }
@@ -305,7 +299,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      *
      * @return string[]|Data
      */
-    public function getVoters()
+    public function getVoters(): array|Data
     {
         return $this->data['voters'];
     }
@@ -317,28 +311,21 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Returns the log of the security decisions made by the access decision manager.
-     *
-     * @return array|Data
      */
-    public function getAccessDecisionLog()
+    public function getAccessDecisionLog(): array|Data
     {
         return $this->data['access_decision_log'];
     }
 
     /**
      * Returns the configuration of the current firewall context.
-     *
-     * @return array|Data|null
      */
-    public function getFirewall()
+    public function getFirewall(): array|Data|null
     {
         return $this->data['firewall'];
     }
 
-    /**
-     * @return array|Data
-     */
-    public function getListeners()
+    public function getListeners(): array|Data
     {
         return $this->data['listeners'];
     }

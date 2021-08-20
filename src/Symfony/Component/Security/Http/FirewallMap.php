@@ -34,7 +34,7 @@ class FirewallMap implements FirewallMapInterface
     /**
      * {@inheritdoc}
      */
-    public function getListeners(Request $request)
+    public function getListeners(Request $request): array
     {
         foreach ($this->map as $elements) {
             if (null === $elements[0] || $elements[0]->matches($request)) {

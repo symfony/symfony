@@ -29,20 +29,16 @@ class CsrfToken
 
     /**
      * Returns the ID of the CSRF token.
-     *
-     * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
     /**
      * Returns the value of the CSRF token.
-     *
-     * @return string
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }

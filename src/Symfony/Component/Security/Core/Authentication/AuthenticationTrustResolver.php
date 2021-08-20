@@ -29,7 +29,7 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
     /**
      * {@inheritdoc}
      */
-    public function isRememberMe(TokenInterface $token = null)
+    public function isRememberMe(TokenInterface $token = null): bool
     {
         return $token && $token instanceof RememberMeToken;
     }
@@ -37,7 +37,7 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
     /**
      * {@inheritdoc}
      */
-    public function isFullFledged(TokenInterface $token = null)
+    public function isFullFledged(TokenInterface $token = null): bool
     {
         return $this->isAuthenticated($token) && !$this->isRememberMe($token);
     }

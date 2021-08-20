@@ -24,7 +24,7 @@ abstract class Voter implements VoterInterface
     /**
      * {@inheritdoc}
      */
-    public function vote(TokenInterface $token, mixed $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         // abstain vote by default in case none of the attributes are supported
         $vote = self::ACCESS_ABSTAIN;
@@ -58,16 +58,12 @@ abstract class Voter implements VoterInterface
      * Determines if the attribute and subject are supported by this voter.
      *
      * @param $subject The subject to secure, e.g. an object the user wants to access or any other PHP type
-     *
-     * @return bool
      */
-    abstract protected function supports(string $attribute, mixed $subject);
+    abstract protected function supports(string $attribute, mixed $subject): bool;
 
     /**
      * Perform a single access check operation on a given attribute, subject and token.
      * It is safe to assume that $attribute and $subject already passed the "supports()" method check.
-     *
-     * @return bool
      */
-    abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token);
+    abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool;
 }

@@ -42,9 +42,6 @@ class Passport
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUser(): UserInterface
     {
         if (null === $this->user) {
@@ -88,10 +85,7 @@ class Passport
         $this->attributes[$name] = $value;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAttribute(string $name, mixed $default = null)
+    public function getAttribute(string $name, mixed $default = null): mixed
     {
         return $this->attributes[$name] ?? $default;
     }

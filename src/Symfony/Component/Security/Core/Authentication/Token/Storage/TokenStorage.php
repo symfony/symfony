@@ -30,7 +30,7 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         if ($initializer = $this->initializer) {
             $this->initializer = null;

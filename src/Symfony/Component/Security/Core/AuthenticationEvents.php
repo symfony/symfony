@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core;
 
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 
 final class AuthenticationEvents

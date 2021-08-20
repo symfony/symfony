@@ -53,20 +53,16 @@ class LogoutUrlGenerator
 
     /**
      * Generates the absolute logout path for the firewall.
-     *
-     * @return string
      */
-    public function getLogoutPath(string $key = null)
+    public function getLogoutPath(string $key = null): string
     {
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     /**
      * Generates the absolute logout URL for the firewall.
-     *
-     * @return string
      */
-    public function getLogoutUrl(string $key = null)
+    public function getLogoutUrl(string $key = null): string
     {
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }

@@ -47,7 +47,7 @@ class PostAuthenticationToken extends AbstractToken
      *
      * {@inheritdoc}
      */
-    public function getCredentials()
+    public function getCredentials(): mixed
     {
         return [];
     }

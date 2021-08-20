@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\User\EquatableInterface;
-use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -56,7 +53,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function getUser()
+    public function getUser(): ?UserInterface
     {
         return $this->user;
     }
@@ -123,7 +120,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -139,7 +136,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function hasAttribute(string $name)
+    public function hasAttribute(string $name): bool
     {
         return \array_key_exists($name, $this->attributes);
     }
@@ -147,7 +144,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function getAttribute(string $name)
+    public function getAttribute(string $name): mixed
     {
         if (!\array_key_exists($name, $this->attributes)) {
             throw new \InvalidArgumentException(sprintf('This token has no "%s" attribute.', $name));

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Authentication;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
@@ -52,10 +53,8 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
 
     /**
      * Gets the options.
-     *
-     * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -68,7 +67,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
     /**
      * {@inheritdoc}
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         if ($failureUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['failure_path_parameter'])) {
             $this->options['failure_path'] = $failureUrl;

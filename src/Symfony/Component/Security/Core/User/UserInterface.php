@@ -44,7 +44,7 @@ interface UserInterface
      *
      * @return string[]
      */
-    public function getRoles();
+    public function getRoles(): array;
 
     /**
      * Removes sensitive data from the user.

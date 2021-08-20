@@ -29,7 +29,6 @@ use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterfac
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -299,9 +298,6 @@ class ContextListener extends AbstractListener
         return $token;
     }
 
-    /**
-     * @param UserInterface $originalUser
-     */
     private static function hasUserChanged(UserInterface $originalUser, TokenInterface $refreshedToken): bool
     {
         $refreshedUser = $refreshedToken->getUser();

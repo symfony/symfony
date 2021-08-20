@@ -51,10 +51,8 @@ class HttpUtils
      *
      * @param string $path   A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      * @param int    $status The status code
-     *
-     * @return RedirectResponse
      */
-    public function createRedirectResponse(Request $request, string $path, int $status = 302)
+    public function createRedirectResponse(Request $request, string $path, int $status = 302): RedirectResponse
     {
         if (null !== $this->secureDomainRegexp && 'https' === $this->urlMatcher->getContext()->getScheme() && preg_match('#^https?:[/\\\\]{2,}+[^/]++#i', $path, $host) && !preg_match(sprintf($this->secureDomainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
             $path = '/';
@@ -70,10 +68,8 @@ class HttpUtils
      * Creates a Request.
      *
      * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
-     *
-     * @return Request
      */
-    public function createRequest(Request $request, string $path)
+    public function createRequest(Request $request, string $path): Request
     {
         $newRequest = Request::create($this->generateUri($request, $path), 'get', [], $request->cookies->all(), [], $request->server->all());
 
@@ -111,7 +107,7 @@ class HttpUtils
      *
      * @return bool true if the path is the same as the one from the Request, false otherwise
      */
-    public function checkRequestPath(Request $request, string $path)
+    public function checkRequestPath(Request $request, string $path): bool
     {
         if ('/' !== $path[0]) {
             try {
@@ -138,11 +134,9 @@ class HttpUtils
      *
      * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
-     * @return string
-     *
      * @throws \LogicException
      */
-    public function generateUri(Request $request, string $path)
+    public function generateUri(Request $request, string $path): string
     {
         if (str_starts_with($path, 'http') || !$path) {
             return $path;

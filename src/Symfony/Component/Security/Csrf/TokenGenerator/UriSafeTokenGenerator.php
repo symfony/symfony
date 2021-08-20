@@ -33,7 +33,7 @@ class UriSafeTokenGenerator implements TokenGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generateToken()
+    public function generateToken(): string
     {
         // Generate an URI safe base64 encoded string that does not contain "+",
         // "/" or "=" which need to be URL encoded and make URLs unnecessarily

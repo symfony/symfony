@@ -275,6 +275,63 @@ class AddConsoleCommandPassTest extends TestCase
 
         $container->compile();
     }
+
+    public function testDisabledCommandIsEnabledByDefault()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('disabled-command', DisabledCommand::class)
+            ->addTag('console.command')
+        ;
+
+        $pass = new AddConsoleCommandPass();
+        $pass->process($container);
+
+        $initCounter = DisabledCommand::$initCounter;
+        $command = $container->get('console.command_loader')->get('disabled');
+
+        $this->assertInstanceOf(LazyCommand::class, $command);
+        $this->assertTrue($command->isEnabled());
+        $this->assertSame($initCounter, DisabledCommand::$initCounter);
+    }
+
+    public function testDisabledCommandIsDisabledByOption()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('disabled-command', DisabledCommand::class)
+            ->addTag('console.command', ['is_enabled' => false])
+        ;
+
+        $pass = new AddConsoleCommandPass();
+        $pass->process($container);
+
+        $initCounter = DisabledCommand::$initCounter;
+        $command = $container->get('console.command_loader')->get('disabled');
+
+        $this->assertInstanceOf(LazyCommand::class, $command);
+        $this->assertFalse($command->isEnabled());
+        $this->assertSame($initCounter, DisabledCommand::$initCounter);
+    }
+
+    public function testDisabledCommandIsDisabledByCommand()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('disabled-command', DisabledCommand::class)
+            ->addTag('console.command', ['is_enabled' => null])
+        ;
+
+        $pass = new AddConsoleCommandPass();
+        $pass->process($container);
+
+        $initCounter = DisabledCommand::$initCounter;
+        $command = $container->get('console.command_loader')->get('disabled');
+
+        $this->assertInstanceOf(LazyCommand::class, $command);
+        $this->assertFalse($command->isEnabled());
+        $this->assertSame($initCounter + 1, DisabledCommand::$initCounter);
+    }
 }
 
 class MyCommand extends Command
@@ -298,5 +355,25 @@ class DescribedCommand extends Command
         ++self::$initCounter;
 
         parent::__construct();
+    }
+}
+
+class DisabledCommand extends Command
+{
+    public static $initCounter = 0;
+
+    protected static $defaultName = 'disabled';
+    protected static $defaultDescription = 'This command is disabled';
+
+    public function __construct()
+    {
+        ++self::$initCounter;
+
+        parent::__construct();
+    }
+
+    public function isEnabled()
+    {
+        return false;
     }
 }

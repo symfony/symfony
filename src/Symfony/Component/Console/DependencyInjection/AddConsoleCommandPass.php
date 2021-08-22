@@ -77,6 +77,8 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 $commandName = array_shift($aliases);
             }
 
+            $isEnabled = \array_key_exists('is_enabled', $tags[0]) ? $tags[0]['is_enabled'] : true;
+
             if (null === $commandName) {
                 if (!$definition->isPublic() || $definition->isPrivate() || $definition->hasTag($this->privateTagName)) {
                     $commandId = 'console.command.public_alias.'.$id;
@@ -131,7 +133,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 $definition->addMethodCall('setDescription', [$description]);
 
                 $container->register('.'.$id.'.lazy', LazyCommand::class)
-                    ->setArguments([$commandName, $aliases, $description, $isHidden, new ServiceClosureArgument($lazyCommandRefs[$id])]);
+                    ->setArguments([$commandName, $aliases, $description, $isHidden, new ServiceClosureArgument($lazyCommandRefs[$id]), $isEnabled]);
 
                 $lazyCommandRefs[$id] = new Reference('.'.$id.'.lazy');
             }

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `TesterTrait::assertCommandIsSuccessful()` to test command
  * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
+ * Add `is_enabled` option to the `console.command` tag
 
 5.3
 ---

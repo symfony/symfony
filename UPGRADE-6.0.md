@@ -132,6 +132,8 @@ HttpKernel
  * Remove support for returning a `ContainerBuilder` from `KernelInterface::registerContainerConfiguration()`
  * Rename `HttpKernelInterface::MASTER_REQUEST` to `MAIN_REQUEST`
  * Rename `KernelEvent::isMasterRequest()` to `isMainRequest()`
+ * Rename `Kernel::RELEASE_VERSION` to `Kernel::PATCH_VERSION`
+ * Add `Kernel::RELEASE_VERSION` that defaults to `Kernel::VERSION`
 
 Inflector
 ---------

@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-18T13:45:42Z
+
+I propose to apply the patch below on top of this PR.
+
+Then we might need a new test case for the legacy code path.
+
+<details>
+
+```diff
+diff --git a/src/Symfony/Component/Serializer/Serializer.php b/src/Symfony/Component/Serializer/Serializer.php
+index 1e4fb793e8..08f8e960ff 100644
+--- a/src/Symfony/Component/Serializer/Serializer.php
++++ b/src/Symfony/Component/Serializer/Serializer.php
+@@ -169,7 +169,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
+                 switch (true) {
+                     case ($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && \is_object($data):
+                         if (!$data instanceof \ArrayObject) {
+-                            trigger_deprecation('symfony/serializer', '5.4', 'The method "%s()" will return an instance of "%s" as of Symfony 6.0 when the object is iteratable, countable and empty.', __METHOD__, \ArrayObject::class);
++                            trigger_deprecation('symfony/serializer', '5.4', 'Returning empty object of class "%s" from "%s()" is deprecated unless it extends "ArrayObject".', get_debug_type($data), __METHOD__);
+                         }
+
+                         return $data;
+diff --git a/src/Symfony/Component/Serializer/Tests/SerializerTest.php b/src/Symfony/Component/Serializer/Tests/SerializerTest.php
+index 2afbd51c22..ab74b06ab0 100644
+--- a/src/Symfony/Component/Serializer/Tests/SerializerTest.php
++++ b/src/Symfony/Component/Serializer/Tests/SerializerTest.php
+@@ -578,10 +578,7 @@ class SerializerTest extends TestCase
+         $this->assertSame($expected, $serializer->serialize($data, 'json'));
+     }
+
+-    /**
+-     * @dataProvider provideObjectOrCollectionTests
+-     * @group legacy
+-     */
++    /** @dataProvider provideObjectOrCollectionTests */
+     public function testNormalizePreserveEmptyArrayObject(Serializer $serializer, array $data)
+     {
+         $expected = '{"a1":{},"a2":{"k":"v"},"b1":[],"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":[]},"d2":{"nested":{"k":"v"}},"e1":{"map":[]},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{"list":[]},"settings":[]},"g2":{"list":["greg"],"settings":[]}}';
+@@ -599,10 +596,7 @@ class SerializerTest extends TestCase
+         ]));
+     }
+
+-    /**
+-     * @dataProvider provideObjectOrCollectionTests
+-     * @group legacy
+-     */
++    /** @dataProvider provideObjectOrCollectionTests */
+     public function testNormalizeEmptyArrayAsObjectAndPreserveEmptyArrayObject(Serializer $serializer, array $data)
+     {
+         $expected = '{"a1":{},"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{"list":[]},"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
+@@ -797,13 +791,15 @@ class Baz
+     }
+ }
+
+-class DummyList implements \Countable, \IteratorAggregate
++class DummyList extends \ArrayObject
+ {
+     public $list;
+
+     public function __construct(array $list)
+     {
+         $this->list = $list;
++
++        $this->setFlags(\ArrayObject::STD_PROP_LIST);
+     }
+
+     public function count(): int
+```
+
+</details>
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-18T14:00:31Z
+
+Could we find a better deprecation message ?
+
+> Returning empty object of class "%s" from "%s()" is deprecated unless it extends "ArrayObject".
+
+With the tests suite fixtures it gives
+
+> Since symfony/serializer 5.4: Returning empty object of class "Symfony\Component\Serializer\Tests\DummyList" from "Symfony\Component\Serializer\Serializer::normalize()" is deprecated unless it extends "ArrayObject".
+
+I'm not sure people understand what it means
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-18T14:03:25Z
+
+And BTW, there is something strange here. It's legit to have class that `implements \Countable, \IteratorAggregate`. And it may not be possible to extends `ArrayObject`. So we are forcing people to do deep change, for something that will be fixed in  6.0.
+
+Finally, I do think this is a very edge case, since the code is ATM broken. So no one could rely on it.
+
+(So... I could update my PR with you patch, since I think nobody will see the message :p)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-18T14:08:23Z
+
+`[...] is deprecated. This class should extend "ArrayObject".`?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-23T08:48:26Z
+
+@nicolas-grekas Should be OK 👍🏼

@@ -257,7 +257,7 @@ class ReflectionExtractorTest extends TestCase
     }
 
     /**
-     *     * @dataProvider php80TypesProvider
+     * @dataProvider php80TypesProvider
      * @requires PHP 8
      */
     public function testExtractPhp80Type($property, array $type = null)
@@ -277,6 +277,14 @@ class ReflectionExtractorTest extends TestCase
             ['data', null],
             ['mixedProperty', null],
         ];
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testExtractPhp81Type()
+    {
+        $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy', 'nothing', []));
     }
 
     /**

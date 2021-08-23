@@ -18,7 +18,6 @@
     "require": {
         "php": ">=7.2.5",
         "symfony/cache": "^4.4|^5.0|^6.0",
-        "symfony/polyfill-php80": "^1.16",
         "symfony/service-contracts": "^1.1|^2"
     },
     "autoload": {

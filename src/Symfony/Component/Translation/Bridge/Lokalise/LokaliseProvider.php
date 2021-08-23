@@ -92,7 +92,7 @@ final class LokaliseProvider implements ProviderInterface
             $createdKeysByDomain[$domain] = $this->createKeys($keys, $domain);
         }
 
-        $this->updateTranslations(array_merge($createdKeysByDomain, $existingKeysByDomain), $translatorBag);
+        $this->updateTranslations(array_merge_recursive($createdKeysByDomain, $existingKeysByDomain), $translatorBag);
     }
 
     public function read(array $domains, array $locales): TranslatorBag
@@ -203,7 +203,8 @@ final class LokaliseProvider implements ProviderInterface
                 continue;
             }
 
-            $createdKeys = array_reduce($response->toArray(false)['keys'], function ($carry, array $keyItem) {
+            $keys = $response->toArray(false)['keys'] ?? [];
+            $createdKeys = array_reduce($keys, static function ($carry, array $keyItem) {
                 $carry[$keyItem['key_name']['web']] = $keyItem['key_id'];
 
                 return $carry;
@@ -232,7 +233,7 @@ final class LokaliseProvider implements ProviderInterface
                         'android' => null,
                         'other' => null,
                     ],
-                    'translations' => array_reduce($translatorBag->getCatalogues(), function ($carry, MessageCatalogueInterface $catalogue) use ($keyName, $domain) {
+                    'translations' => array_reduce($translatorBag->getCatalogues(), static function ($carry, MessageCatalogueInterface $catalogue) use ($keyName, $domain) {
                         // Message could be not found because the catalogue is empty.
                         // We must not send the key in place of the message to avoid wrong message update on the provider.
                         if ($catalogue->get($keyName, $domain) !== $keyName) {
@@ -277,7 +278,7 @@ final class LokaliseProvider implements ProviderInterface
             $this->logger->error(sprintf('Unable to get keys ids from Lokalise: "%s".', $response->getContent(false)));
         }
 
-        return array_reduce($response->toArray(false)['keys'], function ($carry, array $keyItem) {
+        return array_reduce($response->toArray(false)['keys'], static function ($carry, array $keyItem) {
             $carry[$keyItem['key_name']['web']] = $keyItem['key_id'];
 
             return $carry;
@@ -287,8 +288,8 @@ final class LokaliseProvider implements ProviderInterface
     private function ensureAllLocalesAreCreated(TranslatorBagInterface $translatorBag)
     {
         $providerLanguages = $this->getLanguages();
-        $missingLanguages = array_reduce($translatorBag->getCatalogues(), function ($carry, $catalogue) use ($providerLanguages) {
-            if (!\in_array($catalogue->getLocale(), $providerLanguages)) {
+        $missingLanguages = array_reduce($translatorBag->getCatalogues(), static function ($carry, $catalogue) use ($providerLanguages) {
+            if (!\in_array($catalogue->getLocale(), $providerLanguages, true)) {
                 $carry[] = $catalogue->getLocale();
             }
 
@@ -313,9 +314,7 @@ final class LokaliseProvider implements ProviderInterface
         $responseContent = $response->toArray(false);
 
         if (\array_key_exists('languages', $responseContent)) {
-            return array_map(function ($language) {
-                return $language['lang_iso'];
-            }, $responseContent['languages']);
+            return array_column($responseContent['languages'], 'lang_iso');
         }
 
         return [];
@@ -325,7 +324,7 @@ final class LokaliseProvider implements ProviderInterface
     {
         $response = $this->client->request('POST', 'languages', [
             'json' => [
-                'languages' => array_map(function ($language) {
+                'languages' => array_map(static function ($language) {
                     return ['lang_iso' => $language];
                 }, $languages),
             ],

@@ -482,8 +482,10 @@ final class ProgressBar
                     }
                     $this->output->clear($lineCount);
                 } else {
-                    if ($this->formatLineCount > 0) {
-                        $this->cursor->moveUp($this->formatLineCount);
+                    for ($i = 0; $i < $this->formatLineCount; ++$i) {
+                        $this->cursor->moveToColumn(1);
+                        $this->cursor->clearLine();
+                        $this->cursor->moveUp();
                     }
 
                     $this->cursor->moveToColumn(1);

@@ -120,7 +120,7 @@
             </trans-unit>
             <trans-unit id="125">
                 <source>Please enter a valid email address.</source>
-                <target>Indtast venligst en gyldig emailaddresse.</target>
+                <target>Indtast venligst en gyldig e-mailadresse.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>Please select a valid option.</source>

@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-20T07:17:09Z
+
+Thank you for the bugfix, can you please add a testcase to avoid further regressions?
+
+cc @welcoMattic
+
+---------------------------------------------------------------------------
+
+by xepozz at 2021-08-21T19:47:37Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-22T07:33:06Z
+
+@welcoMattic can you please review/test again? Thanks
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-22T09:50:57Z
+
+Since the PR title will appear in the ChangeLog of the next release: Can we please find a better one? The current title does not tell me what aspect of the provider needs fixing.
+
+---------------------------------------------------------------------------
+
+by xepozz at 2021-08-23T07:14:09Z
+
+How can I help you?
+I really need this fix. Can we speed up please?

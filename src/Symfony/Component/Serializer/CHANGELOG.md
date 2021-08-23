@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add support of PHP backed enumerations
  * Add support for serializing empty array as object
+ * Deprecate support for returning empty, iterable, countable, raw object when normalizing
 
 5.3
 ---

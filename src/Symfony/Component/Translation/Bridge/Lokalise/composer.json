@@ -21,9 +21,6 @@
         "symfony/http-client": "^5.3",
         "symfony/translation": "^5.3"
     },
-    "require-dev": {
-        "phpunit/phpunit": "^9.5"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Translation\\Bridge\\Lokalise\\": "" },
         "exclude-from-classmap": [

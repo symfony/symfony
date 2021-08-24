@@ -880,6 +880,26 @@ class BazLegacy
     }
 }
 
+class DummyListLegacy implements \Countable, \IteratorAggregate
+{
+    public $list;
+
+    public function __construct(array $list)
+    {
+        $this->list = $list;
+    }
+
+    public function count(): int
+    {
+        return \count($this->list);
+    }
+
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->list);
+    }
+}
+
 interface NormalizerAwareNormalizer extends NormalizerInterface, NormalizerAwareInterface
 {
 }

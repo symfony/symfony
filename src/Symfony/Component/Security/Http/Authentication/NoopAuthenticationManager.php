@@ -21,13 +21,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * using the authenticator system. Once the authenticator system is no longer
  * experimental, this class can be used to trigger deprecation notices.
  *
- * @internal
- *
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @internal
  */
 class NoopAuthenticationManager implements AuthenticationManagerInterface
 {
-    public function authenticate(TokenInterface $token)
+    public function authenticate(TokenInterface $token): TokenInterface
     {
         return $token;
     }

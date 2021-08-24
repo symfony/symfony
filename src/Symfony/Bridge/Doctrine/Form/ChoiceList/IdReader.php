@@ -77,10 +77,8 @@ class IdReader
      * Returns the ID value for an object.
      *
      * This method assumes that the object has a single-column ID.
-     *
-     * @return string
      */
-    public function getIdValue(object $object = null)
+    public function getIdValue(object $object = null): string
     {
         if (!$object) {
             return '';

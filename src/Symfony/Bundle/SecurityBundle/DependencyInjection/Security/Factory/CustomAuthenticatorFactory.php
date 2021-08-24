@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface, SecurityFactoryInterface
 {
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         throw new \LogicException('Custom authenticators are not supported when "security.enable_authenticator_manager" is not set to true.');
     }

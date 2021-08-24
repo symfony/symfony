@@ -40,8 +40,6 @@ trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecat
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @internal
- *
  * @deprecated since Symfony 5.3
  */
 class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface

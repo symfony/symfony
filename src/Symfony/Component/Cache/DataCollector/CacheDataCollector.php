@@ -67,27 +67,23 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'cache';
     }
 
     /**
      * Method returns amount of logged Cache reads: "get" calls.
-     *
-     * @return array
      */
-    public function getStatistics()
+    public function getStatistics(): array
     {
         return $this->data['instances']['statistics'];
     }
 
     /**
      * Method returns the statistic totals.
-     *
-     * @return array
      */
-    public function getTotals()
+    public function getTotals(): array
     {
         return $this->data['total']['statistics'];
     }

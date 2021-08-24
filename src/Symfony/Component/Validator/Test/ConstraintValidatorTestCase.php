@@ -25,6 +25,7 @@ use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -503,7 +504,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
-    public function getViolations()
+    public function getViolations(): ConstraintViolationListInterface
     {
     }
 

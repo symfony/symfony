@@ -47,7 +47,7 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         'remember_me_parameter' => '_remember_me',
     ];
 
-    public function create(ContainerBuilder $container, string $id, array $config, ?string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, ?string $userProvider, ?string $defaultEntryPoint): array
     {
         // authentication provider
         $authProviderId = 'security.authentication.provider.rememberme.'.$id;
@@ -179,7 +179,7 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         return $authenticatorId;
     }
 
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'remember_me';
     }
@@ -192,7 +192,7 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         return self::PRIORITY;
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'remember-me';
     }

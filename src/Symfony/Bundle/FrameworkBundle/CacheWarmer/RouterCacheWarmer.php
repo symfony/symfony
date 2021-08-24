@@ -36,10 +36,8 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
 
     /**
      * {@inheritdoc}
-     *
-     * @return string[]
      */
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         $router = $this->container->get('router');
 
@@ -51,7 +49,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
     }
 
     /**
-     * Checks whether this warmer is optional or not.
+     * {@inheritdoc}
      */
     public function isOptional(): bool
     {

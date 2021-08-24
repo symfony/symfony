@@ -26,7 +26,7 @@ class JsonLoginLdapFactory extends JsonLoginFactory
 {
     use LdapFactoryTrait;
 
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
+    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
     {
         $provider = 'security.authentication.provider.ldap_bind.'.$id;
         $definition = $container

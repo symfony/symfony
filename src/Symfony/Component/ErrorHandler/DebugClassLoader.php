@@ -534,12 +534,12 @@ class DebugClassLoader
                     $this->patchTypes['force'] = $forcePatchTypes ?: 'docblock';
                 }
 
-                $canAddReturnType = false !== strpos($refl->getFileName(), \DIRECTORY_SEPARATOR.'Tests'.\DIRECTORY_SEPARATOR)
+                $canAddReturnType = false !== stripos($method->getFileName(), \DIRECTORY_SEPARATOR.'Tests'.\DIRECTORY_SEPARATOR)
                     || $refl->isFinal()
                     || $method->isFinal()
                     || $method->isPrivate()
-                    || ('' === (self::$internal[$class] ?? null) && !$refl->isAbstract())
-                    || '' === (self::$final[$class] ?? null)
+                    || ('.' === (self::$internal[$class] ?? null) && !$refl->isAbstract())
+                    || '.' === (self::$final[$class] ?? null)
                     || '' === ($doc['final'][0] ?? null)
                     || '' === ($doc['internal'][0] ?? null)
                 ;

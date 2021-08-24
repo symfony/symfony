@@ -27,7 +27,7 @@ class X509Factory implements SecurityFactoryInterface, AuthenticatorFactoryInter
 {
     public const PRIORITY = -10;
 
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $providerId = 'security.authentication.provider.pre_authenticated.'.$id;
         $container
@@ -67,12 +67,12 @@ class X509Factory implements SecurityFactoryInterface, AuthenticatorFactoryInter
         return self::PRIORITY;
     }
 
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'pre_auth';
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'x509';
     }

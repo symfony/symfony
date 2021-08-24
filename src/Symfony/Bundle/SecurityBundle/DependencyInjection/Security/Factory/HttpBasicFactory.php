@@ -27,7 +27,7 @@ class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactory
 {
     public const PRIORITY = -50;
 
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
@@ -73,12 +73,12 @@ class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactory
         return self::PRIORITY;
     }
 
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'http';
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'http-basic';
     }

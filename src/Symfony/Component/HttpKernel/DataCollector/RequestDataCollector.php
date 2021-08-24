@@ -31,7 +31,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class RequestDataCollector extends DataCollector implements EventSubscriberInterface, LateDataCollectorInterface
 {
-    protected $controllers;
+    private $controllers;
     private $sessionUsages = [];
     private $requestStack;
 
@@ -316,10 +316,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * Gets the route name.
      *
      * The _route request attributes is automatically set by the Router Matcher.
-     *
-     * @return string
      */
-    public function getRoute()
+    public function getRoute(): string
     {
         return $this->data['route'];
     }
@@ -333,10 +331,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * Gets the route parameters.
      *
      * The _route_params request attributes is automatically set by the RouterListener.
-     *
-     * @return array
      */
-    public function getRouteParams()
+    public function getRouteParams(): array
     {
         return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params']->getValue() : [];
     }
@@ -384,7 +380,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => 'onKernelController',
@@ -395,7 +391,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'request';
     }
@@ -432,13 +428,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     }
 
     /**
-     * Parse a controller.
-     *
      * @param string|object|array|null $controller The controller to parse
      *
      * @return array|string An array of controller data or a simple string
      */
-    protected function parseController($controller)
+    private function parseController($controller)
     {
         if (\is_string($controller) && str_contains($controller, '::')) {
             $controller = explode('::', $controller);

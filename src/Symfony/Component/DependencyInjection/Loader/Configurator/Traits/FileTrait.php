@@ -15,6 +15,8 @@ trait FileTrait
 {
     /**
      * Sets a file to require before creating the service.
+     *
+     * @return $this
      */
     final public function file(string $file): static
     {

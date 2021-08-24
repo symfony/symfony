@@ -28,6 +28,8 @@ trait BindTrait
      *
      * @param string $nameOrFqcn A parameter name with its "$" prefix, or an FQCN
      * @param mixed  $valueOrRef The value or reference to bind
+     *
+     * @return $this
      */
     final public function bind(string $nameOrFqcn, mixed $valueOrRef): static
     {

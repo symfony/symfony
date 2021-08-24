@@ -27,6 +27,8 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
 
     /**
      * @param array|KeyboardButton[] $buttons
+     *
+     * @return $this
      */
     public function keyboard(array $buttons): static
     {

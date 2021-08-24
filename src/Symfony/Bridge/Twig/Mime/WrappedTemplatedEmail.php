@@ -57,6 +57,9 @@ final class WrappedTemplatedEmail
         }
     }
 
+    /**
+     * @return $this
+     */
     public function setSubject(string $subject): static
     {
         $this->message->subject($subject);
@@ -69,6 +72,9 @@ final class WrappedTemplatedEmail
         return $this->message->getSubject();
     }
 
+    /**
+     * @return $this
+     */
     public function setReturnPath(string $address): static
     {
         $this->message->returnPath($address);
@@ -81,6 +87,9 @@ final class WrappedTemplatedEmail
         return $this->message->getReturnPath();
     }
 
+    /**
+     * @return $this
+     */
     public function addFrom(string $address, string $name = ''): static
     {
         $this->message->addFrom(new Address($address, $name));
@@ -96,6 +105,9 @@ final class WrappedTemplatedEmail
         return $this->message->getFrom();
     }
 
+    /**
+     * @return $this
+     */
     public function addReplyTo(string $address): static
     {
         $this->message->addReplyTo($address);
@@ -111,6 +123,9 @@ final class WrappedTemplatedEmail
         return $this->message->getReplyTo();
     }
 
+    /**
+     * @return $this
+     */
     public function addTo(string $address, string $name = ''): static
     {
         $this->message->addTo(new Address($address, $name));
@@ -126,6 +141,9 @@ final class WrappedTemplatedEmail
         return $this->message->getTo();
     }
 
+    /**
+     * @return $this
+     */
     public function addCc(string $address, string $name = ''): static
     {
         $this->message->addCc(new Address($address, $name));
@@ -141,6 +159,9 @@ final class WrappedTemplatedEmail
         return $this->message->getCc();
     }
 
+    /**
+     * @return $this
+     */
     public function addBcc(string $address, string $name = ''): static
     {
         $this->message->addBcc(new Address($address, $name));
@@ -156,6 +177,9 @@ final class WrappedTemplatedEmail
         return $this->message->getBcc();
     }
 
+    /**
+     * @return $this
+     */
     public function setPriority(int $priority): static
     {
         $this->message->priority($priority);

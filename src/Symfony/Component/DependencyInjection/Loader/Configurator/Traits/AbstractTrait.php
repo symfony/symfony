@@ -16,6 +16,8 @@ trait AbstractTrait
     /**
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
+     *
+     * @return $this
      */
     final public function abstract(bool $abstract = true): static
     {

@@ -18,6 +18,8 @@ trait AutoconfigureTrait
     /**
      * Sets whether or not instanceof conditionals should be prepended with a global set.
      *
+     * @return $this
+     *
      * @throws InvalidArgumentException when a parent is already set
      */
     final public function autoconfigure(bool $autoconfigured = true): static

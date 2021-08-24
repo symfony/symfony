@@ -21,6 +21,8 @@ trait DecorateTrait
      *
      * @param string|null $id The decorated service id, use null to remove decoration
      *
+     * @return $this
+     *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
     final public function decorate(?string $id, string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): static

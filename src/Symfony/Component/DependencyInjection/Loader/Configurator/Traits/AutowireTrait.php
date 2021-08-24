@@ -15,6 +15,8 @@ trait AutowireTrait
 {
     /**
      * Enables/disables autowiring.
+     *
+     * @return $this
      */
     final public function autowire(bool $autowired = true): static
     {

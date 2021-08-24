@@ -410,6 +410,8 @@ class Response
     /**
      * Sets the HTTP protocol version (1.0 or 1.1).
      *
+     * @return $this
+     *
      * @final
      */
     public function setProtocolVersion(string $version): static
@@ -434,6 +436,8 @@ class Response
      *
      * If the status text is null it will be automatically populated for the known
      * status codes and left empty otherwise.
+     *
+     * @return $this
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      *
@@ -475,6 +479,8 @@ class Response
 
     /**
      * Sets the response charset.
+     *
+     * @return $this
      *
      * @final
      */
@@ -555,6 +561,8 @@ class Response
      *
      * It makes the response ineligible for serving other clients.
      *
+     * @return $this
+     *
      * @final
      */
     public function setPrivate(): static
@@ -570,6 +578,8 @@ class Response
      *
      * It makes the response eligible for serving other clients.
      *
+     * @return $this
+     *
      * @final
      */
     public function setPublic(): static
@@ -582,6 +592,8 @@ class Response
 
     /**
      * Marks the response as "immutable".
+     *
+     * @return $this
      *
      * @final
      */
@@ -635,6 +647,8 @@ class Response
 
     /**
      * Sets the Date header.
+     *
+     * @return $this
      *
      * @final
      */
@@ -699,6 +713,8 @@ class Response
      *
      * Passing null as value will remove the header.
      *
+     * @return $this
+     *
      * @final
      */
     public function setExpires(\DateTimeInterface $date = null): static
@@ -750,6 +766,8 @@ class Response
      *
      * This methods sets the Cache-Control max-age directive.
      *
+     * @return $this
+     *
      * @final
      */
     public function setMaxAge(int $value): static
@@ -763,6 +781,8 @@ class Response
      * Sets the number of seconds after which the response should no longer be considered fresh by shared caches.
      *
      * This methods sets the Cache-Control s-maxage directive.
+     *
+     * @return $this
      *
      * @final
      */
@@ -796,6 +816,8 @@ class Response
      *
      * This method adjusts the Cache-Control/s-maxage directive.
      *
+     * @return $this
+     *
      * @final
      */
     public function setTtl(int $seconds): static
@@ -809,6 +831,8 @@ class Response
      * Sets the response's time-to-live for private/client caches in seconds.
      *
      * This method adjusts the Cache-Control/max-age directive.
+     *
+     * @return $this
      *
      * @final
      */
@@ -835,6 +859,8 @@ class Response
      * Sets the Last-Modified HTTP header with a DateTime instance.
      *
      * Passing null as value will remove the header.
+     *
+     * @return $this
      *
      * @final
      */
@@ -872,6 +898,8 @@ class Response
      * @param string|null $etag The ETag unique identifier or null to remove the header
      * @param bool        $weak Whether you want a weak ETag or not
      *
+     * @return $this
+     *
      * @final
      */
     public function setEtag(string $etag = null, bool $weak = false): static
@@ -893,6 +921,8 @@ class Response
      * Sets the response's cache headers (validation and/or expiration).
      *
      * Available options are: must_revalidate, no_cache, no_store, no_transform, public, private, proxy_revalidate, max_age, s_maxage, immutable, last_modified and etag.
+     *
+     * @return $this
      *
      * @throws \InvalidArgumentException
      *
@@ -955,6 +985,8 @@ class Response
      * This sets the status, removes the body, and discards any headers
      * that MUST NOT be included in 304 responses.
      *
+     * @return $this
+     *
      * @see https://tools.ietf.org/html/rfc2616#section-10.3.5
      *
      * @final
@@ -1005,6 +1037,8 @@ class Response
      * Sets the Vary header.
      *
      * @param bool $replace Whether to replace the actual value or not (true by default)
+     *
+     * @return $this
      *
      * @final
      */

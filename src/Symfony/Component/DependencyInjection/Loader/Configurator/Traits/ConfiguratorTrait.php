@@ -17,6 +17,8 @@ trait ConfiguratorTrait
 {
     /**
      * Sets a configurator to call after the service is fully initialized.
+     *
+     * @return $this
      */
     final public function configurator(string|array|ReferenceConfigurator $configurator): static
     {

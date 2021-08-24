@@ -46,6 +46,9 @@ final class Dotenv
         $this->debugKey = $debugKey;
     }
 
+    /**
+     * @return $this
+     */
     public function setProdEnvs(array $prodEnvs): static
     {
         $this->prodEnvs = $prodEnvs;
@@ -56,6 +59,8 @@ final class Dotenv
     /**
      * @param bool $usePutenv If `putenv()` should be used to define environment variables or not.
      *                        Beware that `putenv()` is not thread safe, that's why this setting defaults to false
+     *
+     * @return $this
      */
     public function usePutenv(bool $usePutenv = true): static
     {

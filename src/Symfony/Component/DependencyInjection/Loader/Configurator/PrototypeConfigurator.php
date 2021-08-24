@@ -75,6 +75,8 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
      * Excludes files from registration using glob patterns.
      *
      * @param string[]|string $excludes
+     *
+     * @return $this
      */
     final public function exclude(array|string $excludes): static
     {

@@ -28,6 +28,8 @@ final class OptionConfigurator
     /**
      * Adds allowed types for this option.
      *
+     * @return $this
+     *
      * @throws AccessException If called from a lazy option or normalizer
      */
     public function allowedTypes(string ...$types): static
@@ -42,6 +44,8 @@ final class OptionConfigurator
      *
      * @param mixed ...$values One or more acceptable values/closures
      *
+     * @return $this
+     *
      * @throws AccessException If called from a lazy option or normalizer
      */
     public function allowedValues(mixed ...$values): static
@@ -53,6 +57,8 @@ final class OptionConfigurator
 
     /**
      * Sets the default value for this option.
+     *
+     * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
@@ -77,6 +83,8 @@ final class OptionConfigurator
      * @param string          $package The name of the composer package that is triggering the deprecation
      * @param string          $version The version of the package that introduced the deprecation
      * @param string|\Closure $message The deprecation message to use
+     *
+     * @return $this
      */
     public function deprecated(string $package, string $version, string|\Closure $message = 'The option "%name%" is deprecated.'): static
     {
@@ -87,6 +95,8 @@ final class OptionConfigurator
 
     /**
      * Sets the normalizer for this option.
+     *
+     * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
@@ -100,6 +110,8 @@ final class OptionConfigurator
     /**
      * Marks this option as required.
      *
+     * @return $this
+     *
      * @throws AccessException If called from a lazy option or normalizer
      */
     public function required(): static
@@ -111,6 +123,8 @@ final class OptionConfigurator
 
     /**
      * Sets an info message for an option.
+     *
+     * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
      */

@@ -15,6 +15,8 @@ trait ArgumentTrait
 {
     /**
      * Sets the arguments to pass to the service constructor/factory method.
+     *
+     * @return $this
      */
     final public function args(array $arguments): static
     {
@@ -25,6 +27,8 @@ trait ArgumentTrait
 
     /**
      * Sets one argument to pass to the service constructor/factory method.
+     *
+     * @return $this
      */
     final public function arg(string|int $key, mixed $value): static
     {

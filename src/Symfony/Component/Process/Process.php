@@ -253,6 +253,8 @@ class Process implements \IteratorAggregate
      * This is identical to run() except that an exception is thrown if the process
      * exits with a non-zero exit code.
      *
+     * @return $this
+     *
      * @throws ProcessFailedException if the process didn't terminate successfully
      *
      * @final

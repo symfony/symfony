@@ -63,9 +63,6 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['memory_limit'];
     }
 
-    /**
-     * Updates the memory usage data.
-     */
     public function updateMemoryUsage()
     {
         $this->data['memory'] = memory_get_peak_usage(true);

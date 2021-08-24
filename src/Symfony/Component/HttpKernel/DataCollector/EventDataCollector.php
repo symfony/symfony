@@ -70,31 +70,51 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
         $this->data = $this->cloneVar($this->data);
     }
 
+    /**
+     * @see TraceableEventDispatcher
+     */
     public function setCalledListeners(array $listeners)
     {
         $this->data['called_listeners'] = $listeners;
     }
 
+    /**
+     * @see TraceableEventDispatcher
+     */
     public function getCalledListeners(): array
     {
         return $this->data['called_listeners'];
     }
 
+    /**
+     * @see TraceableEventDispatcher
+     */
     public function setNotCalledListeners(array $listeners)
     {
         $this->data['not_called_listeners'] = $listeners;
     }
 
+    /**
+     * @see TraceableEventDispatcher
+     */
     public function getNotCalledListeners(): array
     {
         return $this->data['not_called_listeners'];
     }
 
+    /**
+     * @param array $events An array of orphaned events
+     *
+     * @see TraceableEventDispatcher
+     */
     public function setOrphanedEvents(array $events)
     {
         $this->data['orphaned_events'] = $events;
     }
 
+    /**
+     * @see TraceableEventDispatcher
+     */
     public function getOrphanedEvents(): array
     {
         return $this->data['orphaned_events'];

@@ -91,11 +91,17 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         $this->data = $this->cloneVar($this->data);
     }
 
+    /**
+     * Gets the token.
+     */
     public function getToken(): ?string
     {
         return $this->data['token'];
     }
 
+    /**
+     * Gets the Symfony version.
+     */
     public function getSymfonyVersion(): string
     {
         return $this->data['symfony_version'];
@@ -142,11 +148,17 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['symfony_eol'];
     }
 
+    /**
+     * Gets the PHP version.
+     */
     public function getPhpVersion(): string
     {
         return $this->data['php_version'];
     }
 
+    /**
+     * Gets the PHP version extra part.
+     */
     public function getPhpVersionExtra(): ?string
     {
         return $this->data['php_version_extra'] ?? null;
@@ -167,6 +179,9 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['php_timezone'];
     }
 
+    /**
+     * Gets the environment.
+     */
     public function getEnv(): string
     {
         return $this->data['env'];
@@ -182,16 +197,25 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['debug'];
     }
 
+    /**
+     * Returns true if the XDebug is enabled.
+     */
     public function hasXDebug(): bool
     {
         return $this->data['xdebug_enabled'];
     }
 
+    /**
+     * Returns true if APCu is enabled.
+     */
     public function hasApcu(): bool
     {
         return $this->data['apcu_enabled'];
     }
 
+    /**
+     * Returns true if Zend OPcache is enabled.
+     */
     public function hasZendOpcache(): bool
     {
         return $this->data['zend_opcache_enabled'];
@@ -202,6 +226,9 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['bundles'];
     }
 
+    /**
+     * Gets the PHP SAPI name.
+     */
     public function getSapiName(): string
     {
         return $this->data['sapi_name'];

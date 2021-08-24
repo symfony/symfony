@@ -24,8 +24,8 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class TimeDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    protected $kernel;
-    protected $stopwatch;
+    private $kernel;
+    private $stopwatch;
 
     public function __construct(KernelInterface $kernel = null, Stopwatch $stopwatch = null)
     {
@@ -76,8 +76,6 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     }
 
     /**
-     * Sets the request events.
-     *
      * @param StopwatchEvent[] $events The request events
      */
     public function setEvents(array $events)
@@ -97,6 +95,9 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
         return $this->data['events'];
     }
 
+    /**
+     * Gets the request elapsed time.
+     */
     public function getDuration(): float
     {
         if (!isset($this->data['events']['__section__'])) {

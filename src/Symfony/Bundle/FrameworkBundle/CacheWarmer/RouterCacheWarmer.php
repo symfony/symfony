@@ -36,8 +36,6 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
 
     /**
      * {@inheritdoc}
-     *
-     * @return string[]
      */
     public function warmUp(string $cacheDir): array
     {

@@ -31,7 +31,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class RequestDataCollector extends DataCollector implements EventSubscriberInterface, LateDataCollectorInterface
 {
-    protected $controllers;
+    private $controllers;
     private $sessionUsages = [];
     private $requestStack;
 
@@ -428,11 +428,9 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     }
 
     /**
-     * Parse a controller.
-     *
      * @return array|string An array of controller data or a simple string
      */
-    protected function parseController(array|object|string|null $controller): array|string
+    private function parseController(array|object|string|null $controller): array|string
     {
         if (\is_string($controller) && str_contains($controller, '::')) {
             $controller = explode('::', $controller);

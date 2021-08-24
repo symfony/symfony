@@ -218,11 +218,17 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         $this->data = $this->cloneVar($this->data);
     }
 
+    /**
+     * Checks if security is enabled.
+     */
     public function isEnabled(): bool
     {
         return $this->data['enabled'];
     }
 
+    /**
+     * Gets the user.
+     */
     public function getUser(): string
     {
         return $this->data['user'];
@@ -284,11 +290,17 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         return $this->data['token_class'];
     }
 
+    /**
+     * Get the full security token class as Data object.
+     */
     public function getToken(): ?Data
     {
         return $this->data['token'];
     }
 
+    /**
+     * Get the logout URL.
+     */
     public function getLogoutUrl(): ?string
     {
         return $this->data['logout_url'];
@@ -304,6 +316,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         return $this->data['voters'];
     }
 
+    /**
+     * Returns the strategy configured for the security voters.
+     */
     public function getVoterStrategy(): string
     {
         return $this->data['voter_strategy'];

@@ -279,6 +279,14 @@ class ReflectionExtractorTest extends TestCase
     }
 
     /**
+     * @requires PHP 8.1
+     */
+    public function testExtractPhp81Type()
+    {
+        $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php81Dummy', 'nothing', []));
+    }
+
+    /**
      * @dataProvider defaultValueProvider
      */
     public function testExtractWithDefaultValue($property, $type)

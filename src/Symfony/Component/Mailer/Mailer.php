@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Mailer;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

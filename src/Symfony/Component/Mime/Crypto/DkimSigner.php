@@ -68,6 +68,7 @@ final class DkimSigner
             throw new InvalidArgumentException('Invalid DKIM signing algorithm "%s".', $options['algorithm']);
         }
         $headersToIgnore['return-path'] = true;
+        $headersToIgnore['x-transport'] = true;
         foreach ($options['headers_to_ignore'] as $name) {
             $headersToIgnore[strtolower($name)] = true;
         }

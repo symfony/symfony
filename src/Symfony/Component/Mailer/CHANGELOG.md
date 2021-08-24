@@ -6,6 +6,11 @@ CHANGELOG
 
  * The `HttpTransportException` class takes a string at first argument
 
+5.4
+---
+
+ * Enable the mailer to operate on any PSR-14-compatible event dispatcher
+
 5.3
 ---
 

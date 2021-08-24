@@ -48,11 +48,11 @@ class OhmysmtpSmtpTransport extends EsmtpTransport
 
         foreach ($headers->all() as $name => $header) {
             if ($header instanceof TagHeader) {
-                if ($headers->get('X-OMS-Tags') != null) {
+                if (null != $headers->get('X-OMS-Tags')) {
                     $existing = $headers->get('X-OMS-Tags')->getBody();
                     $headers->remove('X-OMS-Tags');
                     $headers->addTextHeader('X-OMS-Tags', $existing.', '.$header->getValue());
-                } else{
+                } else {
                     $headers->addTextHeader('X-OMS-Tags', $header->getValue());
                 }
                 $headers->remove($name);
@@ -60,4 +60,3 @@ class OhmysmtpSmtpTransport extends EsmtpTransport
         }
     }
 }
-

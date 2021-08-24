@@ -52,7 +52,7 @@ class OhmysmtpApiTransport extends AbstractApiTransport
                 'Accept' => 'application/json',
                 'OhMySMTP-Server-Token' => $this->key,
                 'Content-Type' => 'application/json',
-                'User-Agent' => "OhMySMTP Symfony Mailer",
+                'User-Agent' => 'OhMySMTP Symfony Mailer',
             ],
             'json' => $this->getPayload($email, $envelope),
         ]);
@@ -87,7 +87,7 @@ class OhmysmtpApiTransport extends AbstractApiTransport
             'textbody' => $email->getTextBody(),
             'htmlbody' => $email->getHtmlBody(),
             'attachments' => $this->getAttachments($email),
-            'tags' => []
+            'tags' => [],
         ];
 
         $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to'];
@@ -98,7 +98,7 @@ class OhmysmtpApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TagHeader) {
-                array_push($payload['tags'], $header->getValue());
+                $payload['tags'][] = $header->getValue();
                 continue;
             }
 

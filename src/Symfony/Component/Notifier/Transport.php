@@ -58,6 +58,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 5.4
  */
 class Transport
 {

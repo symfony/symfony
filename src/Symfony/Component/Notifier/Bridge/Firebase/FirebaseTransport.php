@@ -89,8 +89,8 @@ final class FirebaseTransport extends AbstractTransport
 
             throw new TransportException('Unable to post the Firebase message: '.$errorMessage, $response);
         }
-        if ($jsonContents && isset($jsonContents['results']['error'])) {
-            throw new TransportException('Unable to post the Firebase message: '.$jsonContents['error'], $response);
+        if ($jsonContents && isset($jsonContents['results'][0]['error'])) {
+            throw new TransportException('Unable to post the Firebase message: '.$jsonContents['results'][0]['error'], $response);
         }
 
         $success = $response->toArray(false);

@@ -58,10 +58,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 5.4
  */
-class Transport
+final class Transport
 {
     private const FACTORY_CLASSES = [
         AllMySmsTransportFactory::class,

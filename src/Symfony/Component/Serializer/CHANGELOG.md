@@ -6,6 +6,7 @@ CHANGELOG
 
  * Remove `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
  * Remove the ability to create instances of the annotation classes by passing an array of parameters, use named arguments instead
+ * Remove support for returning empty, iterable, countable, raw object when normalizing
 
 5.4
 ---

@@ -186,7 +186,7 @@ JSON;
         $this->assertEquals('telegram://api.telegram.org?channel=defaultChannel', $sentMessage->getTransport());
     }
 
-    public function testSendWithMarkdownShouldEscapeDots()
+    public function testSendWithMarkdownShouldEscapeSpecialCharacters()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
@@ -223,7 +223,7 @@ JSON;
 
         $expectedBody = [
             'chat_id' => 'testChannel',
-            'text' => 'I contain a \.',
+            'text' => 'I contain special characters \_ \* \[ \] \( \) \~ \` \> \# \+ \- \= \| \{ \} \. \! to send\.',
             'parse_mode' => 'MarkdownV2',
         ];
 
@@ -235,6 +235,6 @@ JSON;
 
         $transport = $this->createTransport($client, 'testChannel');
 
-        $transport->send(new ChatMessage('I contain a .'));
+        $transport->send(new ChatMessage('I contain special characters _ * [ ] ( ) ~ ` > # + - = | { } . ! to send.'));
     }
 }

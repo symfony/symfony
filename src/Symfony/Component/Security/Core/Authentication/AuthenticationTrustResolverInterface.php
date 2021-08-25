@@ -28,15 +28,11 @@ interface AuthenticationTrustResolverInterface
     /**
      * Resolves whether the passed token implementation is authenticated
      * using remember-me capabilities.
-     *
-     * @return bool
      */
-    public function isRememberMe(TokenInterface $token = null);
+    public function isRememberMe(TokenInterface $token = null): bool;
 
     /**
      * Resolves whether the passed token implementation is fully authenticated.
-     *
-     * @return bool
      */
-    public function isFullFledged(TokenInterface $token = null);
+    public function isFullFledged(TokenInterface $token = null): bool;
 }

@@ -101,7 +101,7 @@ class Question
             throw new LogicException('A hidden question cannot use the autocompleter.');
         }
 
-        $this->hidden = (bool) $hidden;
+        $this->hidden = $hidden;
 
         return $this;
     }
@@ -220,11 +220,8 @@ class Question
      */
     public function setMaxAttempts(?int $attempts): static
     {
-        if (null !== $attempts) {
-            $attempts = (int) $attempts;
-            if ($attempts < 1) {
-                throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
-            }
+        if (null !== $attempts && $attempts < 1) {
+            throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
         }
 
         $this->attempts = $attempts;

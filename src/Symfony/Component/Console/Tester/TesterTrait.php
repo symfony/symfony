@@ -27,6 +27,10 @@ trait TesterTrait
     private $output;
     private $inputs = [];
     private $captureStreamsIndependently = false;
+    /** @var InputInterface */
+    private $input;
+    /** @var int */
+    private $statusCode;
 
     /**
      * Gets the display returned by the last execution of the command or application.

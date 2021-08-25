@@ -38,7 +38,7 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
             trigger_deprecation('symfony/security-core', '5.4', 'The "%s()" method is deprecated, use "isAuthenticated()" or "isFullFledged()" if you want to check if the request is (fully) authenticated.', __METHOD__);
         }
 
-        return $token && !$this->isAuthenticated($token);
+        return $token instanceof AnonymousToken || ($token && !$token->getUser());
     }
 
     /**

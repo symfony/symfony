@@ -362,6 +362,83 @@ class AbstractObjectNormalizerTest extends TestCase
         return $denormalizer;
     }
 
+    public function testDenormalizeBasicTypePropertiesWithStringBoolValues()
+    {
+        $denormalizer = $this->getDenormalizerForObjectWithStringBoolValues();
+
+        // bool
+        $objectWithBooleanProperties = $denormalizer->denormalize(
+            [
+                'true' => 'true',
+                'yes' => 'yEs',
+                'on' => 'ON',
+                'one' => '1',
+                'false' => 'falsE',
+                'no' => 'No',
+                'off' => 'OfF',
+                'zero' => '0',
+                'empty' => '',
+            ],
+            ObjectWithStringBoolean::class,
+            null,
+            [AbstractObjectNormalizer::ENABLE_STRING_BOOL_VALUE => true]
+        );
+
+        $this->assertInstanceOf(ObjectWithStringBoolean::class, $objectWithBooleanProperties);
+
+        $this->assertTrue($objectWithBooleanProperties->true);
+        $this->assertTrue($objectWithBooleanProperties->yes);
+        $this->assertTrue($objectWithBooleanProperties->on);
+        $this->assertTrue($objectWithBooleanProperties->one);
+        $this->assertFalse($objectWithBooleanProperties->false);
+        $this->assertFalse($objectWithBooleanProperties->no);
+        $this->assertFalse($objectWithBooleanProperties->off);
+        $this->assertFalse($objectWithBooleanProperties->zero);
+        $this->assertFalse($objectWithBooleanProperties->empty);
+    }
+
+    public function testDenormalizeBasicTypePropertiesWithBadStringBoolValues()
+    {
+        $denormalizer = $this->getDenormalizerForObjectWithStringBoolValues();
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The value of the "yes" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectWithStringBoolean" must be one of "true", "yes", "on", "1", "false", "no", "off", "0", "" ("foo" given).');
+
+        $objectWithBooleanProperties = $denormalizer->denormalize(
+            [
+                'yes' => 'foo',
+            ],
+            ObjectWithStringBoolean::class,
+            null,
+            [AbstractObjectNormalizer::ENABLE_STRING_BOOL_VALUE => true]
+        );
+    }
+
+    private function getDenormalizerForObjectWithStringBoolValues()
+    {
+        $extractor = $this->createMock(PhpDocExtractor::class);
+        $extractor->method('getTypes')
+            ->will($this->onConsecutiveCalls(
+                [new Type('bool')],
+                [new Type('bool')],
+                [new Type('bool')],
+                [new Type('bool')],
+                [new Type('bool')],
+                [new Type('bool')],
+                [new Type('bool')],
+                [new Type('bool')],
+                [new Type('bool')]
+            ));
+
+        $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
+        $arrayDenormalizer = new ArrayDenormalizerDummy();
+        $serializer = new SerializerCollectionDummy([$arrayDenormalizer, $denormalizer]);
+        $arrayDenormalizer->setSerializer($serializer);
+        $denormalizer->setSerializer($serializer);
+
+        return $denormalizer;
+    }
+
     /**
      * Test that additional attributes throw an exception if no metadata factory is specified.
      */
@@ -414,6 +491,36 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
     {
         return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes, $format);
     }
+}
+
+class ObjectWithStringBoolean
+{
+    /** @var bool */
+    public $true;
+
+    /** @var bool */
+    public $yes;
+
+    /** @var bool */
+    public $on;
+
+    /** @var bool */
+    public $one;
+
+    /** @var bool */
+    public $false;
+
+    /** @var bool */
+    public $no;
+
+    /** @var bool */
+    public $off;
+
+    /** @var bool */
+    public $zero;
+
+    /** @var bool */
+    public $empty;
 }
 
 class Dummy

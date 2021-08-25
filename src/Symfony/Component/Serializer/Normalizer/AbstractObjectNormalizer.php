@@ -53,6 +53,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     public const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
 
     /**
+     * While denormalizing object type boolean fields try to parse string values
+     * into boolean values.
+     *
+     * ["true", "yes", "on", "1"] => true
+     * ["false", "no", "off", "0", ""] => false
+     */
+    public const ENABLE_STRING_BOOL_VALUE = 'enable_string_bool_values';
+
+    /**
      * Flag to control whether fields with the value `null` should be output
      * when normalizing or omitted.
      */
@@ -522,6 +531,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // a float is expected.
             if (Type::BUILTIN_TYPE_FLOAT === $builtinType && \is_int($data) && str_contains($format, JsonEncoder::FORMAT)) {
                 return (float) $data;
+            }
+
+            if (($context[self::ENABLE_STRING_BOOL_VALUE] ?? $this->defaultContext[self::ENABLE_STRING_BOOL_VALUE] ?? false) && Type::BUILTIN_TYPE_BOOL === $builtinType && \is_string($data)) {
+                if (null !== $booleanValue = filter_var($data, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE)) {
+                    return $booleanValue;
+                }
+
+                throw new NotNormalizableValueException(sprintf('The value of the "%s" attribute for class "%s" must be one of "true", "yes", "on", "1", "false", "no", "off", "0", "" ("%s" given).', $attribute, $currentClass, $data));
             }
 
             if (('is_'.$builtinType)($data)) {

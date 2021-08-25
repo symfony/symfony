@@ -34,9 +34,8 @@ use Symfony\Component\ErrorHandler\Internal\TentativeTypes;
  * which is a url-encoded array with the follow parameters:
  *  - "force": any value enables deprecation notices - can be any of:
  *      - "phpdoc" to patch only docblock annotations
- *      - "object" to turn union types to the "object" type when possible (not recommended)
- *      - "1" to add all possible return types including magic methods
- *      - "0" to add possible return types excluding magic methods
+ *      - "2" to add all possible return types
+ *      - "1" to add return types but only to tests/final/internal/private methods
  *  - "php": the target version of PHP - e.g. "7.1" doesn't generate "object" types
  *  - "deprecations": "1" to trigger a deprecation notice when a child class misses a
  *                    return type while the parent declares an "@return" annotation
@@ -73,6 +72,7 @@ class DebugClassLoader
         'mixed' => 'mixed',
         'static' => 'static',
         '$this' => 'static',
+        'list' => 'array',
     ];
 
     private const BUILTIN_RETURN_TYPES = [
@@ -127,7 +127,7 @@ class DebugClassLoader
         $this->patchTypes += [
             'force' => null,
             'php' => \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION,
-            'deprecations' => false,
+            'deprecations' => \PHP_VERSION_ID >= 70400,
         ];
 
         if ('phpdoc' === $this->patchTypes['force']) {
@@ -534,7 +534,8 @@ class DebugClassLoader
                     $this->patchTypes['force'] = $forcePatchTypes ?: 'docblock';
                 }
 
-                $canAddReturnType = false !== stripos($method->getFileName(), \DIRECTORY_SEPARATOR.'Tests'.\DIRECTORY_SEPARATOR)
+                $canAddReturnType = 2 === (int) $forcePatchTypes
+                    || false !== stripos($method->getFileName(), \DIRECTORY_SEPARATOR.'Tests'.\DIRECTORY_SEPARATOR)
                     || $refl->isFinal()
                     || $method->isFinal()
                     || $method->isPrivate()

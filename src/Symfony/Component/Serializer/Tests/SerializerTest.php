@@ -581,7 +581,7 @@ class SerializerTest extends TestCase
     /** @dataProvider provideObjectOrCollectionTests */
     public function testNormalizePreserveEmptyArrayObject(Serializer $serializer, array $data)
     {
-        $expected = '{"a1":{},"a2":{"k":"v"},"b1":[],"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":[]},"d2":{"nested":{"k":"v"}},"e1":{"map":[]},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{"list":[]},"settings":[]},"g2":{"list":["greg"],"settings":[]}}';
+        $expected = '{"a1":{},"a2":{"k":"v"},"b1":[],"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":[]},"d2":{"nested":{"k":"v"}},"e1":{"map":[]},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{},"settings":[]},"g2":{"list":["greg"],"settings":[]}}';
         $this->assertSame($expected, $serializer->serialize($data, 'json', [
             AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
         ]));
@@ -599,62 +599,7 @@ class SerializerTest extends TestCase
     /** @dataProvider provideObjectOrCollectionTests */
     public function testNormalizeEmptyArrayAsObjectAndPreserveEmptyArrayObject(Serializer $serializer, array $data)
     {
-        $expected = '{"a1":{},"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{"list":[]},"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
-        $this->assertSame($expected, $serializer->serialize($data, 'json', [
-            Serializer::EMPTY_ARRAY_AS_OBJECT => true,
-            AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
-        ]));
-    }
-
-    /**
-     * @dataProvider provideObjectOrCollectionTests
-     * @group legacy
-     */
-    public function testNormalizeWithCollectionLegacy(Serializer $serializer, array $data)
-    {
-        $data['g1'] = new BazLegacy([]);
-        $data['g2'] = new BazLegacy(['greg']);
-        $expected = '{"a1":[],"a2":{"k":"v"},"b1":[],"b2":{"k":"v"},"c1":{"nested":[]},"c2":{"nested":{"k":"v"}},"d1":{"nested":[]},"d2":{"nested":{"k":"v"}},"e1":{"map":[]},"e2":{"map":{"k":"v"}},"f1":{"map":[]},"f2":{"map":{"k":"v"}},"g1":{"list":[],"settings":[]},"g2":{"list":["greg"],"settings":[]}}';
-        $this->assertSame($expected, $serializer->serialize($data, 'json'));
-    }
-
-    /**
-     * @dataProvider provideObjectOrCollectionTests
-     * @group legacy
-     */
-    public function testNormalizePreserveEmptyArrayObjectLegacy(Serializer $serializer, array $data)
-    {
-        $data['g1'] = new BazLegacy([]);
-        $data['g2'] = new BazLegacy(['greg']);
-        $expected = '{"a1":{},"a2":{"k":"v"},"b1":[],"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":[]},"d2":{"nested":{"k":"v"}},"e1":{"map":[]},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{"list":[]},"settings":[]},"g2":{"list":["greg"],"settings":[]}}';
-        $this->assertSame($expected, $serializer->serialize($data, 'json', [
-            AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,
-        ]));
-    }
-
-    /**
-     * @dataProvider provideObjectOrCollectionTests
-     * @group legacy
-     */
-    public function testNormalizeEmptyArrayAsObjectLegacy(Serializer $serializer, array $data)
-    {
-        $data['g1'] = new BazLegacy([]);
-        $data['g2'] = new BazLegacy(['greg']);
-        $expected = '{"a1":[],"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":[]},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":[]},"f2":{"map":{"k":"v"}},"g1":{"list":[],"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
-        $this->assertSame($expected, $serializer->serialize($data, 'json', [
-            Serializer::EMPTY_ARRAY_AS_OBJECT => true,
-        ]));
-    }
-
-    /**
-     * @dataProvider provideObjectOrCollectionTests
-     * @group legacy
-     */
-    public function testNormalizeEmptyArrayAsObjectAndPreserveEmptyArrayObjectLegacy(Serializer $serializer, array $data)
-    {
-        $data['g1'] = new BazLegacy([]);
-        $data['g2'] = new BazLegacy(['greg']);
-        $expected = '{"a1":{},"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{"list":[]},"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
+        $expected = '{"a1":{},"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{},"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
         $this->assertSame($expected, $serializer->serialize($data, 'json', [
             Serializer::EMPTY_ARRAY_AS_OBJECT => true,
             AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true,

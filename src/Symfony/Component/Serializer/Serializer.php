@@ -164,18 +164,13 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             return $data;
         }
 
-        if (is_iterable($data)) {
-            if (is_countable($data) && 0 === \count($data)) {
-                switch (true) {
-                    case ($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && \is_object($data):
-                        if (!$data instanceof \ArrayObject) {
-                            trigger_deprecation('symfony/serializer', '5.4', 'Returning empty object of class "%s" from "%s()" is deprecated. This class should extend "ArrayObject".', get_debug_type($data), __METHOD__);
-                        }
+        if (\is_array($data) && !$data && ($context[self::EMPTY_ARRAY_AS_OBJECT] ?? false)) {
+            return new \ArrayObject();
+        }
 
-                        return $data;
-                    case ($context[self::EMPTY_ARRAY_AS_OBJECT] ?? false) && \is_array($data):
-                        return new \ArrayObject();
-                }
+        if (is_iterable($data)) {
+            if ($data instanceof \Countable && ($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && !\count($data)) {
+                return new \ArrayObject();
             }
 
             $normalized = [];

@@ -335,7 +335,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $context);
             } catch (InvalidArgumentException $e) {
-                throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e);
+                throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e, $attribute);
             }
         }
 
@@ -397,14 +397,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         } elseif ('true' === $data || '1' === $data) {
                             $data = true;
                         } else {
-                            throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be bool ("%s" given).', $attribute, $currentClass, $data));
+                            throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be bool ("%s" given).', $attribute, $currentClass, $data), 0, null, $attribute);
                         }
                         break;
                     case Type::BUILTIN_TYPE_INT:
                         if (ctype_digit($data) || '-' === $data[0] && ctype_digit(substr($data, 1))) {
                             $data = (int) $data;
                         } else {
-                            throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $currentClass, $data));
+                            throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $currentClass, $data), 0, null, $attribute);
                         }
                         break;
                     case Type::BUILTIN_TYPE_FLOAT:
@@ -420,7 +420,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             case '-INF':
                                 return -\INF;
                             default:
-                                throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data));
+                                throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data), 0, null, $attribute);
                         }
 
                         break;
@@ -491,7 +491,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $data;
         }
 
-        throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), get_debug_type($data)));
+        throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), get_debug_type($data)), 0, null, $attribute);
     }
 
     /**

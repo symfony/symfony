@@ -16,4 +16,17 @@ namespace Symfony\Component\Serializer\Exception;
  */
 class NotNormalizableValueException extends UnexpectedValueException
 {
+    private ?string $attribute;
+
+    public function __construct(string $message, int $code = 0, \Throwable $previous = null, ?string $attribute = null)
+    {
+        $this->$attribute = $attribute;
+
+        parent::__construct($message, $code, $previous);
+    }
+
+    public function getAttribute(): ?string
+    {
+        return $this->attribute;
+    }
 }

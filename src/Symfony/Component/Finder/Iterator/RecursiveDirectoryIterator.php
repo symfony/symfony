@@ -69,13 +69,28 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
         return new SplFileInfo($basePath.$subPathname, $this->subPath, $subPathname);
     }
 
+    public function hasChildren(bool $allowLinks = false): bool
+    {
+        $hasChildren = parent::hasChildren($allowLinks);
+
+        if (!$hasChildren || !$this->ignoreUnreadableDirs) {
+            return $hasChildren;
+        }
+
+        try {
+            parent::getChildren();
+
+            return true;
+        } catch (\UnexpectedValueException $e) {
+            // If directory is unreadable and finder is set to ignore it, skip children
+            return false;
+        }
+    }
+
     /**
-     * @return \RecursiveIterator
-     *
      * @throws AccessDeniedException
      */
-    #[\ReturnTypeWillChange]
-    public function getChildren()
+    public function getChildren(): \RecursiveDirectoryIterator
     {
         try {
             $children = parent::getChildren();
@@ -91,12 +106,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 
             return $children;
         } catch (\UnexpectedValueException $e) {
-            if ($this->ignoreUnreadableDirs) {
-                // If directory is unreadable and finder is set to ignore it, a fake empty content is returned.
-                return new \RecursiveArrayIterator([]);
-            } else {
-                throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
-            }
+            throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
         }
     }
 

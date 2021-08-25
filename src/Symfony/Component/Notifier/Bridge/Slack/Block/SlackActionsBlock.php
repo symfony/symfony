@@ -21,6 +21,9 @@ final class SlackActionsBlock extends AbstractSlackBlock
         $this->options['type'] = 'actions';
     }
 
+    /**
+     * @return $this
+     */
     public function button(string $text, string $url, string $style = null): static
     {
         if (25 === \count($this->options['elements'] ?? [])) {

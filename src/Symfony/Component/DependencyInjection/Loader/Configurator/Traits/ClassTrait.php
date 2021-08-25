@@ -15,6 +15,8 @@ trait ClassTrait
 {
     /**
      * Sets the service class.
+     *
+     * @return $this
      */
     final public function class(?string $class): static
     {

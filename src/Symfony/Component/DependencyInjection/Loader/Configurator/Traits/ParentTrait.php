@@ -19,6 +19,8 @@ trait ParentTrait
     /**
      * Sets the Definition to inherit from.
      *
+     * @return $this
+     *
      * @throws InvalidArgumentException when parent cannot be set
      */
     final public function parent(string $parent): static

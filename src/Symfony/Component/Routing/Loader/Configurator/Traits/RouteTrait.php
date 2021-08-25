@@ -23,6 +23,8 @@ trait RouteTrait
 
     /**
      * Adds defaults.
+     *
+     * @return $this
      */
     final public function defaults(array $defaults): static
     {
@@ -33,6 +35,8 @@ trait RouteTrait
 
     /**
      * Adds requirements.
+     *
+     * @return $this
      */
     final public function requirements(array $requirements): static
     {
@@ -43,6 +47,8 @@ trait RouteTrait
 
     /**
      * Adds options.
+     *
+     * @return $this
      */
     final public function options(array $options): static
     {
@@ -53,6 +59,8 @@ trait RouteTrait
 
     /**
      * Whether paths should accept utf8 encoding.
+     *
+     * @return $this
      */
     final public function utf8(bool $utf8 = true): static
     {
@@ -63,6 +71,8 @@ trait RouteTrait
 
     /**
      * Sets the condition.
+     *
+     * @return $this
      */
     final public function condition(string $condition): static
     {
@@ -73,6 +83,8 @@ trait RouteTrait
 
     /**
      * Sets the pattern for the host.
+     *
+     * @return $this
      */
     final public function host(string $pattern): static
     {
@@ -86,6 +98,8 @@ trait RouteTrait
      * So an empty array means that any scheme is allowed.
      *
      * @param string[] $schemes
+     *
+     * @return $this
      */
     final public function schemes(array $schemes): static
     {
@@ -99,6 +113,8 @@ trait RouteTrait
      * So an empty array means that any method is allowed.
      *
      * @param string[] $methods
+     *
+     * @return $this
      */
     final public function methods(array $methods): static
     {
@@ -111,6 +127,8 @@ trait RouteTrait
      * Adds the "_controller" entry to defaults.
      *
      * @param callable|string|array $controller a callable or parseable pseudo-callable
+     *
+     * @return $this
      */
     final public function controller(callable|string|array $controller): static
     {
@@ -121,6 +139,8 @@ trait RouteTrait
 
     /**
      * Adds the "_locale" entry to defaults.
+     *
+     * @return $this
      */
     final public function locale(string $locale): static
     {
@@ -131,6 +151,8 @@ trait RouteTrait
 
     /**
      * Adds the "_format" entry to defaults.
+     *
+     * @return $this
      */
     final public function format(string $format): static
     {
@@ -141,6 +163,8 @@ trait RouteTrait
 
     /**
      * Adds the "_stateless" entry to defaults.
+     *
+     * @return $this
      */
     final public function stateless(bool $stateless = true): static
     {

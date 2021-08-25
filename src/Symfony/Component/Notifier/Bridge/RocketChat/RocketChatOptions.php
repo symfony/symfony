@@ -46,6 +46,9 @@ final class RocketChatOptions implements MessageOptionsInterface
         return $this->channel;
     }
 
+    /**
+     * @return $this
+     */
     public function channel(string $channel): static
     {
         $this->channel = $channel;

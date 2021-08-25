@@ -18,6 +18,8 @@ trait FactoryTrait
 {
     /**
      * Sets a factory.
+     *
+     * @return $this
      */
     final public function factory(string|array|ReferenceConfigurator $factory): static
     {

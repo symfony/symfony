@@ -21,6 +21,9 @@ final class SlackSectionBlock extends AbstractSlackBlock
         $this->options['type'] = 'section';
     }
 
+    /**
+     * @return $this
+     */
     public function text(string $text, bool $markdown = true): static
     {
         $this->options['text'] = [
@@ -31,6 +34,9 @@ final class SlackSectionBlock extends AbstractSlackBlock
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function field(string $text, bool $markdown = true): static
     {
         if (10 === \count($this->options['fields'] ?? [])) {
@@ -45,6 +51,9 @@ final class SlackSectionBlock extends AbstractSlackBlock
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function accessory(SlackBlockElementInterface $element): static
     {
         $this->options['accessory'] = $element->toArray();

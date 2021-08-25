@@ -17,6 +17,8 @@ trait TagTrait
 {
     /**
      * Adds a tag for this definition.
+     *
+     * @return $this
      */
     final public function tag(string $name, array $attributes = []): static
     {

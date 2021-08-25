@@ -25,6 +25,9 @@ final class DkimOptions
         return $this->options;
     }
 
+    /**
+     * @return $this
+     */
     public function algorithm(int $algo): static
     {
         $this->options['algorithm'] = $algo;
@@ -32,6 +35,9 @@ final class DkimOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function signatureExpirationDelay(int $show): static
     {
         $this->options['signature_expiration_delay'] = $show;
@@ -39,6 +45,9 @@ final class DkimOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function bodyMaxLength(int $max): static
     {
         $this->options['body_max_length'] = $max;
@@ -46,6 +55,9 @@ final class DkimOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function bodyShowLength(bool $show): static
     {
         $this->options['body_show_length'] = $show;
@@ -53,6 +65,9 @@ final class DkimOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function headerCanon(string $canon): static
     {
         $this->options['header_canon'] = $canon;
@@ -60,6 +75,9 @@ final class DkimOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function bodyCanon(string $canon): static
     {
         $this->options['body_canon'] = $canon;
@@ -67,6 +85,9 @@ final class DkimOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function headersToIgnore(array $headers): static
     {
         $this->options['headers_to_ignore'] = $headers;

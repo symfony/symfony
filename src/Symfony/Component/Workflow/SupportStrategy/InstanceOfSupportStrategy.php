@@ -19,7 +19,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterface
 {
-    private $className;
+    private string $className;
 
     public function __construct(string $className)
     {

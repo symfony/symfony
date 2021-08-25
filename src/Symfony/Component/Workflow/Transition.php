@@ -17,9 +17,9 @@ namespace Symfony\Component\Workflow;
  */
 class Transition
 {
-    private $name;
-    private $froms;
-    private $tos;
+    private string $name;
+    private array $froms;
+    private array $tos;
 
     /**
      * @param string|string[] $froms

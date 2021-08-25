@@ -24,17 +24,16 @@ final class OhMySmtpTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
-        $user = $this->getUser($dsn);
 
         if ('ohmysmtp+api' === $scheme) {
             $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
             $port = $dsn->getPort();
 
-            return (new OhMySmtpApiTransport($user, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
+            return (new OhMySmtpApiTransport($this->getUser($dsn), $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
         if ('ohmysmtp+smtp' === $scheme || 'ohmysmtp+smtps' === $scheme || 'ohmysmtp' === $scheme) {
-            return new OhMySmtpSmtpTransport($user, $this->dispatcher, $this->logger);
+            return new OhMySmtpSmtpTransport($this->getUser($dsn), $this->dispatcher, $this->logger);
         }
 
         throw new UnsupportedSchemeException($dsn, 'ohmysmtp', $this->getSupportedSchemes());

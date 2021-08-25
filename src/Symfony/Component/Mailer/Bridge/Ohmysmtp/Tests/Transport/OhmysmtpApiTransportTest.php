@@ -72,7 +72,7 @@ class OhMySmtpApiTransportTest extends TestCase
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://app.ohmysmtp.com/api/v1/send', $url);
-            $this->assertStringContainsStringIgnoringCase('OhMySMTP-Server-Token: KEY', $options['headers'][0] ?? $options['request_headers'][0]);
+            $this->assertStringContainsStringIgnoringCase('OhMySMTP-Server-Token: KEY', $options['headers'][1] ?? $options['request_headers'][1]);
 
             $body = json_decode($options['body'], true);
             $this->assertSame('"Fabien" <fabpot@symfony.com>', $body['from']);

@@ -137,11 +137,11 @@ jobs:
       - name: Patch return types
         if: "${{ matrix.php == '8.0' && ! matrix.mode }}"
         run: |
-          sed -i 's/"\*\*\/Tests\/"//' composer.json
+          patch -sp1 < .github/expected-missing-return-types.diff
           git add .
           composer install -q --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php # ensure the script is idempotent
+          SYMFONY_PATCH_TYPE_DECLARATIONS=force=2 php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS=force=2 php .github/patch-types.php # ensure the script is idempotent
           git diff --exit-code
 
       - name: Run tests

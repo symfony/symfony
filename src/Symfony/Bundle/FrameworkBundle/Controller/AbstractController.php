@@ -393,13 +393,11 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Get a user from the Security Token Storage.
      *
-     * @return UserInterface|null
-     *
      * @throws \LogicException If SecurityBundle is not available
      *
      * @see TokenInterface::getUser()
      */
-    protected function getUser(): ?object
+    protected function getUser(): ?UserInterface
     {
         if (!$this->container->has('security.token_storage')) {
             throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');

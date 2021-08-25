@@ -25,6 +25,7 @@
         "psr/cache": "^1.0|^2.0",
         "psr/log": "^1|^2|^3",
         "symfony/cache-contracts": "^1.1.7|^2",
+        "symfony/polyfill-php73": "^1.9",
         "symfony/polyfill-php80": "^1.16",
         "symfony/service-contracts": "^1.1|^2",
         "symfony/var-exporter": "^4.2|^5.0"

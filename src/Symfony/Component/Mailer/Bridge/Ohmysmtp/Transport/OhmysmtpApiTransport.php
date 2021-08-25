@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Ohmysmtp\Transport;
+namespace Symfony\Component\Mailer\Bridge\OhMySmtp\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Paul Oms <support@ohmysmtp.com>
  */
-class OhmysmtpApiTransport extends AbstractApiTransport
+class OhMySmtpApiTransport extends AbstractApiTransport
 {
     private const HOST = 'app.ohmysmtp.com/api/v1';
 

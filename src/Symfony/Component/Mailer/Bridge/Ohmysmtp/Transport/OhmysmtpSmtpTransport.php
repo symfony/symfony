@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Ohmysmtp\Transport;
+namespace Symfony\Component\Mailer\Bridge\OhMySmtp\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -23,7 +23,7 @@ use Symfony\Component\Mime\RawMessage;
 /**
  * @author Paul Oms <support@ohmysmtp.com>
  */
-class OhmysmtpSmtpTransport extends EsmtpTransport
+class OhMySmtpSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -36,13 +36,13 @@ class OhmysmtpSmtpTransport extends EsmtpTransport
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         if ($message instanceof Message) {
-            $this->addOhmysmtpHeaders($message);
+            $this->addOhMySmtpHeaders($message);
         }
 
         return parent::send($message, $envelope);
     }
 
-    private function addOhmysmtpHeaders(Message $message): void
+    private function addOhMySmtpHeaders(Message $message): void
     {
         $headers = $message->getHeaders();
 

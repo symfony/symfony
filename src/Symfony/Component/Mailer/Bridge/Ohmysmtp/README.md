@@ -3,6 +3,18 @@ OhMySMTP Bridge
 
 Provides [OhMySMTP](https://ohmysmtp.com) integration for Symfony Mailer.
 
+
+DSN example
+-----------
+
+```
+MAILER_DSN=ohmysmtp+api://API_TOKEN@default
+```
+
+where:
+ - `API_TOKEN` is your OhMySMTP API Token
+
+
 Resources
 ---------
 

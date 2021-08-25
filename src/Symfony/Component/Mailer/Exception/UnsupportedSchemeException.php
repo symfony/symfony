@@ -53,7 +53,7 @@ class UnsupportedSchemeException extends LogicException
             'package' => 'symfony/amazon-mailer',
         ],
         'ohmysmtp' => [
-            'class' => Bridge\Ohmysmtp\Transport\OhmysmtpTransportFactory::class,
+            'class' => Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory::class,
             'package' => 'symfony/ohmysmtp-mailer',
         ],
     ];

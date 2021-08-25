@@ -9,22 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Ohmysmtp\Tests\Transport;
+namespace Symfony\Component\Mailer\Bridge\OhMySmtp\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Mailer\Bridge\Ohmysmtp\Transport\OhmysmtpSmtpTransport;
+use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpSmtpTransport;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
 
-class OhmysmtpSmtpTransportTest extends TestCase
+class OhMySmtpSmtpTransportTest extends TestCase
 {
     public function testCustomHeader()
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
 
-        $transport = new OhmysmtpSmtpTransport('ACCESS_KEY');
-        $method = new \ReflectionMethod(OhmysmtpSmtpTransport::class, 'addOhmysmtpHeaders');
+        $transport = new OhMySmtpSmtpTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(OhMySmtpSmtpTransport::class, 'addOhMySmtpHeaders');
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 
@@ -39,8 +39,8 @@ class OhmysmtpSmtpTransportTest extends TestCase
         $email->getHeaders()->add(new TagHeader('password-reset'));
         $email->getHeaders()->add(new TagHeader('2nd-tag'));
 
-        $transport = new OhmysmtpSmtpTransport('ACCESS_KEY');
-        $method = new \ReflectionMethod(OhmysmtpSmtpTransport::class, 'addOhmysmtpHeaders');
+        $transport = new OhMySmtpSmtpTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(OhMySmtpSmtpTransport::class, 'addOhMySmtpHeaders');
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 

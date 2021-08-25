@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Ohmysmtp\Tests\Transport;
+namespace Symfony\Component\Mailer\Bridge\OhMySmtp\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use Symfony\Component\Mailer\Bridge\Ohmysmtp\Transport\OhmysmtpApiTransport;
+use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\TagHeader;
@@ -22,12 +22,12 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class OhmysmtpApiTransportTest extends TestCase
+class OhMySmtpApiTransportTest extends TestCase
 {
     /**
      * @dataProvider getTransportData
      */
-    public function testToString(OhmysmtpApiTransport $transport, string $expected)
+    public function testToString(OhMySmtpApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -36,15 +36,15 @@ class OhmysmtpApiTransportTest extends TestCase
     {
         return [
             [
-                new OhmysmtpApiTransport('KEY'),
+                new OhMySmtpApiTransport('KEY'),
                 'ohmysmtp+api://app.ohmysmtp.com/api/v1',
             ],
             [
-                (new OhmysmtpApiTransport('KEY'))->setHost('example.com'),
+                (new OhMySmtpApiTransport('KEY'))->setHost('example.com'),
                 'ohmysmtp+api://example.com',
             ],
             [
-                (new OhmysmtpApiTransport('KEY'))->setHost('example.com')->setPort(99),
+                (new OhMySmtpApiTransport('KEY'))->setHost('example.com')->setPort(99),
                 'ohmysmtp+api://example.com:99',
             ],
         ];
@@ -56,8 +56,8 @@ class OhmysmtpApiTransportTest extends TestCase
         $email->getHeaders()->addTextHeader('foo', 'bar');
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
-        $transport = new OhmysmtpApiTransport('ACCESS_KEY');
-        $method = new \ReflectionMethod(OhmysmtpApiTransport::class, 'getPayload');
+        $transport = new OhMySmtpApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(OhMySmtpApiTransport::class, 'getPayload');
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
@@ -72,7 +72,7 @@ class OhmysmtpApiTransportTest extends TestCase
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://app.ohmysmtp.com/api/v1/send', $url);
-            $this->assertStringContainsStringIgnoringCase('OhMySMTP-Server-Token: KEY', $options['headers'][1] ?? $options['request_headers'][1]);
+            $this->assertStringContainsStringIgnoringCase('OhMySMTP-Server-Token: KEY', $options['headers'][0] ?? $options['request_headers'][0]);
 
             $body = json_decode($options['body'], true);
             $this->assertSame('"Fabien" <fabpot@symfony.com>', $body['from']);
@@ -85,7 +85,7 @@ class OhmysmtpApiTransportTest extends TestCase
             ]);
         });
 
-        $transport = new OhmysmtpApiTransport('KEY', $client);
+        $transport = new OhMySmtpApiTransport('KEY', $client);
 
         $mail = new Email();
         $mail->subject('Hello!')
@@ -108,7 +108,7 @@ class OhmysmtpApiTransportTest extends TestCase
                 ],
             ]);
         });
-        $transport = new OhmysmtpApiTransport('KEY', $client);
+        $transport = new OhMySmtpApiTransport('KEY', $client);
         $transport->setPort(8984);
 
         $mail = new Email();
@@ -130,8 +130,8 @@ class OhmysmtpApiTransportTest extends TestCase
 
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
-        $transport = new OhmysmtpApiTransport('ACCESS_KEY');
-        $method = new \ReflectionMethod(OhmysmtpApiTransport::class, 'getPayload');
+        $transport = new OhMySmtpApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(OhMySmtpApiTransport::class, 'getPayload');
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 

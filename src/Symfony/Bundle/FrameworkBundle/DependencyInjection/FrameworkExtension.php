@@ -90,7 +90,7 @@ use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
-use Symfony\Component\Mailer\Bridge\Ohmysmtp\Transport\OhmysmtpTransportFactory;
+use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
@@ -2355,7 +2355,7 @@ class FrameworkExtension extends Extension
             SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
             SendinblueTransportFactory::class => 'mailer.transport_factory.sendinblue',
             SesTransportFactory::class => 'mailer.transport_factory.amazon',
-            OhmysmtpTransportFactory::class => 'mailer.transport_factory.ohmysmtp',
+            OhMySmtpTransportFactory::class => 'mailer.transport_factory.ohmysmtp',
         ];
 
         foreach ($classToServices as $class => $service) {

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by wucdbm at 2021-05-22T04:04:34Z
+
+Should we rely on `ReflectionExtractor` only for this test?
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-22T21:54:28Z
+
+Hey!
+
+I think @TimoBakx has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by wucdbm at 2021-07-23T17:02:07Z
+
+@nicolas-grekas Ping on this one, still happens in production for us every now and then - let's get this reviewed and possibly merged.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-26T07:38:45Z
+
+Looks reasonable to me (should be done on 5.3 instead of 5.4 though).

@@ -7,8 +7,6 @@
         {% if collector.token %}
             {% set is_authenticated = collector.enabled and collector.authenticated  %}
             {% set color_code = not is_authenticated ? 'yellow' %}
-        {% elseif collector.enabled %}
-            {% set color_code = collector.authenticatorManagerEnabled ? 'yellow' : 'red' %}
         {% else %}
             {% set color_code = '' %}
         {% endif %}

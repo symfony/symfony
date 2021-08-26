@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-19T13:57:15Z
+
+This will need a PR on lower branches, to relax the assertions when fwb is used with domcrawler ^5.3
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-19T15:28:26Z
+
+That's true, the alternative would be to merge this in a lower branch. But since this is not a bugfix I think we should not do that.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-02-05T08:20:14Z
+
+If that's easier for us, let's do that change in 4.4?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-02-09T14:10:45Z
+
+rebased on 4.4

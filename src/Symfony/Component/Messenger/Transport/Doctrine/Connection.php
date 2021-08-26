@@ -17,6 +17,7 @@ use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\LockMode;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Comparator;
@@ -386,7 +387,6 @@ class Connection
         $table->addColumn('headers', self::$useDeprecatedConstants ? Type::TEXT : Types::TEXT)
             ->setNotnull(true);
         $table->addColumn('queue_name', self::$useDeprecatedConstants ? Type::STRING : Types::STRING)
-            ->setLength(190) // MySQL 5.6 only supports 191 characters on an indexed column in utf8mb4 mode
             ->setNotnull(true);
         $table->addColumn('created_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(true);
@@ -395,8 +395,11 @@ class Connection
         $table->addColumn('delivered_at', self::$useDeprecatedConstants ? Type::DATETIME : Types::DATETIME_MUTABLE)
             ->setNotnull(false);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['queue_name']);
-        $table->addIndex(['available_at']);
+        // No indices on queue_name and available_at on MySQL to prevent deadlock issues when running multiple consumers.
+        if (!$this->driverConnection->getDatabasePlatform() instanceof MySqlPlatform) {
+            $table->addIndex(['queue_name']);
+            $table->addIndex(['available_at']);
+        }
         $table->addIndex(['delivered_at']);
 
         return $schema;

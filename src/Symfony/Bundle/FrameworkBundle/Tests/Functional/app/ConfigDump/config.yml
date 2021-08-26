@@ -11,3 +11,4 @@ parameters:
     env(LOCALE): en
     env(COOKIE_HTTPONLY): '1'
     secret: test
+    default_config_test_foo: bar

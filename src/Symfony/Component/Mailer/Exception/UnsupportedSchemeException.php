@@ -52,6 +52,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Amazon\Transport\SesTransportFactory::class,
             'package' => 'symfony/amazon-mailer',
         ],
+        'ohmysmtp' => [
+            'class' => Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory::class,
+            'package' => 'symfony/oh-my-smtp-mailer',
+        ],
     ];
 
     public function __construct(Dsn $dsn, string $name = null, array $supported = [])

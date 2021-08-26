@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-29T19:10:11Z
+
+Thank you.
+
+Could you elaborate on the use case for this? Could you give an example of a public bundle that is using this?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-03T09:40:04Z
+
+Thank you for the update. Could you please answer me to this:
+
+>  Could you give an example of a public bundle that is using this?
+
+> I would like to know a public bundle that is using this because it will be easy to test and review the generated output.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2021-05-03T09:43:31Z
+
+> Thank you.
+>
+> Could you elaborate on the use case for this? Could you give an example of a public bundle that is using this?
+
+I've went through some popular bundles & none of them use it, so it I'd say it not a feature often used. I've used it only once when I wanted to allow custom options to be passed to a service.
+
+---------------------------------------------------------------------------
+
+by ciaranmcnulty at 2021-05-24T15:44:01Z
+
+@Nyholm It looks like SwiftMailerBundle does https://github.com/symfony/swiftmailer-bundle/blob/main/DependencyInjection/Configuration.php#L105
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-06-07T04:29:38Z
+
+Im not sure why Travis didn't run...

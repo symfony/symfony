@@ -32,7 +32,7 @@ final class OhMySmtpApiTransportTest extends TestCase
         $this->assertSame($expected, (string) $transport);
     }
 
-    public function getTransportData()
+    public function getTransportData(): array
     {
         return [
             [

@@ -79,7 +79,7 @@ final class SmsapiTransport extends AbstractTransport
             throw new TransportException('Could not decode body to an array.', $response, 0, $e);
         }
 
-        if ((isset($content['error']) && null !== $content['error']) || (200 !== $statusCode)) {
+        if (isset($content['error']) || 200 !== $statusCode) {
             throw new TransportException(sprintf('Unable to send the SMS: "%s".', $content['message'] ?? 'unknown error'), $response);
         }
 

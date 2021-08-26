@@ -58,6 +58,16 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('secret: test', $tester->getDisplay());
     }
 
+    public function testDefaultParameterValueIsResolvedIfConfigIsExisting()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'framework']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $kernelCacheDir = $this->application->getKernel()->getContainer()->getParameter('kernel.cache_dir');
+        $this->assertStringContainsString(sprintf("dsn: 'file:%s/profiler'", $kernelCacheDir), $tester->getDisplay());
+    }
+
     public function testDumpUndefinedBundleOption()
     {
         $tester = $this->createCommandTester();
@@ -72,6 +82,33 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester->execute(['name' => 'FrameworkBundle']);
 
         $this->assertStringContainsString("cookie_httponly: '%env(bool:COOKIE_HTTPONLY)%'", $tester->getDisplay());
+    }
+
+    public function testDumpFallsBackToDefaultConfigAndResolvesParameterValue()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'DefaultConfigTestBundle']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('foo: bar', $tester->getDisplay());
+    }
+
+    public function testDumpFallsBackToDefaultConfigAndResolvesEnvPlaceholder()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['name' => 'DefaultConfigTestBundle']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString("baz: '%env(BAZ)%'", $tester->getDisplay());
+    }
+
+    public function testDumpThrowsExceptionWhenDefaultConfigFallbackIsImpossible()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The extension with alias "extension_without_config_test" does not have configuration.');
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['name' => 'ExtensionWithoutConfigTestBundle']);
     }
 
     private function createCommandTester(): CommandTester

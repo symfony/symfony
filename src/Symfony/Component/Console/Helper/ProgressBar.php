@@ -240,11 +240,7 @@ final class ProgressBar
 
     public function getBarCharacter(): string
     {
-        if (null === $this->barChar) {
-            return $this->max ? '=' : $this->emptyBarChar;
-        }
-
-        return $this->barChar;
+        return $this->barChar ?? ($this->max ? '=' : $this->emptyBarChar);
     }
 
     public function setEmptyBarCharacter(string $char)

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -90,22 +91,14 @@ EOF
         }
 
         $extension = $this->findExtension($name);
+        $extensionAlias = $extension->getAlias();
         $container = $this->compileContainer();
 
-        $extensionAlias = $extension->getAlias();
-        $extensionConfig = [];
-        foreach ($container->getCompilerPassConfig()->getPasses() as $pass) {
-            if ($pass instanceof ValidateEnvPlaceholdersPass) {
-                $extensionConfig = $pass->getExtensionConfig();
-                break;
-            }
-        }
-
-        if (!isset($extensionConfig[$extensionAlias])) {
-            throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
-        }
-
-        $config = $container->resolveEnvPlaceholders($extensionConfig[$extensionAlias]);
+        $config = $container->resolveEnvPlaceholders(
+            $container->getParameterBag()->resolveValue(
+                $this->getConfigForExtension($extension, $container)
+            )
+        );
 
         if (null === $path = $input->getArgument('path')) {
             $io->title(
@@ -165,5 +158,34 @@ EOF
         }
 
         return $config;
+    }
+
+    private function getConfigForExtension(ExtensionInterface $extension, ContainerBuilder $container): array
+    {
+        $extensionAlias = $extension->getAlias();
+
+        $extensionConfig = [];
+        foreach ($container->getCompilerPassConfig()->getPasses() as $pass) {
+            if ($pass instanceof ValidateEnvPlaceholdersPass) {
+                $extensionConfig = $pass->getExtensionConfig();
+                break;
+            }
+        }
+
+        if (isset($extensionConfig[$extensionAlias])) {
+            return $extensionConfig[$extensionAlias];
+        }
+
+        // Fall back to default config if the extension has one
+
+        if (!$extension instanceof ConfigurationExtensionInterface) {
+            throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
+        }
+
+        $configs = $container->getExtensionConfig($extensionAlias);
+        $configuration = $extension->getConfiguration($configs, $container);
+        $this->validateConfiguration($extension, $configuration);
+
+        return (new Processor())->processConfiguration($configuration, $configs);
     }
 }

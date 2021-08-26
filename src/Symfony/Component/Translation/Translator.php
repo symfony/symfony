@@ -411,14 +411,8 @@ EOF
             $this->parentLocales = json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
         }
 
+        $originLocale = $locale;
         $locales = [];
-        foreach ($this->fallbackLocales as $fallback) {
-            if ($fallback === $locale) {
-                continue;
-            }
-
-            $locales[] = $fallback;
-        }
 
         while ($locale) {
             $parent = $this->parentLocales[$locale] ?? null;
@@ -439,8 +433,16 @@ EOF
             }
 
             if (null !== $locale) {
-                array_unshift($locales, $locale);
+                $locales[] = $locale;
             }
+        }
+
+        foreach ($this->fallbackLocales as $fallback) {
+            if ($fallback === $originLocale) {
+                continue;
+            }
+
+            $locales[] = $fallback;
         }
 
         return array_unique($locales);

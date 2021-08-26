@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -72,10 +73,14 @@ final class SmsapiTransport extends AbstractTransport
             throw new TransportException('Could not reach the remote Smsapi server.', $response, 0, $e);
         }
 
-        if (200 !== $statusCode) {
-            $error = $response->toArray(false);
+        try {
+            $content = $response->toArray(false);
+        } catch (DecodingExceptionInterface $e) {
+            throw new TransportException('Could not decode body to an array.', $response, 0, $e);
+        }
 
-            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error['message']), $response);
+        if ((isset($content['error']) && null !== $content['error']) || (200 !== $statusCode)) {
+            throw new TransportException(sprintf('Unable to send the SMS: "%s".', $content['message'] ?? 'unknown error'), $response);
         }
 
         return new SentMessage($message, (string) $this);

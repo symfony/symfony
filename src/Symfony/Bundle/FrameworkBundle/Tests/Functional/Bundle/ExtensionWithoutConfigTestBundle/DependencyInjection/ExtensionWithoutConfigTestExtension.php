@@ -11,7 +11,7 @@ class ExtensionWithoutConfigTestExtension implements ExtensionInterface
     {
     }
 
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return '';
     }
@@ -21,7 +21,7 @@ class ExtensionWithoutConfigTestExtension implements ExtensionInterface
         return false;
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'extension_without_config_test';
     }

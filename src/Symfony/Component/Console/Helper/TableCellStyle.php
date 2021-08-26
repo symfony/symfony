@@ -74,10 +74,7 @@ class TableCellStyle
         );
     }
 
-    /**
-     * @return int
-     */
-    public function getPadByAlign()
+    public function getPadByAlign(): int
     {
         return self::ALIGN_MAP[$this->getOptions()['align']];
     }

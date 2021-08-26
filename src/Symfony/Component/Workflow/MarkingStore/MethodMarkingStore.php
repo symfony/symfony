@@ -29,8 +29,8 @@ use Symfony\Component\Workflow\Marking;
  */
 final class MethodMarkingStore implements MarkingStoreInterface
 {
-    private $singleState;
-    private $property;
+    private bool $singleState;
+    private string $property;
 
     /**
      * @param string $property Used to determine methods to call

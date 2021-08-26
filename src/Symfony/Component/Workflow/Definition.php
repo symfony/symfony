@@ -22,10 +22,10 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
  */
 final class Definition
 {
-    private $places = [];
-    private $transitions = [];
-    private $initialPlaces = [];
-    private $metadataStore;
+    private array $places = [];
+    private array $transitions = [];
+    private array $initialPlaces = [];
+    private MetadataStoreInterface $metadataStore;
 
     /**
      * @param string[]             $places

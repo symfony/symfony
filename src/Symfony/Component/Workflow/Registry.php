@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
  */
 class Registry
 {
-    private $workflows = [];
+    private array $workflows = [];
 
     public function addWorkflow(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy)
     {

@@ -52,10 +52,10 @@ class Workflow implements WorkflowInterface
         WorkflowEvents::ANNOUNCE => self::DISABLE_ANNOUNCE_EVENT,
     ];
 
-    private $definition;
-    private $markingStore;
-    private $dispatcher;
-    private $name;
+    private Definition $definition;
+    private MarkingStoreInterface $markingStore;
+    private ?EventDispatcherInterface $dispatcher;
+    private string $name;
 
     /**
      * When `null` fire all events (the default behaviour).
@@ -65,7 +65,7 @@ class Workflow implements WorkflowInterface
      *
      * @var array|string[]|null
      */
-    private $eventsToDispatch = null;
+    private ?array $eventsToDispatch = null;
 
     public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed', array $eventsToDispatch = null)
     {

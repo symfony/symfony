@@ -11,17 +11,17 @@ class ExtensionWithoutConfigTestExtension implements ExtensionInterface
     {
     }
 
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return '';
     }
 
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|false
     {
         return false;
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'extension_without_config_test';
     }

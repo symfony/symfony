@@ -12,7 +12,7 @@ return static function (AddToListConfig $config) {
             'Foo\\MyArrayMessage' => [
                 'senders' => ['workqueue'],
             ],
-        ]
+        ],
     ]);
     $config->messenger()
         ->routing('Foo\\Message')->senders(['workqueue']);

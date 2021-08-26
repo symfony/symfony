@@ -85,6 +85,9 @@ class Table
     private $columnWidths = [];
     private $columnMaxWidths = [];
 
+    /**
+     * @var array<string, TableStyle>|null
+     */
     private static $styles;
 
     private $rendered = false;
@@ -803,6 +806,9 @@ class Table
         $this->numberOfColumns = null;
     }
 
+    /**
+     * @return array<string, TableStyle>
+     */
     private static function initStyles(): array
     {
         $borderless = new TableStyle();

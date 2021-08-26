@@ -21,6 +21,9 @@ final class Cursor
     private $output;
     private $input;
 
+    /**
+     * @param resource|null $input
+     */
     public function __construct(OutputInterface $output, $input = null)
     {
         $this->output = $output;

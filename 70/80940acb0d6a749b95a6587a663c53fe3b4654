@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-26T06:13:59Z
+
+IIUC, this issue only exists on MySQL. It this is the case, the change should only be done for MySQL and not for all database engines.
+
+---------------------------------------------------------------------------
+
+by jeroennoten at 2021-08-26T10:35:32Z
+
+@fabpot, you are right. To be sure, I tested with PostgreSQL and I could not reproduce the issues there.
+
+So I changed this to only apply to MySQL. I also added a unit test for these changes.

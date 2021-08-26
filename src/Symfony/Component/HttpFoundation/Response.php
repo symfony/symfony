@@ -1079,12 +1079,27 @@ class Response
         $lastModified = $this->headers->get('Last-Modified');
         $modifiedSince = $request->headers->get('If-Modified-Since');
 
-        if ($etags = $request->getETags()) {
-            $notModified = \in_array($this->getEtag(), $etags) || \in_array('*', $etags);
-        }
+        if ($ifNoneMatchEtags = $request->getETags()) {
+            $etag = $this->getEtag();
+            if (0 == strncmp($etag, 'W/', 2)) {
+                $etag = substr($etag, 2);
+            }
 
-        if ($modifiedSince && $lastModified) {
-            $notModified = strtotime($modifiedSince) >= strtotime($lastModified) && (!$etags || $notModified);
+            // Use weak comparison as per https://tools.ietf.org/html/rfc7232#section-3.2.
+            foreach ($ifNoneMatchEtags as $ifNoneMatchEtag) {
+                if (0 == strncmp($ifNoneMatchEtag, 'W/', 2)) {
+                    $ifNoneMatchEtag = substr($ifNoneMatchEtag, 2);
+                }
+
+                if ($ifNoneMatchEtag === $etag || '*' === $ifNoneMatchEtag) {
+                    $notModified = true;
+                    break;
+                }
+            }
+        }
+        // Only do If-Modified-Since date comparison when If-None-Match is not present as per https://tools.ietf.org/html/rfc7232#section-3.3.
+        elseif ($modifiedSince && $lastModified) {
+            $notModified = strtotime($modifiedSince) >= strtotime($lastModified);
         }
 
         if ($notModified) {

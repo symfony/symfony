@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-16T07:12:02Z
+
+Hey!
+
+I think @fancyweb has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mboeck001 at 2021-08-16T10:31:45Z
+
+Hi! There seems to be another problem with this fix, if there are manual or default fallbacks. I changed the routine at my place to this to fix it - the logic is to first take all computed fallbacks, and afterwards all fix coded fallbacks ...
+
+`    protected function computeFallbackLocales($locale)
+    {
+        if (null === $this->parentLocales) {
+            $this->parentLocales = json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
+        }
+
+        $locales = [];
+        // m.boeck: Fallback bug
+        $localesManual = [];
+        foreach ($this->fallbackLocales as $fallback) {
+            if ($fallback === $locale) {
+                continue;
+            }
+
+            // m.boeck: Fallback bug
+            $localesManual[] = $fallback;
+        }
+
+        while ($locale) {
+            $parent = $this->parentLocales[$locale] ?? null;
+
+            if ($parent) {
+                $locale = 'root' !== $parent ? $parent : null;
+            } elseif (\function_exists('locale_parse')) {
+                $localeSubTags = locale_parse($locale);
+                $locale = null;
+                if (1 < \count($localeSubTags)) {
+                    array_pop($localeSubTags);
+                    $locale = locale_compose($localeSubTags) ?: null;
+                }
+            } elseif ($i = strrpos($locale, '_') ?: strrpos($locale, '-')) {
+                $locale = substr($locale, 0, $i);
+            } else {
+                $locale = null;
+            }
+
+            if (null !== $locale) {
+                // m.boeck: wrong order in fallback - bug in symfony
+                $locales[] = $locale;
+            }
+        }
+
+        // m.boeck: fallback bug
+        return array_unique(array_merge($locales, $localesManual));
+    }`
+
+For testing there should be a testcase for manual set fallbacks ...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-16T10:34:06Z
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-16T17:23:27Z
+
+LGTM. Remaing failure seems random.
+
+Status: needs review

@@ -68,7 +68,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['postmark', 'symfony/postmark-mailer'];
         yield ['sendgrid', 'symfony/sendgrid-mailer'];
         yield ['sendinblue', 'symfony/sendinblue-mailer'];
-        yield ['ohmysmtp', 'symfony/ohmysmtp-mailer'];
+        yield ['ohmysmtp', 'symfony/oh-my-smtp-mailer'];
         yield ['ses', 'symfony/amazon-mailer'];
     }
 

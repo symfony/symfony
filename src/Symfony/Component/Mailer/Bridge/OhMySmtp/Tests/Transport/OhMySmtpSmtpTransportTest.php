@@ -16,7 +16,7 @@ use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpSmtpTransport;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
 
-class OhMySmtpSmtpTransportTest extends TestCase
+final class OhMySmtpSmtpTransportTest extends TestCase
 {
     public function testCustomHeader()
     {

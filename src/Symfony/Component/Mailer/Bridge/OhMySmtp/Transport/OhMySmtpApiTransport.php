@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Paul Oms <support@ohmysmtp.com>
  */
-class OhMySmtpApiTransport extends AbstractApiTransport
+final class OhMySmtpApiTransport extends AbstractApiTransport
 {
     private const HOST = 'app.ohmysmtp.com/api/v1';
 

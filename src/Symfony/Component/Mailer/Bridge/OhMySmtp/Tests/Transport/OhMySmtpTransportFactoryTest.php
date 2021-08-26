@@ -18,7 +18,7 @@ use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class OhMySmtpTransportFactoryTest extends TransportFactoryTestCase
+final class OhMySmtpTransportFactoryTest extends TransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface
     {

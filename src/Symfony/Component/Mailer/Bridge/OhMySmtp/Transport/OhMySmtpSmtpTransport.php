@@ -23,7 +23,7 @@ use Symfony\Component\Mime\RawMessage;
 /**
  * @author Paul Oms <support@ohmysmtp.com>
  */
-class OhMySmtpSmtpTransport extends EsmtpTransport
+final class OhMySmtpSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {

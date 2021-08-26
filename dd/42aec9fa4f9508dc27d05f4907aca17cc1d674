@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-04-08T17:18:26Z
+
+shouldnt we fix it at the Configuration level, given `->defaultValue('%kernel.project_dir%/translations')`
+
+IIUC `cannotBeEmpty` is missing.
+
+---------------------------------------------------------------------------
+
+by SimonHeimberg at 2021-04-08T19:15:44Z
+
+> shouldnt we fix it at the Configuration level, given `->defaultValue('%kernel.project_dir%/translations')`
+>
+> IIUC `cannotBeEmpty` is missing.
+
+I see two options:
+* allow null again, as it was before 3.4.x (not sure about the exact version)
+* prevent null cleanly (Your suggestion is probably cleaner. Failing with a fatal php error as currently is bad.)
+
+I am not sure which way to go. Actually it was a BC break in 3.4.x, which was not noticed quickly. For more details see  #37111
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-04-08T19:37:35Z
+
+i think it broke as of 4.x due the added type hint in ContainerBuilder::fileExists
+
+before the inexistence was implicit, eg. `if ($container->fileExists($dir = $defaultDir.'/'.$name)) {` checks `/$name` at root level if $defaultDir is null.
+
+So i think allowing explicit `null` in config is reasonable and should be handled as such, everywhere. As it preserves BC with 3.4
+
+---------------------------------------------------------------------------
+
+by SimonHeimberg at 2021-04-09T10:43:54Z
+
+Should I add a test case checking this config value? Where should I add it? I doubt that `src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/ConfigurationTest.php` would test enough places :thinking:

@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by herndlm at 2021-08-04T11:08:57Z
+
+The failing test should be unrelated.
+
+---------------------------------------------------------------------------
+
+by herndlm at 2021-08-05T18:24:32Z
+
+> looks generally OK to me
+>
+> previously we resolved values (`resolveValue`) after processing => https://github.com/symfony/symfony/pull/30648/files#diff-6f37907eb60dac18aec41358f427dab3c34f1c3d6d71247506ee52a856a05a2dL91, but im not sure it's still applicable for just default config now.
+
+Good catch! This is about env vars, right? I'll try to add a test and adapt that.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-05T18:28:54Z
+
+> This is about env vars, right
+
+yes :D another node with default env would be nice i guess, but AFAIK that's already taken care of due the outer `resolveEnvPlaceholders` call already
+
+---------------------------------------------------------------------------
+
+by herndlm at 2021-08-05T19:11:47Z
+
+> > This is about env vars, right
+>
+> yes :D another node with default env would be nice i guess, but AFAIK that's already taken care of due the outer `resolveEnvPlaceholders` call already
+
+I added another node to check that and yes you're right - it's already taken care of
+
+---------------------------------------------------------------------------
+
+by herndlm at 2021-08-11T07:14:02Z
+
+@ro0NL sorry to bother you again, 3 questions, no worries if you can't answer all of them
+1. After your approval I did another change making the value resolving consistent as you mentioned in https://github.com/symfony/symfony/pull/42368#discussion_r683728000, is that fine with you?
+2. Do you think the failing redis test could be related or can I test this somehow? I was sure it's unrelated but it constantly fails
+3. Is the core team regularly checking PRs like this (e.g. via label) or should somebody be tagged? I want to avoid pinging them unnecessarily
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-11T07:17:47Z
+
+1) :ok_hand:
+2) im 99.99% sure failing redis connection is unrelated, however https://ci.appveyor.com/project/fabpot/symfony/builds/40325532 looks related (outdated fixture perhaps?)
+3) cc @lyrixx :)
+
+---------------------------------------------------------------------------
+
+by herndlm at 2021-08-11T07:29:39Z
+
+Grr, so apparently one of the values to check has single ticks on Windows but not on Linux xD I started to ignore appveyor already because it randomly failed..
+UPDATE: should be fixed
+UPDATE2: installed redis extension and started a redis Docker instance and tests were running fine 🤷‍♂️
+```sh
+➜  symfony git:(bugfix/fallback-to-default-config) ✗ php ./phpunit src/Symfony/Bundle/FrameworkBundle
+#!/usr/bin/env php
+PHPUnit 9.5.7 by Sebastian Bergmann and contributors.
+
+Warning:       Your XML configuration validates against a deprecated schema.
+Suggestion:    Migrate your XML configuration using "--migrate-configuration"!
+
+Testing /Users/herndlm/Development/source/git-forks/symfony/src/Symfony/Bundle/FrameworkBundle
+.............................................................   61 / 1427 (  4%)
+.............................................................  122 / 1427 (  8%)
+.............................................................  183 / 1427 ( 12%)
+.............................................................  244 / 1427 ( 17%)
+.............................................................  305 / 1427 ( 21%)
+.............................................................  366 / 1427 ( 25%)
+.............................................................  427 / 1427 ( 29%)
+.............................................................  488 / 1427 ( 34%)
+.............................................................  549 / 1427 ( 38%)
+......................................................SS.....  610 / 1427 ( 42%)
+.............................................................  671 / 1427 ( 47%)
+.............................................................  732 / 1427 ( 51%)
+.............................................................  793 / 1427 ( 55%)
+.............................................................  854 / 1427 ( 59%)
+.............................................................  915 / 1427 ( 64%)
+.............................................................  976 / 1427 ( 68%)
+............................................................. 1037 / 1427 ( 72%)
+............................................................. 1098 / 1427 ( 76%)
+............................................................. 1159 / 1427 ( 81%)
+............................................................. 1220 / 1427 ( 85%)
+............................................................. 1281 / 1427 ( 89%)
+............................................................. 1342 / 1427 ( 94%)
+............................................................. 1403 / 1427 ( 98%)
+........................                                      1427 / 1427 (100%)
+
+Time: 00:54.738, Memory: 240.50 MB
+
+OK, but incomplete, skipped, or risky tests!
+Tests: 1427, Assertions: 3427, Skipped: 2.
+
+Legacy deprecation notices (156)
+➜  symfony git:(bugfix/fallback-to-default-config) ✗ php -v
+PHP 7.4.22 (cli) (built: Jul 29 2021 18:27:37) ( NTS )
+Copyright (c) The PHP Group
+Zend Engine v3.4.0, Copyright (c) Zend Technologies
+    with Xdebug v3.0.4, Copyright (c) 2002-2021, by Derick Rethans
+    with Zend OPcache v7.4.22, Copyright (c), by Zend Technologies
+➜  symfony git:(bugfix/fallback-to-default-config) ✗ git rev-parse HEAD
+0939cdc44eeff42d04b4817f876494585cbecd87
+➜  symfony git:(bugfix/fallback-to-default-config) ✗
+```
+should be all good then
+
+---------------------------------------------------------------------------
+
+by herndlm at 2021-08-13T16:28:07Z
+
+@lyrixx what do you think?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-17T07:19:10Z
+
+If it works as expected, let's ship it
+
+---------------------------------------------------------------------------
+
+by herndlm at 2021-08-25T08:14:04Z
+
+Rebased on latest 4.4 to get rid of the appveyor fails. 7.2 and 7.4 failing tests should be unrelated, 7.2 tests were still working a week ago 🤔
+
+Shall this be merged then or are any further adaptions needed/wanted? @ro0NL @lyrixx

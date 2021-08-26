@@ -151,6 +151,7 @@ use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -2427,6 +2428,12 @@ class FrameworkExtension extends Extension
         }
 
         $container->getDefinition('notifier.channel_policy')->setArgument(0, $config['channel_policy']);
+
+        $container->registerForAutoconfiguration(NotifierTransportFactoryInterface::class)
+            ->addTag('chatter.transport_factory');
+
+        $container->registerForAutoconfiguration(NotifierTransportFactoryInterface::class)
+            ->addTag('texter.transport_factory');
 
         $classToServices = [
             AllMySmsTransportFactory::class => 'notifier.transport_factory.allmysms',

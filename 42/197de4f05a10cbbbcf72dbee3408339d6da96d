@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-06-03T08:08:36Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-03T09:17:10Z
+
+Shouldn't this PR target a lower branch, eg 4.4?
+Can this be tested somehow?
+
+---------------------------------------------------------------------------
+
+by mr-sven at 2021-06-03T10:20:50Z
+
+Here the snippents from my config. Without the modification the memberOf will fail.
+
+It took me half a day of researching because the documentation is missing the service tag for the ldap service.
+
+```yaml
+# /config/packages/security.yaml
+security:
+    enable_authenticator_manager: true
+
+    providers:
+        provider_ldap:
+            ldap:
+                service: Symfony\Component\Ldap\Ldap
+                base_dn: dc=planetexpress,dc=com
+                search_dn: cn=admin,dc=planetexpress,dc=com
+                search_password: GoodNewsEveryone
+                default_roles: ROLE_USER
+                uid_key: uid
+                extra_fields: ['givenName','sn','mail','memberOf']
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            lazy: true
+
+            form_login_ldap:
+                service: Symfony\Component\Ldap\Ldap
+                enable_csrf: true
+                login_path: login
+                check_path: login
+                dn_string: dc=planetexpress,dc=com
+                query_string: '(&(uid={username}))'
+                search_dn: cn=admin,dc=planetexpress,dc=com
+                search_password: GoodNewsEveryone
+
+            logout:
+                path: logout
+
+    access_control:
+        - { path: ^/login, roles: IS_ANONYMOUS }
+        - { path: ^/, roles: ROLE_USER }
+```
+
+```yaml
+# /config/services.yaml
+services:
+    Symfony\Component\Ldap\Ldap:
+        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
+        # the documentation is missing the service tag
+        tags: ['ldap']
+    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+        arguments:
+            -   host: localhost
+                port: 10386
+                #encryption: tls
+                options:
+                    protocol_version: 3
+                    referrals: false
+```
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-06-05T07:19:20Z
+
+This should target 🎯 4.4 and can you please add a testcase to avoid further regression?

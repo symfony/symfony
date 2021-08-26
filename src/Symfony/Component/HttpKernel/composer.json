@@ -21,7 +21,7 @@
         "symfony/error-handler": "^4.4|^5.0",
         "symfony/event-dispatcher": "^5.0",
         "symfony/http-client-contracts": "^1.1|^2",
-        "symfony/http-foundation": "^5.3",
+        "symfony/http-foundation": "^5.3.7",
         "symfony/polyfill-ctype": "^1.8",
         "symfony/polyfill-php73": "^1.9",
         "symfony/polyfill-php80": "^1.16",

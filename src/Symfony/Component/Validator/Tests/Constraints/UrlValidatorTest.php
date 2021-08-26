@@ -100,6 +100,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         return [
             ['http://a.pl'],
             ['http://www.example.com'],
+            ['http://tt.example.com'],
             ['http://www.example.com.'],
             ['http://www.example.museum'],
             ['https://example.com/'],
@@ -260,6 +261,10 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://example.com/exploit.html?hel lo'],
             ['http://example.com/exploit.html?not_a%hex'],
             ['http://'],
+            ['http://www..com'],
+            ['http://www..example.com'],
+            ['http://wwww.example..com'],
+            ['http://.www.example.com'],
         ];
     }
 

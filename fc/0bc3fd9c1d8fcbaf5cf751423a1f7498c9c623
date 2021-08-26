@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-26T05:50:44Z
+
+When you are calling your assertion in a test, you do have access to the current client, so I don't see the benefit of this new method (which makes difficult to understand what's going on IMHO).
+
+---------------------------------------------------------------------------
+
+by nep-koen at 2021-08-26T06:34:46Z
+
+Yes I agree that the benefits are small, though someone at some points made the decision to be able to call browser kit assertions without passing any arguments, instead acting on the internal state of the test class (e.g. `self::assertResponseIsSuccessful()`, `self::assertBrowserHasCookie(..)`, etc.).
+
+For the sake of consistency I would like to be able to do the same for my own assertions (e.g. `self::assertResponseMatchesOpenApiSchema()` instead of `self::assertResponseMatchesOpenApiSchema($client)` or `self::assertResponseMatchesOpenApiSchema($method, $path)`.
+
+If I hadn't needed the request method and path this would have been completely possible using `BrowserKitAssertions::assertThatForResponse()`, which does the same thing for the `Response` object as the new `BrowserKitAssertions::assertThatForBrowser()` method does for the `AbstractBrowser`.

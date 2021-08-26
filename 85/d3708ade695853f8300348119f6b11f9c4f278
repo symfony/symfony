@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by yoannrenard at 2021-07-13T08:28:51Z
+
+What do you think about adding a `force="true"` parameter instead as we can do when setting [APP_ENV](https://github.com/symfony/recipes/blob/master/symfony/phpunit-bridge/5.3/phpunit.xml.dist#L14) for instance.
+I don't actually know how this works but it would probably look more explicit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-13T08:40:32Z
+
+4.4 might benefit from that too isn't it?
+Meanwhile, you can (and propably should) set COMPOSER_NO_INTERACTION=1 in CI jobs.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-07-13T09:38:08Z
+
+@nicolas-grekas the SYMFONY_PHPUNIT_REQUIRE was [introduced in 5.3](https://github.com/symfony/symfony/pull/40059) and so not part of 4.4.
+
+@yoannrenard  the force parameter has another meaning in the phpunit xml this forces the env if a real env is set.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-07-13T10:06:10Z
+
+Another way I thought to remove the whole `require-dev` part of the installed phpunit version. Then also the composer require would not throw any warning, and so phpunit dev dependencies would not have any effects.

@@ -1,0 +1,110 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-03-22T15:45:55Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-22T16:22:21Z
+
+This breaks some existing tests, please have a look, and add more if it makes sense.
+
+---------------------------------------------------------------------------
+
+by ol0lll at 2021-03-26T08:23:35Z
+
+Tests are running fine on local machine, travis seems to be on correct tag after closing / re-opening the pr. I honestly do not know why the test fails on travis. Any ideas?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-03-26T08:28:53Z
+
+In the `composer.json` file of the HttpKernel component you need to update the HttpFoundation constraints like this:
+
+```
+"symfony/http-foundation": "^4.4.21|^5.2.6"
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T20:28:11Z
+
+Thank you.
+
+Travis is failing and when I reviewed the output I suspect that the failure is related to this PR. Can you confirm?
+
+---------------------------------------------------------------------------
+
+by ol0lll at 2021-04-12T09:32:08Z
+
+> Thank you.
+>
+> Travis is failing and when I reviewed the output I suspect that the failure is related to this PR. Can you confirm?
+
+A friend of mine did ask this on slack and this was the outcome:
+
+> alexpott 30 Mar at 16:49
+@xabbuh @nicolasgrekas I’m trying to help a friend with a Symfony PR - https://github.com/symfony/symfony/pull/40545 - the problem is that HttpKernel tests are failing because HttpFoundation is changing. The PR passes locally when running the tests with both components patches. I’ve looked at the .travis.yml file and I’ve tried to work out how it determines to use components that have changed as part of MR as dependencies but I can’t see how. I feel like I missing something obvious
+
+> xabbuh  13 days ago
+ in this case, the deps=high job is allowed to fail
+
+> xabbuh  13 days ago
+deps=low passes that’s important
+
+> xabbuh  13 days ago
+the other job will pass once the branch is merged up
+
+> alexpott  13 days ago
+Ah thanks… and I was about to ask the question that @nicolasgrekas just answered on the PR - thanks to both you!
+
+> xabbuh  13 days ago
+ah indeed, I missed that we had new releases after the latest PR update
+
+---------------------------------------------------------------------------
+
+by TheNewSound at 2021-04-12T17:18:21Z
+
+~~uses wrong header tag, `if_none_match` should be `If-None-Match`~~
+
+**EDIT:** shouldn't matter since _ are replaced by - and capital letters always to lowercase.
+
+---------------------------------------------------------------------------
+
+by TheNewSound at 2021-04-25T01:44:40Z
+
+This should also be fixed for Symfony 5.x
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2021-05-09T09:51:33Z
+
+Needs a rebase to fix conflicts
+
+---------------------------------------------------------------------------
+
+by PF4Public at 2021-06-04T23:38:46Z
+
+This should probably resolve sensiolabs/SensioFrameworkExtraBundle#513 in a better way than simply adding weak ETags!

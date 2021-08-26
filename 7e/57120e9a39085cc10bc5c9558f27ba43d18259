@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-28T10:49:49Z
+
+>They don't, I still get the failures from #38957.
+
+We should report the issue to ICU...
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-28T11:49:16Z
+
+> > They don't, I still get the failures from #38957.
+>
+> We should report the issue to ICU...
+
+I don't feel like I know enough about unicode to write a proper bug report. 😓
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-28T16:06:04Z
+
+Reported at https://unicode-org.atlassian.net/browse/CLDR-14861

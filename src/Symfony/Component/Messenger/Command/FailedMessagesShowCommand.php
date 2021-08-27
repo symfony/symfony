@@ -86,7 +86,7 @@ EOF
         if ($input->getOption('stats')) {
             $this->listMessagesPerClass($failureTransportName, $io, $input->getOption('max'));
         } elseif (null === $id = $input->getArgument('id')) {
-            $this->listMessages($failureTransportName, $io, $input->getOption('max'));
+            $this->listMessages($failureTransportName, $io, $input->getOption('max'), $input->getOption('class-filter'));
         } else {
             $this->showMessage($failureTransportName, $id, $io);
         }
@@ -154,11 +154,13 @@ EOF
         $countPerClass = [];
 
         foreach ($envelopes as $envelope) {
-            if (!isset($countPerClass[\get_class($envelope->getMessage())])) {
-                $countPerClass[$c = \get_class($envelope->getMessage())] = [$c, 0];
+            $c = \get_class($envelope->getMessage());
+
+            if (!isset($countPerClass[$c])) {
+                $countPerClass[$c] = [$c, 0];
             }
 
-            ++$countPerClass[\get_class($envelope->getMessage())][1];
+            ++$countPerClass[$c][1];
         }
 
         if (0 === \count($countPerClass)) {

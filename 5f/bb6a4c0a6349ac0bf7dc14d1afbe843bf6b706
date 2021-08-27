@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-08-27T10:40:51Z
+
+the commit message (and the PR title) should definitely be improved to explain what the commit does (the fact that it is a backport of changes you wrote for a PR against 6.0 is irrelevant for the git history, given that they won't be kept being done in 6.0 and backported, but this commit will be merged up instead)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-27T10:45:00Z
+
+@stof Done.

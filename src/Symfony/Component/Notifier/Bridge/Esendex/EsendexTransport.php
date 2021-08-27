@@ -69,6 +69,9 @@ final class EsendexTransport extends AbstractTransport
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1.0/messagedispatcher', [
             'auth_basic' => sprintf('%s:%s', $this->email, $this->password),
+            'headers' => [
+                'Accept' => 'application/json',
+            ],
             'json' => [
                 'accountreference' => $this->accountReference,
                 'messages' => [$messageData],
@@ -82,7 +85,15 @@ final class EsendexTransport extends AbstractTransport
         }
 
         if (200 === $statusCode) {
-            return new SentMessage($message, (string) $this);
+            $result = $response->toArray();
+            $sentMessage = new SentMessage($message, (string) $this);
+
+            $messageId = $result['batch']['messageheaders'][0]['id'] ?? null;
+            if ($messageId) {
+                $sentMessage->setMessageId($messageId);
+            }
+
+            return $sentMessage;
         }
 
         $message = sprintf('Unable to send the SMS: error %d.', $statusCode);

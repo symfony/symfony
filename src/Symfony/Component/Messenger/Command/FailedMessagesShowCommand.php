@@ -101,6 +101,11 @@ EOF
         $envelopes = $receiver->all($max);
 
         $rows = [];
+
+        if ($classFilter) {
+            $io->comment(sprintf('Displaying only \'%s\' messages', $classFilter));
+        }
+
         foreach ($envelopes as $envelope) {
             $currentClassName = \get_class($envelope->getMessage());
 
@@ -130,7 +135,9 @@ EOF
             ];
         }
 
-        if (0 === \count($rows)) {
+        $rowsCount = \count($rows);
+
+        if (0 === $rowsCount) {
             $io->success('No failed messages were found.');
 
             return;
@@ -138,8 +145,10 @@ EOF
 
         $io->table(['Id', 'Class', 'Failed at', 'Error'], $rows);
 
-        if (\count($rows) === $max) {
+        if ($rowsCount === $max) {
             $io->comment(sprintf('Showing first %d messages.', $max));
+        } elseif ($classFilter) {
+            $io->comment(sprintf('Showing %d message(s).', $rowsCount));
         }
 
         $io->comment(sprintf('Run <comment>messenger:failed:show {id} --transport=%s -vv</comment> to see message details.', $failedTransportName));

@@ -467,8 +467,12 @@ EOF;
         $this->assertStringContainsString('Things are bad!', $tester->getDisplay(true));
         $tester->execute(['--class-filter' => 'stdClass']);
         $this->assertStringContainsString('Things are bad!', $tester->getDisplay(true));
+        $this->assertStringContainsString('Showing 1 message(s).', $tester->getDisplay(true));
+        $this->assertStringContainsString('Displaying only \'stdClass\' messages', $tester->getDisplay(true));
+
         $tester->execute(['--class-filter' => 'namespace\otherClass']);
         $this->assertStringContainsString('[OK] No failed messages were found.', $tester->getDisplay(true));
+        $this->assertStringContainsString('Displaying only \'namespace\otherClass\' messages', $tester->getDisplay(true));
     }
 
     public function testListMessagesReturnsCountByClassName()

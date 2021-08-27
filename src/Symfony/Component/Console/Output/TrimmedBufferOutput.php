@@ -21,8 +21,8 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 class TrimmedBufferOutput extends Output
 {
-    private $maxLength;
-    private $buffer = '';
+    private int $maxLength;
+    private string $buffer = '';
 
     public function __construct(int $maxLength, ?int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = false, OutputFormatterInterface $formatter = null)
     {

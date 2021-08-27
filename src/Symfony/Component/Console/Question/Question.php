@@ -21,16 +21,16 @@ use Symfony\Component\Console\Exception\LogicException;
  */
 class Question
 {
-    private $question;
-    private $attempts;
-    private $hidden = false;
-    private $hiddenFallback = true;
-    private $autocompleterCallback;
-    private $validator;
-    private $default;
-    private $normalizer;
-    private $trimmable = true;
-    private $multiline = false;
+    private string $question;
+    private ?int $attempts = null;
+    private bool $hidden = false;
+    private bool $hiddenFallback = true;
+    private ?\Closure $autocompleterCallback = null;
+    private ?\Closure $validator = null;
+    private string|int|bool|null|float $default;
+    private ?\Closure $normalizer = null;
+    private bool $trimmable = true;
+    private bool $multiline = false;
 
     /**
      * @param string                     $question The question to ask to the user
@@ -184,7 +184,7 @@ class Question
             throw new LogicException('A hidden question cannot use the autocompleter.');
         }
 
-        $this->autocompleterCallback = $callback;
+        $this->autocompleterCallback = null === $callback || $callback instanceof \Closure ? $callback : \Closure::fromCallable($callback);
 
         return $this;
     }
@@ -196,7 +196,7 @@ class Question
      */
     public function setValidator(callable $validator = null): static
     {
-        $this->validator = $validator;
+        $this->validator = null === $validator || $validator instanceof \Closure ? $validator : \Closure::fromCallable($validator);
 
         return $this;
     }
@@ -248,7 +248,7 @@ class Question
      */
     public function setNormalizer(callable $normalizer): static
     {
-        $this->normalizer = $normalizer;
+        $this->normalizer = $normalizer instanceof \Closure ? $normalizer : \Closure::fromCallable($normalizer);
 
         return $this;
     }

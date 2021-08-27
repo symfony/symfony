@@ -21,8 +21,8 @@ namespace Symfony\Component\Console\Helper;
 class DebugFormatterHelper extends Helper
 {
     private const COLORS = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white', 'default'];
-    private $started = [];
-    private $count = -1;
+    private array $started = [];
+    private int $count = -1;
 
     /**
      * Starts a debug formatting session.

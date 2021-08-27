@@ -37,11 +37,11 @@ class SymfonyStyle extends OutputStyle
 {
     public const MAX_LINE_LENGTH = 120;
 
-    private $input;
-    private $questionHelper;
-    private $progressBar;
-    private $lineLength;
-    private $bufferedOutput;
+    private InputInterface $input;
+    private SymfonyQuestionHelper $questionHelper;
+    private ProgressBar $progressBar;
+    private int $lineLength;
+    private TrimmedBufferOutput $bufferedOutput;
 
     public function __construct(InputInterface $input, OutputInterface $output)
     {
@@ -322,7 +322,7 @@ class SymfonyStyle extends OutputStyle
     {
         $this->getProgressBar()->finish();
         $this->newLine(2);
-        $this->progressBar = null;
+        unset($this->progressBar);
     }
 
     /**
@@ -347,9 +347,7 @@ class SymfonyStyle extends OutputStyle
             $this->autoPrependBlock();
         }
 
-        if (!$this->questionHelper) {
-            $this->questionHelper = new SymfonyQuestionHelper();
-        }
+        $this->questionHelper ??= new SymfonyQuestionHelper();
 
         $answer = $this->questionHelper->ask($this->input, $this, $question);
 
@@ -410,11 +408,8 @@ class SymfonyStyle extends OutputStyle
 
     private function getProgressBar(): ProgressBar
     {
-        if (!$this->progressBar) {
-            throw new RuntimeException('The ProgressBar is not started.');
-        }
-
-        return $this->progressBar;
+        return $this->progressBar
+            ?? throw new RuntimeException('The ProgressBar is not started.');
     }
 
     private function autoPrependBlock(): void

@@ -21,7 +21,7 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
  */
 class FactoryCommandLoader implements CommandLoaderInterface
 {
-    private $factories;
+    private array $factories;
 
     /**
      * @param callable[] $factories Indexed by command names

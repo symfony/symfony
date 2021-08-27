@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class Cursor
 {
-    private $output;
+    private OutputInterface $output;
     private $input;
 
     /**

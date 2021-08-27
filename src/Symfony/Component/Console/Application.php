@@ -66,23 +66,23 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class Application implements ResetInterface
 {
-    private $commands = [];
-    private $wantHelps = false;
-    private $runningCommand;
-    private $name;
-    private $version;
-    private $commandLoader;
-    private $catchExceptions = true;
-    private $autoExit = true;
-    private $definition;
-    private $helperSet;
-    private $dispatcher;
-    private $terminal;
-    private $defaultCommand;
-    private $singleCommand = false;
-    private $initialized;
-    private $signalRegistry;
-    private $signalsToDispatchEvent = [];
+    private array $commands = [];
+    private bool $wantHelps = false;
+    private ?Command $runningCommand = null;
+    private string $name;
+    private string $version;
+    private ?CommandLoaderInterface $commandLoader = null;
+    private bool $catchExceptions = true;
+    private bool $autoExit = true;
+    private InputDefinition $definition;
+    private HelperSet $helperSet;
+    private ?EventDispatcherInterface $dispatcher = null;
+    private Terminal $terminal;
+    private string $defaultCommand;
+    private bool $singleCommand = false;
+    private bool $initialized = false;
+    private SignalRegistry $signalRegistry;
+    private array $signalsToDispatchEvent = [];
 
     public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')
     {
@@ -315,11 +315,7 @@ class Application implements ResetInterface
      */
     public function getHelperSet(): HelperSet
     {
-        if (!$this->helperSet) {
-            $this->helperSet = $this->getDefaultHelperSet();
-        }
-
-        return $this->helperSet;
+        return $this->helperSet ??= $this->getDefaultHelperSet();
     }
 
     public function setDefinition(InputDefinition $definition)
@@ -332,9 +328,7 @@ class Application implements ResetInterface
      */
     public function getDefinition(): InputDefinition
     {
-        if (!$this->definition) {
-            $this->definition = $this->getDefaultInputDefinition();
-        }
+        $this->definition ??= $this->getDefaultInputDefinition();
 
         if ($this->singleCommand) {
             $inputDefinition = $this->definition;

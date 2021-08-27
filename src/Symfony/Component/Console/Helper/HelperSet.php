@@ -23,7 +23,7 @@ class HelperSet implements \IteratorAggregate
     /**
      * @var Helper[]
      */
-    private $helpers = [];
+    private array $helpers = [];
 
     /**
      * @param Helper[] $helpers An array of helper

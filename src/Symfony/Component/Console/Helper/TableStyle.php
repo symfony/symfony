@@ -23,30 +23,30 @@ use Symfony\Component\Console\Exception\LogicException;
  */
 class TableStyle
 {
-    private $paddingChar = ' ';
-    private $horizontalOutsideBorderChar = '-';
-    private $horizontalInsideBorderChar = '-';
-    private $verticalOutsideBorderChar = '|';
-    private $verticalInsideBorderChar = '|';
-    private $crossingChar = '+';
-    private $crossingTopRightChar = '+';
-    private $crossingTopMidChar = '+';
-    private $crossingTopLeftChar = '+';
-    private $crossingMidRightChar = '+';
-    private $crossingBottomRightChar = '+';
-    private $crossingBottomMidChar = '+';
-    private $crossingBottomLeftChar = '+';
-    private $crossingMidLeftChar = '+';
-    private $crossingTopLeftBottomChar = '+';
-    private $crossingTopMidBottomChar = '+';
-    private $crossingTopRightBottomChar = '+';
-    private $headerTitleFormat = '<fg=black;bg=white;options=bold> %s </>';
-    private $footerTitleFormat = '<fg=black;bg=white;options=bold> %s </>';
-    private $cellHeaderFormat = '<info>%s</info>';
-    private $cellRowFormat = '%s';
-    private $cellRowContentFormat = ' %s ';
-    private $borderFormat = '%s';
-    private $padType = \STR_PAD_RIGHT;
+    private string $paddingChar = ' ';
+    private string $horizontalOutsideBorderChar = '-';
+    private string $horizontalInsideBorderChar = '-';
+    private string $verticalOutsideBorderChar = '|';
+    private string $verticalInsideBorderChar = '|';
+    private string $crossingChar = '+';
+    private string $crossingTopRightChar = '+';
+    private string $crossingTopMidChar = '+';
+    private string $crossingTopLeftChar = '+';
+    private string $crossingMidRightChar = '+';
+    private string $crossingBottomRightChar = '+';
+    private string $crossingBottomMidChar = '+';
+    private string $crossingBottomLeftChar = '+';
+    private string $crossingMidLeftChar = '+';
+    private string $crossingTopLeftBottomChar = '+';
+    private string $crossingTopMidBottomChar = '+';
+    private string $crossingTopRightBottomChar = '+';
+    private string $headerTitleFormat = '<fg=black;bg=white;options=bold> %s </>';
+    private string $footerTitleFormat = '<fg=black;bg=white;options=bold> %s </>';
+    private string $cellHeaderFormat = '<info>%s</info>';
+    private string $cellRowFormat = '%s';
+    private string $cellRowContentFormat = ' %s ';
+    private string $borderFormat = '%s';
+    private int $padType = \STR_PAD_RIGHT;
 
     /**
      * Sets padding character, used for cell padding.

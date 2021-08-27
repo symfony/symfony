@@ -22,8 +22,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class LazyCommand extends Command
 {
-    private $command;
-    private $isEnabled;
+    private \Closure|Command $command;
+    private ?bool $isEnabled;
 
     public function __construct(string $name, array $aliases, string $description, bool $isHidden, \Closure $commandFactory, ?bool $isEnabled = true)
     {

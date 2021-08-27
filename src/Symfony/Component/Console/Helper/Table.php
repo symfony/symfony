@@ -36,69 +36,27 @@ class Table
     private const BORDER_OUTSIDE = 0;
     private const BORDER_INSIDE = 1;
 
-    private $headerTitle;
-    private $footerTitle;
+    private ?string $headerTitle = null;
+    private ?string $footerTitle = null;
+    private array $headers = [];
+    private array $rows = [];
+    private bool $horizontal = false;
+    private array $effectiveColumnWidths = [];
+    private int $numberOfColumns;
+    private OutputInterface $output;
+    private TableStyle $style;
+    private array $columnStyles = [];
+    private array $columnWidths = [];
+    private array $columnMaxWidths = [];
+    private bool $rendered = false;
 
-    /**
-     * Table headers.
-     */
-    private $headers = [];
-
-    /**
-     * Table rows.
-     */
-    private $rows = [];
-    private $horizontal = false;
-
-    /**
-     * Column widths cache.
-     */
-    private $effectiveColumnWidths = [];
-
-    /**
-     * Number of columns cache.
-     *
-     * @var int
-     */
-    private $numberOfColumns;
-
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
-     * @var TableStyle
-     */
-    private $style;
-
-    /**
-     * @var array
-     */
-    private $columnStyles = [];
-
-    /**
-     * User set column widths.
-     *
-     * @var array
-     */
-    private $columnWidths = [];
-    private $columnMaxWidths = [];
-
-    /**
-     * @var array<string, TableStyle>|null
-     */
-    private static $styles;
-
-    private $rendered = false;
+    private static array $styles;
 
     public function __construct(OutputInterface $output)
     {
         $this->output = $output;
 
-        if (!self::$styles) {
-            self::$styles = self::initStyles();
-        }
+        self::$styles ??= self::initStyles();
 
         $this->setStyle('default');
     }
@@ -108,9 +66,7 @@ class Table
      */
     public static function setStyleDefinition(string $name, TableStyle $style)
     {
-        if (!self::$styles) {
-            self::$styles = self::initStyles();
-        }
+        self::$styles ??= self::initStyles();
 
         self::$styles[$name] = $style;
     }
@@ -120,15 +76,9 @@ class Table
      */
     public static function getStyleDefinition(string $name): TableStyle
     {
-        if (!self::$styles) {
-            self::$styles = self::initStyles();
-        }
+        self::$styles ??= self::initStyles();
 
-        if (isset(self::$styles[$name])) {
-            return self::$styles[$name];
-        }
-
-        throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
+        return self::$styles[$name] ?? throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
     }
 
     /**
@@ -791,7 +741,7 @@ class Table
     private function cleanup()
     {
         $this->effectiveColumnWidths = [];
-        $this->numberOfColumns = null;
+        unset($this->numberOfColumns);
     }
 
     /**
@@ -850,10 +800,6 @@ class Table
             return $name;
         }
 
-        if (isset(self::$styles[$name])) {
-            return self::$styles[$name];
-        }
-
-        throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
+        return self::$styles[$name] ?? throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
     }
 }

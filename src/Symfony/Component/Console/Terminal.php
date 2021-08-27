@@ -13,9 +13,9 @@ namespace Symfony\Component\Console;
 
 class Terminal
 {
-    private static $width;
-    private static $height;
-    private static $stty;
+    private static ?int $width = null;
+    private static ?int $height = null;
+    private static ?bool $stty = null;
 
     /**
      * Gets the terminal width.

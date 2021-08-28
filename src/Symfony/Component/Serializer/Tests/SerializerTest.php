@@ -807,7 +807,7 @@ class DummyList extends \ArrayObject
         return \count($this->list);
     }
 
-    public function getIterator(): \Traversable
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->list);
     }

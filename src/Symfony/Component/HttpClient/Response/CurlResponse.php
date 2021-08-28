@@ -353,7 +353,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         }
 
         if ($multi->pauseExpiries && 0 < $timeout -= microtime(true) - $now) {
-            usleep(1E6 * $timeout);
+            usleep((int) (1E6 * $timeout));
         }
 
         return 0;

@@ -24,9 +24,5 @@ return static function (ContainerConfigurator $container) {
                 'template' => '@WebProfiler/Collector/mailer.html.twig',
                 'id' => 'mailer',
             ])
-
-        ->set('mailer.message_logger_listener', MessageLoggerListener::class)
-            ->tag('kernel.event_subscriber')
-            ->tag('kernel.reset', ['method' => 'reset'])
     ;
 };

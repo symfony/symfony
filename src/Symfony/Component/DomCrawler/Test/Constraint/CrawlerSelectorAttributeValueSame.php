@@ -47,7 +47,7 @@ final class CrawlerSelectorAttributeValueSame extends Constraint
             return false;
         }
 
-        return $this->expectedText === trim($crawler->attr($this->attribute));
+        return $this->expectedText === trim($crawler->attr($this->attribute) ?? '');
     }
 
     /**

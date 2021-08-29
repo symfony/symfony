@@ -119,6 +119,7 @@ class MainConfigurationTest extends TestCase
     {
         $factory = $this->createMock(AuthenticatorFactoryInterface::class);
         $factory->expects($this->once())->method('addConfiguration');
+        $factory->method('getKey')->willReturn('key');
 
         $configuration = new MainConfiguration(['stub' => $factory], []);
         $configuration->getConfigTreeBuilder();

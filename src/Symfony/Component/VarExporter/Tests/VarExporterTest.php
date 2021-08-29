@@ -16,7 +16,9 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\VarExporter\Tests\Fixtures\FooSerializable;
 use Symfony\Component\VarExporter\Tests\Fixtures\FooUnitEnum;
+use Symfony\Component\VarExporter\Tests\Fixtures\MySerializable;
 use Symfony\Component\VarExporter\VarExporter;
 
 class VarExporterTest extends TestCase
@@ -137,9 +139,28 @@ class VarExporterTest extends TestCase
         yield ['array-iterator', new \ArrayIterator([123], 1)];
         yield ['array-object-custom', new MyArrayObject([234])];
 
-        $value = new MySerializable();
+        $errorHandler = set_error_handler(static function (int $errno, string $errstr) use (&$errorHandler) {
+            if (\E_DEPRECATED === $errno && str_contains($errstr, 'implements the Serializable interface, which is deprecated. Implement __serialize() and __unserialize() instead')) {
+                // We're testing if the component handles deprecated Serializable implementations well.
+                // This kind of implementation triggers a deprecation warning since PHP 8.1 that we explicitly want to
+                // ignore here. We probably need to reevaluate this piece of code for PHP 9.
+                return true;
+            }
 
-        yield ['serializable', [$value, $value]];
+            return $errorHandler ? $errorHandler(...\func_get_args()) : false;
+        });
+
+        try {
+            $mySerializable = new MySerializable();
+            $fooSerializable = new FooSerializable('bar');
+        } finally {
+            restore_error_handler();
+        }
+
+        yield ['serializable', [$mySerializable, $mySerializable]];
+        yield ['foo-serializable', $fooSerializable];
+
+        unset($mySerializable, $fooSerializable, $errorHandler);
 
         $value = new MyWakeup();
         $value->sub = new MyWakeup();
@@ -211,8 +232,6 @@ class VarExporterTest extends TestCase
 
         yield ['abstract-parent', new ConcreteClass()];
 
-        yield ['foo-serializable', new FooSerializable('bar')];
-
         yield ['private-constructor', PrivateConstructor::create('bar')];
 
         yield ['php74-serializable', new Php74Serializable()];
@@ -220,19 +239,6 @@ class VarExporterTest extends TestCase
         if (\PHP_VERSION_ID >= 80100) {
             yield ['unit-enum', [FooUnitEnum::Bar], true];
         }
-    }
-}
-
-class MySerializable implements \Serializable
-{
-    public function serialize(): string
-    {
-        return '123';
-    }
-
-    public function unserialize($data)
-    {
-        // no-op
     }
 }
 
@@ -381,31 +387,6 @@ class ConcreteClass extends AbstractClass
     {
         $this->foo = 123;
         $this->setBar(234);
-    }
-}
-
-class FooSerializable implements \Serializable
-{
-    private $foo;
-
-    public function __construct(string $foo)
-    {
-        $this->foo = $foo;
-    }
-
-    public function getFoo(): string
-    {
-        return $this->foo;
-    }
-
-    public function serialize(): string
-    {
-        return serialize([$this->getFoo()]);
-    }
-
-    public function unserialize($str)
-    {
-        [$this->foo] = unserialize($str);
     }
 }
 

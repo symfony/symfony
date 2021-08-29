@@ -29,7 +29,7 @@ use Symfony\Component\Mime\MimeTypes;
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class UploadedFile extends File
+class UploadedFile extends File implements UploadedFileInterface
 {
     private $test;
     private $originalName;
@@ -71,12 +71,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns the original file name.
-     *
-     * It is extracted from the request from which the file has been uploaded.
-     * Then it should not be considered as a safe value.
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function getClientOriginalName()
     {
@@ -84,12 +79,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns the original file extension.
-     *
-     * It is extracted from the original file name that was uploaded.
-     * Then it should not be considered as a safe value.
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function getClientOriginalExtension()
     {
@@ -97,17 +87,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns the file mime type.
-     *
-     * The client mime type is extracted from the request from which the file
-     * was uploaded, so it should not be considered as a safe value.
-     *
-     * For a trusted mime type, use getMimeType() instead (which guesses the mime
-     * type based on the file content).
-     *
-     * @return string
-     *
-     * @see getMimeType()
+     * {@inheritDoc}
      */
     public function getClientMimeType()
     {
@@ -115,21 +95,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns the extension based on the client mime type.
-     *
-     * If the mime type is unknown, returns null.
-     *
-     * This method uses the mime type as guessed by getClientMimeType()
-     * to guess the file extension. As such, the extension returned
-     * by this method cannot be trusted.
-     *
-     * For a trusted extension, use guessExtension() instead (which guesses
-     * the extension based on the guessed mime type for the file).
-     *
-     * @return string|null
-     *
-     * @see guessExtension()
-     * @see getClientMimeType()
+     * {@inheritDoc}
      */
     public function guessClientExtension()
     {
@@ -141,12 +107,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns the upload error.
-     *
-     * If the upload was successful, the constant UPLOAD_ERR_OK is returned.
-     * Otherwise one of the other UPLOAD_ERR_XXX constants is returned.
-     *
-     * @return int
+     * {@inheritDoc}
      */
     public function getError()
     {
@@ -154,9 +115,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns whether the file has been uploaded with HTTP and no error occurred.
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function isValid()
     {
@@ -166,11 +125,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Moves the file to a new location.
-     *
-     * @return File
-     *
-     * @throws FileException if, for any reason, the file could not have been moved
+     * {@inheritDoc}
      */
     public function move(string $directory, string $name = null)
     {
@@ -214,9 +169,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns the maximum size of an uploaded file as configured in php.ini.
-     *
-     * @return int|float The maximum size of an uploaded file in bytes (returns float if size > PHP_INT_MAX)
+     * {@inheritDoc}
      */
     public static function getMaxFilesize()
     {
@@ -262,9 +215,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns an informative upload error message.
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function getErrorMessage()
     {

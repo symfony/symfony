@@ -42,6 +42,20 @@
                         </div>
 
                         <div class="sf-toolbar-info-piece">
+                            <b>Roles</b>
+                            <span>
+                                {% set remainingRoles = collector.roles|slice(1) %}
+                                {{ collector.roles|first }}
+                                {% if remainingRoles|length > 1 %}
+                                    +
+                                    <abbr title="{{ remainingRoles|join(', ') }}">
+                                        {{ remainingRoles|length }} more
+                                    </abbr>
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="sf-toolbar-info-piece">
                             <b>Token class</b>
                             <span>{{ collector.tokenClass|abbr_class }}</span>
                         </div>

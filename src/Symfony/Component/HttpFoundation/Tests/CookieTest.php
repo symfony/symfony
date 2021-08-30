@@ -117,17 +117,6 @@ class CookieTest extends TestCase
         $this->assertEquals($expire, $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
     }
 
-    public function testGetExpiresTimeIsCastToInt()
-    {
-        $cookie = Cookie::create('foo', 'bar', 3600.9);
-
-        $this->assertSame(3600, $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date as an integer');
-
-        $cookie = Cookie::create('foo')->withExpires(3600.6);
-
-        $this->assertSame(3600, $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date as an integer');
-    }
-
     public function testConstructorWithDateTime()
     {
         $expire = new \DateTime();

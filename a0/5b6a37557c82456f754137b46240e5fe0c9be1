@@ -1,0 +1,184 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-09T13:33:20Z
+
+Scanning all methods of all autoconfigured services might be a perf hog on real apps.
+We should understand the impact this could have before going this way.
+Can you run some benchmark and report your findings please?
+IIRC, Doctrine does it with an extra annotation on the class, basically saying "have a look at methods".
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-07-10T07:31:55Z
+
+@nicolas-grekas Not sure how to _properly_ benchmark this, but I used a `Stopwatch` in my _large application_ and these are the results:
+Class attributes took 3.000000 ms for 4469 classes
+Method attributes took 18.500000 ms for 4469 classes and total of 41920 methods
+
+<details>
+  <summary>Benchmark code</summary>
+
+  ```php
+    private Stopwatch $stopwatch;
+    private int $classes = 0;
+    private int $methods = 0;
+
+    public function __destruct()
+    {
+        dump(sprintf(
+            'Class attributes took %f ms for %d classes',
+            $this->stopwatch->getEvent('class')->getDuration(),
+            $this->classes
+        ));
+        dump(sprintf(
+            'Method attributes took %f ms for %d classes and total of %d methods',
+            $this->stopwatch->getEvent('method')->getDuration(),
+            $this->classes,
+            $this->methods
+        ));
+    }
+
+    protected function processValue($value, bool $isRoot = false)
+    {
+        // ...
+        $this->stopwatch->start('class');
+        ++$this->classes;
+        foreach ($reflector->getAttributes() as $attribute) {
+            if ($configurator = $autoconfiguredAttributes[$attribute->getName()] ?? null) {
+                $configurator($conditionals, $attribute->newInstance(), $reflector);
+            }
+        }
+        $this->stopwatch->stop('class');
+        $this->stopwatch->start('method');
+        foreach ($reflector->getMethods() as $method) {
+            ++$this->methods;
+            foreach ($method->getAttributes() as $attribute) {
+                if ($configurator = $autoconfiguredAttributes[$attribute->getName()] ?? null) {
+                    $configurator($conditionals, $attribute->newInstance(), $method);
+                }
+            }
+        }
+        $this->stopwatch->stop('method');
+        // ...
+    }
+  ```
+</details>
+
+Not sure if this is acceptable and how it can be improved.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-10T07:37:04Z
+
+Thanks for the bench, this looks acceptable!
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-07-10T11:51:17Z
+
+> In order to play safe and optimize perf a bit, I'd suggest doing some reflection in the process() method to classify configurators in 4 groups: the ones that work on classes (ie the ones that have only two arguments or that have a 3rd arg that accept ReflectionClass), the ones that work on methods, properties, and parameters. If a group is empty, we would skip scanning for the corresponding type of attributes.
+
+@nicolas-grekas I applied this feedback and pushed a WIP commit.
+
+Since Attributes only work on PHP 8 I thought it would be nice to support Union types when you want to register an attribute for multiple methods.
+
+So for my example of the `AsEventListener` I want to typehint that with `ReflectionClass | ReflectionMethod`.
+
+This works, but it will produce a fatal error on PHP 7.4 because it doesn't support unions there. How can we fix that?
+Or should we target the `AsEventListener` change for Symfony 6 as that requires PHP 8 and up?
+
+I'm also not sure how `ReflectionParameter` should be implemented. Should that work on all methods? Or only promoted parameters in the constructor? Aren't those already picked by `ReflectionProperty`?
+
+## Todo
+
+- [x] How to handle `AsEventListener` on method change? Move to Symfony 6 or find alternative for Union?
+- [x] Add and fix all tests
+- [x] `ReflectionParameter`
+
+---------------------------------------------------------------------------
+
+by Tobion at 2021-07-13T10:17:00Z
+
+I'd like to see some use-cases for each way of auto-configuring attributes. This would also be required for the docs at the end anyway.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-07-13T10:30:13Z
+
+The reason for creating this PR was to be able to have attributes on methods. In our application we make use of event subscribers that act on events published on our event bus ([SimpleBus](https://github.com/SimpleBus/SimpleBus)). Some subscribers need to be run asynchronous. Some subscribers subscribe to a lot of different events.
+
+We introduced a `Asynchronous` attribute that lets us specify queues and delays.
+
+```php
+final class ProcessManager
+{
+    #[Asynchronous(delayInMinutes: 5)]
+    public function cleanup(CartOpenedEvent $event) {
+      // Do something 5 minutes after cart was opened
+    }
+
+    #[Asynchronous(queue: 'cart')]
+    public function onCartClosed(CartClosedEvent $event) {
+      // Cart was closed, remove it.
+    }
+}
+```
+
+After receiving feedback I also introduced support for properties and parameters. But I don't really need that.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2021-07-13T12:40:42Z
+
+I think the feature and implementation looks pretty clean and flexible.
+I just fear that we add more and more of autoconfiguration options that duplicate alot of functionality.
+I'm trying to list the possibilities of autoconfiguration:
+- based on marker interfaces purely for autoconfiguration like https://github.com/symfony/messenger/blob/5.3/Handler/MessageHandlerInterface.php and https://github.com/symfony/symfony/blob/5.3/src/Symfony/Bundle/FrameworkBundle/Routing/RouteLoaderInterface.php
+- autoconfiguration per directory like https://symfony.com/blog/new-in-symfony-4-4-simpler-event-listeners
+- autoconfiguration based on parameter types (e.g. message handler, event listener)
+- autoconfiguration based on subscribers with the logic in php code like EventSubscriberInterface and ServiceSubscriberInterface
+- autoconfiguration based on attributes in classes, properties, methods and parameters
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-07-13T13:08:21Z
+
+@Tobion I think 1 and 4 are the same thing. 1 doesn't hold any information, just a tag. And 4 require the implementer to return some data. But same principle?
+
+The list that you created is what I love about Symfony. I can decide to use instanceof/interfaces/markers, or just configure based on directory, or introduce new attributes where they make sense.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2021-07-13T13:37:49Z
+
+I wouldn't say marker interfaces and subscribers are the same thing. marker interfaces have only been introduces for autoconfiguration in DI and no other purpose. EventSubscriberInterface on the other hand is actually used in the EventDispatcher component. They have the same purpose yes. But so do the new autoconfigurable attributes. So there are now at least 4 ways to register an event lister:
+- using explicit EventSubscriberInterface
+- using autoconfiguration of event listeners by param types
+- using explicit wiring in DI
+- using AsEventListener attribute
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-08-27T07:26:18Z
+
+Much better!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-27T09:53:55Z
+
+@ruudk Can you work on a PR for the docs, or at least describe the feature with examples in the PR description? Thank you.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-08-28T09:44:16Z
+
+@fabpot I updated the PR description and added a few examples. Hope this helps!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-30T12:55:53Z
+
+> @fabpot I updated the PR description and added a few examples. Hope this helps!
+
+That's perfect, thank you.

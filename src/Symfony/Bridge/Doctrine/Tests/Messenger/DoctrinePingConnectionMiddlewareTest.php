@@ -103,9 +103,12 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewareNoPingInNonWorkerContext()
     {
-        $this->connection->expects($this->never())
-            ->method('ping')
-            ->willReturn(false);
+        // This method has been removed in DBAL 3.0
+        if (method_exists(Connection::class, 'ping')) {
+            $this->connection->expects($this->never())
+                ->method('ping')
+                ->willReturn(false);
+        }
 
         $this->connection->expects($this->never())
             ->method('close')

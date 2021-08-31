@@ -140,7 +140,11 @@ class ConnectionTest extends TestCase
         $schemaConfig->method('getMaxIdentifierLength')->willReturn(63);
         $schemaConfig->method('getDefaultTableOptions')->willReturn([]);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
-        $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        if (method_exists(DBALConnection::class, 'createSchemaManager')) {
+            $driverConnection->method('createSchemaManager')->willReturn($schemaManager);
+        } else {
+            $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        }
 
         return $driverConnection;
     }
@@ -428,7 +432,11 @@ class ConnectionTest extends TestCase
             $expectedTable->addIndex($indexColumns);
         }
         $schemaManager->method('createSchema')->willReturn($schema);
-        $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        if (method_exists(DBALConnection::class, 'createSchemaManager')) {
+            $driverConnection->method('createSchemaManager')->willReturn($schemaManager);
+        } else {
+            $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        }
 
         $platformMock = $this->createMock($platformClass);
         $platformMock

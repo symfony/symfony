@@ -43,10 +43,12 @@
         "doctrine/annotations": "^1.10.4",
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "^1.1",
-        "doctrine/dbal": "^2.6|^3.0",
+        "doctrine/dbal": "^2.7|^3.0",
         "doctrine/orm": "^2.6.3"
     },
     "conflict": {
+        "doctrine/dbal": "<2.7",
+        "doctrine/orm": "<2.6.3",
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/dependency-injection": "<3.4",
         "symfony/form": "<4.4",

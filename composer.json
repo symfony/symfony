@@ -123,7 +123,7 @@
         "doctrine/cache": "^1.6|^2.0",
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "^1.1",
-        "doctrine/dbal": "^2.6|^3.0",
+        "doctrine/dbal": "^2.7|^3.0",
         "doctrine/orm": "^2.6.3",
         "guzzlehttp/promises": "^1.4",
         "masterminds/html5": "^2.6",
@@ -143,6 +143,7 @@
         "twig/markdown-extra": "^2.12|^3"
     },
     "conflict": {
+        "doctrine/dbal": "<2.7",
         "egulias/email-validator": "~3.0.0",
         "masterminds/html5": "<2.6",
         "monolog/monolog": ">=2",

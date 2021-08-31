@@ -33,7 +33,7 @@
     "require-dev": {
         "cache/integration-tests": "dev-master",
         "doctrine/cache": "^1.6|^2.0",
-        "doctrine/dbal": "^2.6|^3.0",
+        "doctrine/dbal": "^2.7|^3.0",
         "predis/predis": "^1.1",
         "psr/simple-cache": "^1.0",
         "symfony/config": "^4.2|^5.0",
@@ -43,7 +43,7 @@
         "symfony/var-dumper": "^4.4|^5.0"
     },
     "conflict": {
-        "doctrine/dbal": "<2.6",
+        "doctrine/dbal": "<2.7",
         "symfony/dependency-injection": "<3.4",
         "symfony/http-kernel": "<4.4|>=5.0",
         "symfony/var-dumper": "<4.4"

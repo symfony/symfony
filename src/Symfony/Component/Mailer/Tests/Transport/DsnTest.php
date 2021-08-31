@@ -76,7 +76,10 @@ class DsnTest extends TestCase
             'smtp://user1:pass2@example.com:99',
             new Dsn('smtp', 'example.com', 'user1', 'pass2', 99),
         ];
-
+        yield 'simple smtp with user and password between ()' => [
+            'smtp://(user1):(pass2)@example.com',
+            new Dsn('smtp', 'example.com', '(user1)', '(pass2)'),
+        ];
         yield 'gmail smtp with urlencoded user and pass' => [
             'smtp://u%24er:pa%24s@gmail',
             new Dsn('smtp', 'gmail', 'u$er', 'pa$s'),
@@ -92,17 +95,17 @@ class DsnTest extends TestCase
     {
         yield [
             'some://',
-            'The "some://" mailer DSN is invalid.',
+            'The mailer DSN is invalid.',
         ];
 
         yield [
             '//sendmail',
-            'The "//sendmail" mailer DSN must contain a scheme.',
+            'The mailer DSN must contain a scheme.',
         ];
 
         yield [
             'file:///some/path',
-            'The "file:///some/path" mailer DSN must contain a host (use "default" by default).',
+            'The mailer DSN must contain a host (use "default" by default).',
         ];
     }
 }

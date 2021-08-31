@@ -92,7 +92,7 @@ class TransportTest extends TestCase
     {
         yield 'garbage at the end' => ['dummy://a some garbage here', 'The DSN has some garbage at the end.'];
 
-        yield 'not a valid DSN' => ['something not a dsn', 'The DSN must contain a scheme.'];
+        yield 'not a valid DSN' => ['something not a dsn', 'The mailer DSN must contain a scheme.'];
 
         yield 'failover not closed' => ['failover(dummy://a', 'The mailer DSN must contain a scheme.'];
 

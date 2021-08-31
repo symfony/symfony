@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-08-30T15:03:45Z
+
+I suggest adding a comment in the code explaining what is done there (that's not self-explanatory right now), which will also allow figuring out that this can be removed once the min PHP requirement allows us to stop caring about that special case.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-30T15:59:19Z
+
+> I suggest adding a comment in the code explaining what is done there
+
+Will do.
+
+> which will also allow figuring out that this can be removed once the min PHP requirement allows us to stop caring about that special case.
+
+That'll be PHP 9 then. 😱
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-30T16:04:03Z
+
+I've added a longer comment to the custom error handling that should explain what I'm doing.

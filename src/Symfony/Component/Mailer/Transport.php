@@ -125,10 +125,13 @@ class Transport
             'roundrobin' => RoundRobinTransport::class,
         ];
 
+        $isObject = false;
+
         while (true) {
             foreach ($keywords as $name => $class) {
                 $name .= '(';
                 if ($name === substr($dsn, $offset, \strlen($name))) {
+                    $isObject = true;
                     $offset += \strlen($name) - 1;
                     preg_match('{\(([^()]|(?R))*\)}A', $dsn, $matches, 0, $offset);
                     if (!isset($matches[0])) {
@@ -157,7 +160,7 @@ class Transport
                 throw new InvalidArgumentException(sprintf('The "%s" keyword is not valid (valid ones are "%s"), ', $matches[1], implode('", "', array_keys($keywords))));
             }
 
-            if ($pos = strcspn($dsn, ' )', $offset)) {
+            if ($pos = strcspn($dsn, ' )', $offset) && $isObject) {
                 return [$this->fromDsnObject(Dsn::fromString(substr($dsn, $offset, $pos))), $offset + $pos];
             }
 

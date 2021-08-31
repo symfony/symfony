@@ -36,6 +36,7 @@ class PasswordType extends AbstractType
     {
         $resolver->setDefaults([
             'always_empty' => true,
+            'hash_password' => false,
             'trim' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true)

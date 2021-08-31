@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordHasherExtension;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
@@ -112,6 +113,13 @@ return static function (ContainerConfigurator $container) {
         ->set('form.type.color', ColorType::class)
             ->args([service('translator')->ignoreOnInvalid()])
             ->tag('form.type')
+
+        ->set('form.type_extension.form.password_hasher', PasswordHasherExtension::class)
+            ->args([
+                service('security.password_hasher')->ignoreOnInvalid(),
+                service('form.property_accessor'),
+            ])
+            ->tag('form.type_extension', ['extended-type' => FormType::class])
 
         ->set('form.type_extension.form.transformation_failure_handling', TransformationFailureExtension::class)
             ->args([service('translator')->ignoreOnInvalid()])

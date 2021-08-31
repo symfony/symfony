@@ -23,7 +23,11 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAnyAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAutoconfiguration;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomMethodAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomParameterAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomPropertyAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
@@ -37,6 +41,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3Configurator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService4;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -710,6 +715,86 @@ class IntegrationTest extends TestCase
         self::assertSame([
             'two' => [
                 ['someAttribute' => 'prio 100', 'priority' => 100],
+            ],
+        ], $collector->collectedTags);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTagsViaAttributeOnPropertyMethodAndParameter()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(
+            CustomMethodAttribute::class,
+            static function (ChildDefinition $definition, CustomMethodAttribute $attribute, \ReflectionMethod $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+                $tagAttributes['method'] = $reflector->getName();
+
+                $definition->addTag('app.custom_tag', $tagAttributes);
+            }
+        );
+        $container->registerAttributeForAutoconfiguration(
+            CustomPropertyAttribute::class,
+            static function (ChildDefinition $definition, CustomPropertyAttribute $attribute, \ReflectionProperty $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+                $tagAttributes['property'] = $reflector->getName();
+
+                $definition->addTag('app.custom_tag', $tagAttributes);
+            }
+        );
+        $container->registerAttributeForAutoconfiguration(
+            CustomParameterAttribute::class,
+            static function (ChildDefinition $definition, CustomParameterAttribute $attribute, \ReflectionParameter $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+                $tagAttributes['parameter'] = $reflector->getName();
+
+                $definition->addTag('app.custom_tag', $tagAttributes);
+            }
+        );
+        $container->registerAttributeForAutoconfiguration(
+            CustomAnyAttribute::class,
+            eval(<<<'PHP'
+            return static function (\Symfony\Component\DependencyInjection\ChildDefinition $definition, \Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAnyAttribute $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+                if ($reflector instanceof \ReflectionClass) {
+                    $tagAttributes['class'] = $reflector->getName();
+                } elseif ($reflector instanceof \ReflectionMethod) {
+                    $tagAttributes['method'] = $reflector->getName();
+                } elseif ($reflector instanceof \ReflectionProperty) {
+                    $tagAttributes['property'] = $reflector->getName();
+                } elseif ($reflector instanceof \ReflectionParameter) {
+                    $tagAttributes['parameter'] = $reflector->getName();
+                }
+
+                $definition->addTag('app.custom_tag', $tagAttributes);
+            };
+PHP
+            ));
+
+        $container->register(TaggedService4::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+
+        $collector = new TagCollector();
+        $container->addCompilerPass($collector);
+
+        $container->compile();
+
+        self::assertSame([
+            TaggedService4::class => [
+                ['class' => TaggedService4::class],
+                ['parameter' => 'param1'],
+                ['someAttribute' => 'on param1 in constructor', 'priority' => 0, 'parameter' => 'param1'],
+                ['parameter' => 'param2'],
+                ['someAttribute' => 'on param2 in constructor', 'priority' => 0, 'parameter' => 'param2'],
+                ['method' => 'fooAction'],
+                ['someAttribute' => 'on fooAction', 'priority' => 0, 'method' => 'fooAction'],
+                ['someAttribute' => 'on param1 in fooAction', 'priority' => 0, 'parameter' => 'param1'],
+                ['method' => 'barAction'],
+                ['someAttribute' => 'on barAction', 'priority' => 0, 'method' => 'barAction'],
+                ['property' => 'name'],
+                ['someAttribute' => 'on name', 'priority' => 0, 'property' => 'name'],
             ],
         ], $collector->collectedTags);
     }

@@ -41,7 +41,7 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
                 }
                 break;
             case KernelEvents::TERMINATE:
-                $sectionId = $event->getRequest()->attributes->get('_stopwatch_token');
+                $sectionId = $this->determineStopwatchToken($event);
                 if (null === $sectionId) {
                     break;
                 }
@@ -68,7 +68,7 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
                 $this->stopwatch->start('controller', 'section');
                 break;
             case KernelEvents::RESPONSE:
-                $sectionId = $event->getRequest()->attributes->get('_stopwatch_token');
+                $sectionId = $this->determineStopwatchToken($event);
                 if (null === $sectionId) {
                     break;
                 }
@@ -77,7 +77,7 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
             case KernelEvents::TERMINATE:
                 // In the special case described in the `preDispatch` method above, the `$token` section
                 // does not exist, then closing it throws an exception which must be caught.
-                $sectionId = $event->getRequest()->attributes->get('_stopwatch_token');
+                $sectionId = $this->determineStopwatchToken($event);
                 if (null === $sectionId) {
                     break;
                 }
@@ -87,5 +87,10 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
                 }
                 break;
         }
+    }
+
+    private function determineStopwatchToken($event)
+    {
+        return $event->getResponse()->headers->get('X-Debug-Token') ?? $event->getRequest()->attributes->get('_stopwatch_token');
     }
 }

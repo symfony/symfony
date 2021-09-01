@@ -45,6 +45,26 @@ class TraceableEventDispatcherTest extends TestCase
         ], array_keys($events));
     }
 
+    public function testStopwatchSectionsWithProfilerToken()
+    {
+        $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch = new Stopwatch());
+        $kernel = $this->getHttpKernel($dispatcher, new Response('', 200, ['X-Debug-Token' => '292e1e']));
+        $request = Request::create('/');
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+
+        $events = $stopwatch->getSectionEvents($response->headers->get('X-Debug-Token'));
+        $this->assertEquals([
+            '__section__',
+            'kernel.request',
+            'kernel.controller',
+            'kernel.controller_arguments',
+            'controller',
+            'kernel.response',
+            'kernel.terminate',
+        ], array_keys($events));
+    }
+
     public function testStopwatchCheckControllerOnRequestEvent()
     {
         $stopwatch = $this->getMockBuilder(Stopwatch::class)
@@ -110,11 +130,11 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
     }
 
-    protected function getHttpKernel($dispatcher)
+    protected function getHttpKernel($dispatcher, Response $response = null)
     {
         $controllerResolver = $this->createMock(ControllerResolverInterface::class);
-        $controllerResolver->expects($this->once())->method('getController')->willReturn(function () {
-            return new Response();
+        $controllerResolver->expects($this->once())->method('getController')->willReturn(function () use ($response) {
+            return $response ?? new Response();
         });
         $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
         $argumentResolver->expects($this->once())->method('getArguments')->willReturn([]);

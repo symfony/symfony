@@ -754,8 +754,7 @@ class IntegrationTest extends TestCase
         );
         $container->registerAttributeForAutoconfiguration(
             CustomAnyAttribute::class,
-            eval(<<<'PHP'
-            return static function (\Symfony\Component\DependencyInjection\ChildDefinition $definition, \Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAnyAttribute $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter $reflector) {
+            static function (ChildDefinition $definition, CustomAnyAttribute $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter $reflector) {
                 $tagAttributes = get_object_vars($attribute);
                 if ($reflector instanceof \ReflectionClass) {
                     $tagAttributes['class'] = $reflector->getName();
@@ -768,9 +767,8 @@ class IntegrationTest extends TestCase
                 }
 
                 $definition->addTag('app.custom_tag', $tagAttributes);
-            };
-PHP
-            ));
+            }
+        );
 
         $container->register(TaggedService4::class)
             ->setPublic(true)

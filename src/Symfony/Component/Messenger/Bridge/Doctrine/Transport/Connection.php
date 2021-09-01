@@ -20,6 +20,7 @@ use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
@@ -386,7 +387,7 @@ class Connection implements ResetInterface
 
     private function getSchema(): Schema
     {
-        $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
+        $schema = new Schema([], [], $this->createSchemaManager()->createSchemaConfig());
         $this->addTableToSchema($schema);
 
         return $schema;
@@ -437,7 +438,7 @@ class Connection implements ResetInterface
         }
 
         $comparator = new Comparator();
-        $schemaDiff = $comparator->compare($this->driverConnection->getSchemaManager()->createSchema(), $this->getSchema());
+        $schemaDiff = $comparator->compare($this->createSchemaManager()->createSchema(), $this->getSchema());
 
         foreach ($schemaDiff->toSaveSql($this->driverConnection->getDatabasePlatform()) as $sql) {
             if (method_exists($this->driverConnection, 'executeStatement')) {
@@ -446,6 +447,13 @@ class Connection implements ResetInterface
                 $this->driverConnection->exec($sql);
             }
         }
+    }
+
+    private function createSchemaManager(): AbstractSchemaManager
+    {
+        return method_exists($this->driverConnection, 'createSchemaManager')
+            ? $this->driverConnection->createSchemaManager()
+            : $this->driverConnection->getSchemaManager();
     }
 }
 

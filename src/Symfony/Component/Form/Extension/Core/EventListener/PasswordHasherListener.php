@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -43,33 +44,45 @@ class PasswordHasherListener implements EventSubscriberInterface
     public function postSubmit(FormEvent $event)
     {
         $form = $event->getForm();
-        $data = $event->getData();
 
-        if ($form->isRoot() && $form->isValid() && $data instanceof PasswordAuthenticatedUserInterface) {
-            foreach ($form->all() as $field) {
-                $passwordField = $field;
+        if ($form->isRoot() && $form->isValid()) {
+            $data = $event->getData();
+            $this->hashPasswords($form, $data);
+            $event->setData($data);
+        }
+    }
 
-                if (
-                    $field->getConfig()->getType()->getInnerType() instanceof RepeatedType
-                    && PasswordType::class == $field->getConfig()->getOption('type')
-                ) {
-                    $passwordField = $field->get('first');
-                }
+    private function hashPasswords(FormInterface $form, &$data)
+    {
+        foreach ($form->all() as $field) {
+            $passwordField = $field;
 
-                if (!$passwordField->getConfig()->getType()->getInnerType() instanceof PasswordType) {
-                    continue;
-                }
-
-                if ($passwordField->getConfig()->getOption('hash_password')) {
-                    $this->propertyAccessor->setValue(
-                        $data,
-                        $field->getPropertyPath(),
-                        $this->passwordHasher->hashPassword($data, $field->getData())
-                    );
-                }
+            if (
+                $field->getConfig()->getType()->getInnerType() instanceof RepeatedType
+                && PasswordType::class == $field->getConfig()->getOption('type')
+            ) {
+                $passwordField = $field->get('first');
             }
 
-            $event->setData($data);
+            if (!$passwordField->getConfig()->getType()->getInnerType() instanceof PasswordType) {
+                if ($field->count()) {
+                    $subData = $this->propertyAccessor->getValue($data, $field->getPropertyPath());
+                    $this->hashPasswords($field, $subData);
+                    $this->propertyAccessor->setValue($data, $field->getPropertyPath(), $subData);
+                }
+                continue;
+            }
+
+            if (
+                $passwordField->getConfig()->getOption('hash_password')
+                && $form->getData() instanceof PasswordAuthenticatedUserInterface
+            ) {
+                $this->propertyAccessor->setValue(
+                    $data,
+                    $field->getPropertyPath(),
+                    $this->passwordHasher->hashPassword($form->getData(), $field->getData())
+                );
+            }
         }
     }
 }

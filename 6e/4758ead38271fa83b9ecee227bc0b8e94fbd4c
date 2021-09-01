@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-31T11:23:27Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by dakur at 2021-08-31T11:26:56Z
+
+Oh, according to @carsonbot I should target 4.4. Is that right? If so, I will make new PR, but just to be sure I've understood it well.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-31T12:42:38Z
+
+Yes, a bugfix should target 4.4
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-31T12:43:03Z
+
+> Oh, according to @carsonbot I should target 4.4. Is that right? If so, I will make new PR, but just to be sure I've understood it well.
+
+No, let's keep 5.4 as target. I'd not file this as a bug but as a DX improvement.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-31T14:04:19Z
+
+Would it make sense to do the same in the `TranslationReader` class?

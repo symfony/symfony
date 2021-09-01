@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -237,7 +238,7 @@ class ContextListener extends AbstractListener
                 $newToken->setUser($refreshedUser, false);
 
                 // tokens can be deauthenticated if the user has been changed.
-                if ($this->hasUserChanged($user, $newToken)) {
+                if ($token instanceof AbstractToken && $this->hasUserChanged($user, $newToken)) {
                     $userDeauthenticated = true;
                     // @deprecated since Symfony 5.4
                     if (method_exists($newToken, 'setAuthenticated')) {

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
@@ -175,7 +176,7 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testTheTransportIsSetupOnGet()
     {
-        $this->assertFalse($this->driverConnection->getSchemaManager()->tablesExist('messenger_messages'));
+        $this->assertFalse($this->createSchemaManager()->tablesExist('messenger_messages'));
         $this->assertNull($this->connection->get());
 
         $this->connection->send('the body', ['my' => 'header']);
@@ -186,5 +187,12 @@ class DoctrineIntegrationTest extends TestCase
     private function formatDateTime(\DateTime $dateTime)
     {
         return $dateTime->format($this->driverConnection->getDatabasePlatform()->getDateTimeFormatString());
+    }
+
+    private function createSchemaManager(): AbstractSchemaManager
+    {
+        return method_exists($this->driverConnection, 'createSchemaManager')
+            ? $this->driverConnection->createSchemaManager()
+            : $this->driverConnection->getSchemaManager();
     }
 }

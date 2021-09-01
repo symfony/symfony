@@ -166,7 +166,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 case Type::BUILTIN_TYPE_ARRAY:
                     switch ($typeOfField) {
                         case Types::ARRAY:
-                        case Types::JSON_ARRAY:
+                        case 'json_array':
                             return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
 
                         case Types::SIMPLE_ARRAY:
@@ -280,7 +280,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
             case Types::ARRAY:
             case Types::SIMPLE_ARRAY:
-            case Types::JSON_ARRAY:
+            case 'json_array':
                 return Type::BUILTIN_TYPE_ARRAY;
         }
 

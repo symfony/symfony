@@ -323,6 +323,10 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      */
     protected function extractFromDirectory(string|array $directory): iterable
     {
+        if (!class_exists(Finder::class)) {
+            throw new \LogicException(sprintf('You cannot use "%s" as the "symfony/finder" package is not installed. Try running "composer require symfony/finder".', static::class));
+        }
+
         $finder = new Finder();
 
         return $finder->files()->name('*.php')->in($directory);

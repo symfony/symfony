@@ -153,8 +153,10 @@ class AutowirePass extends AbstractRecursivePass
         $this->decoratedClass = null;
         $this->getPreviousValue = null;
 
-        if ($isRoot && ($definition = $this->container->getDefinition($this->currentId)) && null !== ($this->decoratedId = $definition->innerServiceId) && $this->container->has($this->decoratedId)) {
-            $this->decoratedClass = $this->container->findDefinition($this->decoratedId)->getClass();
+        if ($isRoot && ($definition = $this->container->getDefinition($this->currentId)) && ($decoratedDefinition = $definition->getDecoratedService()) && null !== ($innerId = $decoratedDefinition[0]) && $this->container->has($innerId)) {
+            // If the class references to itself and is decorated, provide the inner service id and class to not get a circular reference
+            $this->decoratedClass = $this->container->findDefinition($innerId)->getClass();
+            $this->decoratedId = $decoratedDefinition[1] ?? $this->currentId.'.inner';
         }
 
         foreach ($this->methodCalls as $i => $call) {

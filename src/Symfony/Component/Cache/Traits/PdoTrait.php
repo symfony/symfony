@@ -17,6 +17,7 @@ use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\TableNotFoundException;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
@@ -166,17 +167,20 @@ trait PdoTrait
             $deleteSql .= " AND $this->idCol LIKE :namespace";
         }
 
+        $connection = $this->getConnection();
+        $useDbalConstants = $connection instanceof Connection;
+
         try {
-            $delete = $this->getConnection()->prepare($deleteSql);
+            $delete = $connection->prepare($deleteSql);
         } catch (TableNotFoundException $e) {
             return true;
         } catch (\PDOException $e) {
             return true;
         }
-        $delete->bindValue(':time', time(), \PDO::PARAM_INT);
+        $delete->bindValue(':time', time(), $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
 
         if ('' !== $this->namespace) {
-            $delete->bindValue(':namespace', sprintf('%s%%', $this->namespace), \PDO::PARAM_STR);
+            $delete->bindValue(':namespace', sprintf('%s%%', $this->namespace), $useDbalConstants ? ParameterType::STRING : \PDO::PARAM_STR);
         }
         try {
             return $delete->execute();
@@ -192,13 +196,16 @@ trait PdoTrait
      */
     protected function doFetch(array $ids)
     {
+        $connection = $this->getConnection();
+        $useDbalConstants = $connection instanceof Connection;
+
         $now = time();
         $expired = [];
 
         $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
         $sql = "SELECT $this->idCol, CASE WHEN $this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ? THEN $this->dataCol ELSE NULL END FROM $this->table WHERE $this->idCol IN ($sql)";
-        $stmt = $this->getConnection()->prepare($sql);
-        $stmt->bindValue($i = 1, $now, \PDO::PARAM_INT);
+        $stmt = $connection->prepare($sql);
+        $stmt->bindValue($i = 1, $now, $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
         foreach ($ids as $id) {
             $stmt->bindValue(++$i, $id);
         }
@@ -222,8 +229,8 @@ trait PdoTrait
         if ($expired) {
             $sql = str_pad('', (\count($expired) << 1) - 1, '?,');
             $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= ? AND $this->idCol IN ($sql)";
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->bindValue($i = 1, $now, \PDO::PARAM_INT);
+            $stmt = $connection->prepare($sql);
+            $stmt->bindValue($i = 1, $now, $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
             foreach ($expired as $id) {
                 $stmt->bindValue(++$i, $id);
             }
@@ -236,11 +243,14 @@ trait PdoTrait
      */
     protected function doHave($id)
     {
+        $connection = $this->getConnection();
+        $useDbalConstants = $connection instanceof Connection;
+
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = :id AND ($this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > :time)";
-        $stmt = $this->getConnection()->prepare($sql);
+        $stmt = $connection->prepare($sql);
 
         $stmt->bindValue(':id', $id);
-        $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
+        $stmt->bindValue(':time', time(), $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
         $result = $stmt->execute();
 
         return (bool) (\is_object($result) ? $result->fetchOne() : $stmt->fetchColumn());
@@ -303,6 +313,8 @@ trait PdoTrait
         }
 
         $conn = $this->getConnection();
+        $useDbalConstants = $conn instanceof Connection;
+
         $driver = $this->driver;
         $insertSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time)";
 
@@ -354,25 +366,25 @@ trait PdoTrait
         if ('sqlsrv' === $driver || 'oci' === $driver) {
             $stmt->bindParam(1, $id);
             $stmt->bindParam(2, $id);
-            $stmt->bindParam(3, $data, \PDO::PARAM_LOB);
-            $stmt->bindValue(4, $lifetime, \PDO::PARAM_INT);
-            $stmt->bindValue(5, $now, \PDO::PARAM_INT);
-            $stmt->bindParam(6, $data, \PDO::PARAM_LOB);
-            $stmt->bindValue(7, $lifetime, \PDO::PARAM_INT);
-            $stmt->bindValue(8, $now, \PDO::PARAM_INT);
+            $stmt->bindParam(3, $data, $useDbalConstants ? ParameterType::LARGE_OBJECT : \PDO::PARAM_LOB);
+            $stmt->bindValue(4, $lifetime, $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
+            $stmt->bindValue(5, $now, $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
+            $stmt->bindParam(6, $data, $useDbalConstants ? ParameterType::LARGE_OBJECT : \PDO::PARAM_LOB);
+            $stmt->bindValue(7, $lifetime, $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
+            $stmt->bindValue(8, $now, $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
         } else {
             $stmt->bindParam(':id', $id);
-            $stmt->bindParam(':data', $data, \PDO::PARAM_LOB);
-            $stmt->bindValue(':lifetime', $lifetime, \PDO::PARAM_INT);
-            $stmt->bindValue(':time', $now, \PDO::PARAM_INT);
+            $stmt->bindParam(':data', $data, $useDbalConstants ? ParameterType::LARGE_OBJECT : \PDO::PARAM_LOB);
+            $stmt->bindValue(':lifetime', $lifetime, $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
+            $stmt->bindValue(':time', $now, $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
         }
         if (null === $driver) {
             $insertStmt = $conn->prepare($insertSql);
 
             $insertStmt->bindParam(':id', $id);
-            $insertStmt->bindParam(':data', $data, \PDO::PARAM_LOB);
-            $insertStmt->bindValue(':lifetime', $lifetime, \PDO::PARAM_INT);
-            $insertStmt->bindValue(':time', $now, \PDO::PARAM_INT);
+            $insertStmt->bindParam(':data', $data, $useDbalConstants ? ParameterType::LARGE_OBJECT : \PDO::PARAM_LOB);
+            $insertStmt->bindValue(':lifetime', $lifetime, $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
+            $insertStmt->bindValue(':time', $now, $useDbalConstants ? ParameterType::INTEGER : \PDO::PARAM_INT);
         }
 
         foreach ($values as $id => $data) {

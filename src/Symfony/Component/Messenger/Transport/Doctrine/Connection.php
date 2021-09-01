@@ -20,6 +20,7 @@ use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
@@ -377,7 +378,7 @@ class Connection
 
     private function getSchema(): Schema
     {
-        $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
+        $schema = new Schema([], [], $this->createSchemaManager()->createSchemaConfig());
         $table = $schema->createTable($this->configuration['table_name']);
         $table->addColumn('id', self::$useDeprecatedConstants ? Type::BIGINT : Types::BIGINT)
             ->setAutoincrement(true)
@@ -421,7 +422,7 @@ class Connection
         }
 
         $comparator = new Comparator();
-        $schemaDiff = $comparator->compare($this->driverConnection->getSchemaManager()->createSchema(), $this->getSchema());
+        $schemaDiff = $comparator->compare($this->createSchemaManager()->createSchema(), $this->getSchema());
 
         foreach ($schemaDiff->toSaveSql($this->driverConnection->getDatabasePlatform()) as $sql) {
             if (method_exists($this->driverConnection, 'executeStatement')) {
@@ -430,5 +431,12 @@ class Connection
                 $this->driverConnection->exec($sql);
             }
         }
+    }
+
+    private function createSchemaManager(): AbstractSchemaManager
+    {
+        return method_exists($this->driverConnection, 'createSchemaManager')
+            ? $this->driverConnection->createSchemaManager()
+            : $this->driverConnection->getSchemaManager();
     }
 }

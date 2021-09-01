@@ -52,6 +52,7 @@
     },
     "conflict": {
         "doctrine/dbal": "<2.10",
+        "doctrine/orm": "<2.7.3",
         "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<4.4",
         "symfony/form": "<5.1",

@@ -68,7 +68,9 @@ class PasswordHasherListener implements EventSubscriberInterface
                 if ($field->count()) {
                     $subData = $this->propertyAccessor->getValue($data, $field->getPropertyPath());
                     $this->hashPasswords($field, $subData);
-                    $this->propertyAccessor->setValue($data, $field->getPropertyPath(), $subData);
+                    if ($this->propertyAccessor->isWritable($data, $field->getPropertyPath())) {
+                        $this->propertyAccessor->setValue($data, $field->getPropertyPath(), $subData);
+                    }
                 }
                 continue;
             }

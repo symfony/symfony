@@ -38,7 +38,7 @@ class PasswordHasherListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return [FormEvents::POST_SUBMIT => ['postSubmit', -256]];
+        return [FormEvents::POST_SUBMIT => ['postSubmit', -2048]];
     }
 
     public function postSubmit(FormEvent $event)

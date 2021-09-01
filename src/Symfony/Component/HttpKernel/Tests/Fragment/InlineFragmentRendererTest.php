@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
+use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -261,13 +262,24 @@ class InlineFragmentRendererTest extends TestCase
     /**
      * Creates a Kernel expecting a request equals to $request.
      */
-    private function getKernelExpectingRequest(Request $request, $strict = false)
+    private function getKernelExpectingRequest(Request $expectedRequest)
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel
             ->expects($this->once())
             ->method('handle')
-            ->with($request)
+            ->with($this->callback(function (Request $request) use ($expectedRequest) {
+                $requestClone = clone $request;
+                $expectedRequestClone = clone $expectedRequest;
+
+                $irrelevantServerKeys = ['REQUEST_TIME', 'REQUEST_TIME_FLOAT'];
+                foreach ($irrelevantServerKeys as $irrelevantServerKey) {
+                    $requestClone->server->remove($irrelevantServerKey);
+                    $expectedRequestClone->server->remove($irrelevantServerKey);
+                }
+
+                return (new IsEqual($expectedRequestClone))->evaluate($requestClone);
+            }))
             ->willReturn(new Response('foo'));
 
         return $kernel;

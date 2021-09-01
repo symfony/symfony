@@ -121,7 +121,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             return $opcache;
         }
 
-        $apcu = new ApcuAdapter($namespace, (int) $defaultLifetime / 5, $version);
+        $apcu = new ApcuAdapter($namespace, intdiv($defaultLifetime, 5), $version);
         if (null !== $logger) {
             $apcu->setLogger($logger);
         }

@@ -12,6 +12,9 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\EventListener\PasswordHasherListener;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -19,6 +22,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PasswordType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if ($options['hash_password']) {
+            $builder->addEventListener(FormEvents::POST_SUBMIT, [new PasswordHasherListener(), 'registerPasswordType']);
+        }
+    }
+
     /**
      * {@inheritdoc}
      */

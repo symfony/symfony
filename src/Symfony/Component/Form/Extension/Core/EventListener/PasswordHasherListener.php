@@ -12,11 +12,10 @@
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -30,8 +29,8 @@ class PasswordHasherListener implements EventSubscriberInterface
     private $passwordHasher;
     private $propertyAccessor;
 
-    /** @var FormInterface[] */
-    private static $passwordForms = [];
+    /** @var FormType[] */
+    private static $passwordTypes = [];
 
     public function __construct(UserPasswordHasherInterface $passwordHasher = null, PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -42,30 +41,22 @@ class PasswordHasherListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::POST_SUBMIT => [
-                ['setPasswordForms', -2047],
-                ['hashPasswords', -2048],
-            ],
+            FormEvents::POST_SUBMIT => ['hashPasswords', -2048],
         ];
     }
 
-    public function setPasswordForms(FormEvent $event)
+    public function registerPasswordType(FormEvent $event)
     {
         $form = $event->getForm();
         $parentForm = $form->getParent();
+        $rootName = $form->getRoot()->getName();
 
-        if (
-            $parentForm
-            && ($parentForm->getData() instanceof PasswordAuthenticatedUserInterface)
-            && !($parentForm->getConfig()->getType()->getInnerType() instanceof RepeatedType)
-        ) {
-            $config = $form->getConfig();
-            $innerType = $config->getType()->getInnerType();
-            switch (true) {
-                case $innerType instanceof PasswordType && $config->getOption('hash_password'):
-                case $innerType instanceof RepeatedType && PasswordType::class == $config->getOption('type') && $form->get('first')->getConfig()->getOption('hash_password'):
-                    self::$passwordForms[] = $form;
+        if ($parentForm && $parentForm->getConfig()->getType()->getInnerType() instanceof RepeatedType) {
+            if ('first' == $form->getName()) {
+                self::$passwordTypes[$rootName][] = $parentForm;
             }
+        } else {
+            self::$passwordTypes[$rootName][] = $form;
         }
     }
 
@@ -73,14 +64,15 @@ class PasswordHasherListener implements EventSubscriberInterface
     {
         $form = $event->getForm();
 
-        if ($form->isRoot() && $form->isValid()) {
-            foreach (self::$passwordForms as $passwordForm) {
-                $user = $passwordForm->getParent()->getData();
-                $this->propertyAccessor->setValue(
-                    $user,
-                    $passwordForm->getPropertyPath(),
-                    $this->passwordHasher->hashPassword($user, $passwordForm->getData())
-                );
+        if ($form->isRoot() && $form->isValid() && isset(self::$passwordTypes[$form->getName()])) {
+            foreach (self::$passwordTypes[$form->getName()] as $passwordType) {
+                if (($user = $passwordType->getParent()->getData()) && ($user instanceof PasswordAuthenticatedUserInterface)) {
+                    $this->propertyAccessor->setValue(
+                        $user,
+                        $passwordType->getPropertyPath(),
+                        $this->passwordHasher->hashPassword($user, $passwordType->getData())
+                    );
+                }
             }
         }
     }

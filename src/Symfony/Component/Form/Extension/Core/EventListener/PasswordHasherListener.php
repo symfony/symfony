@@ -51,6 +51,10 @@ class PasswordHasherListener implements EventSubscriberInterface
         $parentForm = $form->getParent();
         $rootName = $form->getRoot()->getName();
 
+        if (!isset(self::$passwordTypes[$form->getName()])) {
+            self::$passwordTypes[$rootName] = [];
+        }
+
         if ($parentForm && $parentForm->getConfig()->getType()->getInnerType() instanceof RepeatedType) {
             if ('first' == $form->getName()) {
                 self::$passwordTypes[$rootName][] = $parentForm;

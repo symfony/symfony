@@ -29,7 +29,7 @@ class PasswordHasherListener implements EventSubscriberInterface
     private $passwordHasher;
     private $propertyAccessor;
 
-    /** @var FormType[] */
+    /** @var FormType[][] */
     private static $passwordTypes = [];
 
     public function __construct(UserPasswordHasherInterface $passwordHasher = null, PropertyAccessorInterface $propertyAccessor = null)

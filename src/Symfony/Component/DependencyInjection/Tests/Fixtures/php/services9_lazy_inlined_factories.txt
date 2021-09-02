@@ -186,7 +186,7 @@ $classes[] = 'Bar\FooClass';
 $classes[] = 'Bar\FooLazyClass';
 $classes[] = 'Symfony\Component\DependencyInjection\ContainerInterface';
 
-Preloader::preload($classes);
+$preloaded = Preloader::preload($classes);
 
     [ProjectServiceContainer.php] => <?php
 

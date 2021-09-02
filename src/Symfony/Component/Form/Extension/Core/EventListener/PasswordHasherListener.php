@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -29,7 +29,7 @@ class PasswordHasherListener implements EventSubscriberInterface
     private $passwordHasher;
     private $propertyAccessor;
 
-    /** @var FormType[][] */
+    /** @var FormInterface[][] */
     private static $passwordTypes = [];
 
     public function __construct(UserPasswordHasherInterface $passwordHasher = null, PropertyAccessorInterface $propertyAccessor = null)

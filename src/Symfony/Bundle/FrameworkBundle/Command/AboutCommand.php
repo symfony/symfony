@@ -44,9 +44,6 @@ The <info>%command.name%</info> command displays information about the current S
 
 The <info>PHP</info> section displays important configuration that could affect your application. The values might
 be different between web and CLI.
-
-The <info>Environment</info> section displays the current environment variables managed by Symfony Dotenv. It will not
-be shown if no variables were found. The values might be different between web and CLI.
 EOT
             )
         ;

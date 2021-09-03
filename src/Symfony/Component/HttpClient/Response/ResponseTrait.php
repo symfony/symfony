@@ -233,15 +233,15 @@ trait ResponseTrait
      */
     abstract protected static function select(ClientState $multi, float $timeout): int;
 
-    private static function initialize(self $response): void
+    private static function initialize(self $response, float $timeout = null): void
     {
         if (null !== $response->info['error']) {
             throw new TransportException($response->info['error']);
         }
 
         try {
-            if (($response->initializer)($response)) {
-                foreach (self::stream([$response]) as $chunk) {
+            if (($response->initializer)($response, $timeout)) {
+                foreach (self::stream([$response], $timeout) as $chunk) {
                     if ($chunk->isFirst()) {
                         break;
                     }
@@ -304,7 +304,7 @@ trait ResponseTrait
         $this->shouldBuffer = true;
 
         if ($this->initializer && null === $this->info['error']) {
-            self::initialize($this);
+            self::initialize($this, -0.0);
             $this->checkStatusCode();
         }
     }
@@ -325,6 +325,12 @@ trait ResponseTrait
         $lastActivity = microtime(true);
         $elapsedTimeout = 0;
 
+        if ($fromLastTimeout = 0.0 === $timeout && '-0' === (string) $timeout) {
+            $timeout = null;
+        } elseif ($fromLastTimeout = 0 > $timeout) {
+            $timeout = -$timeout;
+        }
+
         while (true) {
             $hasActivity = false;
             $timeoutMax = 0;
@@ -340,13 +346,18 @@ trait ResponseTrait
                     $timeoutMin = min($timeoutMin, $response->timeout, 1);
                     $chunk = false;
 
+                    if ($fromLastTimeout && null !== $multi->lastTimeout) {
+                        $elapsedTimeout = microtime(true) - $multi->lastTimeout;
+                    }
+
                     if (isset($multi->handlesActivity[$j])) {
-                        // no-op
+                        $multi->lastTimeout = null;
                     } elseif (!isset($multi->openHandles[$j])) {
                         unset($responses[$j]);
                         continue;
                     } elseif ($elapsedTimeout >= $timeoutMax) {
                         $multi->handlesActivity[$j] = [new ErrorChunk($response->offset, sprintf('Idle timeout reached for "%s".', $response->getInfo('url')))];
+                        $multi->lastTimeout ?? $multi->lastTimeout = $lastActivity;
                     } else {
                         continue;
                     }

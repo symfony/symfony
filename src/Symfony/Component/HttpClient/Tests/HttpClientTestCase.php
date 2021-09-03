@@ -19,6 +19,15 @@ use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCa
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
+    public function testTimeoutOnDestruct()
+    {
+        if (!method_exists(parent::class, 'testTimeoutOnDestruct')) {
+            $this->markTestSkipped('BaseHttpClientTestCase doesn\'t have testTimeoutOnDestruct().');
+        }
+
+        parent::testTimeoutOnDestruct();
+    }
+
     public function testAcceptHeader()
     {
         $client = $this->getHttpClient(__FUNCTION__);

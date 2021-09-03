@@ -14,10 +14,12 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
+use Symfony\Component\Messenger\Handler\ConfigurableAutoAckInterface;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
+use Symfony\Component\Messenger\Stamp\DelayedAckStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -114,6 +116,45 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ];
     }
 
+    /**
+     * @dataProvider itAddsDelayedAckStampProvider
+     */
+    public function testItAddsDelayedAckStamp($handler, bool $stampIsExpected)
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        try {
+            $envelope = $middleware->handle($envelope, $this->getStackMock(true));
+        } catch (HandlerFailedException $e) {
+            $envelope = $e->getEnvelope();
+        }
+
+        $this->assertSame($stampIsExpected, null !== $envelope->last(DelayedAckStamp::class));
+    }
+
+    public function itAddsDelayedAckStampProvider(): iterable
+    {
+        yield 'It does not add stamp by default' => [
+            new HandleMessageMiddlewareTestCallable(),
+            false,
+        ];
+
+        yield 'It does not add when object return false' => [
+            new HandleMessageMiddlewareWithAckConfigurationTestCallable(false),
+            false,
+        ];
+
+        yield 'It adds when object return true' => [
+            new HandleMessageMiddlewareWithAckConfigurationTestCallable(true),
+            true,
+        ];
+    }
+
     public function testThrowsNoHandlerException()
     {
         $this->expectException(NoHandlerForMessageException::class);
@@ -133,6 +174,25 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
 class HandleMessageMiddlewareTestCallable
 {
+    public function __invoke()
+    {
+    }
+}
+
+class HandleMessageMiddlewareWithAckConfigurationTestCallable implements ConfigurableAutoAckInterface
+{
+    private $autoAckDisabled;
+
+    public function __construct(bool $autoAckDisabled)
+    {
+        $this->autoAckDisabled = $autoAckDisabled;
+    }
+
+    public function isAutoAckDisabled(Envelope $envelope): bool
+    {
+        return $this->autoAckDisabled;
+    }
+
     public function __invoke()
     {
     }

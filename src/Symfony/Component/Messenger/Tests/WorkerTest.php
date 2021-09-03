@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
+use Symfony\Component\Messenger\Stamp\DelayedAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
@@ -328,6 +329,24 @@ class WorkerTest extends TestCase
 
         $envelope = current($receiver->getAcknowledgedEnvelopes());
         $this->assertCount(1, $envelope->all(\get_class($stamp)));
+    }
+
+    public function testWorkerDoesNotCallAckWhenDelayedAckStamp()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $envelope = $envelope->with(new DelayedAckStamp());
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->method('dispatch')->willReturnArgument(0);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker([$receiver], $bus, $dispatcher);
+        $worker->run();
+
+        $this->assertSame(0, $receiver->getAcknowledgeCount());
     }
 }
 

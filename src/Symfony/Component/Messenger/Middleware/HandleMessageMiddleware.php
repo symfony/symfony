@@ -16,8 +16,10 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
+use Symfony\Component\Messenger\Handler\ConfigurableAutoAckInterface;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
+use Symfony\Component\Messenger\Stamp\DelayedAckStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
@@ -60,7 +62,10 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
             try {
                 $handler = $handlerDescriptor->getHandler();
-                $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $handler($message));
+                if ($handler instanceof ConfigurableAutoAckInterface && $handler->isAutoAckDisabled($envelope)) {
+                    $envelope = $envelope->with(new DelayedAckStamp());
+                }
+                $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $handler($message, $envelope));
                 $envelope = $envelope->with($handledStamp);
                 $this->logger->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
             } catch (\Throwable $e) {

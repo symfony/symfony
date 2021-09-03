@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
+use Symfony\Component\Messenger\Stamp\DelayedAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -171,7 +172,9 @@ class Worker
             $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);
         }
 
-        $receiver->ack($envelope);
+        if (null === $envelope->last(DelayedAckStamp::class)) {
+            $receiver->ack($envelope);
+        }
     }
 
     public function stop(): void

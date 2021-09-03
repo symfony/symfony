@@ -21,7 +21,7 @@ foreach (explode("\n", $data) as $line) {
     $new[$mimeType] = $extensions;
 }
 
-$xml = simplexml_load_string(file_get_contents('https://gitlab.freedesktop.org/xdg/shared-mime-info/-/raw/master/data/freedesktop.org.xml.in?inline=false'));
+$xml = simplexml_load_string(file_get_contents('https://raw.github.com/minad/mimemagic/master/script/freedesktop.org.xml'));
 foreach ($xml as $node) {
     $exts = [];
     foreach ($node->glob as $glob) {

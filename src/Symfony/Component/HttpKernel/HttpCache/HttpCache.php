@@ -29,13 +29,13 @@ use Symfony\Component\HttpKernel\TerminableInterface;
  */
 class HttpCache implements HttpKernelInterface, TerminableInterface
 {
-    private $kernel;
-    private $store;
-    private $request;
-    private $surrogate;
-    private $surrogateCacheStrategy;
-    private $options = [];
-    private $traces = [];
+    private HttpKernelInterface $kernel;
+    private StoreInterface $store;
+    private Request $request;
+    private ?SurrogateInterface $surrogate;
+    private ?ResponseCacheStrategyInterface $surrogateCacheStrategy = null;
+    private array $options = [];
+    private array $traces = [];
 
     /**
      * Constructor.

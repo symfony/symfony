@@ -31,16 +31,16 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class DebugHandlersListener implements EventSubscriberInterface
 {
-    private $earlyHandler;
-    private $exceptionHandler;
-    private $logger;
-    private $deprecationLogger;
-    private $levels;
-    private $throwAt;
-    private $scream;
-    private $scope;
-    private $firstCall = true;
-    private $hasTerminatedWithException;
+    private string|object|null $earlyHandler;
+    private ?\Closure $exceptionHandler;
+    private ?LoggerInterface $logger;
+    private ?LoggerInterface $deprecationLogger;
+    private array|int|null $levels;
+    private ?int $throwAt;
+    private bool $scream;
+    private bool $scope;
+    private bool $firstCall = true;
+    private bool $hasTerminatedWithException = false;
 
     /**
      * @param callable|null  $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
@@ -49,13 +49,13 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param bool           $scream           Enables/disables screaming mode, where even silenced errors are logged
      * @param bool           $scope            Enables/disables scoping mode
      */
-    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, bool $scope = true, LoggerInterface $deprecationLogger = null)
+    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, array|int|null $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, bool $scope = true, LoggerInterface $deprecationLogger = null)
     {
         $handler = set_exception_handler('var_dump');
         $this->earlyHandler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();
 
-        $this->exceptionHandler = $exceptionHandler;
+        $this->exceptionHandler = $exceptionHandler === null || $exceptionHandler instanceof \Closure ? $exceptionHandler : \Closure::fromCallable($exceptionHandler);
         $this->logger = $logger;
         $this->levels = $levels ?? \E_ALL;
         $this->throwAt = \is_int($throwAt) ? $throwAt : (null === $throwAt ? null : ($throwAt ? \E_ALL : null));

@@ -25,8 +25,8 @@ use Symfony\Component\HttpFoundation\Response;
 class Store implements StoreInterface
 {
     protected $root;
-    private $keyCache;
-    private $locks;
+    private \SplObjectStorage $keyCache;
+    private array $locks = [];
 
     /**
      * @throws \RuntimeException
@@ -38,7 +38,6 @@ class Store implements StoreInterface
             throw new \RuntimeException(sprintf('Unable to create the store directory (%s).', $this->root));
         }
         $this->keyCache = new \SplObjectStorage();
-        $this->locks = [];
     }
 
     /**

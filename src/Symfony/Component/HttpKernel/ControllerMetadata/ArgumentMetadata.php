@@ -20,13 +20,13 @@ class ArgumentMetadata
 {
     public const IS_INSTANCEOF = 2;
 
-    private $name;
-    private $type;
-    private $isVariadic;
-    private $hasDefaultValue;
-    private $defaultValue;
-    private $isNullable;
-    private $attributes;
+    private string $name;
+    private ?string $type;
+    private bool $isVariadic;
+    private bool $hasDefaultValue;
+    private mixed $defaultValue;
+    private bool $isNullable;
+    private array $attributes;
 
     /**
      * @param object[] $attributes

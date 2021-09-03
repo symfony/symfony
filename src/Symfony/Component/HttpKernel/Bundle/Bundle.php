@@ -29,7 +29,7 @@ abstract class Bundle implements BundleInterface
     protected $name;
     protected $extension;
     protected $path;
-    private $namespace;
+    private string $namespace;
 
     /**
      * {@inheritdoc}
@@ -92,7 +92,7 @@ abstract class Bundle implements BundleInterface
      */
     public function getNamespace(): string
     {
-        if (null === $this->namespace) {
+        if (!isset($this->namespace)) {
             $this->parseClassName();
         }
 

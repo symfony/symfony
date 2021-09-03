@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Response;
 class HttpKernelBrowser extends AbstractBrowser
 {
     protected $kernel;
-    private $catchExceptions = true;
+    private bool $catchExceptions = true;
 
     /**
      * @param array $server The server parameters (equivalent of $_SERVER)

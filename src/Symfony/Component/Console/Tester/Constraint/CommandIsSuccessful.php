@@ -39,4 +39,17 @@ final class CommandIsSuccessful extends Constraint
     {
         return 'the command '.$this->toString();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function additionalFailureDescription($other): string
+    {
+        $mapping = [
+            Command::FAILURE => 'Command failed.',
+            Command::INVALID => 'Command was invalid.',
+        ];
+
+        return $mapping[$other] ?? sprintf('Command returned exit status %d.', $other);
+    }
 }

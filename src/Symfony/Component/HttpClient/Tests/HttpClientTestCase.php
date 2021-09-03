@@ -32,6 +32,15 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
     private static $vulcainStarted = false;
 
+    public function testTimeoutOnDestruct()
+    {
+        if (!method_exists(parent::class, 'testTimeoutOnDestruct')) {
+            $this->markTestSkipped('BaseHttpClientTestCase doesn\'t have testTimeoutOnDestruct().');
+        }
+
+        parent::testTimeoutOnDestruct();
+    }
+
     public function testAcceptHeader()
     {
         $client = $this->getHttpClient(__FUNCTION__);

@@ -45,7 +45,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
     private static $nextId = 'a';
 
-    private $multi;
     private $options;
     private $canceller;
     private $onProgress;

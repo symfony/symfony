@@ -145,15 +145,15 @@ trait CommonResponseTrait
      */
     abstract protected function close(): void;
 
-    private static function initialize(self $response): void
+    private static function initialize(self $response, float $timeout = null): void
     {
         if (null !== $response->getInfo('error')) {
             throw new TransportException($response->getInfo('error'));
         }
 
         try {
-            if (($response->initializer)($response)) {
-                foreach (self::stream([$response]) as $chunk) {
+            if (($response->initializer)($response, $timeout)) {
+                foreach (self::stream([$response], $timeout) as $chunk) {
                     if ($chunk->isFirst()) {
                         break;
                     }

@@ -43,11 +43,11 @@ class DebugHandlersListener implements EventSubscriberInterface
     private $hasTerminatedWithException;
 
     /**
-     * @param callable|null $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
-     * @param array|int     $levels           An array map of E_* to LogLevel::* or an integer bit field of E_* constants
-     * @param int|null      $throwAt          Thrown errors in a bit field of E_* constants, or null to keep the current value
-     * @param bool          $scream           Enables/disables screaming mode, where even silenced errors are logged
-     * @param bool          $scope            Enables/disables scoping mode
+     * @param callable|null  $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
+     * @param array|int|null $levels           An array map of E_* to LogLevel::* or an integer bit field of E_* constants
+     * @param int|null       $throwAt          Thrown errors in a bit field of E_* constants, or null to keep the current value
+     * @param bool           $scream           Enables/disables screaming mode, where even silenced errors are logged
+     * @param bool           $scope            Enables/disables scoping mode
      */
     public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, bool $scope = true, LoggerInterface $deprecationLogger = null)
     {

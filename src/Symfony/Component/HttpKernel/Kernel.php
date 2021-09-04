@@ -73,6 +73,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     private $requestStackSize = 0;
     private $resetServices = false;
 
+    /**
+     * @var array<string, bool>
+     */
     private static $freshCache = [];
 
     public const VERSION = '6.0.0-DEV';

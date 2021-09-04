@@ -65,7 +65,7 @@ class RouterListener implements EventSubscriberInterface
         }
 
         $this->matcher = $matcher;
-        $this->context = $context ?: $matcher->getContext();
+        $this->context = $context ?? $matcher->getContext();
         $this->requestStack = $requestStack;
         $this->logger = $logger;
         $this->projectDir = $projectDir;

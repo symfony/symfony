@@ -38,7 +38,6 @@ jobs:
       - name: Configure for PHP 8.1
         if: "${{ matrix.php == '8.1' }}"
         run: |
-          echo "extensions=mbstring" >> $GITHUB_ENV
           composer config platform.php 8.0.99
 
       - name: Setup PHP

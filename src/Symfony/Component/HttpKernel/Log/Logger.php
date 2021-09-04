@@ -35,8 +35,13 @@ class Logger extends AbstractLogger
 
     private $minLevelIndex;
     private $formatter;
+
+    /** @var resource|null */
     private $handle;
 
+    /**
+     * @param string|resource|null $output
+     */
     public function __construct(string $minLevel = null, $output = null, callable $formatter = null)
     {
         if (null === $minLevel) {

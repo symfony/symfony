@@ -728,10 +728,12 @@ class Request
      * This method does not give any information about the state of the session object,
      * like whether the session is started or not. It is just a way to check if this Request
      * is associated with a Session instance.
+     *
+     * @param bool $skipIfUninitialized When true, ignores factories injected by `setSessionFactory`
      */
-    public function hasSession(): bool
+    public function hasSession(bool $skipIfUninitialized = false): bool
     {
-        return null !== $this->session;
+        return null !== $this->session && (!$skipIfUninitialized || $this->session instanceof SessionInterface);
     }
 
     public function setSession(SessionInterface $session)

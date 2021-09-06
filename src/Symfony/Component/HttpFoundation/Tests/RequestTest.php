@@ -1635,8 +1635,15 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $this->assertFalse($request->hasSession());
+        $this->assertFalse($request->hasSession(true));
+
+        $request->setSessionFactory(function () {});
+        $this->assertTrue($request->hasSession());
+        $this->assertFalse($request->hasSession(true));
+
         $request->setSession(new Session(new MockArraySessionStorage()));
         $this->assertTrue($request->hasSession());
+        $this->assertTrue($request->hasSession(true));
     }
 
     public function testGetSession()

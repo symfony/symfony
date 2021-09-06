@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-30T16:04:07Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by NicoHaase at 2021-09-06T06:01:27Z
+
+So, I'm having a new shot after all that feedback - thank you guys for commenting!
+
+![Bildschirmfoto von 2021-09-06 07-59-54](https://user-images.githubusercontent.com/1069028/132167971-db53feef-baa5-4db1-b3b5-7fb500f0076a.png)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-06T07:44:24Z
+
+@ro0NL Can you test this PR with your 200+ roles app? 🙃

@@ -28,6 +28,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
+ *
+ * @deprecated the TestSessionListener use the default SessionListener instead
  */
 abstract class AbstractTestSessionListener implements EventSubscriberInterface
 {
@@ -37,6 +39,8 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
     public function __construct(array $sessionOptions = [])
     {
         $this->sessionOptions = $sessionOptions;
+
+        trigger_deprecation('symfony/http-kernel', '5.4', 'The %s is deprecated use the %s instead.', __CLASS__, AbstractSessionListener::class);
     }
 
     public function onKernelRequest(RequestEvent $event)

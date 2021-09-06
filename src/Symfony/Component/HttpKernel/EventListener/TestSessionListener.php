@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @final
+ *
+ * @deprecated the TestSessionListener use the default SessionListener instead
  */
 class TestSessionListener extends AbstractTestSessionListener
 {

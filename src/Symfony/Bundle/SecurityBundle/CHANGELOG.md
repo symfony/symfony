@@ -26,6 +26,7 @@ CHANGELOG
  * Deprecate passing an array of arrays as 1st argument to `MainConfiguration`, pass a sorted flat array of
    factories instead.
  * Deprecate the `always_authenticate_before_granting` option
+ * Display the roles of the logged-in user in the Web Debug Toolbar
 
 
 5.3

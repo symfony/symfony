@@ -576,8 +576,9 @@ class CustomToken implements TokenInterface
         return false;
     }
 
-    public function getAttribute(string $name)
+    public function getAttribute(string $name): mixed
     {
+        return null;
     }
 
     public function setAttribute(string $name, $value)

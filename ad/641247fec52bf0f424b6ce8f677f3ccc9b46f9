@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-24T15:14:33Z
+
+Hey!
+
+I think @Simperfit has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-07-08T17:07:40Z
+
+@Nyholm Yes the PR itself is ready for review, I want still provide some tests for the Listener logic.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-07-19T10:25:48Z
+
+@Nyholm As it is now handled all in the `AbstractSessionListener` I added there the ResetInterface to handle it there. **EDIT**: Need to have a deeper look at this as currently some tests fails now.
+@jderusse Sounds good for me did add a deprecation message to the class.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-08-25T11:43:02Z
+
+@jderusse I added a deprecation message but the CI is failing now because of that. Not sure if we can just remove https://github.com/symfony/symfony/blob/e2d1cb1d3ca5cc57315626f3e8c24a582ca460b6/src/Symfony/Bundle/FrameworkBundle/Resources/config/test.php#L38-L44  or if we should keep the test listener. What do you think?

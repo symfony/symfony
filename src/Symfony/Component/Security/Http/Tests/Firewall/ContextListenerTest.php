@@ -546,7 +546,7 @@ class SupportingUserProvider implements UserProviderInterface
     }
 }
 
-class CustomToken implements TokenInterface
+abstract class BaseCustomToken implements TokenInterface
 {
     private $user;
     private $roles;
@@ -638,11 +638,24 @@ class CustomToken implements TokenInterface
         return false;
     }
 
-    public function getAttribute(string $name)
-    {
-    }
-
     public function setAttribute(string $name, $value)
     {
+    }
+}
+
+if (\PHP_VERSION_ID >= 80000) {
+    class CustomToken extends BaseCustomToken
+    {
+        public function getAttribute(string $name): mixed
+        {
+            return null;
+        }
+    }
+} else {
+    class CustomToken extends BaseCustomToken
+    {
+        public function getAttribute(string $name)
+        {
+        }
     }
 }

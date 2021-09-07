@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-06T21:37:21Z
+
+I think this should be fine for 4.4
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-09-07T05:28:58Z
+
+Can you rebase on 4.4 then?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-07T07:02:05Z
+
+Done! I've also adjusted `AdapterTestCase` to check the return value of `prune()` calls.

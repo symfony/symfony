@@ -27,10 +27,10 @@ final class LocoProviderFactory extends AbstractProviderFactory
 {
     private const HOST = 'localise.biz';
 
-    private $client;
-    private $logger;
-    private $defaultLocale;
-    private $loader;
+    private HttpClientInterface $client;
+    private LoggerInterface $logger;
+    private string $defaultLocale;
+    private LoaderInterface $loader;
 
     public function __construct(HttpClientInterface $client, LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader)
     {

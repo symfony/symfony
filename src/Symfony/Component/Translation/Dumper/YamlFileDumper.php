@@ -23,7 +23,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileDumper extends FileDumper
 {
-    private $extension;
+    private string $extension;
 
     public function __construct(string $extension = 'yml')
     {

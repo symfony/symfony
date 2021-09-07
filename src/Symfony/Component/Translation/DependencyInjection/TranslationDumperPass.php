@@ -20,8 +20,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class TranslationDumperPass implements CompilerPassInterface
 {
-    private $writerServiceId;
-    private $dumperTag;
+    private string $writerServiceId;
+    private string $dumperTag;
 
     public function __construct(string $writerServiceId = 'translation.writer', string $dumperTag = 'translation.dumper')
     {

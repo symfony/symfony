@@ -19,12 +19,12 @@ use Symfony\Component\Translation\Exception\LogicException;
  */
 class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface
 {
-    private $messages = [];
-    private $metadata = [];
-    private $resources = [];
-    private $locale;
-    private $fallbackCatalogue;
-    private $parent;
+    private array $messages = [];
+    private array $metadata = [];
+    private array $resources = [];
+    private string $locale;
+    private ?MessageCatalogueInterface $fallbackCatalogue = null;
+    private ?self $parent = null;
 
     /**
      * @param array $messages An array of messages classified by domain

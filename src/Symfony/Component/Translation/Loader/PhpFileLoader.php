@@ -18,7 +18,7 @@ namespace Symfony\Component\Translation\Loader;
  */
 class PhpFileLoader extends FileLoader
 {
-    private static $cache = [];
+    private static ?array $cache = [];
 
     /**
      * {@inheritdoc}

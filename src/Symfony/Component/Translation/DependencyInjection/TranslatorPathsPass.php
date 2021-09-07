@@ -22,26 +22,26 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class TranslatorPathsPass extends AbstractRecursivePass
 {
-    private $translatorServiceId;
-    private $debugCommandServiceId;
-    private $updateCommandServiceId;
-    private $resolverServiceId;
-    private $level = 0;
+    private string $translatorServiceId;
+    private string $debugCommandServiceId;
+    private string $updateCommandServiceId;
+    private string $resolverServiceId;
+    private int $level = 0;
 
     /**
      * @var array<string, bool>
      */
-    private $paths = [];
+    private array $paths = [];
 
     /**
      * @var array<int, Definition>
      */
-    private $definitions = [];
+    private array $definitions = [];
 
     /**
      * @var array<string, array<string, bool>>
      */
-    private $controllers = [];
+    private array $controllers = [];
 
     public function __construct(string $translatorServiceId = 'translator', string $debugCommandServiceId = 'console.command.translation_debug', string $updateCommandServiceId = 'console.command.translation_update', string $resolverServiceId = 'argument_resolver.service')
     {

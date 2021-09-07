@@ -32,11 +32,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LokaliseProvider implements ProviderInterface
 {
-    private $client;
-    private $loader;
-    private $logger;
-    private $defaultLocale;
-    private $endpoint;
+    private HttpClientInterface $client;
+    private LoaderInterface $loader;
+    private LoggerInterface $logger;
+    private string $defaultLocale;
+    private string $endpoint;
 
     public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
     {

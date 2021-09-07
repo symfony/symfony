@@ -335,10 +335,8 @@ class ContextListenerTest extends TestCase
             $session->set('_security_session', $original);
         }
 
-        $tokenStorage = new UsageTrackingTokenStorage(new TokenStorage(), new class(['request_stack' => function () use ($requestStack) {
-            return $requestStack;
-        },
-        ]) implements ContainerInterface {
+        $factories = ['request_stack' => function () use ($requestStack) { return $requestStack; }];
+        $tokenStorage = new UsageTrackingTokenStorage(new TokenStorage(), new class($factories) implements ContainerInterface {
             use ServiceLocatorTrait;
         });
 
@@ -382,17 +380,9 @@ class ContextListenerTest extends TestCase
 
         $tokenStorage = new TokenStorage();
         $usageIndex = $session->getUsageIndex();
-        $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class(
-            (new \ReflectionClass(UsageTrackingTokenStorage::class))->hasMethod('getSession') ? [
-                'request_stack' => function () use ($requestStack) {
-                return $requestStack;
-            }] : [
-                // BC for symfony/framework-bundle < 5.3
-                'session' => function () use ($session) {
-                    return $session;
-                },
-            ]
-        ) implements ContainerInterface {
+
+        $factories = ['request_stack' => function () use ($requestStack) { return $requestStack; }];
+        $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class($factories) implements ContainerInterface {
             use ServiceLocatorTrait;
         });
         $sessionTrackerEnabler = [$tokenStorage, 'enableUsageTracking'];

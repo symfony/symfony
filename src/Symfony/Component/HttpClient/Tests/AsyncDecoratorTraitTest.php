@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\AsyncDecoratorTrait;
-use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\DecoratorTrait;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
@@ -32,7 +31,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         }
 
         if ('testTimeoutOnDestruct' === $testCase) {
-            return new CurlHttpClient();
+            return HttpClient::create();
         }
 
         $chunkFilter = $chunkFilter ?? static function (ChunkInterface $chunk, AsyncContext $context) { yield $chunk; };
@@ -58,10 +57,10 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
     public function testTimeoutOnDestruct()
     {
         if (HttpClient::create() instanceof NativeHttpClient) {
-            parent::testTimeoutOnDestruct();
-        } else {
-            HttpClientTestCase::testTimeoutOnDestruct();
+            $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
         }
+
+        HttpClientTestCase::testTimeoutOnDestruct();
     }
 
     public function testRetry404()

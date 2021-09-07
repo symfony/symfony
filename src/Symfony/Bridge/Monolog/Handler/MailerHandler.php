@@ -24,16 +24,15 @@ use Symfony\Component\Mime\Email;
  */
 class MailerHandler extends AbstractProcessingHandler
 {
-    private $mailer;
-
-    private $messageTemplate;
+    private MailerInterface $mailer;
+    private \Closure|Email $messageTemplate;
 
     public function __construct(MailerInterface $mailer, callable|Email $messageTemplate, string|int $level = Logger::DEBUG, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
 
         $this->mailer = $mailer;
-        $this->messageTemplate = $messageTemplate;
+        $this->messageTemplate = !\is_callable($messageTemplate) || $messageTemplate instanceof \Closure ? $messageTemplate : \Closure::fromCallable($messageTemplate);
     }
 
     /**
@@ -96,7 +95,7 @@ class MailerHandler extends AbstractProcessingHandler
         if ($this->messageTemplate instanceof Email) {
             $message = clone $this->messageTemplate;
         } elseif (\is_callable($this->messageTemplate)) {
-            $message = \call_user_func($this->messageTemplate, $content, $records);
+            $message = ($this->messageTemplate)($content, $records);
             if (!$message instanceof Email) {
                 throw new \InvalidArgumentException(sprintf('Could not resolve message from a callable. Instance of "%s" is expected.', Email::class));
             }

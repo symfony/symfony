@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
  */
 class ResetLoggersWorkerSubscriber implements EventSubscriberInterface
 {
-    private $loggers;
+    private iterable $loggers;
 
     public function __construct(iterable $loggers)
     {

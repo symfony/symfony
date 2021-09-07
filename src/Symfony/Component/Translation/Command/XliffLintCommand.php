@@ -84,12 +84,8 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $filenames = (array) $input->getArgument('filename');
-        $this->format = $input->getOption('format');
+        $this->format = $input->getOption('format') ?? (GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt');
         $this->displayCorrectFiles = $output->isVerbose();
-
-        if (null === $this->format) {
-            $this->format = GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt';
-        }
 
         if (['-'] === $filenames) {
             return $this->display($io, [$this->validate(file_get_contents('php://stdin'))]);

@@ -1786,14 +1786,10 @@ class Request
 
         if (!$this->isSecure()) {
             // see https://tools.ietf.org/html/rfc8674#section-3
-            $this->isSafeContentPreferred = false;
-
-            return $this->isSafeContentPreferred;
+            return $this->isSafeContentPreferred = false;
         }
 
-        $this->isSafeContentPreferred = AcceptHeader::fromString($this->headers->get('Prefer'))->has('safe');
-
-        return $this->isSafeContentPreferred;
+        return $this->isSafeContentPreferred = AcceptHeader::fromString($this->headers->get('Prefer'))->has('safe');
     }
 
     /*

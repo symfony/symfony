@@ -28,12 +28,12 @@ class ContainerAwareEventManager extends EventManager
      *
      * <event> => <listeners>
      */
-    private $listeners = [];
-    private $subscribers;
-    private $initialized = [];
-    private $initializedSubscribers = false;
-    private $methods = [];
-    private $container;
+    private array $listeners = [];
+    private array $subscribers;
+    private array $initialized = [];
+    private bool $initializedSubscribers = false;
+    private array $methods = [];
+    private ContainerInterface $container;
 
     /**
      * @param list<string|EventSubscriber|array{string[], string|object}> $subscriberIds List of subscribers, subscriber ids, or [events, listener] tuples

@@ -32,11 +32,11 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private $registry;
-    private $managerName;
-    private $classOrAlias;
-    private $class;
-    private $property;
+    private ManagerRegistry $registry;
+    private ?string $managerName;
+    private string $classOrAlias;
+    private string $class;
+    private ?string $property;
 
     public function __construct(ManagerRegistry $registry, string $classOrAlias, string $property = null, string $managerName = null)
     {
@@ -141,7 +141,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
 
     private function getClass(): string
     {
-        if (null === $this->class) {
+        if (!isset($this->class)) {
             $class = $this->classOrAlias;
 
             if (str_contains($class, ':')) {

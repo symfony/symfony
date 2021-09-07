@@ -68,6 +68,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $this->currentId, ServiceSubscriberInterface::class));
         }
         $class = $r->name;
+        // to remove when symfony/dependency-injection will stop being compatible with symfony/framework-bundle<6.0
         $replaceDeprecatedSession = $this->container->has('.session.deprecated') && $r->isSubclassOf(AbstractController::class);
         $subscriberMap = [];
 
@@ -89,7 +90,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 }
                 if ($replaceDeprecatedSession && SessionInterface::class === $type) {
                     // This prevents triggering the deprecation when building the container
-                    // Should be removed in Symfony 6.0
+                    // to remove when symfony/dependency-injection will stop being compatible with symfony/framework-bundle<6.0
                     $type = '.session.deprecated';
                 }
                 $serviceMap[$key] = new Reference($type);

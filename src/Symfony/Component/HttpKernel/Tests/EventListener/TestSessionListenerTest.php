@@ -46,9 +46,6 @@ class TestSessionListenerTest extends TestCase
     {
         $this->listener = $this->getMockForAbstractClass(AbstractTestSessionListener::class);
         $this->session = $this->getSession();
-        $this->listener->expects($this->any())
-             ->method('getSession')
-             ->willReturn($this->session);
     }
 
     public function testShouldSaveMainRequestSession()
@@ -99,7 +96,7 @@ class TestSessionListenerTest extends TestCase
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
-        $request->setSession($this->getSession());
+        $request->setSession($this->session);
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
 
@@ -119,7 +116,7 @@ class TestSessionListenerTest extends TestCase
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
-        $request->setSession($this->getSession());
+        $request->setSession($this->session);
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
 

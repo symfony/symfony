@@ -24,7 +24,7 @@ class TranslationProviderCollectionFactory
     private $enabledLocales;
 
     /**
-     * @param ProviderFactoryInterface[] $factories
+     * @param iterable<mixed, ProviderFactoryInterface> $factories
      */
     public function __construct(iterable $factories, array $enabledLocales)
     {

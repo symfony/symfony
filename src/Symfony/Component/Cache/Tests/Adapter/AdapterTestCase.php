@@ -227,7 +227,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $doSet('qux', 'qux-val', new \DateInterval('PT20S'));
 
         sleep(30);
-        $cache->prune();
+        $this->assertTrue($cache->prune());
         $this->assertTrue($this->isPruned($cache, 'foo'));
         $this->assertTrue($this->isPruned($cache, 'bar'));
         $this->assertTrue($this->isPruned($cache, 'baz'));
@@ -238,27 +238,27 @@ abstract class AdapterTestCase extends CachePoolTest
         $doSet('baz', 'baz-val', new \DateInterval('PT40S'));
         $doSet('qux', 'qux-val', new \DateInterval('PT80S'));
 
-        $cache->prune();
+        $this->assertTrue($cache->prune());
         $this->assertFalse($this->isPruned($cache, 'foo'));
         $this->assertFalse($this->isPruned($cache, 'bar'));
         $this->assertFalse($this->isPruned($cache, 'baz'));
         $this->assertFalse($this->isPruned($cache, 'qux'));
 
         sleep(30);
-        $cache->prune();
+        $this->assertTrue($cache->prune());
         $this->assertFalse($this->isPruned($cache, 'foo'));
         $this->assertTrue($this->isPruned($cache, 'bar'));
         $this->assertFalse($this->isPruned($cache, 'baz'));
         $this->assertFalse($this->isPruned($cache, 'qux'));
 
         sleep(30);
-        $cache->prune();
+        $this->assertTrue($cache->prune());
         $this->assertFalse($this->isPruned($cache, 'foo'));
         $this->assertTrue($this->isPruned($cache, 'baz'));
         $this->assertFalse($this->isPruned($cache, 'qux'));
 
         sleep(30);
-        $cache->prune();
+        $this->assertTrue($cache->prune());
         $this->assertFalse($this->isPruned($cache, 'foo'));
         $this->assertTrue($this->isPruned($cache, 'qux'));
     }

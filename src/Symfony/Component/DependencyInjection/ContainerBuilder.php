@@ -54,31 +54,35 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {
     /**
-     * @var ExtensionInterface[]
+     * @var array<string, ExtensionInterface>
      */
     private array $extensions = [];
 
     /**
-     * @var ExtensionInterface[]
+     * @var array<string, ExtensionInterface>
      */
     private array $extensionsByNs = [];
 
     /**
-     * @var Definition[]
+     * @var array<string, Definition>
      */
     private array $definitions = [];
 
     /**
-     * @var Alias[]
+     * @var array<string, Alias>
      */
     private array $aliasDefinitions = [];
 
     /**
-     * @var ResourceInterface[]
+     * @var array<string, ResourceInterface>
      */
     private array $resources = [];
 
+    /**
+     * @var array<string, array<array<string, mixed>>>
+     */
     private array $extensionConfigs = [];
+
     private Compiler $compiler;
     private bool $trackResources;
     private ?InstantiatorInterface $proxyInstantiator = null;
@@ -109,15 +113,24 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private array $vendors;
 
+    /**
+     * @var array<string, ChildDefinition>
+     */
     private array $autoconfiguredInstanceof = [];
 
     /**
-     * @var callable[]
+     * @var array<string, callable>
      */
     private array $autoconfiguredAttributes = [];
 
+    /**
+     * @var array<string, bool>
+     */
     private array $removedIds = [];
 
+    /**
+     * @var array<int, bool>
+     */
     private array $removedBindingIds = [];
 
     private const INTERNAL_TYPES = [
@@ -143,7 +156,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @var \ReflectionClass[] a list of class reflectors
+     * @var array<string, \ReflectionClass>
      */
     private array $classReflectors;
 
@@ -204,7 +217,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all registered extensions.
      *
-     * @return ExtensionInterface[]
+     * @return array<string, ExtensionInterface>
      */
     public function getExtensions(): array
     {
@@ -250,7 +263,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the resources for this configuration.
      *
-     * @param ResourceInterface[] $resources An array of resources
+     * @param array<string, ResourceInterface> $resources
      *
      * @return $this
      */
@@ -395,8 +408,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Loads the configuration for an extension.
      *
-     * @param string $extension The extension alias or namespace
-     * @param array  $values    An array of values that customizes the extension
+     * @param string                    $extension The extension alias or namespace
+     * @param array<string, mixed>|null $values    An array of values that customizes the extension
      *
      * @return $this
      *
@@ -409,13 +422,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException('Cannot load from an extension on a compiled container.');
         }
 
-        if (\func_num_args() < 2) {
-            $values = [];
-        }
-
         $namespace = $this->getExtension($extension)->getAlias();
 
-        $this->extensionConfigs[$namespace][] = $values;
+        $this->extensionConfigs[$namespace][] = $values ?? [];
 
         return $this;
     }
@@ -644,6 +653,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns the configuration array for the given extension.
+     *
+     * @return array<array<string, mixed>>
      */
     public function getExtensionConfig(string $name): array
     {
@@ -656,6 +667,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Prepends a config array to the configs of the given extension.
+     *
+     * @param array<string, mixed> $config
      */
     public function prependExtensionConfig(string $name, array $config)
     {
@@ -737,6 +750,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Gets removed service or alias ids.
+     *
+     * @return array<string, bool>
      */
     public function getRemovedIds(): array
     {
@@ -745,6 +760,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Adds the service aliases.
+     *
+     * @param array<string, string|Alias> $aliases
      */
     public function addAliases(array $aliases)
     {
@@ -755,6 +772,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets the service aliases.
+     *
+     * @param array<string, string|Alias> $aliases
      */
     public function setAliases(array $aliases)
     {
@@ -801,7 +820,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @return Alias[]
+     * @return array<string, Alias>
      */
     public function getAliases(): array
     {
@@ -845,7 +864,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Adds the service definitions.
      *
-     * @param Definition[] $definitions An array of service definitions
+     * @param array<string, Definition> $definitions
      */
     public function addDefinitions(array $definitions)
     {
@@ -857,7 +876,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service definitions.
      *
-     * @param Definition[] $definitions An array of service definitions
+     * @param array<string, Definition> $definitions
      */
     public function setDefinitions(array $definitions)
     {
@@ -868,7 +887,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets all service definitions.
      *
-     * @return Definition[]
+     * @return array<string, Definition>
      */
     public function getDefinitions(): array
     {
@@ -1165,7 +1184,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *         }
      *     }
      *
-     * @return array An array of tags with the tagged service as key, holding a list of attribute arrays
+     * @return array<string, array> An array of tags with the tagged service as key, holding a list of attribute arrays
      */
     public function findTaggedServiceIds(string $name, bool $throwOnAbstract = false): array
     {
@@ -1185,6 +1204,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Returns all tags the defined services use.
+     *
+     * @return string[]
      */
     public function findTags(): array
     {
@@ -1271,7 +1292,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns an array of ChildDefinition[] keyed by interface.
      *
-     * @return ChildDefinition[]
+     * @return array<string, ChildDefinition>
      */
     public function getAutoconfiguredInstanceof(): array
     {
@@ -1279,7 +1300,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * @return callable[]
+     * @return array<string, callable>
      */
     public function getAutoconfiguredAttributes(): array
     {
@@ -1419,6 +1440,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets removed binding ids.
      *
+     * @return array<int, bool>
+     *
      * @internal
      */
     public function getRemovedBindingIds(): array
@@ -1442,6 +1465,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * @return string[]
+     *
      * @internal
      */
     public static function getServiceConditionals(mixed $value): array
@@ -1460,6 +1485,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * @return string[]
+     *
      * @internal
      */
     public static function getInitializedConditionals(mixed $value): array

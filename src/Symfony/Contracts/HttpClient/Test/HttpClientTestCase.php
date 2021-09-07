@@ -835,6 +835,38 @@ abstract class HttpClientTestCase extends TestCase
         }
     }
 
+    public function testTimeoutOnDestruct()
+    {
+        $p1 = TestHttpServer::start(8067);
+        $p2 = TestHttpServer::start(8077);
+
+        $client = $this->getHttpClient(__FUNCTION__);
+        $start = microtime(true);
+        $responses = [];
+
+        $responses[] = $client->request('GET', 'http://localhost:8067/timeout-header', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:8077/timeout-header', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:8067/timeout-header', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:8077/timeout-header', ['timeout' => 0.25]);
+
+        try {
+            while ($response = array_shift($responses)) {
+                try {
+                    unset($response);
+                    $this->fail(TransportExceptionInterface::class.' expected');
+                } catch (TransportExceptionInterface $e) {
+                }
+            }
+
+            $duration = microtime(true) - $start;
+
+            $this->assertLessThan(1.0, $duration);
+        } finally {
+            $p1->stop();
+            $p2->stop();
+        }
+    }
+
     public function testDestruct()
     {
         $client = $this->getHttpClient(__FUNCTION__);

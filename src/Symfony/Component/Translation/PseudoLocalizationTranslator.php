@@ -25,6 +25,10 @@ final class PseudoLocalizationTranslator implements TranslatorInterface
     private $expansionFactor;
     private $brackets;
     private $parseHTML;
+
+    /**
+     * @var string[]
+     */
     private $localizableHTMLAttributes;
 
     /**

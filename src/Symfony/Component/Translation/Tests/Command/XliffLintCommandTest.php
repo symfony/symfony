@@ -167,6 +167,16 @@ EOF;
         }
     }
 
+    public function testPassingClosureAndCallableToConstructor()
+    {
+        $command = new XliffLintCommand('translation:xliff:lint',
+            \Closure::fromCallable([$this, 'testPassingClosureAndCallableToConstructor']),
+            [$this, 'testPassingClosureAndCallableToConstructor']
+        );
+
+        self::assertInstanceOf(XliffLintCommand::class, $command);
+    }
+
     private function createFile($sourceContent = 'note', $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.xlf'): string
     {
         $xliffContent = <<<XLIFF

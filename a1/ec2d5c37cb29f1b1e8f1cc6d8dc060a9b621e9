@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-21T08:06:34Z
+
+Hey!
+
+I think @welcoMattic has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-07-23T08:07:38Z
+
+maybe @Nyholm and @nicolas-grekas can review, as I saw them reviewing other PRs?
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-08-06T12:16:32Z
+
+@stof @derrabus thanks for your reviews. Resolved them, and added the related commits to your comments. Rebased on 6.0 to fix confict.
+
+Ready for review again. The fabbot check now is a false positive, as @stof mentioned in his review already.
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-08-06T13:36:16Z
+
+@derrabus as a result of [this recent change](https://github.com/symfony/symfony/commit/8ac2b2a05aeee7c70748c3662a0ac73938ae80b7#diff-aea87a7c5e373feb4fa038e9c8fe1ee760af30fe433b1d09cdb70194d8c48dd4R60) `getOption` would return `null` as default value for the XliffLintCommand's `format` option, resulting in failing tests as private `format` field became a strict string. Committed 13dbc35e8de67826ce5d63cb4972cea18a3af702 to fix that.
+
+Ready for review again 👍
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-06T13:49:07Z
+
+> Committed [13dbc35](https://github.com/symfony/symfony/commit/13dbc35e8de67826ce5d63cb4972cea18a3af702) to fix that.
+
+Excellent.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-06T13:50:58Z
+
+Have you checked the Psalm failures?
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-08-06T14:20:48Z
+
+> Have you checked the Psalm failures?
+
+@derrabus did now with fixes in 6a54b273631792be8a5067a5783af85870980525
+
+but, I'm not sure on how to fix the Psalm issues related to
+
+> [...] with declared type 'Symfony\Contracts\Translation\TranslatorInterface&Symfony\Component\Translation\TranslatorBagInterface&Symfony\Contracts\Translation\LocaleAwareInterface' cannot be assigned type 'Symfony\Component\Translation\TranslatorBagInterface&Symfony\Contracts\Translation\LocaleAwareInterface'
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-10T19:07:58Z
+
+@rvanlaak That looks like a false positive to me. Maybe we can fix that by adding the union type to the `@param` annotation of the two constructors as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-26T10:43:14Z
+
+(please squash also)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-07T14:56:05Z
+
+Backports: #42918

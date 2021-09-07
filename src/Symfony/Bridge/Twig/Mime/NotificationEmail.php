@@ -28,8 +28,8 @@ class NotificationEmail extends TemplatedEmail
     public const IMPORTANCE_MEDIUM = 'medium';
     public const IMPORTANCE_LOW = 'low';
 
-    private $theme = 'default';
-    private $context = [
+    private string $theme = 'default';
+    private array $context = [
         'importance' => self::IMPORTANCE_LOW,
         'content' => '',
         'exception' => false,

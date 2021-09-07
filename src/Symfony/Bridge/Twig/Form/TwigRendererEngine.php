@@ -21,15 +21,8 @@ use Twig\Template;
  */
 class TwigRendererEngine extends AbstractRendererEngine
 {
-    /**
-     * @var Environment
-     */
-    private $environment;
-
-    /**
-     * @var Template
-     */
-    private $template;
+    private Environment $environment;
+    private Template $template;
 
     public function __construct(array $defaultThemes, Environment $environment)
     {
@@ -146,17 +139,14 @@ class TwigRendererEngine extends AbstractRendererEngine
     protected function loadResourcesFromTheme(string $cacheKey, mixed &$theme)
     {
         if (!$theme instanceof Template) {
-            /* @var Template $theme */
             $theme = $this->environment->load($theme)->unwrap();
         }
 
-        if (null === $this->template) {
-            // Store the first Template instance that we find so that
-            // we can call displayBlock() later on. It doesn't matter *which*
-            // template we use for that, since we pass the used blocks manually
-            // anyway.
-            $this->template = $theme;
-        }
+        // Store the first Template instance that we find so that
+        // we can call displayBlock() later on. It doesn't matter *which*
+        // template we use for that, since we pass the used blocks manually
+        // anyway.
+        $this->template ??= $theme;
 
         // Use a separate variable for the inheritance traversal, because
         // theme is a reference and we don't want to change it.

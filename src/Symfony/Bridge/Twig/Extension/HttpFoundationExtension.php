@@ -23,7 +23,7 @@ use Twig\TwigFunction;
  */
 final class HttpFoundationExtension extends AbstractExtension
 {
-    private $urlHelper;
+    private UrlHelper $urlHelper;
 
     public function __construct(UrlHelper $urlHelper)
     {

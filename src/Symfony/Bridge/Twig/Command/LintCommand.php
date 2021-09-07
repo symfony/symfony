@@ -38,12 +38,8 @@ class LintCommand extends Command
     protected static $defaultName = 'lint:twig';
     protected static $defaultDescription = 'Lint a Twig template and outputs encountered errors';
 
-    private $twig;
-
-    /**
-     * @var string|null
-     */
-    private $format;
+    private Environment $twig;
+    private string $format;
 
     public function __construct(Environment $twig)
     {
@@ -86,11 +82,7 @@ EOF
         $io = new SymfonyStyle($input, $output);
         $filenames = $input->getArgument('filename');
         $showDeprecations = $input->getOption('show-deprecations');
-        $this->format = $input->getOption('format');
-
-        if (null === $this->format) {
-            $this->format = GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt';
-        }
+        $this->format = $input->getOption('format') ?? (GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt');
 
         if (['-'] === $filenames) {
             return $this->display($input, $output, $io, [$this->validate(file_get_contents('php://stdin'), uniqid('sf_', true))]);

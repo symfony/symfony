@@ -25,7 +25,7 @@ use Twig\TwigFunction;
  */
 final class WorkflowExtension extends AbstractExtension
 {
-    private $workflowRegistry;
+    private Registry $workflowRegistry;
 
     public function __construct(Registry $workflowRegistry)
     {

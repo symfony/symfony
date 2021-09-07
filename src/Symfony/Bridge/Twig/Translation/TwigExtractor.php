@@ -29,19 +29,15 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
 {
     /**
      * Default domain for found messages.
-     *
-     * @var string
      */
-    private $defaultDomain = 'messages';
+    private string $defaultDomain = 'messages';
 
     /**
      * Prefix for found message.
-     *
-     * @var string
      */
-    private $prefix = '';
+    private string $prefix = '';
 
-    private $twig;
+    private Environment $twig;
 
     public function __construct(Environment $twig)
     {

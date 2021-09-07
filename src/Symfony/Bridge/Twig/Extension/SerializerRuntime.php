@@ -19,7 +19,7 @@ use Twig\Extension\RuntimeExtensionInterface;
  */
 final class SerializerRuntime implements RuntimeExtensionInterface
 {
-    private $serializer;
+    private SerializerInterface $serializer;
 
     public function __construct(SerializerInterface $serializer)
     {

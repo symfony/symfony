@@ -34,8 +34,8 @@ class_exists(TranslatorTrait::class);
  */
 final class TranslationExtension extends AbstractExtension
 {
-    private $translator;
-    private $translationNodeVisitor;
+    private ?TranslatorInterface $translator;
+    private ?TranslationNodeVisitor $translationNodeVisitor;
 
     public function __construct(TranslatorInterface $translator = null, TranslationNodeVisitor $translationNodeVisitor = null)
     {

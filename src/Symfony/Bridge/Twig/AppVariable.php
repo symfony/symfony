@@ -25,10 +25,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class AppVariable
 {
-    private $tokenStorage;
-    private $requestStack;
-    private $environment;
-    private $debug;
+    private TokenStorageInterface $tokenStorage;
+    private RequestStack $requestStack;
+    private string $environment;
+    private bool $debug;
 
     public function setTokenStorage(TokenStorageInterface $tokenStorage)
     {
@@ -57,11 +57,11 @@ class AppVariable
      */
     public function getToken(): ?TokenInterface
     {
-        if (null === $tokenStorage = $this->tokenStorage) {
+        if (!isset($this->tokenStorage)) {
             throw new \RuntimeException('The "app.token" variable is not available.');
         }
 
-        return $tokenStorage->getToken();
+        return $this->tokenStorage->getToken();
     }
 
     /**
@@ -71,15 +71,11 @@ class AppVariable
      */
     public function getUser(): ?UserInterface
     {
-        if (null === $tokenStorage = $this->tokenStorage) {
+        if (!isset($this->tokenStorage)) {
             throw new \RuntimeException('The "app.user" variable is not available.');
         }
 
-        if (!$token = $tokenStorage->getToken()) {
-            return null;
-        }
-
-        return $token->getUser();
+        return $this->tokenStorage->getToken()?->getUser();
     }
 
     /**
@@ -87,7 +83,7 @@ class AppVariable
      */
     public function getRequest(): ?Request
     {
-        if (null === $this->requestStack) {
+        if (!isset($this->requestStack)) {
             throw new \RuntimeException('The "app.request" variable is not available.');
         }
 
@@ -99,7 +95,7 @@ class AppVariable
      */
     public function getSession(): ?Session
     {
-        if (null === $this->requestStack) {
+        if (!isset($this->requestStack)) {
             throw new \RuntimeException('The "app.session" variable is not available.');
         }
         $request = $this->getRequest();
@@ -112,7 +108,7 @@ class AppVariable
      */
     public function getEnvironment(): string
     {
-        if (null === $this->environment) {
+        if (!isset($this->environment)) {
             throw new \RuntimeException('The "app.environment" variable is not available.');
         }
 
@@ -124,7 +120,7 @@ class AppVariable
      */
     public function getDebug(): bool
     {
-        if (null === $this->debug) {
+        if (!isset($this->debug)) {
             throw new \RuntimeException('The "app.debug" variable is not available.');
         }
 

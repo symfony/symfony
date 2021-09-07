@@ -25,9 +25,8 @@ use Twig\TwigFunction;
  */
 final class SecurityExtension extends AbstractExtension
 {
-    private $securityChecker;
-
-    private $impersonateUrlGenerator;
+    private ?AuthorizationCheckerInterface $securityChecker;
+    private ?ImpersonateUrlGenerator $impersonateUrlGenerator;
 
     public function __construct(AuthorizationCheckerInterface $securityChecker = null, ImpersonateUrlGenerator $impersonateUrlGenerator = null)
     {

@@ -26,15 +26,31 @@ final class CommandIsSuccessfulTest extends TestCase
         $this->assertTrue($constraint->evaluate(Command::SUCCESS, '', true));
         $this->assertFalse($constraint->evaluate(Command::FAILURE, '', true));
         $this->assertFalse($constraint->evaluate(Command::INVALID, '', true));
+    }
+
+    /**
+     * @dataProvider providesUnsuccessful
+     */
+    public function testUnsuccessfulCommand(string $expectedException, int $exitCode)
+    {
+        $constraint = new CommandIsSuccessful();
 
         try {
-            $constraint->evaluate(Command::FAILURE);
+            $constraint->evaluate($exitCode);
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('Failed asserting that the command is successful.', TestFailure::exceptionToString($e));
+            $this->assertStringContainsString($expectedException, TestFailure::exceptionToString($e));
 
             return;
         }
 
         $this->fail();
+    }
+
+    public function providesUnsuccessful(): iterable
+    {
+        yield 'Failed' => ['Command failed.', Command::FAILURE];
+        yield 'Invalid' => ['Command was invalid.', Command::INVALID];
+        yield 'Exit code 3' => ['Command returned exit status 3.', 3];
     }
 }

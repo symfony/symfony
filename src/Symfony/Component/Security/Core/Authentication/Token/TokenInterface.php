@@ -16,8 +16,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * TokenInterface is the interface for the user authentication information.
  *
- * @method string getUserIdentifier() returns the user identifier used during authentication (e.g. a user's email address or username)
- *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -29,6 +27,11 @@ interface TokenInterface
      * This is only to be used for debugging purposes.
      */
     public function __toString(): string;
+
+    /**
+     * Returns the user identifier used during authentication (e.g. a user's email address or username).
+     */
+    public function getUserIdentifier(): string;
 
     /**
      * Returns the user roles.

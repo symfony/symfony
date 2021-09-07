@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouteCollectionBuilder;
 
 /**
  * A Kernel that provides configuration hooks.
@@ -28,7 +27,6 @@ use Symfony\Component\Routing\RouteCollectionBuilder;
  * @author Ryan Weaver <ryan@knpuniversity.com>
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @method void configureRoutes(RoutingConfigurator $routes)
  * @method void configureContainer(ContainerConfigurator $container)
  */
 trait MicroKernelTrait
@@ -42,7 +40,7 @@ trait MicroKernelTrait
      *         ->controller('App\Controller\AdminController::dashboard')
      *     ;
      */
-    //abstract protected function configureRoutes(RoutingConfigurator $routes): void;
+    abstract protected function configureRoutes(RoutingConfigurator $routes): void;
 
     /**
      * Configures the container.
@@ -173,23 +171,6 @@ trait MicroKernelTrait
         $kernelLoader = $loader->getResolver()->resolve($file, 'php');
         $kernelLoader->setCurrentDir(\dirname($file));
         $collection = new RouteCollection();
-
-        try {
-            $configureRoutes = new \ReflectionMethod($this, 'configureRoutes');
-        } catch (\ReflectionException $e) {
-            throw new \LogicException(sprintf('"%s" uses "%s", but does not implement the required method "protected function configureRoutes(RoutingConfigurator $routes): void".', get_debug_type($this), MicroKernelTrait::class), 0, $e);
-        }
-
-        $configuratorClass = $configureRoutes->getNumberOfParameters() > 0 && ($type = $configureRoutes->getParameters()[0]->getType()) instanceof \ReflectionNamedType && !$type->isBuiltin() ? $type->getName() : null;
-
-        if ($configuratorClass && !is_a(RoutingConfigurator::class, $configuratorClass, true)) {
-            trigger_deprecation('symfony/framework-bundle', '5.1', 'Using type "%s" for argument 1 of method "%s:configureRoutes()" is deprecated, use "%s" instead.', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class);
-
-            $routes = new RouteCollectionBuilder($loader);
-            $this->configureRoutes($routes);
-
-            return $routes->build();
-        }
 
         $this->configureRoutes(new RoutingConfigurator($collection, $kernelLoader, $file, $file, $this->getEnvironment()));
 

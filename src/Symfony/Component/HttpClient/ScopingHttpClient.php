@@ -121,7 +121,7 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
     /**
      * {@inheritdoc}
      */
-    public function withOptions(array $options): self
+    public function withOptions(array $options): static
     {
         $clone = clone $this;
         $clone->client = $this->client->withOptions($options);

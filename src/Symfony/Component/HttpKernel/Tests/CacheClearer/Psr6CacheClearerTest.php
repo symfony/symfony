@@ -32,9 +32,11 @@ class Psr6CacheClearerTest extends TestCase
         $pool = $this->createMock(CacheItemPoolInterface::class);
         $pool
             ->expects($this->once())
-            ->method('clear');
+            ->method('clear')
+            ->willReturn(true)
+        ;
 
-        (new Psr6CacheClearer(['pool' => $pool]))->clearPool('pool');
+        $this->assertTrue((new Psr6CacheClearer(['pool' => $pool]))->clearPool('pool'));
     }
 
     public function testClearPoolThrowsExceptionOnUnreferencedPool()

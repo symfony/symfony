@@ -19,6 +19,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Statement;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -208,6 +209,13 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             $delete->bindValue(':namespace', sprintf('%s%%', $this->namespace), $useDbalConstants ? ParameterType::STRING : \PDO::PARAM_STR);
         }
         try {
+            // Doctrine DBAL ^2.13 || >= 3.1
+            if ($delete instanceof Statement && method_exists($delete, 'executeStatement')) {
+                $delete->executeStatement();
+
+                return true;
+            }
+
             return $delete->execute();
         } catch (TableNotFoundException $e) {
             return true;

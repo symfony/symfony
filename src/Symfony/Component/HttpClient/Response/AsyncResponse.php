@@ -57,13 +57,13 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         }
         $this->response = $client->request($method, $url, ['buffer' => false] + $options);
         $this->passthru = $passthru;
-        $this->initializer = static function (self $response) {
+        $this->initializer = static function (self $response, float $timeout = null) {
             if (null === $response->shouldBuffer) {
                 return false;
             }
 
             while (true) {
-                foreach (self::stream([$response]) as $chunk) {
+                foreach (self::stream([$response], $timeout) as $chunk) {
                     if ($chunk->isTimeout() && $response->passthru) {
                         foreach (self::passthru($response->client, $response, new ErrorChunk($response->offset, new TransportException($chunk->getError()))) as $chunk) {
                             if ($chunk->isFirst()) {
@@ -179,6 +179,7 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
 
         if ($this->initializer && null === $this->getInfo('error')) {
             try {
+                self::initialize($this, -0.0);
                 $this->getHeaders(true);
             } catch (HttpExceptionInterface $httpException) {
                 // no-op

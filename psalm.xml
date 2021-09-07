@@ -17,4 +17,13 @@
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <!-- Class has been added in PHP 8.1 -->
+                <referencedClass name="ReflectionIntersectionType"/>
+            </errorLevel>
+        </UndefinedClass>
+    </issueHandlers>
 </psalm>

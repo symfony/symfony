@@ -121,7 +121,12 @@ class SendgridApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['headers'][$name] = $header->getBodyAsString();
+            if ('mail_settings' === $name) {
+                // https://docs.sendgrid.com/ui/sending-email/index-suppressions#bypass-filters-and-v3-mail-send
+                $payload['mail_settings'] = json_decode($header->getBodyAsString(), true);
+            } else {
+                $payload['headers'][$name] = $header->getBodyAsString();
+            }
         }
 
         return $payload;

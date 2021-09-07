@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-27T20:29:36Z
+
+@nicolas-grekas Have you made up your mind yet?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-28T04:59:21Z
+
+Nope. Maybe @dunglas has? Otherwise can you make a proposal? I'm AFK right now 😅
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-28T10:50:25Z
+
+My proposal is this PR. Our current strategy of returning an array of types does not really work well anymore if we want to distinguish union from intersection types. I think, we can find a better representation for 5.4, but for 4.4, I just want PropertyInfo to not fall apart if we encounter an intersection.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-26T06:20:29Z
+
+This should probably be for 5.4 instead.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-26T13:04:32Z
+
+> This should probably be for 5.4 instead.
+
+I tend to disagree here. The component would currently throw cryptic errors if presented with an intersection type. We can certainly argue about _what_ it should do instead, but I don't think we should leave it as is in 4.4.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-26T13:13:48Z
+
+i think a list of types fits our semantic generally;
+https://github.com/symfony/symfony/blob/2bf839d65c38fa407e0d43766d4cc1151580245b/src/Symfony/Component/PropertyInfo/PropertyTypeExtractorInterface.php#L22
+
+can we think of something that would conflict in practice?
+
+ref #37971 also :) i agree about the compat issue.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-26T13:34:16Z
+
+ok, fair enough.

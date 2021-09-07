@@ -6,6 +6,7 @@ CHANGELOG
 
  * Deprecate calling `FormErrorIterator::children()` if the current element is not iterable.
  * Allow to pass `TranslatableMessage` objects to the `help` option
+ * Add `hash_mapping` option to `PasswordType`
 
 5.3
 ---

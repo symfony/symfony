@@ -17,6 +17,7 @@ use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -31,12 +32,14 @@ class CoreExtension extends AbstractExtension
     private $propertyAccessor;
     private $choiceListFactory;
     private $translator;
+    private $passwordHasher;
 
-    public function __construct(PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null, TranslatorInterface $translator = null)
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null, TranslatorInterface $translator = null, UserPasswordHasherInterface $passwordHasher = null)
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->choiceListFactory = $choiceListFactory ?? new CachingFactoryDecorator(new PropertyAccessDecorator(new DefaultChoiceListFactory(), $this->propertyAccessor));
         $this->translator = $translator;
+        $this->passwordHasher = $passwordHasher;
     }
 
     protected function loadTypes()
@@ -58,7 +61,7 @@ class CoreExtension extends AbstractExtension
             new Type\LocaleType(),
             new Type\MoneyType(),
             new Type\NumberType(),
-            new Type\PasswordType(),
+            new Type\PasswordType($this->passwordHasher, $this->propertyAccessor),
             new Type\PercentType(),
             new Type\RadioType(),
             new Type\RangeType(),

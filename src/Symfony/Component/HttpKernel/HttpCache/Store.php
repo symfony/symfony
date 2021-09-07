@@ -26,6 +26,10 @@ class Store implements StoreInterface
 {
     protected $root;
     private \SplObjectStorage $keyCache;
+
+    /**
+     * @var array<string, resource>
+     */
     private array $locks = [];
 
     /**

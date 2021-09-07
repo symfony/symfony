@@ -32,14 +32,14 @@ class WebProfilerBundleKernel extends Kernel
         ];
     }
 
-    protected function configureRoutes(RoutingConfigurator $routes)
+    protected function configureRoutes(RoutingConfigurator $routes): void
     {
         $routes->import(__DIR__.'/../../Resources/config/routing/profiler.xml')->prefix('/_profiler');
         $routes->import(__DIR__.'/../../Resources/config/routing/wdt.xml')->prefix('/_wdt');
         $routes->add('_', '/')->controller('kernel::homepageController');
     }
 
-    protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader)
+    protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader): void
     {
         $containerBuilder->loadFromExtension('framework', [
             'secret' => 'foo-secret',

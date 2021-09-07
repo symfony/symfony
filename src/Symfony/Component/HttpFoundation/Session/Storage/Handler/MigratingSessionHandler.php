@@ -25,12 +25,12 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
     /**
      * @var \SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface
      */
-    private $currentHandler;
+    private \SessionHandlerInterface $currentHandler;
 
     /**
      * @var \SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface
      */
-    private $writeOnlyHandler;
+    private \SessionHandlerInterface $writeOnlyHandler;
 
     public function __construct(\SessionHandlerInterface $currentHandler, \SessionHandlerInterface $writeOnlyHandler)
     {

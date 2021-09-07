@@ -22,10 +22,10 @@ class_exists(NativeSessionStorage::class);
  */
 class NativeSessionStorageFactory implements SessionStorageFactoryInterface
 {
-    private $options;
-    private $handler;
-    private $metaBag;
-    private $secure;
+    private array $options;
+    private AbstractProxy|\SessionHandlerInterface|null $handler;
+    private ?MetadataBag $metaBag;
+    private bool $secure;
 
     /**
      * @see NativeSessionStorage constructor.

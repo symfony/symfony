@@ -18,40 +18,29 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RequestMatcher implements RequestMatcherInterface
 {
-    /**
-     * @var string|null
-     */
-    private $path;
-
-    /**
-     * @var string|null
-     */
-    private $host;
-
-    /**
-     * @var int|null
-     */
-    private $port;
+    private ?string $path = null;
+    private ?string $host = null;
+    private ?int $port = null;
 
     /**
      * @var string[]
      */
-    private $methods = [];
+    private array $methods = [];
 
     /**
      * @var string[]
      */
-    private $ips = [];
-
-    /**
-     * @var array
-     */
-    private $attributes = [];
+    private array $ips = [];
 
     /**
      * @var string[]
      */
-    private $schemes = [];
+    private array $attributes = [];
+
+    /**
+     * @var string[]
+     */
+    private array $schemes = [];
 
     /**
      * @param string|string[]|null $methods

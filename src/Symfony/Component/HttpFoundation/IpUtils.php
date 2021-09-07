@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpFoundation;
  */
 class IpUtils
 {
-    private static $checkedIps = [];
+    private static array $checkedIps = [];
 
     /**
      * This class should not be instantiated.

@@ -67,103 +67,61 @@ class PdoSessionHandler extends AbstractSessionHandler
 
     private const MAX_LIFETIME = 315576000;
 
-    /**
-     * @var \PDO|null PDO instance or null when not connected yet
-     */
-    private $pdo;
+    private \PDO $pdo;
 
     /**
      * DSN string or null for session.save_path or false when lazy connection disabled.
-     *
-     * @var string|false|null
      */
-    private $dsn = false;
+    private string|false|null $dsn = false;
 
-    /**
-     * @var string|null
-     */
-    private $driver;
-
-    /**
-     * @var string
-     */
-    private $table = 'sessions';
-
-    /**
-     * @var string
-     */
-    private $idCol = 'sess_id';
-
-    /**
-     * @var string
-     */
-    private $dataCol = 'sess_data';
-
-    /**
-     * @var string
-     */
-    private $lifetimeCol = 'sess_lifetime';
-
-    /**
-     * @var string
-     */
-    private $timeCol = 'sess_time';
+    private string $driver;
+    private string $table = 'sessions';
+    private string $idCol = 'sess_id';
+    private string $dataCol = 'sess_data';
+    private string $lifetimeCol = 'sess_lifetime';
+    private string $timeCol = 'sess_time';
 
     /**
      * Username when lazy-connect.
-     *
-     * @var string
      */
-    private $username = '';
+    private string $username = '';
 
     /**
      * Password when lazy-connect.
-     *
-     * @var string
      */
-    private $password = '';
+    private string $password = '';
 
     /**
      * Connection options when lazy-connect.
-     *
-     * @var array
      */
-    private $connectionOptions = [];
+    private array $connectionOptions = [];
 
     /**
      * The strategy for locking, see constants.
-     *
-     * @var int
      */
-    private $lockMode = self::LOCK_TRANSACTIONAL;
+    private int $lockMode = self::LOCK_TRANSACTIONAL;
 
     /**
      * It's an array to support multiple reads before closing which is manual, non-standard usage.
      *
      * @var \PDOStatement[] An array of statements to release advisory locks
      */
-    private $unlockStatements = [];
+    private array $unlockStatements = [];
 
     /**
      * True when the current session exists but expired according to session.gc_maxlifetime.
-     *
-     * @var bool
      */
-    private $sessionExpired = false;
+    private bool $sessionExpired = false;
 
     /**
      * Whether a transaction is active.
-     *
-     * @var bool
      */
-    private $inTransaction = false;
+    private bool $inTransaction = false;
 
     /**
      * Whether gc() has been called.
-     *
-     * @var bool
      */
-    private $gcCalled = false;
+    private bool $gcCalled = false;
 
     /**
      * You can either pass an existing database connection as PDO instance or
@@ -277,7 +235,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     {
         $this->sessionExpired = false;
 
-        if (null === $this->pdo) {
+        if (!isset($this->pdo)) {
             $this->connect($this->dsn ?: $savePath);
         }
 
@@ -412,8 +370,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         }
 
         if (false !== $this->dsn) {
-            $this->pdo = null; // only close lazy-connection
-            $this->driver = null;
+            unset($this->pdo, $this->driver); // only close lazy-connection
         }
 
         return true;
@@ -897,7 +854,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      */
     protected function getConnection(): \PDO
     {
-        if (null === $this->pdo) {
+        if (!isset($this->pdo)) {
             $this->connect($this->dsn ?: ini_get('session.save_path'));
         }
 

@@ -26,15 +26,8 @@ class MetadataBag implements SessionBagInterface
     public const UPDATED = 'u';
     public const LIFETIME = 'l';
 
-    /**
-     * @var string
-     */
-    private $name = '__metadata';
-
-    /**
-     * @var string
-     */
-    private $storageKey;
+    private string $name = '__metadata';
+    private string $storageKey;
 
     /**
      * @var array
@@ -43,15 +36,10 @@ class MetadataBag implements SessionBagInterface
 
     /**
      * Unix timestamp.
-     *
-     * @var int
      */
-    private $lastUsed;
+    private int $lastUsed;
 
-    /**
-     * @var int
-     */
-    private $updateThreshold;
+    private int $updateThreshold;
 
     /**
      * @param string $storageKey      The key used to store bag in the session

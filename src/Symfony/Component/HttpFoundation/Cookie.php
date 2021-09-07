@@ -30,9 +30,9 @@ class Cookie
     protected $secure;
     protected $httpOnly;
 
-    private $raw;
-    private $sameSite;
-    private $secureDefault = false;
+    private bool $raw;
+    private ?string $sameSite = null;
+    private bool $secureDefault = false;
 
     private const RESERVED_CHARS_LIST = "=,; \t\r\n\v\f";
     private const RESERVED_CHARS_FROM = ['=', ',', ';', ' ', "\t", "\r", "\n", "\v", "\f"];

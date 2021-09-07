@@ -28,7 +28,7 @@ class StreamedResponse extends Response
 {
     protected $callback;
     protected $streamed;
-    private $headersSent;
+    private bool $headersSent;
 
     public function __construct(callable $callback = null, int $status = 200, array $headers = [])
     {

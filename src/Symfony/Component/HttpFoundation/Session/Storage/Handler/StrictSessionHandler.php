@@ -18,8 +18,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class StrictSessionHandler extends AbstractSessionHandler
 {
-    private $handler;
-    private $doDestroy;
+    private \SessionHandlerInterface $handler;
+    private bool $doDestroy;
 
     public function __construct(\SessionHandlerInterface $handler)
     {

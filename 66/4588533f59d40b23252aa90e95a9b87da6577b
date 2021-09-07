@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-06T09:53:11Z
+
+Merge conflicts with 5.3 should be solved using #42894
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-09-07T05:53:31Z
+
+Hey!
+
+I think @Toflar has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot

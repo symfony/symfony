@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-5.4.0
------
+5.4
+---
 
-* Add `Path` class
-
+ * Add `Path` class
 
 5.0.0
 -----

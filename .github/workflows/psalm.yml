@@ -52,5 +52,4 @@ jobs:
 
       - name: Psalm
         run: |
-          ./vendor/bin/psalm.phar --no-progress
-          ./vendor/bin/psalm.phar --output-format=github --no-progress
+          ./vendor/bin/psalm.phar --no-progress || ./vendor/bin/psalm.phar --output-format=github --no-progress

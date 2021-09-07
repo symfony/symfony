@@ -708,6 +708,16 @@ index eda4730004..00cfc5b9c7 100644
 +    public function loadTokenBySeries(string $series): PersistentTokenInterface;
  
      /**
+diff --git a/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php b/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
+index 7e401c3ff3..6b446ff376 100644
+--- a/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
++++ b/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
+@@ -36,4 +36,4 @@ interface VoterInterface
+      * @return int either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED
+      */
+-    public function vote(TokenInterface $token, mixed $subject, array $attributes);
++    public function vote(TokenInterface $token, mixed $subject, array $attributes): int;
+ }
 diff --git a/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php b/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php
 index 606c812fad..040c641bd7 100644
 --- a/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php

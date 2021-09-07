@@ -32,8 +32,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 abstract class AbstractTestSessionListener implements EventSubscriberInterface
 {
-    private $sessionId;
-    private $sessionOptions;
+    private ?string $sessionId = null;
+    private array $sessionOptions;
 
     public function __construct(array $sessionOptions = [])
     {

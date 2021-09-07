@@ -26,16 +26,16 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class Profiler implements ResetInterface
 {
-    private $storage;
+    private ProfilerStorageInterface $storage;
 
     /**
      * @var DataCollectorInterface[]
      */
-    private $collectors = [];
+    private array $collectors = [];
 
-    private $logger;
-    private $initiallyEnabled = true;
-    private $enabled = true;
+    private ?LoggerInterface $logger;
+    private bool $initiallyEnabled = true;
+    private bool $enabled = true;
 
     public function __construct(ProfilerStorageInterface $storage, LoggerInterface $logger = null, bool $enable = true)
     {

@@ -20,10 +20,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
 {
     /**
      * Folder where profiler data are stored.
-     *
-     * @var string
      */
-    private $folder;
+    private string $folder;
 
     /**
      * Constructs the file storage using a "dsn-like" path.

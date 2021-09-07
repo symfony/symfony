@@ -68,15 +68,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     protected $booted = false;
     protected $startTime;
 
-    private $projectDir;
-    private $warmupDir;
-    private $requestStackSize = 0;
-    private $resetServices = false;
+    private string $projectDir;
+    private ?string $warmupDir = null;
+    private int $requestStackSize = 0;
+    private bool $resetServices = false;
 
     /**
      * @var array<string, bool>
      */
-    private static $freshCache = [];
+    private static array $freshCache = [];
 
     public const VERSION = '6.0.0-DEV';
     public const VERSION_ID = 60000;
@@ -281,7 +281,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function getProjectDir(): string
     {
-        if (null === $this->projectDir) {
+        if (!isset($this->projectDir)) {
             $r = new \ReflectionObject($this);
 
             if (!is_file($dir = $r->getFileName())) {

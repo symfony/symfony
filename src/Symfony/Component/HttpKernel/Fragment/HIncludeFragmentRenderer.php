@@ -24,10 +24,10 @@ use Twig\Environment;
  */
 class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 {
-    private $globalDefaultTemplate;
-    private $signer;
-    private $twig;
-    private $charset;
+    private ?string $globalDefaultTemplate;
+    private ?UriSigner $signer;
+    private ?Environment $twig;
+    private string $charset;
 
     /**
      * @param string $globalDefaultTemplate The global default content (it can be a template name or the content)

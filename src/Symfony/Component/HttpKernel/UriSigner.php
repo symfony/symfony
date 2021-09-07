@@ -20,8 +20,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class UriSigner
 {
-    private $secret;
-    private $parameter;
+    private string $secret;
+    private string $parameter;
 
     /**
      * @param string $secret    A secret

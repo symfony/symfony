@@ -29,9 +29,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class FragmentHandler
 {
-    private $debug;
-    private $renderers = [];
-    private $requestStack;
+    private bool $debug;
+    private array $renderers = [];
+    private RequestStack $requestStack;
 
     /**
      * @param FragmentRendererInterface[] $renderers An array of FragmentRendererInterface instances

@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class ResponseListener implements EventSubscriberInterface
 {
-    private $charset;
+    private string $charset;
 
     public function __construct(string $charset)
     {

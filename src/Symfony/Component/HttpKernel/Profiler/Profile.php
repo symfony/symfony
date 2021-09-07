@@ -20,28 +20,24 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  */
 class Profile
 {
-    private $token;
+    private string $token;
 
     /**
      * @var DataCollectorInterface[]
      */
-    private $collectors = [];
+    private array $collectors = [];
 
-    private $ip;
-    private $method;
-    private $url;
-    private $time;
-    private $statusCode;
-
-    /**
-     * @var Profile
-     */
-    private $parent;
+    private ?string $ip = null;
+    private ?string $method = null;
+    private ?string $url = null;
+    private ?int $time = null;
+    private ?int $statusCode = null;
+    private ?self $parent = null;
 
     /**
      * @var Profile[]
      */
-    private $children = [];
+    private array $children = [];
 
     public function __construct(string $token)
     {

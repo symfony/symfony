@@ -31,9 +31,9 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class RequestDataCollector extends DataCollector implements EventSubscriberInterface, LateDataCollectorInterface
 {
-    private $controllers;
-    private $sessionUsages = [];
-    private $requestStack;
+    private \SplObjectStorage $controllers;
+    private array $sessionUsages = [];
+    private ?RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack = null)
     {

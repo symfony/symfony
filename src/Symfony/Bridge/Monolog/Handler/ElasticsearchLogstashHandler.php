@@ -44,10 +44,10 @@ class ElasticsearchLogstashHandler extends AbstractHandler
     use FormattableHandlerTrait;
     use ProcessableHandlerTrait;
 
-    private $endpoint;
-    private $index;
-    private $client;
-    private $responses;
+    private string $endpoint;
+    private string $index;
+    private HttpClientInterface $client;
+    private \SplObjectStorage $responses;
 
     public function __construct(string $endpoint = 'http://127.0.0.1:9200', string $index = 'monolog', HttpClientInterface $client = null, string|int $level = Logger::DEBUG, bool $bubble = true)
     {

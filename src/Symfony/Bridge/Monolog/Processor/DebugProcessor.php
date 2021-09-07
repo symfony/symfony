@@ -19,9 +19,9 @@ use Symfony\Contracts\Service\ResetInterface;
 
 class DebugProcessor implements DebugLoggerInterface, ResetInterface
 {
-    private $records = [];
-    private $errorCount = [];
-    private $requestStack;
+    private array $records = [];
+    private array $errorCount = [];
+    private ?RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack = null)
     {

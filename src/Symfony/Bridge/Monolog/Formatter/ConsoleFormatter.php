@@ -41,10 +41,15 @@ class ConsoleFormatter implements FormatterInterface
         Logger::EMERGENCY => 'fg=white;bg=red',
     ];
 
-    private $options;
-    private $cloner;
+    private array $options;
+    private VarCloner $cloner;
+
+    /**
+     * @var resource|null
+     */
     private $outputBuffer;
-    private $dumper;
+
+    private CliDumper $dumper;
 
     /**
      * Available options:
@@ -180,7 +185,7 @@ class ConsoleFormatter implements FormatterInterface
 
     private function dumpData(mixed $data, bool $colors = null): string
     {
-        if (null === $this->dumper) {
+        if (!isset($this->dumper)) {
             return '';
         }
 

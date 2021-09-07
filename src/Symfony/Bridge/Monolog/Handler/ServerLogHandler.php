@@ -50,8 +50,16 @@ if (trait_exists(FormattableHandlerTrait::class)) {
  */
 trait ServerLogHandlerTrait
 {
-    private $host;
+    private string $host;
+
+    /**
+     * @var resource
+     */
     private $context;
+
+    /**
+     * @var resource|null
+     */
     private $socket;
 
     public function __construct(string $host, string|int $level = Logger::DEBUG, bool $bubble = true, array $context = [])

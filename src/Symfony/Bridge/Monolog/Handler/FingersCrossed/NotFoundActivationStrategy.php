@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 final class NotFoundActivationStrategy implements ActivationStrategyInterface
 {
-    private $exclude;
+    private string $exclude;
 
     public function __construct(
         private RequestStack $requestStack,

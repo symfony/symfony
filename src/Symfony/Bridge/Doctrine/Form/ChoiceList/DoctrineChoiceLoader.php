@@ -21,10 +21,10 @@ use Symfony\Component\Form\ChoiceList\Loader\AbstractChoiceLoader;
  */
 class DoctrineChoiceLoader extends AbstractChoiceLoader
 {
-    private $manager;
-    private $class;
-    private $idReader;
-    private $objectLoader;
+    private ObjectManager $manager;
+    private string $class;
+    private ?IdReader $idReader;
+    private ?EntityLoaderInterface $objectLoader;
 
     /**
      * Creates a new choice loader.

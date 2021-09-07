@@ -23,10 +23,10 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
  */
 final class PdoCacheAdapterDoctrineSchemaSubscriber implements EventSubscriber
 {
-    private $pdoAdapters;
+    private iterable $pdoAdapters;
 
     /**
-     * @param iterable|PdoAdapter[] $pdoAdapters
+     * @param iterable<mixed, PdoAdapter> $pdoAdapters
      */
     public function __construct(iterable $pdoAdapters)
     {

@@ -43,7 +43,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  */
 class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInterface
 {
-    private $conn;
+    private Connection $conn;
 
     public function __construct(Connection $conn)
     {

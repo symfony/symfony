@@ -28,14 +28,14 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class DoctrineDataCollector extends DataCollector
 {
-    private $registry;
-    private $connections;
-    private $managers;
+    private ManagerRegistry $registry;
+    private array $connections;
+    private array $managers;
 
     /**
-     * @var DebugStack[]
+     * @var array<string, DebugStack>
      */
-    private $loggers = [];
+    private array $loggers = [];
 
     public function __construct(ManagerRegistry $registry)
     {

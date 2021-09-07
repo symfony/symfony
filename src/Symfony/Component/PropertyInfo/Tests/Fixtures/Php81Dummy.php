@@ -8,4 +8,8 @@ class Php81Dummy
     {
         throw new \Exception('Oops');
     }
+
+    public function getCollection(): \Traversable&\Countable
+    {
+    }
 }

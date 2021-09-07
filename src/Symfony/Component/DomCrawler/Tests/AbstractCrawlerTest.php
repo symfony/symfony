@@ -12,7 +12,6 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Image;
@@ -20,8 +19,6 @@ use Symfony\Component\DomCrawler\Link;
 
 abstract class AbstractCrawlerTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     abstract public function getDoctype(): string;
 
     protected function createCrawler($node = null, string $uri = null, string $baseHref = null)

@@ -130,29 +130,6 @@ class Type
     }
 
     /**
-     * Gets collection key type.
-     *
-     * Only applicable for a collection type.
-     *
-     * @deprecated since Symfony 5.3, use "getCollectionKeyTypes()" instead
-     */
-    public function getCollectionKeyType(): ?self
-    {
-        trigger_deprecation('symfony/property-info', '5.3', 'The "%s()" method is deprecated, use "getCollectionKeyTypes()" instead.', __METHOD__);
-
-        $type = $this->getCollectionKeyTypes();
-        if (0 === \count($type)) {
-            return null;
-        }
-
-        if (\is_array($type)) {
-            [$type] = $type;
-        }
-
-        return $type;
-    }
-
-    /**
      * Gets collection key types.
      *
      * Only applicable for a collection type.
@@ -162,20 +139,6 @@ class Type
     public function getCollectionKeyTypes(): array
     {
         return $this->collectionKeyType;
-    }
-
-    /**
-     * Gets collection value type.
-     *
-     * Only applicable for a collection type.
-     *
-     * @deprecated since Symfony 5.3, use "getCollectionValueTypes()" instead
-     */
-    public function getCollectionValueType(): ?self
-    {
-        trigger_deprecation('symfony/property-info', '5.3', 'The "%s()" method is deprecated, use "getCollectionValueTypes()" instead.', __METHOD__);
-
-        return $this->getCollectionValueTypes()[0] ?? null;
     }
 
     /**

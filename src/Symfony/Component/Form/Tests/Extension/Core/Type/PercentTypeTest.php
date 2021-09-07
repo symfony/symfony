@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class PercentTypeTest extends TypeTestCase
 {
-    use ExpectDeprecationTrait;
-
     public const TESTED_TYPE = PercentType::class;
 
     private $defaultLocale;

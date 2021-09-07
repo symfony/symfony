@@ -386,7 +386,6 @@ class ConfigurationTest extends TestCase
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
                 ],
-                'legacy_error_messages' => true,
             ],
             'esi' => ['enabled' => false],
             'ssi' => ['enabled' => false],
@@ -398,7 +397,6 @@ class ConfigurationTest extends TestCase
             'profiler' => [
                 'enabled' => false,
                 'only_exceptions' => false,
-                'only_master_requests' => false,
                 'only_main_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
@@ -464,7 +462,7 @@ class ConfigurationTest extends TestCase
                 'http_port' => 80,
                 'https_port' => 443,
                 'strict_requirements' => true,
-                'utf8' => null,
+                'utf8' => true,
             ],
             'session' => [
                 'enabled' => false,

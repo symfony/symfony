@@ -12,14 +12,11 @@
 namespace Symfony\Component\HttpKernel\Tests\ControllerMetadata;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
 
 class ArgumentMetadataTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testWithBcLayerWithDefault()
     {
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value');

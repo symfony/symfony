@@ -33,13 +33,6 @@ abstract class KernelTestCase extends TestCase
      */
     protected static $kernel;
 
-    /**
-     * @var ContainerInterface
-     *
-     * @deprecated since Symfony 5.3, use static::getContainer() instead
-     */
-    protected static $container;
-
     protected static $booted = false;
 
     private static $kernelContainer;
@@ -79,8 +72,7 @@ abstract class KernelTestCase extends TestCase
         static::$kernel->boot();
         static::$booted = true;
 
-        self::$kernelContainer = $container = static::$kernel->getContainer();
-        static::$container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
+        self::$kernelContainer = static::$kernel->getContainer();
 
         return static::$kernel;
     }
@@ -157,6 +149,6 @@ abstract class KernelTestCase extends TestCase
             self::$kernelContainer->reset();
         }
 
-        static::$container = self::$kernelContainer = null;
+        self::$kernelContainer = null;
     }
 }

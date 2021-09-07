@@ -32,7 +32,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -102,32 +101,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'message_bus' => '?'.MessageBusInterface::class, // to be removed in 6.0
             'messenger.default_bus' => '?'.MessageBusInterface::class, // to be removed in 6.0
         ];
-    }
-
-    /**
-     * Returns true if the service id is defined.
-     *
-     * @deprecated since Symfony 5.4, use method or constructor injection in your controller instead
-     */
-    protected function has(string $id): bool
-    {
-        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, use method or constructor injection in your controller instead.', __METHOD__);
-
-        return $this->container->has($id);
-    }
-
-    /**
-     * Gets a container service by its id.
-     *
-     * @return object The service
-     *
-     * @deprecated since Symfony 5.4, use method or constructor injection in your controller instead
-     */
-    protected function get(string $id): object
-    {
-        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, use method or constructor injection in your controller instead.', __METHOD__);
-
-        return $this->container->get($id);
     }
 
     /**
@@ -371,24 +344,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
-     * Shortcut to return the Doctrine Registry service.
-     *
-     * @throws \LogicException If DoctrineBundle is not available
-     *
-     * @deprecated since Symfony 5.4, inject an instance of ManagerRegistry in your controller instead
-     */
-    protected function getDoctrine(): ManagerRegistry
-    {
-        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, inject an instance of ManagerRegistry in your controller instead.', __METHOD__);
-
-        if (!$this->container->has('doctrine')) {
-            throw new \LogicException('The DoctrineBundle is not registered in your application. Try running "composer require symfony/orm-pack".');
-        }
-
-        return $this->container->get('doctrine');
-    }
-
-    /**
      * Get a user from the Security Token Storage.
      *
      * @throws \LogicException If SecurityBundle is not available
@@ -421,25 +376,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
-    }
-
-    /**
-     * Dispatches a message to the bus.
-     *
-     * @param object|Envelope $message The message or the message pre-wrapped in an envelope
-     *
-     * @deprecated since Symfony 5.4, inject an instance of MessageBusInterface in your controller instead
-     */
-    protected function dispatchMessage(object $message, array $stamps = []): Envelope
-    {
-        trigger_deprecation('symfony/framework-bundle', '5.4', 'Method "%s()" is deprecated, inject an instance of MessageBusInterface in your controller instead.', __METHOD__);
-
-        if (!$this->container->has('messenger.default_bus')) {
-            $message = class_exists(Envelope::class) ? 'You need to define the "messenger.default_bus" configuration option.' : 'Try running "composer require symfony/messenger".';
-            throw new \LogicException('The message bus is not enabled in your application. '.$message);
-        }
-
-        return $this->container->get('messenger.default_bus')->dispatch($message, $stamps);
     }
 
     /**

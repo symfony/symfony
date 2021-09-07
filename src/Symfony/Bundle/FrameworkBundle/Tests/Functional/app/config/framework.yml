@@ -5,7 +5,6 @@ framework:
     csrf_protection: true
     form:
         enabled: true
-        legacy_error_messages: false
     test: true
     default_locale: en
     session:

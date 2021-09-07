@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -586,22 +585,6 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetDoctrine()
-    {
-        $doctrine = $this->createMock(ManagerRegistry::class);
-
-        $container = new Container();
-        $container->set('doctrine', $doctrine);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $this->assertEquals($doctrine, $controller->getDoctrine());
     }
 
     public function testAddLink()

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -27,8 +26,6 @@ use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 
 class AbstractAuthenticatorTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testCreateToken()
     {
         $authenticator = new ConcreteAuthenticator();

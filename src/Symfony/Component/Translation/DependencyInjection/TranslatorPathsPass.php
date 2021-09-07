@@ -22,10 +22,6 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class TranslatorPathsPass extends AbstractRecursivePass
 {
-    private string $translatorServiceId;
-    private string $debugCommandServiceId;
-    private string $updateCommandServiceId;
-    private string $resolverServiceId;
     private int $level = 0;
 
     /**
@@ -43,21 +39,9 @@ class TranslatorPathsPass extends AbstractRecursivePass
      */
     private array $controllers = [];
 
-    public function __construct(string $translatorServiceId = 'translator', string $debugCommandServiceId = 'console.command.translation_debug', string $updateCommandServiceId = 'console.command.translation_update', string $resolverServiceId = 'argument_resolver.service')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/translation', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->translatorServiceId = $translatorServiceId;
-        $this->debugCommandServiceId = $debugCommandServiceId;
-        $this->updateCommandServiceId = $updateCommandServiceId;
-        $this->resolverServiceId = $resolverServiceId;
-    }
-
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->translatorServiceId)) {
+        if (!$container->hasDefinition('translator')) {
             return;
         }
 
@@ -82,12 +66,12 @@ class TranslatorPathsPass extends AbstractRecursivePass
                 }
             }
             if ($paths) {
-                if ($container->hasDefinition($this->debugCommandServiceId)) {
-                    $definition = $container->getDefinition($this->debugCommandServiceId);
+                if ($container->hasDefinition('console.command.translation_debug')) {
+                    $definition = $container->getDefinition('console.command.translation_debug');
                     $definition->replaceArgument(6, array_merge($definition->getArgument(6), $paths));
                 }
-                if ($container->hasDefinition($this->updateCommandServiceId)) {
-                    $definition = $container->getDefinition($this->updateCommandServiceId);
+                if ($container->hasDefinition('console.command.translation_update')) {
+                    $definition = $container->getDefinition('console.command.translation_update');
                     $definition->replaceArgument(7, array_merge($definition->getArgument(7), $paths));
                 }
             }
@@ -101,7 +85,7 @@ class TranslatorPathsPass extends AbstractRecursivePass
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof Reference) {
-            if ((string) $value === $this->translatorServiceId) {
+            if ((string) $value === 'translator') {
                 for ($i = $this->level - 1; $i >= 0; --$i) {
                     $class = $this->definitions[$i]->getClass();
 
@@ -136,8 +120,8 @@ class TranslatorPathsPass extends AbstractRecursivePass
 
     private function findControllerArguments(ContainerBuilder $container): array
     {
-        if ($container->hasDefinition($this->resolverServiceId)) {
-            $argument = $container->getDefinition($this->resolverServiceId)->getArgument(0);
+        if ($container->hasDefinition('argument_resolver.service')) {
+            $argument = $container->getDefinition('argument_resolver.service')->getArgument(0);
             if ($argument instanceof Reference) {
                 $argument = $container->getDefinition($argument);
             }
@@ -145,8 +129,8 @@ class TranslatorPathsPass extends AbstractRecursivePass
             return $argument->getArgument(0);
         }
 
-        if ($container->hasDefinition('debug.'.$this->resolverServiceId)) {
-            $argument = $container->getDefinition('debug.'.$this->resolverServiceId)->getArgument(0);
+        if ($container->hasDefinition('debug.'.'argument_resolver.service')) {
+            $argument = $container->getDefinition('debug.'.'argument_resolver.service')->getArgument(0);
             if ($argument instanceof Reference) {
                 $argument = $container->getDefinition($argument);
             }

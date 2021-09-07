@@ -12,14 +12,11 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class RequestStackTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testGetCurrentRequest()
     {
         $requestStack = new RequestStack();

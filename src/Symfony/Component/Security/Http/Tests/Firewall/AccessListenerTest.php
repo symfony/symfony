@@ -86,13 +86,10 @@ class AccessListenerTest extends TestCase
             ->willReturn([null, null])
         ;
 
-        $token = $this->createMock(TokenInterface::class);
-
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects($this->never())
             ->method('getToken')
-            ->willReturn($token)
         ;
 
         $listener = new AccessListener(

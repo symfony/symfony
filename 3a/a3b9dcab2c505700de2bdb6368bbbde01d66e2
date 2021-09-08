@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-08T10:10:24Z
+
+fabbot has a catch :) (will you backport some changes to 5.4 after merge or do you prefer to create the PR for 5.4 before?)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-08T10:45:45Z
+
+I'll do the backports once the integration tests are green. I don't have an LDAP setup, so I'm abusing GHA at the moment. 🙈
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-08T11:05:04Z
+
+Backports: #42931

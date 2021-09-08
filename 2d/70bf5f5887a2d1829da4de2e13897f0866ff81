@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-09-07T14:23:21Z
+
+> > 1. Symfony\Component\Security\Http\Tests\Firewall\AccessListenerTest::testHandleWhenThereIsNoAccessMapEntryMatchingTheRequest
+> >    This test did not perform any assertions
+> >
+> > /home/runner/work/symfony/symfony/src/Symfony/Component/Security/Http/Tests/Firewall/AccessListenerTest.php:77
+>
+> Anyone has an idea why this failure appears?
+> It disappears if I revert the changes on `AbstractAuthenticatorTest`, but that doesn't make sense...
+
+I would say that this is related to what the test listener is doing:
+https://github.com/symfony/symfony/blob/6bc0f354c0cc2a48ded008139ff4ff9e4e01d4d0/src/Symfony/Bridge/PhpUnit/Legacy/SymfonyTestsListenerTrait.php#L234-L246
+
+It seems to detect only the presence of the trait, not the fact that it was actually called in the test.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-07T14:26:30Z
+
+Does that also mean that `testHandleWhenThereIsNoAccessMapEntryMatchingTheRequest` is broken and that we didn't spot it because of that?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-09-07T14:34:24Z
+
+Well, there is a mock assertion performed in it, but only conditionally:
+https://github.com/symfony/symfony/blob/f1643e871dd8cb7612ddea6837de6acaaf49fca5/src/Symfony/Component/Security/Http/Tests/Firewall/AccessListenerTest.php#L168-L174
+
+So the test is only doing no assertions in the 6.0 branch.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-07T15:13:30Z
+
+Thanks for the help @stof, this should be good now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-08T06:49:53Z
+
+@HeahDude if you have some bandwidth, could you please have a look at removing the deprecated code from `src/Symfony/Bridge/Doctrine/Form/ChoiceList/DoctrineChoiceLoader.php` on branch 6.0?

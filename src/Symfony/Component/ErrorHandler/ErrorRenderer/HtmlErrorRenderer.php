@@ -33,14 +33,14 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     private const GHOST_HEART = 'M125.91386369681868,8.305165958366445 C128.95033202169043,-0.40540639102854037 140.8469835342744,8.305165958366445 125.91386369681868,19.504526138305664 C110.98208663272044,8.305165958366445 122.87795231771452,-0.40540639102854037 125.91386369681868,8.305165958366445 z';
     private const GHOST_PLUS = 'M111.36824226379395,8.969108581542969 L118.69175148010254,8.969108581542969 L118.69175148010254,1.6455793380737305 L126.20429420471191,1.6455793380737305 L126.20429420471191,8.969108581542969 L133.52781105041504,8.969108581542969 L133.52781105041504,16.481630325317383 L126.20429420471191,16.481630325317383 L126.20429420471191,23.805158615112305 L118.69175148010254,23.805158615112305 L118.69175148010254,16.481630325317383 L111.36824226379395,16.481630325317383 z';
 
-    private $debug;
-    private $charset;
-    private $fileLinkFormat;
-    private $projectDir;
-    private $outputBuffer;
-    private $logger;
+    private bool|\Closure $debug;
+    private string $charset;
+    private string|array|FileLinkFormatter|false $fileLinkFormat;
+    private ?string $projectDir;
+    private string|\Closure $outputBuffer;
+    private ?LoggerInterface $logger;
 
-    private static $template = 'views/error.html.php';
+    private static string $template = 'views/error.html.php';
 
     /**
      * @param bool|callable   $debug        The debugging mode as a boolean or a callable that should return it
@@ -48,11 +48,11 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      */
     public function __construct(bool|callable $debug = false, string $charset = null, string|FileLinkFormatter $fileLinkFormat = null, string $projectDir = null, string|callable $outputBuffer = '', LoggerInterface $logger = null)
     {
-        $this->debug = $debug;
+        $this->debug = \is_bool($debug) || $debug instanceof \Closure ? $debug : \Closure::fromCallable($debug);
         $this->charset = $charset ?: (ini_get('default_charset') ?: 'UTF-8');
         $this->fileLinkFormat = $fileLinkFormat ?: (ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format'));
         $this->projectDir = $projectDir;
-        $this->outputBuffer = $outputBuffer;
+        $this->outputBuffer = \is_string($outputBuffer) || $outputBuffer instanceof \Closure ? $outputBuffer : \Closure::fromCallable($outputBuffer);
         $this->logger = $logger;
     }
 

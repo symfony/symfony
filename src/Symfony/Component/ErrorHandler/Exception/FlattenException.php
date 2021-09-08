@@ -24,41 +24,18 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  */
 class FlattenException
 {
-    /** @var string */
-    private $message;
-
-    /** @var int|string */
-    private $code;
-
-    /** @var self|null */
-    private $previous;
-
-    /** @var array */
-    private $trace;
-
-    /** @var string */
-    private $traceAsString;
-
-    /** @var string */
-    private $class;
-
-    /** @var int */
-    private $statusCode;
-
-    /** @var string */
-    private $statusText;
-
-    /** @var array */
-    private $headers;
-
-    /** @var string */
-    private $file;
-
-    /** @var int */
-    private $line;
-
-    /** @var string|null */
-    private $asString;
+    private string $message;
+    private string|int $code;
+    private ?self $previous = null;
+    private array $trace;
+    private string $traceAsString;
+    private string $class;
+    private int $statusCode;
+    private string $statusText;
+    private array $headers;
+    private string $file;
+    private int $line;
+    private ?string $asString = null;
 
     public static function create(\Exception $exception, int $statusCode = null, array $headers = []): static
     {

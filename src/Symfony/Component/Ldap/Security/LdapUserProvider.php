@@ -32,15 +32,15 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private $ldap;
-    private $baseDn;
-    private $searchDn;
-    private $searchPassword;
-    private $defaultRoles;
-    private $uidKey;
-    private $defaultSearch;
-    private $passwordAttribute;
-    private $extraFields;
+    private LdapInterface $ldap;
+    private string $baseDn;
+    private ?string $searchDn;
+    private ?string $searchPassword;
+    private array $defaultRoles;
+    private ?string $uidKey;
+    private string $defaultSearch;
+    private ?string $passwordAttribute;
+    private array $extraFields;
 
     public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, string $searchPassword = null, array $defaultRoles = [], string $uidKey = null, string $filter = null, string $passwordAttribute = null, array $extraFields = [])
     {

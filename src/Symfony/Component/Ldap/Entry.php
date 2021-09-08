@@ -17,17 +17,17 @@ namespace Symfony\Component\Ldap;
  */
 class Entry
 {
-    private $dn;
+    private string $dn;
 
     /**
      * @var array<string, array>
      */
-    private $attributes = [];
+    private array $attributes = [];
 
     /**
      * @var array<string, string>
      */
-    private $lowerMap = [];
+    private array $lowerMap = [];
 
     /**
      * @param array<string, array> $attributes

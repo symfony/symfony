@@ -29,8 +29,7 @@ final class FirebaseTransport extends AbstractTransport
 {
     protected const HOST = 'fcm.googleapis.com/fcm/send';
 
-    /** @var string */
-    private $token;
+    private string $token;
 
     public function __construct(string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

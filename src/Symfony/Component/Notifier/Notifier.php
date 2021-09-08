@@ -26,9 +26,9 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 final class Notifier implements NotifierInterface
 {
-    private $adminRecipients = [];
-    private $channels;
-    private $policy;
+    private array $adminRecipients = [];
+    private array|ContainerInterface $channels;
+    private ?ChannelPolicyInterface $policy;
 
     /**
      * @param ChannelInterface[]|ContainerInterface $channels

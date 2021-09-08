@@ -98,7 +98,7 @@ final class Transport
         ZulipTransportFactory::class,
     ];
 
-    private $factories;
+    private iterable $factories;
 
     public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
     {
@@ -115,7 +115,7 @@ final class Transport
     }
 
     /**
-     * @param TransportFactoryInterface[] $factories
+     * @param iterable<mixed, TransportFactoryInterface> $factories
      */
     public function __construct(iterable $factories)
     {

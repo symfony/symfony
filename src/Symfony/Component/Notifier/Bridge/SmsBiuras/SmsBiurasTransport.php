@@ -28,10 +28,10 @@ final class SmsBiurasTransport extends AbstractTransport
 {
     protected const HOST = 'savitarna.smsbiuras.lt';
 
-    private $uid;
-    private $apiKey;
-    private $from;
-    private $testMode;
+    private string $uid;
+    private string $apiKey;
+    private string $from;
+    private bool $testMode;
 
     private const ERROR_CODES = [
         1 => 'The message was processed and sent to the mobile operator. But delivery confirmations have not yet been returned.',

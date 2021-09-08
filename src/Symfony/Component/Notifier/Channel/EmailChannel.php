@@ -15,6 +15,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\EmailMessage;
@@ -28,10 +29,10 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 class EmailChannel implements ChannelInterface
 {
-    private $transport;
-    private $bus;
-    private $from;
-    private $envelope;
+    private ?TransportInterface $transport;
+    private ?MessageBusInterface $bus;
+    private string|Address|null $from;
+    private ?Envelope $envelope;
 
     public function __construct(TransportInterface $transport = null, MessageBusInterface $bus = null, string $from = null, Envelope $envelope = null)
     {
@@ -41,7 +42,7 @@ class EmailChannel implements ChannelInterface
 
         $this->transport = $transport;
         $this->bus = $bus;
-        $this->from = $from ?: ($envelope ? $envelope->getSender() : null);
+        $this->from = $from ?: $envelope?->getSender();
         $this->envelope = $envelope;
     }
 

@@ -28,9 +28,9 @@ final class SinchTransport extends AbstractTransport
 {
     protected const HOST = 'sms.api.sinch.com';
 
-    private $accountSid;
-    private $authToken;
-    private $from;
+    private string $accountSid;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $accountSid, string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

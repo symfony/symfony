@@ -34,8 +34,8 @@ final class TurboSmsTransport extends AbstractTransport
     private const SUBJECT_CYRILLIC_LIMIT = 661;
     private const SENDER_LIMIT = 20;
 
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

@@ -30,7 +30,7 @@ final class MicrosoftTeamsTransport extends AbstractTransport
 {
     protected const ENDPOINT = 'outlook.office.com';
 
-    private $path;
+    private string $path;
 
     public function __construct(string $path, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

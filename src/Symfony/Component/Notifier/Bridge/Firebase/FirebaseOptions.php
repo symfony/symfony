@@ -20,14 +20,14 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 abstract class FirebaseOptions implements MessageOptionsInterface
 {
-    private $to;
+    private string $to;
 
     /**
      * @see https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref.html#notification-payload-support
      */
     protected $options;
 
-    private $data;
+    private array $data;
 
     public function __construct(string $to, array $options, array $data = [])
     {

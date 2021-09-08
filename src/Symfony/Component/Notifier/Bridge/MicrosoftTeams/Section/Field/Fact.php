@@ -16,7 +16,7 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field;
  */
 final class Fact
 {
-    private $options = [];
+    private array $options = [];
 
     public function name(string $name): self
     {

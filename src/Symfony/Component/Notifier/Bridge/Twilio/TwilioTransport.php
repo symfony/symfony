@@ -28,9 +28,9 @@ final class TwilioTransport extends AbstractTransport
 {
     protected const HOST = 'api.twilio.com';
 
-    private $accountSid;
-    private $authToken;
-    private $from;
+    private string $accountSid;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $accountSid, string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

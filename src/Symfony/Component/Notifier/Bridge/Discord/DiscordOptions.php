@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class DiscordOptions implements MessageOptionsInterface
 {
-    private $options = [];
+    private array $options = [];
 
     public function __construct(array $options = [])
     {

@@ -17,7 +17,7 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input;
  */
 abstract class AbstractInput implements InputInterface
 {
-    private $options = [];
+    private array $options = [];
 
     public function id(string $id): self
     {

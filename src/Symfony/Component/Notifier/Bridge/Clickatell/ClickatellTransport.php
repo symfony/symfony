@@ -28,8 +28,8 @@ final class ClickatellTransport extends AbstractTransport
 {
     protected const HOST = 'api.clickatell.com';
 
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private ?string $from;
 
     public function __construct(string $authToken, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

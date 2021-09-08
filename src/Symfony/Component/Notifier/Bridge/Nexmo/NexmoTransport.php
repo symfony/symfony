@@ -28,9 +28,9 @@ final class NexmoTransport extends AbstractTransport
 {
     protected const HOST = 'rest.nexmo.com';
 
-    private $apiKey;
-    private $apiSecret;
-    private $from;
+    private string $apiKey;
+    private string $apiSecret;
+    private string $from;
 
     public function __construct(string $apiKey, string $apiSecret, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

@@ -28,7 +28,7 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
 {
     private const MAX_ACTIONS = 4;
 
-    private $options = [];
+    private array $options = [];
 
     public function __construct(array $options = [])
     {

@@ -29,9 +29,9 @@ final class TelnyxTransport extends AbstractTransport
 {
     protected const HOST = 'api.telnyx.com';
 
-    private $apiKey;
-    private $from;
-    private $messagingProfileId;
+    private string $apiKey;
+    private string $from;
+    private ?string $messagingProfileId;
 
     public function __construct(string $apiKey, string $from, ?string $messagingProfileId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

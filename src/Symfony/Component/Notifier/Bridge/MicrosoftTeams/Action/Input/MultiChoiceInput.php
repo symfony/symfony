@@ -26,7 +26,7 @@ final class MultiChoiceInput extends AbstractInput
         'normal',
     ];
 
-    private $options = [];
+    private array $options = [];
 
     public function choice(string $display, string $value): self
     {

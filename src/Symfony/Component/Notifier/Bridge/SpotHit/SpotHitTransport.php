@@ -33,8 +33,8 @@ final class SpotHitTransport extends AbstractTransport
 {
     protected const HOST = 'spot-hit.fr';
 
-    private $token;
-    private $from;
+    private string $token;
+    private ?string $from;
 
     public function __construct(string $token, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

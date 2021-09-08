@@ -36,13 +36,13 @@ class Notification
     public const IMPORTANCE_MEDIUM = 'medium';
     public const IMPORTANCE_LOW = 'low';
 
-    private $channels = [];
-    private $subject = '';
-    private $content = '';
-    private $emoji = '';
-    private $exception;
-    private $exceptionAsString = '';
-    private $importance = self::IMPORTANCE_HIGH;
+    private array $channels = [];
+    private string $subject = '';
+    private string $content = '';
+    private string $emoji = '';
+    private ?FlattenException $exception = null;
+    private string $exceptionAsString = '';
+    private string $importance = self::IMPORTANCE_HIGH;
 
     public function __construct(string $subject = '', array $channels = [])
     {

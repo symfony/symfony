@@ -30,10 +30,10 @@ final class GoogleChatTransport extends AbstractTransport
 {
     protected const HOST = 'chat.googleapis.com';
 
-    private $space;
-    private $accessKey;
-    private $accessToken;
-    private $threadKey;
+    private string $space;
+    private string $accessKey;
+    private string $accessToken;
+    private ?string $threadKey;
 
     /**
      * @param string      $space       The space name the the webhook url "/v1/spaces/<space>/messages"

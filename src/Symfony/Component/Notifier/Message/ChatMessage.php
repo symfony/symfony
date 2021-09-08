@@ -18,10 +18,10 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class ChatMessage implements MessageInterface
 {
-    private $transport;
-    private $subject;
-    private $options;
-    private $notification;
+    private ?string $transport = null;
+    private string $subject;
+    private ?MessageOptionsInterface $options;
+    private ?Notification $notification = null;
 
     public function __construct(string $subject, MessageOptionsInterface $options = null)
     {

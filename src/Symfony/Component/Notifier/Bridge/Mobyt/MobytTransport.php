@@ -29,10 +29,10 @@ final class MobytTransport extends AbstractTransport
 {
     protected const HOST = 'app.mobyt.fr';
 
-    private $accountSid;
-    private $authToken;
-    private $from;
-    private $typeQuality;
+    private string $accountSid;
+    private string $authToken;
+    private string $from;
+    private string $typeQuality;
 
     public function __construct(string $accountSid, string $authToken, string $from, string $typeQuality = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

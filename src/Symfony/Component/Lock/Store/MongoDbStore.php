@@ -49,11 +49,11 @@ class MongoDbStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $collection;
-    private $client;
-    private $uri;
-    private $options;
-    private $initialTtl;
+    private Collection $collection;
+    private Client $client;
+    private string $uri;
+    private array $options;
+    private float $initialTtl;
 
     /**
      * @param Collection|Client|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/
@@ -322,13 +322,11 @@ class MongoDbStore implements PersistingStoreInterface
 
     private function getCollection(): Collection
     {
-        if (null !== $this->collection) {
+        if (isset($this->collection)) {
             return $this->collection;
         }
 
-        if (null === $this->client) {
-            $this->client = new Client($this->uri, $this->options['uriOptions'], $this->options['driverOptions']);
-        }
+        $this->client ??= new Client($this->uri, $this->options['uriOptions'], $this->options['driverOptions']);
 
         $this->collection = $this->client->selectCollection(
             $this->options['database'],

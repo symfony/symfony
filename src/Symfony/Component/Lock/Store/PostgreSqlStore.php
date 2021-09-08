@@ -28,12 +28,12 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {
-    private $conn;
-    private $dsn;
-    private $username = '';
-    private $password = '';
-    private $connectionOptions = [];
-    private static $storeRegistry = [];
+    private \PDO|Connection $conn;
+    private string $dsn;
+    private string $username = '';
+    private string $password = '';
+    private array $connectionOptions = [];
+    private static array $storeRegistry = [];
 
     /**
      * You can either pass an existing database connection as PDO instance or
@@ -234,7 +234,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
 
     private function getConnection(): \PDO|Connection
     {
-        if (null === $this->conn) {
+        if (!isset($this->conn)) {
             if (strpos($this->dsn, '://')) {
                 if (!class_exists(DriverManager::class)) {
                     throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $this->dsn));

@@ -40,18 +40,18 @@ class PdoStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $conn;
-    private $dsn;
-    private $driver;
-    private $table = 'lock_keys';
-    private $idCol = 'key_id';
-    private $tokenCol = 'key_token';
-    private $expirationCol = 'key_expiration';
-    private $username = '';
-    private $password = '';
-    private $connectionOptions = [];
-    private $gcProbability;
-    private $initialTtl;
+    private \PDO|Connection $conn;
+    private string $dsn;
+    private string $driver;
+    private string $table = 'lock_keys';
+    private string $idCol = 'key_id';
+    private string $tokenCol = 'key_token';
+    private string $expirationCol = 'key_expiration';
+    private string $username = '';
+    private string $password = '';
+    private array $connectionOptions = [];
+    private float $gcProbability;
+    private int $initialTtl;
 
     /**
      * You can either pass an existing database connection as PDO instance or
@@ -232,7 +232,7 @@ class PdoStore implements PersistingStoreInterface
 
     private function getConnection(): \PDO|Connection
     {
-        if (null === $this->conn) {
+        if (!isset($this->conn)) {
             if (strpos($this->dsn, '://')) {
                 if (!class_exists(DriverManager::class)) {
                     throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $this->dsn));
@@ -336,7 +336,7 @@ class PdoStore implements PersistingStoreInterface
 
     private function getDriver(): string
     {
-        if (null !== $this->driver) {
+        if (isset($this->driver)) {
             return $this->driver;
         }
 

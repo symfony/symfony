@@ -35,12 +35,17 @@ class DebugCommand extends Command
     protected static $defaultName = 'debug:twig';
     protected static $defaultDescription = 'Show a list of twig functions, filters, globals and tests';
 
-    private $twig;
-    private $projectDir;
-    private $bundlesMetadata;
-    private $twigDefaultPath;
-    private $filesystemLoaders;
-    private $fileLinkFormatter;
+    private Environment $twig;
+    private ?string $projectDir;
+    private array $bundlesMetadata;
+    private ?string $twigDefaultPath;
+
+    /**
+     * @var FilesystemLoader[]
+     */
+    private array $filesystemLoaders;
+
+    private ?FileLinkFormatter $fileLinkFormatter;
 
     public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, FileLinkFormatter $fileLinkFormatter = null)
     {
@@ -557,7 +562,7 @@ EOF
      */
     private function getFilesystemLoaders(): array
     {
-        if (null !== $this->filesystemLoaders) {
+        if (isset($this->filesystemLoaders)) {
             return $this->filesystemLoaders;
         }
         $this->filesystemLoaders = [];

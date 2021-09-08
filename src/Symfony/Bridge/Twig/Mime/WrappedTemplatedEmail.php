@@ -21,8 +21,8 @@ use Twig\Environment;
  */
 final class WrappedTemplatedEmail
 {
-    private $twig;
-    private $message;
+    private Environment $twig;
+    private TemplatedEmail $message;
 
     public function __construct(Environment $twig, TemplatedEmail $message)
     {

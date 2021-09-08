@@ -18,9 +18,9 @@ use Symfony\Component\Mime\Email;
  */
 class TemplatedEmail extends Email
 {
-    private $htmlTemplate;
-    private $textTemplate;
-    private $context = [];
+    private ?string $htmlTemplate = null;
+    private ?string $textTemplate = null;
+    private array $context = [];
 
     /**
      * @return $this

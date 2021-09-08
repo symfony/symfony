@@ -22,7 +22,7 @@ use Twig\TwigFunction;
  */
 final class AssetExtension extends AbstractExtension
 {
-    private $packages;
+    private Packages $packages;
 
     public function __construct(Packages $packages)
     {

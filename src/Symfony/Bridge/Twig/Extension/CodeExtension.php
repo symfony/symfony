@@ -22,9 +22,9 @@ use Twig\TwigFilter;
  */
 final class CodeExtension extends AbstractExtension
 {
-    private $fileLinkFormat;
-    private $charset;
-    private $projectDir;
+    private string|FileLinkFormatter|array|false $fileLinkFormat;
+    private string $charset;
+    private string $projectDir;
 
     public function __construct(string|FileLinkFormatter $fileLinkFormat, string $projectDir, string $charset)
     {

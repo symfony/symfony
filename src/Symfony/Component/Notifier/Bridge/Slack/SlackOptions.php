@@ -25,7 +25,7 @@ final class SlackOptions implements MessageOptionsInterface
 {
     private const MAX_BLOCKS = 50;
 
-    private $options;
+    private array $options;
 
     public function __construct(array $options = [])
     {

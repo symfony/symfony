@@ -19,7 +19,7 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input;
  */
 final class TextInput extends AbstractInput
 {
-    private $options = [];
+    private array $options = [];
 
     public function isMultiline(bool $multiline): self
     {

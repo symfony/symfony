@@ -28,8 +28,8 @@ final class MailjetTransport extends AbstractTransport
 {
     protected const HOST = 'api.mailjet.com';
 
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

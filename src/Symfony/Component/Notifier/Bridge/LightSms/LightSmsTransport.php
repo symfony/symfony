@@ -28,9 +28,9 @@ final class LightSmsTransport extends AbstractTransport
 {
     protected const HOST = 'www.lightsms.com';
 
-    private $login;
-    private $password;
-    private $from;
+    private string $login;
+    private string $password;
+    private string $from;
 
     private const ERROR_CODES = [
         1 => 'Missing Signature',

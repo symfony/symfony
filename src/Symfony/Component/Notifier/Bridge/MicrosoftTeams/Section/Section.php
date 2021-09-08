@@ -24,7 +24,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field\Image;
  */
 final class Section implements SectionInterface
 {
-    private $options = [];
+    private array $options = [];
 
     public function title(string $title): self
     {

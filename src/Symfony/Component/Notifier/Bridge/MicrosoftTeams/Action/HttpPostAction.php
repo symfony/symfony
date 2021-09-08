@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Element\Header;
  */
 final class HttpPostAction implements ActionCardCompatibleActionInterface
 {
-    private $options = ['@type' => 'HttpPOST'];
+    private array $options = ['@type' => 'HttpPOST'];
 
     public function name(string $name): self
     {

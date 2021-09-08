@@ -21,8 +21,8 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class GoogleChatOptions implements MessageOptionsInterface
 {
-    private $threadKey;
-    private $options = [];
+    private ?string $threadKey = null;
+    private array $options = [];
 
     public function __construct(array $options = [])
     {

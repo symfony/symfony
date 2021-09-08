@@ -19,7 +19,7 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Element;
  */
 final class Header
 {
-    private $options = [];
+    private array $options = [];
 
     public function name(string $name): self
     {

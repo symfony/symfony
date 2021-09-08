@@ -28,8 +28,8 @@ final class SendinblueTransport extends AbstractTransport
 {
     protected const HOST = 'api.sendinblue.com';
 
-    private $apiKey;
-    private $sender;
+    private string $apiKey;
+    private string $sender;
 
     public function __construct(string $apiKey, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

@@ -19,7 +19,7 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field;
  */
 final class Image
 {
-    private $options = [];
+    private array $options = [];
 
     public function image(string $imageUrl): self
     {

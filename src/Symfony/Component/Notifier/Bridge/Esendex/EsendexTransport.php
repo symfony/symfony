@@ -27,10 +27,10 @@ final class EsendexTransport extends AbstractTransport
 {
     protected const HOST = 'api.esendex.com';
 
-    private $email;
-    private $password;
-    private $accountReference;
-    private $from;
+    private string $email;
+    private string $password;
+    private string $accountReference;
+    private string $from;
 
     public function __construct(string $email, string $password, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

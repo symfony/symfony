@@ -18,11 +18,11 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class MercureOptions implements MessageOptionsInterface
 {
-    private $topics;
-    private $private;
-    private $id;
-    private $type;
-    private $retry;
+    private ?array $topics;
+    private bool $private;
+    private ?string $id;
+    private ?string $type;
+    private ?int $retry;
 
     /**
      * @param string|string[]|null $topics

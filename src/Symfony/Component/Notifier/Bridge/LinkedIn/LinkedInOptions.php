@@ -23,7 +23,7 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class LinkedInOptions implements MessageOptionsInterface
 {
-    private $options = [];
+    private array $options = [];
 
     public function __construct(array $options = [])
     {

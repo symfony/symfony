@@ -28,7 +28,7 @@ final class OpenUriAction implements ActionCardCompatibleActionInterface
         'windows',
     ];
 
-    private $options = [];
+    private array $options = [];
 
     public function name(string $name): self
     {

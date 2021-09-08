@@ -19,7 +19,7 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action;
  */
 final class InvokeAddInCommandAction implements ActionInterface
 {
-    private $options = [];
+    private array $options = [];
 
     public function name(string $name): self
     {

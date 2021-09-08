@@ -20,14 +20,14 @@ use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
  */
 final class Dsn
 {
-    private $scheme;
-    private $host;
-    private $user;
-    private $password;
-    private $port;
-    private $path;
-    private $options;
-    private $originalDsn;
+    private string $scheme;
+    private string $host;
+    private ?string $user;
+    private ?string $password;
+    private ?int $port;
+    private ?string $path;
+    private array $options = [];
+    private string $originalDsn;
 
     public function __construct(string $dsn)
     {

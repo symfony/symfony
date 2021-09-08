@@ -19,9 +19,8 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class AmazonSnsOptions implements MessageOptionsInterface
 {
-    private $options = [];
-
-    private $recipient;
+    private array $options = [];
+    private string $recipient;
 
     public function __construct(string $recipient, array $options = [])
     {

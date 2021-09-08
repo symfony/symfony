@@ -30,11 +30,11 @@ final class SmscTransport extends AbstractTransport
 {
     protected const HOST = 'smsc.ru';
 
-    private $login;
-    private $password;
-    private $from;
+    private ?string $login;
+    private ?string $password;
+    private string $from;
 
-    public function __construct($username, $password, $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(?string $username, ?string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $username;
         $this->password = $password;
@@ -45,7 +45,7 @@ final class SmscTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('smsc://%s?from=%s', $this->getEndpoint(), (string) $this->from);
+        return sprintf('smsc://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool

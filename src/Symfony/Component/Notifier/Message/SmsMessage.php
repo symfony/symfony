@@ -20,9 +20,9 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
  */
 final class SmsMessage implements MessageInterface
 {
-    private $transport;
-    private $subject;
-    private $phone;
+    private ?string $transport = null;
+    private string $subject;
+    private string $phone;
 
     public function __construct(string $phone, string $subject)
     {

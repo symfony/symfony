@@ -28,9 +28,9 @@ final class AllMySmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.allmysms.com';
 
-    private $login;
-    private $apiKey;
-    private $from;
+    private string $login;
+    private string $apiKey;
+    private ?string $from;
 
     public function __construct(string $login, string $apiKey, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

@@ -36,7 +36,7 @@ class YamlFileLoader extends FileLoader
     private const AVAILABLE_KEYS = [
         'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless',
     ];
-    private $yamlParser;
+    private YamlParser $yamlParser;
 
     /**
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
@@ -53,9 +53,7 @@ class YamlFileLoader extends FileLoader
             throw new \InvalidArgumentException(sprintf('File "%s" not found.', $path));
         }
 
-        if (null === $this->yamlParser) {
-            $this->yamlParser = new YamlParser();
-        }
+        $this->yamlParser ??= new YamlParser();
 
         try {
             $parsedConfig = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);

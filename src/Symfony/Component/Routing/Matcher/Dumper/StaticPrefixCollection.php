@@ -23,22 +23,22 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class StaticPrefixCollection
 {
-    private $prefix;
+    private string $prefix;
 
     /**
      * @var string[]
      */
-    private $staticPrefixes = [];
+    private array $staticPrefixes = [];
 
     /**
      * @var string[]
      */
-    private $prefixes = [];
+    private array $prefixes = [];
 
     /**
      * @var array[]|self[]
      */
-    private $items = [];
+    private array $items = [];
 
     public function __construct(string $prefix = '/')
     {

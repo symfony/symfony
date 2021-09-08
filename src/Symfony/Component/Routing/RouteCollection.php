@@ -28,17 +28,17 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * @var array<string, Route>
      */
-    private $routes = [];
+    private array $routes = [];
 
     /**
      * @var array<string, ResourceInterface>
      */
-    private $resources = [];
+    private array $resources = [];
 
     /**
      * @var array<string, int>
      */
-    private $priorities = [];
+    private array $priorities = [];
 
     public function __clone()
     {

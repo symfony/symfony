@@ -23,15 +23,15 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RequestContext
 {
-    private $baseUrl;
-    private $pathInfo;
-    private $method;
-    private $host;
-    private $scheme;
-    private $httpPort;
-    private $httpsPort;
-    private $queryString;
-    private $parameters = [];
+    private string $baseUrl;
+    private string $pathInfo;
+    private string $method;
+    private string $host;
+    private string $scheme;
+    private int $httpPort;
+    private int $httpsPort;
+    private string $queryString;
+    private array $parameters = [];
 
     public function __construct(string $baseUrl = '', string $method = 'GET', string $host = 'localhost', string $scheme = 'http', int $httpPort = 80, int $httpsPort = 443, string $path = '/', string $queryString = '')
     {

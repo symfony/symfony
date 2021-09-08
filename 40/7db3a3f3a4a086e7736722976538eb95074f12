@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-08T06:53:52Z
+
+(a test is failing: "TwigDataCollector::$profile must not be accessed before initialization")
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-08T09:12:24Z
+
+Should be fixed now.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-08T09:23:19Z
+
+The Psalm failures are false positives.

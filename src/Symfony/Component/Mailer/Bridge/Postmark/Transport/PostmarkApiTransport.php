@@ -34,6 +34,8 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     private $key;
 
+    private $messageStream;
+
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->key = $key;
@@ -43,7 +45,7 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('postmark+api://%s', $this->getEndpoint());
+        return sprintf('postmark+api://%s', $this->getEndpoint()).($this->messageStream ? '?message_stream='.$this->messageStream : '');
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
@@ -106,10 +108,20 @@ class PostmarkApiTransport extends AbstractApiTransport
                 continue;
             }
 
+            if ($header instanceof MessageStreamHeader) {
+                $payload['MessageStream'] = $header->getValue();
+
+                continue;
+            }
+
             $payload['Headers'][] = [
                 'Name' => $name,
                 'Value' => $header->getBodyAsString(),
             ];
+        }
+
+        if (null !== $this->messageStream && !isset($payload['MessageStream'])) {
+            $payload['MessageStream'] = $this->messageStream;
         }
 
         return $payload;
@@ -142,5 +154,15 @@ class PostmarkApiTransport extends AbstractApiTransport
     private function getEndpoint(): ?string
     {
         return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMessageStream(string $messageStream): self
+    {
+        $this->messageStream = $messageStream;
+
+        return $this;
     }
 }

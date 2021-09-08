@@ -342,7 +342,7 @@ EOF;
 
                 $code[$options['class'].'.preload.php'] .= <<<'EOF'
 
-Preloader::preload($classes);
+$preloaded = Preloader::preload($classes);
 
 EOF;
             }

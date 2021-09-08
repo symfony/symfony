@@ -37,10 +37,10 @@ class ServerDumpCommand extends Command
     protected static $defaultName = 'server:dump';
     protected static $defaultDescription = 'Start a dump server that collects and displays dumps in a single place';
 
-    private $server;
+    private DumpServer $server;
 
     /** @var DumpDescriptorInterface[] */
-    private $descriptors;
+    private array $descriptors;
 
     public function __construct(DumpServer $server, array $descriptors = [])
     {

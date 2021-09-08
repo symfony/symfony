@@ -44,7 +44,7 @@ class ExceptionCaster
         \E_STRICT => 'E_STRICT',
     ];
 
-    private static $framesCache = [];
+    private static array $framesCache = [];
 
     public static function castError(\Error $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
     {

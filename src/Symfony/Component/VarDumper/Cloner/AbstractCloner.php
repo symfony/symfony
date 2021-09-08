@@ -196,15 +196,15 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * @var array<string, list<callable>>
      */
-    private $casters = [];
+    private array $casters = [];
 
     /**
      * @var callable|null
      */
     private $prevErrorHandler;
 
-    private $classInfo = [];
-    private $filter = 0;
+    private array $classInfo = [];
+    private int $filter = 0;
 
     /**
      * @param callable[]|null $casters A map of casters

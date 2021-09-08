@@ -55,11 +55,11 @@ class CliDumper extends AbstractDumper
     protected $collapseNextHash = false;
     protected $expandNextHash = false;
 
-    private $displayOptions = [
+    private array $displayOptions = [
         'fileLinkFormat' => null,
     ];
 
-    private $handlesHrefGracefully;
+    private bool $handlesHrefGracefully;
 
     /**
      * {@inheritdoc}
@@ -441,10 +441,8 @@ class CliDumper extends AbstractDumper
             $this->colors = $this->supportsColors();
         }
 
-        if (null === $this->handlesHrefGracefully) {
-            $this->handlesHrefGracefully = 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR')
-                && (!getenv('KONSOLE_VERSION') || (int) getenv('KONSOLE_VERSION') > 201100);
-        }
+        $this->handlesHrefGracefully ??= 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR')
+            && (!getenv('KONSOLE_VERSION') || (int) getenv('KONSOLE_VERSION') > 201100);
 
         if (isset($attr['ellipsis'], $attr['ellipsis-type'])) {
             $prefix = substr($value, 0, -$attr['ellipsis']);

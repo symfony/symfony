@@ -22,7 +22,7 @@ trait VarDumperTestTrait
     /**
      * @internal
      */
-    private $varDumperConfig = [
+    private array $varDumperConfig = [
         'casters' => [],
         'flags' => null,
     ];

@@ -31,7 +31,7 @@ final class OhMySmtpApiTransport extends AbstractApiTransport
 {
     private const HOST = 'app.ohmysmtp.com/api/v1';
 
-    private $key;
+    private string $key;
 
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {

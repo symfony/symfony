@@ -31,14 +31,14 @@ use Symfony\Component\Mime\RawMessage;
  */
 class SmtpTransport extends AbstractTransport
 {
-    private $started = false;
-    private $restartThreshold = 100;
-    private $restartThresholdSleep = 0;
-    private $restartCounter;
-    private $pingThreshold = 100;
-    private $lastMessageTime = 0;
-    private $stream;
-    private $domain = '[127.0.0.1]';
+    private bool $started = false;
+    private int $restartThreshold = 100;
+    private int $restartThresholdSleep = 0;
+    private int $restartCounter = 0;
+    private int $pingThreshold = 100;
+    private int $lastMessageTime = 0;
+    private AbstractStream $stream;
+    private string $domain = '[127.0.0.1]';
 
     public function __construct(AbstractStream $stream = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {

@@ -23,13 +23,13 @@ use Symfony\Component\Mailer\Exception\TransportException;
  */
 final class SocketStream extends AbstractStream
 {
-    private $url;
-    private $host = 'localhost';
-    private $port = 465;
-    private $timeout;
-    private $tls = true;
-    private $sourceIp;
-    private $streamContextOptions = [];
+    private string $url;
+    private string $host = 'localhost';
+    private int $port = 465;
+    private float $timeout;
+    private bool $tls = true;
+    private ?string $sourceIp = null;
+    private array $streamContextOptions = [];
 
     public function setTimeout(float $timeout): self
     {

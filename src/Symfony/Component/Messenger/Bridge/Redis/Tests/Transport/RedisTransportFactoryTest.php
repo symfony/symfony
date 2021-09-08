@@ -27,6 +27,7 @@ class RedisTransportFactoryTest extends TestCase
         $factory = new RedisTransportFactory();
 
         $this->assertTrue($factory->supports('redis://localhost', []));
+        $this->assertTrue($factory->supports('rediss://localhost', []));
         $this->assertFalse($factory->supports('sqs://localhost', []));
         $this->assertFalse($factory->supports('invalid-dsn', []));
     }

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `service_closure()` to the PHP-DSL
  * Add support for autoconfigurable attributes on methods, properties and parameters
+ * Make auto-aliases private by default
 
 5.3
 ---

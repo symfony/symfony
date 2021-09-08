@@ -26,17 +26,17 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 class RouteCollection implements \IteratorAggregate, \Countable
 {
     /**
-     * @var Route[]
+     * @var array<string, Route>
      */
     private $routes = [];
 
     /**
-     * @var array
+     * @var array<string, ResourceInterface>
      */
     private $resources = [];
 
     /**
-     * @var int[]
+     * @var array<string, int>
      */
     private $priorities = [];
 

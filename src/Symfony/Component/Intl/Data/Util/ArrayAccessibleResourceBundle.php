@@ -25,7 +25,7 @@ use Symfony\Component\Intl\Exception\BadMethodCallException;
  */
 class ArrayAccessibleResourceBundle implements \ArrayAccess, \IteratorAggregate, \Countable
 {
-    private $bundleImpl;
+    private \ResourceBundle $bundleImpl;
 
     public function __construct(\ResourceBundle $bundleImpl)
     {

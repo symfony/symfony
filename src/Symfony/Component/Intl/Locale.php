@@ -20,18 +20,13 @@ namespace Symfony\Component\Intl;
  */
 final class Locale extends \Locale
 {
-    /**
-     * @var string|null
-     */
-    private static $defaultFallback = 'en';
+    private static ?string $defaultFallback = 'en';
 
     /**
      * Sets the default fallback locale.
      *
      * The default fallback locale is used as fallback for locales that have no
      * fallback otherwise.
-     *
-     * @param string|null $locale The default fallback locale
      *
      * @see getFallback()
      */

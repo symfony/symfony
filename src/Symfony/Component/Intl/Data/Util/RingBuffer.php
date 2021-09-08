@@ -26,13 +26,10 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  */
 class RingBuffer implements \ArrayAccess
 {
-    private $values = [];
-
-    private $indices = [];
-
-    private $cursor = 0;
-
-    private $size;
+    private array $values = [];
+    private array $indices = [];
+    private int $cursor = 0;
+    private int $size;
 
     public function __construct(int $size)
     {

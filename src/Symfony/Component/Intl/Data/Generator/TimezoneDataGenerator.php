@@ -35,9 +35,9 @@ class TimezoneDataGenerator extends AbstractDataGenerator
      *
      * @var string[]
      */
-    private $zoneIds = [];
-    private $zoneToCountryMapping = [];
-    private $localeAliases = [];
+    private array $zoneIds = [];
+    private array $zoneToCountryMapping = [];
+    private array $localeAliases = [];
 
     /**
      * {@inheritdoc}

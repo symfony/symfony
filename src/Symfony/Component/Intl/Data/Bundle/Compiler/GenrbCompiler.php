@@ -22,7 +22,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 class GenrbCompiler implements BundleCompilerInterface
 {
-    private $genrb;
+    private string $genrb;
 
     /**
      * Creates a new compiler based on the "genrb" executable.

@@ -46,7 +46,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
      *
      * @var string[]
      */
-    private $currencyCodes = [];
+    private array $currencyCodes = [];
 
     /**
      * {@inheritdoc}

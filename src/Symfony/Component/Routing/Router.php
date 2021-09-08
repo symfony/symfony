@@ -82,17 +82,14 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     protected $defaultLocale;
 
-    /**
-     * @var ConfigCacheFactoryInterface|null
-     */
-    private $configCacheFactory;
+    private ConfigCacheFactoryInterface $configCacheFactory;
 
     /**
      * @var ExpressionFunctionProviderInterface[]
      */
-    private $expressionLanguageProviders = [];
+    private array $expressionLanguageProviders = [];
 
-    private static $cache = [];
+    private static ?array $cache = [];
 
     public function __construct(LoaderInterface $loader, mixed $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null)
     {
@@ -252,8 +249,6 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     /**
      * Gets the UrlMatcher or RequestMatcher instance associated with this Router.
-     *
-     * @return UrlMatcherInterface|RequestMatcherInterface
      */
     public function getMatcher(): UrlMatcherInterface|RequestMatcherInterface
     {
@@ -349,11 +344,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     private function getConfigCacheFactory(): ConfigCacheFactoryInterface
     {
-        if (null === $this->configCacheFactory) {
-            $this->configCacheFactory = new ConfigCacheFactory($this->options['debug']);
-        }
-
-        return $this->configCacheFactory;
+        return $this->configCacheFactory ??= new ConfigCacheFactory($this->options['debug']);
     }
 
     private static function getCompiledRoutes(string $path): array
@@ -366,10 +357,6 @@ class Router implements RouterInterface, RequestMatcherInterface
             return require $path;
         }
 
-        if (isset(self::$cache[$path])) {
-            return self::$cache[$path];
-        }
-
-        return self::$cache[$path] = require $path;
+        return self::$cache[$path] ??= require $path;
     }
 }

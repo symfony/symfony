@@ -21,10 +21,10 @@ class RoutingConfigurator
 {
     use Traits\AddTrait;
 
-    private $loader;
-    private $path;
-    private $file;
-    private $env;
+    private PhpFileLoader $loader;
+    private string $path;
+    private string $file;
+    private ?string $env;
 
     public function __construct(RouteCollection $collection, PhpFileLoader $loader, string $path, string $file, string $env = null)
     {

@@ -19,13 +19,13 @@ use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
  */
 class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 {
-    private $data;
-    private $position = 0;
-    private $key = 0;
-    private $maxDepth = 20;
-    private $maxItemsPerDepth = -1;
-    private $useRefHandles = -1;
-    private $context = [];
+    private array $data;
+    private int $position = 0;
+    private int|string $key = 0;
+    private int $maxDepth = 20;
+    private int $maxItemsPerDepth = -1;
+    private int $useRefHandles = -1;
+    private array $context = [];
 
     /**
      * @param array $data An array as returned by ClonerInterface::cloneVar()

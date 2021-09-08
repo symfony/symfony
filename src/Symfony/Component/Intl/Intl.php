@@ -54,7 +54,7 @@ final class Intl
      */
     public const TIMEZONE_DIR = 'timezones';
 
-    private static string|bool|null $icuVersion = false;
+    private static string|false|null $icuVersion = false;
     private static string $icuDataVersion;
 
     /**

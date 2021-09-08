@@ -32,9 +32,9 @@ class MailgunHttpTransport extends AbstractHttpTransport
 
     private const HOST = 'api.%region_dot%mailgun.net';
 
-    private $key;
-    private $domain;
-    private $region;
+    private string $key;
+    private string $domain;
+    private ?string $region;
 
     public function __construct(string $key, string $domain, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {

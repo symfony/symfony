@@ -28,7 +28,7 @@ abstract class AbstractStream
     protected $in;
     protected $out;
 
-    private $debug = '';
+    private string $debug = '';
 
     public function write(string $bytes, bool $debug = true): void
     {

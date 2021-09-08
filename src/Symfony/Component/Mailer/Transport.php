@@ -54,7 +54,7 @@ final class Transport
         SesTransportFactory::class,
     ];
 
-    private $factories;
+    private iterable $factories;
 
     public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
     {

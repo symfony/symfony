@@ -24,10 +24,10 @@ use Symfony\Component\Mime\RawMessage;
  */
 class RoundRobinTransport implements TransportInterface
 {
-    private $deadTransports;
-    private $transports = [];
-    private $retryPeriod;
-    private $cursor = -1;
+    private \SplObjectStorage $deadTransports;
+    private array $transports = [];
+    private int $retryPeriod;
+    private int $cursor = -1;
 
     /**
      * @param TransportInterface[] $transports

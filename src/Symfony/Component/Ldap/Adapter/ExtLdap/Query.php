@@ -25,9 +25,6 @@ class Query extends AbstractQuery
     // As of PHP 7.2, we can use LDAP_CONTROL_PAGEDRESULTS instead of this
     public const PAGINATION_OID = '1.2.840.113556.1.4.319';
 
-    /** @var Connection */
-    protected $connection;
-
     /** @var resource[] */
     private $results;
 
@@ -154,17 +151,13 @@ class Query extends AbstractQuery
      * Returns an LDAP search resource. If this query resulted in multiple searches, only the first
      * page will be returned.
      *
-     * @return resource
+     * @return resource|null
      *
      * @internal
      */
     public function getResource(int $idx = 0)
     {
-        if (null === $this->results || $idx >= \count($this->results)) {
-            return null;
-        }
-
-        return $this->results[$idx];
+        return $this->results[$idx] ?? null;
     }
 
     /**
@@ -249,9 +242,9 @@ class Query extends AbstractQuery
      *
      * @param resource $con
      *
-     * @return resource
+     * @return resource|false
      */
-    private function callSearchFunction($con, string $func, int $sizeLimit)
+    private function callSearchFunction($con, callable $func, int $sizeLimit)
     {
         return @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref'], $this->serverctrls);
     }

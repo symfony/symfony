@@ -86,7 +86,7 @@ trait MicroKernelTrait
      */
     public function registerBundles(): iterable
     {
-        $contents = require $this->getProjectDir().'/config/bundles.php';
+        $contents = require $this->getBundlesPath();
         foreach ($contents as $class => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {
                 yield new $class();
@@ -122,7 +122,7 @@ trait MicroKernelTrait
             $kernelDefinition->addTag('routing.route_loader');
 
             $container->addObjectResource($this);
-            $container->fileExists($this->getProjectDir().'/config/bundles.php');
+            $container->fileExists($this->getBundlesPath());
 
             try {
                 $configureContainer = new \ReflectionMethod($this, 'configureContainer');
@@ -183,5 +183,13 @@ trait MicroKernelTrait
         }
 
         return $collection;
+    }
+
+    /**
+     * Gets the path to the bundles configuration file.
+     */
+    private function getBundlesPath(): string
+    {
+        return $this->getProjectDir().'/config/bundles.php';
     }
 }

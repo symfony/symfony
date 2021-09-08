@@ -18,14 +18,23 @@ namespace Symfony\Component\Ldap;
 class Entry
 {
     private $dn;
-    private $attributes;
-    private $lowerMap;
 
+    /**
+     * @var array<string, array>
+     */
+    private $attributes = [];
+
+    /**
+     * @var array<string, string>
+     */
+    private $lowerMap = [];
+
+    /**
+     * @param array<string, array> $attributes
+     */
     public function __construct(string $dn, array $attributes = [])
     {
         $this->dn = $dn;
-        $this->attributes = [];
-        $this->lowerMap = [];
 
         foreach ($attributes as $key => $attribute) {
             $this->setAttribute($key, $attribute);

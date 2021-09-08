@@ -569,7 +569,7 @@ $classes[] = 'Some\Sidekick2';
 $classes[] = 'Request';
 $classes[] = 'Symfony\Component\DependencyInjection\ContainerInterface';
 
-Preloader::preload($classes);
+$preloaded = Preloader::preload($classes);
 
     [ProjectServiceContainer.php] => <?php
 

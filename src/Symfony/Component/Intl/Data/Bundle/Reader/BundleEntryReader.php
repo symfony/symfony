@@ -28,12 +28,12 @@ use Symfony\Component\Intl\Locale;
  */
 class BundleEntryReader implements BundleEntryReaderInterface
 {
-    private $reader;
+    private BundleReaderInterface $reader;
 
     /**
      * A mapping of locale aliases to locales.
      */
-    private $localeAliases = [];
+    private array $localeAliases = [];
 
     /**
      * Creates an entry reader based on the given resource bundle reader.

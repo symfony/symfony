@@ -11,7 +11,14 @@ CHANGELOG
  * Remove the `lock.RESOURCE_NAME` and `lock.RESOURCE_NAME.store` services and the `lock`, `LockInterface`, `lock.store` and `PersistingStoreInterface` aliases, use `lock.RESOURCE_NAME.factory`, `lock.factory` or `LockFactory` instead
  * The `form.factory`, `form.type.file`, `translator`, `security.csrf.token_manager`, `serializer`,
    `cache_clearer`, `filesystem` and `validator` services are now private
-* Remove the `output-format` and `xliff-version` options from `TranslationUpdateCommand`
+ * Remove the `output-format` and `xliff-version` options from `TranslationUpdateCommand`
+ * Remove `has()`, `get()`, `getDoctrine()`n and `dispatchMessage()` from `AbstractController`, use method/constructor injection instead
+ * Make the "framework.router.utf8" configuration option default to `true`
+ * Remove the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
+ * Make the `profiler` service private
+ * Remove all other values than "none", "php_array" and "file" for `framework.annotation.cache`
+ * Register workflow services as private
+ * Remove support for passing a `RouteCollectionBuilder` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
 
 5.4
 ---

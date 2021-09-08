@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -20,8 +19,6 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 
 class ResolveChildDefinitionsPassTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testProcess()
     {
         $container = new ContainerBuilder();

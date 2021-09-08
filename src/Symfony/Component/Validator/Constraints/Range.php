@@ -48,16 +48,6 @@ class Range extends Constraint
     public $max;
     public $maxPropertyPath;
 
-    /**
-     * @internal
-     */
-    public $deprecatedMinMessageSet = false;
-
-    /**
-     * @internal
-     */
-    public $deprecatedMaxMessageSet = false;
-
     public function __construct(
         array $options = null,
         string $notInRangeMessage = null,

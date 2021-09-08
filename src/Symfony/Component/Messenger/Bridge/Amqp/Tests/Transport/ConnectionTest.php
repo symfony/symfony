@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
@@ -26,8 +25,6 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  */
 class ConnectionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private const DEFAULT_EXCHANGE_NAME = 'messages';
 
     public function testItCannotBeConstructedWithAWrongDsn()

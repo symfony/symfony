@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
@@ -23,8 +22,6 @@ use Symfony\Component\Security\Http\EventListener\UserProviderListener;
 
 class UserProviderListenerTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private $userProvider;
     private $listener;
 

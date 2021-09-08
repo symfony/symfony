@@ -68,8 +68,6 @@ class SwitchUserTokenTest extends TestCase
      *         )
      *     )
      * )
-     *
-     * @group legacy
      */
     public function testUnserializeOldToken()
     {

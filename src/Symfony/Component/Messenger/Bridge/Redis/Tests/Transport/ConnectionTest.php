@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Exception\TransportException;
 
@@ -21,8 +20,6 @@ use Symfony\Component\Messenger\Exception\TransportException;
  */
 class ConnectionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testFromInvalidDsn()
     {
         $this->expectException(\InvalidArgumentException::class);

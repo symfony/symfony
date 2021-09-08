@@ -603,8 +603,6 @@ class FrameworkExtension extends Extension
     {
         $loader->load('form.php');
 
-        $container->getDefinition('form.type_extension.form.validator')->setArgument(1, $config['form']['legacy_error_messages']);
-
         if (null === $config['form']['csrf_protection']['enabled']) {
             $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
         }
@@ -729,7 +727,7 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
-        $container->setParameter('profiler_listener.only_main_requests', $config['only_main_requests'] || $config['only_master_requests']);
+        $container->setParameter('profiler_listener.only_main_requests', $config['only_main_requests']);
 
         // Choose storage class based on the DSN
         [$class] = explode(':', $config['dsn'], 2);
@@ -991,10 +989,6 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('routing.php');
-
-        if (null === $config['utf8']) {
-            trigger_deprecation('symfony/framework-bundle', '5.1', 'Not setting the "framework.router.utf8" configuration option is deprecated, it will default to "true" in version 6.0.');
-        }
 
         if ($config['utf8']) {
             $container->getDefinition('routing.loader')->replaceArgument(1, ['utf8' => true]);
@@ -1530,60 +1524,35 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        $cacheService = $config['cache'];
-        if (\in_array($config['cache'], ['php_array', 'file'])) {
-            $isPsr6Service = $container->hasDefinition('annotations.psr_cached_reader');
-        } else {
-            $isPsr6Service = false;
-            trigger_deprecation('symfony/framework-bundle', '5.3', 'Using a custom service for "framework.annotation.cache" is deprecated, only values "none", "php_array" and "file" are valid in version 6.0.');
+        if ($container->hasDefinition('annotations.psr_cached_reader')) {
+            $container->setDefinition('annotations.cached_reader', $container->getDefinition('annotations.psr_cached_reader'));
         }
 
-        if ($isPsr6Service) {
-            $container->removeDefinition('annotations.cached_reader');
-            $container->setDefinition('annotations.cached_reader', $container->getDefinition('annotations.psr_cached_reader'));
+        if ('php_array' === $config['cache']) {
+            $cacheService = $container->hasDefinition('annotations.psr_cached_reader') ? 'annotations.cache_adapter' : 'annotations.cache';
 
-            if ('php_array' === $config['cache']) {
-                $cacheService = 'annotations.cache_adapter';
-
-                // Enable warmer only if PHP array is used for cache
-                $definition = $container->findDefinition('annotations.cache_warmer');
-                $definition->addTag('kernel.cache_warmer');
-            } elseif ('file' === $config['cache']) {
-                $cacheService = 'annotations.filesystem_cache_adapter';
-                $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
-
-                if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-                    throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
-                }
-
-                $container
-                    ->getDefinition('annotations.filesystem_cache_adapter')
-                    ->replaceArgument(2, $cacheDir)
-                ;
-            }
+            // Enable warmer only if PHP array is used for cache
+            $definition = $container->findDefinition('annotations.cache_warmer');
+            $definition->addTag('kernel.cache_warmer');
         } else {
-            // Legacy code for doctrine/annotations:<1.13
-            if (!class_exists(\Doctrine\Common\Cache\CacheProvider::class)) {
-                throw new LogicException('Annotations cannot be cached as the Doctrine Cache library is not installed. Try running "composer require doctrine/cache".');
+            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
+
+            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
+                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
             }
 
-            if ('php_array' === $config['cache']) {
-                $cacheService = 'annotations.cache';
+            $container
+                ->getDefinition('annotations.filesystem_cache_adapter')
+                ->replaceArgument(2, $cacheDir)
+            ;
 
-                // Enable warmer only if PHP array is used for cache
-                $definition = $container->findDefinition('annotations.cache_warmer');
-                $definition->addTag('kernel.cache_warmer');
-            } elseif ('file' === $config['cache']) {
-                $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
-
-                if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-                    throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+            if ($container->hasDefinition('annotations.psr_cached_reader')) {
+                $cacheService = 'annotations.filesystem_cache_adapter';
+            } else {
+                // Legacy code for doctrine/annotations:<1.13
+                if (!class_exists(\Doctrine\Common\Cache\CacheProvider::class)) {
+                    throw new LogicException('Annotations cannot be cached as the Doctrine Cache library is not installed. Try running "composer require doctrine/cache".');
                 }
-
-                $container
-                    ->getDefinition('annotations.filesystem_cache_adapter')
-                    ->replaceArgument(2, $cacheDir)
-                ;
 
                 $cacheService = 'annotations.filesystem_cache';
             }
@@ -2296,9 +2265,6 @@ class FrameworkExtension extends Extension
         $transports = $config['dsn'] ? ['main' => $config['dsn']] : $config['transports'];
         $container->getDefinition('mailer.transports')->setArgument(0, $transports);
         $container->getDefinition('mailer.default_transport')->setArgument(0, current($transports));
-
-        $container->removeDefinition('mailer.logger_message_listener');
-        $container->setAlias('mailer.logger_message_listener', (new Alias('mailer.message_logger_listener'))->setDeprecated('symfony/framework-bundle', '5.2', 'The "%alias_id%" alias is deprecated, use "mailer.message_logger_listener" instead.'));
 
         $mailer = $container->getDefinition('mailer.mailer');
         if (false === $messageBus = $config['message_bus']) {

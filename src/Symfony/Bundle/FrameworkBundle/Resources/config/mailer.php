@@ -69,11 +69,6 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
 
-        ->set('mailer.logger_message_listener', MessageLoggerListener::class)
-            ->tag('kernel.event_subscriber')
-            ->tag('kernel.reset', ['method' => 'reset'])
-            ->deprecate('symfony/framework-bundle', '5.2', 'The "%service_id%" service is deprecated, use "mailer.message_logger_listener" instead.')
-
         ->set('mailer.message_logger_listener', MessageLoggerListener::class)
             ->tag('kernel.event_subscriber')
             ->tag('kernel.reset', ['method' => 'reset'])

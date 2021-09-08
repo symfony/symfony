@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 class IntegerTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
-    use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;
 
     protected function createForm(array $options = [])

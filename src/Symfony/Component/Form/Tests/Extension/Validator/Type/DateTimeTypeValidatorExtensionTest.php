@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 class DateTimeTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
-    use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;
 
     protected function createForm(array $options = [])

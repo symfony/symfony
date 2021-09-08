@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,8 +27,6 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 class LogoutListenerTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testHandleUnmatchedPath()
     {
         $dispatcher = $this->getEventDispatcher();

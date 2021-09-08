@@ -5,6 +5,5 @@ $container->loadFromExtension('framework', [
         'csrf_protection' => [
             'enabled' => false,
         ],
-        'legacy_error_messages' => false,
     ],
 ]);

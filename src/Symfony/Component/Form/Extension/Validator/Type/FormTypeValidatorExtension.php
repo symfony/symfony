@@ -34,7 +34,6 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     {
         $this->validator = $validator;
         $this->violationMapper = new ViolationMapper($formRenderer, $translator);
-        $this->legacyErrorMessages = $legacyErrorMessages;
     }
 
     /**
@@ -62,11 +61,9 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
             'constraints' => [],
             'invalid_message' => 'This value is not valid.',
             'invalid_message_parameters' => [],
-            'legacy_error_messages' => $this->legacyErrorMessages,
             'allow_extra_fields' => false,
             'extra_fields_message' => 'This form should not contain extra fields.',
         ]);
-        $resolver->setAllowedTypes('legacy_error_messages', 'bool');
 
         $resolver->setNormalizer('constraints', $constraintsNormalizer);
     }

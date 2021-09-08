@@ -1062,7 +1062,6 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @group legacy
      * @dataProvider provideMessageIfMinAndMaxSet
      */
     public function testMessageIfMinAndMaxSet(array $constraintExtraOptions, int $value, string $expectedMessage, string $expectedCode)

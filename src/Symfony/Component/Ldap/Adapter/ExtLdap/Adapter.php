@@ -22,9 +22,9 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class Adapter implements AdapterInterface
 {
-    private $config;
-    private $connection;
-    private $entryManager;
+    private array $config;
+    private ConnectionInterface $connection;
+    private EntryManagerInterface $entryManager;
 
     public function __construct(array $config = [])
     {
@@ -40,11 +40,7 @@ class Adapter implements AdapterInterface
      */
     public function getConnection(): ConnectionInterface
     {
-        if (null === $this->connection) {
-            $this->connection = new Connection($this->config);
-        }
-
-        return $this->connection;
+        return $this->connection ??= new Connection($this->config);
     }
 
     /**
@@ -52,11 +48,7 @@ class Adapter implements AdapterInterface
      */
     public function getEntryManager(): EntryManagerInterface
     {
-        if (null === $this->entryManager) {
-            $this->entryManager = new EntryManager($this->getConnection());
-        }
-
-        return $this->entryManager;
+        return $this->entryManager ??= new EntryManager($this->getConnection());
     }
 
     /**

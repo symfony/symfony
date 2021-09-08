@@ -20,9 +20,9 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class Collection implements CollectionInterface
 {
-    private $connection;
-    private $search;
-    private $entries;
+    private Connection $connection;
+    private Query $search;
+    private array $entries;
 
     public function __construct(Connection $connection, Query $search)
     {
@@ -35,11 +35,7 @@ class Collection implements CollectionInterface
      */
     public function toArray(): array
     {
-        if (null === $this->entries) {
-            $this->entries = iterator_to_array($this->getIterator(), false);
-        }
-
-        return $this->entries;
+        return $this->entries ??= iterator_to_array($this->getIterator(), false);
     }
 
     public function count(): int

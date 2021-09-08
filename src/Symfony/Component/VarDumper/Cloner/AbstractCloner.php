@@ -194,8 +194,16 @@ abstract class AbstractCloner implements ClonerInterface
     protected $maxString = -1;
     protected $minDepth = 1;
 
+    /**
+     * @var array<string, list<callable>>
+     */
     private $casters = [];
+
+    /**
+     * @var callable|null
+     */
     private $prevErrorHandler;
+
     private $classInfo = [];
     private $filter = 0;
 

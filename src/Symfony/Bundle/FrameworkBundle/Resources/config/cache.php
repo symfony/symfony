@@ -93,8 +93,10 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('cache.pool', ['clearer' => 'cache.default_clearer', 'reset' => 'reset'])
             ->tag('monolog.logger', ['channel' => 'cache'])
+        ;
 
-        ->set('cache.adapter.doctrine', DoctrineAdapter::class)
+    if (class_exists(DoctrineAdapter::class)) {
+        $container->services()->set('cache.adapter.doctrine', DoctrineAdapter::class)
             ->abstract()
             ->args([
                 abstract_arg('Doctrine provider service'),
@@ -108,7 +110,11 @@ return static function (ContainerConfigurator $container) {
                 'reset' => 'reset',
             ])
             ->tag('monolog.logger', ['channel' => 'cache'])
+            ->deprecate('symfony/framework-bundle', '5.4', 'The abstract service "%service_id%" is deprecated.')
+        ;
+    }
 
+    $container->services()
         ->set('cache.adapter.filesystem', FilesystemAdapter::class)
             ->abstract()
             ->args([

@@ -14,7 +14,7 @@ DoctrineBridge
 Cache
 -----
 
- * Remove `DoctrineProvider` because it has been added to the `doctrine/cache` package
+ * Remove `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
 
 Config
 ------
@@ -104,6 +104,7 @@ FrameworkBundle
  * Remove option `--output-format` of the `translation:update` command, use e.g. `--output-format=xlf20` instead
  * Remove the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Remove `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
+ * Deprecate the `cache.adapter.doctrine` service: The Doctrine Cache library is deprecated. Either switch to Symfony Cache or use the PSR-6 adapters provided by Doctrine Cache.
 
 HttpFoundation
 --------------

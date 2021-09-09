@@ -32,11 +32,10 @@ class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
     use LoggerAwareTrait;
 
     /** @var PersistingStoreInterface[] */
-    private $stores;
-    /** @var StrategyInterface */
-    private $strategy;
+    private array $stores;
+    private StrategyInterface $strategy;
     /** @var SharedLockStoreInterface[] */
-    private $sharedLockStores;
+    private array $sharedLockStores;
 
     /**
      * @param PersistingStoreInterface[] $stores The list of synchronized stores

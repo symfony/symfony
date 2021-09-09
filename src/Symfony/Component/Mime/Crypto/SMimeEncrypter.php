@@ -19,8 +19,8 @@ use Symfony\Component\Mime\Message;
  */
 final class SMimeEncrypter extends SMime
 {
-    private $certs;
-    private $cipher;
+    private string|array $certs;
+    private int $cipher;
 
     /**
      * @param string|string[] $certificate The path (or array of paths) of the file(s) containing the X.509 certificate(s)

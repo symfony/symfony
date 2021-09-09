@@ -33,11 +33,11 @@ final class Address
      */
     private const FROM_STRING_PATTERN = '~(?<displayName>[^<]*)<(?<addrSpec>.*)>[^>]*~';
 
-    private static $validator;
-    private static $encoder;
+    private static EmailValidator $validator;
+    private static IdnAddressEncoder $encoder;
 
-    private $address;
-    private $name;
+    private string $address;
+    private string $name;
 
     public function __construct(string $address, string $name = '')
     {
@@ -45,9 +45,7 @@ final class Address
             throw new LogicException(sprintf('The "%s" class cannot be used as it needs "%s"; try running "composer require egulias/email-validator".', __CLASS__, EmailValidator::class));
         }
 
-        if (null === self::$validator) {
-            self::$validator = new EmailValidator();
-        }
+        self::$validator ??= new EmailValidator();
 
         $this->address = trim($address);
         $this->name = trim(str_replace(["\n", "\r"], '', $name));
@@ -69,9 +67,7 @@ final class Address
 
     public function getEncodedAddress(): string
     {
-        if (null === self::$encoder) {
-            self::$encoder = new IdnAddressEncoder();
-        }
+        self::$encoder ??= new IdnAddressEncoder();
 
         return self::$encoder->encodeString($this->address);
     }

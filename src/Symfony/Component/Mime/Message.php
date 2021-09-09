@@ -21,8 +21,8 @@ use Symfony\Component\Mime\Part\TextPart;
  */
 class Message extends RawMessage
 {
-    private $headers;
-    private $body;
+    private Headers $headers;
+    private ?AbstractPart $body;
 
     public function __construct(Headers $headers = null, AbstractPart $body = null)
     {

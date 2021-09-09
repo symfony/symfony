@@ -18,7 +18,7 @@ namespace Symfony\Component\Mime\Crypto;
  */
 final class DkimOptions
 {
-    private $options = [];
+    private array $options = [];
 
     public function toArray(): array
     {

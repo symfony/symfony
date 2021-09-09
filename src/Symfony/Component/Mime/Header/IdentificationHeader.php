@@ -21,8 +21,8 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
  */
 final class IdentificationHeader extends AbstractHeader
 {
-    private $ids = [];
-    private $idsAsAddresses = [];
+    private array $ids = [];
+    private array $idsAsAddresses = [];
 
     public function __construct(string $name, string|array $ids)
     {

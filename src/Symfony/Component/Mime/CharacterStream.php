@@ -55,12 +55,12 @@ final class CharacterStream
         "\xf8" => 5, "\xf9" => 5, "\xfa" => 5, "\xfb" => 5, "\xfc" => 6, "\xfd" => 6, "\xfe" => 0, "\xff" => 0,
     ];
 
-    private $data = '';
-    private $dataSize = 0;
-    private $map = [];
-    private $charCount = 0;
-    private $currentPos = 0;
-    private $fixedWidth = 0;
+    private string $data = '';
+    private int $dataSize = 0;
+    private array $map = [];
+    private int $charCount = 0;
+    private int $currentPos = 0;
+    private int $fixedWidth = 0;
 
     /**
      * @param resource|string $input

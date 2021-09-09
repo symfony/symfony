@@ -311,7 +311,7 @@ abstract class AbstractToken implements TokenInterface
         };
         // if the username/identifier is an object with an eqials-method (like Uuid or Ulid), prefer that for a comparison
         if (\is_object($userIdentifier($this->user)) && method_exists($userIdentifier($this->user), 'equals')) {
-            if (!$userIdentifier($this->user)->equals($userIdentifier($user))){
+            if (!$userIdentifier($this->user)->equals($userIdentifier($user))) {
                 return true;
             }
         } elseif ($userIdentifier($this->user) !== $userIdentifier($user)) {

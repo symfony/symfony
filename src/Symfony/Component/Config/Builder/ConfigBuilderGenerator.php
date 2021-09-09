@@ -156,9 +156,10 @@ public function NAME(array $value = []): CLASS
 
         $body = '
 /**
-COMMENT * @return $this
+COMMENT *
+ * @return $this
  */
-public function NAME($valueDEFAULT): self
+public function NAME(mixed $valueDEFAULT): static
 {
     $this->PROPERTY = $value;
 
@@ -181,10 +182,11 @@ public function NAME($valueDEFAULT): self
                 // This is an array of values; don't use singular name
                 $body = '
 /**
- * @param ParamConfigurator|list<TYPE|ParamConfigurator> $value
+ * @param ParamConfigurator|list<ParamConfigurator|TYPE> $value
+ *
  * @return $this
  */
-public function NAME($value): self
+public function NAME(ParamConfigurator|array $value): static
 {
     $this->PROPERTY = $value;
 
@@ -195,17 +197,16 @@ public function NAME($value): self
             } else {
                 $body = '
 /**
- * @param ParamConfigurator|TYPE $value
  * @return $this
  */
-public function NAME(string $VAR, $VALUE): self
+public function NAME(string $VAR, TYPE $VALUE): static
 {
     $this->PROPERTY[$VAR] = $VALUE;
 
     return $this;
 }';
 
-                $class->addMethod($methodName, $body, ['PROPERTY' => $property->getName(), 'TYPE' => '' === $parameterType ? 'mixed' : $parameterType, 'VAR' => '' === $key ? 'key' : $key, 'VALUE' => 'value' === $key ? 'data' : 'value']);
+                $class->addMethod($methodName, $body, ['PROPERTY' => $property->getName(), 'TYPE' => '' === $parameterType ? 'mixed' : 'ParamConfigurator|'.$parameterType, 'VAR' => '' === $key ? 'key' : $key, 'VALUE' => 'value' === $key ? 'data' : 'value']);
             }
 
             return;
@@ -256,7 +257,7 @@ public function NAME(string $VAR, array $VALUE = []): CLASS
 /**
 COMMENT * @return $this
  */
-public function NAME($value): self
+public function NAME($value): static
 {
     $this->PROPERTY = $value;
 
@@ -301,31 +302,31 @@ public function NAME($value): self
     {
         $comment = '';
         if ('' !== $info = (string) $node->getInfo()) {
-            $comment .= ' * '.$info.\PHP_EOL;
+            $comment .= ' * '.$info."\n";
         }
 
         foreach ((array) ($node->getExample() ?? []) as $example) {
-            $comment .= ' * @example '.$example.\PHP_EOL;
+            $comment .= ' * @example '.$example."\n";
         }
 
         if ('' !== $default = $node->getDefaultValue()) {
-            $comment .= ' * @default '.(null === $default ? 'null' : var_export($default, true)).\PHP_EOL;
+            $comment .= ' * @default '.(null === $default ? 'null' : var_export($default, true))."\n";
         }
 
         if ($node instanceof EnumNode) {
             $comment .= sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_map(function ($a) {
                 return var_export($a, true);
-            }, $node->getValues()))).\PHP_EOL;
+            }, $node->getValues())))."\n";
         } else {
             $parameterType = $this->getParameterType($node);
             if (null === $parameterType || '' === $parameterType) {
                 $parameterType = 'mixed';
             }
-            $comment .= ' * @param ParamConfigurator|'.$parameterType.' $value'.\PHP_EOL;
+            $comment .= ' * @param ParamConfigurator|'.$parameterType.' $value'."\n";
         }
 
         if ($node->isDeprecated()) {
-            $comment .= ' * @deprecated '.$node->getDeprecation($node->getName(), $node->getParent()->getName())['message'].\PHP_EOL;
+            $comment .= ' * @deprecated '.$node->getDeprecation($node->getName(), $node->getParent()->getName())['message']."\n";
         }
 
         return $comment;
@@ -435,9 +436,10 @@ public function __construct(array $value = [])
         $class->addMethod('set', '
 /**
  * @param ParamConfigurator|mixed $value
+ *
  * @return $this
  */
-public function NAME(string $key, $value): self
+public function NAME(string $key, mixed $value): static
 {
     if (null === $value) {
         unset($this->_extraKeys[$key]);

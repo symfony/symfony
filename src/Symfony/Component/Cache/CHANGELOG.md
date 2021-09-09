@@ -4,7 +4,7 @@ CHANGELOG
 6.0
 ---
 
- * Remove `DoctrineProvider`
+ * Remove `DoctrineProvider` and `DoctrineAdapter`
 
 5.4
 ---

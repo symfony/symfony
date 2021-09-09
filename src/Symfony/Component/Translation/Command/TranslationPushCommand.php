@@ -24,8 +24,6 @@ use Symfony\Component\Translation\TranslatorBag;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
- *
- * @experimental in 5.3
  */
 final class TranslationPushCommand extends Command
 {

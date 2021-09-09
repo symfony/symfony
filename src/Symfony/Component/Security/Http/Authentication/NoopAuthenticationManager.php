@@ -18,8 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * This class is used when the authenticator system is activated.
  *
  * This is used to not break AuthenticationChecker and ContextListener when
- * using the authenticator system. Once the authenticator system is no longer
- * experimental, this class can be used to trigger deprecation notices.
+ * using the authenticator system.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *

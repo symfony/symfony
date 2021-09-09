@@ -34,7 +34,7 @@ final class SmscTransport extends AbstractTransport
     private $password;
     private $from;
 
-    public function __construct($username, $password, $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(?string $username, ?string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $username;
         $this->password = $password;
@@ -45,7 +45,7 @@ final class SmscTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('smsc://%s?from=%s', $this->getEndpoint(), (string) $this->from);
+        return sprintf('smsc://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -62,7 +62,7 @@ final class SmscTransport extends AbstractTransport
         $body = [
             'login' => $this->login,
             'psw' => $this->password,
-            'sender' => (string) $this->from,
+            'sender' => $this->from,
             'phones' => $message->getPhone(),
             'mes' => $message->getSubject(),
             'fmt' => 3, // response as JSON

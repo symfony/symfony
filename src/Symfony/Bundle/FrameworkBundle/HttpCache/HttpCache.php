@@ -45,8 +45,6 @@ class HttpCache extends BaseHttpCache
 
         if ($cache instanceof StoreInterface) {
             $this->store = $cache;
-        } elseif (null !== $cache && !\is_string($cache)) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be a string or a SurrogateInterface, "%s" given.', __METHOD__, get_debug_type($cache)));
         } else {
             $this->cacheDir = $cache;
         }

@@ -39,8 +39,6 @@ trait AsyncDecoratorTrait
     {
         if ($responses instanceof AsyncResponse) {
             $responses = [$responses];
-        } elseif (!is_iterable($responses)) {
-            throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of AsyncResponse objects, "%s" given.', __METHOD__, get_debug_type($responses)));
         }
 
         return new ResponseStream(AsyncResponse::stream($responses, $timeout, static::class));

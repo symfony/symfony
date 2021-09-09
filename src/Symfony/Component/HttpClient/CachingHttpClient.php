@@ -113,8 +113,6 @@ class CachingHttpClient implements HttpClientInterface
     {
         if ($responses instanceof ResponseInterface) {
             $responses = [$responses];
-        } elseif (!is_iterable($responses)) {
-            throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of ResponseInterface objects, "%s" given.', __METHOD__, get_debug_type($responses)));
         }
 
         $mockResponses = [];

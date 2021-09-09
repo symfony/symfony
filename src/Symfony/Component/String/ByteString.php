@@ -303,15 +303,7 @@ class ByteString extends AbstractString
             $fromRegexp .= 'i';
         }
 
-        if (\is_array($to)) {
-            if (!\is_callable($to)) {
-                throw new \TypeError(sprintf('Argument 2 passed to "%s::replaceMatches()" must be callable, array given.', static::class));
-            }
-
-            $replace = 'preg_replace_callback';
-        } else {
-            $replace = $to instanceof \Closure ? 'preg_replace_callback' : 'preg_replace';
-        }
+        $replace = \is_array($to) || $to instanceof \Closure ? 'preg_replace_callback' : 'preg_replace';
 
         set_error_handler(static function ($t, $m) { throw new InvalidArgumentException($m); });
 

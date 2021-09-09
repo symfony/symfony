@@ -1481,7 +1481,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $container->compile();
 
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foo', 'cache.adapter.apcu', 30);
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.bar', 'cache.adapter.doctrine', 5);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.baz', 'cache.adapter.filesystem', 7);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foobar', 'cache.adapter.psr6', 10);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.def', 'cache.app', 'PT11S');
@@ -1521,6 +1520,23 @@ abstract class FrameworkExtensionTest extends TestCase
                 ['setLogger', [new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]],
             ], $tagAwareDefinition->getMethodCalls());
         }
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDoctrineCache()
+    {
+        if (!class_exists(DoctrineAdapter::class)) {
+            self::markTestSkipped('This test requires symfony/cache 5.4 or lower.');
+        }
+
+        $container = $this->createContainerFromFile('doctrine_cache', [], true, false);
+        $container->setParameter('cache.prefix.seed', 'test');
+        $container->addCompilerPass(new CachePoolPass());
+        $container->compile();
+
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.bar', 'cache.adapter.doctrine', 5);
     }
 
     public function testRedisTagAwareAdapter()

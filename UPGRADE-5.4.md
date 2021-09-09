@@ -4,7 +4,7 @@ UPGRADE FROM 5.3 to 5.4
 Cache
 -----
 
- * Deprecate `DoctrineProvider` because this class has been added to the `doctrine/cache` package
+ * Deprecate `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
 
 Console
 -------
@@ -28,6 +28,7 @@ FrameworkBundle
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private
  * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
+ * Deprecate the `cache.adapter.doctrine` service: The Doctrine Cache library is deprecated. Either switch to Symfony Cache or use the PSR-6 adapters provided by Doctrine Cache.
 
 HttpKernel
 ----------

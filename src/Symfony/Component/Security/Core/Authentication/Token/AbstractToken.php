@@ -309,7 +309,13 @@ abstract class AbstractToken implements TokenInterface
         $userIdentifier = function ($user) {
             return method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername();
         };
-        if ($userIdentifier($this->user) !== $userIdentifier($user)) {
+        // if the username/identifier is an object with an eqials-method (like Uuid or Ulid), prefer that for a comparison
+        if (is_object($userIdentifier($this->user)) && method_exists($userIdentifier($this->user), 'equals')) {
+            if (!$userIdentifier($this->user)->equals($userIdentifier($user))){
+                return true;
+            }
+        }
+        elseif ($userIdentifier($this->user) !== $userIdentifier($user)) {
             return true;
         }
 

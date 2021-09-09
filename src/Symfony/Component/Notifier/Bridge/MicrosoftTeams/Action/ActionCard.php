@@ -23,6 +23,9 @@ final class ActionCard implements ActionInterface
 {
     private $options = [];
 
+    /**
+     * @return $this
+     */
     public function name(string $name): self
     {
         $this->options['name'] = $name;
@@ -30,6 +33,9 @@ final class ActionCard implements ActionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function input(InputInterface $inputAction): self
     {
         $this->options['inputs'][] = $inputAction->toArray();
@@ -37,6 +43,9 @@ final class ActionCard implements ActionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function action(ActionCardCompatibleActionInterface $action): self
     {
         $this->options['actions'][] = $action->toArray();

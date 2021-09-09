@@ -23,6 +23,9 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
         $this->options['text'] = $text;
     }
 
+    /**
+     * @return $this
+     */
     public function url(string $url): self
     {
         $this->options['url'] = $url;
@@ -30,6 +33,9 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function loginUrl(string $url): self
     {
         $this->options['login_url']['url'] = $url;
@@ -37,6 +43,9 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function loginUrlForwardText(string $text): self
     {
         $this->options['login_url']['forward_text'] = $text;
@@ -44,6 +53,9 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function requestWriteAccess(bool $bool): self
     {
         $this->options['login_url']['request_write_access'] = $bool;
@@ -51,6 +63,9 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function callbackData(string $data): self
     {
         $this->options['callback_data'] = $data;
@@ -58,6 +73,9 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function switchInlineQuery(string $query): self
     {
         $this->options['switch_inline_query'] = $query;
@@ -65,6 +83,9 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function payButton(bool $bool): self
     {
         $this->options['pay'] = $bool;

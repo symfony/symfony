@@ -53,6 +53,8 @@ final class AmazonSnsOptions implements MessageOptionsInterface
 
     /**
      * @see PublishInput::$Subject
+     *
+     * @return $this
      */
     public function subject(string $subject): self
     {
@@ -63,6 +65,8 @@ final class AmazonSnsOptions implements MessageOptionsInterface
 
     /**
      * @see PublishInput::$MessageStructure
+     *
+     * @return $this
      */
     public function messageStructure(string $messageStructure): self
     {

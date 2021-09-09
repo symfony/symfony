@@ -39,6 +39,8 @@ class RateLimit
     }
 
     /**
+     * @return $this
+     *
      * @throws RateLimitExceededException if not accepted
      */
     public function ensureAccepted(): self

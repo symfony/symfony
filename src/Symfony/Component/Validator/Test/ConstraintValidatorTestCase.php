@@ -326,6 +326,9 @@ final class ConstraintViolationAssertion
         $this->assertions = $assertions;
     }
 
+    /**
+     * @return $this
+     */
     public function atPath(string $path)
     {
         $this->propertyPath = $path;
@@ -333,6 +336,9 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setParameter(string $key, string $value)
     {
         $this->parameters[$key] = $value;
@@ -340,6 +346,9 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;
@@ -347,6 +356,9 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setTranslationDomain($translationDomain)
     {
         // no-op for BC
@@ -354,6 +366,9 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setInvalidValue($invalidValue)
     {
         $this->invalidValue = $invalidValue;
@@ -361,6 +376,9 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setPlural(int $number)
     {
         $this->plural = $number;
@@ -368,6 +386,9 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setCode(string $code)
     {
         $this->code = $code;
@@ -375,6 +396,9 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setCause($cause)
     {
         $this->cause = $cause;
@@ -448,6 +472,9 @@ class AssertingContextualValidator implements ContextualValidatorInterface
     {
     }
 
+    /**
+     * @return $this
+     */
     public function doAtPath(string $path)
     {
         Assert::assertFalse($this->expectNoValidate, 'No validation calls have been expected.');
@@ -465,6 +492,9 @@ class AssertingContextualValidator implements ContextualValidatorInterface
     {
     }
 
+    /**
+     * @return $this
+     */
     public function doValidate($value, $constraints = null, $groups = null)
     {
         Assert::assertFalse($this->expectNoValidate, 'No validation calls have been expected.');
@@ -490,6 +520,9 @@ class AssertingContextualValidator implements ContextualValidatorInterface
     {
     }
 
+    /**
+     * @return $this
+     */
     public function doValidateProperty(object $object, string $propertyName, $groups = null)
     {
         return $this;
@@ -499,6 +532,9 @@ class AssertingContextualValidator implements ContextualValidatorInterface
     {
     }
 
+    /**
+     * @return $this
+     */
     public function doValidatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null)
     {
         return $this;

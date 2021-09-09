@@ -59,6 +59,8 @@ class SmtpTransport extends AbstractTransport
      *
      * @param int $threshold The maximum number of messages (0 to disable)
      * @param int $sleep     The number of seconds to sleep between stopping and re-starting the transport
+     *
+     * @return $this
      */
     public function setRestartThreshold(int $threshold, int $sleep = 0): self
     {
@@ -99,6 +101,8 @@ class SmtpTransport extends AbstractTransport
      * If your server does not have a domain name, use the IP address. This will
      * automatically be wrapped in square brackets as described in RFC 5321,
      * section 4.1.3.
+     *
+     * @return $this
      */
     public function setLocalDomain(string $domain): self
     {

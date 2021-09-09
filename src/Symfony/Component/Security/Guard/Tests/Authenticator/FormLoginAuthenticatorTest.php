@@ -110,6 +110,8 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
 
     /**
      * @param mixed $defaultSuccessRedirectUrl
+     *
+     * @return $this
      */
     public function setDefaultSuccessRedirectUrl($defaultSuccessRedirectUrl): self
     {
@@ -120,6 +122,8 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
 
     /**
      * @param mixed $loginUrl
+     *
+     * @return $this
      */
     public function setLoginUrl($loginUrl): self
     {

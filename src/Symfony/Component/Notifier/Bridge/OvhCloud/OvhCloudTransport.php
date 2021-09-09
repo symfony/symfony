@@ -53,6 +53,9 @@ final class OvhCloudTransport extends AbstractTransport
         return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName);
     }
 
+    /**
+     * @return $this
+     */
     public function setSender(?string $sender): self
     {
         $this->sender = $sender;

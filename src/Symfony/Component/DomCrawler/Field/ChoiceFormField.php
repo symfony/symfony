@@ -310,7 +310,7 @@ class ChoiceFormField extends FormField
      *
      * @internal since Symfony 5.3
      *
-     * @return self
+     * @return $this
      */
     public function disableValidation()
     {

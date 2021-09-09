@@ -50,6 +50,9 @@ abstract class FirebaseOptions implements MessageOptionsInterface
         return $this->to;
     }
 
+    /**
+     * @return $this
+     */
     public function title(string $title): self
     {
         $this->options['title'] = $title;
@@ -57,6 +60,9 @@ abstract class FirebaseOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function body(string $body): self
     {
         $this->options['body'] = $body;
@@ -64,6 +70,9 @@ abstract class FirebaseOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function data(array $data): self
     {
         $this->data = $data;

@@ -19,6 +19,9 @@ abstract class AbstractInput implements InputInterface
 {
     private $options = [];
 
+    /**
+     * @return $this
+     */
     public function id(string $id): self
     {
         $this->options['id'] = $id;
@@ -26,6 +29,9 @@ abstract class AbstractInput implements InputInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function isRequired(bool $required): self
     {
         $this->options['isRequired'] = $required;
@@ -33,6 +39,9 @@ abstract class AbstractInput implements InputInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function title(string $title): self
     {
         $this->options['title'] = $title;
@@ -40,6 +49,9 @@ abstract class AbstractInput implements InputInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function value(string $value): self
     {
         $this->options['value'] = $value;

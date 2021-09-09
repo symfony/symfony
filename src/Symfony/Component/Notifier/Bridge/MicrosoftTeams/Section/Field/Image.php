@@ -21,6 +21,9 @@ final class Image
 {
     private $options = [];
 
+    /**
+     * @return $this
+     */
     public function image(string $imageUrl): self
     {
         $this->options['image'] = $imageUrl;
@@ -28,6 +31,9 @@ final class Image
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function title(string $title): self
     {
         $this->options['title'] = $title;

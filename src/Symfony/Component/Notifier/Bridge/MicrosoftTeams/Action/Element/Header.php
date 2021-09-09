@@ -21,6 +21,9 @@ final class Header
 {
     private $options = [];
 
+    /**
+     * @return $this
+     */
     public function name(string $name): self
     {
         $this->options['name'] = $name;
@@ -28,6 +31,9 @@ final class Header
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function value(string $value): self
     {
         $this->options['value'] = $value;

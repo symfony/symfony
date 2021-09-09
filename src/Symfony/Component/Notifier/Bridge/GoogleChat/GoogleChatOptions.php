@@ -62,6 +62,9 @@ final class GoogleChatOptions implements MessageOptionsInterface
         return $this->options;
     }
 
+    /**
+     * @return $this
+     */
     public function card(array $card): self
     {
         $this->options['cards'][] = $card;
@@ -69,6 +72,9 @@ final class GoogleChatOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function text(string $text): self
     {
         $this->options['text'] = $text;
@@ -76,6 +82,9 @@ final class GoogleChatOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setThreadKey(?string $threadKey): self
     {
         $this->threadKey = $threadKey;

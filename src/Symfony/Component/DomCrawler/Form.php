@@ -368,7 +368,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Disables validation.
      *
-     * @return self
+     * @return $this
      */
     public function disableValidation()
     {

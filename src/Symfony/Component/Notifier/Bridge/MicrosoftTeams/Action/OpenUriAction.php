@@ -30,6 +30,9 @@ final class OpenUriAction implements ActionCardCompatibleActionInterface
 
     private $options = [];
 
+    /**
+     * @return $this
+     */
     public function name(string $name): self
     {
         $this->options['name'] = $name;
@@ -37,6 +40,9 @@ final class OpenUriAction implements ActionCardCompatibleActionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function target(string $uri, string $os = 'default'): self
     {
         if (!\in_array($os, self::OPERATING_SYSTEMS)) {

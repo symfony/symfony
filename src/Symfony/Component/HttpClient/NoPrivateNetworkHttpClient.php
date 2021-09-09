@@ -53,10 +53,6 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
      */
     public function __construct(HttpClientInterface $client, string|array $subnets = null)
     {
-        if (!(\is_array($subnets) || \is_string($subnets) || null === $subnets)) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be of the type array, string or null. "%s" given.', __METHOD__, get_debug_type($subnets)));
-        }
-
         if (!class_exists(IpUtils::class)) {
             throw new \LogicException(sprintf('You can not use "%s" if the HttpFoundation component is not installed. Try running "composer require symfony/http-foundation".', __CLASS__));
         }

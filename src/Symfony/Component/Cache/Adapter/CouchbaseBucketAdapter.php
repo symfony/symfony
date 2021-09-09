@@ -58,8 +58,6 @@ class CouchbaseBucketAdapter extends AbstractAdapter
     {
         if (\is_string($servers)) {
             $servers = [$servers];
-        } elseif (!\is_array($servers)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be array or string, "%s" given.', __METHOD__, get_debug_type($servers)));
         }
 
         if (!static::isSupported()) {

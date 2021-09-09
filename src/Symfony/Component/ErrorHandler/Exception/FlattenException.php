@@ -179,7 +179,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setStatusText(string $statusText): self
+    public function setStatusText(string $statusText): static
     {
         $this->statusText = $statusText;
 

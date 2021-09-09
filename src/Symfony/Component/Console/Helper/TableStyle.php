@@ -88,7 +88,7 @@ class TableStyle
      *
      * @return $this
      */
-    public function setHorizontalBorderChars(string $outside, string $inside = null): self
+    public function setHorizontalBorderChars(string $outside, string $inside = null): static
     {
         $this->horizontalOutsideBorderChar = $outside;
         $this->horizontalInsideBorderChar = $inside ?? $outside;
@@ -113,7 +113,7 @@ class TableStyle
      *
      * @return $this
      */
-    public function setVerticalBorderChars(string $outside, string $inside = null): self
+    public function setVerticalBorderChars(string $outside, string $inside = null): static
     {
         $this->verticalOutsideBorderChar = $outside;
         $this->verticalInsideBorderChar = $inside ?? $outside;
@@ -167,7 +167,7 @@ class TableStyle
      *
      * @return $this
      */
-    public function setCrossingChars(string $cross, string $topLeft, string $topMid, string $topRight, string $midRight, string $bottomRight, string $bottomMid, string $bottomLeft, string $midLeft, string $topLeftBottom = null, string $topMidBottom = null, string $topRightBottom = null): self
+    public function setCrossingChars(string $cross, string $topLeft, string $topMid, string $topRight, string $midRight, string $bottomRight, string $bottomMid, string $bottomLeft, string $midLeft, string $topLeftBottom = null, string $topMidBottom = null, string $topRightBottom = null): static
     {
         $this->crossingChar = $cross;
         $this->crossingTopLeftChar = $topLeft;
@@ -338,7 +338,7 @@ class TableStyle
     /**
      * @return $this
      */
-    public function setHeaderTitleFormat(string $format): self
+    public function setHeaderTitleFormat(string $format): static
     {
         $this->headerTitleFormat = $format;
 
@@ -353,7 +353,7 @@ class TableStyle
     /**
      * @return $this
      */
-    public function setFooterTitleFormat(string $format): self
+    public function setFooterTitleFormat(string $format): static
     {
         $this->footerTitleFormat = $format;
 

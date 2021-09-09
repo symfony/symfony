@@ -124,7 +124,7 @@ final class AsyncContext
      *
      * @return $this
      */
-    public function setInfo(string $type, mixed $value): self
+    public function setInfo(string $type, mixed $value): static
     {
         if ('canceled' === $type && $value !== $this->info['canceled']) {
             throw new \LogicException('You cannot set the "canceled" info directly.');

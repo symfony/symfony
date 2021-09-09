@@ -24,7 +24,7 @@ final class DateInput extends AbstractInput
     /**
      * @return $this
      */
-    public function includeTime(bool $includeTime): self
+    public function includeTime(bool $includeTime): static
     {
         $this->options['includeTime'] = $includeTime;
 

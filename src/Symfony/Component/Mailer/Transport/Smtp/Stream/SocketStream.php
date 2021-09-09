@@ -34,7 +34,7 @@ final class SocketStream extends AbstractStream
     /**
      * @return $this
      */
-    public function setTimeout(float $timeout): self
+    public function setTimeout(float $timeout): static
     {
         $this->timeout = $timeout;
 
@@ -51,7 +51,7 @@ final class SocketStream extends AbstractStream
      *
      * @return $this
      */
-    public function setHost(string $host): self
+    public function setHost(string $host): static
     {
         $this->host = $host;
 
@@ -66,7 +66,7 @@ final class SocketStream extends AbstractStream
     /**
      * @return $this
      */
-    public function setPort(int $port): self
+    public function setPort(int $port): static
     {
         $this->port = $port;
 
@@ -83,7 +83,7 @@ final class SocketStream extends AbstractStream
      *
      * @return $this
      */
-    public function disableTls(): self
+    public function disableTls(): static
     {
         $this->tls = false;
 
@@ -98,7 +98,7 @@ final class SocketStream extends AbstractStream
     /**
      * @return $this
      */
-    public function setStreamOptions(array $options): self
+    public function setStreamOptions(array $options): static
     {
         $this->streamContextOptions = $options;
 
@@ -117,7 +117,7 @@ final class SocketStream extends AbstractStream
      *
      * @return $this
      */
-    public function setSourceIp(string $ip): self
+    public function setSourceIp(string $ip): static
     {
         $this->sourceIp = $ip;
 

@@ -22,7 +22,7 @@ abstract class AbstractInput implements InputInterface
     /**
      * @return $this
      */
-    public function id(string $id): self
+    public function id(string $id): static
     {
         $this->options['id'] = $id;
 
@@ -32,7 +32,7 @@ abstract class AbstractInput implements InputInterface
     /**
      * @return $this
      */
-    public function isRequired(bool $required): self
+    public function isRequired(bool $required): static
     {
         $this->options['isRequired'] = $required;
 
@@ -42,7 +42,7 @@ abstract class AbstractInput implements InputInterface
     /**
      * @return $this
      */
-    public function title(string $title): self
+    public function title(string $title): static
     {
         $this->options['title'] = $title;
 
@@ -52,7 +52,7 @@ abstract class AbstractInput implements InputInterface
     /**
      * @return $this
      */
-    public function value(string $value): self
+    public function value(string $value): static
     {
         $this->options['value'] = $value;
 

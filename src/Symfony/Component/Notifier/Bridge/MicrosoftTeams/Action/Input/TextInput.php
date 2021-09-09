@@ -24,7 +24,7 @@ final class TextInput extends AbstractInput
     /**
      * @return $this
      */
-    public function isMultiline(bool $multiline): self
+    public function isMultiline(bool $multiline): static
     {
         $this->options['isMultiline'] = $multiline;
 
@@ -34,7 +34,7 @@ final class TextInput extends AbstractInput
     /**
      * @return $this
      */
-    public function maxLength(int $maxLength): self
+    public function maxLength(int $maxLength): static
     {
         $this->options['maxLength'] = $maxLength;
 

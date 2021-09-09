@@ -324,7 +324,7 @@ final class ConstraintViolationAssertion
     /**
      * @return $this
      */
-    public function atPath(string $path)
+    public function atPath(string $path): static
     {
         $this->propertyPath = $path;
 
@@ -334,7 +334,7 @@ final class ConstraintViolationAssertion
     /**
      * @return $this
      */
-    public function setParameter(string $key, string $value)
+    public function setParameter(string $key, string $value): static
     {
         $this->parameters[$key] = $value;
 
@@ -344,7 +344,7 @@ final class ConstraintViolationAssertion
     /**
      * @return $this
      */
-    public function setParameters(array $parameters)
+    public function setParameters(array $parameters): static
     {
         $this->parameters = $parameters;
 
@@ -374,7 +374,7 @@ final class ConstraintViolationAssertion
     /**
      * @return $this
      */
-    public function setPlural(int $number)
+    public function setPlural(int $number): static
     {
         $this->plural = $number;
 
@@ -384,7 +384,7 @@ final class ConstraintViolationAssertion
     /**
      * @return $this
      */
-    public function setCode(string $code)
+    public function setCode(string $code): static
     {
         $this->code = $code;
 
@@ -471,7 +471,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
     /**
      * @return $this
      */
-    public function doAtPath(string $path)
+    public function doAtPath(string $path): static
     {
         Assert::assertFalse($this->expectNoValidate, 'No validation calls have been expected.');
 

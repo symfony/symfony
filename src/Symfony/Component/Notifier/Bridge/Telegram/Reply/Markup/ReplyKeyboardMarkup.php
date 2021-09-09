@@ -44,7 +44,7 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
     /**
      * @return $this
      */
-    public function resizeKeyboard(bool $bool): self
+    public function resizeKeyboard(bool $bool): static
     {
         $this->options['resize_keyboard'] = $bool;
 
@@ -54,7 +54,7 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
     /**
      * @return $this
      */
-    public function oneTimeKeyboard(bool $bool): self
+    public function oneTimeKeyboard(bool $bool): static
     {
         $this->options['one_time_keyboard'] = $bool;
 
@@ -64,7 +64,7 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
     /**
      * @return $this
      */
-    public function selective(bool $bool): self
+    public function selective(bool $bool): static
     {
         $this->options['selective'] = $bool;
 

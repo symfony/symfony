@@ -62,7 +62,7 @@ class SmtpTransport extends AbstractTransport
      *
      * @return $this
      */
-    public function setRestartThreshold(int $threshold, int $sleep = 0): self
+    public function setRestartThreshold(int $threshold, int $sleep = 0): static
     {
         $this->restartThreshold = $threshold;
         $this->restartThresholdSleep = $sleep;
@@ -104,7 +104,7 @@ class SmtpTransport extends AbstractTransport
      *
      * @return $this
      */
-    public function setLocalDomain(string $domain): self
+    public function setLocalDomain(string $domain): static
     {
         if ('' !== $domain && '[' !== $domain[0]) {
             if (filter_var($domain, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {

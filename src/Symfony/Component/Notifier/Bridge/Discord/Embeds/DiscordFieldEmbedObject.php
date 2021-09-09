@@ -19,7 +19,7 @@ final class DiscordFieldEmbedObject extends AbstractDiscordEmbedObject
     /**
      * @return $this
      */
-    public function name(string $name): self
+    public function name(string $name): static
     {
         $this->options['name'] = $name;
 
@@ -29,7 +29,7 @@ final class DiscordFieldEmbedObject extends AbstractDiscordEmbedObject
     /**
      * @return $this
      */
-    public function value(string $value): self
+    public function value(string $value): static
     {
         $this->options['value'] = $value;
 
@@ -39,7 +39,7 @@ final class DiscordFieldEmbedObject extends AbstractDiscordEmbedObject
     /**
      * @return $this
      */
-    public function inline(bool $inline): self
+    public function inline(bool $inline): static
     {
         $this->options['inline'] = $inline;
 

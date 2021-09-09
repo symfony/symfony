@@ -53,7 +53,7 @@ abstract class FirebaseOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function title(string $title): self
+    public function title(string $title): static
     {
         $this->options['title'] = $title;
 
@@ -63,7 +63,7 @@ abstract class FirebaseOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function body(string $body): self
+    public function body(string $body): static
     {
         $this->options['body'] = $body;
 
@@ -73,7 +73,7 @@ abstract class FirebaseOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function data(array $data): self
+    public function data(array $data): static
     {
         $this->data = $data;
 

@@ -44,7 +44,7 @@ class Compiler implements ResetInterface
     /**
      * @return $this
      */
-    public function reset()
+    public function reset(): static
     {
         $this->source = '';
 

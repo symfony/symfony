@@ -19,7 +19,7 @@ final class DiscordFooterEmbedObject extends AbstractDiscordEmbedObject
     /**
      * @return $this
      */
-    public function text(string $text): self
+    public function text(string $text): static
     {
         $this->options['text'] = $text;
 
@@ -29,7 +29,7 @@ final class DiscordFooterEmbedObject extends AbstractDiscordEmbedObject
     /**
      * @return $this
      */
-    public function iconUrl(string $iconUrl): self
+    public function iconUrl(string $iconUrl): static
     {
         $this->options['icon_url'] = $iconUrl;
 
@@ -39,7 +39,7 @@ final class DiscordFooterEmbedObject extends AbstractDiscordEmbedObject
     /**
      * @return $this
      */
-    public function proxyIconUrl(string $proxyIconUrl): self
+    public function proxyIconUrl(string $proxyIconUrl): static
     {
         $this->options['proxy_icon_url'] = $proxyIconUrl;
 

@@ -47,7 +47,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function enableMagicMethods(): self
+    public function enableMagicMethods(): static
     {
         $this->magicMethods = PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET | PropertyAccessor::MAGIC_CALL;
 
@@ -59,7 +59,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function disableMagicMethods(): self
+    public function disableMagicMethods(): static
     {
         $this->magicMethods = PropertyAccessor::DISALLOW_MAGIC_METHODS;
 
@@ -93,7 +93,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function enableMagicSet(): self
+    public function enableMagicSet(): static
     {
         $this->magicMethods |= PropertyAccessor::MAGIC_SET;
 
@@ -117,7 +117,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function disableMagicGet(): self
+    public function disableMagicGet(): static
     {
         $this->magicMethods &= ~PropertyAccessor::MAGIC_GET;
 
@@ -129,7 +129,7 @@ class PropertyAccessorBuilder
      *
      * @return $this
      */
-    public function disableMagicSet(): self
+    public function disableMagicSet(): static
     {
         $this->magicMethods &= ~PropertyAccessor::MAGIC_SET;
 

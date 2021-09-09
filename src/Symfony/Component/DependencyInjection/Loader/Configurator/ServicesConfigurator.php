@@ -101,7 +101,7 @@ class ServicesConfigurator extends AbstractConfigurator
      *
      * @return $this
      */
-    final public function remove(string $id): self
+    final public function remove(string $id): static
     {
         $this->container->removeDefinition($id);
         $this->container->removeAlias($id);

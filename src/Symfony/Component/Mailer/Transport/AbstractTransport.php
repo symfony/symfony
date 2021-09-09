@@ -41,7 +41,7 @@ abstract class AbstractTransport implements TransportInterface
      *
      * @return $this
      */
-    public function setMaxPerSecond(float $rate): self
+    public function setMaxPerSecond(float $rate): static
     {
         if (0 >= $rate) {
             $rate = 0;

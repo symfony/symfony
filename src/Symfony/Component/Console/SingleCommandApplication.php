@@ -27,7 +27,7 @@ class SingleCommandApplication extends Command
     /**
      * @return $this
      */
-    public function setVersion(string $version): self
+    public function setVersion(string $version): static
     {
         $this->version = $version;
 
@@ -39,7 +39,7 @@ class SingleCommandApplication extends Command
      *
      * @return $this
      */
-    public function setAutoExit(bool $autoExit): self
+    public function setAutoExit(bool $autoExit): static
     {
         $this->autoExit = $autoExit;
 

@@ -106,7 +106,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function setAutoLastModified()
+    public function setAutoLastModified(): static
     {
         $this->setLastModified(\DateTime::createFromFormat('U', $this->file->getMTime()));
 
@@ -118,7 +118,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function setAutoEtag()
+    public function setAutoEtag(): static
     {
         $this->setEtag(base64_encode(hash_file('sha256', $this->file->getPathname(), true)));
 

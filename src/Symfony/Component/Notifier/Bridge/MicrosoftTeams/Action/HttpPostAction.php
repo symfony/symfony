@@ -26,7 +26,7 @@ final class HttpPostAction implements ActionCardCompatibleActionInterface
     /**
      * @return $this
      */
-    public function name(string $name): self
+    public function name(string $name): static
     {
         $this->options['name'] = $name;
 
@@ -36,7 +36,7 @@ final class HttpPostAction implements ActionCardCompatibleActionInterface
     /**
      * @return $this
      */
-    public function target(string $url): self
+    public function target(string $url): static
     {
         $this->options['target'] = $url;
 
@@ -46,7 +46,7 @@ final class HttpPostAction implements ActionCardCompatibleActionInterface
     /**
      * @return $this
      */
-    public function header(Header $header): self
+    public function header(Header $header): static
     {
         $this->options['headers'][] = $header->toArray();
 
@@ -56,7 +56,7 @@ final class HttpPostAction implements ActionCardCompatibleActionInterface
     /**
      * @return $this
      */
-    public function body(string $body): self
+    public function body(string $body): static
     {
         $this->options['body'] = $body;
 
@@ -66,7 +66,7 @@ final class HttpPostAction implements ActionCardCompatibleActionInterface
     /**
      * @return $this
      */
-    public function bodyContentType(string $contentType): self
+    public function bodyContentType(string $contentType): static
     {
         $this->options['bodyContentType'] = $contentType;
 

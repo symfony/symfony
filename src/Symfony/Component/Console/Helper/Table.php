@@ -174,7 +174,7 @@ class Table
     /**
      * @return $this
      */
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers): static
     {
         $headers = array_values($headers);
         if (!empty($headers) && !\is_array($headers[0])) {
@@ -196,7 +196,7 @@ class Table
     /**
      * @return $this
      */
-    public function addRows(array $rows)
+    public function addRows(array $rows): static
     {
         foreach ($rows as $row) {
             $this->addRow($row);
@@ -226,7 +226,7 @@ class Table
      *
      * @return $this
      */
-    public function appendRow(TableSeparator|array $row): self
+    public function appendRow(TableSeparator|array $row): static
     {
         if (!$this->output instanceof ConsoleSectionOutput) {
             throw new RuntimeException(sprintf('Output should be an instance of "%s" when calling "%s".', ConsoleSectionOutput::class, __METHOD__));
@@ -255,7 +255,7 @@ class Table
     /**
      * @return $this
      */
-    public function setHeaderTitle(?string $title): self
+    public function setHeaderTitle(?string $title): static
     {
         $this->headerTitle = $title;
 
@@ -265,7 +265,7 @@ class Table
     /**
      * @return $this
      */
-    public function setFooterTitle(?string $title): self
+    public function setFooterTitle(?string $title): static
     {
         $this->footerTitle = $title;
 
@@ -275,7 +275,7 @@ class Table
     /**
      * @return $this
      */
-    public function setHorizontal(bool $horizontal = true): self
+    public function setHorizontal(bool $horizontal = true): static
     {
         $this->horizontal = $horizontal;
 

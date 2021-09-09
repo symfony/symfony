@@ -56,7 +56,7 @@ final class OvhCloudTransport extends AbstractTransport
     /**
      * @return $this
      */
-    public function setSender(?string $sender): self
+    public function setSender(?string $sender): static
     {
         $this->sender = $sender;
 

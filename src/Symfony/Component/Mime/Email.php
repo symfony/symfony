@@ -514,7 +514,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    private function setListAddressHeaderBody(string $name, array $addresses)
+    private function setListAddressHeaderBody(string $name, array $addresses): static
     {
         $addresses = Address::createArray($addresses);
         $headers = $this->getHeaders();

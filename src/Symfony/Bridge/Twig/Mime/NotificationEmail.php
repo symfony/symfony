@@ -72,7 +72,7 @@ class NotificationEmail extends TemplatedEmail
     /**
      * @return $this
      */
-    public function markAsPublic(): self
+    public function markAsPublic(): static
     {
         $this->context['importance'] = null;
         $this->context['footer_text'] = null;

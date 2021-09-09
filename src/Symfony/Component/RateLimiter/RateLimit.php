@@ -43,7 +43,7 @@ class RateLimit
      *
      * @throws RateLimitExceededException if not accepted
      */
-    public function ensureAccepted(): self
+    public function ensureAccepted(): static
     {
         if (!$this->accepted) {
             throw new RateLimitExceededException($this);

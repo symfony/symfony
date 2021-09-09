@@ -20,7 +20,7 @@ use Psr\Log\AbstractLogger;
  */
 class BufferingLogger extends AbstractLogger
 {
-    private $logs = [];
+    private array $logs = [];
 
     public function log($level, $message, array $context = []): void
     {

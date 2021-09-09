@@ -50,7 +50,7 @@ use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
  */
 class ErrorHandler
 {
-    private $levels = [
+    private array $levels = [
         \E_DEPRECATED => 'Deprecated',
         \E_USER_DEPRECATED => 'User Deprecated',
         \E_NOTICE => 'Notice',
@@ -68,7 +68,7 @@ class ErrorHandler
         \E_CORE_ERROR => 'Core Error',
     ];
 
-    private $loggers = [
+    private array $loggers = [
         \E_DEPRECATED => [null, LogLevel::INFO],
         \E_USER_DEPRECATED => [null, LogLevel::INFO],
         \E_NOTICE => [null, LogLevel::WARNING],
@@ -86,24 +86,23 @@ class ErrorHandler
         \E_CORE_ERROR => [null, LogLevel::CRITICAL],
     ];
 
-    private $thrownErrors = 0x1FFF; // E_ALL - E_DEPRECATED - E_USER_DEPRECATED
-    private $scopedErrors = 0x1FFF; // E_ALL - E_DEPRECATED - E_USER_DEPRECATED
-    private $tracedErrors = 0x77FB; // E_ALL - E_STRICT - E_PARSE
-    private $screamedErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE
-    private $loggedErrors = 0;
-    private $configureException;
-    private $debug;
+    private int $thrownErrors = 0x1FFF; // E_ALL - E_DEPRECATED - E_USER_DEPRECATED
+    private int $scopedErrors = 0x1FFF; // E_ALL - E_DEPRECATED - E_USER_DEPRECATED
+    private int $tracedErrors = 0x77FB; // E_ALL - E_STRICT - E_PARSE
+    private int $screamedErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE
+    private int $loggedErrors = 0;
+    private \Closure $configureException;
+    private bool $debug;
 
-    private $isRecursive = 0;
-    private $isRoot = false;
+    private bool $isRecursive = false;
+    private bool $isRoot = false;
     private $exceptionHandler;
-    private $bootstrappingLogger;
+    private ?BufferingLogger $bootstrappingLogger = null;
 
-    private static $reservedMemory;
-    private static $toStringException;
-    private static $silencedErrorCache = [];
-    private static $silencedErrorCount = 0;
-    private static $exitCode = 0;
+    private static ?string $reservedMemory = null;
+    private static array $silencedErrorCache = [];
+    private static int $silencedErrorCount = 0;
+    private static int $exitCode = 0;
 
     /**
      * Registers the error handler.
@@ -411,10 +410,7 @@ class ErrorHandler
 
         $logMessage = $this->levels[$type].': '.$message;
 
-        if (null !== self::$toStringException) {
-            $errorAsException = self::$toStringException;
-            self::$toStringException = null;
-        } elseif (!$throw && !($type & $level)) {
+        if (!$throw && !($type & $level)) {
             if (!isset(self::$silencedErrorCache[$id = $file.':'.$line])) {
                 $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 5), $type, $file, $line, false) : [];
                 $errorAsException = new SilencedErrorContext($type, $file, $line, isset($lightTrace[1]) ? [$lightTrace[0]] : $lightTrace);

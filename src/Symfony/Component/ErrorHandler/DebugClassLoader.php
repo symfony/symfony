@@ -100,24 +100,27 @@ class DebugClassLoader
         '__serialize' => 'array',
     ];
 
+    /**
+     * @var callable
+     */
     private $classLoader;
-    private $isFinder;
-    private $loaded = [];
-    private $patchTypes;
+    private bool $isFinder;
+    private array $loaded = [];
+    private array $patchTypes = [];
 
-    private static $caseCheck;
-    private static $checkedClasses = [];
-    private static $final = [];
-    private static $finalMethods = [];
-    private static $deprecated = [];
-    private static $internal = [];
-    private static $internalMethods = [];
-    private static $annotatedParameters = [];
-    private static $darwinCache = ['/' => ['/', []]];
-    private static $method = [];
-    private static $returnTypes = [];
-    private static $methodTraits = [];
-    private static $fileOffsets = [];
+    private static int $caseCheck;
+    private static array $checkedClasses = [];
+    private static array $final = [];
+    private static array $finalMethods = [];
+    private static array $deprecated = [];
+    private static array $internal = [];
+    private static array $internalMethods = [];
+    private static array $annotatedParameters = [];
+    private static array $darwinCache = ['/' => ['/', []]];
+    private static array $method = [];
+    private static array $returnTypes = [];
+    private static array $methodTraits = [];
+    private static array $fileOffsets = [];
 
     public function __construct(callable $classLoader)
     {

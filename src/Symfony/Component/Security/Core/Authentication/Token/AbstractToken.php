@@ -309,8 +309,8 @@ abstract class AbstractToken implements TokenInterface
         $userIdentifier = function ($user) {
             return method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername();
         };
-        // if the username/identifier is an object with an eqials-method (like Uuid or Ulid), prefer that for a comparison
-        if (\is_object($userIdentifier($this->user)) && method_exists($userIdentifier($this->user), 'equals')) {
+        // if the username/identifier is a Uid (like Uuid or Ulid), prefer its eqials-method for a comparison
+        if ($userIdentifier($this->user) instanceof \Symfony\Component\Uid\AbstractUid) {
             if (!$userIdentifier($this->user)->equals($userIdentifier($user))) {
                 return true;
             }

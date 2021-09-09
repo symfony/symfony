@@ -1559,23 +1559,12 @@ class FrameworkExtension extends Extension
 
         if ('none' === $config['cache']) {
             $container->removeDefinition('annotations.cached_reader');
-            $container->removeDefinition('annotations.psr_cached_reader');
 
             return;
         }
 
         $cacheService = $config['cache'];
         if (\in_array($config['cache'], ['php_array', 'file'])) {
-            $isPsr6Service = $container->hasDefinition('annotations.psr_cached_reader');
-        } else {
-            $isPsr6Service = false;
-            trigger_deprecation('symfony/framework-bundle', '5.3', 'Using a custom service for "framework.annotation.cache" is deprecated, only values "none", "php_array" and "file" are valid in version 6.0.');
-        }
-
-        if ($isPsr6Service) {
-            $container->removeDefinition('annotations.cached_reader');
-            $container->setDefinition('annotations.cached_reader', $container->getDefinition('annotations.psr_cached_reader'));
-
             if ('php_array' === $config['cache']) {
                 $cacheService = 'annotations.cache_adapter';
 
@@ -1596,31 +1585,7 @@ class FrameworkExtension extends Extension
                 ;
             }
         } else {
-            // Legacy code for doctrine/annotations:<1.13
-            if (!class_exists(\Doctrine\Common\Cache\CacheProvider::class)) {
-                throw new LogicException('Annotations cannot be cached as the Doctrine Cache library is not installed. Try running "composer require doctrine/cache".');
-            }
-
-            if ('php_array' === $config['cache']) {
-                $cacheService = 'annotations.cache';
-
-                // Enable warmer only if PHP array is used for cache
-                $definition = $container->findDefinition('annotations.cache_warmer');
-                $definition->addTag('kernel.cache_warmer');
-            } elseif ('file' === $config['cache']) {
-                $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
-
-                if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-                    throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
-                }
-
-                $container
-                    ->getDefinition('annotations.filesystem_cache_adapter')
-                    ->replaceArgument(2, $cacheDir)
-                ;
-
-                $cacheService = 'annotations.filesystem_cache';
-            }
+            trigger_deprecation('symfony/framework-bundle', '5.3', 'Using a custom service for "framework.annotation.cache" is deprecated, only values "none", "php_array" and "file" are valid in version 6.0.');
         }
 
         $container

@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate the public `profiler` service to private
  * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
  * Add `MicroKernelTrait::getBundlesPath` method to get bundles config path
+ * Deprecate the `cache.adapter.doctrine` service
 
 5.3
 ---

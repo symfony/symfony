@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Make `LockRegistry` use semaphores when possible
- * Deprecate `DoctrineProvider` because this class has been added to the `doctrine/cache` package
+ * Deprecate `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
 
 5.3
 ---

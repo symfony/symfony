@@ -16,6 +16,7 @@ use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\ArrayCache;
 
 /**
+ * @group legacy
  * @group time-sensitive
  */
 class DoctrineAdapterTest extends AdapterTestCase

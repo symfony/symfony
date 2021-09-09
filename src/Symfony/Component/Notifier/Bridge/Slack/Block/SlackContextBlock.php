@@ -20,6 +20,9 @@ final class SlackContextBlock extends AbstractSlackBlock
         $this->options['type'] = 'context';
     }
 
+    /**
+     * @return $this
+     */
     public function text(string $text, bool $markdown = true, bool $emoji = true, bool $verbatim = false): self
     {
         if (self::ELEMENT_LIMIT === \count($this->options['elements'] ?? [])) {
@@ -40,6 +43,9 @@ final class SlackContextBlock extends AbstractSlackBlock
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function image(string $url, string $text): self
     {
         if (self::ELEMENT_LIMIT === \count($this->options['elements'] ?? [])) {
@@ -55,6 +61,9 @@ final class SlackContextBlock extends AbstractSlackBlock
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function id(string $id): self
     {
         $this->options['block_id'] = $id;

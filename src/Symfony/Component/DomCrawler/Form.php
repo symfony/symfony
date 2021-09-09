@@ -330,8 +330,10 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Disables validation.
+     *
+     * @return $this
      */
-    public function disableValidation(): self
+    public function disableValidation(): static
     {
         foreach ($this->fields->all() as $field) {
             if ($field instanceof Field\ChoiceFormField) {

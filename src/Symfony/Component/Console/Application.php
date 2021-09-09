@@ -1108,6 +1108,8 @@ class Application implements ResetInterface
 
     /**
      * Sets the default Command name.
+     *
+     * @return $this
      */
     public function setDefaultCommand(string $commandName, bool $isSingleCommand = false): static
     {

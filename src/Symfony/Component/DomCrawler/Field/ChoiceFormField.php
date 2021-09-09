@@ -283,6 +283,8 @@ class ChoiceFormField extends FormField
      * Disables the internal validation of the field.
      *
      * @internal
+     *
+     * @return $this
      */
     public function disableValidation(): static
     {

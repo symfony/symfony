@@ -63,6 +63,9 @@ class EsmtpTransport extends SmtpTransport
         $stream->setPort($port);
     }
 
+    /**
+     * @return $this
+     */
     public function setUsername(string $username): self
     {
         $this->username = $username;
@@ -75,6 +78,9 @@ class EsmtpTransport extends SmtpTransport
         return $this->username;
     }
 
+    /**
+     * @return $this
+     */
     public function setPassword(string $password): self
     {
         $this->password = $password;

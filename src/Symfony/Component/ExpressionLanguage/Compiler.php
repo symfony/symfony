@@ -41,6 +41,9 @@ class Compiler implements ResetInterface
         return $this->source;
     }
 
+    /**
+     * @return $this
+     */
     public function reset()
     {
         $this->source = '';

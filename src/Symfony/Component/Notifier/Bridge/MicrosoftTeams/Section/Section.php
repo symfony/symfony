@@ -26,6 +26,9 @@ final class Section implements SectionInterface
 {
     private array $options = [];
 
+    /**
+     * @return $this
+     */
     public function title(string $title): self
     {
         $this->options['title'] = $title;
@@ -33,6 +36,9 @@ final class Section implements SectionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function text(string $text): self
     {
         $this->options['text'] = $text;
@@ -40,6 +46,9 @@ final class Section implements SectionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function action(ActionInterface $action): self
     {
         $this->options['potentialAction'][] = $action->toArray();
@@ -47,6 +56,9 @@ final class Section implements SectionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function activity(Activity $activity): self
     {
         foreach ($activity->toArray() as $key => $element) {
@@ -56,6 +68,9 @@ final class Section implements SectionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function image(Image $image): self
     {
         $this->options['images'][] = $image->toArray();
@@ -63,6 +78,9 @@ final class Section implements SectionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function fact(Fact $fact): self
     {
         $this->options['facts'][] = $fact->toArray();
@@ -70,6 +88,9 @@ final class Section implements SectionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function markdown(bool $markdown): self
     {
         $this->options['markdown'] = $markdown;

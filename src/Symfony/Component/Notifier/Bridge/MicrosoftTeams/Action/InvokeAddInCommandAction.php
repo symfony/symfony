@@ -21,6 +21,9 @@ final class InvokeAddInCommandAction implements ActionInterface
 {
     private array $options = [];
 
+    /**
+     * @return $this
+     */
     public function name(string $name): self
     {
         $this->options['name'] = $name;
@@ -28,6 +31,9 @@ final class InvokeAddInCommandAction implements ActionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function addInId(string $addInId): self
     {
         $this->options['addInId'] = $addInId;
@@ -35,6 +41,9 @@ final class InvokeAddInCommandAction implements ActionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function desktopCommandId(string $desktopCommandId): self
     {
         $this->options['desktopCommandId'] = $desktopCommandId;
@@ -42,6 +51,9 @@ final class InvokeAddInCommandAction implements ActionInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function initializationContext(array $context): self
     {
         $this->options['initializationContext'] = $context;

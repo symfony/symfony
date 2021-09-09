@@ -321,6 +321,9 @@ final class ConstraintViolationAssertion
         $this->assertions = $assertions;
     }
 
+    /**
+     * @return $this
+     */
     public function atPath(string $path)
     {
         $this->propertyPath = $path;
@@ -328,6 +331,9 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setParameter(string $key, string $value)
     {
         $this->parameters[$key] = $value;
@@ -335,6 +341,9 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;
@@ -342,20 +351,29 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
-    public function setTranslationDomain(?string $translationDomain)
+    /**
+     * @return $this
+     */
+    public function setTranslationDomain(?string $translationDomain): static
     {
         // no-op for BC
 
         return $this;
     }
 
-    public function setInvalidValue(mixed $invalidValue)
+    /**
+     * @return $this
+     */
+    public function setInvalidValue(mixed $invalidValue): static
     {
         $this->invalidValue = $invalidValue;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setPlural(int $number)
     {
         $this->plural = $number;
@@ -363,6 +381,9 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setCode(string $code)
     {
         $this->code = $code;
@@ -370,7 +391,10 @@ final class ConstraintViolationAssertion
         return $this;
     }
 
-    public function setCause(mixed $cause)
+    /**
+     * @return $this
+     */
+    public function setCause(mixed $cause): static
     {
         $this->cause = $cause;
 
@@ -444,6 +468,9 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         throw new \BadMethodCallException();
     }
 
+    /**
+     * @return $this
+     */
     public function doAtPath(string $path)
     {
         Assert::assertFalse($this->expectNoValidate, 'No validation calls have been expected.');
@@ -462,7 +489,10 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         throw new \BadMethodCallException();
     }
 
-    public function doValidate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null)
+    /**
+     * @return $this
+     */
+    public function doValidate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array $groups = null): static
     {
         Assert::assertFalse($this->expectNoValidate, 'No validation calls have been expected.');
 
@@ -488,7 +518,10 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         throw new \BadMethodCallException();
     }
 
-    public function doValidateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null)
+    /**
+     * @return $this
+     */
+    public function doValidateProperty(object $object, string $propertyName, string|GroupSequence|array $groups = null): static
     {
         return $this;
     }
@@ -498,7 +531,10 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         throw new \BadMethodCallException();
     }
 
-    public function doValidatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null)
+    /**
+     * @return $this
+     */
+    public function doValidatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array $groups = null): static
     {
         return $this;
     }

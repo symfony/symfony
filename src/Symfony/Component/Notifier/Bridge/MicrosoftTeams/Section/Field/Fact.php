@@ -18,6 +18,9 @@ final class Fact
 {
     private array $options = [];
 
+    /**
+     * @return $this
+     */
     public function name(string $name): self
     {
         $this->options['name'] = $name;
@@ -25,6 +28,9 @@ final class Fact
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function value(string $value): self
     {
         $this->options['value'] = $value;

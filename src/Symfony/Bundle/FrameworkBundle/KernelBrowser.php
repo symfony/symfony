@@ -107,6 +107,8 @@ class KernelBrowser extends HttpKernelBrowser
 
     /**
      * @param UserInterface $user
+     *
+     * @return $this
      */
     public function loginUser(object $user, string $firewallContext = 'main'): self
     {

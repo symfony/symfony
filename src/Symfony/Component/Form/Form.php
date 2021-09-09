@@ -773,8 +773,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * {@inheritdoc}
-     *
-     * @return $this
      */
     public function clearErrors(bool $deep = false): static
     {

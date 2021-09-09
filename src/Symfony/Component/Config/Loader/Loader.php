@@ -57,11 +57,9 @@ abstract class Loader implements LoaderInterface
     /**
      * Finds a loader able to load an imported resource.
      *
-     * @return $this|LoaderInterface
-     *
      * @throws LoaderLoadException If no loader is found
      */
-    public function resolve(mixed $resource, string $type = null): static|LoaderInterface
+    public function resolve(mixed $resource, string $type = null): LoaderInterface
     {
         if ($this->supports($resource, $type)) {
             return $this;

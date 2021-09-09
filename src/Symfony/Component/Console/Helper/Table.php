@@ -171,6 +171,9 @@ class Table
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setHeaders(array $headers)
     {
         $headers = array_values($headers);
@@ -190,6 +193,9 @@ class Table
         return $this->addRows($rows);
     }
 
+    /**
+     * @return $this
+     */
     public function addRows(array $rows)
     {
         foreach ($rows as $row) {
@@ -199,7 +205,10 @@ class Table
         return $this;
     }
 
-    public function addRow(TableSeparator|array $row)
+    /**
+     * @return $this
+     */
+    public function addRow(TableSeparator|array $row): static
     {
         if ($row instanceof TableSeparator) {
             $this->rows[] = $row;
@@ -214,6 +223,8 @@ class Table
 
     /**
      * Adds a row to the table, and re-renders the table.
+     *
+     * @return $this
      */
     public function appendRow(TableSeparator|array $row): self
     {
@@ -231,13 +242,19 @@ class Table
         return $this;
     }
 
-    public function setRow(int|string $column, array $row)
+    /**
+     * @return $this
+     */
+    public function setRow(int|string $column, array $row): static
     {
         $this->rows[$column] = $row;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setHeaderTitle(?string $title): self
     {
         $this->headerTitle = $title;
@@ -245,6 +262,9 @@ class Table
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setFooterTitle(?string $title): self
     {
         $this->footerTitle = $title;
@@ -252,6 +272,9 @@ class Table
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setHorizontal(bool $horizontal = true): self
     {
         $this->horizontal = $horizontal;

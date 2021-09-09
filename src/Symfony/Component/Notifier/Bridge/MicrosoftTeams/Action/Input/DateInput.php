@@ -21,6 +21,9 @@ final class DateInput extends AbstractInput
 {
     private array $options = [];
 
+    /**
+     * @return $this
+     */
     public function includeTime(bool $includeTime): self
     {
         $this->options['includeTime'] = $includeTime;

@@ -21,6 +21,9 @@ final class Activity
 {
     private array $options = [];
 
+    /**
+     * @return $this
+     */
     public function image(string $imageUrl): self
     {
         $this->options['activityImage'] = $imageUrl;
@@ -28,6 +31,9 @@ final class Activity
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function title(string $title): self
     {
         $this->options['activityTitle'] = $title;
@@ -35,6 +41,9 @@ final class Activity
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function subtitle(string $subtitle): self
     {
         $this->options['activitySubtitle'] = $subtitle;
@@ -42,6 +51,9 @@ final class Activity
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function text(string $text): self
     {
         $this->options['activityText'] = $text;

@@ -28,6 +28,9 @@ final class MultiChoiceInput extends AbstractInput
 
     private array $options = [];
 
+    /**
+     * @return $this
+     */
     public function choice(string $display, string $value): self
     {
         $this->options['choices'][] = ['display' => $display, 'value' => $value];
@@ -35,6 +38,9 @@ final class MultiChoiceInput extends AbstractInput
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function isMultiSelect(bool $multiSelect): self
     {
         $this->options['isMultiSelect'] = $multiSelect;
@@ -42,6 +48,9 @@ final class MultiChoiceInput extends AbstractInput
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function style(string $style): self
     {
         if (!\in_array($style, self::STYLES)) {

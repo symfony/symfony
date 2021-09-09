@@ -62,7 +62,7 @@ final class SmscTransport extends AbstractTransport
         $body = [
             'login' => $this->login,
             'psw' => $this->password,
-            'sender' => (string) $this->from,
+            'sender' => $this->from,
             'phones' => $message->getPhone(),
             'mes' => $message->getSubject(),
             'fmt' => 3, // response as JSON

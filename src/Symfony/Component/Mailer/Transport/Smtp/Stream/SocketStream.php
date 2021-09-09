@@ -31,6 +31,9 @@ final class SocketStream extends AbstractStream
     private ?string $sourceIp = null;
     private array $streamContextOptions = [];
 
+    /**
+     * @return $this
+     */
     public function setTimeout(float $timeout): self
     {
         $this->timeout = $timeout;
@@ -45,6 +48,8 @@ final class SocketStream extends AbstractStream
 
     /**
      * Literal IPv6 addresses should be wrapped in square brackets.
+     *
+     * @return $this
      */
     public function setHost(string $host): self
     {
@@ -58,6 +63,9 @@ final class SocketStream extends AbstractStream
         return $this->host;
     }
 
+    /**
+     * @return $this
+     */
     public function setPort(int $port): self
     {
         $this->port = $port;
@@ -72,6 +80,8 @@ final class SocketStream extends AbstractStream
 
     /**
      * Sets the TLS/SSL on the socket (disables STARTTLS).
+     *
+     * @return $this
      */
     public function disableTls(): self
     {
@@ -85,6 +95,9 @@ final class SocketStream extends AbstractStream
         return $this->tls;
     }
 
+    /**
+     * @return $this
+     */
     public function setStreamOptions(array $options): self
     {
         $this->streamContextOptions = $options;
@@ -101,6 +114,8 @@ final class SocketStream extends AbstractStream
      * Sets the source IP.
      *
      * IPv6 addresses should be wrapped in square brackets.
+     *
+     * @return $this
      */
     public function setSourceIp(string $ip): self
     {

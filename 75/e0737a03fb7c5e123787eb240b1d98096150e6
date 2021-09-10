@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-14T09:52:04Z
+
+Hey!
+
+I think @fancyweb has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-18T14:42:44Z
+
+Can you please add a test case that covers the new behavior?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-18T14:43:11Z
+
+Oh, and please have a look at failing test cases.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-08T07:23:21Z
+
+Friendly ping @BoShurik
+
+---------------------------------------------------------------------------
+
+by BoShurik at 2021-09-08T07:25:00Z
+
+@nicolas-grekas yes, it's in my todo-list for this week
+
+---------------------------------------------------------------------------
+
+by BoShurik at 2021-09-09T12:26:14Z
+
+@nicolas-grekas I am not sure how to fix `7.4, high-deps` tests.
+As I understand in this case my changes in `DependencyInjection` used as a dependency for `HttpKernel` tests and those tests falls
+So we need to exclude `symfony/dependency-injection: 5.4` for `symfony/http-kernel: 4.4`. Is it possible?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-09T12:33:52Z
+
+>  So we need to exclude symfony/dependency-injection: 5.4 for symfony/http-kernel: 4.4. Is it possible?
+
+no need to exclude: we should patch 4.4 instead to relax the test case, which is too strict apparently

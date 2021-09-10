@@ -24,7 +24,6 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
-use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
@@ -1522,23 +1521,6 @@ abstract class FrameworkExtensionTest extends TestCase
         }
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDoctrineCache()
-    {
-        if (!class_exists(DoctrineAdapter::class)) {
-            self::markTestSkipped('This test requires symfony/cache 5.4 or lower.');
-        }
-
-        $container = $this->createContainerFromFile('doctrine_cache', [], true, false);
-        $container->setParameter('cache.prefix.seed', 'test');
-        $container->addCompilerPass(new CachePoolPass());
-        $container->compile();
-
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.bar', 'cache.adapter.doctrine', 5);
-    }
-
     public function testRedisTagAwareAdapter()
     {
         $container = $this->createContainerFromFile('cache', [], true);
@@ -1972,9 +1954,6 @@ abstract class FrameworkExtensionTest extends TestCase
         switch ($adapter) {
             case 'cache.adapter.apcu':
                 $this->assertSame(ApcuAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.adapter.doctrine':
-                $this->assertSame(DoctrineAdapter::class, $parentDefinition->getClass());
                 break;
             case 'cache.app':
             case 'cache.adapter.filesystem':

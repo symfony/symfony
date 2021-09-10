@@ -19,6 +19,7 @@ CHANGELOG
  * Remove all other values than "none", "php_array" and "file" for `framework.annotation.cache`
  * Register workflow services as private
  * Remove support for passing a `RouteCollectionBuilder` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
+ * Remove the `cache.adapter.doctrine` service
 
 5.4
 ---

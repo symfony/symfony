@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-10T08:11:18Z
+
+> /cc @wouterj there is a note in src/Symfony/Component/Security/Http/Authentication/NoopAuthenticationManager.php that some cleanup is needed now, can you please have a look?
+
+That sentence ("Once the authenticator system is no longer experimental, this class can be used to trigger deprecation notices.") can be removed. We decided not to add a deprecation notice there, as it was already covered by other deprecation notices about the old authentication system.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-10T08:16:56Z
+
+Thanks for the hint. PR is ready.

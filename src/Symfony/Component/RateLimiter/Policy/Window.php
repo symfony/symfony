@@ -17,7 +17,6 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @internal
- * @experimental in 5.3
  */
 final class Window implements LimiterStateInterface
 {

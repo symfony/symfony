@@ -19,8 +19,6 @@ use Symfony\Component\Translation\Provider\NullProviderFactory;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
- *
- * @experimental in 5.3
  */
 class NullProviderFactoryTest extends TestCase
 {

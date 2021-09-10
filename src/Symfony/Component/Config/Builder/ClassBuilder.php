@@ -94,8 +94,6 @@ USE
 
 /**
  * This class is automatically generated to help creating config.
- *
- * @experimental in 5.3
  */
 class CLASS IMPLEMENTS
 {

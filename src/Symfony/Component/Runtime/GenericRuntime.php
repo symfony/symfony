@@ -41,8 +41,6 @@ class_exists(ClosureResolver::class);
  * that throws exceptions when a PHP warning/notice is raised.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 5.3
  */
 class GenericRuntime implements RuntimeInterface
 {

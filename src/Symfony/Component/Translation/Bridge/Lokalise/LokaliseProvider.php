@@ -27,8 +27,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *  * Filenames refers to Symfony's translation domains;
  *  * Keys refers to Symfony's translation keys;
  *  * Translations refers to Symfony's translated messages
- *
- * @experimental in 5.3
  */
 final class LokaliseProvider implements ProviderInterface
 {

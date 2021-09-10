@@ -1,6 +1,9 @@
 CHANGELOG
 =========
 
+5.4
+---
+
  * Add returned message ID to `SentMessage`
 
 5.3

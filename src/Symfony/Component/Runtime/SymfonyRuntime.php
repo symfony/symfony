@@ -62,8 +62,6 @@ class_exists(MissingDotenv::class, false) || class_exists(Dotenv::class) || clas
  *  - int|string|null as handled by GenericRuntime.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 5.3
  */
 class SymfonyRuntime extends GenericRuntime
 {

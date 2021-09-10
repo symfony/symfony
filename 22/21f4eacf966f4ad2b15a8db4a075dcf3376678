@@ -1,0 +1,199 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-06-26T08:39:14Z
+
+see #41136
+
+i agree being able to nest messages-as-params is nice (cc @sylfabre)
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2021-06-29T09:05:39Z
+
+@kylekatarnls I'm wondering if using a placeholder for "awesome" is a good practice in the first place for this example 🤔
+
+A placeholder in a translation string is basically a parameter which place varies from one language to another. And it may be formatted differently too (like m/d/y vs d/m/y, or the decimal separator).
+
+IMO, if the placeholder requires translation (and not just formatting) then you are actually splitting a sentence. You'll hit grammar issues (like plural issues) at some point.
+
+I do believe that this unit test is misleading. But it should use another value for the placeholder like a name. For instance, turn `'Symfony is %what%', ['%what%' => 'awesome']` into `'%who% is the creator of Symfony, ['%who' => 'Fabien']`
+
+=> Do you have a real-world example where you would need to translate the placeholder?
+
+cc @ro0NL
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-06-29T09:37:04Z
+
+Yes I have real-world examples where sub-sentences grammar is handled well (we have no issue because translators are aware, can use ICU format messages and context, number of languages is limited, etc.):
+
+- `%name%: %value%` key-pair with colon so you can translate the spacing for colon, the LTR/RTL or customize `:` to use something else, then name and value can be translatable strings or not-translatable strings in different contexts.
+  - For instance: `Task output: %status%` => success/failure (translated) and here for helping translators and avoid broken sentences it helps to have the whole and not to split this with concatenation
+- `Hello %civility% %name%` => civility is `Mrs`, `Mr`, `Dr` and is translated
+- `An error occurred when %event%` => translate event
+- `The field "%field%" is invalid` => translate field
+
+> And it may be formatted differently too (like m/d/y vs d/m/y, or the decimal separator)
+
+Yes, and `TranslatableMessage` can embed a date and format it according to the locale and/or translation messages, I don't see the point, it's actually one of the case we now have to format first manually before passing it in a translation and that we could handle automatically with this PR.
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2021-06-30T20:53:19Z
+
+@kylekatarnls Thank you for the real-world use-cases. I get your point and it makes sense 👍
+
+I think your PR should be merged first, and then I'll update mine https://github.com/symfony/symfony/pull/41136 to use `TranslatableInterface` implementations. What do you think?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-07-02T14:12:35Z
+
+IIUC we don't nessecarily aim for eg. `$translator->trans('Symfony is %what%!', ['%what%' => new TranslatableMessage('awesome')]);`? Should we?
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-07-02T14:51:11Z
+
+@ro0NL My point is: if it's a "translatable message" as the class name stand for and we pass it as a parameter of an other translatable message, one may fairly expect:
+- to be translated with the same translator and locale as the parent string.
+- an exception because maybe as you say it's not aimed, so we might assume Symfony would require user to explicitly translate it before passing it, sounds overkill, but it's the non-ambiguous way.
+
+But what is the point is just casting it to string silently (so you get the message ID)? What is the real case where you could expect the current behavior for `TranslatableMessage` passed as parameter?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-07-02T15:01:28Z
+
+same as #41136, to me this is just another form of formatting parameters i'd say
+
+as such the feature to me sounds like; translator supporting translatable parameters.
+
+or put different, im not sure `TranslatableMessage` should build custom parameter semantics on-top.
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2021-07-02T15:12:35Z
+
+@ro0NL I had the same first reaction as you: `$translator->trans('Symfony is %what%!', ['%what%' => new TranslatableMessage('awesome')]);` makes no sense because it splits the sentence and this is a bad practice. Let's forget about this one.
+
+That's why I asked @kylekatarnls for other use cases and it turns out that placeholder values fall into 3 categories:
+1. Basic values with no change like a first name
+2. Medium values that just need formatting like a date: I'm addressing it with https://github.com/symfony/symfony/pull/41136 and it was the only use-case I was aware of before discussing with @kylekatarnls
+3. Advanced values that also require translations like "Mr" in English vs "M" in French
+
+Think of "Hello Mr Sylvain, it is 8AM so get up!" in en_US, and "Bonjour M. Sylvain, il est 8:00 alors lève-toi !" in fr_FR
+
+The en_US translation string with its placeholders is: `Hello %civility% %firstname%, it is %hour% so get up`
+* `%civility%` is use-case 3
+* `%firstname%` is use-case 1
+* `%hour%` is use-case 2
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-07-02T15:18:26Z
+
+> @ro0NL I had the same first reaction as you: $translator->trans('Symfony is %what%!', ['%what%' => new TranslatableMessage('awesome')]); makes no sense
+
+well my first reaction was https://github.com/symfony/symfony/pull/41858#issuecomment-868969680 :D
+
+my point is, shouldnt these 2-ways-of-doing-things be equivalent semantically spoken?
+
+```php
+$message = new TranslatableMessage('Symfony is %what%!', ['%what%' => new TranslatableMessage('awesome')]);
+echo $message->trans($translator, 'fr');
+
+// vs
+
+echo $translator->trans('Symfony is %what%!', ['%what%' => new TranslatableMessage('awesome')]);
+```
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-07-02T15:26:45Z
+
+Formatting (like in #41136) in a single way (having only the locale) is different from translating using a translator service (so you can mock it, customize, having dynamic translations). So with the current implementation for parameter formatting, no it does not solve the issue about translating sub-strings.
+
+See the following:
+
+```php
+return t('You will get %something% and %otherthing% when %event%', [
+    'something' => t('a T-shirt'),
+    'otherthing' => t('a cup'),
+    'event' => t('you will finish the contest'),
+]);
+```
+(returned value above to be translated later with some translator service and locale calculated somehow from user or any other way)
+
+If something is 10 possible solutions, otherthing 10, and event 100, sorry for the "bad practice" but we won't send 10 000 strings to our translators for every single possible output.
+
+That's the clear and intuitive way to build the message, and assuming  #41136 is merged, you still have to wrap each `t()` inside a special parameter object (which makes your code very noisy) and your object is still not aware of the translator service which breaks test-ability and you will have somehow to pass your service an other way (clearly poor solution). Without talking nested parameter in a second level.
+
+About your second question, I'm not sure what you mean, currently both are possible and behave the same (`TranslatableMessage` is casted to string using `getMessage()`) This PR would change the result for both styles and I feel it's right. Can't see any reason to have different output.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-07-02T15:35:58Z
+
+> currently both are possible and behave the same
+
+they do not. The casting is a side-effect, if we pass specific parameters and/or domain to `new TranslatableMessage('awesome')` we'd lose it.
+
+I think #41136 is on the right track, but instead of `if ($parameter instanceof ParameterInterface) {` it could do `if ($parameter instanceof TranslatableInterface) {`. If eg. DateTranslatable ignores the $translator being passed, that's fine i'd say.
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-07-02T15:42:39Z
+
+Absolutely, if #41136 handles `TranslatableInterface`, that resolves the issue.
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2021-07-02T16:53:11Z
+
+@ro0NL @kylekatarnls Are you guys working together to give me some work? 😅
+
+More seriously, I'm okay with refactoring my PR to drop `ParameterInterface`, and to stick with `TranslatableInterface`
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-07-04T11:27:10Z
+
+Hi guys, want to mention that my PR only add support for the interface in arguments, that's quite scoped to the strict minimum to support any implementation of `TranslatableInterface` as parameter in user-land.
+
+That's why I think it would be nice to have an other review from @nicolas-grekas now I fixed the first review's comments. And maybe him and @fabpot could give an opinion about this feature, says if it goes to 5.4 or 6 (then I would re-ajust the closure style).
+
+The @sylfabre #41136 PR is going quite further as it also provides implementations for precise cases, add a new dependency, so before refactoring it to use `TranslatableInterface` instead of a new dedicated interface, I think it would be wise to wait for Symfony translation team to first accept or decline this one.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-07-04T12:44:14Z
+
+I think it's important to keep $translator->trans the main entry point.
+
+Contract defines `array       $parameters An array of parameters for the message`, thus ... we can do anything. In that sense i'd be OK if we experiment with eg. `array<string, string|Stringable|TranslatableInterface>` for the component's translator implmentation. We can argue it should be the parameter's contract yes.
+
+---------------------------------------------------------------------------
+
+by romaricdrigon at 2021-07-05T11:40:58Z
+
+Hello,
+I came here from #41882, to add that I had this exact use case, and I indeed up needing a `NestedTranslatableMessage` as in #41882. So having this feature in the framework would be amazing - either supported in `TranslatableMessage` base implementation as here, or in a more complex `NestedTranslatableMessage`. Maybe I can help move it forward in some way?
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2021-07-20T14:19:05Z
+
+Hello @ro0NL @kylekatarnls
+What are the next steps here? How may I help to make it move forward?
+
+> The @sylfabre #41136 PR is going quite further as it also provides implementations for precise cases, add a new dependency, so before refactoring it to use TranslatableInterface instead of a new dedicated interface, I think it would be wise to wait for Symfony translation team to first accept or decline this one.
+
+I'm 100% aligned with this ☝️
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-07-29T14:49:32Z
+
+@nicolas-grekas 🙏

@@ -1,0 +1,182 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-13T10:47:36Z
+
+Hey!
+
+I think @VincentLanglet has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-16T09:39:11Z
+
+> I'm mix feeling with this PR that brings validation without to much changes. But also silents deserialization failures..
+
+I understand this is a bit weird. But this process has an advantage overs others PR: you can get the hydrated object **and** the errors.
+So you can merge deserialization errors with validations errors and return everything to the end user.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-08-16T10:34:16Z
+
+> > I'm mix feeling with this PR that brings validation without to much changes. But also silents deserialization failures..
+>
+> I understand this is a bit weird. But this process has an advantage overs others PR: you can get the hydrated object **and** the errors.
+> So you can merge deserialization errors with validations errors and return everything to the end user.
+
+Yeah, that's what I like in your PR!.
+
+What's about
+```
+try {
+   $o = $serializer->unserialize(...);
+} catch (PartialDenormalizationException $e) {
+  $o = $e->getPartialObject();
+  $exceptions = $e->getExceptions();
+}
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-16T15:12:31Z
+
+Oh, this is a good idea too! I'll update the PR
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-18T12:18:10Z
+
+about partial objects, im not sure they should ever leak.
+
+> you can get the hydrated object and the errors
+
+dont see the usecase yet :thinking:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-18T13:24:26Z
+
+>about partial objects, im not sure they should ever leak.
+
+ I'm not sure I follow you :/
+
+> dont see the usecase yet
+
+See the PR  description => you can get the whole (type + validator) validation at once
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-18T13:34:13Z
+
+```
+} catch (PartialDenormalizationException $e) {
+  $o = $e->getPartialObject();
+```
+
+would be leaking something invalid isnt it?
+
+IIUC in your PR example code you dont actually need a partial `$dto` within the `if ($exceptions) {` block. Or why would you?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-18T13:54:56Z
+
+> would be leaking something invalid isnt it?
+
+anyway, it's always the case, that's why we validate the data after. Same with form (but the form component trigger the validation itself)
+
+> IIUC in your PR example code you dont actually need a partial `$dto` within the `if ($exceptions) {` block. Or why would you?
+
+In my example, it don't trigger the validation, but it would be even better if it's the case ❤️
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-18T14:11:58Z
+
+currently no invalid object leaks isnt it? you get a NotNormalizableValueException
+
+then i agree with @jderusse , as i have mixed feelings about silencing those now.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-18T14:13:26Z
+
+> In my example, it don't trigger the validation, but it would be even better if it's the case
+
+well i think we should serialize the NotNormalizableValueException to a constration violation list yes
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-18T14:25:29Z
+
+ohh =) you mean `$validator->validate($dto)`, after deserialize :facepalm: i see we have 2 point of views.
+
+im really not sure one should continue from an invalid state, assuming validator does some job maybe.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-18T14:56:18Z
+
+> im really not sure one should continue from an invalid state, assuming validator does some job maybe.
+
+It's up to the final developper, but why not?
+
+```
+class Test
+{
+    public int $int; // required, but a string is passed
+    public bool $bool; // required, nothing is passed
+}
+```
+
+* the "int" value must be a int, string passed
+* the "bool" value must not be blank
+
+=> this is nice for the end user to report all errors. But again, it's up to the developer to choose
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-18T15:11:37Z
+
+got ya. Reporting deserialization AND validation in one go is also nice yes :+1: (overread https://github.com/symfony/symfony/pull/42502#issuecomment-899370779)
+
+I agree with https://github.com/symfony/symfony/pull/42502#issuecomment-899405106 to optin :+1:
+
+sorry if i was noisy :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-23T10:05:33Z
+
+I pushed another implementation where I introduced a `PartialDenormalizationException` as asked by @jderusse
+
+I also addressed CS comments.
+
+I'm not sure about the @ro0NL comment to add other exception classes. What do other people think ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-24T09:01:21Z
+
+* I fixed test for PHP 7.2
+* I addressed some @ro0NL comments
+* I added support collecting error that occurs during the object instanciation
+* I fixed a type error in the UidNormalizer
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-24T09:19:04Z
+
+@lyrixx LGTM. I cannot decide on further Serializer semantics (in terms of i18n / exposing PHP-SF symbols). I believe it doesn't matter much _yet_, for what i think is the key feature in this PR: "use sf/validator to validate a partial deserialized object from sf/serializer".
+
+Using sf/validator solves my issues generally if we talk about eg. human friendly errors. My other goal would be to enforce fully deserialized objects OR human friendly errors from _just_ sf/serializer. But we pursue similar goals :+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-07T12:47:05Z
+
+Hi @fabpot. I fixed your comments and there is already 2 approvals

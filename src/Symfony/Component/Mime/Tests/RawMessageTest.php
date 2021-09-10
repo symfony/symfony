@@ -16,21 +16,26 @@ use Symfony\Component\Mime\RawMessage;
 
 class RawMessageTest extends TestCase
 {
-    public function testToString()
+    /**
+     * @dataProvider provideMessages
+     */
+    public function testToString($messageParameter)
     {
-        $message = new RawMessage('string');
-        $this->assertEquals('string', $message->toString());
-        $this->assertEquals('string', implode('', iterator_to_array($message->toIterable())));
+        $message = new RawMessage($messageParameter);
+        $this->assertEquals('some string', $message->toString());
+        $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
         // calling methods more than once work
-        $this->assertEquals('string', $message->toString());
-        $this->assertEquals('string', implode('', iterator_to_array($message->toIterable())));
+        $this->assertEquals('some string', $message->toString());
+        $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
+    }
 
-        $message = new RawMessage(new \ArrayObject(['some', ' ', 'string']));
-        $this->assertEquals('some string', $message->toString());
-        $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
-        // calling methods more than once work
-        $this->assertEquals('some string', $message->toString());
-        $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
+    public function provideMessages(): array
+    {
+        return [
+            'string' => ['some string'],
+            'traversable' => [new \ArrayObject(['some', ' ', 'string'])],
+            'array' => [['some', ' ', 'string']],
+        ];
     }
 
     public function testSerialization()

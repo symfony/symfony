@@ -397,7 +397,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $this->assertSame([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
+        $this->assertEqualsCanonicalizing([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
     }
 
     /**

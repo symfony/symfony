@@ -26,6 +26,8 @@ use Symfony\Component\Mime\RawMessage;
  */
 class PostmarkSmtpTransport extends EsmtpTransport
 {
+    private $messageStream;
+
     public function __construct(string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct('smtp.postmarkapp.com', 587, false, $dispatcher, $logger);
@@ -60,5 +62,19 @@ class PostmarkSmtpTransport extends EsmtpTransport
                 $headers->remove($name);
             }
         }
+
+        if (null !== $this->messageStream && !$message->getHeaders()->has('X-PM-Message-Stream')) {
+            $headers->addTextHeader('X-PM-Message-Stream', $this->messageStream);
+        }
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMessageStream(string $messageStream): self
+    {
+        $this->messageStream = $messageStream;
+
+        return $this;
     }
 }

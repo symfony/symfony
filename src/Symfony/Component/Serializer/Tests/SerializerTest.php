@@ -16,12 +16,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
@@ -34,6 +36,9 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -41,6 +46,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -52,6 +58,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
@@ -712,6 +719,253 @@ class SerializerTest extends TestCase
             $expectedData,
             $serializer->deserialize($jsonData, __NAMESPACE__.'\Model', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]'])
         );
+    }
+
+    public function testCollectDenormalizationErrors()
+    {
+        $json = '
+        {
+            "string": null,
+            "int": null,
+            "float": null,
+            "bool": null,
+            "dateTime": null,
+            "dateTimeImmutable": null,
+            "dateTimeZone": null,
+            "splFileInfo": null,
+            "uuid": null,
+            "array": null,
+            "collection": [
+                {
+                    "string": "string"
+                },
+                {
+                    "string": null
+                }
+            ],
+            "php74FullWithConstructor": {}
+        }';
+
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+
+        $serializer = new Serializer(
+            [
+                new ArrayDenormalizer(),
+                new DateTimeNormalizer(),
+                new DateTimeZoneNormalizer(),
+                new DataUriNormalizer(),
+                new UidNormalizer(),
+                new ObjectNormalizer($classMetadataFactory, null, null, $extractor, new ClassDiscriminatorFromClassMetadata($classMetadataFactory)),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize($json, Php74Full::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $this->assertInstanceOf(Php74Full::class, $th->getData());
+
+        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
+            return [
+                'currentType' => $e->getCurrentType(),
+                'expectedTypes' => $e->getExpectedTypes(),
+                'path' => $e->getPath(),
+                'useMessageForUser' => $e->canUseMessageForUser(),
+                'message' => $e->getMessage(),
+            ];
+        }, $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => 'string',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "string" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full" must be one of "string" ("null" given).',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'int',
+                ],
+                'path' => 'int',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "int" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full" must be one of "int" ("null" given).',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'float',
+                ],
+                'path' => 'float',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "float" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full" must be one of "float" ("null" given).',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'bool',
+                ],
+                'path' => 'bool',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "bool" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full" must be one of "bool" ("null" given).',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => 'dateTime',
+                'useMessageForUser' => true,
+                'message' => 'The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => 'dateTimeImmutable',
+                'useMessageForUser' => true,
+                'message' => 'The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => 'dateTimeZone',
+                'useMessageForUser' => true,
+                'message' => 'The data is either an empty string or null, you should pass a string that can be parsed as a DateTimeZone.',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => 'splFileInfo',
+                'useMessageForUser' => true,
+                'message' => 'The provided "data:" URI is not valid.',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => 'uuid',
+                'useMessageForUser' => true,
+                'message' => 'The data is not a valid UUID string representation.',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'array',
+                ],
+                'path' => 'array',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "array" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full" must be one of "array" ("null" given).',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => 'collection[1].string',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "string" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74Full" must be one of "string" ("null" given).',
+            ],
+            [
+                'currentType' => 'array',
+                'expectedTypes' => [
+                    'unknown',
+                ],
+                'path' => 'php74FullWithConstructor',
+                'useMessageForUser' => true,
+                'message' => 'Failed to create object because the object miss the "constructorArgument" property.',
+            ],
+        ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
+    }
+
+    public function testCollectDenormalizationErrors2()
+    {
+        $json = '
+        [
+            {
+                "string": null
+            },
+            {
+                "string": null
+            }
+        ]';
+
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+
+        $serializer = new Serializer(
+            [
+                new ArrayDenormalizer(),
+                new ObjectNormalizer($classMetadataFactory, null, null, $extractor, new ClassDiscriminatorFromClassMetadata($classMetadataFactory)),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize($json, Php74Full::class.'[]', 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $this->assertCount(2, $th->getData());
+        $this->assertInstanceOf(Php74Full::class, $th->getData()[0]);
+        $this->assertInstanceOf(Php74Full::class, $th->getData()[1]);
+
+        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
+            return [
+                'currentType' => $e->getCurrentType(),
+                'expectedTypes' => $e->getExpectedTypes(),
+                'path' => $e->getPath(),
+                'useMessageForUser' => $e->canUseMessageForUser(),
+                'message' => $e->getMessage(),
+            ];
+        }, $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => '[0].string',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "string" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full" must be one of "string" ("null" given).',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => '[1].string',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "string" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full" must be one of "string" ("null" given).',
+            ],
+            ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
     }
 }
 

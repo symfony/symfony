@@ -102,7 +102,6 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             }
             $refMap[$id] = new ServiceClosureArgument($ref);
         }
-        ksort($refMap);
 
         $locator = (new Definition(ServiceLocator::class))
             ->addArgument($refMap)

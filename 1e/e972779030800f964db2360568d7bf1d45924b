@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-08T12:20:46Z
+
+Btw, please allow me to first see if this is the accepted message before updating all those messages in the test files :)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-08T13:42:15Z
+
+Thanks @derrabus.
+
+I have no clue where the Psalm errors come from...
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-08T13:43:45Z
+
+> I have no clue where the Psalm errors come from...
+
+Apparently, we need to install PhpUnitBridge before running Psalm. 🤔
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-08T14:25:06Z
+
+But it doesn't show up in e.g. https://github.com/symfony/symfony/pull/42939 . So it must be that the changes in this PR cause Psalm to fail with these errors?

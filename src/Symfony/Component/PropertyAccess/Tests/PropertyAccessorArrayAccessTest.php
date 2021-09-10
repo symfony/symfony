@@ -38,6 +38,14 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
         ];
     }
 
+    public function getInvalidPropertyPaths()
+    {
+        return [
+            [$this->getContainer(['firstName' => 'Bernhard']), 'firstName', 'Bernhard'],
+            [$this->getContainer(['person' => $this->getContainer(['firstName' => 'Bernhard'])]), 'person.firstName', 'Bernhard'],
+        ];
+    }
+
     /**
      * @dataProvider getValidPropertyPaths
      */
@@ -82,5 +90,13 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
     public function testIsWritable($collection, $path)
     {
         $this->assertTrue($this->propertyAccessor->isWritable($collection, $path));
+    }
+
+    /**
+     * @dataProvider getInvalidPropertyPaths
+     */
+    public function testIsNotWritable($collection, $path)
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable($collection, $path));
     }
 }

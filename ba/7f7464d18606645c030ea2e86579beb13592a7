@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-11T11:59:31Z
+
+Hey!
+
+I think @tyx has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-07-23T09:18:44Z
+
+Hello, I have rebased this PR, and addressed all comments. I should be OK now
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-01T08:16:14Z
+
+I could rebase this PR, but before doing so, I prefer to be sure it's mergeable. so WDYT?
+
+**Edit**: I have rebased the PR
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-09-03T15:18:51Z
+
+> So if the first message trigger and "error" level message, all others message will log and overflow the buffer.
+
+From my experience, a worker running without processing messages can also go out of memory. For example if you have an app running in debug mode the tracing/profiling will keep event-dispatcher events in memory, eventually causing the process to go out of memory.
+
+Because of this, should there also be a possibility to trigger the reset `onWorkerRunning` instead of just the `WorkerMessageHandledEvent` and `WorkerMessageFailedEvent` ?
+
+And continuing on that, would it be nice if you could do a reset when the worker is inactive (Can be read `WorkerRunningEvent->isWorkerIdle()`) ? . So that if your reset functionality has a bit of performance impact, it could have less impact on the message handling performance.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-03T15:25:30Z
+
+> From my experience, a worker running without processing messages can also go out of memory. For example if you have an app running in debug mode the tracing/profiling will keep event-dispatcher events in memory, eventually causing the process to go out of memory.
+
+Indeed, cf https://github.com/symfony/symfony/issues/32422
+
+> Because of this, should there also be a possibility to trigger the reset `onWorkerRunning` instead of just the `WorkerMessageHandledEvent` and `WorkerMessageFailedEvent` ?
+
+I don't understand :/
+
+> And continuing on that, would it be nice if you could do a reset when the worker is inactive (Can be read `WorkerRunningEvent->isWorkerIdle()`) ? . So that if your reset functionality has a bit of performance impact, it could have less impact on the message handling performance.
+
+Indeed, that would be possible, in a next PR :)
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-09-03T15:28:11Z
+
+If I understood the logic in this PR correctly, a reset is only triggered by on of those `WorkerMessage..` events right? So it's only going to reset if messages are being consumed. What about a worker/consumer that's idle for a while? It could go out of memory for the same reasons and might benefit from reset of its services.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-03T15:31:36Z
+
+Ohhh, I see, good point. I need to check when the running event is triggered to ensure it does not break something
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-09-03T15:37:02Z
+
+> when the running event is triggered
+
+I think it should be just as safe as the other events, it at least not during the handling of a message:
+
+https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/Messenger/Worker.php#L95
+https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/Messenger/Worker.php#L111
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-06T15:35:28Z
+
+@Jeroeny Here we go 👍🏼 I pushed a new version where the listener listen `WorkerRunningEvent` too. Thanks for the hint 👍🏼
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-10T09:15:34Z
+
+@fabpot I haved edited the PR description, and the configuration.
+I'll open the doc PR asap (edit: https://github.com/symfony/symfony-docs/pull/15796)

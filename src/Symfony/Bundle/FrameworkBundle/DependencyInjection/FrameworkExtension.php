@@ -2013,6 +2013,7 @@ class FrameworkExtension extends Extension
 
         $senderAliases = [];
         $transportRetryReferences = [];
+        $transportNamesForResetServices = [];
         foreach ($config['transports'] as $name => $transport) {
             $serializerId = $transport['serializer'] ?? 'messenger.default_serializer';
             $transportDefinition = (new Definition(TransportInterface::class))
@@ -2041,6 +2042,18 @@ class FrameworkExtension extends Extension
 
                 $transportRetryReferences[$name] = new Reference($retryServiceId);
             }
+            if ($transport['reset_on_message']) {
+                $transportNamesForResetServices[] = $name;
+            }
+        }
+
+        if ($transportNamesForResetServices) {
+            $container
+                ->getDefinition('messenger.listener.reset_services')
+                ->replaceArgument(1, $transportNamesForResetServices)
+            ;
+        } else {
+            $container->removeDefinition('messenger.listener.reset_services');
         }
 
         $senderReferences = [];

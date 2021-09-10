@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
+ * Add support for resetting container services after each messenger message.
 
 5.3
 ---

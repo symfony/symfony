@@ -397,10 +397,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-
-        $services = array_keys($locator);
-        sort($services);
-        $this->assertSame([RegisterTestController::class.'::fooAction', 'foo::fooAction'], $services);
+        $this->assertEqualsCanonicalizing([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
     }
 
     public function testBindWithTarget()

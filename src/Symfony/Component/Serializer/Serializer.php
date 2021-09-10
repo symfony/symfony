@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
@@ -199,12 +200,16 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
+        if (isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS], $context['not_normalizable_value_exceptions'])) {
+            throw new LogicException('Passing a value for "not_normalizable_value_exceptions" context key is not allowed.');
+        }
+
         $normalizer = $this->getDenormalizer($data, $type, $format, $context);
 
         // Check for a denormalizer first, e.g. the data is wrapped
         if (!$normalizer && isset(self::SCALAR_TYPES[$type])) {
             if (!('is_'.$type)($data)) {
-                throw new NotNormalizableValueException(sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data)));
+                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data)), $data, [$type], $context['deserialization_path'] ?? null, true);
             }
 
             return $data;
@@ -214,11 +219,23 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
 
-        if ($normalizer) {
-            return $normalizer->denormalize($data, $type, $format, $context);
+        if (!$normalizer) {
+            throw new NotNormalizableValueException(sprintf('Could not denormalize object of type "%s", no supporting normalizer found.', $type));
         }
 
-        throw new NotNormalizableValueException(sprintf('Could not denormalize object of type "%s", no supporting normalizer found.', $type));
+        if (isset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS])) {
+            unset($context[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS]);
+            $context['not_normalizable_value_exceptions'] = [];
+            $errors = &$context['not_normalizable_value_exceptions'];
+            $denormalized = $normalizer->denormalize($data, $type, $format, $context);
+            if ($errors) {
+                throw new PartialDenormalizationException($denormalized, $errors);
+            }
+
+            return $denormalized;
+        }
+
+        return $normalizer->denormalize($data, $type, $format, $context);
     }
 
     /**

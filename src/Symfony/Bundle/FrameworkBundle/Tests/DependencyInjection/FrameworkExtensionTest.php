@@ -694,6 +694,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
         $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
         $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
+        $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
     }
 
     public function testMessengerMultipleFailureTransports()
@@ -838,6 +839,9 @@ abstract class FrameworkExtensionTest extends TestCase
             return array_shift($values);
         }, $failureTransports);
         $this->assertEquals($expectedTransportsByFailureTransports, $failureTransportsReferences);
+
+        $this->assertTrue($container->hasDefinition('messenger.listener.reset_services'));
+        $this->assertSame(['customised'], $container->getDefinition('messenger.listener.reset_services')->getArgument(1));
     }
 
     public function testMessengerRouting()

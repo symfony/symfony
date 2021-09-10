@@ -15,8 +15,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.3
  */
 class ProviderException extends RuntimeException implements ProviderExceptionInterface
 {

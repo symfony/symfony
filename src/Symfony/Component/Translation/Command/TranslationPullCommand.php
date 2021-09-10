@@ -25,8 +25,6 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
- *
- * @experimental in 5.3
  */
 final class TranslationPullCommand extends Command
 {

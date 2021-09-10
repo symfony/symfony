@@ -15,8 +15,6 @@ use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
- *
- * @experimental in 5.3
  */
 final class NullProviderFactory extends AbstractProviderFactory
 {

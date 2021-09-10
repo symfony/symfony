@@ -30,8 +30,11 @@ class RawMessage
         if (\is_string($this->message)) {
             return $this->message;
         }
+        if ($this->message instanceof \Traversable) {
+            $this->message = iterator_to_array($this->message, false);
+        }
 
-        return $this->message = implode('', iterator_to_array($this->message, false));
+        return $this->message = implode('', $this->message);
     }
 
     public function toIterable(): iterable

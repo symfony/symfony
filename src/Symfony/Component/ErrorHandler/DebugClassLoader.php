@@ -753,6 +753,10 @@ class DebugClassLoader
 
     private function setReturnType(string $types, string $class, string $method, string $filename, ?string $parent, \ReflectionType $returnType = null): void
     {
+        if ('__construct' === $method) {
+            return;
+        }
+
         if ($nullable = 0 === strpos($types, 'null|')) {
             $types = substr($types, 5);
         } elseif ($nullable = '|null' === substr($types, -5)) {

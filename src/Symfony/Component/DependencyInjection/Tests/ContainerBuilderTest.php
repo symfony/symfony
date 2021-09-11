@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
@@ -1752,6 +1753,17 @@ class ContainerBuilderTest extends TestCase
         $container->get(B::class);
 
         $this->addToAssertionCount(1);
+    }
+
+    public function testCompileTwice()
+    {
+        $container = new ContainerBuilder();
+        $container->compile();
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Compiling an already compiled container is not allowed.');
+
+        $container->compile();
     }
 }
 

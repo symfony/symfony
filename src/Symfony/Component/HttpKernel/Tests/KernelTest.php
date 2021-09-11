@@ -623,6 +623,34 @@ EOF
         $this->assertMatchesRegularExpression('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*TestDebugContainer$/', $kernel->getContainerClass());
     }
 
+    public function testKernelBuildMustNotCompile()
+    {
+        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) {
+            $container->compile();
+        });
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The kernel\'s container has been compiled by the "build()" method of "Symfony\Component\HttpKernel\Tests\CustomProjectDirKernel". Please remove the call to "ContainerBuilder::compile()" from that method.');
+
+        $kernel->boot();
+    }
+
+    public function testBundleBuildShouldNotCompile()
+    {
+        $kernel = new class() extends CustomProjectDirKernel {
+            public function registerBundles(): iterable
+            {
+                yield from parent::registerBundles();
+                yield new BadBundle();
+            }
+        };
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The kernel\'s container has been compiled by the "build()" method of "Symfony\Component\HttpKernel\Tests\BadBundle". Please remove the call to "ContainerBuilder::compile()" from that method.');
+
+        $kernel->boot();
+    }
+
     /**
      * Returns a mock for the BundleInterface.
      */
@@ -759,5 +787,18 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $container->setParameter('test.processed', true);
+    }
+}
+
+class BadBundle extends Bundle
+{
+    public function build(ContainerBuilder $container): void
+    {
+        $container->compile();
+    }
+
+    public function getContainerExtension(): ?ExtensionInterface
+    {
+        return null;
     }
 }

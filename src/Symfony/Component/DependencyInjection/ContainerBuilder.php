@@ -738,9 +738,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *                                     env vars or be replaced by uniquely identifiable placeholders.
      *                                     Set to "true" when you want to use the current ContainerBuilder
      *                                     directly, keep to "false" when the container is dumped instead.
+     *
+     * @throws BadMethodCallException if the container has been compiled already
      */
     public function compile(bool $resolveEnvPlaceholders = false)
     {
+        if ($this->isCompiled()) {
+            throw new BadMethodCallException('Compiling an already compiled container is not allowed.');
+        }
+
         $compiler = $this->getCompiler();
 
         if ($this->trackResources) {

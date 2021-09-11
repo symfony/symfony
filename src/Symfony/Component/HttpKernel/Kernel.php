@@ -674,11 +674,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             }
         }
 
-        foreach ($this->bundles as $bundle) {
+        foreach ($this->bundles + [$this] as $bundle) {
             $bundle->build($container);
-        }
 
-        $this->build($container);
+            if ($container->isCompiled()) {
+                throw new \LogicException(sprintf('The kernel\'s container has been compiled by the "build()" method of "%s". Please remove the call to "ContainerBuilder::compile()" from that method.', get_debug_type($bundle)));
+            }
+        }
 
         foreach ($container->getExtensions() as $extension) {
             $extensions[] = $extension->getAlias();

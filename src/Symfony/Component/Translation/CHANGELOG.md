@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add new implementations of `TranslatableInterface` to format parameters
+  separately as recommended per the ICU for DateTime, money, and decimal values.
+
 5.4
 ---
 

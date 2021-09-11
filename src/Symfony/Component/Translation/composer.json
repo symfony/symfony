@@ -47,7 +47,8 @@
     "suggest": {
         "symfony/config": "",
         "symfony/yaml": "",
-        "psr/log-implementation": "To use logging capability in translator"
+        "psr/log-implementation": "To use logging capability in translator",
+        "moneyphp/money":  "To use money capability in translator"
     },
     "autoload": {
         "files": [ "Resources/functions.php" ],

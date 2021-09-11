@@ -4,7 +4,7 @@ CHANGELOG
 5.4
 ---
 
-* Add `MessageBirdOptions`
+ * Add `MessageBirdOptions`
 
 5.3
 ---

@@ -37,6 +37,9 @@ final class MessageBirdOptions implements MessageOptionsInterface
         return $this->options['recipients'] ?? null;
     }
 
+    /**
+     * @return $this
+     */
     public function validity(int $validity): self
     {
         $this->options['validity'] = $validity;
@@ -44,6 +47,9 @@ final class MessageBirdOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function reference(string $reference): self
     {
         $this->options['reference'] = $reference;

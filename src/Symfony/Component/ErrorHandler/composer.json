@@ -31,5 +31,8 @@
             "/Tests/"
         ]
     },
+    "bin": [
+        "Resources/bin/patch-type-declarations"
+    ],
     "minimum-stability": "dev"
 }

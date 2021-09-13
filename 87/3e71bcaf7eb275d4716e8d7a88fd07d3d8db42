@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-10T08:31:47Z
+
+Tests and psalm fail, can you please have a look?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-13T09:17:26Z
+
+Psalm is a false positive. I'll look into the low-deps tests.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-13T09:59:22Z
+
+The low-deps test failed because we need doctrine/annotations#412. I've bumped `doctrine/annotations` to `^1.13.1` to address this.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-13T10:01:44Z
+
+low-deps is passing now. The new PHPUnit failure is unrelated (Database connection issues).

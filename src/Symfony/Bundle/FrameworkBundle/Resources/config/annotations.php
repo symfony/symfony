@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
@@ -33,14 +32,10 @@ return static function (ContainerConfigurator $container) {
         ->set('annotations.dummy_registry', AnnotationRegistry::class)
             ->call('registerUniqueLoader', ['class_exists'])
 
-        ->set('annotations.cached_reader', CachedReader::class)
+        ->set('annotations.cached_reader', PsrCachedReader::class)
             ->args([
                 service('annotations.reader'),
-                inline_service(DoctrineProvider::class)
-                    ->factory([DoctrineProvider::class, 'wrap'])
-                    ->args([
-                        inline_service(ArrayAdapter::class),
-                    ]),
+                inline_service(ArrayAdapter::class),
                 abstract_arg('Debug-Flag'),
             ])
 
@@ -56,6 +51,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('annotations.filesystem_cache_adapter'),
             ])
+            ->deprecate('symfony/framework-bundle', '5.4', '"%service_id% is deprecated"')
 
         ->set('annotations.cache_warmer', AnnotationsCacheWarmer::class)
             ->args([
@@ -78,19 +74,8 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('annotations.cache_adapter'),
             ])
-            ->tag('container.hot_path')
+            ->deprecate('symfony/framework-bundle', '5.4', '"%service_id% is deprecated"')
 
         ->alias('annotation_reader', 'annotations.reader')
         ->alias(Reader::class, 'annotation_reader');
-
-    if (class_exists(PsrCachedReader::class)) {
-        $container->services()
-            ->set('annotations.psr_cached_reader', PsrCachedReader::class)
-                ->args([
-                    service('annotations.reader'),
-                    inline_service(ArrayAdapter::class),
-                    abstract_arg('Debug-Flag'),
-                ])
-        ;
-    }
 };

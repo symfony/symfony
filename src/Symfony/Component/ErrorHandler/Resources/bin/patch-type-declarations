@@ -42,9 +42,9 @@ if (false === getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
     echo 'No SYMFONY_PATCH_TYPE_DECLARATIONS env var set, patching type declarations in all methods (run the command with "-h" for more information).'.PHP_EOL;
 }
 
-if (is_file($autoload = __DIR__.'/../../../autoload.php')) {
+if (is_file($autoload = __DIR__.'/../../../../autoload.php')) {
     // noop
-} elseif (is_file($autoload = __DIR__.'/../../../../../autoload.php')) {
+} elseif (is_file($autoload = __DIR__.'/../../../../../../../autoload.php')) {
     // noop
 } else {
     echo PHP_EOL.'  /!\ Cannot find the Composer autoloader, did you forget to run "composer install"?'.PHP_EOL;
@@ -71,7 +71,11 @@ set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$dep
 
 $exclude = getenv('SYMFONY_PATCH_TYPE_EXCLUDE') ?: null;
 foreach ($loader->getClassMap() as $class => $file) {
-    if ($exclude && preg_match($exclude, realpath($file))) {
+    if (false !== strpos($file = realpath($file), '/vendor/')) {
+        continue;
+    }
+
+    if ($exclude && preg_match($exclude, $file)) {
         continue;
     }
 

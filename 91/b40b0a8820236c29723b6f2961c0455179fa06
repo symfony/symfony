@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-09-11T10:06:58Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Jubeki at 2021-09-11T10:38:58Z
+
+I don't know why the PhpUnit with PHP 8.0 fails but it seems unrelated to my PR. Maybe somebody can trigger a rerun.
+
+Error:
+```
+1) Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport\DoctrineIntegrationTest::testConnectionSendAndGet
+710
+Doctrine\DBAL\Exception\ReadOnlyException: An exception occurred while executing a query: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database
+```
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-09-11T11:50:22Z
+
+Hey, thank you for this PR. Is it a duplicate of #40193 ?
+
+Having a `session_token` in a DSN sounds weird to me. As you pointed in the AWS documentation, Session Tokens are temporary credentials, but DSN is a configuration, that is not the best candidate for temporary configuration.
+
+That's said. I realize that the `TransportFactory` takes a `Dsn` instance in the parameter, so, even if the users don't use string configuration (ie. `ses://key:secret@default`), they have to create an instance of `Dsn` class event when credentials (session_token) are fetched programmaticaly.
+
+Note: In the Laravel PR you linked, the DSN is built from the `$config` variable, which looks suspicious to me. I've the feeling that you are expecting to store temporary credentials in a config file...
+
+Why not using Env variable like suggested in #40193 ?
+
+---------------------------------------------------------------------------
+
+by Jubeki at 2021-09-11T12:12:48Z
+
+Yeah it is a duplicate of the PR.
+
+In Laravel the token is passed through the config right now. I am not sure why though and I am not sure when and where it is explicitly set.
+
+It was introduced in the following PR for SES and it seems like it is intended for the config:
+https://github.com/laravel/framework/pull/23766
+
+It was expanded to SQS and S3 in the following PR: (unrelated for this PR though)
+https://github.com/laravel/framework/pull/24746
+
+I would forward the question to @driesvints and @taylorotwell
+Maybe they have a reason for doing it. Also in Regards to Laravel Vapor which uses AWS Lambda.
+
+I think it would be possible using ENV. But I am unsure what happens if you maybe change the SESSION_TOKEN between two different SesTransports.
+
+Example you want to send an email with one configuration to the users and then send another internal email to the admins using another configuration. (Probably unlikely but possible)
+
+---------------------------------------------------------------------------
+
+by Jubeki at 2021-09-11T13:01:42Z
+
+Using the config has another advantage:
+It doesn't matter if you use temporary credentials or not because the token is only attached if it exists.
+Therefor you only need one setup method just with different credentials.
+
+Because the access_key and secret is loaded from the config in laravel. It doesn't matter how the env variables is named in the `.env` file.
+
+Before 2018 the variables in the default config also were named differently and were then renamed:
+https://github.com/laravel/laravel/commit/87667b25ae57308f8bbc47f45222d2d1de3ffeed#diff-a7bf72e66282b81a3685555cf2fa6fbb80ba61953539e8d6e80b603eb58e0709
+
+Some people don't upgrade the default configuration for the configs. That would be an addionational upgrade step.

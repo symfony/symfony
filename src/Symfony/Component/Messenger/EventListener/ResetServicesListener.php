@@ -16,7 +16,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Event\AbstractWorkerMessageEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
-use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -46,7 +45,6 @@ class ResetServicesListener implements EventSubscriberInterface
         return [
             WorkerMessageHandledEvent::class => ['resetServices'],
             WorkerMessageFailedEvent::class => ['resetServices'],
-            WorkerRunningEvent::class => ['resetServices'],
         ];
     }
 }

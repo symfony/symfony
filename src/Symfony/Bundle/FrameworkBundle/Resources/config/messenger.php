@@ -196,6 +196,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
 
         ->set('messenger.listener.stop_worker_on_stop_exception_listener', StopWorkerOnCustomStopExceptionListener::class)
+            ->tag('kernel.event_subscriber')
 
         ->set('messenger.listener.reset_services', ResetServicesListener::class)
             ->args([

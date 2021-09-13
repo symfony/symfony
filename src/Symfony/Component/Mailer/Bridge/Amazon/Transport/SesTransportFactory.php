@@ -52,6 +52,8 @@ final class SesTransportFactory extends AbstractTransportFactory
                     'accessKeySecret' => $dsn->getPassword(),
                 ] + (
                     'default' === $dsn->getHost() ? [] : ['endpoint' => 'https://'.$dsn->getHost().($dsn->getPort() ? ':'.$dsn->getPort() : '')]
+                ) + (
+                    null === $dsn->getOption('session_token') ? [] : ['sessionToken' => $dsn->getOption('session_token')]
                 );
 
                 return new $class(new SesClient(Configuration::create($options), null, $this->client, $this->logger), $this->dispatcher, $this->logger);

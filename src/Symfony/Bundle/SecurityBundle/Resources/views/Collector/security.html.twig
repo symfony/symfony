@@ -44,7 +44,7 @@
                             <span>
                                 {% set remainingRoles = collector.roles|slice(1) %}
                                 {{ collector.roles|first }}
-                                {% if remainingRoles|length > 1 %}
+                                {% if remainingRoles is not empty %}
                                     +
                                     <abbr title="{{ remainingRoles|join(', ') }}">
                                         {{ remainingRoles|length }} more

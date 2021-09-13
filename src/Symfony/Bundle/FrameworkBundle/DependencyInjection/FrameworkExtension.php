@@ -1518,22 +1518,18 @@ class FrameworkExtension extends Extension
 
         if ('none' === $config['cache']) {
             $container->removeDefinition('annotations.cached_reader');
-            $container->removeDefinition('annotations.psr_cached_reader');
 
             return;
         }
 
-        if ($container->hasDefinition('annotations.psr_cached_reader')) {
-            $container->setDefinition('annotations.cached_reader', $container->getDefinition('annotations.psr_cached_reader'));
-        }
-
         if ('php_array' === $config['cache']) {
-            $cacheService = $container->hasDefinition('annotations.psr_cached_reader') ? 'annotations.cache_adapter' : 'annotations.cache';
+            $cacheService = 'annotations.cache_adapter';
 
             // Enable warmer only if PHP array is used for cache
             $definition = $container->findDefinition('annotations.cache_warmer');
             $definition->addTag('kernel.cache_warmer');
         } else {
+            $cacheService = 'annotations.filesystem_cache_adapter';
             $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
 
             if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
@@ -1544,17 +1540,6 @@ class FrameworkExtension extends Extension
                 ->getDefinition('annotations.filesystem_cache_adapter')
                 ->replaceArgument(2, $cacheDir)
             ;
-
-            if ($container->hasDefinition('annotations.psr_cached_reader')) {
-                $cacheService = 'annotations.filesystem_cache_adapter';
-            } else {
-                // Legacy code for doctrine/annotations:<1.13
-                if (!class_exists(\Doctrine\Common\Cache\CacheProvider::class)) {
-                    throw new LogicException('Annotations cannot be cached as the Doctrine Cache library is not installed. Try running "composer require doctrine/cache".');
-                }
-
-                $cacheService = 'annotations.filesystem_cache';
-            }
         }
 
         $container

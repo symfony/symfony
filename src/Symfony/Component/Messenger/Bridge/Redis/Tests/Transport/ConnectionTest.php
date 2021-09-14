@@ -78,7 +78,7 @@ class ConnectionTest extends TestCase
         $redis->expects($this->once())
             ->method('connect')
             ->with('tls://127.0.0.1', 6379)
-            ->willReturn(null);
+            ->willReturn(true);
 
         Connection::fromDsn('redis://127.0.0.1?tls=1', [], $redis);
     }
@@ -92,7 +92,7 @@ class ConnectionTest extends TestCase
         $redis->expects($this->once())
             ->method('connect')
             ->with('tls://127.0.0.1', 6379)
-            ->willReturn(null);
+            ->willReturn(true);
 
         Connection::fromDsn('redis://127.0.0.1', ['tls' => true], $redis);
     }
@@ -103,7 +103,7 @@ class ConnectionTest extends TestCase
         $redis->expects($this->once())
             ->method('connect')
             ->with('tls://127.0.0.1', 6379)
-            ->willReturn(null);
+            ->willReturn(true);
 
         Connection::fromDsn('rediss://127.0.0.1?delete_after_ack=true', [], $redis);
     }
@@ -315,7 +315,7 @@ class ConnectionTest extends TestCase
 
         $redis->expects($this->exactly(1))->method('xadd')
             ->with('queue', '*', ['message' => '{"body":"1","headers":[]}'], 20000, true)
-            ->willReturn(1);
+            ->willReturn('1');
 
         $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000', ['delete_after_ack' => true], $redis);
         $connection->add('1', []);
@@ -365,7 +365,7 @@ class ConnectionTest extends TestCase
     {
         $redis = $this->createMock(\Redis::class);
 
-        $redis->expects($this->once())->method('xadd')->willReturn(0);
+        $redis->expects($this->once())->method('xadd')->willReturn('0');
         $redis->expects($this->once())->method('xack')->willReturn(0);
 
         $redis->method('getLastError')->willReturnOnConsecutiveCalls('xadd error', 'xack error');

@@ -38,12 +38,10 @@
         "symfony/property-info": "^5.4|^6.0",
         "symfony/translation": "^5.4|^6.0",
         "doctrine/annotations": "^1.13",
-        "doctrine/cache": "^1.11|^2.0",
         "egulias/email-validator": "^2.1.10|^3"
     },
     "conflict": {
         "doctrine/annotations": "<1.13",
-        "doctrine/cache": "<1.11",
         "doctrine/lexer": "<1.0.2",
         "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<5.4",

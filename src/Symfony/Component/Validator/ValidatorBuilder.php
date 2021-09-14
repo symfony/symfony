@@ -12,10 +12,8 @@
 namespace Symfony\Component\Validator;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Cache\ArrayCache;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
@@ -392,12 +390,6 @@ class ValidatorBuilder
 
         if (class_exists(ArrayAdapter::class)) {
             return new PsrCachedReader(new AnnotationReader(), new ArrayAdapter());
-        }
-
-        if (class_exists(CachedReader::class) && class_exists(ArrayCache::class)) {
-            trigger_deprecation('symfony/validator', '5.4', 'Enabling annotation based constraint mapping without having symfony/cache installed is deprecated.');
-
-            return new CachedReader(new AnnotationReader(), new ArrayCache());
         }
 
         throw new LogicException('Enabling annotation based constraint mapping requires the packages doctrine/annotations and symfony/cache to be installed.');

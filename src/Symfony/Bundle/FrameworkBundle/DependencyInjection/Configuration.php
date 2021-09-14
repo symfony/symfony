@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
-use Doctrine\Common\Annotations\PsrCachedReader;
-use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
@@ -930,9 +928,6 @@ class Configuration implements ConfigurationInterface
 
     private function addAnnotationsSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable)
     {
-        $doctrineCache = $willBeAvailable('doctrine/cache', Cache::class, 'doctrine/annotation');
-        $psr6Cache = $willBeAvailable('symfony/cache', PsrCachedReader::class, 'doctrine/annotation');
-
         $rootNode
             ->children()
                 ->arrayNode('annotations')
@@ -941,7 +936,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->enumNode('cache')
                             ->values(['none', 'php_array', 'file'])
-                            ->defaultValue(($doctrineCache || $psr6Cache) ? 'php_array' : 'none')
+                            ->defaultValue('php_array')
                         ->end()
                         ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
                         ->booleanNode('debug')->defaultValue($this->debug)->end()

@@ -15,7 +15,7 @@ jobs:
     runs-on: Ubuntu-20.04
 
     env:
-      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,mongodb,redis
+      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,mongodb,redis-5.3.4
 
     strategy:
       matrix:

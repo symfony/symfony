@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-14T18:00:52Z
+
+Apparently, SetupPHP installs some dev snapshot of `ext-edis` on PHP 8.1. I don't know why they do that since the stable 5.3.4 works fine on PHP 8.1. This PR fixes all the tests I could fix. Regarding the remaining failures, I believe that the extension is simply broken.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-14T18:29:21Z
+
+I've pinned the redis extension to get green tests again.

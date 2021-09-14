@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-09-14T09:18:19Z
+
+laminas/laminas-code does not support PHP 8.1 yet, so we cannot remove the `php 8.0.99` hack yet.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-14T09:20:11Z
+
+Yes, that's what I figured out, we should remove the hack once https://github.com/laminas/laminas-code/pull/86 is merged. Thanks @derrabus for working on that PR btw!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-14T10:26:31Z
+
+Wow, we are early this time. 😲
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-14T10:32:58Z
+
+> we should remove the hack once [laminas/laminas-code#86](https://github.com/laminas/laminas-code/pull/86) is merged.
+
+We would make this a `8.1.99` hack then that is only applied for the PHP 8.2 job.

@@ -30,13 +30,13 @@ class MockResponse implements ResponseInterface, StreamableInterface
         doDestruct as public __destruct;
     }
 
-    private $body;
-    private $requestOptions = [];
-    private $requestUrl;
-    private $requestMethod;
+    private string|iterable $body;
+    private array $requestOptions = [];
+    private string $requestUrl;
+    private string $requestMethod;
 
-    private static $mainMulti;
-    private static $idSequence = 0;
+    private static ClientState $mainMulti;
+    private static int $idSequence = 0;
 
     /**
      * @param string|string[]|iterable $body The response body as a string or an iterable of strings,
@@ -47,7 +47,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
      */
     public function __construct(string|iterable $body = '', array $info = [])
     {
-        $this->body = is_iterable($body) ? $body : (string) $body;
+        $this->body = $body;
         $this->info = $info + ['http_code' => 200] + $this->info;
 
         if (!isset($info['response_headers'])) {
@@ -105,7 +105,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
     {
         $this->info['canceled'] = true;
         $this->info['error'] = 'Response has been canceled.';
-        $this->body = null;
+        unset($this->body);
     }
 
     /**
@@ -176,7 +176,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         foreach ($responses as $response) {
             $id = $response->id;
 
-            if (null === $response->body) {
+            if (!isset($response->body)) {
                 // Canceled response
                 $response->body = [];
             } elseif ([] === $response->body) {

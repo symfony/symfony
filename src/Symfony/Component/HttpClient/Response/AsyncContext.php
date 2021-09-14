@@ -25,12 +25,15 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 final class AsyncContext
 {
     private $passthru;
-    private $client;
-    private $response;
-    private $info = [];
+    private HttpClientInterface $client;
+    private ResponseInterface $response;
+    private array $info = [];
     private $content;
-    private $offset;
+    private int $offset;
 
+    /**
+     * @param resource|null $content
+     */
     public function __construct(?callable &$passthru, HttpClientInterface $client, ResponseInterface &$response, array &$info, $content, int $offset)
     {
         $this->passthru = &$passthru;

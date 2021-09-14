@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class HttpOptions
 {
-    private $options = [];
+    private array $options = [];
 
     public function toArray(): array
     {

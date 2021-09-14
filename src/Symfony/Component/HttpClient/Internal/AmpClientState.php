@@ -41,21 +41,21 @@ use Psr\Log\LoggerInterface;
  */
 final class AmpClientState extends ClientState
 {
-    public $dnsCache = [];
-    public $responseCount = 0;
-    public $pushedResponses = [];
+    public array $dnsCache = [];
+    public int $responseCount = 0;
+    public array $pushedResponses = [];
 
-    private $clients = [];
-    private $clientConfigurator;
-    private $maxHostConnections;
-    private $maxPendingPushes;
-    private $logger;
+    private array $clients = [];
+    private \Closure $clientConfigurator;
+    private int $maxHostConnections;
+    private int $maxPendingPushes;
+    private ?LoggerInterface $logger;
 
     public function __construct(?callable $clientConfigurator, int $maxHostConnections, int $maxPendingPushes, ?LoggerInterface &$logger)
     {
-        $this->clientConfigurator = $clientConfigurator ?? static function (PooledHttpClient $client) {
-            return new InterceptedHttpClient($client, new RetryRequests(2));
-        };
+        $clientConfigurator ??= static fn (PooledHttpClient $client) => new InterceptedHttpClient($client, new RetryRequests(2));
+        $this->clientConfigurator = $clientConfigurator instanceof \Closure ? $clientConfigurator : \Closure::fromCallable($clientConfigurator);
+
         $this->maxHostConnections = $maxHostConnections;
         $this->maxPendingPushes = $maxPendingPushes;
         $this->logger = &$logger;

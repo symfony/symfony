@@ -29,16 +29,22 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
     use CommonResponseTrait;
     use TransportResponseTrait;
 
+    /**
+     * @var resource
+     */
     private $context;
-    private $url;
+    private string $url;
     private $resolver;
     private $onProgress;
-    private $remaining;
+    private ?int $remaining = null;
+
+    /**
+     * @var resource|null
+     */
     private $buffer;
-    private $multi;
-    private $debugBuffer;
-    private $shouldBuffer;
-    private $pauseExpiry = 0;
+
+    private NativeClientState $multi;
+    private float $pauseExpiry = 0.0;
 
     /**
      * @internal

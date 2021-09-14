@@ -32,8 +32,12 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
     use TransportResponseTrait;
 
-    private static $performing = false;
-    private $multi;
+    private static bool $performing = false;
+    private CurlClientState $multi;
+
+    /**
+     * @var resource
+     */
     private $debugBuffer;
 
     /**

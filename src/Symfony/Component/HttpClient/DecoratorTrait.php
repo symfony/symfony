@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  */
 trait DecoratorTrait
 {
-    private $client;
+    private HttpClientInterface $client;
 
     public function __construct(HttpClientInterface $client = null)
     {

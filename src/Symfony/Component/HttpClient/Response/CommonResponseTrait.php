@@ -32,8 +32,8 @@ trait CommonResponseTrait
     private $initializer;
     private $shouldBuffer;
     private $content;
-    private $offset = 0;
-    private $jsonData;
+    private int $offset = 0;
+    private ?array $jsonData = null;
 
     /**
      * {@inheritdoc}

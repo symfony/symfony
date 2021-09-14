@@ -23,7 +23,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  */
 trait HttpClientTrait
 {
-    private static $CHUNK_SIZE = 16372;
+    private static int $CHUNK_SIZE = 16372;
 
     /**
      * {@inheritdoc}

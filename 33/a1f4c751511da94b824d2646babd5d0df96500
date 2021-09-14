@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-13T20:02:07Z
+
+Oh, something for the doc also: ppl should empty exclude-from-classmap before running composer i -o

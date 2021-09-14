@@ -30,6 +30,8 @@ interface HelperInterface
 
     /**
      * Returns the canonical name of this helper.
+     *
+     * @return string
      */
-    public function getName(): string;
+    public function getName();
 }

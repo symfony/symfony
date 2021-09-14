@@ -212,6 +212,17 @@ index 761b31d0d2..bf4ff86dd5 100644
 +    protected function execute(InputInterface $input, OutputInterface $output): int
      {
          throw new LogicException('You must override the execute() method in the concrete command class.');
+diff --git a/src/Symfony/Component/Console/Helper/HelperInterface.php b/src/Symfony/Component/Console/Helper/HelperInterface.php
+index 1d2b7bf..cb1f661 100644
+--- a/src/Symfony/Component/Console/Helper/HelperInterface.php
++++ b/src/Symfony/Component/Console/Helper/HelperInterface.php
+@@ -33,5 +33,5 @@ interface HelperInterface
+      *
+      * @return string
+      */
+-    public function getName();
++    public function getName(): string;
+ }
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 index 1acec50de5..904e67a47b 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php

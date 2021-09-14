@@ -142,7 +142,7 @@ class DeprecationErrorHandler
 
         $msg = $deprecation->getMessage();
 
-        if (error_reporting() & $type) {
+        if (\E_DEPRECATED !== $type && (error_reporting() & $type)) {
             $group = 'unsilenced';
         } elseif ($deprecation->isLegacy()) {
             $group = 'legacy';

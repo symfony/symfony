@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
+use Symfony\Component\Validator\Constraints\DateTime;
+
 /**
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
@@ -24,11 +26,8 @@ final class PersistentToken implements PersistentTokenInterface
     private $tokenValue;
     private $lastUsed;
 
-    public function __construct(string $class, string $userIdentifier, string $series, string $tokenValue, \DateTime $lastUsed)
+    public function __construct(/*string*/ $userIdentifier, /*string*/ $series, /*string*/ $tokenValue, /*\DateTime*/ $lastUsed)
     {
-        if (empty($class)) {
-            throw new \InvalidArgumentException('$class must not be empty.');
-        }
         if ('' === $userIdentifier) {
             throw new \InvalidArgumentException('$userIdentifier must not be empty.');
         }
@@ -39,7 +38,15 @@ final class PersistentToken implements PersistentTokenInterface
             throw new \InvalidArgumentException('$tokenValue must not be empty.');
         }
 
-        $this->class = $class;
+        if ($tokenValue instanceof \DateTime) {
+            trigger_deprecation('symfony/security-core', '5.4', 'The $class argument of "%s" is deprecated.', __METHOD__);
+
+            $userIdentifier = $series;
+            $series = $tokenValue;
+            $tokenValue = $lastUsed;
+            $lastUsed = func_get_arg(4);
+        }
+
         $this->userIdentifier = $userIdentifier;
         $this->series = $series;
         $this->tokenValue = $tokenValue;

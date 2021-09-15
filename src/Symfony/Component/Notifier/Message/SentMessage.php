@@ -36,7 +36,7 @@ final class SentMessage
         return $this->transport;
     }
 
-    public function setMessageId(string $id): void
+    public function setMessageId(?string $id): void
     {
         $this->messageId = $id;
     }

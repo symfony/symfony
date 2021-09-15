@@ -124,10 +124,10 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     {
         $series = base64_encode(random_bytes(64));
         $tokenValue = base64_encode(random_bytes(64));
+        $user = $token->getUser();
 
         $this->tokenProvider->createNewToken(
             new PersistentToken(
-                \get_class($user = $token->getUser()),
                 // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
                 method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(),
                 $series,

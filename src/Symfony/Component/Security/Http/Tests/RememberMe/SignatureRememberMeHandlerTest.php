@@ -62,7 +62,7 @@ class SignatureRememberMeHandlerTest extends TestCase
 
         /** @var Cookie $cookie */
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-        $this->assertEquals(base64_encode(InMemoryUser::class.':d291dGVy:'.$expire.':abc'), $cookie->getValue());
+        $this->assertEquals(base64_encode('d291dGVy:'.$expire.':abc'), $cookie->getValue());
     }
 
     public function testClearRememberMeCookie()
@@ -87,14 +87,14 @@ class SignatureRememberMeHandlerTest extends TestCase
             ->with($user, $expire = time() + 31536000)
             ->willReturn('newsignature');
 
-        $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'signature');
+        $rememberMeDetails = new RememberMeDetails('wouter', 360, 'signature');
         $this->handler->consumeRememberMeCookie($rememberMeDetails);
 
         $this->assertTrue($this->request->attributes->has(ResponseListener::COOKIE_ATTR_NAME));
 
         /** @var Cookie $cookie */
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-        $this->assertEquals((new RememberMeDetails(InMemoryUser::class, 'wouter', $expire, 'newsignature'))->toString(), $cookie->getValue());
+        $this->assertEquals((new RememberMeDetails('wouter', $expire, 'newsignature'))->toString(), $cookie->getValue());
     }
 
     public function testConsumeRememberMeCookieInvalidHash()
@@ -107,7 +107,7 @@ class SignatureRememberMeHandlerTest extends TestCase
             ->with(new InMemoryUser('wouter', null), 360, 'badsignature')
             ->will($this->throwException(new InvalidSignatureException()));
 
-        $this->handler->consumeRememberMeCookie(new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'badsignature'));
+        $this->handler->consumeRememberMeCookie(new RememberMeDetails('wouter', 360, 'badsignature'));
     }
 
     public function testConsumeRememberMeCookieExpired()
@@ -120,6 +120,6 @@ class SignatureRememberMeHandlerTest extends TestCase
             ->with(new InMemoryUser('wouter', null), 360, 'signature')
             ->will($this->throwException(new ExpiredSignatureException()));
 
-        $this->handler->consumeRememberMeCookie(new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'signature'));
+        $this->handler->consumeRememberMeCookie(new RememberMeDetails('wouter', 360, 'signature'));
     }
 }

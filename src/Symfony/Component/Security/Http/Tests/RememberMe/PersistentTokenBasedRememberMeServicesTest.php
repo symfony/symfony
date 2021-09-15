@@ -93,7 +93,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
-            ->willReturn(new PersistentToken('fooclass', 'fooname', 'fooseries', $this->generateHash('foovalue'), new \DateTime()))
+            ->willReturn(new PersistentToken('fooname', 'fooseries', $this->generateHash('foovalue'), new \DateTime()))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -114,7 +114,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
-            ->willReturn(new PersistentToken('fooclass', 'foouser', 'fooseries', 'anotherFooValue', new \DateTime()))
+            ->willReturn(new PersistentToken('foouser', 'fooseries', 'anotherFooValue', new \DateTime()))
         ;
 
         $tokenProvider
@@ -144,7 +144,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
             ->expects($this->once())
             ->method('loadTokenBySeries')
             ->with($this->equalTo('fooseries'))
-            ->willReturn(new PersistentToken('fooclass', 'username', 'fooseries', $this->generateHash('foovalue'), new \DateTime('yesterday')))
+            ->willReturn(new PersistentToken('username', 'fooseries', $this->generateHash('foovalue'), new \DateTime('yesterday')))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -173,7 +173,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
             ->expects($this->once())
             ->method('loadTokenBySeries')
             ->with($this->equalTo('fooseries'))
-            ->willReturn(new PersistentToken(InMemoryUser::class, 'foouser', 'fooseries', $tokenValue, new \DateTime()))
+            ->willReturn(new PersistentToken('foouser', 'fooseries', $tokenValue, new \DateTime()))
         ;
         $service->setTokenProvider($tokenProvider);
 

@@ -21,14 +21,20 @@ class RememberMeDetails
 {
     public const COOKIE_DELIMITER = ':';
 
-    private $userFqcn;
     private $userIdentifier;
     private $expires;
     private $value;
 
-    public function __construct(string $userFqcn, string $userIdentifier, int $expires, string $value)
+    public function __construct(/*string*/ $userIdentifier, /*int*/ $expires, /*string*/ $value)
     {
-        $this->userFqcn = $userFqcn;
+        if (\is_string($expires)) {
+            trigger_deprecation('symfony/security-http', '5.4', 'The $userFqcn argument of "%s" is deprecated.', __METHOD__);
+
+            $userIdentifier = $expires;
+            $expires = $value;
+            $value = func_get_arg(3);
+        }
+
         $this->userIdentifier = $userIdentifier;
         $this->expires = $expires;
         $this->value = $value;
@@ -37,10 +43,10 @@ class RememberMeDetails
     public static function fromRawCookie(string $rawCookie): self
     {
         $cookieParts = explode(self::COOKIE_DELIMITER, base64_decode($rawCookie), 4);
-        if (false === $cookieParts[1] = base64_decode($cookieParts[1], true)) {
+        if (false === $cookieParts[0] = base64_decode($cookieParts[0], true)) {
             throw new AuthenticationException('The user identifier contains a character from outside the base64 alphabet.');
         }
-        if (4 !== \count($cookieParts)) {
+        if (3 !== \count($cookieParts)) {
             throw new AuthenticationException('The cookie contains invalid data.');
         }
 
@@ -49,7 +55,7 @@ class RememberMeDetails
 
     public static function fromPersistentToken(PersistentToken $persistentToken, int $expires): self
     {
-        return new static($persistentToken->getClass(), $persistentToken->getUserIdentifier(), $expires, $persistentToken->getSeries().':'.$persistentToken->getTokenValue());
+        return new static($persistentToken->getUserIdentifier(), $expires, $persistentToken->getSeries().':'.$persistentToken->getTokenValue());
     }
 
     public function withValue(string $value): self
@@ -58,11 +64,6 @@ class RememberMeDetails
         $details->value = $value;
 
         return $details;
-    }
-
-    public function getUserFqcn(): string
-    {
-        return $this->userFqcn;
     }
 
     public function getUserIdentifier(): string
@@ -83,6 +84,6 @@ class RememberMeDetails
     public function toString(): string
     {
         // $userIdentifier is encoded because it might contain COOKIE_DELIMITER, we assume other values don't
-        return base64_encode(implode(self::COOKIE_DELIMITER, [$this->userFqcn, base64_encode($this->userIdentifier), $this->expires, $this->value]));
+        return base64_encode(implode(self::COOKIE_DELIMITER, [base64_encode($this->userIdentifier), $this->expires, $this->value]));
     }
 }

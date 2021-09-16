@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 
@@ -29,6 +30,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     public const STRATEGY_PRIORITY = 'priority';
 
     private $voters;
+    private $votersCacheAttributes;
+    private $votersCacheObject;
     private $strategy;
     private $allowIfAllAbstainDecisions;
     private $allowIfEqualGrantedDeniedDecisions;
@@ -80,7 +83,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     private function decideAffirmative(TokenInterface $token, array $attributes, $object = null): bool
     {
         $deny = 0;
-        foreach ($this->voters as $voter) {
+        foreach ($this->getVoters($attributes, $object) as $voter) {
             $result = $voter->vote($token, $object, $attributes);
 
             if (VoterInterface::ACCESS_GRANTED === $result) {
@@ -119,7 +122,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     {
         $grant = 0;
         $deny = 0;
-        foreach ($this->voters as $voter) {
+        foreach ($this->getVoters($attributes, $object) as $voter) {
             $result = $voter->vote($token, $object, $attributes);
 
             if (VoterInterface::ACCESS_GRANTED === $result) {
@@ -155,7 +158,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     private function decideUnanimous(TokenInterface $token, array $attributes, $object = null): bool
     {
         $grant = 0;
-        foreach ($this->voters as $voter) {
+        foreach ($this->getVoters($attributes, $object) as $voter) {
             foreach ($attributes as $attribute) {
                 $result = $voter->vote($token, $object, [$attribute]);
 
@@ -188,7 +191,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     private function decidePriority(TokenInterface $token, array $attributes, $object = null)
     {
-        foreach ($this->voters as $voter) {
+        foreach ($this->getVoters($attributes, $object) as $voter) {
             $result = $voter->vote($token, $object, $attributes);
 
             if (VoterInterface::ACCESS_GRANTED === $result) {
@@ -205,5 +208,49 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         return $this->allowIfAllAbstainDecisions;
+    }
+
+    private function getVoters(array $attributes, $object = null): iterable
+    {
+        $keyAttributes = [];
+        foreach ($attributes as $attribute) {
+            $keyAttributes[] = \is_string($attribute) ? $attribute : null;
+        }
+        // use `get_class` to handle anonymous classes
+        $keyObject = \is_object($object) ? \get_class($object) : get_debug_type($object);
+        foreach ($this->voters as $key => $voter) {
+            if (!$voter instanceof CacheableVoterInterface) {
+                yield $voter;
+                continue;
+            }
+
+            $supports = true;
+            // The voter supports the attributes if it supports at least one attribute of the list
+            foreach ($keyAttributes as $keyAttribute) {
+                if (null === $keyAttribute) {
+                    $supports = true;
+                } elseif (!isset($this->votersCacheAttributes[$keyAttribute][$key])) {
+                    $this->votersCacheAttributes[$keyAttribute][$key] = $supports = $voter->supportsAttribute($keyAttribute);
+                } else {
+                    $supports = $this->votersCacheAttributes[$keyAttribute][$key];
+                }
+                if ($supports) {
+                    break;
+                }
+            }
+            if (!$supports) {
+                continue;
+            }
+
+            if (!isset($this->votersCacheObject[$keyObject][$key])) {
+                $this->votersCacheObject[$keyObject][$key] = $supports = $voter->supportsType($keyObject);
+            } else {
+                $supports = $this->votersCacheObject[$keyObject][$key];
+            }
+            if (!$supports) {
+                continue;
+            }
+            yield $voter;
+        }
     }
 }

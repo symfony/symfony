@@ -21,8 +21,10 @@
     <issueHandlers>
         <UndefinedClass>
             <errorLevel type="suppress">
-                <!-- Class has been added in PHP 8.1 -->
+                <!-- These classes have been added in PHP 8.1 -->
+                <referencedClass name="BackedEnum"/>
                 <referencedClass name="ReflectionIntersectionType"/>
+                <referencedClass name="UnitEnum"/>
             </errorLevel>
         </UndefinedClass>
     </issueHandlers>

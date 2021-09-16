@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-16T10:52:38Z
+
+I'm fine with bumping. However, we could get around it by skipping the new tests if `TagHeader` is not present, couldn't we?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-16T10:59:30Z
+
+We could indeed. I tend to prefer bumping over adding a skip condition here, but both work for me. Let me know about your preference
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-16T11:46:05Z
+
+PR updated, now skips the problematic test based on class existence.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-16T13:09:56Z
+
+Yes, I think that's better. We bump the dependency on the 6.0 branch anyway and can remove the skip condition there.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-16T14:38:03Z
+
+I think, the commit message and PR title deserve an update. Apart from that, let's merge to make the CI green again.

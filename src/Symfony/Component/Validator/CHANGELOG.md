@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for `ConstraintViolationList::createFromMessage()`
+ * Add enum support (>= PHP 8.1) for the `Choice` constraint
 
 5.3
 ---

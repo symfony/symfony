@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\ChoiceValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Test\SampleBackedEnum;
 
 function choice_callback()
 {
@@ -92,6 +93,10 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
         if (\PHP_VERSION_ID >= 80000) {
             yield 'named arguments' => [eval('return new \Symfony\Component\Validator\Constraints\Choice(choices: ["foo", "bar"]);')];
+        }
+
+        if (\PHP_VERSION_ID >= 80100) {
+            yield 'enums' => [new Choice(SampleBackedEnum::class)];
         }
     }
 

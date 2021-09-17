@@ -134,7 +134,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Patch return types
-        if: "${{ matrix.php == '8.0' && ! matrix.mode }}"
+        if: "${{ matrix.php == '8.1' && ! matrix.mode }}"
         run: |
           patch -sp1 < .github/expected-missing-return-types.diff
           git add .

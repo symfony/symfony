@@ -28,9 +28,9 @@ CHANGELOG
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private
  * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
- * Add `MicroKernelTrait::getBundlesPath` method to get bundles config path
  * Deprecate the `cache.adapter.doctrine` service
- * Add support for resetting container services after each messenger message.
+ * Add support for resetting container services after each messenger message
+ * Add `configureContainer()`, `configureRoutes()`, `getConfigDir()` and `getBundlesPath()` to `MicroKernelTrait`
 
 5.3
 ---

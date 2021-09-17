@@ -143,10 +143,6 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         }
         $ok = $this->pool->commit() && $ok;
 
-        if ($invalidatedTags) {
-            $ok = (self::$invalidateTags)($this->tags, $invalidatedTags) && $ok;
-        }
-
         return $ok;
     }
 
@@ -373,7 +369,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         }
     }
 
-    private function getTagVersions(array $tagsByKey, array &$invalidatedTags = [])
+    private function getTagVersions(array $tagsByKey, array $invalidatedTags = [])
     {
         $tagVersions = $invalidatedTags;
 
@@ -416,12 +412,27 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             return $tagVersions;
         }
 
+        $tod = gettimeofday();
+        $newVersion = $tod['sec'] * 1000000 + $tod['usec'];
+        $updatedTags = [];
         foreach ($this->tags->getItems(array_keys($tags)) as $tag => $version) {
-            $tagVersions[$tag = $tags[$tag]] = $version->get() ?: 0;
+            $tag = $tags[$tag];
+
+            if ($version->isHit()) {
+                $tagVersions[$tag] = $version->get();
+            } else {
+                $tagVersions[$tag] = $newVersion;
+                $updatedTags[$tag] = $version->set($newVersion);
+            }
+
             if (isset($invalidatedTags[$tag])) {
-                $invalidatedTags[$tag] = $version->set(++$tagVersions[$tag]);
+                $updatedTags[$tag] = $version->set(++$tagVersions[$tag]);
             }
             $this->knownTagVersions[$tag] = [$now, $tagVersions[$tag]];
+        }
+
+        if ($updatedTags) {
+            (self::$invalidateTags)($this->tags, $updatedTags);
         }
 
         return $tagVersions;

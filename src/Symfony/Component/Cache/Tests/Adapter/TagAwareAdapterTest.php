@@ -83,6 +83,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $item->expiresAfter(100);
 
         $tag = $this->createMock(CacheItemInterface::class);
+        $tag->expects(self::exactly(2))->method('isHit')->willReturn(true);
         $tag->expects(self::exactly(2))->method('get')->willReturn(10);
 
         $tagsPool->expects(self::exactly(2))->method('getItems')->willReturn([

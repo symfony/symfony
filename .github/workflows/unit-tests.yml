@@ -139,8 +139,8 @@ jobs:
           patch -sp1 < .github/expected-missing-return-types.diff
           git add .
           composer install -q --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS=force=2 php .github/patch-types.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS=force=2 php .github/patch-types.php # ensure the script is idempotent
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.0' php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.0' php .github/patch-types.php # ensure the script is idempotent
           git diff --exit-code
 
       - name: Run tests

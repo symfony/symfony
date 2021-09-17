@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\ChoiceValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
-use Symfony\Component\Validator\Test\SampleBackedEnum;
+use Symfony\Component\Validator\Tests\SampleBackedEnum;
 
 function choice_callback()
 {

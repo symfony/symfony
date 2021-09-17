@@ -9,9 +9,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
-namespace Symfony\Component\Validator\Test;
+namespace Symfony\Component\Validator\Tests;
 
 enum SampleBackedEnum: string
 {

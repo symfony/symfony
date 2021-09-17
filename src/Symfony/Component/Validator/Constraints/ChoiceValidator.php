@@ -60,12 +60,7 @@ class ChoiceValidator extends ConstraintValidator
             }
             $choices = $choices();
         } elseif (is_a($constraint->choices, \BackedEnum::class, true)) {
-            $choices = array_map(
-                function (\BackedEnum $enum) {
-                    return $enum->value;
-                },
-                $constraint->choices::cases()
-            );
+            $choices = \array_column($constraint->choices::cases(), 'value');
         } else {
             $choices = $constraint->choices;
         }

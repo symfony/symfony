@@ -44,8 +44,8 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         '::/128',
     ];
 
-    private $client;
-    private $subnets;
+    private HttpClientInterface $client;
+    private string|array|null $subnets;
 
     /**
      * @param string|array|null $subnets String or array of subnets using CIDR notation that will be used by IpUtils.

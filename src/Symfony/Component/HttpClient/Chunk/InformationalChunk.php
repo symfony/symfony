@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpClient\Chunk;
  */
 class InformationalChunk extends DataChunk
 {
-    private $status;
+    private array $status;
 
     public function __construct(int $statusCode, array $headers)
     {

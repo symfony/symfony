@@ -25,9 +25,9 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  */
 class AmpListener implements EventListener
 {
-    private $info;
-    private $pinSha256;
-    private $onProgress;
+    private array $info;
+    private array $pinSha256;
+    private \Closure $onProgress;
     private $handle;
 
     public function __construct(array &$info, array $pinSha256, \Closure $onProgress, &$handle)

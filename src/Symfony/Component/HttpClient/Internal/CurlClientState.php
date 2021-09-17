@@ -22,17 +22,14 @@ use Psr\Log\LoggerInterface;
  */
 final class CurlClientState extends ClientState
 {
-    /** @var \CurlMultiHandle */
-    public $handle;
+    public \CurlMultiHandle $handle;
     /** @var PushedResponse[] */
-    public $pushedResponses = [];
-    /** @var DnsCache */
-    public $dnsCache;
+    public array $pushedResponses = [];
+    public DnsCache $dnsCache;
     /** @var float[] */
-    public $pauseExpiries = [];
-    public $execCounter = \PHP_INT_MIN;
-    /** @var LoggerInterface|null */
-    public $logger;
+    public array $pauseExpiries = [];
+    public int $execCounter = \PHP_INT_MIN;
+    public ?LoggerInterface $logger = null;
 
     public function __construct()
     {

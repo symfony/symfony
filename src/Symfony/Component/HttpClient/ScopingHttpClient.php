@@ -28,9 +28,9 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
 {
     use HttpClientTrait;
 
-    private $client;
-    private $defaultOptionsByRegexp;
-    private $defaultRegexp;
+    private HttpClientInterface $client;
+    private array $defaultOptionsByRegexp;
+    private ?string $defaultRegexp;
 
     public function __construct(HttpClientInterface $client, array $defaultOptionsByRegexp, string $defaultRegexp = null)
     {

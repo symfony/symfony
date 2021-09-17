@@ -37,7 +37,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     use HttpClientTrait;
     use LoggerAwareTrait;
 
-    private $defaultOptions = self::OPTIONS_DEFAULTS + [
+    private array $defaultOptions = self::OPTIONS_DEFAULTS + [
         'auth_ntlm' => null, // array|string - an array containing the username as first value, and optionally the
                              //   password as the second one; or string like username:password - enabling NTLM auth
         'extra' => [
@@ -47,12 +47,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
     /**
      * An internal object to share state between the client and its responses.
-     *
-     * @var CurlClientState
      */
-    private $multi;
+    private CurlClientState $multi;
 
-    private static $curlVersion;
+    private static array $curlVersion;
 
     /**
      * @param array $defaultOptions     Default request's options

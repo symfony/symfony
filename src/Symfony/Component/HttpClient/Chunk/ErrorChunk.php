@@ -22,10 +22,10 @@ use Symfony\Contracts\HttpClient\ChunkInterface;
  */
 class ErrorChunk implements ChunkInterface
 {
-    private $didThrow = false;
-    private $offset;
-    private $errorMessage;
-    private $error;
+    private bool $didThrow = false;
+    private int $offset;
+    private string $errorMessage;
+    private ?\Throwable $error = null;
 
     public function __construct(int $offset, \Throwable|string $error)
     {

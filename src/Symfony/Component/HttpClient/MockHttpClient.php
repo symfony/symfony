@@ -27,9 +27,9 @@ class MockHttpClient implements HttpClientInterface
 {
     use HttpClientTrait;
 
-    private $responseFactory;
-    private $requestsCount = 0;
-    private $defaultOptions = [];
+    private ResponseInterface|\Closure|iterable|null $responseFactory;
+    private int $requestsCount = 0;
+    private array $defaultOptions = [];
 
     /**
      * @param callable|callable[]|ResponseInterface|ResponseInterface[]|iterable|null $responseFactory
@@ -46,7 +46,7 @@ class MockHttpClient implements HttpClientInterface
             })();
         }
 
-        $this->responseFactory = $responseFactory;
+        $this->responseFactory = !\is_callable($responseFactory) || $responseFactory instanceof \Closure ? $responseFactory : \Closure::fromCallable($responseFactory);
         $this->defaultOptions['base_uri'] = $baseUri;
     }
 

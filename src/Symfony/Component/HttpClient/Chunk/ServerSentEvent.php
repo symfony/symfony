@@ -19,10 +19,10 @@ use Symfony\Contracts\HttpClient\ChunkInterface;
  */
 final class ServerSentEvent extends DataChunk implements ChunkInterface
 {
-    private $data = '';
-    private $id = '';
-    private $type = 'message';
-    private $retry = 0;
+    private string $data = '';
+    private string $id = '';
+    private string $type = 'message';
+    private float $retry = 0;
 
     public function __construct(string $content)
     {

@@ -30,7 +30,7 @@ final class EventSourceHttpClient implements HttpClientInterface
         AsyncDecoratorTrait::withOptions insteadof HttpClientTrait;
     }
 
-    private $reconnectionTime;
+    private float $reconnectionTime;
 
     public function __construct(HttpClientInterface $client = null, float $reconnectionTime = 10.0)
     {
@@ -52,10 +52,10 @@ final class EventSourceHttpClient implements HttpClientInterface
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $state = new class() {
-            public $buffer = null;
-            public $lastEventId = null;
-            public $reconnectionTime;
-            public $lastError = null;
+            public ?string $buffer = null;
+            public ?string $lastEventId = null;
+            public float $reconnectionTime;
+            public ?float $lastError = null;
         };
         $state->reconnectionTime = $this->reconnectionTime;
 

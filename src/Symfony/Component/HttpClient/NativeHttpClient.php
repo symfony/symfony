@@ -35,10 +35,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     use HttpClientTrait;
     use LoggerAwareTrait;
 
-    private $defaultOptions = self::OPTIONS_DEFAULTS;
-
-    /** @var NativeClientState */
-    private $multi;
+    private array $defaultOptions = self::OPTIONS_DEFAULTS;
+    private NativeClientState $multi;
 
     /**
      * @param array $defaultOptions     Default request's options

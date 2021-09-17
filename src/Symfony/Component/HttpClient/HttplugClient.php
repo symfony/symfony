@@ -57,33 +57,34 @@ if (!interface_exists(RequestFactory::class)) {
  */
 final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestFactory, StreamFactory, UriFactory
 {
-    private $client;
-    private $responseFactory;
-    private $streamFactory;
-    private $promisePool;
-    private $waitLoop;
+    private HttpClientInterface $client;
+    private ResponseFactoryInterface $responseFactory;
+    private StreamFactoryInterface $streamFactory;
+    private ?\SplObjectStorage $promisePool;
+    private HttplugWaitLoop $waitLoop;
 
     public function __construct(HttpClientInterface $client = null, ResponseFactoryInterface $responseFactory = null, StreamFactoryInterface $streamFactory = null)
     {
         $this->client = $client ?? HttpClient::create();
-        $this->responseFactory = $responseFactory;
-        $this->streamFactory = $streamFactory ?? ($responseFactory instanceof StreamFactoryInterface ? $responseFactory : null);
+        $streamFactory ??= $responseFactory instanceof StreamFactoryInterface ? $responseFactory : null;
         $this->promisePool = \function_exists('GuzzleHttp\Promise\queue') ? new \SplObjectStorage() : null;
 
-        if (null === $this->responseFactory || null === $this->streamFactory) {
+        if (null === $responseFactory || null === $streamFactory) {
             if (!class_exists(Psr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
                 throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as no PSR-17 factories have been provided. Try running "composer require nyholm/psr7".');
             }
 
             try {
                 $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : null;
-                $this->responseFactory = $this->responseFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
-                $this->streamFactory = $this->streamFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
+                $responseFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
+                $streamFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
             } catch (NotFoundException $e) {
                 throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as no PSR-17 factories have been found. Try running "composer require nyholm/psr7".', 0, $e);
             }
         }
 
+        $this->responseFactory = $responseFactory;
+        $this->streamFactory = $streamFactory;
         $this->waitLoop = new HttplugWaitLoop($this->client, $this->promisePool, $this->responseFactory, $this->streamFactory);
     }
 

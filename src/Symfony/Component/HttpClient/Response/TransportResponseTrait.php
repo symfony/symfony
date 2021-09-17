@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\HttpClient\Response;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Chunk\LastChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\Canary;
 use Symfony\Component\HttpClient\Internal\ClientState;
 
 /**
@@ -27,8 +29,8 @@ use Symfony\Component\HttpClient\Internal\ClientState;
  */
 trait TransportResponseTrait
 {
-    private $headers = [];
-    private $info = [
+    private array $headers = [];
+    private array $info = [
         'response_headers' => [],
         'http_code' => 0,
         'error' => null,
@@ -37,12 +39,12 @@ trait TransportResponseTrait
 
     /** @var object|resource */
     private $handle;
-    private $id;
-    private $timeout = 0;
-    private $inflate;
-    private $finalInfo;
-    private $canary;
-    private $logger;
+    private int|string $id;
+    private ?float $timeout = 0;
+    private \InflateContext|bool|null $inflate = null;
+    private ?array $finalInfo = null;
+    private Canary $canary;
+    private ?LoggerInterface $logger = null;
 
     /**
      * {@inheritdoc}

@@ -28,7 +28,7 @@ abstract class AbstractTransport implements TransportInterface
     private ?EventDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
     private float $rate = 0;
-    private int $lastSent = 0;
+    private float $lastSent = 0;
 
     public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {

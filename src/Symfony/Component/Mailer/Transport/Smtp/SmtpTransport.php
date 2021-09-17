@@ -36,7 +36,7 @@ class SmtpTransport extends AbstractTransport
     private int $restartThresholdSleep = 0;
     private int $restartCounter = 0;
     private int $pingThreshold = 100;
-    private int $lastMessageTime = 0;
+    private float $lastMessageTime = 0;
     private AbstractStream $stream;
     private string $domain = '[127.0.0.1]';
 

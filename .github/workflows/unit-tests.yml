@@ -135,7 +135,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Patch return types
-        if: "${{ matrix.php == '8.0' && ! matrix.mode }}"
+        if: "${{ matrix.php == '8.1' && ! matrix.mode }}"
         run: |
           sed -i 's/"\*\*\/Tests\/"//' composer.json
           composer install -q --optimize-autoloader

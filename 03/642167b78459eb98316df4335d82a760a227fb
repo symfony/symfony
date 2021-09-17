@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-09-16T11:00:15Z
+
+shouldn't this update the .github/expected-missing-return-types.diff file ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-16T11:20:01Z
+
+Right, I'll do that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-17T09:06:13Z
+
+> shouldn't this update the .github/expected-missing-return-types.diff file ?
+
+I just fixed the CI, this should make it red if your rebase as is @derrabus

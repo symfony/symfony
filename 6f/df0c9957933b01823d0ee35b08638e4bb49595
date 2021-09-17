@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-14T22:35:27Z
+
+Thank you for the test case. Yes, I think, we should fix that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-15T05:15:56Z
+
+PCRE is compiled with Unicode tables, older versions have outdated tables. I don't know what we can do about this nor how we can work around it in a reasonable way...
+Any idea?
+
+---------------------------------------------------------------------------
+
+by simonberger at 2021-09-15T09:45:40Z
+
+As far as I understand the problem it is about removing invisible characters, where the old PCRE version probably does this for all ranges it did not know at that time.
+Can we instead use some ranges of really invisible characters instead of `\pC`? Or do this just for PHP <7.3 if it is safe for the other versions.
+
+---------------------------------------------------------------------------
+
+by simonberger at 2021-09-15T22:37:14Z
+
+@nicolas-grekas I re-requested your approval because I removed the Surrogate and Private Use character categories as well. I think those should not be relevant or if they are, trimming would be more likely a wrong move.

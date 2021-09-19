@@ -52,6 +52,11 @@ class InputOption
     private $default;
     private $description;
 
+    /* @see Symfony\Component\Console\Application->getDefaultInputDefinition() */
+    public const RESERVED_NAMES = ["help", "quiet", "version", "ansi", "no-ansi", "no-interaction", "env", "no-debug", "verbose"];
+    public const RESERVED_COMMANDS = ["about", "help", "list"];
+    public const RESERVED_SHORTCUTS = ["h", "q", "V", "n", "e", "v", "vv", "vvv"];
+
     /**
      * @param string|array|null                $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
      * @param int|null                         $mode     The option mode: One of the VALUE_* constants
@@ -79,6 +84,10 @@ class InputOption
             }
             $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
             $shortcuts = array_filter($shortcuts);
+            $used_reserved_shortcuts = array_intersect($shortcuts, self::RESERVED_SHORTCUTS);
+            if($used_reserved_shortcuts && !in_array($name, array_merge(self::RESERVED_NAMES, self::RESERVED_COMMANDS))) {
+                throw new InvalidArgumentException(sprintf('An option shortcut cannot include a reserved shortcut (%s).', implode('|', $used_reserved_shortcuts)));
+            }
             $shortcut = implode('|', $shortcuts);
 
             if (empty($shortcut)) {
@@ -226,6 +235,6 @@ class InputOption
             && $option->isArray() === $this->isArray()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
-        ;
+            ;
     }
 }

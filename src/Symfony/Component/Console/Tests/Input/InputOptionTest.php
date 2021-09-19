@@ -57,6 +57,41 @@ class InputOptionTest extends TestCase
         $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null by default');
     }
 
+    public function testInvalidShortcut()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('An option shortcut cannot include a reserved shortcut (e).');
+        $option = new InputOption('foo', 'e');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('An option shortcut cannot include a reserved shortcut (v).');
+        $option = new InputOption('foo', 'x|v|z');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('An option shortcut cannot include a reserved shortcut (v).');
+        $option = new InputOption('foo', ['x'|'v'|'z']);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('An option shortcut cannot include a reserved shortcut (V).');
+        $option = new InputOption('foo', 'V');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('An option shortcut cannot include a reserved shortcut (vvv).');
+        $option = new InputOption('foo', 'vvv');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('An option shortcut cannot include a reserved shortcut (help).');
+        $option = new InputOption('foo', 'help');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('An option shortcut cannot include a reserved shortcut (ansi).');
+        $option = new InputOption('foo', 'ansi');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('An option shortcut cannot include a reserved shortcut (no-ansi).');
+        $option = new InputOption('foo', 'no-ansi');
+    }
+
     public function testModes()
     {
         $option = new InputOption('foo', 'f');

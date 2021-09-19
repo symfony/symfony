@@ -504,12 +504,12 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foos:bar1'], ['decorated' => false]);
         $this->assertSame('
-
-  There are no commands defined in the "foos" namespace.
-
-  Did you mean this?
-      foo
-
+                                                          
+  There are no commands defined in the "foos" namespace.  
+                                                          
+  Did you mean this?                                      
+      foo                                                 
+                                                          
 
 ', $tester->getDisplay(true));
     }
@@ -1198,6 +1198,7 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
+
         $application
             ->register('foo')
             ->setDefinition([$def])
@@ -1214,7 +1215,7 @@ class ApplicationTest extends TestCase
         return [
             [new InputArgument('command', InputArgument::REQUIRED)],
             [new InputOption('quiet', '', InputOption::VALUE_NONE)],
-            [new InputOption('query', 'q', InputOption::VALUE_NONE)],
+            //[new InputOption('quiet', 'q', InputOption::VALUE_NONE)], \InvalidArgumentException::class);
         ];
     }
 

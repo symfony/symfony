@@ -504,12 +504,12 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foos:bar1'], ['decorated' => false]);
         $this->assertSame('
-                                                          
-  There are no commands defined in the "foos" namespace.  
-                                                          
-  Did you mean this?                                      
-      foo                                                 
-                                                          
+
+  There are no commands defined in the "foos" namespace.
+
+  Did you mean this?
+      foo
+
 
 ', $tester->getDisplay(true));
     }
@@ -1167,19 +1167,19 @@ class ApplicationTest extends TestCase
     public function testAddingOptionWithDuplicateShortcut()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('An option with shortcut "e" already exists.');
+        $this->expectExceptionMessage('An option with shortcut "t" already exists.');
         $dispatcher = new EventDispatcher();
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $application->setDispatcher($dispatcher);
 
-        $application->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'Environment'));
+        $application->getDefinition()->addOption(new InputOption('--test', '-t', InputOption::VALUE_REQUIRED, 'Test'));
 
         $application
             ->register('foo')
             ->setAliases(['f'])
-            ->setDefinition([new InputOption('survey', 'e', InputOption::VALUE_REQUIRED, 'My option with a shortcut.')])
+            ->setDefinition([new InputOption('survey', 't', InputOption::VALUE_REQUIRED, 'My option with a shortcut.')])
             ->setCode(function (InputInterface $input, OutputInterface $output) {})
         ;
 

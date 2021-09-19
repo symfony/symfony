@@ -24,6 +24,7 @@
         "symfony/polyfill-intl-icu": "^1.21",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php80": "^1.16",
+        "symfony/polyfill-php81": "^1.23",
         "symfony/property-access": "^5.0.8|^6.0",
         "symfony/service-contracts": "^1.1|^2"
     },

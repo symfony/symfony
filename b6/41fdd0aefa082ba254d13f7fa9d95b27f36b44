@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by keichinger at 2021-09-14T10:20:08Z
+
+I couldn't find many tests `Request::$formats`. The only test for `Request::getContentType()` is a `null` test for the default value. Other than that, I've extended the `Request::getMimeType(s)` test, which also rely on `Request::$formats`, with a test-case for the form MIME types.
+
+If there's any other test that I've missed, please let me know and I'll update it accordingly.
+
+---------------------------------------------------------------------------
+
+by keichinger at 2021-09-14T11:10:49Z
+
+The failing test seems unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-14T12:59:27Z
+
+We're trying to be on the more cautious side to judge whether something is a bug or a feature since some time. So I would say this "bug fixing feature" should target 5.4.
+
+---------------------------------------------------------------------------
+
+by keichinger at 2021-09-14T13:09:20Z
+
+@wouterj I've rebased the PR to 5.4 as requested.
+
+Thanks for the feedback to both of you ☺️

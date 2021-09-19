@@ -4,6 +4,7 @@ CHANGELOG
 5.4
 ---
 
+ * Add blacklisting of reserved shortcuts for InputOptions in commands
  * Add `TesterTrait::assertCommandIsSuccessful()` to test command
  * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
 

@@ -10,6 +10,7 @@ Console
 -------
 
  * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
+ * Add blacklisting of reserved shortcuts for `InputOptions` in commands. See `getDefaultInputDefinition()` in `Symfony\Component\Console\Application`
 
 Finder
 ------

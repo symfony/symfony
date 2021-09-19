@@ -52,7 +52,6 @@ class InputOption
     private $default;
     private $description;
 
-    /* @see Symfony\Component\Console\Application->getDefaultInputDefinition() */
     public const RESERVED_NAMES = ["help", "quiet", "version", "ansi", "no-ansi", "no-interaction", "env", "no-debug", "verbose"];
     public const RESERVED_COMMANDS = ["about", "help", "list"];
     public const RESERVED_SHORTCUTS = ["h", "q", "V", "n", "e", "v", "vv", "vvv"];
@@ -235,6 +234,6 @@ class InputOption
             && $option->isArray() === $this->isArray()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
-            ;
+        ;
     }
 }

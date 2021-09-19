@@ -386,6 +386,10 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>ค่า​รหัสหลักทรัพย์สากล (ISIN) ไม่ถูกต้อง</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>ค่านี้ควรเป็นนิพจน์ที่ถูกต้อง</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

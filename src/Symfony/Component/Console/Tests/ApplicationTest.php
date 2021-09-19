@@ -503,15 +503,10 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foos:bar1'], ['decorated' => false]);
-        $this->assertSame('
-                                                          
-  There are no commands defined in the "foos" namespace.  
-                                                          
-  Did you mean this?                                      
-      foo                                                 
-                                                          
-
-', $tester->getDisplay(true));
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString('There are no commands defined in the "foos" namespace.', $display);
+        $this->assertStringContainsString('Did you mean this?', $display);
+        $this->assertStringContainsString('foo', $display);
     }
 
     public function testCanRunAlternativeCommandName()

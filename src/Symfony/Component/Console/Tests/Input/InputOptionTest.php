@@ -69,7 +69,7 @@ class InputOptionTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('An option shortcut cannot include a reserved shortcut (v).');
-        $option = new InputOption('foo', ['x'|'v'|'z']);
+        $option = new InputOption('foo', ['x' | 'v' | 'z']);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('An option shortcut cannot include a reserved shortcut (V).');

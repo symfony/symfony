@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>V php.ini nie je nastavená cesta k adresáru pre dočasné súbory.</target>
+                <target>V php.ini nie je nastavená cesta k addressáru pre dočasné súbory.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -385,6 +385,10 @@
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Táto hodnota nie je platné medzinárodné označenie cenného papiera (ISIN).</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Táto hodnota by mala byť platným výrazom.</target>
             </trans-unit>
         </body>
     </file>

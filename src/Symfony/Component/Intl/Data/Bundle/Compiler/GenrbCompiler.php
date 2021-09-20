@@ -34,13 +34,13 @@ class GenrbCompiler implements BundleCompilerInterface
      */
     public function __construct(string $genrb = 'genrb', string $envVars = '')
     {
-        exec('which '.$genrb, $output, $status);
-
+        $this->genrb = ($envVars ? $envVars.' ' : '').$genrb;
+        
+        exec(escapeshellcmd('which '.$this->genrb), $output, $status);
+        
         if (0 !== $status) {
             throw new RuntimeException(sprintf('The command "%s" is not installed.', $genrb));
         }
-
-        $this->genrb = ($envVars ? $envVars.' ' : '').$genrb;
     }
 
     /**

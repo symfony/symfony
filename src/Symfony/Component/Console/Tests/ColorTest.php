@@ -46,6 +46,9 @@ class ColorTest extends TestCase
 
         $color = new Color('rgb(255, 255, 255)', 'rgb(0, 0, 0)');
         $this->assertSame("\033[38;2;255;255;255;48;2;0;0;0m \033[39;49m", $color->apply(' '));
+
+        $color = new Color('hsl(0, 100%, 100%)', 'hsl(0, 0%, 0%)');
+        $this->assertSame("\033[38;2;255;255;255;48;2;0;0;0m \033[39;49m", $color->apply(' '));
     }
 
     public function testDegradedTrueColors()
@@ -58,6 +61,12 @@ class ColorTest extends TestCase
             $this->assertSame("\033[31;43m \033[39;49m", $color->apply(' '));
 
             $color = new Color('#c0392b', '#f1c40f');
+            $this->assertSame("\033[31;43m \033[39;49m", $color->apply(' '));
+
+            $color = new Color('rgb(192, 57, 43)', 'rgb(241, 196, 15)');
+            $this->assertSame("\033[31;43m \033[39;49m", $color->apply(' '));
+
+            $color = new Color('hsl(6, 63%, 46%)', 'hsl(48, 89%, 50%)');
             $this->assertSame("\033[31;43m \033[39;49m", $color->apply(' '));
         } finally {
             putenv('COLORTERM='.$colorterm);
@@ -90,5 +99,37 @@ class ColorTest extends TestCase
         yield ['rgb(256, 0, 0)', 'Invalid color component; value should be between 0 and 255, got 256.'];
 
         yield ['rgb(0, 0, 0', 'Invalid RGB functional notation; should be of the form "rgb(r, g, b)", got "rgb(0, 0, 0".'];
+    }
+
+    /**
+     * @dataProvider provideMalformedHslStrings
+     */
+    public function testMalformedHslString(string $color, string $exceptionMessage)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        new Color($color);
+    }
+
+    public function provideMalformedHslStrings(): \Generator
+    {
+        yield ['hsl()', 'Invalid HSL functional notation; should be of the form "hsl(h, s%, l%)", got "hsl()".'];
+
+        yield ['hsl(0, 0%)', 'Invalid HSL functional notation; should be of the form "hsl(h, s%, l%)", got "hsl(0, 0%)".'];
+
+        yield ['hsl(0, 0, 0)', 'Invalid HSL functional notation; should be of the form "hsl(h, s%, l%)", got "hsl(0, 0, 0)".'];
+
+        yield ['hsl(0, 0%, 0%, 0%)', 'Invalid HSL functional notation; should be of the form "hsl(h, s%, l%)", got "hsl(0, 0%, 0%, 0%)".'];
+
+        yield ['hsl(360, 0%, 0%)', 'Invalid hue; value should be between 0 and 359, got 360.'];
+
+        yield ['hsl(0, 101%, 0%)', 'Invalid saturation; value should be between 0 and 100, got 101.'];
+
+        yield ['hsl(0, 0%, 101%)', 'Invalid lightness; value should be between 0 and 100, got 101.'];
+
+        yield ['hsl(invalid, 0%, 0%)', 'Invalid HSL functional notation; should be of the form "hsl(h, s%, l%)", got "hsl(invalid, 0%, 0%)".'];
+
+        yield ['hsl(0, 0%, 0%', 'Invalid HSL functional notation; should be of the form "hsl(h, s%, l%)", got "hsl(0, 0%, 0%".'];
     }
 }

@@ -7,6 +7,7 @@ CHANGELOG
  * Add `TesterTrait::assertCommandIsSuccessful()` to test command
  * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
  * Add `rgb(r, g, b)` notation support for output colors
+ * Add `hsl(h, s%, l%)` notation support for output colors
 
 5.3
 ---

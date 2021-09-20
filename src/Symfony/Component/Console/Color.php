@@ -50,6 +50,7 @@ final class Color
     ];
 
     private const RGB_FUNCTIONAL_NOTATION_REGEX = '/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/';
+    private const HSL_FUNCTIONAL_NOTATION_REGEX = '/^hsl\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)$/';
 
     private $foreground;
     private $background;
@@ -120,6 +121,8 @@ final class Color
 
         if (str_starts_with($color, 'rgb(')) {
             $color = $this->rgbToHex($color);
+        } elseif (str_starts_with($color, 'hsl(')) {
+            $color = $this->hslToHex($color);
         }
 
         if ('#' === $color[0]) {
@@ -197,6 +200,64 @@ final class Color
                 throw new InvalidArgumentException(sprintf('Invalid color component; value should be between 0 and 255, got %d.', $element));
             }
 
+            return str_pad(dechex((int) $element), 2, '0', \STR_PAD_LEFT);
+        }, $rgb);
+
+        return '#'.implode('', $hexString);
+    }
+
+    /**
+     * Explained formula can be found here: {@see https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB}.
+     */
+    private function hslToHex(string $color): string
+    {
+        if (!preg_match(self::HSL_FUNCTIONAL_NOTATION_REGEX, $color, $matches)) {
+            throw new InvalidArgumentException(sprintf('Invalid HSL functional notation; should be of the form "hsl(h, s%%, l%%)", got "%s".', $color));
+        }
+
+        [$hue, $saturation, $lightness] = \array_slice($matches, 1);
+
+        if ($hue > 359) {
+            throw new InvalidArgumentException(sprintf('Invalid hue; value should be between 0 and 359, got %d.', $hue));
+        }
+
+        if ($saturation > 100) {
+            throw new InvalidArgumentException(sprintf('Invalid saturation; value should be between 0 and 100, got %d.', $saturation));
+        }
+
+        if ($lightness > 100) {
+            throw new InvalidArgumentException(sprintf('Invalid lightness; value should be between 0 and 100, got %d.', $lightness));
+        }
+
+        $hue = fmod($hue / 60, 6);
+        $saturation /= 100;
+        $lightness /= 100;
+
+        $chroma = (1 - abs((2 * $lightness) - 1)) * $saturation;
+        $x = $chroma * (1 - abs(fmod($hue, 2) - 1));
+
+        if ($hue < 1) {
+            [$r, $g, $b] = [$chroma, $x, 0];
+        } elseif ($hue < 2) {
+            [$r, $g, $b] = [$x, $chroma, 0];
+        } elseif ($hue < 3) {
+            [$r, $g, $b] = [0, $chroma, $x];
+        } elseif ($hue < 4) {
+            [$r, $g, $b] = [0, $x, $chroma];
+        } elseif ($hue < 5) {
+            [$r, $g, $b] = [$x, 0, $chroma];
+        } else {
+            [$r, $g, $b] = [$chroma, 0, $x];
+        }
+
+        $m = $lightness - $chroma / 2;
+        $rgb = [
+            ($r + $m) * 255,
+            ($g + $m) * 255,
+            ($b + $m) * 255,
+        ];
+
+        $hexString = array_map(function ($element) {
             return str_pad(dechex((int) $element), 2, '0', \STR_PAD_LEFT);
         }, $rgb);
 

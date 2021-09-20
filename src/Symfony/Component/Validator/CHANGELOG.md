@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for `ConstraintViolationList::createFromMessage()`
+ * Add error's uid to `Count` and `Length` constraints with "exactly" option enabled
 
 5.3
 ---

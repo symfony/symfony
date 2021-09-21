@@ -24,7 +24,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
-use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -484,16 +483,34 @@ class SerializerTest extends TestCase
 
     public function testExceptionWhenTypeIsNotKnownInDiscriminator()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The type "second" has no mapped class for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface"');
-        $this->serializerWithClassDiscriminator()->deserialize('{"type":"second","one":1}', DummyMessageInterface::class, 'json');
+        try {
+            $this->serializerWithClassDiscriminator()->deserialize('{"type":"second","one":1}', DummyMessageInterface::class, 'json');
+
+            $this->fail();
+        } catch (\Throwable $e) {
+            $this->assertInstanceOf(NotNormalizableValueException::class, $e);
+            $this->assertSame('The type "second" is not a valid value.', $e->getMessage());
+            $this->assertSame('string', $e->getCurrentType());
+            $this->assertSame(['string'], $e->getExpectedTypes());
+            $this->assertSame('type', $e->getPath());
+            $this->assertTrue($e->canUseMessageForUser());
+        }
     }
 
     public function testExceptionWhenTypeIsNotInTheBodyToDeserialiaze()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Type property "type" not found for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface"');
-        $this->serializerWithClassDiscriminator()->deserialize('{"one":1}', DummyMessageInterface::class, 'json');
+        try {
+            $this->serializerWithClassDiscriminator()->deserialize('{"one":1}', DummyMessageInterface::class, 'json');
+
+            $this->fail();
+        } catch (\Throwable $e) {
+            $this->assertInstanceOf(NotNormalizableValueException::class, $e);
+            $this->assertSame('Type property "type" not found for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface".', $e->getMessage());
+            $this->assertSame('null', $e->getCurrentType());
+            $this->assertSame(['string'], $e->getExpectedTypes());
+            $this->assertSame('type', $e->getPath());
+            $this->assertFalse($e->canUseMessageForUser());
+        }
     }
 
     public function testNotNormalizableValueExceptionMessageForAResource()
@@ -743,7 +760,9 @@ class SerializerTest extends TestCase
                     "string": null
                 }
             ],
-            "php74FullWithConstructor": {}
+            "php74FullWithConstructor": {},
+            "dummyMessage": {
+            }
         }';
 
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -891,6 +910,15 @@ class SerializerTest extends TestCase
                 'path' => 'php74FullWithConstructor',
                 'useMessageForUser' => true,
                 'message' => 'Failed to create object because the object miss the "constructorArgument" property.',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string',
+                ],
+                'path' => 'dummyMessage.type',
+                'useMessageForUser' => false,
+                'message' => 'Type property "type" not found for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface".',
             ],
         ];
 

@@ -23,6 +23,7 @@
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-icu": "^1.21",
         "symfony/polyfill-mbstring": "~1.0",
+        "symfony/polyfill-php81": "^1.23",
         "symfony/property-access": "^5.4|^6.0",
         "symfony/service-contracts": "^1.1|^2.0|^3.0"
     },

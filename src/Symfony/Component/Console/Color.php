@@ -49,6 +49,8 @@ final class Color
         'conceal' => ['set' => 8, 'unset' => 28],
     ];
 
+    private const RGB_FUNCTIONAL_NOTATION_REGEX = '/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/';
+
     private string $foreground;
     private string $background;
     private array $options = [];
@@ -116,6 +118,10 @@ final class Color
             return '';
         }
 
+        if (str_starts_with($color, 'rgb(')) {
+            $color = $this->rgbToHex($color);
+        }
+
         if ('#' === $color[0]) {
             $color = substr($color, 1);
 
@@ -176,5 +182,24 @@ final class Color
         }
 
         return (int) $diff * 100 / $v;
+    }
+
+    private function rgbToHex(string $color): string
+    {
+        if (!preg_match(self::RGB_FUNCTIONAL_NOTATION_REGEX, $color, $matches)) {
+            throw new InvalidArgumentException(sprintf('Invalid RGB functional notation; should be of the form "rgb(r, g, b)", got "%s".', $color));
+        }
+
+        $rgb = \array_slice($matches, 1);
+
+        $hexString = array_map(function ($element) {
+            if ($element > 255) {
+                throw new InvalidArgumentException(sprintf('Invalid color component; value should be between 0 and 255, got %d.', $element));
+            }
+
+            return str_pad(dechex((int) $element), 2, '0', \STR_PAD_LEFT);
+        }, $rgb);
+
+        return '#'.implode('', $hexString);
     }
 }

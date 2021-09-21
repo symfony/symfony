@@ -28,6 +28,7 @@ final class Php74Full
     /** @var Php74Full[] */
     public array $collection;
     public Php74FullWithConstructor $php74FullWithConstructor;
+    public DummyMessageInterface $dummyMessage;
 }
 
 

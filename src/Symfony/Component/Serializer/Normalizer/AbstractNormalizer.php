@@ -401,7 +401,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     $params[] = null;
                 } else {
                     if (!isset($context['not_normalizable_value_exceptions'])) {
-                        throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
+                        throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name), 0, null, [$constructorParameter->name]);
                     }
 
                     $exception = NotNormalizableValueException::createForUnexpectedDataType(

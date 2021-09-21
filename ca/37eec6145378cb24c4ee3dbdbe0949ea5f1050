@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-09-19T16:35:08Z
+
+please also add a test covering the case of enums backed by integers rather than strings.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-19T16:51:40Z
+
+> please also add a test covering the case of enums backed by integers rather than strings.
+
+Good idea, done!

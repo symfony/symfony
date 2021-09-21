@@ -42,6 +42,7 @@
         "symfony/sendinblue-notifier": "<5.3",
         "symfony/sinch-notifier": "<5.3",
         "symfony/slack-notifier": "<5.3",
+        "symfony/sms77-notifier": "<5.3",
         "symfony/smsapi-notifier": "<5.3",
         "symfony/telegram-notifier": "<5.3",
         "symfony/twilio-notifier": "<5.3",

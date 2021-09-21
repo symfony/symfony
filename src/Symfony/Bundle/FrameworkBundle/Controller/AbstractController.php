@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 use Psr\Link\LinkInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -32,7 +31,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -93,13 +91,10 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'serializer' => '?'.SerializerInterface::class,
             'security.authorization_checker' => '?'.AuthorizationCheckerInterface::class,
             'twig' => '?'.Environment::class,
-            'doctrine' => '?'.ManagerRegistry::class, // to be removed in 6.0
             'form.factory' => '?'.FormFactoryInterface::class,
             'security.token_storage' => '?'.TokenStorageInterface::class,
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerBagInterface::class,
-            'message_bus' => '?'.MessageBusInterface::class, // to be removed in 6.0
-            'messenger.default_bus' => '?'.MessageBusInterface::class, // to be removed in 6.0
         ];
     }
 

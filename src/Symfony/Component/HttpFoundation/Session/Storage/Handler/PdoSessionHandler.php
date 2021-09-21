@@ -591,9 +591,6 @@ class PdoSessionHandler extends AbstractSessionHandler
 
             if ($sessionRows) {
                 $expiry = (int) $sessionRows[0][1];
-                if ($expiry <= self::MAX_LIFETIME) {
-                    $expiry += $sessionRows[0][2];
-                }
 
                 if ($expiry < time()) {
                     $this->sessionExpired = true;
@@ -726,14 +723,13 @@ class PdoSessionHandler extends AbstractSessionHandler
         if (self::LOCK_TRANSACTIONAL === $this->lockMode) {
             $this->beginTransaction();
 
-            // selecting the time column should be removed in 6.0
             switch ($this->driver) {
                 case 'mysql':
                 case 'oci':
                 case 'pgsql':
-                    return "SELECT $this->dataCol, $this->lifetimeCol, $this->timeCol FROM $this->table WHERE $this->idCol = :id FOR UPDATE";
+                    return "SELECT $this->dataCol, $this->lifetimeCol FROM $this->table WHERE $this->idCol = :id FOR UPDATE";
                 case 'sqlsrv':
-                    return "SELECT $this->dataCol, $this->lifetimeCol, $this->timeCol FROM $this->table WITH (UPDLOCK, ROWLOCK) WHERE $this->idCol = :id";
+                    return "SELECT $this->dataCol, $this->lifetimeCol FROM $this->table WITH (UPDLOCK, ROWLOCK) WHERE $this->idCol = :id";
                 case 'sqlite':
                     // we already locked when starting transaction
                     break;
@@ -742,7 +738,7 @@ class PdoSessionHandler extends AbstractSessionHandler
             }
         }
 
-        return "SELECT $this->dataCol, $this->lifetimeCol, $this->timeCol FROM $this->table WHERE $this->idCol = :id";
+        return "SELECT $this->dataCol, $this->lifetimeCol FROM $this->table WHERE $this->idCol = :id";
     }
 
     /**

@@ -635,6 +635,14 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Returns only the inner text that is the direct descendent of the current node, excluding any child nodes.
+     */
+    public function innerText(): string
+    {
+        return $this->filterXPath('.//text()')->text();
+    }
+
+    /**
      * Returns the first node of the list as HTML.
      *
      * @param string|null $default When not null: the value to return when the current node is empty

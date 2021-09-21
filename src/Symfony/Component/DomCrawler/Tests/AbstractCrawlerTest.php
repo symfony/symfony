@@ -354,6 +354,18 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->text('my value'));
     }
 
+    /**
+     * Tests that innerText() returns only text that is the direct descendent of the current node, in contrast to
+     * text() that returns the text of all child nodes.
+     */
+    public function testInnerText()
+    {
+        self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath('//*[@id="complex-element"]'));
+
+        self::assertSame('Parent text Child text', $crawler->text());
+        self::assertSame('Parent text', $crawler->innerText());
+    }
+
     public function testHtml()
     {
         $this->assertEquals('<img alt="Bar">', $this->createTestCrawler()->filterXPath('//a[5]')->html());
@@ -1283,6 +1295,10 @@ HTML;
                         <div id="child2" xmlns:foo="http://example.com"></div>
                     </div>
                     <div id="sibling"><img /></div>
+                    <div id="complex-element">
+                        Parent text
+                        <span>Child text</span>
+                    </div>
                 </body>
             </html>
         ');

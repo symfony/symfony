@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-09-21T10:51:24Z
+
+> BTW is there a reason we are using `FETCH_NUM` instead of `FETCH_ASSOC` for more readability?
+
+Currently, the SQL does not guarantee fixed names for the fetched columns in `FETCH_ASSOC` mode as it does not alias them and the field names in the database are configurable. So this would make the code more complex.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-09-21T10:52:30Z
+
+Looks like this breaks some tests. Maybe they were relying on the BC layer by storing the lifetime instead of the expiry ?
+
+---------------------------------------------------------------------------
+
+by IonBazan at 2021-09-21T10:56:01Z
+
+Thanks for explanation, @stof.
+I will look into the test issues. Converting to draft for now.

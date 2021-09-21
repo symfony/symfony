@@ -122,6 +122,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RoutingResolverPass());
+        $container->addCompilerPass(new DataCollectorTranslatorPass());
         $container->addCompilerPass(new ProfilerPass());
         // must be registered before removing private services as some might be listeners/subscribers
         // but as late as possible to get resolved parameters
@@ -141,7 +142,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FragmentRendererPass());
         $this->addCompilerPassIfExists($container, SerializerPass::class);
         $this->addCompilerPassIfExists($container, PropertyInfoPass::class);
-        $container->addCompilerPass(new DataCollectorTranslatorPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new CachePoolPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
         $container->addCompilerPass(new CachePoolClearerPass(), PassConfig::TYPE_AFTER_REMOVING);

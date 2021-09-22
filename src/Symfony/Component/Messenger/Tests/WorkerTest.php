@@ -167,6 +167,28 @@ class WorkerTest extends TestCase
         $worker->run();
     }
 
+    public function testWorkerContainsMetadata()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $receiver = new DummyQueueReceiver([[$envelope]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->method('dispatch')->willReturn($envelope);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) {
+            $event->getWorker()->stop();
+        });
+
+        $worker = new Worker(['dummyReceiver' => $receiver], $bus, $dispatcher);
+        $worker->run(['queues' => ['queue1', 'queue2']]);
+
+        $workerMetadata = $worker->getMetadata();
+
+        $this->assertSame(['queue1', 'queue2'], $workerMetadata->getQueueNames());
+        $this->assertSame(['dummyReceiver'], $workerMetadata->getTransportNames());
+    }
+
     public function testTimeoutIsConfigurable()
     {
         $apiMessage = new DummyMessage('API');
@@ -357,5 +379,13 @@ class DummyReceiver implements ReceiverInterface
     public function getAcknowledgedEnvelopes(): array
     {
         return $this->acknowledgedEnvelopes;
+    }
+}
+
+class DummyQueueReceiver extends DummyReceiver implements QueueReceiverInterface
+{
+    public function getFromQueues(array $queueNames): iterable
+    {
+        return $this->get();
     }
 }

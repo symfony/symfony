@@ -42,6 +42,7 @@ class Worker
     private $eventDispatcher;
     private $logger;
     private $shouldStop = false;
+    private $metadata;
 
     /**
      * @param ReceiverInterface[] $receivers Where the key is the transport name
@@ -52,6 +53,9 @@ class Worker
         $this->bus = $bus;
         $this->logger = $logger;
         $this->eventDispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($eventDispatcher) : $eventDispatcher;
+        $this->metadata = new WorkerMetadata([
+            'transportNames' => array_keys($receivers),
+        ]);
     }
 
     /**
@@ -63,12 +67,14 @@ class Worker
      */
     public function run(array $options = []): void
     {
-        $this->dispatchEvent(new WorkerStartedEvent($this));
-
         $options = array_merge([
             'sleep' => 1000000,
         ], $options);
-        $queueNames = $options['queues'] ?? false;
+        $queueNames = $options['queues'] ?? null;
+
+        $this->metadata->set(['queueNames' => $queueNames]);
+
+        $this->dispatchEvent(new WorkerStartedEvent($this));
 
         if ($queueNames) {
             // if queue names are specified, all receivers must implement the QueueReceiverInterface
@@ -171,6 +177,11 @@ class Worker
     public function stop(): void
     {
         $this->shouldStop = true;
+    }
+
+    public function getMetadata(): WorkerMetadata
+    {
+        return $this->metadata;
     }
 
     private function dispatchEvent(object $event): void

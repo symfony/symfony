@@ -77,9 +77,8 @@ EOF
 
         foreach ($secrets as $k => $v) {
             if (null === $v) {
-                $io->error($this->vault->getLastMessage());
-
-                return 1;
+                $io->error($this->vault->getLastMessage() ?? sprintf('Secret "%s" has been skipped as there was an error reading it.', $k));
+                continue;
             }
 
             $this->localVault->seal($k, $v);

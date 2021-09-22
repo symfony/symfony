@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-31T12:44:32Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-01T08:46:04Z
+
+Hey!
+
+I think @alexander-schranz has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-08-02T12:46:48Z
+
+@carsonbot find another a reviewer please.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-02T12:47:48Z
+
+@tienvx could maybe review this PR?
+
+---------------------------------------------------------------------------
+
+by okwinza at 2021-08-03T17:58:35Z
+
+Friendly ping @Nyholm.
+Could you see any value in such a feature? :)
+
+---------------------------------------------------------------------------
+
+by Guikingone at 2021-08-09T15:00:56Z
+
+Hi 👋🏻
+
+I may ask a strange question but what's the benefits compared to using a `getWorkerMetadata(): array`?
+
+As an event already receive the `Worker`, any benefits from using a dedicated class? 🤔
+
+---------------------------------------------------------------------------
+
+by okwinza at 2021-08-09T17:10:54Z
+
+> Hi 👋🏻
+>
+> I may ask a strange question but what's the benefits compared to using a `getWorkerMetadata(): array`?
+>
+> As an event already receive the `Worker`, any benefits from using a dedicated class? 🤔
+
+Hi, indeed, the whole PR might be replaced with one or a couple getters but:
+1) IMO bloating `Worker` class with getters sounds more like a hack and doesn't seem like a good idea overall, it's better to keep the concerns separated here.
+2) I considered going with `getWorkerMetadata(): array` but the DX looked much worse to me since it wasn't clear what's being returned without first looking through the code/docs, etc. Not to mention that IDE autocomplete wont work and you won't be able to enforce return types on the language level that way. I know we have psalm for this, but still.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-09T20:22:17Z
+
+I like the idea of using an object but I think it's fine to make it accessible from the Worker instead of passing it to all worker-aware events.
+
+---------------------------------------------------------------------------
+
+by okwinza at 2021-08-31T13:09:46Z
+
+@chalasr I've refactored the PR according to your suggestions. Should be good to go once the CI is green.
+
+---------------------------------------------------------------------------
+
+by okwinza at 2021-09-13T14:02:09Z
+
+Ping @chalasr @derrabus.
+Is there anything I could do to make the review easier for you guys? :)
+
+---------------------------------------------------------------------------
+
+by okwinza at 2021-09-22T11:20:40Z
+
+> It looks cool.
+>
+> But one question:
+>
+> from where you gonna call `$worker->getWorkerMetadata()` ?
+
+Much thanks for the review @lyrixx, appreciate it!
+The primary use case is to call it from any worker event subscriber,  mostly via `WorkerRunningEvent::getWorker()` or any other event that contains a reference to a Worker object.
+
+---------------------------------------------------------------------------
+
+by okwinza at 2021-09-22T12:19:02Z
+
+Rebased, squashed & updated the PR description. Should be good to go now :partying_face: .

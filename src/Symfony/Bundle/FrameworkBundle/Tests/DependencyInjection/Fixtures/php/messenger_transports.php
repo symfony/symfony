@@ -4,6 +4,7 @@ $container->loadFromExtension('framework', [
     'serializer' => true,
     'messenger' => [
         'failure_transport' => 'failed',
+        'reset_on_message' =>  true,
         'serializer' => [
             'default_serializer' => 'messenger.transport.symfony_serializer',
         ],
@@ -11,7 +12,6 @@ $container->loadFromExtension('framework', [
             'default' => 'amqp://localhost/%2f/messages',
             'customised' => [
                 'dsn' => 'amqp://localhost/%2f/messages?exchange_name=exchange_name',
-                'reset_on_message' =>  true,
                 'options' => ['queue' => ['name' => 'Queue']],
                 'serializer' => 'messenger.transport.native_php_serializer',
                 'retry_strategy' => [

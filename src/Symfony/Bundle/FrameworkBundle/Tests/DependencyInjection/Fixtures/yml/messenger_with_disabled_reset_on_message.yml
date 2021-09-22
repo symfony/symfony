@@ -1,6 +1,6 @@
 framework:
     messenger:
-        reset_on_message: true
+        reset_on_message: false
         routing:
             'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage': ['sender.bar', 'sender.biz']
             'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage': 'sender.foo'

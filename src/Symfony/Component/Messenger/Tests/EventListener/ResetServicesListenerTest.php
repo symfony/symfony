@@ -13,27 +13,29 @@ namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Event\AbstractWorkerMessageEvent;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
+use Symfony\Component\Messenger\Worker;
 
 class ResetServicesListenerTest extends TestCase
 {
-    public function provideTests(): iterable
+    public function provideResetServices(): iterable
     {
-        yield ['foo', true];
-        yield ['bar', false];
+        yield [true];
+        yield [false];
     }
 
-    /** @dataProvider provideTests */
-    public function test(string $receiverName, bool $shouldReset)
+    /**
+     * @dataProvider provideResetServices
+     */
+    public function testResetServices(bool $shouldReset)
     {
         $servicesResetter = $this->createMock(ServicesResetter::class);
         $servicesResetter->expects($shouldReset ? $this->once() : $this->never())->method('reset');
 
-        $event = new class(new Envelope(new \stdClass()), $receiverName) extends AbstractWorkerMessageEvent {};
+        $event = new WorkerRunningEvent($this->createMock(Worker::class), !$shouldReset);
 
-        $resetListener = new ResetServicesListener($servicesResetter, ['foo']);
+        $resetListener = new ResetServicesListener($servicesResetter);
         $resetListener->resetServices($event);
     }
 }

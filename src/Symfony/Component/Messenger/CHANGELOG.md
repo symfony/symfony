@@ -6,6 +6,8 @@ CHANGELOG
 
  * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
  * Add support for resetting container services after each messenger message.
+ * Added `WorkerMetadata` class which allows you to access the configuration details of a worker, like `queueNames` and `transportNames` it consumes from.
+ * New method `getMetadata()` was added to `Worker` class which returns the `WorkerMetadata` object.
 
 5.3
 ---

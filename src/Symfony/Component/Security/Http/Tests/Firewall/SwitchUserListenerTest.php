@@ -52,7 +52,7 @@ class SwitchUserListenerTest extends TestCase
         $this->tokenStorage = new TokenStorage();
         $this->userProvider = new InMemoryUserProvider(['kuba' => []]);
         $this->userChecker = $this->createMock(UserCheckerInterface::class);
-        $this->accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $this->accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $this->request = new Request();
         $this->event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->request, HttpKernelInterface::MAIN_REQUEST);
     }
@@ -347,7 +347,7 @@ class SwitchUserListenerTest extends TestCase
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'kuba');
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $accessDecisionManager->expects($this->any())
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $this->callback(function ($user) { return 'kuba' === $user->getUserIdentifier(); }))
             ->willReturn(true);

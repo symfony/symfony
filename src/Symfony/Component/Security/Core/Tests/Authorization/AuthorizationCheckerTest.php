@@ -30,7 +30,7 @@ class AuthorizationCheckerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $this->accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $this->tokenStorage = new TokenStorage();
 
         $this->authorizationChecker = new AuthorizationChecker(

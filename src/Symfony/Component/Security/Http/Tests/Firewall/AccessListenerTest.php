@@ -109,7 +109,7 @@ class AccessListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $accessDecisionManager
             ->expects($this->once())
             ->method('decide')
@@ -173,7 +173,7 @@ class AccessListenerTest extends TestCase
             ->with($this->equalTo($authenticatedToken))
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $accessDecisionManager
             ->expects($this->once())
             ->method('getDecision')
@@ -240,7 +240,7 @@ class AccessListenerTest extends TestCase
             ->with($this->equalTo($authenticatedToken))
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $accessDecisionManager
             ->expects($this->once())
             ->method('decide')
@@ -287,7 +287,7 @@ class AccessListenerTest extends TestCase
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->createMock(AccessDecisionManagerInterface::class),
+            $this->createMock(AccessDecisionManager::class),
             $accessMap,
             $this->createMock(AuthenticationManagerInterface::class)
         );
@@ -315,7 +315,7 @@ class AccessListenerTest extends TestCase
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->createMock(AccessDecisionManagerInterface::class),
+            $this->createMock(AccessDecisionManager::class),
             $accessMap,
             $this->createMock(AuthenticationManagerInterface::class)
         );
@@ -347,7 +347,7 @@ class AccessListenerTest extends TestCase
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->createMock(AccessDecisionManagerInterface::class),
+            $this->createMock(AccessDecisionManager::class),
             $accessMap,
             $this->createMock(AuthenticationManagerInterface::class)
         );
@@ -368,7 +368,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $accessDecisionManager->expects($this->once())
             ->method('getDecision')
             ->with($this->isInstanceOf(NullToken::class))
@@ -401,7 +401,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $accessDecisionManager->expects($this->once())
             ->method('decide')
             ->with($this->isInstanceOf(NullToken::class))
@@ -430,7 +430,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $accessDecisionManager->expects($this->once())
             ->method('getDecision')
             ->with($this->isInstanceOf(NullToken::class), [AuthenticatedVoter::PUBLIC_ACCESS])
@@ -461,7 +461,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $accessDecisionManager->expects($this->once())
             ->method('getDecision')
             ->with($this->equalTo($token), [AuthenticatedVoter::PUBLIC_ACCESS])
@@ -495,7 +495,7 @@ class AccessListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($authenticatedToken);
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
         $accessDecisionManager
             ->expects($this->once())
             ->method('getDecision')
@@ -526,7 +526,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
         ;
 
-        $listener = new AccessListener($tokenStorage, $this->createMock(AccessDecisionManagerInterface::class), $accessMap, false);
+        $listener = new AccessListener($tokenStorage, $this->createMock(AccessDecisionManager::class), $accessMap, false);
         $listener(new LazyResponseEvent(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
     }
 
@@ -546,7 +546,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([[AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY], null])
         ;
 
-        $listener = new AccessListener($tokenStorage, $this->createMock(AccessDecisionManagerInterface::class), $accessMap, false);
+        $listener = new AccessListener($tokenStorage, $this->createMock(AccessDecisionManager::class), $accessMap, false);
         $listener(new LazyResponseEvent(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
     }
 }

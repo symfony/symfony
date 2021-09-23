@@ -97,7 +97,6 @@ abstract class Voter implements VoterInterface
      *
      * @param string $attribute An attribute
      * @param mixed  $subject   The subject to secure, e.g. an object the user wants to access or any other PHP type
-     *
      */
     abstract protected function supports(string $attribute, $subject);
 

@@ -66,7 +66,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      *
      * {@inheritdoc}
      *
-     * @deprecated since 5.3, use {@see getDecision()} instead.
+     * @deprecated since Symfony 5.4, use {@see getDecision()} instead.
      */
     public function decide(TokenInterface $token, array $attributes, $object = null/*, bool $allowMultipleAttributes = false*/)
     {

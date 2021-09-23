@@ -77,7 +77,7 @@ class AccessDeniedException extends RuntimeException
             return $vote->getReason();
         }, $accessDecision->getDeniedVotes());
 
-        $this->message .= ' ' . rtrim(' ' . implode(' ', $reasons));
+        $this->message .= ' '.rtrim(' '.implode(' ', $reasons));
     }
 
     public function getAccessDecision(): AccessDecision

@@ -70,7 +70,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
      *
      * @param bool $allowMultipleAttributes Whether to allow passing multiple values to the $attributes array
      *
-     * @deprecated since 5.3, use {@see getDecision()} instead.
+     * @deprecated since Symfony 5.4, use {@see getDecision()} instead.
      */
     public function decide(TokenInterface $token, array $attributes, $object = null/*, bool $allowMultipleAttributes = false*/): bool
     {

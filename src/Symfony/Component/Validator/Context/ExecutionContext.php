@@ -294,7 +294,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getPropertyPath(string $subPath = ''): string
     {
-        return PropertyPath::append($this->propertyPath, $subPath);
+        return '' === $subPath ? $this->propertyPath : PropertyPath::append($this->propertyPath, $subPath);
     }
 
     /**

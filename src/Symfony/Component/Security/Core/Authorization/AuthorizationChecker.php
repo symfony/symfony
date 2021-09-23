@@ -65,25 +65,21 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      *
      * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token and $exceptionOnNoToken is set to true
      */
-    final public function isGranted($attribute, $subject = null): AccessDecision
+    final public function isGranted($attribute, $subject = null): bool
     {
-        $token = $this->tokenStorage->getToken();
+        return $this->getDecision($attribute, $subject)->isGranted();
+    }
 
-        if (!$token || !$token->getUser()) {
+    public function getDecision($attribute, $subject = null): AccessDecision
+    {
+        if (null === ($token = $this->tokenStorage->getToken())) {
             if ($this->exceptionOnNoToken) {
                 throw new AuthenticationCredentialsNotFoundException('The token storage contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');
             }
 
             $token = new NullToken();
-        } else {
-            $authenticated = true;
-            // @deprecated since Symfony 5.4
-            if ($this->alwaysAuthenticate || !$authenticated = $token->isAuthenticated(false)) {
-                if (!($authenticated ?? true)) {
-                    trigger_deprecation('symfony/core', '5.4', 'Returning false from "%s()" is deprecated, return null from "getUser()" instead.');
-                }
-                $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
-            }
+        } elseif ($this->alwaysAuthenticate || !$token->isAuthenticated()) {
+            $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
         }
 
         if (!method_exists($this->accessDecisionManager, 'getDecision')) {

@@ -71,7 +71,7 @@ abstract class Voter implements VoterInterface
     /**
      * Creates a granted vote.
      */
-    public function grant(string $reason = '', array $parameters = []): Vote
+    protected function grant(string $reason = '', array $parameters = []): Vote
     {
         return Vote::createGranted($reason, $parameters);
     }
@@ -79,7 +79,7 @@ abstract class Voter implements VoterInterface
     /**
      * Creates an abstained vote.
      */
-    public function abstain(string $reason = '', array $parameters = []): Vote
+    protected function abstain(string $reason = '', array $parameters = []): Vote
     {
         return Vote::createAbstain($reason, $parameters);
     }
@@ -87,7 +87,7 @@ abstract class Voter implements VoterInterface
     /**
      * Creates a denied vote.
      */
-    public function deny(string $reason = '', array $parameters = []): Vote
+    protected function deny(string $reason = '', array $parameters = []): Vote
     {
         return Vote::createDenied($reason, $parameters);
     }
@@ -98,7 +98,6 @@ abstract class Voter implements VoterInterface
      * @param string $attribute An attribute
      * @param mixed  $subject   The subject to secure, e.g. an object the user wants to access or any other PHP type
      *
-     * @return bool True if the attribute and subject are supported, false otherwise
      */
     abstract protected function supports(string $attribute, $subject);
 
@@ -108,7 +107,7 @@ abstract class Voter implements VoterInterface
      *
      * @param mixed $subject
      *
-     * @return Vote Returning a boolean is deprecated since Symfony 5.1. Return a Vote object instead.
+     * @return Vote Returning a boolean is deprecated since Symfony 5.4. Return a Vote object instead.
      */
     abstract protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token);
 }

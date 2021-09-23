@@ -20,7 +20,7 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
 final class Vote
 {
     /** @var int One of the VoterInterface::ACCESS_* constants */
-    protected $access;
+    private $access;
     private $reason;
     private $parameters;
 

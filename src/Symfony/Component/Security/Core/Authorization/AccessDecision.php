@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 final class AccessDecision
 {
     /** @var int One of the VoterInterface::ACCESS_* constants */
-    protected $access;
+    private $access;
 
     /** @var Vote[] */
     private $votes = [];

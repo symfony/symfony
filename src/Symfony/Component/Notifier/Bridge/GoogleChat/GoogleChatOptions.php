@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\GoogleChat;
 
-use Symfony\Component\Notifier\Bridge\GoogleChat\Component\Card;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;

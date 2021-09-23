@@ -49,7 +49,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
 
         $adm->getDecision($token, $attributes, $object);
 
-        $this->assertSame($expectedLog, $adm->getDecisionLog());
+        $this->assertEquals($expectedLog, $adm->getDecisionLog());
     }
 
     public function provideObjectsAndLogs(): \Generator

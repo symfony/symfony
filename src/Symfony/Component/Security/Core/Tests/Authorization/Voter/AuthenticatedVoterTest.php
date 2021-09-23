@@ -30,7 +30,7 @@ class AuthenticatedVoterTest extends TestCase
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
-        $this->assertSame($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
+        $this->assertEquals($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
     }
 
     public function getVoteTests()

@@ -789,6 +789,17 @@ index 6704940153..ee0f2ed470 100644
 -    public function getListeners(Request $request);
 +    public function getListeners(Request $request): array;
  }
+diff --git a/src/Symfony/Component/Templating/Helper/HelperInterface.php b/src/Symfony/Component/Templating/Helper/HelperInterface.php
+index 5dade65db5..db0d0a00ea 100644
+--- a/src/Symfony/Component/Templating/Helper/HelperInterface.php
++++ b/src/Symfony/Component/Templating/Helper/HelperInterface.php
+@@ -24,5 +24,5 @@ interface HelperInterface
+      * @return string
+      */
+-    public function getName();
++    public function getName(): string;
+ 
+     /**
 diff --git a/src/Symfony/Component/Translation/Extractor/AbstractFileExtractor.php b/src/Symfony/Component/Translation/Extractor/AbstractFileExtractor.php
 index 4c088b94f9..86107a636d 100644
 --- a/src/Symfony/Component/Translation/Extractor/AbstractFileExtractor.php

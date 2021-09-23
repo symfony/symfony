@@ -65,7 +65,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      *
      * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token and $exceptionOnNoToken is set to true
      */
-    final public function isGranted($attribute, $subject = null): bool
+    final public function isGranted($attribute, $subject = null): AccessDecision
     {
         $token = $this->tokenStorage->getToken();
 
@@ -86,6 +86,12 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
             }
         }
 
-        return $this->accessDecisionManager->decide($token, [$attribute], $subject);
+        if (!method_exists($this->accessDecisionManager, 'getDecision')) {
+            trigger_deprecation('symfony/security-core', 5.3, 'Not implementing "%s::getDecision()" method is deprecated, and would be required in 6.0.', \get_class($this->accessDecisionManager));
+
+            return $this->accessDecisionManager->decide($token, [$attribute], $subject) ? AccessDecision::createGranted() : AccessDecision::createDenied();
+        }
+
+        return $this->accessDecisionManager->getDecision($token, [$attribute], $subject);
     }
 }

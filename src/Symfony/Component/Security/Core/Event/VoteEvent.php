@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Event;
 
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -28,11 +29,20 @@ final class VoteEvent extends Event
     private $attributes;
     private $vote;
 
-    public function __construct(VoterInterface $voter, $subject, array $attributes, int $vote)
+    /**
+     * @param Vote|int $vote
+     */
+    public function __construct(VoterInterface $voter, $subject, array $attributes, $vote)
     {
         $this->voter = $voter;
         $this->subject = $subject;
         $this->attributes = $attributes;
+        if (!$vote instanceof Vote) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Passing an int as the fourth argument to "%s::__construct" is deprecated, pass a "%s" instance instead.', __CLASS__, Vote::class);
+
+            $vote = Vote::create($vote);
+        }
+
         $this->vote = $vote;
     }
 
@@ -51,7 +61,7 @@ final class VoteEvent extends Event
         return $this->attributes;
     }
 
-    public function getVote(): int
+    public function getVote(): Vote
     {
         return $this->vote;
     }

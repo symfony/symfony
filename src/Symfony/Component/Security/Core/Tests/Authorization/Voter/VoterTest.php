@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -60,7 +61,7 @@ class VoterTest extends TestCase
      */
     public function testVote(VoterInterface $voter, array $attributes, $expectedVote, $object, $message)
     {
-        $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
+        $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes)->getAccess(), $message);
     }
 
     public function testVoteWithTypeError()
@@ -74,9 +75,9 @@ class VoterTest extends TestCase
 
 class VoterTest_Voter extends Voter
 {
-    protected function voteOnAttribute(string $attribute, $object, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, $object, TokenInterface $token): Vote
     {
-        return 'EDIT' === $attribute;
+        return 'EDIT' === $attribute ? Vote::createGranted() : Vote::createDenied();
     }
 
     protected function supports(string $attribute, $object): bool
@@ -87,9 +88,9 @@ class VoterTest_Voter extends Voter
 
 class IntegerVoterTest_Voter extends Voter
 {
-    protected function voteOnAttribute($attribute, $object, TokenInterface $token): bool
+    protected function voteOnAttribute($attribute, $object, TokenInterface $token): Vote
     {
-        return 42 === $attribute;
+        return 42 === $attribute ? Vote::createGranted() : Vote::createDenied();
     }
 
     protected function supports($attribute, $object): bool
@@ -100,9 +101,9 @@ class IntegerVoterTest_Voter extends Voter
 
 class TypeErrorVoterTest_Voter extends Voter
 {
-    protected function voteOnAttribute($attribute, $object, TokenInterface $token): bool
+    protected function voteOnAttribute($attribute, $object, TokenInterface $token): Vote
     {
-        return false;
+        return Vote::createDenied();
     }
 
     protected function supports($attribute, $object): bool

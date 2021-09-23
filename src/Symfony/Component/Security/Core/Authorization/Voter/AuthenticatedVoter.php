@@ -54,10 +54,10 @@ class AuthenticatedVoter implements VoterInterface
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
         if ($attributes === [self::PUBLIC_ACCESS]) {
-            return VoterInterface::ACCESS_GRANTED;
+            return Vote::createGranted();
         }
 
-        $result = VoterInterface::ACCESS_ABSTAIN;
+        $result = Vote::createAbstain();
         foreach ($attributes as $attribute) {
             if (null === $attribute || (self::IS_AUTHENTICATED_FULLY !== $attribute
                     && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
@@ -69,17 +69,17 @@ class AuthenticatedVoter implements VoterInterface
                 continue;
             }
 
-            $result = VoterInterface::ACCESS_DENIED;
+            $result = Vote::createDenied();
 
             if (self::IS_AUTHENTICATED_FULLY === $attribute
                 && $this->authenticationTrustResolver->isFullFledged($token)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_AUTHENTICATED_REMEMBERED === $attribute
                 && ($this->authenticationTrustResolver->isRememberMe($token)
                     || $this->authenticationTrustResolver->isFullFledged($token))) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_AUTHENTICATED_ANONYMOUSLY === $attribute
@@ -88,7 +88,7 @@ class AuthenticatedVoter implements VoterInterface
                     || $this->authenticationTrustResolver->isFullFledged($token))) {
                 trigger_deprecation('symfony/security-core', '5.4', 'The "IS_AUTHENTICATED_ANONYMOUSLY" security attribute is deprecated, use "IS_AUTHENTICATED" or "IS_AUTHENTICATED_FULLY" instead if you want to check if the request is (fully) authenticated.');
 
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             // @deprecated $this->authenticationTrustResolver must implement isAuthenticated() in 6.0
@@ -96,21 +96,21 @@ class AuthenticatedVoter implements VoterInterface
                 && (method_exists($this->authenticationTrustResolver, 'isAuthenticated')
                     ? $this->authenticationTrustResolver->isAuthenticated($token)
                     : ($token && $token->getUser()))) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_REMEMBERED === $attribute && $this->authenticationTrustResolver->isRememberMe($token)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_ANONYMOUS === $attribute && $this->authenticationTrustResolver->isAnonymous($token)) {
                 trigger_deprecation('symfony/security-core', '5.4', 'The "IS_ANONYMOUSLY" security attribute is deprecated, anonymous no longer exists in version 6.');
 
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
 
             if (self::IS_IMPERSONATOR === $attribute && $token instanceof SwitchUserToken) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
         }
 

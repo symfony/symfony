@@ -61,7 +61,7 @@ class AccessDecisionManagerTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $manager = new AccessDecisionManager([$this->getVoter(3)], $strategy);
 
-        $this->expectDeprecation('Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.');
+        $this->expectDeprecation('Since symfony/security-core 5.4: Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.');
         $this->expectDeprecation('Since symfony/security-core 5.4: Returning "3" in "%s::vote()" is deprecated, return an instance of "%s" instead.');
 
         $manager->decide($token, ['ROLE_FOO']);

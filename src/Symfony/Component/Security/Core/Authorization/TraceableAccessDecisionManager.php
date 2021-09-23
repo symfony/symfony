@@ -74,7 +74,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, $object = null/*, bool $allowMultipleAttributes = false*/): bool
     {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '5.4', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
 
         $currentDecisionLog = [
             'attributes' => $attributes,

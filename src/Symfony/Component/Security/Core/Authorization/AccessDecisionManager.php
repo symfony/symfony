@@ -70,7 +70,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, $object = null/*, bool $allowMultipleAttributes = false*/)
     {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
+        trigger_deprecation('symfony/security-core', '5.4', 'Method "%s::decide()" has been deprecated, use "%s::getDecision()" instead.', __CLASS__, __CLASS__);
 
         $allowMultipleAttributes = 3 < \func_num_args() && func_get_arg(3);
 

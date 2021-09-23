@@ -41,6 +41,11 @@ class Connection
         'lazy' => false,
         'auth' => null,
         'serializer' => \Redis::SERIALIZER_PHP,
+        'sentinel_master' => null, // String, master to look for (optional, default is NULL meaning Sentinel support is disabled)
+        'timeout' => 0, // Float, value in seconds (optional, default is 0 meaning unlimited)
+        'read_timeout' => 0, //  Float, value in seconds (optional, default is 0 meaning unlimited)
+        'retry_interval' => 0, //  Int, value in milliseconds (optional, default is 0)
+        'persistent_id' => null, // String, persistent connection id (optional, default is NULL meaning not persistent)
     ];
 
     private \Redis|\RedisCluster|RedisProxy|RedisClusterProxy $connection;
@@ -72,6 +77,21 @@ class Connection
             $auth = null;
         }
 
+        $sm = $redisOptions['sentinel_master'] ?? null;
+        $sentinelMaster = (null == $sm || (\is_string($sm) && '' === $sm)) ? null : $sm;
+        $sentinelTimeout = $redisOptions['timeout'] ?? self::DEFAULT_OPTIONS['timeout'];
+        $sentinelReadTimeout = $redisOptions['read_timeout'] ?? self::DEFAULT_OPTIONS['read_timeout'];
+        $sentinelRetryInterval = $redisOptions['retry_interval'] ?? self::DEFAULT_OPTIONS['retry_interval'];
+        $sentinelPersistentId = $redisOptions['persistent_id'] ?? self::DEFAULT_OPTIONS['persistent_id'];
+
+        if (null !== $sentinelMaster && !class_exists(\Predis\Client::class) && !class_exists(\RedisSentinel::class)) {
+            throw new InvalidArgumentException('Redis Sentinel support requires the "predis/predis" package or the "redis" extension v5.2 or higher.');
+        }
+
+        if (null !== $sentinelMaster && $redis instanceof \RedisCluster) {
+            throw new InvalidArgumentException('Cannot configure Redis Sentinel and Redis Cluster instance at the same time.');
+        }
+
         $lazy = $configuration['lazy'] ?? self::DEFAULT_OPTIONS['lazy'];
         if (\is_array($host) || $redis instanceof \RedisCluster) {
             $hosts = \is_string($host) ? [$host.':'.$port] : $host; // Always ensure we have an array
@@ -80,6 +100,16 @@ class Connection
             };
             $redis = $lazy ? new RedisClusterProxy($redis, $initializer) : $initializer($redis);
         } else {
+            if (null !== $sentinelMaster) {
+                $sentinelClient = new \RedisSentinel($host, $port, $sentinelTimeout, $sentinelPersistentId, $sentinelRetryInterval, $sentinelReadTimeout);
+
+                if (!$address = $sentinelClient->getMasterAddrByName($sentinelMaster)) {
+                    throw new InvalidArgumentException(sprintf('Failed to retrieve master information from master name "%s" and address "%s:%d".', $sentinelMaster, $host, $port));
+                }
+
+                [$host, $port] = $address;
+            }
+
             $redis = $redis ?? new \Redis();
             $initializer = static function ($redis) use ($host, $port, $auth, $serializer, $dbIndex) {
                 return self::initializeRedis($redis, $host, $port, $auth, $serializer, $dbIndex);

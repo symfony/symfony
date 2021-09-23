@@ -381,4 +381,26 @@ class ConnectionTest extends TestCase
         $redis->expects($this->atLeastOnce())->method('rawCommand')->willReturn('1');
         yield '100ms delay' => ['/^\w+\.\d+$/', $redis, 100];
     }
+
+    public function testInvalidSentinelMasterName()
+    {
+        try {
+            Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], null);
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
+
+        if (!getenv('MESSENGER_REDIS_SENTINEL_MASTER')) {
+            self::markTestSkipped('Redis sentinel is not configured');
+        }
+
+        $master = getenv('MESSENGER_REDIS_DSN');
+        $uid = uniqid('sentinel_');
+
+        $exp = explode('://', $master, 2)[1];
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Failed to retrieve master information from master name "%s" and address "%s".', $uid, $exp));
+
+        Connection::fromDsn(sprintf('%s/messenger-clearlasterror', $master), ['delete_after_ack' => true, 'sentinel_master' => $uid], null);
+    }
 }

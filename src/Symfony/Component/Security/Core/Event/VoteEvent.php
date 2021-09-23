@@ -40,7 +40,7 @@ final class VoteEvent extends Event
         if (!$vote instanceof Vote) {
             trigger_deprecation('symfony/security-core', '5.3', 'Passing an int as the fourth argument to "%s::__construct" is deprecated, pass a "%s" instance instead.', __CLASS__, Vote::class);
 
-            $vote = Vote::create($vote);
+            $vote = new Vote($vote);
         }
 
         $this->vote = $vote;

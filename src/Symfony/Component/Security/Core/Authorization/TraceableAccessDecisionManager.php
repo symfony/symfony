@@ -103,7 +103,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     {
         if (!$vote instanceof Vote) {
             trigger_deprecation('symfony/security-core', '5.3', 'Passing an int as the third argument to "%s::addVoterVote()" is deprecated, pass an instance of "%s" instead.', __CLASS__, Vote::class);
-            $vote = Vote::create($vote);
+            $vote = new Vote($vote);
         }
 
         $currentLogIndex = \count($this->currentLog) - 1;

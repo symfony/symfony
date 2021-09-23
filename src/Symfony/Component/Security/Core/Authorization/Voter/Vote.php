@@ -27,7 +27,7 @@ final class Vote
     /**
      * @param int $access One of the VoterInterface::ACCESS_* constants
      */
-    private function __construct(int $access, string $reason = '', array $parameters = [])
+    public function __construct(int $access, string $reason = '', array $parameters = [])
     {
         $this->access = $access;
         $this->reason = $reason;

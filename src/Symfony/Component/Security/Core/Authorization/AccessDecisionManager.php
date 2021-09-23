@@ -252,7 +252,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         trigger_deprecation('symfony/security-core', '5.3', 'Returning "%s" in "%s::vote()" is deprecated, return a "%s" object instead.', var_export($result, true), get_debug_type($voter), Vote::class);
 
         if (\in_array($result, [VoterInterface::ACCESS_ABSTAIN, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_GRANTED], true)) {
-            return Vote::create($result);
+            return new Vote($result);
         }
 
         return null;

@@ -7,14 +7,27 @@ DSN example
 -----------
 
 ```
-MATTERMOST_DSN=mattermost://ACCESS_TOKEN@HOST/PATH?channel=CHANNEL
+MATTERMOST_DSN=mattermost://ACCESS_TOKEN@HOST/PATH?channel=CHANNEL_ID
 ```
 
 where:
  - `ACCESS_TOKEN` is your Mattermost access token
  - `HOST` is your Mattermost host
  - `PATH` is your Mattermost sub-path (optional)
- - `CHANNEL` is your Mattermost channel
+ - `CHANNEL_ID` is your Mattermost default channel id
+
+Usage
+-----
+
+```
+// to post to another channel
+$options = new MattermostOptions();
+$options->recipient('{channel_id}');
+
+$message = (new ChatMessage($text))->options($options);
+
+$chatter->send($message);
+```
 
 Resources
 ---------

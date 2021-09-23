@@ -256,8 +256,8 @@ class TraceableAccessDecisionManagerTest extends TestCase
             });
 
         $token = $this->createMock(TokenInterface::class);
-        $sut->getDecision($token, ['attr1'], null);
-        $sut->getDecision($token, ['attr2'], $obj = new \stdClass());
+        $result1 = $sut->getDecision($token, ['attr1'], null);
+        $result2 = $sut->getDecision($token, ['attr2'], $obj = new \stdClass());
 
         $this->assertEquals([
             [
@@ -266,7 +266,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 'voterDetails' => [
                     ['voter' => $voter1, 'attributes' => ['attr1'], 'vote' => Vote::createGranted()],
                 ],
-                'result' => true,
+                'result' => $result1,
             ],
             [
                 'attributes' => ['attr2'],
@@ -275,7 +275,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
                     ['voter' => $voter1, 'attributes' => ['attr2'], 'vote' => Vote::createAbstain()],
                     ['voter' => $voter2, 'attributes' => ['attr2'], 'vote' => Vote::createGranted()],
                 ],
-                'result' => true,
+                'result' => $result2,
             ],
             [
                 'attributes' => ['attr2'],
@@ -285,7 +285,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
                     ['voter' => $voter2, 'attributes' => ['attr2'], 'vote' => Vote::createDenied()],
                     ['voter' => $voter3, 'attributes' => ['attr2'], 'vote' => Vote::createGranted()],
                 ],
-                'result' => true,
+                'result' => $result2,
             ],
         ], $sut->getDecisionLog());
     }

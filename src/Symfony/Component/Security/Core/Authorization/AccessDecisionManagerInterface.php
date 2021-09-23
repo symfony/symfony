@@ -28,9 +28,7 @@ interface AccessDecisionManagerInterface
      * @param array  $attributes An array of attributes associated with the method being invoked
      * @param object $object     The object to secure
      *
-     * @return bool true if the access is granted, false otherwise
-     *
-     * @deprecated since 5.3, use {@see getDecision()} instead.
+     * @deprecated since 5.4, use {@see getDecision()} instead.
      */
-    public function decide(TokenInterface $token, array $attributes, $object = null): bool;
+    public function decide(TokenInterface $token, array $attributes, $object = null);
 }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authorization;
 
-use Symfony\Component\Security\Core\Authorization\Voter\AccessTrait;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -23,7 +22,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 final class AccessDecision
 {
-    use AccessTrait;
+    /** @var int One of the VoterInterface::ACCESS_* constants */
+    protected $access;
 
     /** @var Vote[] */
     private $votes = [];
@@ -36,6 +36,26 @@ final class AccessDecision
     {
         $this->access = $access;
         $this->votes = $votes;
+    }
+
+    public function getAccess(): int
+    {
+        return $this->access;
+    }
+
+    public function isGranted(): bool
+    {
+        return VoterInterface::ACCESS_GRANTED === $this->access;
+    }
+
+    public function isAbstain(): bool
+    {
+        return VoterInterface::ACCESS_ABSTAIN === $this->access;
+    }
+
+    public function isDenied(): bool
+    {
+        return VoterInterface::ACCESS_DENIED === $this->access;
     }
 
     /**

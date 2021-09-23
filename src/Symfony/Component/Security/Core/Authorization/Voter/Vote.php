@@ -19,8 +19,8 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
  */
 final class Vote
 {
-    use AccessTrait;
-
+    /** @var int One of the VoterInterface::ACCESS_* constants */
+    protected $access;
     private $reason;
     private $parameters;
 
@@ -32,6 +32,26 @@ final class Vote
         $this->access = $access;
         $this->reason = $reason;
         $this->parameters = $parameters;
+    }
+
+    public function getAccess(): int
+    {
+        return $this->access;
+    }
+
+    public function isGranted(): bool
+    {
+        return VoterInterface::ACCESS_GRANTED === $this->access;
+    }
+
+    public function isAbstain(): bool
+    {
+        return VoterInterface::ACCESS_ABSTAIN === $this->access;
+    }
+
+    public function isDenied(): bool
+    {
+        return VoterInterface::ACCESS_DENIED === $this->access;
     }
 
     public static function create(int $access, string $reason = '', array $parameters = []): self

@@ -19,6 +19,6 @@ namespace Symfony\Component\Messenger\Exception;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-interface RecoverableExceptionInterface extends \Throwable
+interface RecoverableExceptionInterface extends LogRetryAsWarningInterface
 {
 }

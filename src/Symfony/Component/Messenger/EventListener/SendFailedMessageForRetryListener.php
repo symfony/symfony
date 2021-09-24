@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageRetriedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\LogRetryAsWarningInterface;
 use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
@@ -72,11 +73,11 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
 
             if (null !== $this->logger) {
                 $logLevel = LogLevel::ERROR;
-                if ($throwable instanceof RecoverableExceptionInterface) {
+                if ($throwable instanceof LogRetryAsWarningInterface) {
                     $logLevel = LogLevel::WARNING;
                 } elseif ($throwable instanceof HandlerFailedException) {
                     foreach ($throwable->getNestedExceptions() as $nestedException) {
-                        if ($nestedException instanceof RecoverableExceptionInterface) {
+                        if ($nestedException instanceof LogRetryAsWarningInterface) {
                             $logLevel = LogLevel::WARNING;
                             break;
                         }

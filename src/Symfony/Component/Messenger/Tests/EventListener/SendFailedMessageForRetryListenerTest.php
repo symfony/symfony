@@ -13,6 +13,8 @@ namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
@@ -20,6 +22,7 @@ use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\RetryWithWarningException;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -104,6 +107,60 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $retryStategy = $this->createMock(RetryStrategyInterface::class);
         $retryStategy->expects($this->once())->method('isRetryable')->willReturn(true);
         $retryStategy->expects($this->once())->method('getWaitingTime')->willReturn(1000);
+        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
+        $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
+        $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStategy);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log')->with(LogLevel::ERROR);
+
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->once())->method('dispatch');
+
+        $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator, $logger, $eventDispatcher);
+
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
+
+        $listener->onMessageFailed($event);
+    }
+
+    public function exceptionLogSeverityProvider()
+    {
+        return [
+            [new \Exception('test'), LogLevel::ERROR],
+            [new RecoverableMessageHandlingException('test'), LogLevel::WARNING],
+            [new RetryWithWarningException(), LogLevel::WARNING],
+        ];
+    }
+
+    /**
+     * @dataProvider exceptionLogSeverityProvider
+     */
+    public function testRetriesAreLoggedWithAppropriateLogSeverity(\Exception $exception, string $expectedSeverity)
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->once())->method('send')->willReturnCallback(function (Envelope $envelope) {
+            /** @var DelayStamp $delayStamp */
+            $delayStamp = $envelope->last(DelayStamp::class);
+            /** @var RedeliveryStamp $redeliveryStamp */
+            $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
+
+            $this->assertInstanceOf(DelayStamp::class, $delayStamp);
+            $this->assertSame(1000, $delayStamp->getDelay());
+
+            $this->assertInstanceOf(RedeliveryStamp::class, $redeliveryStamp);
+            $this->assertSame(1, $redeliveryStamp->getRetryCount());
+
+            return $envelope;
+        });
+        $senderLocator = $this->createMock(ContainerInterface::class);
+        $senderLocator->expects($this->once())->method('has')->willReturn(true);
+        $senderLocator->expects($this->once())->method('get')->willReturn($sender);
+        $retryStategy = $this->createMock(RetryStrategyInterface::class);
+        $retryStategy->expects($this->any())->method('isRetryable')->willReturn(true);
+        $retryStategy->expects($this->any())->method('getWaitingTime')->willReturn(1000);
         $retryStrategyLocator = $this->createMock(ContainerInterface::class);
         $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
         $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStategy);

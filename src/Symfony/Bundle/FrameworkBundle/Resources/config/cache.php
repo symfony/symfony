@@ -195,6 +195,7 @@ return static function (ContainerConfigurator $container) {
         ->set('cache.default_marshaller', DefaultMarshaller::class)
             ->args([
                 null, // use igbinary_serialize() when available
+                '%kernel.debug%',
             ])
 
         ->set('cache.early_expiration_handler', EarlyExpirationHandler::class)

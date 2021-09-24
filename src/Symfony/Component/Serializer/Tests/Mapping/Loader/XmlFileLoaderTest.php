@@ -84,6 +84,16 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
     }
 
+    public function testSerializedPath()
+    {
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertEquals('[one][two]', $attributesMetadata['three']->getSerializedPath());
+        $this->assertEquals('[three][four]', $attributesMetadata['seven']->getSerializedPath());
+    }
+
     public function testLoadDiscriminatorMap()
     {
         $classMetadata = new ClassMetadata(AbstractDummy::class);

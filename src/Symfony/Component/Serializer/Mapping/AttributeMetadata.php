@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Mapping;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -47,6 +49,13 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           {@link getSerializedName()} instead.
      */
     public $serializedName;
+
+    /**
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getSerializedPath()} instead.
+     */
+    public ?PropertyPath $serializedPath = null;
 
     /**
      * @var bool
@@ -121,6 +130,16 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->serializedName;
     }
 
+    public function setSerializedPath(PropertyPath $serializedPath = null): void
+    {
+        $this->serializedPath = $serializedPath;
+    }
+
+    public function getSerializedPath(): ?PropertyPath
+    {
+        return $this->serializedPath;
+    }
+
     public function setIgnore(bool $ignore)
     {
         $this->ignore = $ignore;
@@ -190,14 +209,9 @@ class AttributeMetadata implements AttributeMetadataInterface
         }
 
         // Overwrite only if not defined
-        if (null === $this->maxDepth) {
-            $this->maxDepth = $attributeMetadata->getMaxDepth();
-        }
-
-        // Overwrite only if not defined
-        if (null === $this->serializedName) {
-            $this->serializedName = $attributeMetadata->getSerializedName();
-        }
+        $this->maxDepth ??= $attributeMetadata->getMaxDepth();
+        $this->serializedName ??= $attributeMetadata->getSerializedName();
+        $this->serializedPath ??= $attributeMetadata->getSerializedPath();
 
         // Overwrite only if both contexts are empty
         if (!$this->normalizationContexts && !$this->denormalizationContexts) {
@@ -217,6 +231,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep(): array
     {
-        return ['name', 'groups', 'maxDepth', 'serializedName', 'ignore', 'normalizationContexts', 'denormalizationContexts'];
+        return ['name', 'groups', 'maxDepth', 'serializedName', 'serializedPath', 'ignore', 'normalizationContexts', 'denormalizationContexts'];
     }
 }

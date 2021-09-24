@@ -11,6 +11,7 @@ CHANGELOG
  * Change the signature of `AttributeMetadataInterface::setSerializedName()` to `setSerializedName(?string)`
  * Change the signature of `ClassMetadataInterface::setClassDiscriminatorMapping()` to `setClassDiscriminatorMapping(?ClassDiscriminatorMapping)`
  * Add option YamlEncoder::YAML_INDENTATION to YamlEncoder constructor options to configure additional indentation for each level of nesting. This allows configuring indentation in the service configuration.
+ * Add `SerializedPath` annotation to flatten nested attributes
 
 6.1
 ---

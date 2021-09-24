@@ -16,6 +16,12 @@
       serialized_name: 'baz'
     bar:
       serialized_name: 'qux'
+'Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy':
+  attributes:
+    three:
+      serialized_path: '[one][two]'
+    seven:
+      serialized_path: '[three][four]'
 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy':
   discriminator_map:
     type_property: type

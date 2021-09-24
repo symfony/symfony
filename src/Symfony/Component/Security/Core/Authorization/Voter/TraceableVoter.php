@@ -38,7 +38,7 @@ class TraceableVoter implements VoterInterface
         $vote = $this->voter->vote($token, $subject, $attributes);
         $result = $vote;
         if (!$vote instanceof Vote && \in_array($vote, [VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_ABSTAIN])) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Returning an int from "%s::vote" is deprecated, return an instance of "%s" instead.', \get_class($this->voter), Vote::class);
+            trigger_deprecation('symfony/security-core', '5.4', 'Returning an int from "%s::vote" is deprecated, return an instance of "%s" instead.', \get_class($this->voter), Vote::class);
 
             $result = new Vote($vote);
         }

@@ -79,7 +79,7 @@ class TraceableVoterTest extends TestCase
 
         $sut = new TraceableVoter($voter, $eventDispatcher);
 
-        $this->expectDeprecation(sprintf('Since symfony/security-core 5.3: Returning an int from "%s::vote" is deprecated, return an instance of "%s" instead.', \get_class($voter), Vote::class));
+        $this->expectDeprecation(sprintf('Since symfony/security-core 5.4: Returning an int from "%s::vote" is deprecated, return an instance of "%s" instead.', \get_class($voter), Vote::class));
 
         $result = $sut->vote($token, 'anysubject', ['attr1']);
 

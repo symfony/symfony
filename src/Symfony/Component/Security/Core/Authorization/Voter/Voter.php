@@ -53,7 +53,7 @@ abstract class Voter implements VoterInterface
 
             $decision = $this->voteOnAttribute($attribute, $subject, $token);
             if (\is_bool($decision)) {
-                trigger_deprecation('symfony/security-core', '5.3', 'Returning a boolean in "%s::voteOnAttribute()" is deprecated, return an instance of "%s" instead.', static::class, Vote::class);
+                trigger_deprecation('symfony/security-core', '5.4', 'Returning a boolean in "%s::voteOnAttribute()" is deprecated, return an instance of "%s" instead.', static::class, Vote::class);
                 $decision = $decision ? $this->grant() : $this->deny();
             }
 

@@ -256,8 +256,8 @@ class TraceableAccessDecisionManagerTest extends TestCase
             });
 
         $token = $this->createMock(TokenInterface::class);
-        $result1 = $sut->getDecision($token, ['attr1'], null);
-        $result2 = $sut->getDecision($token, ['attr2'], $obj = new \stdClass());
+        $sut->getDecision($token, ['attr1'], null);
+        $sut->getDecision($token, ['attr2'], $obj = new \stdClass());
 
         $this->assertEquals([
             [
@@ -266,7 +266,9 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 'voterDetails' => [
                     ['voter' => $voter1, 'attributes' => ['attr1'], 'vote' => Vote::createGranted()],
                 ],
-                'result' => $result1,
+                'result' => AccessDecision::createGranted([
+                    Vote::createGranted()
+                ]),
             ],
             [
                 'attributes' => ['attr2'],
@@ -275,7 +277,10 @@ class TraceableAccessDecisionManagerTest extends TestCase
                     ['voter' => $voter1, 'attributes' => ['attr2'], 'vote' => Vote::createAbstain()],
                     ['voter' => $voter2, 'attributes' => ['attr2'], 'vote' => Vote::createGranted()],
                 ],
-                'result' => $result2,
+                'result' => AccessDecision::createGranted([
+                    Vote::createAbstain(),
+                    Vote::createGranted()
+                ]),
             ],
             [
                 'attributes' => ['attr2'],
@@ -285,7 +290,11 @@ class TraceableAccessDecisionManagerTest extends TestCase
                     ['voter' => $voter2, 'attributes' => ['attr2'], 'vote' => Vote::createDenied()],
                     ['voter' => $voter3, 'attributes' => ['attr2'], 'vote' => Vote::createGranted()],
                 ],
-                'result' => $result2,
+                'result' => AccessDecision::createGranted([
+                    Vote::createAbstain(),
+                    Vote::createDenied(),
+                    Vote::createGranted()
+                ]),
             ],
         ], $sut->getDecisionLog());
     }

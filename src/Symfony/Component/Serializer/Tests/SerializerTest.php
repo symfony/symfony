@@ -58,6 +58,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
+use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
@@ -994,6 +995,58 @@ class SerializerTest extends TestCase
                 'message' => 'The type of the "string" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php74Full" must be one of "string" ("null" given).',
             ],
             ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
+    }
+
+    /** @requires PHP 8.0 */
+    public function testCollectDenormalizationErrorsWithConstructor()
+    {
+        $json = '{"bool": "bool"}';
+
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+
+        $serializer = new Serializer(
+            [
+                new ObjectNormalizer($classMetadataFactory, null, null, $extractor, new ClassDiscriminatorFromClassMetadata($classMetadataFactory)),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize($json, Php80WithPromotedTypedConstructor::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $this->assertInstanceOf(Php80WithPromotedTypedConstructor::class, $th->getData());
+
+        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
+            return [
+                'currentType' => $e->getCurrentType(),
+                'expectedTypes' => $e->getExpectedTypes(),
+                'path' => $e->getPath(),
+                'useMessageForUser' => $e->canUseMessageForUser(),
+                'message' => $e->getMessage(),
+            ];
+        }, $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'string',
+                'expectedTypes' => [
+                    'bool',
+                ],
+                'path' => 'bool',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "bool" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php80WithPromotedTypedConstructor" must be one of "bool" ("string" given).',
+            ],
+        ];
 
         $this->assertSame($expected, $exceptionsAsArray);
     }

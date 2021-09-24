@@ -27,6 +27,7 @@ interface AccessDecisionManagerInterface
      *
      * @param array  $attributes An array of attributes associated with the method being invoked
      * @param object $object     The object to secure
+     * 
      * @return bool
      *
      * @deprecated since Symfony 5.4, use {@see getDecision()} instead.

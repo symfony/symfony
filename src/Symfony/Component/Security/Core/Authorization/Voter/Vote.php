@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 /**
  * A Vote is returned by a Voter and contains the access (granted, abstain or denied).
- * It can also contain a reason explaining the vote decision.
+ * It can also contain a message explaining the vote decision.
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
  */
@@ -21,17 +21,17 @@ final class Vote
 {
     /** @var int One of the VoterInterface::ACCESS_* constants */
     private $access;
-    private $reason;
-    private $parameters;
+    private $message;
+    private $context;
 
     /**
      * @param int $access One of the VoterInterface::ACCESS_* constants
      */
-    public function __construct(int $access, string $reason = '', array $parameters = [])
+    public function __construct(int $access, string $message = '', array $context = [])
     {
         $this->access = $access;
-        $this->reason = $reason;
-        $this->parameters = $parameters;
+        $this->message = $message;
+        $this->context = $context;
     }
 
     public function getAccess(): int
@@ -54,38 +54,38 @@ final class Vote
         return VoterInterface::ACCESS_DENIED === $this->access;
     }
 
-    public static function create(int $access, string $reason = '', array $parameters = []): self
+    public static function create(int $access, string $message = '', array $context = []): self
     {
-        return new self($access, $reason, $parameters);
+        return new self($access, $message, $context);
     }
 
-    public static function createGranted(string $reason = '', array $parameters = []): self
+    public static function createGranted(string $message = '', array $context = []): self
     {
-        return new self(VoterInterface::ACCESS_GRANTED, $reason, $parameters);
+        return new self(VoterInterface::ACCESS_GRANTED, $message, $context);
     }
 
-    public static function createAbstain(string $reason = '', array $parameters = []): self
+    public static function createAbstain(string $message = '', array $context = []): self
     {
-        return new self(VoterInterface::ACCESS_ABSTAIN, $reason, $parameters);
+        return new self(VoterInterface::ACCESS_ABSTAIN, $message, $context);
     }
 
-    public static function createDenied(string $reason = '', array $parameters = []): self
+    public static function createDenied(string $message = '', array $context = []): self
     {
-        return new self(VoterInterface::ACCESS_DENIED, $reason, $parameters);
+        return new self(VoterInterface::ACCESS_DENIED, $message, $context);
     }
 
-    public function setReason(string $reason)
+    public function setMessage(string $message)
     {
-        $this->reason = $reason;
+        $this->message = $message;
     }
 
-    public function getReason(): string
+    public function getMessage(): string
     {
-        return $this->reason;
+        return $this->message;
     }
 
-    public function getParameters(): array
+    public function getContext(): array
     {
-        return $this->parameters;
+        return $this->context;
     }
 }

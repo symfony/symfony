@@ -73,11 +73,11 @@ class AccessDeniedException extends RuntimeException
             return;
         }
 
-        $reasons = array_map(static function (Vote $vote) {
-            return $vote->getReason();
+        $messages = array_map(static function (Vote $vote) {
+            return $vote->getMessage();
         }, $accessDecision->getDeniedVotes());
 
-        $this->message .= ' '.rtrim(' '.implode(' ', $reasons));
+        $this->message .= ' '.rtrim(' '.implode(' ', $messages));
     }
 
     public function getAccessDecision(): AccessDecision

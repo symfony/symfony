@@ -62,7 +62,7 @@ abstract class Voter implements VoterInterface
                 return $decision;
             }
 
-            $vote->setReason($vote->getReason().trim(' '.$decision->getReason()));
+            $vote->setMessage($vote->getMessage().trim(' '.$decision->getMessage()));
         }
 
         return $vote;
@@ -71,25 +71,25 @@ abstract class Voter implements VoterInterface
     /**
      * Creates a granted vote.
      */
-    protected function grant(string $reason = '', array $parameters = []): Vote
+    protected function grant(string $message = '', array $context = []): Vote
     {
-        return Vote::createGranted($reason, $parameters);
+        return Vote::createGranted($message, $context);
     }
 
     /**
      * Creates an abstained vote.
      */
-    protected function abstain(string $reason = '', array $parameters = []): Vote
+    protected function abstain(string $message = '', array $context = []): Vote
     {
-        return Vote::createAbstain($reason, $parameters);
+        return Vote::createAbstain($message, $context);
     }
 
     /**
      * Creates a denied vote.
      */
-    protected function deny(string $reason = '', array $parameters = []): Vote
+    protected function deny(string $message = '', array $context = []): Vote
     {
-        return Vote::createDenied($reason, $parameters);
+        return Vote::createDenied($message, $context);
     }
 
     /**

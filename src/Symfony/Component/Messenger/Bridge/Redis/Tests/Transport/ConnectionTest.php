@@ -163,15 +163,26 @@ class ConnectionTest extends TestCase
         $this->assertNotNull($connection->get());
     }
 
-    public function testAuth()
+    /**
+     * @param string|array $expected
+     *
+     * @dataProvider provideAuthDsn
+     */
+    public function testAuth($expected, string $dsn)
     {
         $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('auth')
-            ->with('password')
+            ->with($expected)
             ->willReturn(true);
 
-        Connection::fromDsn('redis://password@localhost/queue', ['delete_after_ack' => true], $redis);
+        Connection::fromDsn($dsn, ['delete_after_ack' => true], $redis);
+    }
+
+    public function provideAuthDsn(): \Generator
+    {
+        yield 'Password only' => ['password', 'redis://password@localhost/queue'];
+        yield 'User and password' => [['user', 'password'], 'redis://user:password@localhost/queue'];
     }
 
     public function testAuthFromOptions()

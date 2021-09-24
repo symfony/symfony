@@ -27,12 +27,12 @@ class VarCloner extends AbstractCloner
         $len = 1;                       // Length of $queue
         $pos = 0;                       // Number of cloned items past the minimum depth
         $refsCounter = 0;               // Hard references counter
-        $queue = [[$var]];    // This breadth-first queue is the return value
-        $hardRefs = [];            // Map of original zval ids to stub objects
-        $objRefs = [];             // Map of original object handles to their stub object counterpart
-        $objects = [];             // Keep a ref to objects to ensure their handle cannot be reused while cloning
-        $resRefs = [];             // Map of original resource handles to their stub object counterpart
-        $values = [];              // Map of stub objects' ids to original values
+        $queue = [[$var]];              // This breadth-first queue is the return value
+        $hardRefs = [];                 // Map of original zval ids to stub objects
+        $objRefs = [];                  // Map of original object handles to their stub object counterpart
+        $objects = [];                  // Keep a ref to objects to ensure their handle cannot be reused while cloning
+        $resRefs = [];                  // Map of original resource handles to their stub object counterpart
+        $values = [];                   // Map of stub objects' ids to original values
         $maxItems = $this->maxItems;
         $maxString = $this->maxString;
         $minDepth = $this->minDepth;
@@ -129,39 +129,45 @@ class VarCloner extends AbstractCloner
                             continue 2;
                         }
                         $stub = $arrayStub;
+
+                        if (\PHP_VERSION_ID >= 80100) {
+                            $stub->class = array_is_list($v) ? Stub::ARRAY_INDEXED : Stub::ARRAY_ASSOC;
+                            $a = $v;
+                            break;
+                        }
+
                         $stub->class = Stub::ARRAY_INDEXED;
 
                         $j = -1;
                         foreach ($v as $gk => $gv) {
                             if ($gk !== ++$j) {
                                 $stub->class = Stub::ARRAY_ASSOC;
+                                $a = $v;
+                                $a[$gid] = true;
                                 break;
                             }
                         }
-                        $a = $v;
 
-                        if (Stub::ARRAY_ASSOC === $stub->class) {
-                            // Copies of $GLOBALS have very strange behavior,
-                            // let's detect them with some black magic
-                            if (\PHP_VERSION_ID < 80100 && ($a[$gid] = true) && isset($v[$gid])) {
-                                unset($v[$gid]);
-                                $a = [];
-                                foreach ($v as $gk => &$gv) {
-                                    if ($v === $gv) {
-                                        unset($v);
-                                        $v = new Stub();
-                                        $v->value = [$v->cut = \count($gv), Stub::TYPE_ARRAY => 0];
-                                        $v->handle = -1;
-                                        $gv = &$hardRefs[spl_object_id($v)];
-                                        $gv = $v;
-                                    }
-
-                                    $a[$gk] = &$gv;
+                        // Copies of $GLOBALS have very strange behavior,
+                        // let's detect them with some black magic
+                        if (isset($v[$gid])) {
+                            unset($v[$gid]);
+                            $a = [];
+                            foreach ($v as $gk => &$gv) {
+                                if ($v === $gv) {
+                                    unset($v);
+                                    $v = new Stub();
+                                    $v->value = [$v->cut = \count($gv), Stub::TYPE_ARRAY => 0];
+                                    $v->handle = -1;
+                                    $gv = &$hardRefs[spl_object_id($v)];
+                                    $gv = $v;
                                 }
-                                unset($gv);
-                            } else {
-                                $a = $v;
+
+                                $a[$gk] = &$gv;
                             }
+                            unset($gv);
+                        } else {
+                            $a = $v;
                         }
                         break;
 

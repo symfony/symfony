@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-21T14:31:45Z
+
+Is 4.4 affected by this bug as well?
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2021-09-21T22:11:39Z
+
+> Is 4.4 affected by this bug as well?
+
+File did not exists in 4.4 !
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-22T11:13:12Z
+
+> File did not exists in 4.4 !
+
+That was not my question. 😉 Messenger 4.4 did have support for Redis and the logic was eventually moved to the file you're fixing here.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-09-22T15:13:45Z
+
+I suppose the code was in `src/Symfony/Component/Messenger/Transport/RedisExt/Connection.php` in 4.4.
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2021-09-22T16:39:48Z
+
+Ok, my bad! should backport the PR to 4.4 as well  @fabpot ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-22T18:45:34Z
+
+Please rebase on 4.4 and do the change on that file, yes. We will take care of applying the patch to the new location when merging up.
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2021-09-23T17:02:48Z
+
+@chalasr I've changed the base branch & files :)

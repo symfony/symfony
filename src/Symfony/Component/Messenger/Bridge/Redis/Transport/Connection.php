@@ -233,7 +233,8 @@ class Connection
             $connectionCredentials = [
                 'host' => $parsedUrl['host'] ?? '127.0.0.1',
                 'port' => $parsedUrl['port'] ?? 6379,
-                'auth' => $redisOptions['auth'] ?? $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
+                // See: https://github.com/phpredis/phpredis/#auth
+                'auth' => $redisOptions['auth'] ?? (isset($parsedUrl['pass']) && isset($parsedUrl['user']) ? [$parsedUrl['user'], $parsedUrl['pass']] : $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null),
             ];
 
             $pathParts = explode('/', rtrim($parsedUrl['path'] ?? '', '/'));

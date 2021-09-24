@@ -267,7 +267,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
                     ['voter' => $voter1, 'attributes' => ['attr1'], 'vote' => Vote::createGranted()],
                 ],
                 'result' => AccessDecision::createGranted([
-                    Vote::createGranted()
+                    Vote::createGranted(),
                 ]),
             ],
             [
@@ -279,7 +279,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 ],
                 'result' => AccessDecision::createGranted([
                     Vote::createAbstain(),
-                    Vote::createGranted()
+                    Vote::createGranted(),
                 ]),
             ],
             [
@@ -293,7 +293,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 'result' => AccessDecision::createGranted([
                     Vote::createAbstain(),
                     Vote::createDenied(),
-                    Vote::createGranted()
+                    Vote::createGranted(),
                 ]),
             ],
         ], $sut->getDecisionLog());

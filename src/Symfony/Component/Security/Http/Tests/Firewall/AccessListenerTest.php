@@ -509,7 +509,7 @@ class AccessListenerTest extends TestCase
         $accessDecisionManager
             ->expects($this->once())
             ->method('getDecision')
-            ->with($this->equalTo($authenticatedToken), $this->equalTo(['foo' => 'bar', 'bar' => 'baz']), $this->equalTo($request), true)
+            ->with($this->equalTo($authenticatedToken), $this->equalTo(['foo' => 'bar', 'bar' => 'baz']), $this->equalTo($request))
             ->willReturn(AccessDecision::createGranted())
         ;
 

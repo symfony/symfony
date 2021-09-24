@@ -411,7 +411,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager->expects($this->once())
             ->method('decide')
             ->with($this->isInstanceOf(NullToken::class))

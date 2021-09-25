@@ -107,7 +107,10 @@ class Connection
         $this->claimInterval = $configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval'];
     }
 
-    private static function initializeRedis(\Redis $redis, string $host, int $port, ?string $auth, int $serializer, int $dbIndex): \Redis
+    /**
+     * @param string|string[]|null $auth
+     */
+    private static function initializeRedis(\Redis $redis, string $host, int $port, $auth, int $serializer, int $dbIndex): \Redis
     {
         $redis->connect($host, $port);
         $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);

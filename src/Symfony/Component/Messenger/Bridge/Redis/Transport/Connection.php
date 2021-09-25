@@ -110,7 +110,7 @@ class Connection
     /**
      * @param string|string[]|null $auth
      */
-    private static function initializeRedis(\Redis $redis, string $host, int $port, $auth, int $serializer, int $dbIndex): \Redis
+    private static function initializeRedis(\Redis $redis, string $host, int $port, string|array|null $auth, int $serializer, int $dbIndex): \Redis
     {
         $redis->connect($host, $port);
         $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
@@ -129,7 +129,7 @@ class Connection
     /**
      * @param string|string[]|null $auth
      */
-    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, $auth, int $serializer): \RedisCluster
+    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, string|array|null $auth, int $serializer): \RedisCluster
     {
         if (null === $redis) {
             $redis = new \RedisCluster(null, $hosts, 0.0, 0.0, false, $auth);

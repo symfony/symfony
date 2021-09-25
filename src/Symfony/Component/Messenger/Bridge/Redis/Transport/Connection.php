@@ -126,7 +126,10 @@ class Connection
         return $redis;
     }
 
-    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, ?string $auth, int $serializer): \RedisCluster
+    /**
+     * @param string|string[]|null $auth
+     */
+    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, $auth, int $serializer): \RedisCluster
     {
         if (null === $redis) {
             $redis = new \RedisCluster(null, $hosts, 0.0, 0.0, false, $auth);

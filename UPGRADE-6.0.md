@@ -10,6 +10,8 @@ DoctrineBridge
 --------------
 
  * Remove `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()`
+ * Add argument `$bundleDir` to `AbstractDoctrineExtension::getMappingDriverBundleConfigDefaults()`
+ * Add argument `$bundleDir` to `AbstractDoctrineExtension::getMappingResourceConfigDirectory()`
 
 Cache
 -----

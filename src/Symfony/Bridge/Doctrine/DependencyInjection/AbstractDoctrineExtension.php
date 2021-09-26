@@ -73,9 +73,11 @@ abstract class AbstractDoctrineExtension extends Extension
 
             if ($mappingConfig['is_bundle']) {
                 $bundle = null;
+                $bundleMetadata = null;
                 foreach ($container->getParameter('kernel.bundles') as $name => $class) {
                     if ($mappingName === $name) {
                         $bundle = new \ReflectionClass($class);
+                        $bundleMetadata = $container->getParameter('kernel.bundles_metadata')[$name];
 
                         break;
                     }
@@ -85,7 +87,7 @@ abstract class AbstractDoctrineExtension extends Extension
                     throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $mappingName));
                 }
 
-                $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container);
+                $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container, $bundleMetadata['path']);
                 if (!$mappingConfig) {
                     continue;
                 }
@@ -133,11 +135,20 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * Returns false when autodetection failed, an array of the completed information otherwise.
      *
+     * @param string|null $bundleDir The bundle directory path
+     *
      * @return array|false
      */
-    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container)
+    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container/*, string $bundleDir = null*/)
     {
-        $bundleDir = \dirname($bundle->getFileName());
+        if (\func_num_args() < 4 && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
+            trigger_deprecation('symfony/doctrine-bridge', '5.4', 'The "%s()" method will have a new "string $bundleDir = null" argument in version 6.0, not defining it is deprecated.', __METHOD__);
+            $bundleDir = null;
+        } else {
+            $bundleDir = func_get_arg(3);
+        }
+
+        $bundleDir ?? $bundleDir = \dirname($bundle->getFileName());
 
         if (!$bundleConfig['type']) {
             $bundleConfig['type'] = $this->detectMetadataDriver($bundleDir, $container);
@@ -152,7 +163,7 @@ abstract class AbstractDoctrineExtension extends Extension
             if (\in_array($bundleConfig['type'], ['annotation', 'staticphp', 'attribute'])) {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingObjectDefaultName();
             } else {
-                $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory();
+                $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory($bundleDir);
             }
         } else {
             $bundleConfig['dir'] = $bundleDir.'/'.$bundleConfig['dir'];
@@ -246,7 +257,7 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function detectMetadataDriver(string $dir, ContainerBuilder $container)
     {
-        $configPath = $this->getMappingResourceConfigDirectory();
+        $configPath = $this->getMappingResourceConfigDirectory($dir);
         $extension = $this->getMappingResourceExtension();
 
         if (glob($dir.'/'.$configPath.'/*.'.$extension.'.xml', \GLOB_NOSORT)) {
@@ -440,9 +451,11 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Relative path from the bundle root to the directory where mapping files reside.
      *
+     * @param string|null $bundleDir The bundle directory path
+     *
      * @return string
      */
-    abstract protected function getMappingResourceConfigDirectory();
+    abstract protected function getMappingResourceConfigDirectory(/*string $bundleDir = null*/);
 
     /**
      * Extension used by the mapping files.

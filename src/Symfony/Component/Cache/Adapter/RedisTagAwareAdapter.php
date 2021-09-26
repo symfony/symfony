@@ -15,6 +15,7 @@ use Predis\Connection\Aggregate\ClusterInterface;
 use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Connection\Aggregate\ReplicationInterface;
 use Predis\Response\Status;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
@@ -159,6 +160,12 @@ EOLUA;
         });
 
         foreach ($results as $id => $result) {
+            if ($result instanceof \RedisException) {
+                CacheItem::log($this->logger, 'Failed to delete key "{key}": '.$result->getMessage(), ['key' => substr($id, \strlen($this->namespace)), 'exception' => $result]);
+
+                continue;
+            }
+
             try {
                 yield $id => !\is_string($result) || '' === $result ? [] : $this->marshaller->unmarshall($result);
             } catch (\Exception $e) {
@@ -197,6 +204,8 @@ EOLUA;
         // gargage collect that set from the client side.
 
         $lua = <<<'EOLUA'
+            redis.replicate_commands()
+
             local cursor = '0'
             local id = KEYS[1]
             repeat
@@ -234,6 +243,8 @@ EOLUA;
         });
 
         $lua = <<<'EOLUA'
+            redis.replicate_commands()
+
             local id = KEYS[1]
             local cursor = table.remove(ARGV)
             redis.call('SREM', '{'..id..'}'..id, unpack(ARGV))
@@ -241,7 +252,17 @@ EOLUA;
             return redis.call('SSCAN', '{'..id..'}'..id, cursor, 'COUNT', 5000)
 EOLUA;
 
-        foreach ($results as $id => [$cursor, $ids]) {
+        $success = true;
+        foreach ($results as $id => $values) {
+            if ($values instanceof \RedisException) {
+                CacheItem::log($this->logger, 'Failed to invalidate key "{key}": '.$values->getMessage(), ['key' => substr($id, \strlen($this->namespace)), 'exception' => $values]);
+                $success = false;
+
+                continue;
+            }
+
+            [$cursor, $ids] = $values;
+
             while ($ids || '0' !== $cursor) {
                 $this->doDelete($ids);
 
@@ -264,7 +285,7 @@ EOLUA;
             }
         }
 
-        return true;
+        return $success;
     }
 
     private function getRedisEvictionPolicy(): string

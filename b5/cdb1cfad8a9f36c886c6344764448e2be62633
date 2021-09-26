@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-03T13:54:20Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-06T14:16:06Z
+
+Hi! I guess this is a question for @chalasr as he proposed this solution, but I don't think the `LogicException` works/is nice. This means that if the internal authenticator isn't an entry point, a user will get a 500 instead of the default authentication entry point behavior. It's perfectly valid for an authenticator to not be an entry point (e.g. see the `JsonLoginFactory`, which also has a `json_login_ldap` variant). Am I missing something or should we find a different way of approaching this? (maybe a special exception class that we catch when calling the `start()` method?)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-17T09:02:45Z
+
+> maybe a special exception class that we catch when calling the start() method?
+
+That's the best approach AFAICT. I just pushed a commit doing that.
+Review needed :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-26T12:14:27Z
+
+PR ready (I need this for #42582)

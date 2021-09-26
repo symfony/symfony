@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
@@ -22,6 +23,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class TraceableAccessDecisionManagerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @dataProvider provideObjectsAndLogs
      */

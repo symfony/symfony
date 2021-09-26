@@ -10,6 +10,7 @@ DoctrineBridge
 --------------
 
  * Remove `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()`
+ * Remove `AbstractDoctrineExtension::getMappingDriverBundleConfigDefaults()` in favor of `AbstractDoctrineExtension::getBundleMappingDriverDefaultConfig()`
 
 Cache
 -----

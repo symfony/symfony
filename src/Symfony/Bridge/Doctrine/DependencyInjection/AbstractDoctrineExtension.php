@@ -73,9 +73,11 @@ abstract class AbstractDoctrineExtension extends Extension
 
             if ($mappingConfig['is_bundle']) {
                 $bundle = null;
+                $bundleMetadata = null;
                 foreach ($container->getParameter('kernel.bundles') as $name => $class) {
                     if ($mappingName === $name) {
                         $bundle = new \ReflectionClass($class);
+                        $bundleMetadata = $container->getParameter('kernel.bundles_metadata')[$name];
 
                         break;
                     }
@@ -85,6 +87,7 @@ abstract class AbstractDoctrineExtension extends Extension
                     throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $mappingName));
                 }
 
+                // $mappingConfig = $this->getBundleMappingDriverDefaultConfig($mappingConfig, $bundleMetadata, $container);
                 $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container);
                 if (!$mappingConfig) {
                     continue;
@@ -151,10 +154,26 @@ abstract class AbstractDoctrineExtension extends Extension
      * Returns false when autodetection failed, an array of the completed information otherwise.
      *
      * @return array|false
+     *
+     * @deprecated since Symfony 5.4, use "getBundleMappingDriverDefaultConfig()" instead
      */
     protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container)
     {
-        $bundleDir = \dirname($bundle->getFileName());
+        trigger_deprecation('symfony/doctrine-bridge', '5.4', 'Method "%s()" is deprecated, use "getBundleMappingDriverDefaultConfig()" instead.', __METHOD__);
+
+        return $this->getBundleMappingDriverDefaultConfig($bundleConfig, ['path' => \dirname($bundle->getFileName()), 'namespace' => $bundle->getNamespaceName()], $container);
+    }
+
+    /**
+     * If this is a bundle controlled mapping all the missing information can be autodetected by this method.
+     *
+     * Returns false when autodetection failed, an array of the completed information otherwise.
+     *
+     * @return array|false
+     */
+    protected function getBundleMappingDriverDefaultConfig(array $bundleConfig, array $bundleMetadata, ContainerBuilder $container)
+    {
+        $bundleDir = $bundleMetadata['path'];
 
         if (!$bundleConfig['type']) {
             $bundleConfig['type'] = $this->detectMetadataDriver($bundleDir, $container);
@@ -169,14 +188,14 @@ abstract class AbstractDoctrineExtension extends Extension
             if (\in_array($bundleConfig['type'], ['annotation', 'staticphp', 'attribute'])) {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingObjectDefaultName();
             } else {
-                $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory();
+                $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory($bundleDir);
             }
         } else {
             $bundleConfig['dir'] = $bundleDir.'/'.$bundleConfig['dir'];
         }
 
         if (!$bundleConfig['prefix']) {
-            $bundleConfig['prefix'] = $bundle->getNamespaceName().'\\'.$this->getMappingObjectDefaultName();
+            $bundleConfig['prefix'] = $bundleMetadata['namespace'].'\\'.$this->getMappingObjectDefaultName();
         }
 
         return $bundleConfig;
@@ -424,7 +443,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @return string
      */
-    abstract protected function getMappingResourceConfigDirectory();
+    abstract protected function getMappingResourceConfigDirectory(/* string $bundleDir */);
 
     /**
      * Extension used by the mapping files.

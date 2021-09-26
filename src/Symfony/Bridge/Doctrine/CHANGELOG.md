@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add support for the newer bundle structure to `AbstractDoctrineExtension::loadMappingInformation()`
+ * Deprecate `AbstractDoctrineExtension::getMappingDriverBundleConfigDefaults()` in favor of `AbstractDoctrineExtension::getBundleMappingDriverDefaultConfig()`
+
 5.3
 ---
 

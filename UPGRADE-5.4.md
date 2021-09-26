@@ -1,6 +1,11 @@
 UPGRADE FROM 5.3 to 5.4
 =======================
 
+DoctrineBridge
+--------------
+
+* Deprecate `AbstractDoctrineExtension::getMappingDriverBundleConfigDefaults()` in favor of `AbstractDoctrineExtension::getBundleMappingDriverDefaultConfig()`
+
 Cache
 -----
 

@@ -31,6 +31,7 @@ use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
@@ -195,11 +196,7 @@ class ExceptionListener
     private function startAuthentication(Request $request, AuthenticationException $authException): Response
     {
         if (null === $this->authenticationEntryPoint) {
-            if (null !== $this->logger) {
-                $this->logger->notice(sprintf('No Authentication entry point configured, returning a %s HTTP response. Configure "entry_point" on the firewall "%s" if you want to modify the response.', Response::HTTP_UNAUTHORIZED, $this->firewallName));
-            }
-
-            throw new HttpException(Response::HTTP_UNAUTHORIZED, $authException->getMessage(), $authException, [], $authException->getCode());
+            $this->throwUnauthorizedException($authException);
         }
 
         if (null !== $this->logger) {
@@ -219,7 +216,11 @@ class ExceptionListener
             }
         }
 
-        $response = $this->authenticationEntryPoint->start($request, $authException);
+        try {
+            $response = $this->authenticationEntryPoint->start($request, $authException);
+        } catch (NotAnEntryPointException $e) {
+            $this->throwUnauthorizedException($authException);
+        }
 
         if (!$response instanceof Response) {
             $given = get_debug_type($response);
@@ -236,5 +237,14 @@ class ExceptionListener
         if ($request->hasSession() && $request->isMethodSafe() && !$request->isXmlHttpRequest()) {
             $this->saveTargetPath($request->getSession(), $this->firewallName, $request->getUri());
         }
+    }
+
+    private function throwUnauthorizedException(AuthenticationException $authException)
+    {
+        if (null !== $this->logger) {
+            $this->logger->notice(sprintf('No Authentication entry point configured, returning a %s HTTP response. Configure "entry_point" on the firewall "%s" if you want to modify the response.', Response::HTTP_UNAUTHORIZED, $this->firewallName));
+        }
+
+        throw new HttpException(Response::HTTP_UNAUTHORIZED, $authException->getMessage(), $authException, [], $authException->getCode());
     }
 }

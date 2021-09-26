@@ -29,7 +29,7 @@ trait FirewallAwareTrait
     {
         $serviceIdentifier = str_replace('FirewallAware', '', static::class);
         if (null === $request = $this->requestStack->getCurrentRequest()) {
-            throw new \LogicException('Cannot determine the correct '.$serviceIdentifier.' to use: there is no active Request and so, the firewall cannot be determined. Try using a specific '.$serviceIdentifier().' service.');
+            throw new \LogicException('Cannot determine the correct '.$serviceIdentifier.' to use: there is no active Request and so, the firewall cannot be determined. Try using a specific '.$serviceIdentifier.' service.');
         }
 
         $firewall = $this->firewallMap->getFirewallConfig($request);

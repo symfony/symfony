@@ -344,29 +344,28 @@ class AccessListenerTest extends TestCase
 
     public function testHandleWhenTheSecurityTokenStorageHasNoToken()
     {
-        $this->expectException(AuthenticationCredentialsNotFoundException::class);
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $tokenStorage
-            ->expects($this->any())
-            ->method('getToken')
-            ->willReturn(null)
-        ;
-
+        $this->expectException(AccessDeniedException::class);
+        $tokenStorage = new TokenStorage();
         $request = new Request();
 
         $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap
-            ->expects($this->any())
+        $accessMap->expects($this->any())
             ->method('getPatterns')
             ->with($this->equalTo($request))
             ->willReturn([['foo' => 'bar'], null])
         ;
 
+        $accessDecisionManager = $this->createMock(AccessDecisionManager::class);
+        $accessDecisionManager->expects($this->once())
+            ->method('getDecision')
+            ->with($this->isInstanceOf(NullToken::class))
+            ->willReturn(AccessDecision::createDenied());
+
         $listener = new AccessListener(
             $tokenStorage,
-            $this->createMock(AccessDecisionManager::class),
+            $accessDecisionManager,
             $accessMap,
-            true
+            false
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));

@@ -25,8 +25,8 @@ interface AccessDecisionManagerInterface
     /**
      * Decides whether the access is possible or not.
      *
-     * @param array  $attributes An array of attributes associated with the method being invoked
-     * @param object $object     The object to secure
+     * @param array $attributes An array of attributes associated with the method being invoked
+     * @param mixed $object     The object to secure
      *
      * @return bool
      *

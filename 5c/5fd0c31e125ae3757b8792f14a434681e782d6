@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-24T08:39:32Z
+
+<5 instead of <3? What about doDeleteYieldTags()?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-24T08:54:01Z
+
+> What about doDeleteYieldTags()?
+
+This new replication method is only required when the commands are non deterministic. It seems like the `doDeleteYieldTags()` script is deterministic. For completeness, I've started a redis:3 container locally and ran the `RedisTagAwareAdapterTest` integration tests with this container. They all passed with the changes in this PR.
+
+I've also updated the PR to handle any exception better. Currently, users get a PHP Error: "Cannot use object of type RedisException as array". After this PR, they'll get the actual redis exception.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-24T15:53:31Z
+
+For my understanding, when did you encounter `RedisException` being returned? Is that a dev-time only issue or can this happen in regular operations? I'm asking because the cache adapters are not supposed to fail when there is an issue.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-24T19:00:24Z
+
+We had this occur when invalidating caches in production.
+
+I'm not sure what would be the best way forward. If there is an error, nothing is invalidated. So simply logging the exception and retuning would probably not be correct either.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-24T21:10:52Z
+
+Do you know what the `RedisException` was about?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-25T10:12:38Z
+
+> Do you know what the RedisException was about?
+
+Yeah, it was about the error in the lua script that is fixed in this PR:
+
+> ERR Error running script (call to f_cea3ea3b59f1b3411febbbeb5f94de8a695cec73): @user_script:19: @user_script: 19: Write commands not allowed after non deterministic commands. Call redis.replicate_commands() at the start of your script in order to switch to single commands replication mode.
+
+So in theory, you will not get this exception. But I don't know anything about Redis, so I guess maybe there is something else in this script that breaks for e.g. Redis 4 or Redis 6 in the future?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-25T10:28:14Z
+
+Can we call `CacheItem::log` when we have the exception somehow?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-09-25T10:31:23Z
+
+> So in theory, you will not get this exception. But I don't know anything about Redis, so I guess maybe there is something else in this script that breaks for e.g. Redis 4 or Redis 6 in the future?
+
+method `SSCAN` is not deterministic (because `SETs` are unordered), that's why, in Redis 4, you have to tell Redis to replicate commands.
+
+more info https://redis.io/commands/eval#replicating-commands-instead-of-scripts and https://redis.io/commands/EVAL#scripts-with-deterministic-writes
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-25T11:09:09Z
+
+> Can we call `CacheItem::log` when we have the exception somehow?
+
+Oh, didn't know about this helper method. I've updated the PR with your suggestions: any exception is now logged and not thrown, and `doInvalidateTags()` nows returns `false` when there was an exception.

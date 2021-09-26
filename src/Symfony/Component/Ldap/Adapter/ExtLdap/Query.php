@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
+use LDAP\Connection as LDAPConnection;
+use LDAP\Result;
 use Symfony\Component\Ldap\Adapter\AbstractQuery;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Exception\LdapException;
@@ -25,7 +27,10 @@ class Query extends AbstractQuery
     // As of PHP 7.2, we can use LDAP_CONTROL_PAGEDRESULTS instead of this
     public const PAGINATION_OID = '1.2.840.113556.1.4.319';
 
-    /** @var resource[] */
+    /** @var Connection */
+    protected $connection;
+
+    /** @var resource[]|Result[] */
     private array $results;
 
     private array $serverctrls = [];
@@ -145,7 +150,7 @@ class Query extends AbstractQuery
      * Returns an LDAP search resource. If this query resulted in multiple searches, only the first
      * page will be returned.
      *
-     * @return resource|null
+     * @return resource|Result|null
      *
      * @internal
      */
@@ -157,7 +162,7 @@ class Query extends AbstractQuery
     /**
      * Returns all LDAP search resources.
      *
-     * @return resource[]
+     * @return resource[]|Result[]
      *
      * @internal
      */
@@ -199,6 +204,11 @@ class Query extends AbstractQuery
 
     /**
      * Sets LDAP pagination controls.
+<<<<<<< HEAD
+=======
+     *
+     * @param resource|LDAPConnection $con
+>>>>>>> 5.4
      */
     private function controlPagedResult(int $pageSize, bool $critical, string $cookie): bool
     {
@@ -219,8 +229,8 @@ class Query extends AbstractQuery
     /**
      * Retrieve LDAP pagination cookie.
      *
-     * @param resource $con
-     * @param resource $result
+     * @param resource|LDAPConnection $con
+     * @param resource|Result         $result
      */
     private function controlPagedResultResponse($con, $result): string
     {
@@ -232,9 +242,9 @@ class Query extends AbstractQuery
     /**
      * Calls actual LDAP search function with the prepared options and parameters.
      *
-     * @param resource $con
+     * @param resource|LDAPConnection $con
      *
-     * @return resource|false
+     * @return resource|Result|false
      */
     private function callSearchFunction($con, callable $func, int $sizeLimit)
     {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
+use LDAP\Connection as LDAPConnection;
 use Symfony\Component\Ldap\Adapter\AbstractConnection;
 use Symfony\Component\Ldap\Exception\AlreadyExistsException;
 use Symfony\Component\Ldap\Exception\ConnectionException;
@@ -31,7 +32,7 @@ class Connection extends AbstractConnection
 
     private bool $bound = false;
 
-    /** @var resource */
+    /** @var resource|LDAPConnection */
     private $connection;
 
     public function __sleep(): array
@@ -85,9 +86,7 @@ class Connection extends AbstractConnection
     }
 
     /**
-     * Returns a link resource.
-     *
-     * @return resource
+     * @return resource|LDAPConnection
      *
      * @internal
      */
@@ -161,7 +160,7 @@ class Connection extends AbstractConnection
 
     private function disconnect()
     {
-        if ($this->connection && \is_resource($this->connection)) {
+        if ($this->connection) {
             ldap_unbind($this->connection);
         }
 

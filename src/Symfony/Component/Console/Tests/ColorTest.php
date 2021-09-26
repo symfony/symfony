@@ -13,7 +13,6 @@ namespace Symfony\Component\Console\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Color;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class ColorTest extends TestCase
 {
@@ -43,9 +42,6 @@ class ColorTest extends TestCase
 
         $color = new Color('#ffffff', '#000000');
         $this->assertSame("\033[38;2;255;255;255;48;2;0;0;0m \033[39;49m", $color->apply(' '));
-
-        $color = new Color('rgb(255, 255, 255)', 'rgb(0, 0, 0)');
-        $this->assertSame("\033[38;2;255;255;255;48;2;0;0;0m \033[39;49m", $color->apply(' '));
     }
 
     public function testDegradedTrueColors()
@@ -62,33 +58,5 @@ class ColorTest extends TestCase
         } finally {
             putenv('COLORTERM='.$colorterm);
         }
-    }
-
-    /**
-     * @dataProvider provideMalformedRgbStrings
-     */
-    public function testMalformedRgbString(string $color, string $exceptionMessage)
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($exceptionMessage);
-
-        new Color($color);
-    }
-
-    public function provideMalformedRgbStrings(): \Generator
-    {
-        yield ['rgb()', 'Invalid RGB functional notation; should be of the form "rgb(r, g, b)", got "rgb()".'];
-
-        yield ['rgb(0, 0)', 'Invalid RGB functional notation; should be of the form "rgb(r, g, b)", got "rgb(0, 0)".'];
-
-        yield ['rgb(0, 0, 0, 0)', 'Invalid RGB functional notation; should be of the form "rgb(r, g, b)", got "rgb(0, 0, 0, 0)".'];
-
-        yield ['rgb(-1, 0, 0)', 'Invalid RGB functional notation; should be of the form "rgb(r, g, b)", got "rgb(-1, 0, 0)".'];
-
-        yield ['rgb(invalid, 0, 0)', 'Invalid RGB functional notation; should be of the form "rgb(r, g, b)", got "rgb(invalid, 0, 0)".'];
-
-        yield ['rgb(256, 0, 0)', 'Invalid color component; value should be between 0 and 255, got 256.'];
-
-        yield ['rgb(0, 0, 0', 'Invalid RGB functional notation; should be of the form "rgb(r, g, b)", got "rgb(0, 0, 0".'];
     }
 }

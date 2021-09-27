@@ -23,8 +23,7 @@ class AccessDeniedException extends RuntimeException
 {
     private $attributes = [];
     private $subject;
-    /** @var AccessDecision */
-    private $accessDecision;
+    private ?AccessDecision $accessDecision;
 
     public function __construct(string $message = 'Access Denied.', \Throwable $previous = null)
     {
@@ -44,7 +43,7 @@ class AccessDeniedException extends RuntimeException
      */
     public function setAttributes($attributes)
     {
-        $this->attributes = (array) $attributes;
+        $this->attributes = (array)$attributes;
     }
 
     /**
@@ -77,10 +76,15 @@ class AccessDeniedException extends RuntimeException
             return $vote->getMessage();
         }, $accessDecision->getDeniedVotes());
 
-        $this->message .= ' '.rtrim(' '.implode(' ', $messages));
+        $this->message .= ' ' . rtrim(' ' . implode(' ', $messages));
     }
 
-    public function getAccessDecision(): AccessDecision
+    /**
+     * Gets the access decision
+     *
+     * @return AccessDecision|null
+     */
+    public function getAccessDecision(): ?AccessDecision
     {
         return $this->accessDecision;
     }

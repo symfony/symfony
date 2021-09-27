@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by Th3Mouk at 2021-09-24T15:30:27Z
+
+Is anyone have an advice to resolve the parse error on prior php versions ?
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-09-25T11:15:34Z
+
+Hey!
+
+I think @BafS has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-25T11:22:11Z
+
+> Is anyone have an advice to resolve the parse error on prior php versions ?
+
+yes i guess, you need to move the class `Php80WithPromotedTypedConstructor` in a dedicated file

@@ -22,7 +22,7 @@ class TransportFactory implements TransportFactoryInterface
     private $factories;
 
     /**
-     * @param iterable|TransportFactoryInterface[] $factories
+     * @param iterable<mixed, TransportFactoryInterface> $factories
      */
     public function __construct(iterable $factories)
     {

@@ -242,7 +242,7 @@ class FrameworkExtension extends Extension
 
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);
 
-        if (class_exists(Application::class)) {
+        if ($this->hasConsole()) {
             $loader->load('console.php');
 
             if (!class_exists(BaseXliffLintCommand::class)) {
@@ -597,6 +597,11 @@ class FrameworkExtension extends Extension
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
         return new Configuration($container->getParameter('kernel.debug'));
+    }
+
+    protected function hasConsole(): bool
+    {
+        return class_exists(Application::class);
     }
 
     private function registerFormConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
@@ -2081,7 +2086,9 @@ class FrameworkExtension extends Extension
             throw new LogicException('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.');
         }
 
-        if (null === $config['reset_on_message']) {
+        if (!$container->hasDefinition('console.command.messenger_consume_messages')) {
+            $container->removeDefinition('messenger.listener.reset_services');
+        } elseif (null === $config['reset_on_message']) {
             trigger_deprecation('symfony/framework-bundle', '5.4', 'Not setting the "framework.messenger.reset_on_message" configuration option is deprecated, it will default to "true" in version 6.0.');
 
             $container->getDefinition('console.command.messenger_consume_messages')->replaceArgument(5, null);

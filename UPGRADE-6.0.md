@@ -157,6 +157,7 @@ Messenger
  * Removed the `prefetch_count` parameter in the AMQP bridge.
  * Removed the use of TLS option for Redis Bridge, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
  * The `delete_after_ack` config option of the Redis transport now defaults to `true`
+ * The `reset_on_message` config option now defaults to `true`
 
 Mime
 ----

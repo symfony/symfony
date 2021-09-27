@@ -422,11 +422,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // if a value is meant to be a string, float, int or a boolean value from the serialized representation.
             // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
             if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
-                if ('' === $data && $type->isNullable() && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true)) {
-                    return null;
+                if ('' === $data) {
+                    if (Type::BUILTIN_TYPE_ARRAY === $builtinType = $type->getBuiltinType()) {
+                        return [];
+                    }
+
+                    if ($type->isNullable() && \in_array($builtinType, [Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true)) {
+                        return null;
+                    }
                 }
 
-                switch ($type->getBuiltinType()) {
+                switch ($builtinType ?? $type->getBuiltinType()) {
                     case Type::BUILTIN_TYPE_BOOL:
                         // according to https://www.w3.org/TR/xmlschema-2/#boolean, valid representations are "false", "true", "0" and "1"
                         if ('false' === $data || '0' === $data) {

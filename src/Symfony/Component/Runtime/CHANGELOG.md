@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * The component is not experimental anymore
- * Add options "env_var_names" to `GenericRuntime` and `SymfonyRuntime`
+ * Add options "env_var_name" and "debug_var_name" to `GenericRuntime` and `SymfonyRuntime`
 
 5.3.0
 -----

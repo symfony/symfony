@@ -51,11 +51,15 @@ class GenericRuntime implements RuntimeInterface
      *   debug?: ?bool,
      *   runtimes?: ?array,
      *   error_handler?: string|false,
+     *   env_var_names?: ?array,
      * } $options
      */
     public function __construct(array $options = [])
     {
-        $debug = $options['debug'] ?? $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? true;
+        $options['env_var_names']['env_key'] ?? $options['env_var_names']['env_key'] = 'APP_ENV';
+        $debugKey = $options['env_var_names']['debug_key'] ?? $options['env_var_names']['debug_key'] = 'APP_DEBUG';
+
+        $debug = $options['debug'] ?? $_SERVER[$debugKey] ?? $_ENV[$debugKey] ?? true;
 
         if (!\is_bool($debug)) {
             $debug = filter_var($debug, \FILTER_VALIDATE_BOOLEAN);
@@ -63,14 +67,14 @@ class GenericRuntime implements RuntimeInterface
 
         if ($debug) {
             umask(0000);
-            $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '1';
+            $_SERVER[$debugKey] = $_ENV[$debugKey] = '1';
 
             if (false !== $errorHandler = ($options['error_handler'] ?? BasicErrorHandler::class)) {
                 $errorHandler::register($debug);
                 $options['error_handler'] = false;
             }
         } else {
-            $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0';
+            $_SERVER[$debugKey] = $_ENV[$debugKey] = '0';
         }
 
         $this->options = $options;
@@ -103,7 +107,7 @@ class GenericRuntime implements RuntimeInterface
             return $arguments;
         };
 
-        if ($_SERVER['APP_DEBUG']) {
+        if ($_SERVER[$this->options['env_var_names']['debug_key']]) {
             return new DebugClosureResolver($callable, $arguments);
         }
 
@@ -135,7 +139,7 @@ class GenericRuntime implements RuntimeInterface
             $application = \Closure::fromCallable($application);
         }
 
-        if ($_SERVER['APP_DEBUG'] && ($r = new \ReflectionFunction($application)) && $r->getNumberOfRequiredParameters()) {
+        if ($_SERVER[$this->options['env_var_names']['debug_key']] && ($r = new \ReflectionFunction($application)) && $r->getNumberOfRequiredParameters()) {
             throw new \ArgumentCountError(sprintf('Zero argument should be required by the runner callable, but at least one is in "%s" on line "%d.', $r->getFileName(), $r->getStartLine()));
         }
 

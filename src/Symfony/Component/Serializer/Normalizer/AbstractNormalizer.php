@@ -368,7 +368,16 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     }
 
                     // Don't run set for a parameter passed to the constructor
-                    $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
+                    try {
+                        $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
+                    } catch (NotNormalizableValueException $exception) {
+                        if (!isset($context['not_normalizable_value_exceptions'])) {
+                            throw $exception;
+                        }
+
+                        $context['not_normalizable_value_exceptions'][] = $exception;
+                        $params[] = $parameterData;
+                    }
                     unset($data[$key]);
                 } elseif (\array_key_exists($key, $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
                     $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];

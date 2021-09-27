@@ -209,7 +209,17 @@ class ConnectionTest extends TestCase
             ->willReturn(['queue' => [['message' => '{"body":"1","headers":[]}']]]);
 
         $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
-        $connection->get();
+        $message = $connection->get();
+
+        $this->assertSame([
+            'id' => 0,
+            'data' => [
+                'message' => json_encode([
+                    'body' => '1',
+                    'headers' => [],
+                ]),
+            ],
+        ], $message);
     }
 
     public function testClaimAbandonedMessageWithRaceCondition()

@@ -342,13 +342,13 @@ class Connection
                 }
 
                 foreach ($queuedMessages as $queuedMessage => $time) {
-                    $queuedMessage = json_decode($queuedMessage, true);
+                    $decodedQueuedMessage = json_decode($queuedMessage, true);
                     // if a futured placed message is actually popped because of a race condition with
                     // another running message consumer, the message is readded to the queue by add function
                     // else its just added stream and will be available for all stream consumers
                     $this->add(
-                        $queuedMessage['body'],
-                        $queuedMessage['headers'],
+                        \array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage,
+                        $decodedQueuedMessage['headers'] ?? [],
                         $time - $this->getCurrentTimeInMilliseconds()
                     );
                 }
@@ -392,12 +392,9 @@ class Connection
         }
 
         foreach ($messages[$this->stream] ?? [] as $key => $message) {
-            $redisEnvelope = json_decode($message['message'], true);
-
             return [
                 'id' => $key,
-                'body' => $redisEnvelope['body'],
-                'headers' => $redisEnvelope['headers'],
+                'data' => $message,
             ];
         }
 

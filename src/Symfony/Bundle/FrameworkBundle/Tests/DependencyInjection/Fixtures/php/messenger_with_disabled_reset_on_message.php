@@ -5,7 +5,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
 
 $container->loadFromExtension('framework', [
     'messenger' => [
-        'reset_on_message' =>  true,
+        'reset_on_message' =>  false,
         'routing' => [
             FooMessage::class => ['sender.bar', 'sender.biz'],
             BarMessage::class => 'sender.foo',

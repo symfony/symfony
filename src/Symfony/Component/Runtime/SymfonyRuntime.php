@@ -82,13 +82,14 @@ class SymfonyRuntime extends GenericRuntime
      *   use_putenv?: ?bool,
      *   runtimes?: ?array,
      *   error_handler?: string|false,
-     *   env_var_names?: ?array,
+     *   env_var_name?: string,
+     *   debug_var_name?: string,
      * } $options
      */
     public function __construct(array $options = [])
     {
-        $envKey = $options['env_var_names']['env_key'] ?? $options['env_var_names']['env_key'] = 'APP_ENV';
-        $debugKey = $options['env_var_names']['debug_key'] ?? $options['env_var_names']['debug_key'] = 'APP_DEBUG';
+        $envKey = $options['env_var_name'] ?? $options['env_var_name'] = 'APP_ENV';
+        $debugKey = $options['debug_var_name'] ?? $options['debug_var_name'] = 'APP_DEBUG';
 
         if (isset($options['env'])) {
             $_SERVER[$envKey] = $options['env'];
@@ -144,7 +145,7 @@ class SymfonyRuntime extends GenericRuntime
             }
 
             set_time_limit(0);
-            $defaultEnv = !isset($this->options['env']) ? ($_SERVER[$this->options['env_var_names']['env_key']] ?? 'dev') : null;
+            $defaultEnv = !isset($this->options['env']) ? ($_SERVER[$this->options['env_var_name']] ?? 'dev') : null;
             $output = $this->output ?? $this->output = new ConsoleOutput();
 
             return new ConsoleApplicationRunner($application, $defaultEnv, $this->getInput(), $output);
@@ -212,11 +213,11 @@ class SymfonyRuntime extends GenericRuntime
         }
 
         if (null !== $env = $input->getParameterOption(['--env', '-e'], null, true)) {
-            putenv($this->options['env_var_names']['env_key'].'='.$_SERVER[$this->options['env_var_names']['env_key']] = $_ENV[$this->options['env_var_names']['env_key']] = $env);
+            putenv($this->options['env_var_name'].'='.$_SERVER[$this->options['env_var_name']] = $_ENV[$this->options['env_var_name']] = $env);
         }
 
         if ($input->hasParameterOption('--no-debug', true)) {
-            putenv($this->options['env_var_names']['debug_key'].'='.$_SERVER[$this->options['env_var_names']['debug_key']] = $_ENV[$this->options['env_var_names']['debug_key']] = '0');
+            putenv($this->options['debug_var_name'].'='.$_SERVER[$this->options['debug_var_name']] = $_ENV[$this->options['debug_var_name']] = '0');
         }
 
         return $this->input = $input;

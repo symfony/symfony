@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-08T12:42:19Z
+
+Do you have a use case? If yes can you explain it? If not, better leave this as is IMHO.
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2021-06-08T12:57:11Z
+
+On many of our projects, clients want to redefine the names of variables or prefix them with the name of their application.
+It's always possible to create a custom runtime to work around this, but that requires a lot of override and I'm afraid that we lose the interest of the component.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-06-10T10:54:25Z
+
+This feature looks reasonable 👍  but I don't like much the names of these options --> "envKey" and "debugKey"  To me they sound like some secret key or token related to the environment of the application.
+
+Here's a proposal for your consideration:
+
+```php
+// Before
+$_SERVER['APP_RUNTIME_OPTIONS'] = [
+    'envKey' => 'ENV_MODE',
+    'debugKey' => 'DEBUG_MODE',
+];
+
+// After
+$_SERVER['APP_RUNTIME_OPTIONS'] = [
+    'envVarNames' => [
+        'env' => 'ENV_MODE',
+        'debug' => 'DEBUG_MODE',
+    ],
+];
+```
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2021-06-16T12:30:48Z
+
+@nicolas-grekas @javiereguiluz what do I do? Which modification do I apply?
+
+---------------------------------------------------------------------------
+
+by rosier at 2021-06-16T19:01:24Z
+
+My suggestion is mainly about using snake_case consistent. How about combining that with the proposal of @javiereguiluz  into:
+```
+$_SERVER['APP_RUNTIME_OPTIONS'] = [
+    'env_var_names' => [
+        'env' => 'ENV_MODE',
+        'debug' => 'DEBUG_MODE',
+    ],
+];
+```
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2021-07-02T08:02:15Z
+
+Status: Needs Review

@@ -1,0 +1,230 @@
+---------------------------------------------------------------------------
+
+by okwinza at 2021-09-22T11:53:13Z
+
+Waiting until the worker is completely done handling a message before actually resetting services sounds good to me. :+1:
+
+Things to keep in mind:
+- Services should only be reset after the worker is done with a message.
+- Services should not be reset more once between each message.
+
+As for the implementation part, this could also benefit from #42335 to easily check the worker transport name.
+So you could just do something like this:
+```php
+$event->getWorker()->getWorkerMetadata()->getTransportName() === $this->transportName;
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-22T14:56:56Z
+
+I just merged #42335. Can you rebase to use the new feature? Thanks
+
+And please, fix fabpot issue :)
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-24T10:46:37Z
+
+> ```
+> $event->getWorker()->getWorkerMetadata()->getTransportName() === $this->transportName;
+> ```
+
+@okwinza
+It won't work as expected because the `WorkerMetadata` has an array of transport names. The part of transports can be not resettable. We can either restrict using resettable and not resettable transports in the same worker or rely on the event's sequence. I'd prefer to use new metadata, and I think it will be good to restrict resetting services on a receiver when the different one doesn't expect that behavior.
+
+So it'll take a while to implement.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-24T12:01:37Z
+
+What about moving the ack before the dispatch ?
+
+Edit: this is a bad idea. But I think the best solution is to create a new event (same for nack)
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-24T20:59:15Z
+
+@lyrixx:
+> What about moving the ack before the dispatch ?
+>
+> Edit: this is a bad idea. But I think the best solution is to create a new event (same for nack)
+
+We have the event already. We have metadata, transport names, and other things.
+
+I've been investigating the topic more. I've realized that resetting services is a worker's job rather than a transport's because service leak is a consumer problem and isn't dependent on transport. And there aren't any consumers on the "sync" transport.
+
+In my opinion, the best alternative is resetting services after every message. The only drawback is decreasing performance, so we can provide an option to disable it. It also will break compatibility, so we should enable that option by default and add an inversed one.
+
+I consider removing the `reset_on_message` parameter from a configuration and adding two options to the `messenger:consume` command: `--reset-services-on-message` and `--no-reset-services-on-message`. It's also good to deprecate running the command without explicitly indicating which one to use and change defaults in 6.0.
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-24T23:52:26Z
+
+I've made a working draft as an example. If it's OK, I'll continue.
+
+---------------------------------------------------------------------------
+
+by okwinza at 2021-09-25T09:48:17Z
+
+> ```yaml
+> framework:
+>     messenger:
+>         reset_on_message: true # add a deprecation if not set
+>         transports: ....
+> ```
+Can't we just set it to `false` by default for BC and then change it to `true` and make it mandatory in 6.0?
+Also it might be useful to add a runtime `--no-reset` option to `messenger:consume` as well.
+WDYT?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-25T11:08:35Z
+
+> Can't we just set it to `false` by default for BC and then change it to `true` and make it mandatory in 6.0?
+
+it's not the best way to handle migration path.
+5.4: deprecation if not set, telling it'll be true in 6.0, default to false for BC
+6.0: default to true, no deprecation, optin
+
+> Also it might be useful to add a runtime `--no-reset` option to `messenger:consume` as well.
+
+do you have a use case for overriding the value? (less code == less bug)
+
+---------------------------------------------------------------------------
+
+by okwinza at 2021-09-25T12:59:55Z
+
+> 5.4: deprecation if not set, telling it'll be true in 6.0, default to false for BC
+> 6.0: default to true, no deprecation, optin
+
+:+1: Agreed.
+
+> > Also it might be useful to add a runtime `--no-reset` option to `messenger:consume` as well.
+>
+> do you have a use case for overriding the value? (less code == less bug)
+
+Since container resetting affects conformance, it **might** make sense to be able to override it for additional performance gain in some particular consumers.
+
+But this is just an idea and it's totally out of scope of this PR and should be added later down the road, if at all.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-25T13:50:01Z
+
+Okay let's go 👍 do you wanna to finish the pr ?
+
+Thanks for discussion 😊
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-25T15:52:28Z
+
+@lyrixx
+The only use case for disabling service resetting is to gain performance for specific consumers; therefore, the option should be in a consumer but not in configuration.
+
+> less code == less bug
+
+Absolutely! So we do not need a configuration option (in prospect). What we need are backward compatibility and migration strategy. Some users may use "service leak" as a side effect for their scenarios; however, it's a poor solution. So the decision we should make: how to migrate it.
+
+I think you are right about a deployment. A new plan:
+5.4:
+ - add the `messenger.reset_on_message` config with default `false`
+ - deprecate empty `messenger.reset_on_message` with hint about defaults
+ - add `--no-reset` (or `--no-reset-services` or `--no-reset-services-on-message` ?) option to `messenger:consume` command.
+
+6.0:
+ - change default of `messenger.reset_on_message` to `true`
+ - deprecate `messenger.reset_on_message` to remove it in 7.0
+
+@lyrixx @okwinza do you agree?
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-26T13:54:45Z
+
+I've realized that services **must not** be reset on idle. It's not optional because of counters and sequences that can be used. Possible memory leaks in transports should be fixed in transports.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-27T08:36:41Z
+
+> I've realized that services **must not** be reset on idle. It's not optional because of counters and sequences that can be used.
+
+What are you refering to?
+
+I think something is not clear here. you (@upyx and @okwinza) talks about performance penalty. Even if this **could** be true, this is not always the case. I'm not sure, but it looks like you think **all** symfony (and app) services will be **unset**. This is not the case. Service will be **reset**, it means the `ServicesResetter` service will take all services tagged `kernel.reset` and call `reset()` method on it. On the current application I'm working one (SF 5.3, APIP, Doctrine). There are 41 services impacted in dev.
+
+For reference:
+```
+ ---------------------------------------------------------- ---------------------- ----------------------------------------------------------------------------------------
+  Service ID                                                 method                 Class name
+ ---------------------------------------------------------- ---------------------- ----------------------------------------------------------------------------------------
+  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        reset                  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        reset                  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        reset                  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        reset                  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        reset                  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        reset                  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        reset                  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        reset                  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  Symfony\Bridge\Monolog\Processor\ConsoleCommandProcessor   reset                  Symfony\Bridge\Monolog\Processor\ConsoleCommandProcessor
+  Symfony\Component\Cache\Psr16Cache                         reset                  Symfony\Component\Cache\Psr16Cache
+  cache.app                                                  reset                  Symfony\Component\Cache\Adapter\FilesystemAdapter
+  cache.system                                               reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  cache.validator                                            reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  cache.serializer                                           reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  cache.annotations                                          reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  cache.property_info                                        reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  cache.messenger.restart_workers_signal                     reset                  Symfony\Component\Cache\Adapter\FilesystemAdapter
+  agent_rules.cache                                          reset                  Symfony\Component\Cache\Adapter\RedisAdapter
+  cache.array                                                reset                  Symfony\Component\Cache\Adapter\ArrayAdapter
+  doctrine.result_cache_pool                                 reset                  Symfony\Component\Cache\Adapter\FilesystemAdapter
+  doctrine.system_cache_pool                                 reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  form.choice_list_factory.cached                            reset                  Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator
+  messenger.transport.in_memory.factory                      reset                  Symfony\Component\Messenger\Transport\InMemoryTransportFactory
+  cache.validator_expression_language                        reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  debug.stopwatch                                            reset                  Symfony\Component\Stopwatch\Stopwatch
+  security.token_storage                                     disableUsageTracking   Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage
+   (same service as previous, another tag)                   setToken
+  cache.security_expression_language                         reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  monolog.handler.main                                       reset                  Monolog\Handler\FingersCrossedHandler
+  monolog.handler.console                                    reset                  Symfony\Bridge\Monolog\Handler\ConsoleHandler
+  webpack_encore.tag_renderer                                reset                  Symfony\WebpackEncoreBundle\Asset\TagRenderer
+  cache.webpack_encore                                       reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  webpack_encore.entrypoint_lookup[_default]                 reset                  Symfony\WebpackEncoreBundle\Asset\EntrypointLookup
+  doctrine                                                   reset                  Doctrine\Bundle\DoctrineBundle\Registry
+  form.type.entity                                           reset                  Symfony\Bridge\Doctrine\Form\Type\EntityType
+  cache.easyadmin                                            reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  api_platform.cache.route_name_resolver                     reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  api_platform.cache.identifiers_extractor                   reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  api_platform.cache.subresource_operation_factory           reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  api_platform.cache.metadata.resource                       reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+  api_platform.cache.metadata.property                       reset                  Symfony\Component\Cache\Adapter\AdapterInterface
+ ---------------------------------------------------------- ---------------------- ----------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-27T11:25:40Z
+
+@lyrixx
+I meant that what services do on reset. It can be a custom service that increases some counter on every message. For example, Monolog's `UidProcessor` generates random UID on every reset. I'm not too fond of randoms (because of collisions), so I'd like to store a sequence in APCu or Redis. It isn't a hot queue (5 messages per day), and I'd like to make numbers as short as possible, and the sequence is short. So forwarding sequence on idle would quickly lead to sequence overflow. It's a simplified example just for clarity. Performance isn't an issue when the queue is idle. We mustn't reset services on idle not because of the cost but because of side effects.
+
+I think it would be good to add documentation that describes what the "services resetting" is and what it is for, how to use the `kernel.reset` tag and the `ResetInterface`, where to enable `autoconfigure`, and where don't.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-27T12:16:44Z
+
+> so I'd like to store a sequence in APCu or Redis
+
+if the sequence is in APCu or Redis, it's safe.
+
+IMHO, store a state between 2 messages in PHP memory (so in a service) is a bad idea. It does not work when a worker restart or when there are many worker.
+
+So this is not a valid use case since it's harmful.
+
+The plan you propose in [this comment](https://github.com/symfony/symfony/pull/43133#issuecomment-927140162) is really good. Let's stick to it.

@@ -7,11 +7,11 @@ DSN example
 -----------
 
 ```
-SMS//_DSN=sms77://APIKEY@default?from=FROM
+SMS77_DSN=sms77://API_KEY@default?from=FROM
 ```
 
 where:
- - `APIKEY` is your sms77 API key
+ - `API_KEY` is your sms77 API key
  - `FROM` is your sender (optional, default: SMS)
 
 Resources

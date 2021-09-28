@@ -25,7 +25,6 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
 class ChainEncoder implements ContextAwareEncoderInterface
 {
     protected $encoders = [];
-    protected $encoderByFormat = [];
 
     public function __construct(array $encoders = [])
     {
@@ -77,18 +76,10 @@ class ChainEncoder implements ContextAwareEncoderInterface
      *
      * @throws RuntimeException if no encoder is found
      */
-    private function getEncoder(string $format, array $context): EncoderInterface
+    public function getEncoder(string $format, array $context): EncoderInterface
     {
-        if (isset($this->encoderByFormat[$format])
-            && isset($this->encoders[$this->encoderByFormat[$format]])
-        ) {
-            return $this->encoders[$this->encoderByFormat[$format]];
-        }
-
         foreach ($this->encoders as $i => $encoder) {
             if ($encoder->supportsEncoding($format, $context)) {
-                $this->encoderByFormat[$format] = $i;
-
                 return $encoder;
             }
         }

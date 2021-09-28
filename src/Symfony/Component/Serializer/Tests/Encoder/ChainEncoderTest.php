@@ -37,6 +37,7 @@ class ChainEncoderTest extends TestCase
                 [self::FORMAT_2, [], false],
                 [self::FORMAT_3, [], false],
                 [self::FORMAT_3, ['foo' => 'bar'], true],
+                [self::FORMAT_3, ['foo' => 'bar2'], false],
             ]);
 
         $this->encoder2 = $this->createMock(EncoderInterface::class);
@@ -46,6 +47,8 @@ class ChainEncoderTest extends TestCase
                 [self::FORMAT_1, [], false],
                 [self::FORMAT_2, [], true],
                 [self::FORMAT_3, [], false],
+                [self::FORMAT_3, ['foo' => 'bar'], false],
+                [self::FORMAT_3, ['foo' => 'bar2'], true],
             ]);
 
         $this->chainEncoder = new ChainEncoder([$this->encoder1, $this->encoder2]);
@@ -54,9 +57,18 @@ class ChainEncoderTest extends TestCase
     public function testSupportsEncoding()
     {
         $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_1));
+        $this->assertSame($this->encoder1, $this->chainEncoder->getEncoder(self::FORMAT_1, []));
+
         $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_2));
+        $this->assertSame($this->encoder2, $this->chainEncoder->getEncoder(self::FORMAT_2, []));
+
         $this->assertFalse($this->chainEncoder->supportsEncoding(self::FORMAT_3));
+
         $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar']));
+        $this->assertSame($this->encoder1, $this->chainEncoder->getEncoder(self::FORMAT_3, ['foo' => 'bar']));
+
+        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar2']));
+        $this->assertSame($this->encoder2, $this->chainEncoder->getEncoder(self::FORMAT_3, ['foo' => 'bar2']));
     }
 
     public function testEncode()

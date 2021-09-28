@@ -7,6 +7,10 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.32 (2021-09-28)
+
+ * Fix subtree split issues
+
 * 4.4.31 (2021-09-28)
 
  * bug #43158 [Cache] Fix invalidating tags on Redis <5 (wouterj)

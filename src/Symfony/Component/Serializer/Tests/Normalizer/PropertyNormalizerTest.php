@@ -115,10 +115,11 @@ class PropertyNormalizerTest extends TestCase
         $group->setBaz('baz');
         $group->setFoo('foo');
         $group->setBar('bar');
+        $group->setQuux('quux');
         $group->setKevin('Kevin');
         $group->setCoopTilleuls('coop');
         $this->assertEquals(
-            ['foo' => 'foo', 'bar' => 'bar', 'kevin' => 'Kevin', 'coopTilleuls' => 'coop', 'fooBar' => null, 'symfony' => null, 'baz' => 'baz'],
+            ['foo' => 'foo', 'bar' => 'bar', 'quux' => 'quux', 'kevin' => 'Kevin', 'coopTilleuls' => 'coop', 'fooBar' => null, 'symfony' => null, 'baz' => 'baz'],
             $this->normalizer->normalize($group, 'any')
         );
     }

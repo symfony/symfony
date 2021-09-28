@@ -40,7 +40,7 @@ final class Sms77TransportFactoryTest extends TransportFactoryTestCase
 
     public function incompleteDsnProvider(): iterable
     {
-        yield 'missing auth token' => ['sms77://host?from=TEST'];
+        yield 'missing api key' => ['sms77://host?from=TEST'];
     }
 
     public function supportsProvider(): iterable

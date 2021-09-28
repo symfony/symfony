@@ -9,7 +9,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 4.4.32 (2021-09-28)
 
- * 
+ * Fix subtree split issues
 
 * 4.4.31 (2021-09-28)
 

@@ -101,8 +101,6 @@ final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceS
         }
 
         if (!$this->container->get('request_stack')->getMainRequest()) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Using "%s" (service ID: "security.token_storage") outside the request-response cycle is deprecated, use the "%s" class (service ID: "security.untracked_token_storage") instead or disable usage tracking using "disableUsageTracking()".', __CLASS__, TokenStorage::class);
-
             return false;
         }
 

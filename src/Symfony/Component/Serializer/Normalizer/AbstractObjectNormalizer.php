@@ -449,11 +449,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         $expectedTypes = [];
         foreach ($types as $type) {
-            if (null === $data && $type->isNullable()) {
+            if (null === $data && $isNullable = $type->isNullable()) {
                 return null;
             }
 
-            $collectionValueType = $type->isCollection() ? $type->getCollectionValueTypes()[0] ?? null : null;
+            $isCollection = $type->isCollection();
+            $collectionValueType = $isCollection ? ($collectionValueTypes = $type->getCollectionValueTypes())[0] ?? null : null;
 
             // Fix a collection that contains the only one element
             // This is special to xml format only
@@ -465,11 +466,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // if a value is meant to be a string, float, int or a boolean value from the serialized representation.
             // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
             if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
-                if ('' === $data && $type->isNullable() && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true)) {
+                if (
+                    '' === $data &&
+                    ($isNullable ?? $type->isNullable()) &&
+                    ($builtinType = $type->getBuiltinType()) &&
+                    (Type::BUILTIN_TYPE_BOOL === $builtinType || Type::BUILTIN_TYPE_INT === $builtinType || Type::BUILTIN_TYPE_FLOAT === $builtinType)
+                ) {
                     return null;
                 }
 
-                switch ($type->getBuiltinType()) {
+                switch ($builtinType ?? $type->getBuiltinType()) {
                     case Type::BUILTIN_TYPE_BOOL:
                         // according to https://www.w3.org/TR/xmlschema-2/#boolean, valid representations are "false", "true", "0" and "1"
                         if ('false' === $data || '0' === $data) {
@@ -481,7 +487,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         }
                         break;
                     case Type::BUILTIN_TYPE_INT:
-                        if (ctype_digit($data) || '-' === $data[0] && ctype_digit(substr($data, 1))) {
+                        if (ctype_digit($data) || ('-' === $data[0] && ctype_digit(substr($data, 1)))) {
                             $data = (int) $data;
                         } else {
                             throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_INT], $context['deserialization_path'] ?? null);
@@ -502,8 +508,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             default:
                                 throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_FLOAT], $context['deserialization_path'] ?? null);
                         }
-
-                        break;
                 }
             }
 
@@ -514,15 +518,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 if (\count($collectionKeyType = $type->getCollectionKeyTypes()) > 0) {
                     [$context['key_type']] = $collectionKeyType;
                 }
-            } elseif ($type->isCollection() && \count($collectionValueType = $type->getCollectionValueTypes()) > 0 && Type::BUILTIN_TYPE_ARRAY === $collectionValueType[0]->getBuiltinType()) {
+            } elseif (
+                $isCollection &&
+                \count($collectionValueTypes = $collectionValueTypes ?? $type->getCollectionValueTypes()) > 0 &&
+                Type::BUILTIN_TYPE_ARRAY === $collectionValueTypes[0]->getBuiltinType()
+            ) {
                 // get inner type for any nested array
-                [$innerType] = $collectionValueType;
+                [$innerType] = $collectionValueTypes;
 
                 // note that it will break for any other builtinType
                 $dimensions = '[]';
-                while (\count($innerType->getCollectionValueTypes()) > 0 && Type::BUILTIN_TYPE_ARRAY === $innerType->getBuiltinType()) {
+                while (\count($innerCollectionValueTypes = $innerType->getCollectionValueTypes()) > 0 && Type::BUILTIN_TYPE_ARRAY === $innerType->getBuiltinType()) {
                     $dimensions .= '[]';
-                    [$innerType] = $innerType->getCollectionValueTypes();
+                    [$innerType] = $innerCollectionValueTypes;
                 }
 
                 if (null !== $innerType->getClassName()) {

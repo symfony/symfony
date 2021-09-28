@@ -344,15 +344,6 @@
         <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 
-    <xsd:simpleType name="audit_trail_enabled">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="true" />
-            <xsd:enumeration value="false" />
-            <xsd:enumeration value="1" />
-            <xsd:enumeration value="0" />
-        </xsd:restriction>
-    </xsd:simpleType>
-
     <xsd:complexType name="marking_store">
         <xsd:sequence>
             <xsd:element name="argument" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />

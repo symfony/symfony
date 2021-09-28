@@ -7,6 +7,27 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.31 (2021-09-28)
+
+ * bug #43158 [Cache] Fix invalidating tags on Redis <5 (wouterj)
+ * bug #43179 [Ldap] Fix `resource` type checks & docblocks on PHP 8.1 (chalasr)
+ * bug #43137 [FrameworkBundle] Avoid secrets:decrypt-to-local command to fail (noniagriconomie)
+ * bug #43171 [VarDumper] fix dumping typed references from properties (nicolas-grekas)
+ * bug #43124 [Messenger] [Redis] Allow authentication with user and password (GaryPEGEOT)
+ * bug #39350 [FrameworkBundle] Remove translation data_collector BEFORE adding it to profiler (l-vo)
+ * bug #43115 [DependencyInjection] Fix iterator in ServiceConfigurator (jderusse)
+ * bug #43031 [Form] Do not trim unassigned unicode characters (simonberger)
+ * bug #43058 [WebProfilerBundle] Fix displaying certain configs (HypeMC)
+ * bug #43022 [PhpUnitBridge] Track unsilenced deprecations only for userland (nicolas-grekas)
+ * bug #42976 [Mime] Allow array as input for RawMessage (derrabus)
+ * bug #42098 [PropertyInfo] Support for intersection types (derrabus)
+ * bug #42904 [Cache] Make sure PdoAdapter::prune() always returns a bool (derrabus)
+ * bug #42896 [HttpClient] Fix handling timeouts when responses are destructed (nicolas-grekas)
+ * bug #42835 [Cache] Fix implicit float to int cast (derrabus)
+ * bug #42831 [Mime] Update mime types (fabpot)
+ * bug #42830 [HttpKernel] Fix empty timeline in profiler (nicodmf)
+ * bug #42819 Fix tests failing with DBAL 3 (derrabus)
+
 * 4.4.30 (2021-08-30)
 
  * bug #42753 Cast ini_get to an integer to match expected type (natewiebe13)

@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-07-26T08:57:23Z
+
+@Nyholm yeah, I agree with @derrabus comment. That's why I did not change the current Symfony behavior.
+
+But now, everything is configurable, that's what many people want.
+
+About a solution in pure PHP to decide or not... I'm not really convinced. The solution I propose fit my needs and is simple to use. Do you have real use case where it does not fit and you would need PHP to configure it?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-01T09:44:37Z
+
+@Nyholm I have fixed your comments, thanks.
+
+I think the PR is ready now
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-22T08:47:02Z
+
+Hello @symfony/mergers
+
+The initial issue got 8 👍🏼, 4 ❤️  and, this PR got 5 ❤️ and @dunglas commented "A big +1 on my side." on the issue.
+
+So without feedback, I'm planning to merge this PR by the end of the month, before the feature freeze.
+If you are against it, it's time to raise your voice :)

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-28T20:33:22Z
+
+Btw, we can also once again reword the deprecation message to fit the standard set by all other deprecation messages. I'm all ears for suggestions :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-09-29T10:51:29Z
+
+Isn't it something for 5.3?

@@ -124,7 +124,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function serialize($data, string $format, array $context = []): string
+    final public function serialize($data, string $format, array $context = [])
     {
         if (!$this->supportsEncoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Serialization for the format "%s" is not supported.', $format));

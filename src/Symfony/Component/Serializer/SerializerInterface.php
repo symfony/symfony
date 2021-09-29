@@ -23,7 +23,7 @@ interface SerializerInterface
      * @param string $format  Format name
      * @param array  $context Options normalizers/encoders have access to
      *
-     * @return string
+     * @return string|array
      */
     public function serialize($data, string $format, array $context = []);
 

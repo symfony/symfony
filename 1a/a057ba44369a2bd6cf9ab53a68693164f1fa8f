@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-29T12:08:09Z
+
+For 5.4 please as this is not a bugfix strictly speaking. (We decided to be more strict on this topic)
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-09-29T12:21:22Z
+
+@nicolas-grekas done. Not sure whats wrong with the pipeline.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-29T12:26:24Z
+
+You may need to force-push again since you changed the base branch.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-09-29T12:28:38Z
+
+@chalasr  Thanks 👍

@@ -45,6 +45,7 @@ Messenger
 
  * Deprecate not setting the `delete_after_ack` config option (or DSN parameter) using the Redis transport,
    its default value will change to `true` in 6.0
+ * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
 
 SecurityBundle
 --------------

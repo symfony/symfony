@@ -746,6 +746,25 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('messenger.listener.reset_services', (string) $container->getDefinition('console.command.messenger_consume_messages')->getArgument(5));
     }
 
+    public function testMessengerWithoutConsole()
+    {
+        $extension = $this->createPartialMock(FrameworkExtension::class, ['hasConsole', 'getAlias']);
+        $extension->method('hasConsole')->willReturn(false);
+        $extension->method('getAlias')->willReturn((new FrameworkExtension())->getAlias());
+
+        $container = $this->createContainerFromFile('messenger', [], true, false, $extension);
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('console.command.messenger_consume_messages'));
+        $this->assertTrue($container->hasAlias('messenger.default_bus'));
+        $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
+        $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
+        $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
+        $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
+        $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
+        $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
+    }
+
     public function testMessengerMultipleFailureTransports()
     {
         $container = $this->createContainerFromFile('messenger_multiple_failure_transports');
@@ -1960,14 +1979,14 @@ abstract class FrameworkExtensionTest extends TestCase
         ], $data)));
     }
 
-    protected function createContainerFromFile($file, $data = [], $resetCompilerPasses = true, $compile = true)
+    protected function createContainerFromFile($file, $data = [], $resetCompilerPasses = true, $compile = true, FrameworkExtension $extension = null)
     {
         $cacheKey = md5(static::class.$file.serialize($data));
         if ($compile && isset(self::$containerCache[$cacheKey])) {
             return self::$containerCache[$cacheKey];
         }
         $container = $this->createContainer($data);
-        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension($extension ?: new FrameworkExtension());
         $this->loadFromFile($container, $file);
 
         if ($resetCompilerPasses) {

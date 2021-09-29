@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-09-27T19:07:14Z
+
+can you fix fabbot issue?
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-27T19:08:11Z
+
+I've added a test for messenger without console. I wrapped `class_exists()` call to protected `hasConsole()`, and mock it in tests.
+I've touched pretty old code, and we should be careful before merge it.
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-28T14:36:21Z
+
+@lyrixx :wave:  I'd love to finish the work which we started :) Could you check it, please?

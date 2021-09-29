@@ -26,7 +26,7 @@ final class SerializerRuntime implements RuntimeExtensionInterface
         $this->serializer = $serializer;
     }
 
-    public function serialize($data, string $format = 'json', array $context = []): string
+    public function serialize($data, string $format = 'json', array $context = [])
     {
         return $this->serializer->serialize($data, $format, $context);
     }

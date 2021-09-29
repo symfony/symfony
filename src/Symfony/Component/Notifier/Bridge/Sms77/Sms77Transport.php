@@ -88,12 +88,12 @@ final class Sms77Transport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        if (false === in_array($success['success'], [100, 101])) {
+        if (false === \in_array($success['success'], [100, 101])) {
             throw new TransportException(sprintf('Unable to send the SMS: "%s".', $success['success']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);
-        $sentMessage->setMessageId((int)$success['messages'][0]['id']);
+        $sentMessage->setMessageId((int) $success['messages'][0]['id']);
 
         return $sentMessage;
     }

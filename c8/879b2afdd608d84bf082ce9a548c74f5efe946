@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-09-28T09:55:46Z
+
+@nicolas-grekas what about my suggestion in https://github.com/symfony/symfony/issues/37666#issuecomment-781357024 ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-28T09:59:54Z
+
+Here are some examples if we concat both messages:
+
+- "Couldn't resolve host name: Could not resolve host: bad.host.test for "http://bad.host.test/"."
+- "Transferred a partial file: transfer closed with 718 bytes remaining to read for "http://localhost:8057/length-broken"."
+- "Transferred a partial file: transfer closed with outstanding read data remaining for "http://localhost:8057/chunked-broken"."
+- "Couldn't resolve host name: Could not resolve host: foo.example. for "http://foo.example./"."
+- "Couldn't resolve host name: Could not resolve host: foo.example. for "http://foo.example./"."
+- "Operation was aborted by an application callback: Callback aborted for "http://localhost:8057/timeout-body"."
+- "Operation was aborted by an application callback: Callback aborted for "http://localhost:8057/timeout-body"."
+- "Timeout was reached: Operation timed out after 100 milliseconds with 462 bytes received for "http://localhost:8057/max-duration"."
+
+That's why I didn't do it here as it looks like this would put duplicates in the message...

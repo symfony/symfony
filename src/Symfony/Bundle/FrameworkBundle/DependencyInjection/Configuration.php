@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
+use Psr\Log\LogLevel;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -139,6 +140,7 @@ class Configuration implements ConfigurationInterface
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
         $this->addCacheSection($rootNode, $willBeAvailable);
         $this->addPhpErrorsSection($rootNode);
+        $this->addExceptionsSection($rootNode);
         $this->addWebLinkSection($rootNode, $enableIfStandalone);
         $this->addLockSection($rootNode, $enableIfStandalone);
         $this->addMessengerSection($rootNode, $enableIfStandalone);
@@ -1156,6 +1158,64 @@ class Configuration implements ConfigurationInterface
                             ->info('Throw PHP errors as \ErrorException instances.')
                             ->defaultValue($this->debug)
                             ->treatNullLike($this->debug)
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addExceptionsSection(ArrayNodeDefinition $rootNode)
+    {
+        $logLevels = (new \ReflectionClass(LogLevel::class))->getConstants();
+
+        $rootNode
+            ->children()
+                ->arrayNode('exceptions')
+                    ->info('Exception handling configuration')
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(function (array $v): array {
+                            if (!\array_key_exists('exception', $v)) {
+                                return $v;
+                            }
+
+                            // Fix XML normalization
+                            $data = isset($v['exception'][0]) ? $v['exception'] : [$v['exception']];
+                            $exceptions = [];
+                            foreach ($data as $exception) {
+                                $config = [];
+                                if (\array_key_exists('log-level', $exception)) {
+                                    $config['log_level'] = $exception['log-level'];
+                                }
+                                if (\array_key_exists('status-code', $exception)) {
+                                    $config['status_code'] = $exception['status-code'];
+                                }
+                                $exceptions[$exception['name']] = $config;
+                            }
+
+                            return $exceptions;
+                        })
+                    ->end()
+                    ->prototype('array')
+                        ->fixXmlConfig('exception')
+                        ->children()
+                            ->scalarNode('log_level')
+                                ->info('The level of log message. Null to let Symfony decide.')
+                                ->validate()
+                                    ->ifTrue(function ($v) use ($logLevels) { return !\in_array($v, $logLevels); })
+                                    ->thenInvalid(sprintf('The log level is not valid. Pick one among "%s".', implode('", "', $logLevels)))
+                                ->end()
+                                ->defaultNull()
+                            ->end()
+                            ->scalarNode('status_code')
+                                ->info('The status code of the response. Null to let Symfony decide.')
+                                ->validate()
+                                    ->ifTrue(function ($v) { return !\in_array($v, range(100, 499)); })
+                                    ->thenInvalid('The log level is not valid. Pick one among between 100 et 599.')
+                                ->end()
+                                ->defaultNull()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

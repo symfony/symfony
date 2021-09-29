@@ -521,6 +521,18 @@ abstract class FrameworkExtensionTest extends TestCase
         ], $definition->getArgument(2));
     }
 
+    public function testExceptionsConfig()
+    {
+        $container = $this->createContainerFromFile('exceptions');
+
+        $this->assertSame([
+            \Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class => [
+                'log_level' => 'info',
+                'status_code' => 422,
+            ],
+        ], $container->getDefinition('exception_listener')->getArgument(3));
+    }
+
     public function testRouter()
     {
         $container = $this->createContainerFromFile('full');

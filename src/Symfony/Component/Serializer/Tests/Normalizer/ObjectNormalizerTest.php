@@ -166,6 +166,19 @@ class ObjectNormalizerTest extends TestCase
         $this->assertTrue($obj->isBaz());
     }
 
+    public function testDenormalizeEmptyXmlArray()
+    {
+        $normalizer = $this->getDenormalizerForObjectToPopulate();
+        $obj = $normalizer->denormalize(
+            ['bar' => ''],
+            ObjectDummy::class,
+            'xml'
+        );
+
+        $this->assertIsArray($obj->bar);
+        $this->assertEmpty($obj->bar);
+    }
+
     public function testDenormalizeWithObject()
     {
         $data = new \stdClass();

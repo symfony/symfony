@@ -5,6 +5,9 @@ namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 class ObjectDummy
 {
     protected $foo;
+    /**
+     * @var array
+     */
     public $bar;
     private $baz;
     protected $camelCase;

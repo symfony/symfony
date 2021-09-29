@@ -7,6 +7,42 @@ in 5.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.3.0...v5.3.1
 
+* 5.3.9 (2021-09-28)
+
+ * Fix subtree split issue
+
+* 5.3.8 (2021-09-28)
+
+ * bug #43206 [Workflow] Add missing audit-trail settings in framework workflow con… (Stephan Wentz)
+ * bug #42354 [Ldap][Security] Make LdapAuthenticator an EntryPoint (dcp-dev, chalasr)
+ * bug #43146 [SecurityBundle] Fixed LogicException message of FirewallAwareTrait (fkropfhamer)
+ * bug #43158 [Cache] Fix invalidating tags on Redis <5 (wouterj)
+ * bug #43179 [Ldap] Fix `resource` type checks & docblocks on PHP 8.1 (chalasr)
+ * bug #43174 [Messenger] relax parameter type (xabbuh)
+ * bug #43137 [FrameworkBundle] Avoid secrets:decrypt-to-local command to fail (noniagriconomie)
+ * bug #43171 [VarDumper] fix dumping typed references from properties (nicolas-grekas)
+ * bug #43124 [Messenger] [Redis] Allow authentication with user and password (GaryPEGEOT)
+ * bug #39350 [FrameworkBundle] Remove translation data_collector BEFORE adding it to profiler (l-vo)
+ * bug #43115 [DependencyInjection] Fix iterator in ServiceConfigurator (jderusse)
+ * bug #43073 [Notifier] Update FirebaseTransport.php (dima-gr)
+ * bug #43031 [Form] Do not trim unassigned unicode characters (simonberger)
+ * bug #43058 [WebProfilerBundle] Fix displaying certain configs (HypeMC)
+ * bug #43022 [PhpUnitBridge] Track unsilenced deprecations only for userland (nicolas-grekas)
+ * bug #42979 [FrameworkBundle] fix session-related BC layer triggering deprecation (nicolas-grekas)
+ * bug #42672 [PropertyAccess] Fix Regression in PropertyAccessor::isWritable()  (haase-fabian)
+ * bug #42976 [Mime] Allow array as input for RawMessage (derrabus)
+ * bug #42932 [Messenger] Support rediss in transport bridge (RuslanZavacky)
+ * bug #42771 [FrameworkBundle] Match 5.3 and 5.1 mailer configuration (wizardz)
+ * bug #42098 [PropertyInfo] Support for intersection types (derrabus)
+ * bug #42904 [Cache] Make sure PdoAdapter::prune() always returns a bool (derrabus)
+ * bug #42896 [HttpClient] Fix handling timeouts when responses are destructed (nicolas-grekas)
+ * bug #42862 [Framework] Clean "about" command help after Environment section was removed (GromNaN)
+ * bug #42835 [Cache] Fix implicit float to int cast (derrabus)
+ * bug #42831 [Mime] Update mime types (fabpot)
+ * bug #42830 [HttpKernel] Fix empty timeline in profiler (nicodmf)
+ * bug #42815 [DependencyInjection] Fix circular reference in autowired decorators (shyim)
+ * bug #42819 Fix tests failing with DBAL 3 (derrabus)
+
 * 5.3.7 (2021-08-30)
 
  * bug #42769 [HttpClient] Don't pass float to `usleep()` (derrabus)

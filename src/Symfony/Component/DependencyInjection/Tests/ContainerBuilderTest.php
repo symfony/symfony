@@ -1753,6 +1753,18 @@ class ContainerBuilderTest extends TestCase
 
         $this->addToAssertionCount(1);
     }
+
+    public function testFindTags()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register(A::class)
+            ->addTag('tag1')
+            ->addTag('tag2')
+            ->addTag('tag3');
+
+        $this->assertSame(['tag1', 'tag2', 'tag3'], $container->findTags());
+    }
 }
 
 class FooClass

@@ -1262,15 +1262,13 @@ class Configuration implements ConfigurationInterface
                                 ->then(function ($v) {
                                     $resources = [];
                                     foreach ($v as $resource) {
-                                        $resources = array_merge_recursive(
-                                            $resources,
-                                            \is_array($resource) && isset($resource['name'])
-                                                ? [$resource['name'] => $resource['value']]
-                                                : ['default' => $resource]
-                                        );
+                                        $resources[] = \is_array($resource) && isset($resource['name'])
+                                            ? [$resource['name'] => $resource['value']]
+                                            : ['default' => $resource]
+                                        ;
                                     }
 
-                                    return $resources;
+                                    return array_merge_recursive([], ...$resources);
                                 })
                             ->end()
                             ->prototype('array')

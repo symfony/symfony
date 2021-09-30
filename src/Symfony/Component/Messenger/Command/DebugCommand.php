@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,11 +24,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
+#[AsCommand(name: 'debug:messenger', description: 'List messages you can dispatch using the message buses')]
 class DebugCommand extends Command
 {
-    protected static $defaultName = 'debug:messenger';
-    protected static $defaultDescription = 'List messages you can dispatch using the message buses';
-
     private $mapping;
 
     public function __construct(array $mapping)
@@ -44,7 +43,6 @@ class DebugCommand extends Command
     {
         $this
             ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of "%s")', implode('", "', array_keys($this->mapping))))
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all messages that can be
 dispatched using the message buses:

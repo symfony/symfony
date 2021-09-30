@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Command;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,11 +27,9 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 /**
  * @author Timo Bakx <timobakx@gmail.com>
  */
+#[AsCommand(name: 'debug:firewall', description: 'Display information about your security firewall(s)')]
 final class DebugFirewallCommand extends Command
 {
-    protected static $defaultName = 'debug:firewall';
-    protected static $defaultDescription = 'Display information about your security firewall(s)';
-
     private $firewallNames;
     private $contexts;
     private $eventDispatchers;
@@ -55,7 +54,6 @@ final class DebugFirewallCommand extends Command
         $exampleName = $this->getExampleName();
 
         $this
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command displays the firewalls that are configured
 in your application:

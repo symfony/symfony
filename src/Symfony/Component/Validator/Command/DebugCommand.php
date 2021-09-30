@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Helper\Table;
@@ -30,11 +31,9 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
  *
  * @author Loïc Frémont <lc.fremont@gmail.com>
  */
+#[AsCommand(name: 'debug:validator', description: 'Display validation constraints for classes')]
 class DebugCommand extends Command
 {
-    protected static $defaultName = 'debug:validator';
-    protected static $defaultDescription = 'Display validation constraints for classes';
-
     private MetadataFactoryInterface $validator;
 
     public function __construct(MetadataFactoryInterface $validator)
@@ -49,7 +48,6 @@ class DebugCommand extends Command
         $this
             ->addArgument('class', InputArgument::REQUIRED, 'A fully qualified class name or a path')
             ->addOption('show-all', null, InputOption::VALUE_NONE, 'Show all classes even if they have no validation constraints')
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name% 'App\Entity\Dummy'</info> command dumps the validators for the dummy class.
 

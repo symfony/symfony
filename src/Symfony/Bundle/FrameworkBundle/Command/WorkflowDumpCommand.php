@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,11 +29,9 @@ use Symfony\Component\Workflow\Marking;
  *
  * @final
  */
+#[AsCommand(name: 'workflow:dump', description: 'Dump a workflow')]
 class WorkflowDumpCommand extends Command
 {
-    protected static $defaultName = 'workflow:dump';
-    protected static $defaultDescription = 'Dump a workflow';
-
     /**
      * {@inheritdoc}
      */
@@ -45,7 +44,6 @@ class WorkflowDumpCommand extends Command
                 new InputOption('label', 'l', InputOption::VALUE_REQUIRED, 'Label a graph'),
                 new InputOption('dump-format', null, InputOption::VALUE_REQUIRED, 'The dump format [dot|puml]', 'dot'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the graphical representation of a
 workflow in different formats

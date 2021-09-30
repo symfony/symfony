@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -33,14 +34,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @final
  */
+#[AsCommand(name: 'assets:install', description: 'Install bundle\'s web assets under a public directory')]
 class AssetsInstallCommand extends Command
 {
     public const METHOD_COPY = 'copy';
     public const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
     public const METHOD_RELATIVE_SYMLINK = 'relative symlink';
-
-    protected static $defaultName = 'assets:install';
-    protected static $defaultDescription = 'Install bundle\'s web assets under a public directory';
 
     private $filesystem;
     private $projectDir;
@@ -65,7 +64,6 @@ class AssetsInstallCommand extends Command
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlink the assets instead of copying them')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
             ->addOption('no-cleanup', null, InputOption::VALUE_NONE, 'Do not remove the assets of the bundles that no longer exist')
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command installs bundle assets into a given
 directory (e.g. the <comment>public</comment> directory).

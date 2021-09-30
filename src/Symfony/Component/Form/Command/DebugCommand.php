@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -29,11 +30,9 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
+#[AsCommand(name: 'debug:form', description: 'Display form type information')]
 class DebugCommand extends Command
 {
-    protected static $defaultName = 'debug:form';
-    protected static $defaultDescription = 'Display form type information';
-
     private FormRegistryInterface $formRegistry;
     private array $namespaces;
     private array $types;
@@ -65,7 +64,6 @@ class DebugCommand extends Command
                 new InputOption('show-deprecated', null, InputOption::VALUE_NONE, 'Display deprecated options in form types'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt or json)', 'txt'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays information about form types.
 

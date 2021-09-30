@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -36,6 +37,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @final
  */
+#[AsCommand(name: 'debug:translation', description: 'Display translation messages information')]
 class TranslationDebugCommand extends Command
 {
     public const EXIT_CODE_GENERAL_ERROR = 64;
@@ -45,9 +47,6 @@ class TranslationDebugCommand extends Command
     public const MESSAGE_MISSING = 0;
     public const MESSAGE_UNUSED = 1;
     public const MESSAGE_EQUALS_FALLBACK = 2;
-
-    protected static $defaultName = 'debug:translation';
-    protected static $defaultDescription = 'Display translation messages information';
 
     private $translator;
     private $reader;
@@ -84,7 +83,6 @@ class TranslationDebugCommand extends Command
                 new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Display only unused messages'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Load messages from all registered bundles'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command helps finding unused or missing translation
 messages and comparing them with the fallback ones by inspecting the

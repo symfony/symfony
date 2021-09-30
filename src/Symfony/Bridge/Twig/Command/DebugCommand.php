@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -30,11 +31,9 @@ use Twig\Loader\FilesystemLoader;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
+#[AsCommand(name: 'debug:twig', description: 'Show a list of twig functions, filters, globals and tests')]
 class DebugCommand extends Command
 {
-    protected static $defaultName = 'debug:twig';
-    protected static $defaultDescription = 'Show a list of twig functions, filters, globals and tests';
-
     private Environment $twig;
     private ?string $projectDir;
     private array $bundlesMetadata;
@@ -66,7 +65,6 @@ class DebugCommand extends Command
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'Show details for all entries matching this filter'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (text or json)', 'text'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command outputs a list of twig functions,
 filters, globals and tests.

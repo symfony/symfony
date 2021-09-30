@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PasswordHasher\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -32,11 +33,9 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
  *
  * @final
  */
+#[AsCommand(name: 'security:hash-password', description: 'Hash a user password')]
 class UserPasswordHashCommand extends Command
 {
-    protected static $defaultName = 'security:hash-password';
-    protected static $defaultDescription = 'Hash a user password';
-
     private PasswordHasherFactoryInterface $hasherFactory;
     private array $userClasses;
 
@@ -54,7 +53,6 @@ class UserPasswordHashCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->addArgument('password', InputArgument::OPTIONAL, 'The plain password to hash.')
             ->addArgument('user-class', InputArgument::OPTIONAL, 'The User entity class path associated with the hasher used to hash the password.')
             ->addOption('empty-salt', null, InputOption::VALUE_NONE, 'Do not generate a salt or let the hasher generate one.')

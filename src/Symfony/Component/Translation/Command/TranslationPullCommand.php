@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,12 +27,10 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
+#[AsCommand(name: 'translation:pull', description: 'Pull translations from a given provider.')]
 final class TranslationPullCommand extends Command
 {
     use TranslationTrait;
-
-    protected static $defaultName = 'translation:pull';
-    protected static $defaultDescription = 'Pull translations from a given provider.';
 
     private TranslationProviderCollection $providerCollection;
     private TranslationWriterInterface $writer;

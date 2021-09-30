@@ -11,23 +11,35 @@
 
 namespace Symfony\Component\Dotenv\Command;
 
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
- * A console command to compile the contents of the .env files into a PHP-optimized file called .env.local.php.
+ * A console command to compile .env files into a PHP-optimized file called .env.local.php.
  *
  * @internal
  */
+#[Autoconfigure(bind: ['$dotenvPath' => '%kernel.project_dir%/.env', '$defaultEnv' => '%kernel.environment%'])]
 final class DotenvDumpCommand extends Command
 {
     protected static $defaultName = 'dotenv:dump';
     protected static $defaultDescription = 'Compiles .env files to .env.local.php';
+
+    private $dotenvPath;
+    private $defaultEnv;
+
+    public function __construct(string $dotenvPath, string $defaultEnv = null)
+    {
+        $this->dotenvPath = $dotenvPath;
+        $this->defaultEnv = $defaultEnv;
+
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -35,13 +47,12 @@ final class DotenvDumpCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Compiles .env files to .env.local.php.')
             ->setDefinition([
-                new InputArgument('env', InputArgument::OPTIONAL, 'The application environment to dump .env files for - e.g. "prod".'),
+                new InputArgument('env', null === $this->defaultEnv ? InputArgument::REQUIRED : InputArgument::OPTIONAL, 'The application environment to dump .env files for - e.g. "prod".'),
             ])
             ->addOption('empty', null, InputOption::VALUE_NONE, 'Ignore the content of .env files')
             ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command compiles the contents of the .env files into a PHP-optimized file called .env.local.php.
+The <info>%command.name%</info> command compiles .env files into a PHP-optimized file called .env.local.php.
 
     <info>%command.full_name%</info>
 EOT
@@ -54,23 +65,13 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var Application $application */
-        $application = $this->getApplication();
-        $kernel = $application->getKernel();
-
-        if ($env = $input->getArgument('env')) {
-            $_SERVER['APP_ENV'] = $env;
-        }
-
-        $path = $kernel->getProjectDir().'/.env';
-
-        if (!$env || !$input->getOption('empty')) {
-            $vars = $this->loadEnv($path, $env, $kernel->getProjectDir().'/composer.json');
-            $env = $vars['APP_ENV'];
-        }
+        $env = $input->getArgument('env') ?? $this->defaultEnv;
 
         if ($input->getOption('empty')) {
             $vars = ['APP_ENV' => $env];
+        } else {
+            $vars = $this->loadEnv($env);
+            $env = $vars['APP_ENV'];
         }
 
         $vars = var_export($vars, true);
@@ -82,47 +83,31 @@ EOT
 return $vars;
 
 EOF;
-        file_put_contents($path.'.local.php', $vars, \LOCK_EX);
+        file_put_contents($this->dotenvPath.'.local.php', $vars, \LOCK_EX);
 
-        $output->writeln('Successfully dumped .env files in <info>.env.local.php</>');
+        $output->writeln(sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));
 
-        return Command::SUCCESS;
+        return 0;
     }
 
-    private function loadEnv(string $path, ?string $env, $composerFilePath): array
+    private function loadEnv(string $env): array
     {
+        $dotenv = new Dotenv();
+        $composerFile = \dirname($this->dotenvPath).'/composer.json';
+        $testEnvs = (is_file($composerFile) ? json_decode(file_get_contents($composerFile), true) : [])['extra']['runtime']['test_envs'] ?? ['test'];
+
         $globalsBackup = [$_SERVER, $_ENV];
         unset($_SERVER['APP_ENV']);
         $_ENV = ['APP_ENV' => $env];
         $_SERVER['SYMFONY_DOTENV_VARS'] = implode(',', array_keys($_SERVER));
-        putenv('SYMFONY_DOTENV_VARS='.$_SERVER['SYMFONY_DOTENV_VARS']);
 
         try {
-            $dotenv = new Dotenv();
+            $dotenv->loadEnv($this->dotenvPath, null, 'dev', $testEnvs);
+            unset($_ENV['SYMFONY_DOTENV_VARS']);
 
-            if (!$env && file_exists($p = "$path.local")) {
-                $env = $_ENV['APP_ENV'] = $dotenv->parse(file_get_contents($p), $p)['APP_ENV'] ?? null;
-            }
-
-            if (!$env) {
-                throw new \RuntimeException('Please provide the name of the environment either by passing it as command line argument or by defining the "APP_ENV" variable in the ".env.local" file.');
-            }
-
-            $dotenv->loadEnv(
-                $path,
-                null,
-                'dev',
-                json_decode(file_get_contents($composerFilePath), true)['extra']['runtime']['test_envs'] ?? ['test']
-            );
-
-            if (isset($_ENV['SYMFONY_DOTENV_VARS'])) {
-                unset($_ENV['SYMFONY_DOTENV_VARS']);
-            }
-            $env = $_ENV;
+            return $_ENV;
         } finally {
             [$_SERVER, $_ENV] = $globalsBackup;
         }
-
-        return $env;
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,11 +32,9 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @final
  */
+#[AsCommand(name: 'debug:config', description: 'Dump the current configuration for an extension')]
 class ConfigDebugCommand extends AbstractConfigCommand
 {
-    protected static $defaultName = 'debug:config';
-    protected static $defaultDescription = 'Dump the current configuration for an extension';
-
     /**
      * {@inheritdoc}
      */
@@ -46,7 +45,6 @@ class ConfigDebugCommand extends AbstractConfigCommand
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the current configuration for an
 extension/bundle.

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,11 +33,9 @@ use Symfony\Component\VarDumper\Server\DumpServer;
  *
  * @final
  */
+#[AsCommand(name: 'server:dump', description: 'Start a dump server that collects and displays dumps in a single place')]
 class ServerDumpCommand extends Command
 {
-    protected static $defaultName = 'server:dump';
-    protected static $defaultDescription = 'Start a dump server that collects and displays dumps in a single place';
-
     private DumpServer $server;
 
     /** @var DumpDescriptorInterface[] */
@@ -59,7 +58,6 @@ class ServerDumpCommand extends Command
 
         $this
             ->addOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format (%s)', $availableFormats), 'cli')
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 <info>%command.name%</info> starts a dump server that collects and displays
 dumps in a single place for debugging you application:

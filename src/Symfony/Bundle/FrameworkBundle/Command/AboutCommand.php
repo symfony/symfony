@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -27,18 +28,15 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @final
  */
+#[AsCommand(name: 'about', description: 'Display information about the current project')]
 class AboutCommand extends Command
 {
-    protected static $defaultName = 'about';
-    protected static $defaultDescription = 'Display information about the current project';
-
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command displays information about the current Symfony project.
 

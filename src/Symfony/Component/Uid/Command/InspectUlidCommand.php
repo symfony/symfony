@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Uid\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,11 +21,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Uid\Ulid;
 
+#[AsCommand(name: 'ulid:inspect', description: 'Inspect a ULID')]
 class InspectUlidCommand extends Command
 {
-    protected static $defaultName = 'ulid:inspect';
-    protected static $defaultDescription = 'Inspect a ULID';
-
     /**
      * {@inheritdoc}
      */
@@ -34,7 +33,6 @@ class InspectUlidCommand extends Command
             ->setDefinition([
                 new InputArgument('ulid', InputArgument::REQUIRED, 'The ULID to inspect'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> displays information about a ULID.
 

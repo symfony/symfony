@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,11 +28,9 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\HttpKernel\Kernel;
 
+#[AsCommand(name: 'lint:container', description: 'Ensure that arguments injected into services match type declarations')]
 final class ContainerLintCommand extends Command
 {
-    protected static $defaultName = 'lint:container';
-    protected static $defaultDescription = 'Ensure that arguments injected into services match type declarations';
-
     /**
      * @var ContainerBuilder
      */
@@ -43,7 +42,6 @@ final class ContainerLintCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->setHelp('This command parses service definitions and ensures that injected values match the type declarations of each services\' class.')
         ;
     }

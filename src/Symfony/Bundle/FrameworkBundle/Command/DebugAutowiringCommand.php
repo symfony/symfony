@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\Descriptor;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,11 +28,9 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
  *
  * @internal
  */
+#[AsCommand(name: 'debug:autowiring', description: 'List classes/interfaces you can use for autowiring')]
 class DebugAutowiringCommand extends ContainerDebugCommand
 {
-    protected static $defaultName = 'debug:autowiring';
-    protected static $defaultDescription = 'List classes/interfaces you can use for autowiring';
-
     private $supportsHref;
     private $fileLinkFormatter;
 
@@ -52,7 +51,6 @@ class DebugAutowiringCommand extends ContainerDebugCommand
                 new InputArgument('search', InputArgument::OPTIONAL, 'A search filter'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Show also services that are not aliased'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays the classes and interfaces that
 you can use as type-hints for autowiring:

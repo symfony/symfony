@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Command;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,12 +34,10 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
+#[AsCommand(name: 'messenger:failed:retry', description: 'Retry one or more messages from the failure transport')]
 class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 {
     private const DEFAULT_TRANSPORT_OPTION = 'choose';
-
-    protected static $defaultName = 'messenger:failed:retry';
-    protected static $defaultDescription = 'Retry one or more messages from the failure transport';
 
     private $eventDispatcher;
     private $messageBus;
@@ -64,7 +63,6 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force action without confirmation'),
                 new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> retries message in the failure transport.
 

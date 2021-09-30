@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Uid\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,11 +20,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Uid\Factory\UlidFactory;
 
+#[AsCommand(name: 'ulid:generate', description: 'Generate a ULID')]
 class GenerateUlidCommand extends Command
 {
-    protected static $defaultName = 'ulid:generate';
-    protected static $defaultDescription = 'Generate a ULID';
-
     private UlidFactory $factory;
 
     public function __construct(UlidFactory $factory = null)
@@ -44,7 +43,6 @@ class GenerateUlidCommand extends Command
                 new InputOption('count', 'c', InputOption::VALUE_REQUIRED, 'The number of ULID to generate', 1),
                 new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'The ULID output format: base32, base58 or rfc4122', 'base32'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command generates a ULID.
 

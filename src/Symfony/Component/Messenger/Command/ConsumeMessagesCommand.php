@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Command;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -34,11 +35,9 @@ use Symfony\Component\Messenger\Worker;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
+#[AsCommand(name: 'messenger:consume', description: 'Consume messages')]
 class ConsumeMessagesCommand extends Command
 {
-    protected static $defaultName = 'messenger:consume';
-    protected static $defaultDescription = 'Consume messages';
-
     private $routableBus;
     private $receiverLocator;
     private $eventDispatcher;
@@ -77,7 +76,6 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
                 new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseLintCommand;
 
 /**
@@ -22,11 +23,9 @@ use Symfony\Component\Translation\Command\XliffLintCommand as BaseLintCommand;
  *
  * @final
  */
+#[AsCommand(name: 'lint:xliff', description: 'Lints an XLIFF file and outputs encountered errors')]
 class XliffLintCommand extends BaseLintCommand
 {
-    protected static $defaultName = 'lint:xliff';
-    protected static $defaultDescription = 'Lints an XLIFF file and outputs encountered errors';
-
     public function __construct()
     {
         $directoryIteratorProvider = function ($directory, $default) {

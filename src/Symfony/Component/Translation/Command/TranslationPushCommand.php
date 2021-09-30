@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,12 +26,10 @@ use Symfony\Component\Translation\TranslatorBag;
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
  */
+#[AsCommand(name: 'translation:push', description: 'Push translations to a given provider.')]
 final class TranslationPushCommand extends Command
 {
     use TranslationTrait;
-
-    protected static $defaultName = 'translation:push';
-    protected static $defaultDescription = 'Push translations to a given provider.';
 
     private TranslationProviderCollection $providers;
     private TranslationReaderInterface $reader;

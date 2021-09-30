@@ -33,12 +33,12 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 class AnnotationLoader implements LoaderInterface
 {
     private const KNOWN_ANNOTATIONS = [
-        DiscriminatorMap::class => true,
-        Groups::class => true,
-        Ignore::class => true,
-        MaxDepth::class => true,
-        SerializedName::class => true,
-        Context::class => true,
+        DiscriminatorMap::class,
+        Groups::class,
+        Ignore::class,
+        MaxDepth::class,
+        SerializedName::class,
+        Context::class,
     ];
 
     private $reader;
@@ -157,7 +157,7 @@ class AnnotationLoader implements LoaderInterface
     {
         if (\PHP_VERSION_ID >= 80000) {
             foreach ($reflector->getAttributes() as $attribute) {
-                if (self::KNOWN_ANNOTATIONS[$attribute->getName()] ?? false) {
+                if ($this->isKnownAttribute($attribute->getName())) {
                     yield $attribute->newInstance();
                 }
             }
@@ -192,5 +192,16 @@ class AnnotationLoader implements LoaderInterface
         if ($annotation->getDenormalizationContext()) {
             $attributeMetadata->setDenormalizationContextForGroups($annotation->getDenormalizationContext(), $annotation->getGroups());
         }
+    }
+
+    private function isKnownAttribute(string $attributeName): bool
+    {
+        foreach (self::KNOWN_ANNOTATIONS as $knownAnnotation) {
+            if (is_a($attributeName, $knownAnnotation, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

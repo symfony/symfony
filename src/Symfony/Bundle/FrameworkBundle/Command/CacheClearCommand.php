@@ -122,7 +122,11 @@ EOF
 
         // the warmup cache dir name must have the same length as the real one
         // to avoid the many problems in serialized resources files
-        $warmupDir = substr($realBuildDir, 0, -1).('_' === substr($realBuildDir, -1) ? '-' : '_');
+        if($kernel->getContainer()->hasParameter('kernel.warmup_dir')) {
+            $warmupDir = $kernel->getContainer()->getParameter('kernel.warmup_dir');
+        } else {
+            $warmupDir = substr($realBuildDir, 0, -1).('_' === substr($realBuildDir, -1) ? '-' : '_');
+        }
 
         if ($output->isVerbose() && $fs->exists($warmupDir)) {
             $io->comment('Clearing outdated warmup directory...');

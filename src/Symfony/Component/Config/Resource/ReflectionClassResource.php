@@ -201,38 +201,34 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                 $parametersWithUndefinedConstants[$p->name] = true;
             }
 
-            if (!$parametersWithUndefinedConstants) {
-                yield preg_replace('/^  @@.*/m', '', $m);
-            } else {
-                $t = $m->getReturnType();
-                $stack = [
-                    $m->getDocComment(),
-                    $m->getName(),
-                    $m->isAbstract(),
-                    $m->isFinal(),
-                    $m->isStatic(),
-                    $m->isPublic(),
-                    $m->isPrivate(),
-                    $m->isProtected(),
-                    $m->returnsReference(),
-                    $t instanceof \ReflectionNamedType ? ((string) $t->allowsNull()).$t->getName() : (string) $t,
-                ];
+            $t = $m->getReturnType();
+            $stack = [
+                $m->getDocComment(),
+                $m->getName(),
+                $m->isAbstract(),
+                $m->isFinal(),
+                $m->isStatic(),
+                $m->isPublic(),
+                $m->isPrivate(),
+                $m->isProtected(),
+                $m->returnsReference(),
+                $t instanceof \ReflectionNamedType ? ((string) $t->allowsNull()).$t->getName() : (string) $t,
+            ];
 
-                foreach ($m->getParameters() as $p) {
-                    if (!isset($parametersWithUndefinedConstants[$p->name])) {
-                        $stack[] = (string) $p;
-                    } else {
-                        $t = $p->getType();
-                        $stack[] = $p->isOptional();
-                        $stack[] = $t instanceof \ReflectionNamedType ? ((string) $t->allowsNull()).$t->getName() : (string) $t;
-                        $stack[] = $p->isPassedByReference();
-                        $stack[] = $p->isVariadic();
-                        $stack[] = $p->getName();
-                    }
+            foreach ($m->getParameters() as $p) {
+                if (!isset($parametersWithUndefinedConstants[$p->name])) {
+                    $stack[] = $this->extractParameterData($p);
+                } else {
+                    $t = $p->getType();
+                    $stack[] = $p->isOptional();
+                    $stack[] = $t instanceof \ReflectionNamedType ? ((string) $t->allowsNull()).$t->getName() : (string) $t;
+                    $stack[] = $p->isPassedByReference();
+                    $stack[] = $p->isVariadic();
+                    $stack[] = $p->getName();
                 }
-
-                yield implode(',', $stack);
             }
+
+            yield implode(',', $stack);
 
             yield print_r($defaults, true);
         }
@@ -257,5 +253,30 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             yield ServiceSubscriberInterface::class;
             yield print_r($class->name::getSubscribedServices(), true);
         }
+    }
+
+    private function extractParameterData(\ReflectionParameter $p): string
+    {
+        if (false === $p->isOptional()) {
+            return (string) $p;
+        }
+
+        if (false === $p->isDefaultValueAvailable()) {
+            return (string) $p;
+        }
+
+        $defaultValue = $p->getDefaultValue();
+        if (false === \is_object($defaultValue)) {
+            return (string) $p;
+        }
+
+        $class = \get_class($defaultValue);
+        $type = $p->getType();
+
+        if (null === $type) {
+            return 'untyped = '.$class;
+        }
+
+        return $type->getName().' = '.$class;
     }
 }

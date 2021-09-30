@@ -107,6 +107,7 @@ FrameworkBundle
  * Remove the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Remove `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
  * Deprecate the `cache.adapter.doctrine` service: The Doctrine Cache library is deprecated. Either switch to Symfony Cache or use the PSR-6 adapters provided by Doctrine Cache.
+ * Make the `framework.messenger.reset_on_message` configuration option default to `true`
 
 HttpFoundation
 --------------
@@ -169,7 +170,6 @@ Messenger
  * Removed the `prefetch_count` parameter in the AMQP bridge.
  * Removed the use of TLS option for Redis Bridge, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
  * The `delete_after_ack` config option of the Redis transport now defaults to `true`
- * The `reset_on_message` config option now defaults to `true`
 
 Mime
 ----

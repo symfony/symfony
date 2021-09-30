@@ -1,7 +1,6 @@
 framework:
     messenger:
         enabled: true
-        reset_on_message: true
     mailer:
         dsn: 'smtp://example.com'
     notifier:

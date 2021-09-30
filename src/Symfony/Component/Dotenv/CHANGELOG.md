@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `dotenv:dump` command to compile the contents of the .env files into a PHP-optimized file called `.env.local.php`
+
 5.1.0
 -----
 

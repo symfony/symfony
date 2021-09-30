@@ -29,6 +29,7 @@
             <xsd:element name="cache" type="cache" minOccurs="0" maxOccurs="1" />
             <xsd:element name="workflow" type="workflow" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="php-errors" type="php-errors" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="exceptions" type="exceptions" minOccurs="0" maxOccurs="1" />
             <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-client" type="http_client" minOccurs="0" maxOccurs="1" />
@@ -312,6 +313,7 @@
 
     <xsd:complexType name="workflow">
         <xsd:sequence>
+            <xsd:element name="audit-trail" type="audit_trail" minOccurs="0" maxOccurs="1" />
             <xsd:element name="initial-marking" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="marking-store" type="marking_store" minOccurs="0" maxOccurs="1" />
             <xsd:element name="support" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
@@ -339,6 +341,22 @@
     <xsd:complexType name="logLevel" mixed="true">
         <xsd:attribute name="type" type="xsd:string" use="required" />
         <xsd:attribute name="logLevel" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="audit_trail">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="exceptions">
+        <xsd:sequence>
+            <xsd:element name="exception" type="exception" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="exception">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="log-level" type="xsd:string" />
+        <xsd:attribute name="status-code" type="xsd:int" />
     </xsd:complexType>
 
     <xsd:complexType name="marking_store">
@@ -469,6 +487,7 @@
         <xsd:attribute name="default-bus" type="xsd:string" />
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="failure-transport" type="xsd:string" />
+        <xsd:attribute name="reset-on-message" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_serializer">
@@ -505,7 +524,6 @@
         <xsd:attribute name="serializer" type="xsd:string" />
         <xsd:attribute name="dsn" type="xsd:string" />
         <xsd:attribute name="failure-transport" type="xsd:string" />
-        <xsd:attribute name="reset-on-message" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_retry_strategy">

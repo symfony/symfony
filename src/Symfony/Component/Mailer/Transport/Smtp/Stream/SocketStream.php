@@ -167,7 +167,14 @@ final class SocketStream extends AbstractStream
 
     public function startTLS(): bool
     {
-        return (bool) stream_socket_enable_crypto($this->stream, true);
+        set_error_handler(function ($type, $msg) {
+            throw new TransportException('Unable to connect with STARTTLS: '.$msg);
+        });
+        try {
+            return stream_socket_enable_crypto($this->stream, true);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     public function terminate(): void

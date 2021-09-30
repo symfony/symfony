@@ -13,9 +13,7 @@ namespace Symfony\Component\Messenger\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
-use Symfony\Component\Messenger\Event\AbstractWorkerMessageEvent;
-use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
-use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -23,28 +21,23 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 class ResetServicesListener implements EventSubscriberInterface
 {
     private $servicesResetter;
-    private $receiversName;
 
-    public function __construct(ServicesResetter $servicesResetter, array $receiversName)
+    public function __construct(ServicesResetter $servicesResetter)
     {
         $this->servicesResetter = $servicesResetter;
-        $this->receiversName = $receiversName;
     }
 
-    public function resetServices(AbstractWorkerMessageEvent $event)
+    public function resetServices(WorkerRunningEvent $event): void
     {
-        if (!\in_array($event->getReceiverName(), $this->receiversName, true)) {
-            return;
+        if (!$event->isWorkerIdle()) {
+            $this->servicesResetter->reset();
         }
-
-        $this->servicesResetter->reset();
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            WorkerMessageHandledEvent::class => ['resetServices'],
-            WorkerMessageFailedEvent::class => ['resetServices'],
+            WorkerRunningEvent::class => ['resetServices'],
         ];
     }
 }

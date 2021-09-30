@@ -27,7 +27,9 @@ class_exists(ClosureResolver::class);
  *    to the "APP_DEBUG" environment variable;
  *  - "runtimes" maps types to a GenericRuntime implementation
  *    that knows how to deal with each of them;
- *  - "error_handler" defines the class to use to handle PHP errors.
+ *  - "error_handler" defines the class to use to handle PHP errors;
+ *  - "env_var_name" and "debug_var_name" define the name of the env
+ *    vars that hold the Symfony env and the debug flag respectively.
  *
  * The app-callable can declare arguments among either:
  * - "array $context" to get a local array similar to $_SERVER;
@@ -51,13 +53,14 @@ class GenericRuntime implements RuntimeInterface
      *   debug?: ?bool,
      *   runtimes?: ?array,
      *   error_handler?: string|false,
-     *   env_var_names?: ?array,
+     *   env_var_name?: string,
+     *   debug_var_name?: string,
      * } $options
      */
     public function __construct(array $options = [])
     {
-        $options['env_var_names']['env_key'] ?? $options['env_var_names']['env_key'] = 'APP_ENV';
-        $debugKey = $options['env_var_names']['debug_key'] ?? $options['env_var_names']['debug_key'] = 'APP_DEBUG';
+        $options['env_var_name'] ?? $options['env_var_name'] = 'APP_ENV';
+        $debugKey = $options['debug_var_name'] ?? $options['debug_var_name'] = 'APP_DEBUG';
 
         $debug = $options['debug'] ?? $_SERVER[$debugKey] ?? $_ENV[$debugKey] ?? true;
 
@@ -107,7 +110,7 @@ class GenericRuntime implements RuntimeInterface
             return $arguments;
         };
 
-        if ($_SERVER[$this->options['env_var_names']['debug_key']]) {
+        if ($_SERVER[$this->options['debug_var_name']]) {
             return new DebugClosureResolver($callable, $arguments);
         }
 
@@ -139,7 +142,7 @@ class GenericRuntime implements RuntimeInterface
             $application = \Closure::fromCallable($application);
         }
 
-        if ($_SERVER[$this->options['env_var_names']['debug_key']] && ($r = new \ReflectionFunction($application)) && $r->getNumberOfRequiredParameters()) {
+        if ($_SERVER[$this->options['debug_var_name']] && ($r = new \ReflectionFunction($application)) && $r->getNumberOfRequiredParameters()) {
             throw new \ArgumentCountError(sprintf('Zero argument should be required by the runner callable, but at least one is in "%s" on line "%d.', $r->getFileName(), $r->getStartLine()));
         }
 

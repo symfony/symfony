@@ -5,7 +5,8 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
 
 $container->loadFromExtension('framework', [
     'messenger' => [
-        'enabled' => true
+        'enabled' => true,
+        'reset_on_message' =>  true,
     ],
     'mailer' => [
         'dsn' => 'smtp://example.com',

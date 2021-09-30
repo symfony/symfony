@@ -201,9 +201,7 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.listener.reset_services', ResetServicesListener::class)
             ->args([
                 service('services_resetter'),
-                abstract_arg('receivers names'),
             ])
-            ->tag('kernel.event_subscriber')
 
         ->set('messenger.routable_message_bus', RoutableMessageBus::class)
             ->args([

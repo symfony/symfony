@@ -84,6 +84,6 @@ final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceS
 
     private function shouldTrackUsage(): bool
     {
-        return $this->enableUsageTracking;
+        return $this->enableUsageTracking && $this->container->get('request_stack')->getMainRequest();
     }
 }

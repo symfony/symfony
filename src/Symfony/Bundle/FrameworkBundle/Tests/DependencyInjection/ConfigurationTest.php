@@ -532,6 +532,7 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
+                'reset_on_message' => null,
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [
@@ -575,6 +576,7 @@ class ConfigurationTest extends TestCase
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 6,
             ],
+            'exceptions' => [],
         ];
     }
 }

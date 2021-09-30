@@ -79,11 +79,17 @@ class HttpCache extends BaseHttpCache
         return [];
     }
 
+    /**
+     * @return SurrogateInterface
+     */
     protected function createSurrogate()
     {
         return $this->surrogate ?? new Esi();
     }
 
+    /**
+     * @return StoreInterface
+     */
     protected function createStore()
     {
         return $this->store ?? new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');

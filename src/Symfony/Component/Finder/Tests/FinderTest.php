@@ -348,7 +348,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->ignoreVCS(false)->ignoreDotFiles(false));
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             '.git',
             'foo',
             'foo/bar.tmp',
@@ -375,7 +374,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder->ignoreVCS(false)->ignoreVCS(false)->ignoreDotFiles(false);
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             '.git',
             'foo',
             'foo/bar.tmp',
@@ -402,7 +400,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->ignoreVCS(true)->ignoreDotFiles(false));
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             'foo',
             'foo/bar.tmp',
             'test.php',
@@ -435,16 +432,15 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 ->ignoreDotFiles(true)
                 ->ignoreVCSIgnored(true)
         );
-        $this->assertIterator($this->toAbsolute([
-            'foo',
-            'foo/bar.tmp',
-            'test.py',
-            'toto',
-            'foo bar',
-            'qux',
-            'qux/baz_100_1.py',
-            'qux/baz_1_2.py',
-        ]), $finder->in(self::$tmpDir)->getIterator());
+
+        copy(__DIR__.'/Fixtures/gitignore/b.txt', __DIR__.'/Fixtures/gitignore/a.txt');
+        copy(__DIR__.'/Fixtures/gitignore/dir/a.txt', __DIR__.'/Fixtures/gitignore/dir/b.txt');
+
+        $this->assertIterator($this->toAbsoluteFixtures([
+            'gitignore/b.txt',
+            'gitignore/dir',
+            'gitignore/dir/a.txt',
+        ]), $finder->in(__DIR__.'/Fixtures/gitignore')->getIterator());
     }
 
     public function testIgnoreVCSCanBeDisabledAfterFirstIteration()
@@ -454,7 +450,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->ignoreDotFiles(false);
 
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             'foo',
             'foo/bar.tmp',
             'qux',
@@ -478,7 +473,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder->ignoreVCS(false);
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             '.git',
             'foo',
             'foo/bar.tmp',
@@ -508,7 +502,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->ignoreDotFiles(false)->ignoreVCS(false));
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             '.git',
             '.bar',
             '.foo',
@@ -535,7 +528,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder->ignoreDotFiles(false)->ignoreDotFiles(false)->ignoreVCS(false);
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             '.git',
             '.bar',
             '.foo',
@@ -605,7 +597,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder->ignoreDotFiles(false);
         $this->assertIterator($this->toAbsolute([
-            '.gitignore',
             'foo',
             'foo/bar.tmp',
             'qux',

@@ -15,6 +15,7 @@ CHANGELOG
 
  * Deprecate `AbstractTestSessionListener::getSession` inject a session in the request instead
  * Deprecate the `fileLinkFormat` parameter of `DebugHandlersListener`
+ * Add support for configuring log level, and status code by exception class
 
 5.3
 ---

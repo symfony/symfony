@@ -65,4 +65,18 @@ class UsageTrackingTokenStorageTest extends TestCase
         $this->assertSame($token, $trackingStorage->getToken());
         $this->assertSame(1, $sessionAccess);
     }
+
+    public function testWithoutMainRequest()
+    {
+        $locator = new class(['request_stack' => function () {
+            return new RequestStack();
+        }]) implements ContainerInterface {
+            use ServiceLocatorTrait;
+        };
+        $tokenStorage = new TokenStorage();
+        $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $locator);
+        $trackingStorage->enableUsageTracking();
+
+        $this->assertNull($trackingStorage->getToken());
+    }
 }

@@ -42,6 +42,7 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 use Symfony\Component\Security\Http\Firewall;
+use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
@@ -158,6 +159,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Firewall context locator'),
                 abstract_arg('Request matchers'),
             ])
+        ->alias(FirewallMapInterface::class, 'security.firewall.map')
 
         ->set('security.firewall.context', FirewallContext::class)
             ->abstract()

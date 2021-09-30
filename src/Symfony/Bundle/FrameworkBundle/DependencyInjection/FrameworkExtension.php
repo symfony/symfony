@@ -241,7 +241,7 @@ class FrameworkExtension extends Extension
 
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);
 
-        if (class_exists(Application::class)) {
+        if ($this->hasConsole()) {
             $loader->load('console.php');
 
             if (!class_exists(BaseXliffLintCommand::class)) {
@@ -426,6 +426,8 @@ class FrameworkExtension extends Extension
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
 
+        $container->getDefinition('exception_listener')->replaceArgument(3, $config['exceptions']);
+
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists(\Symfony\Component\Serializer\Serializer::class)) {
                 throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed. Try running "composer require symfony/serializer-pack".');
@@ -596,6 +598,11 @@ class FrameworkExtension extends Extension
     public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
         return new Configuration($container->getParameter('kernel.debug'));
+    }
+
+    protected function hasConsole(): bool
+    {
+        return class_exists(Application::class);
     }
 
     private function registerFormConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
@@ -1917,7 +1924,6 @@ class FrameworkExtension extends Extension
 
         $senderAliases = [];
         $transportRetryReferences = [];
-        $transportNamesForResetServices = [];
         foreach ($config['transports'] as $name => $transport) {
             $serializerId = $transport['serializer'] ?? 'messenger.default_serializer';
             $transportDefinition = (new Definition(TransportInterface::class))
@@ -1946,18 +1952,6 @@ class FrameworkExtension extends Extension
 
                 $transportRetryReferences[$name] = new Reference($retryServiceId);
             }
-            if ($transport['reset_on_message']) {
-                $transportNamesForResetServices[] = $name;
-            }
-        }
-
-        if ($transportNamesForResetServices) {
-            $container
-                ->getDefinition('messenger.listener.reset_services')
-                ->replaceArgument(1, $transportNamesForResetServices)
-            ;
-        } else {
-            $container->removeDefinition('messenger.listener.reset_services');
         }
 
         $senderReferences = [];
@@ -2028,6 +2022,19 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_failed_messages_retry');
             $container->removeDefinition('console.command.messenger_failed_messages_show');
             $container->removeDefinition('console.command.messenger_failed_messages_remove');
+        }
+
+        if (false === $config['reset_on_message']) {
+            throw new LogicException('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.');
+        }
+
+        if (!$container->hasDefinition('console.command.messenger_consume_messages')) {
+            $container->removeDefinition('messenger.listener.reset_services');
+        } elseif (null === $config['reset_on_message']) {
+            trigger_deprecation('symfony/framework-bundle', '5.4', 'Not setting the "framework.messenger.reset_on_message" configuration option is deprecated, it will default to "true" in version 6.0.');
+
+            $container->getDefinition('console.command.messenger_consume_messages')->replaceArgument(5, null);
+            $container->removeDefinition('messenger.listener.reset_services');
         }
     }
 

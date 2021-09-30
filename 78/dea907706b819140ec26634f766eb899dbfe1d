@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by abdielcs at 2021-08-18T19:11:58Z
+
+Help with this issues please? `unset($_ENV['SYMFONY_DOTENV_VARS'])` came from original code in https://github.com/symfony/flex/blob/main/src/Command/DumpEnvCommand.php and need to be done to pass tests, and Psalm insists that is not set. Not sure what need to be done to rebase upstream. Seems also a test is failing from HttpKernel.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-08-19T08:58:13Z
+
+See https://github.com/vimeo/psalm/issues/6337
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-08T07:22:48Z
+
+Please rebase and squash also (PR should not contain any merge commits)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-24T16:12:16Z
+
+We might need to implement https://github.com/symfony/flex/pull/810 in this also.
+@abdielcs are you still available to finish this PR?
+
+---------------------------------------------------------------------------
+
+by abdielcs at 2021-09-24T21:41:03Z
+
+> We might need to implement [symfony/flex#810](https://github.com/symfony/flex/pull/810) in this also.
+> @abdielcs are you still available to finish this PR?
+
+@nicolas-grekas  Al the work is done, but I can't managed to pass the rebase. Really would appreciate help here. Sorry for been so newbie doing PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-27T09:03:04Z
+
+@abdielcs I rebased the PR and pushed it on your fork. Please fetch and sync your local copy before moving the command to the component.

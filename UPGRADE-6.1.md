@@ -15,6 +15,12 @@ Console
  * Add argument `$suggestedValues` to `Command::addArgument` and `Command::addOption`
  * Add argument `$suggestedValues` to `InputArgument` and `InputOption` constructors
 
+FrameworkBundle
+---------------
+
+ * Deprecate the `reset_on_message` config option. It can be set to `true` only and does nothing now.
+   To prevent services resetting after each message the "--no-reset" option in "messenger:consume" command can be set
+
 HttpKernel
 ----------
 

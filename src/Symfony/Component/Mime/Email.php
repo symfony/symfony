@@ -480,6 +480,12 @@ class Email extends Message
         foreach ($this->attachments as $attachment) {
             foreach ($names as $name) {
                 if (isset($attachment['part'])) {
+                    if ('inline' === $attachment['part']->getPreparedHeaders()->getHeaderBody('Content-Disposition')) {
+                        $inlineParts[] = $attachment['part'];
+
+                        continue 2;
+                    }
+
                     continue;
                 }
                 if ($name !== $attachment['name']) {

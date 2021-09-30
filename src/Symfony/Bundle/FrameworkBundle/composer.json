@@ -89,6 +89,7 @@
         "symfony/property-info": "<4.4",
         "symfony/property-access": "<5.3",
         "symfony/serializer": "<5.2",
+        "symfony/service-contracts": ">=3.0",
         "symfony/security-csrf": "<5.3",
         "symfony/stopwatch": "<4.4",
         "symfony/translation": "<5.3",

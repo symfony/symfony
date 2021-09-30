@@ -162,6 +162,10 @@ EOPHP;
             yield [false, 9, 'private string $priv;'];
         }
 
+        if (\PHP_VERSION_ID >= 80100) {
+            yield [true, 17, 'public function ccc($bar = new \stdClass()) {}'];
+        }
+
         yield [true, 17, 'public function ccc($bar = 187) {}'];
         yield [true, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}'];
         yield [true, 17, 'public function ccc($bar = parent::BOOM) {}'];

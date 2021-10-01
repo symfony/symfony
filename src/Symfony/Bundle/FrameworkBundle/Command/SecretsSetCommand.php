@@ -51,12 +51,17 @@ final class SecretsSetCommand extends Command
             ->setDescription(self::$defaultDescription)
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the secret')
             ->addArgument('file', InputArgument::OPTIONAL, 'A file where to read the secret from or "-" for reading from STDIN')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Re-set an existing secret\'s value.')
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Update the local vault.')
             ->addOption('random', 'r', InputOption::VALUE_OPTIONAL, 'Generate a random value.', false)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command stores a secret in the vault.
 
     <info>%command.full_name% <name></info>
+
+Use <info>--force</info> to override an already defined secret's value.
+
+    <info>%command.full_name% --force</info>
 
 To reference secrets in services.yaml or any other config
 files, use <info>"%env(<name>)%"</info>.
@@ -82,6 +87,7 @@ EOF
         $io = new SymfonyStyle($input, $errOutput);
         $name = $input->getArgument('name');
         $vault = $input->getOption('local') ? $this->localVault : $this->vault;
+        $force = $input->getOption('force');
 
         if (null === $vault) {
             $io->error('The local vault is disabled.');
@@ -89,7 +95,9 @@ EOF
             return 1;
         }
 
-        if ($this->localVault === $vault && !\array_key_exists($name, $this->vault->list())) {
+        $secretExist = \array_key_exists($name, $this->vault->list());
+
+        if ($this->localVault === $vault && !$secretExist) {
             $io->error(sprintf('Secret "%s" does not exist in the vault, you cannot override it locally.', $name));
 
             return 1;
@@ -122,18 +130,23 @@ EOF
             }
         }
 
-        $vault->seal($name, $value);
+        if (!$secretExist || ($secretExist && $force)) {
+            $vault->seal($name, $value);
+            $io->success($vault->getLastMessage() ?? 'Secret was successfully stored in the vault.');
+            $success = true;
+        } else {
+            $io->info(sprintf('You should use the "--force" option to override the value of the secret "%s" in the vault.', $name));
+            $success = false;
+        }
 
-        $io->success($vault->getLastMessage() ?? 'Secret was successfully stored in the vault.');
-
-        if (0 < $random) {
+        if ($success && 0 < $random) {
             $errOutput->write(' // The generated random value is: <comment>');
             $output->write($value);
             $errOutput->writeln('</comment>');
             $io->newLine();
         }
 
-        if ($this->vault === $vault && null !== $this->localVault->reveal($name)) {
+        if ($success && $this->vault === $vault && null !== $this->localVault->reveal($name)) {
             $io->comment('Note that this secret is overridden in the local vault.');
         }
 

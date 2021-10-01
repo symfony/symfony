@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-01T08:24:01Z
+
+Do you have any numbers to share to back up the performance improvement?
+
+---------------------------------------------------------------------------
+
+by simonberger at 2021-10-01T09:07:59Z
+
+@fabpot Good point. I just heard up to this point it is slower and can require a lot of memory.
+I created a quick script. Let me know in case I did a mistake somewhere. The numbers show a much more dramatic difference than I had expected.
+
+```php
+<?php
+$arr = [];
+
+$startTime = microtime(true);
+for ($i = 0; $i < 20000; ++$i) {
+    $arr = array_merge($arr, ['a'.$i, 'b'.$i]);
+}
+$endTime = microtime(true);
+
+echo "array_merge in loop took: " . number_format($endTime - $startTime, 3) . " Seconds \n";
+
+$arr = [];
+
+$startTime = microtime(true);
+for ($i = 0; $i < 20000; ++$i) {
+    $arr[] = ['a'.$i, 'b'.$i];
+}
+$arr = array_merge([], ...$arr);
+$endTime = microtime(true);
+
+echo "array_merge out of loop took: " . number_format($endTime - $startTime, 3) . "Seconds \n";
+```
+
+```
+array_merge in loop took: 3.017 Seconds
+array_merge out of loop took: 0.008 Seconds
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-01T09:14:13Z
+
+I can see the perf boost on many iterations, but here, we are talking about a few schemes and/or a few methods. So, maybe it's not worth it after all.
+
+---------------------------------------------------------------------------
+
+by simonberger at 2021-10-01T09:18:31Z
+
+Yes I agree there won't be a any notable difference here. We have 1 to a maximum of three iterations, but it also won't have any negative impact and there are a few analyzers out there marking an array_merge in a loop as an error.
+
+I already changed places which should have a real impact.

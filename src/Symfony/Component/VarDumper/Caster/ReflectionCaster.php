@@ -356,6 +356,8 @@ class ReflectionCaster
                     $signature .= 10 > \strlen($v) && !str_contains($v, '\\') ? "'{$v}'" : "'…".\strlen($v)."'";
                 } elseif (\is_bool($v)) {
                     $signature .= $v ? 'true' : 'false';
+                } elseif (\is_object($v)) {
+                    $signature .= 'new '.substr(strrchr('\\'.get_debug_type($v), '\\'), 1);
                 } else {
                     $signature .= $v;
                 }

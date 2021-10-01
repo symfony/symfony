@@ -295,7 +295,7 @@ class PdoStore implements StoreInterface
                 $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(64) NOT NULL, $this->expirationCol INTEGER)";
                 break;
             default:
-                throw new \DomainException(sprintf('Creating the lock table is currently not implemented for PDO driver "%s".', $driver));
+                throw new \DomainException(sprintf('Creating the lock table is currently not implemented for platform "%s".', $driver));
         }
 
         if (method_exists($conn, 'executeStatement')) {
@@ -331,33 +331,33 @@ class PdoStore implements StoreInterface
             $this->driver = $con->getAttribute(\PDO::ATTR_DRIVER_NAME);
         } else {
             $driver = $con->getDriver();
+            $platform = $driver->getDatabasePlatform();
+
+            if ($driver instanceof \Doctrine\DBAL\Driver\Mysqli\Driver) {
+                throw new \LogicException(sprintf('The adapter "%s" does not support the mysqli driver, use pdo_mysql instead.', static::class));
+            }
 
             switch (true) {
-                case $driver instanceof \Doctrine\DBAL\Driver\Mysqli\Driver:
-                    throw new \LogicException(sprintf('The adapter "%s" does not support the mysqli driver, use pdo_mysql instead.', static::class));
-                case $driver instanceof \Doctrine\DBAL\Driver\AbstractMySQLDriver:
+                case $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform:
+                case $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform:
                     $this->driver = 'mysql';
                     break;
-                case $driver instanceof \Doctrine\DBAL\Driver\PDOSqlite\Driver:
-                case $driver instanceof \Doctrine\DBAL\Driver\PDO\SQLite\Driver:
+                case $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform:
                     $this->driver = 'sqlite';
                     break;
-                case $driver instanceof \Doctrine\DBAL\Driver\PDOPgSql\Driver:
-                case $driver instanceof \Doctrine\DBAL\Driver\PDO\PgSQL\Driver:
+                case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform:
+                case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform:
                     $this->driver = 'pgsql';
                     break;
-                case $driver instanceof \Doctrine\DBAL\Driver\OCI8\Driver:
-                case $driver instanceof \Doctrine\DBAL\Driver\PDOOracle\Driver:
-                case $driver instanceof \Doctrine\DBAL\Driver\PDO\OCI\Driver:
+                case $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform:
                     $this->driver = 'oci';
                     break;
-                case $driver instanceof \Doctrine\DBAL\Driver\SQLSrv\Driver:
-                case $driver instanceof \Doctrine\DBAL\Driver\PDOSqlsrv\Driver:
-                case $driver instanceof \Doctrine\DBAL\Driver\PDO\SQLSrv\Driver:
+                case $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform:
+                case $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform:
                     $this->driver = 'sqlsrv';
                     break;
                 default:
-                    $this->driver = \get_class($driver);
+                    $this->driver = \get_class($platform);
                     break;
             }
         }

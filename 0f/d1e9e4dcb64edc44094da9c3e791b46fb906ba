@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-02T15:37:31Z
+
+There is a missing translation in `https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Validator/Resources/translations/validators.sr_Cyrl.xlf` (the last one, id 100, which you can find here for English: `https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Validator/Resources/translations/validators.en.xlf`).
+
+---------------------------------------------------------------------------
+
+by ajakov at 2021-10-02T17:08:56Z
+
+Ah, I see what happened, I did not fetch upstream ...
+Thank you @fabpot, should be good now.

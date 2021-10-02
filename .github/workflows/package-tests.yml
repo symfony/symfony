@@ -11,14 +11,19 @@ jobs:
     runs-on: Ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # pin@v2
 
       - name: Fetch branch from where the PR started
-        run: git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+        run: git fetch --no-tags --prune --depth=1 origin
+          +refs/heads/*:refs/remotes/origin/*
 
       - name: Find packages
         id: find-packages
-        run: echo "::set-output name=packages::$(php .github/get-modified-packages.php $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | jq -R -s -c 'split("\n")[:-1]') $(git diff --name-only origin/${{ github.base_ref }} HEAD | grep src/ | jq -R -s -c 'split("\n")[:-1]'))"
+        run: echo "::set-output name=packages::$(php .github/get-modified-packages.php
+          $(find src/Symfony -mindepth 2 -type f -name composer.json -printf
+          '%h\n' | jq -R -s -c 'split("\n")[:-1]') $(git diff --name-only
+          origin/${{ github.base_ref }} HEAD | grep src/ | jq -R -s -c
+          'split("\n")[:-1]'))"
 
       - name: Verify meta files are correct
         run: |

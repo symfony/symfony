@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # pin@v2
 
       - name: Install system dependencies
         run: |
@@ -37,7 +37,7 @@ jobs:
           echo "SYMFONY_ICU_VERSION=$SYMFONY_ICU_VERSION" >> $GITHUB_ENV
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@17ef667e04bd0c8836175514bc8ad08555a31106 # pin@v2
         with:
           coverage: "none"
           extensions: "zip,intl-${{env.SYMFONY_ICU_VERSION}}"

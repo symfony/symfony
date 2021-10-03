@@ -58,7 +58,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         }
 
         if (!class_exists(IpUtils::class)) {
-            throw new \LogicException(sprintf('You can not use "%s" if the HttpFoundation component is not installed. Try running "composer require symfony/http-foundation".', __CLASS__));
+            throw new \LogicException(sprintf('You cannot use "%s" if the HttpFoundation component is not installed. Try running "composer require symfony/http-foundation".', __CLASS__));
         }
 
         $this->client = $client;

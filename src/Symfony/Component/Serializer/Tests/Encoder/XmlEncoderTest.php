@@ -679,7 +679,7 @@ XML;
     public function testDecodeEmptyXml()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Invalid XML data, it can not be empty.');
+        $this->expectExceptionMessage('Invalid XML data, it cannot be empty.');
         $this->encoder->decode(' ', 'xml');
     }
 

@@ -58,7 +58,7 @@ class WeekToArrayTransformer implements DataTransformerInterface
      *
      * @return string|null A week date string following the format Y-\WW
      *
-     * @throws TransformationFailedException If the given value can not be merged in a valid week date string,
+     * @throws TransformationFailedException If the given value cannot be merged in a valid week date string,
      *                                       or if the obtained week date does not exists
      */
     public function reverseTransform($value)

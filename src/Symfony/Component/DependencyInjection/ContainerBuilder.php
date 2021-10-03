@@ -846,7 +846,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($alias === (string) $id) {
-            throw new InvalidArgumentException(sprintf('An alias can not reference itself, got a circular reference on "%s".', $alias));
+            throw new InvalidArgumentException(sprintf('An alias cannot reference itself, got a circular reference on "%s".', $alias));
         }
 
         unset($this->definitions[$alias], $this->removedIds[$alias]);

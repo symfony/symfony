@@ -28,7 +28,7 @@ interface SemaphoreInterface
      *
      * @return bool
      *
-     * @throws SemaphoreAcquiringException If the semaphore can not be acquired
+     * @throws SemaphoreAcquiringException If the semaphore cannot be acquired
      */
     public function acquire(): bool;
 
@@ -47,7 +47,7 @@ interface SemaphoreInterface
     /**
      * Release the semaphore.
      *
-     * @throws SemaphoreReleasingException If the semaphore can not be released
+     * @throws SemaphoreReleasingException If the semaphore cannot be released
      */
     public function release();
 

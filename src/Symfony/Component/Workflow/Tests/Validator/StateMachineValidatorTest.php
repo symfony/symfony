@@ -108,7 +108,7 @@ class StateMachineValidatorTest extends TestCase
     public function testWithTooManyInitialPlaces()
     {
         $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('The state machine "foo" can not store many places. But the definition has 2 initial places. Only one is supported.');
+        $this->expectExceptionMessage('The state machine "foo" cannot store many places. But the definition has 2 initial places. Only one is supported.');
         $places = range('a', 'c');
         $transitions = [];
         $definition = new Definition($places, $transitions, ['a', 'b']);

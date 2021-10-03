@@ -48,7 +48,7 @@ trait HttpClientTrait
                 throw new InvalidArgumentException(sprintf('Invalid HTTP method "%s", only uppercase letters are accepted.', $method));
             }
             if (!$method) {
-                throw new InvalidArgumentException('The HTTP method can not be empty.');
+                throw new InvalidArgumentException('The HTTP method cannot be empty.');
             }
         }
 

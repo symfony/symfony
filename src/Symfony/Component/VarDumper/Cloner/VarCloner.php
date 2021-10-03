@@ -100,7 +100,7 @@ class VarCloner extends AbstractCloner
                         $values[$h] = $v;
                     }
                 }
-                // Create $stub when the original value $v can not be used directly
+                // Create $stub when the original value $v cannot be used directly
                 // If $v is a nested structure, put that structure in array $a
                 switch (true) {
                     case null === $v:

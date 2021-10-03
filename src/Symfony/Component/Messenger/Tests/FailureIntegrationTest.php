@@ -24,7 +24,7 @@ use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTranspor
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
-use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\Handler\OptionalHandlerLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -80,7 +80,7 @@ class FailureIntegrationTest extends TestCase
         $transport1HandlerThatFails = new DummyTestHandler(true);
         $allTransportHandlerThatWorks = new DummyTestHandler(false);
         $transport2HandlerThatWorks = new DummyTestHandler(false);
-        $handlerLocator = new HandlersLocator([
+        $handlerLocator = new OptionalHandlerLocator([
             DummyMessage::class => [
                 new HandlerDescriptor($transport1HandlerThatFails, [
                     'from_transport' => 'transport1',
@@ -268,7 +268,7 @@ class FailureIntegrationTest extends TestCase
         $transport1HandlerThatFails = new DummyTestHandler(true);
         $allTransportHandlerThatWorks = new DummyTestHandler(false);
         $transport2HandlerThatWorks = new DummyTestHandler(false);
-        $handlerLocator = new HandlersLocator([
+        $handlerLocator = new OptionalHandlerLocator([
             DummyMessage::class => [
                 new HandlerDescriptor($transport1HandlerThatFails, [
                     'from_transport' => 'transport1',
@@ -460,7 +460,7 @@ class FailureIntegrationTest extends TestCase
         // using to so we can lazily get the bus later and avoid circular problem
         $transport1HandlerThatFails = new DummyTestHandler(true);
         $transport2HandlerThatFails = new DummyTestHandler(true);
-        $handlerLocator = new HandlersLocator([
+        $handlerLocator = new OptionalHandlerLocator([
             DummyMessage::class => [
                 new HandlerDescriptor($transport1HandlerThatFails, [
                     'from_transport' => 'transport1',

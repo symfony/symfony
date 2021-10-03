@@ -20,22 +20,44 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class HandlersLocator implements HandlersLocatorInterface
+/** abstract */ class HandlersLocator implements HandlersLocatorInterface
 {
-    private $handlers;
+    protected $handlers;
 
     /**
      * @param HandlerDescriptor[][]|callable[][] $handlers
      */
     public function __construct(array $handlers)
     {
+        if (__CLASS__ === static::class) {
+            trigger_deprecation('symfony/messenger', '5.4',
+                'Instantiating "%s" is deprecated, use one of the provided concretions of "%s" instead.',
+                static::class,
+                HandlersLocatorInterface::class
+            );
+        }
         $this->handlers = $handlers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHandlers(Envelope $envelope): iterable
+    {
+        yield from $this->doGetHandlers($envelope);
+    }
+
+    /**
+     * @internal
+     */
+    public static function listTypes(Envelope $envelope): array
+    {
+        $class = \get_class($envelope->getMessage());
+
+        return [$class => $class]
+            + class_parents($class)
+            + class_implements($class)
+            + ['*' => '*'];
+    }
+
+    protected function doGetHandlers(Envelope $envelope): iterable
     {
         $seen = [];
 
@@ -61,20 +83,7 @@ class HandlersLocator implements HandlersLocatorInterface
         }
     }
 
-    /**
-     * @internal
-     */
-    public static function listTypes(Envelope $envelope): array
-    {
-        $class = \get_class($envelope->getMessage());
-
-        return [$class => $class]
-            + class_parents($class)
-            + class_implements($class)
-            + ['*' => '*'];
-    }
-
-    private function shouldHandle(Envelope $envelope, HandlerDescriptor $handlerDescriptor): bool
+    protected function shouldHandle(Envelope $envelope, HandlerDescriptor $handlerDescriptor): bool
     {
         if (null === $received = $envelope->last(ReceivedStamp::class)) {
             return true;
@@ -85,5 +94,21 @@ class HandlersLocator implements HandlersLocatorInterface
         }
 
         return $received->getTransportName() === $expectedTransport;
+    }
+
+    protected function countHandlers(Envelope $envelope): int
+    {
+        return array_reduce(
+            array_map(
+                function (string $type) {
+                    return $this->handlers[$type] ?? [];
+                },
+                self::listTypes($envelope)
+            ),
+            function (int $total, array $handlers) {
+                return $total + \count($handlers);
+            },
+            0
+        );
     }
 }

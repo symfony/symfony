@@ -27,6 +27,9 @@ use Symfony\Component\Messenger\Worker;
 
 class ResetLoggersWorkerSubscriberTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testLogsAreFlushed()
     {
         $loggerTestHandler = new TestHandler();

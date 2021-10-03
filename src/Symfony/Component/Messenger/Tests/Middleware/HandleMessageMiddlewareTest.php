@@ -13,11 +13,9 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
-use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
-use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -31,9 +29,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         $handler = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
 
-        $middleware = new HandleMessageMiddleware(new HandlersLocator([
-            DummyMessage::class => [$handler],
-        ]));
+        $middleware = new HandleMessageMiddleware($this->createHandlersLocatorStub([new HandlerDescriptor($handler)]));
 
         $handler->expects($this->once())->method('__invoke')->with($message);
 
@@ -48,9 +44,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
 
-        $middleware = new HandleMessageMiddleware(new HandlersLocator([
-            DummyMessage::class => $handlers,
-        ]));
+        $middleware = new HandleMessageMiddleware($this->createHandlersLocatorStub($handlers));
 
         try {
             $envelope = $middleware->handle($envelope, $this->getStackMock($nextIsCalled));
@@ -75,7 +69,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $failing->method('__invoke')->will($this->throwException(new \Exception('handler failed.')));
 
         yield 'A stamp is added' => [
-            [$first],
+            [new HandlerDescriptor($first)],
             [new HandledStamp('first result', $firstClass.'::__invoke')],
             true,
         ];
@@ -106,7 +100,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ];
 
         yield 'It ignores duplicated handler' => [
-            [$first, $first],
+            [new HandlerDescriptor($first), new HandlerDescriptor($first)],
             [
                 new HandledStamp('first result', $firstClass.'::__invoke'),
             ],
@@ -114,20 +108,12 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ];
     }
 
-    public function testThrowsNoHandlerException()
+    private function createHandlersLocatorStub(array $handlers)
     {
-        $this->expectException(NoHandlerForMessageException::class);
-        $this->expectExceptionMessage('No handler for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"');
-        $middleware = new HandleMessageMiddleware(new HandlersLocator([]));
+        $mock = $this->createStub(HandlersLocatorInterface::class);
+        $mock->method('getHandlers')->willReturn($handlers);
 
-        $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware());
-    }
-
-    public function testAllowNoHandlers()
-    {
-        $middleware = new HandleMessageMiddleware(new HandlersLocator([]), true);
-
-        $this->assertInstanceOf(Envelope::class, $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware()));
+        return $mock;
     }
 }
 

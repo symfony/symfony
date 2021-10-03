@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
+use Symfony\Component\Messenger\Handler\OptionalHandlerLocator;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
@@ -32,6 +33,9 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
     public function __construct(HandlersLocatorInterface $handlersLocator, bool $allowNoHandlers = false)
     {
+        if (1 < \func_num_args()) {
+            trigger_deprecation('symfony/messenger', '5.4', 'Passing the allowNoHandlers argument is deprecated, inject an instance of the "%s" instead.', OptionalHandlerLocator::class);
+        }
         $this->handlersLocator = $handlersLocator;
         $this->allowNoHandlers = $allowNoHandlers;
         $this->logger = new NullLogger();

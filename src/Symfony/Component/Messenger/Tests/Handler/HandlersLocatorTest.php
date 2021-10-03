@@ -18,6 +18,9 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
+/**
+ * @group legacy
+ */
 class HandlersLocatorTest extends TestCase
 {
     public function testItYieldsHandlerDescriptors()

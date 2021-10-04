@@ -386,6 +386,10 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>該數值不是有效的國際證券識別碼 （ISIN）。</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>該值需為一個有效的表達式。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

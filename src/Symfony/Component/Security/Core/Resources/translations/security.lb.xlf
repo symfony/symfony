@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Ongëltegen oder ofgelafene Login-Link.</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Ze vill mësslonge Login-Versich, w.e.g. nach emol an %minutes% Minutt probéieren.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Ze vill mësslonge Login-Versich, w.e.g. nach emol a %minutes% Minutten probéieren.</target>
+            </trans-unit>            
         </body>
     </file>
 </xliff>

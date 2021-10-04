@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-10-02T19:59:25Z
+
+@jderusse this PR fixes compatibility with driver decorators (inspecting the driver class to find the target platform is a mistake). See the ticket referenced in the issue description, which describes precisely such a bug.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-10-03T13:13:00Z
+
+> @jderusse this PR fixes compatibility with driver decorators (inspecting the driver class to find the target platform is a mistake). See the ticket referenced in the issue description, which describes precisely such a bug.
+
+Still.. `getName` will be removed in the next major version (https://github.com/doctrine/dbal/pull/4763) fixing the issue by introducing a dependency with a (soon) deprecated method is not the right way to fix the issue IMHO.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-03T15:45:27Z
+
+I agree, seems worth trying to fix this using `instanceof` checks on the platform instance instead so we don't have to revisit this too soon.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2021-10-04T07:00:31Z
+
+I've changed the approach to use the `instanceof` on the platforms.

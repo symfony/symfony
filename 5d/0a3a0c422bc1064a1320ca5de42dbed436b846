@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by simonberger at 2021-10-02T15:12:37Z
+
+I don't understand why the 7.4 tests still fail with the same error.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-02T15:35:21Z
+
+As the status messages should never be used for anything, I think this should be done in 5.4 instead (aka not a bug fix).
+
+---------------------------------------------------------------------------
+
+by simonberger at 2021-10-02T15:44:01Z
+
+The main problem are failing tests (https://github.com/symfony/symfony/pull/43291/checks?check_run_id=3776657076#step:8:4317).
+
+There would be the need to replace values of the XML https://www.iana.org/assignments/http-status-codes/http-status-codes.xml
+
+---------------------------------------------------------------------------
+
+by simonberger at 2021-10-02T16:08:51Z
+
+Or moving the XML into the project as a test resource and keep an old version for 4.4 to 5.3?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-02T16:29:27Z
+
+Good idea
+
+---------------------------------------------------------------------------
+
+by simonberger at 2021-10-02T16:59:25Z
+
+I found the state of the XML of last month (from 2018) and added it to the project.
+I'll create another PR for 5.4 (or 6.0?) to update the XML and actual message-texts in the Response class.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-10-03T08:40:32Z
+
+5.4 please
+
+---------------------------------------------------------------------------
+
+by simonberger at 2021-10-03T10:10:18Z
+
+> 5.4 please
+
+It is a bugfix. How should it be fixed on 4.4?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-10-03T17:04:01Z
+
+As @fabpot mentioned as no bugfix, it should result in 5.4 instead of 6.0.
+While it is now considered a bugfix, 4.4 is fine
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-04T08:40:58Z
+
+@OskarStark: @fabpot's comment was on the initial iteration of this PR, where the reason text was updated. That's not the case anymore and only tests are fixed (by making them used a pinned version of iana's xml).

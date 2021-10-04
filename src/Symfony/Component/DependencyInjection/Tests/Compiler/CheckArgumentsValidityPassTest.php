@@ -46,22 +46,22 @@ class CheckArgumentsValidityPassTest extends TestCase
      */
     public function testException(array $arguments, array $methodCalls)
     {
-        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $definition = $container->register('foo');
         $definition->setArguments($arguments);
         $definition->setMethodCalls($methodCalls);
 
         $pass = new CheckArgumentsValidityPass();
+        $this->expectException(RuntimeException::class);
         $pass->process($container);
     }
 
     public function definitionProvider()
     {
         return [
-            [[null, 'a' => 'a'], []],
+            [['a' => 'a', null], []],
             [[1 => 1], []],
-            [[], [['baz', [null, 'a' => 'a']]]],
+            [[], [['baz', ['a' => 'a', null]]]],
             [[], [['baz', [1 => 1]]]],
         ];
     }
@@ -70,7 +70,7 @@ class CheckArgumentsValidityPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $definition = $container->register('foo');
-        $definition->setArguments([null, 'a' => 'a']);
+        $definition->setArguments(['a' => 'a', null]);
 
         $pass = new CheckArgumentsValidityPass(false);
         $pass->process($container);

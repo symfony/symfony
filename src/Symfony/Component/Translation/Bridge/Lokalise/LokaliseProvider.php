@@ -148,6 +148,7 @@ final class LokaliseProvider implements ProviderInterface
                 'directory_prefix' => '%LANG_ISO%',
                 'filter_langs' => array_values($locales),
                 'filter_filenames' => array_map([$this, 'getLokaliseFilenameFromDomain'], $domains),
+                'export_empty_as' => 'skip',
             ],
         ]);
 

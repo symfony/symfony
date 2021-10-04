@@ -553,6 +553,44 @@ class RouterTest extends TestCase
         }
     }
 
+    public function testResolvingSchemes()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('/test', [], [], [], '', ['%parameter.http%', '%parameter.https%']);
+        $routes->add('foo', $route);
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = $this->getParameterBag([
+            'parameter.http' => 'http',
+            'parameter.https' => 'https',
+        ]);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertEquals(['http', 'https'], $route->getSchemes());
+    }
+
+    public function testResolvingMethods()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('/test', [], [], [], '', [], ['%parameter.get%', '%parameter.post%']);
+        $routes->add('foo', $route);
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = $this->getParameterBag([
+            'PARAMETER.GET' => 'GET',
+            'PARAMETER.POST' => 'POST',
+        ]);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertEquals(['GET', 'POST'], $route->getMethods());
+    }
+
     public function getContainerParameterForRoute()
     {
         yield 'String' => ['"foo"'];

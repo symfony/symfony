@@ -138,7 +138,7 @@ class Response
      *
      * The list of codes is complete according to the
      * {@link https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml Hypertext Transfer Protocol (HTTP) Status Code Registry}
-     * (last updated 2016-03-01).
+     * (last updated 2021-10-01).
      *
      * Unless otherwise noted, the status code is defined in RFC2616.
      *
@@ -180,14 +180,14 @@ class Response
         410 => 'Gone',
         411 => 'Length Required',
         412 => 'Precondition Failed',
-        413 => 'Payload Too Large',
+        413 => 'Content Too Large',                                           // RFC-ietf-httpbis-semantics
         414 => 'URI Too Long',
         415 => 'Unsupported Media Type',
         416 => 'Range Not Satisfiable',
         417 => 'Expectation Failed',
         418 => 'I\'m a teapot',                                               // RFC2324
         421 => 'Misdirected Request',                                         // RFC7540
-        422 => 'Unprocessable Entity',                                        // RFC4918
+        422 => 'Unprocessable Content',                                       // RFC-ietf-httpbis-semantics
         423 => 'Locked',                                                      // RFC4918
         424 => 'Failed Dependency',                                           // RFC4918
         425 => 'Too Early',                                                   // RFC-ietf-httpbis-replay-04

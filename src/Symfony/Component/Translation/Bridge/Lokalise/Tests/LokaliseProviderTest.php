@@ -246,6 +246,7 @@ class LokaliseProviderTest extends ProviderTestCase
                 'directory_prefix' => '%LANG_ISO%',
                 'filter_langs' => [$locale],
                 'filter_filenames' => [$domain.'.xliff'],
+                'export_empty_as' => 'skip',
             ]);
 
             $this->assertSame('POST', $method);

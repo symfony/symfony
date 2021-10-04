@@ -130,15 +130,15 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
 
             $schemes = [];
             foreach ($route->getSchemes() as $scheme) {
-                $schemes = array_merge($schemes, explode('|', $this->resolve($scheme)));
+                $schemes[] = explode('|', $this->resolve($scheme));
             }
-            $route->setSchemes($schemes);
+            $route->setSchemes(array_merge([], ...$schemes));
 
             $methods = [];
             foreach ($route->getMethods() as $method) {
-                $methods = array_merge($methods, explode('|', $this->resolve($method)));
+                $methods[] = explode('|', $this->resolve($method));
             }
-            $route->setMethods($methods);
+            $route->setMethods(array_merge([], ...$methods));
             $route->setCondition($this->resolve($route->getCondition()));
         }
     }

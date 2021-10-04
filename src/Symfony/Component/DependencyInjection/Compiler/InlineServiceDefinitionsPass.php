@@ -110,7 +110,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof ArgumentInterface) {
-            // Reference found in ArgumentInterface::getValues() are not inlineable
+            // References found in ArgumentInterface::getValues() are not inlineable
             return $value;
         }
 

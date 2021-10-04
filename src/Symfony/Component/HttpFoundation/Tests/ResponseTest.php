@@ -1038,25 +1038,10 @@ class ResponseTest extends ResponseTestCase
      */
     public function ianaCodesReasonPhrasesProvider()
     {
-        if (!\in_array('https', stream_get_wrappers(), true)) {
-            $this->markTestSkipped('The "https" wrapper is not available');
-        }
-
+        // XML taken from https://www.iana.org/assignments/http-status-codes/http-status-codes.xml
+        // (might not be up-to-date for older Symfony versions)
         $ianaHttpStatusCodes = new \DOMDocument();
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'GET',
-                'timeout' => 30,
-                'user_agent' => __METHOD__,
-            ],
-        ]);
-
-        if (!$rawStatusCodes = file_get_contents('https://www.iana.org/assignments/http-status-codes/http-status-codes.xml', false, $context)) {
-            $this->markTestSkipped('The IANA server is throttling the list of status codes');
-        }
-
-        $ianaHttpStatusCodes->loadXML($rawStatusCodes);
+        $ianaHttpStatusCodes->load(__DIR__.'/Fixtures/xml/http-status-codes.xml');
         if (!$ianaHttpStatusCodes->relaxNGValidate(__DIR__.'/schema/http-status-codes.rng')) {
             self::fail('Invalid IANA\'s HTTP status code list.');
         }

@@ -48,7 +48,8 @@
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "^2.13|^3.0",
-        "doctrine/orm": "^2.7.3"
+        "doctrine/orm": "^2.7.3",
+        "psr/log": "^1|^2|^3"
     },
     "conflict": {
         "doctrine/dbal": "<2.13",

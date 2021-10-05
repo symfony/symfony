@@ -12,10 +12,9 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\Schema;
@@ -110,7 +109,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
      *
      * @throws \PDOException    When the table already exists
      * @throws DBALException    When the table already exists
-     * @throws Exception        When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
      */
     public function createTable()
@@ -437,7 +435,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             if (null === $driver && !(\is_object($result) ? $result->rowCount() : $stmt->rowCount())) {
                 try {
                     $insertStmt->execute();
-                } catch (DBALException | Exception $e) {
+                } catch (DBALException $e) {
                 } catch (\PDOException $e) {
                     // A concurrent write won, let it be
                 }

@@ -1,0 +1,115 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-07-23T09:07:04Z
+
+ping @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-07-23T16:25:03Z
+
+@OskarStark Thanks for the review.
+
+---
+
+I added tests + entry in the CHANGELOG.
+It should be OK
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-24T05:54:08Z
+
+Thank you for this PR.
+
+This scenario seams like an edge case. My experience is obviously biased, but I can count the number of times I've been working with DB transactions on my one hand.
+
+Given you have code in your handler that open a transaction, I think that handler should also be responsible to make sure the transaction is closed.
+
+I do see the value for a middleware like this in your application or in a third partly library. But I don't think it should be in the Symfony organisation.
+
+Im :-1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-07-25T09:06:17Z
+
+Don't get me wrong: this middleware is a watchdog. People should not really on it. As you can see, when it's triggered, it generates an **error** log.
+
+So yes, all open transaction must to closed in the handler, I agree with you on this point.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-15T07:40:41Z
+
+People tend to like this feature: https://twitter.com/lyrixx/status/1437440305159094275 and https://twitter.com/lyrixx/status/1418497608658661382
+
+Another option would be to throw an exception when the transaction is not finished.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-22T08:46:07Z
+
+> Another option would be to throw an exception when the transaction is not finished.
+
+ping @Nyholm ; What do you think ? 👆
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-09-22T09:23:12Z
+
+First sentence of the description says: "This is a WIP to get some feedback." So, I suppose it cannot be merged yet :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-22T09:42:09Z
+
+@fabpot I have edited the PR description, thanks :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-22T10:10:50Z
+
+I share Tobias's feeling here, the proposed middleware seems too specific for being in core to me (same for the exception alternative).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-22T10:32:41Z
+
+@chalasr as I explained in the PR description, forgetting to close a transaction can really hurt. IMHO this middleware should be native and not op-tin 😬
+
+I understand your point of view, but as you can see, people on twitter tend to like it 👼🏼
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-22T13:11:30Z
+
+Well, it's less than your average likes on contrib related tweets isn't it? 🙃
+
+Jokes aside, I can see the potential value for debugging so I won't block this PR.
+Could it just log? Or perhaps it could be configurable (log vs exception vs rollback)?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-22T14:53:30Z
+
+I could just log indeed, without exception, and without throwing. I'll update the PR.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-01T09:05:52Z
+
+I updated the PR. now, it only log at `error` level when a transaction is open
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-10-03T01:02:48Z
+
+Maybe "Detect" is more appropriate than "watchdog"?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-04T15:36:07Z
+
+I have renamed everything:
+
+> Add a middleware to log when transaction has been left open `DoctrineOpenTransactionLoggerMiddleware`

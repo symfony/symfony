@@ -291,6 +291,7 @@ class MockHttpClientTest extends HttpClientTestCase
             case 'testReentrantBufferCallback':
             case 'testThrowingBufferCallback':
             case 'testInfoOnCanceledResponse':
+            case 'testChangeResponseFactory':
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;
 
@@ -386,5 +387,17 @@ class MockHttpClientTest extends HttpClientTestCase
     public function testHttp2PushVulcainWithUnusedResponse()
     {
         $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
+    }
+
+    public function testChangeResponseFactory()
+    {
+        /* @var MockHttpClient $client */
+        $client = $this->getHttpClient(__METHOD__);
+        $expectedBody = '{"foo": "bar"}';
+        $client->setResponseFactory(new MockResponse($expectedBody));
+
+        $response = $client->request('GET', 'http://localhost:8057');
+
+        $this->assertSame($expectedBody, $response->getContent());
     }
 }

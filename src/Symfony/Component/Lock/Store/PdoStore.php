@@ -12,9 +12,8 @@
 namespace Symfony\Component\Lock\Store;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
@@ -141,7 +140,7 @@ class PdoStore implements PersistingStoreInterface
                 $this->createTable();
             }
             $stmt->execute();
-        } catch (DBALException | Exception $e) {
+        } catch (DBALException $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         } catch (\PDOException $e) {
@@ -252,7 +251,6 @@ class PdoStore implements PersistingStoreInterface
      *
      * @throws \PDOException    When the table already exists
      * @throws DBALException    When the table already exists
-     * @throws Exception        When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
      */
     public function createTable(): void
@@ -266,7 +264,7 @@ class PdoStore implements PersistingStoreInterface
             $this->addTableToSchema($schema);
 
             foreach ($schema->toSql($conn->getDatabasePlatform()) as $sql) {
-                if (method_exists($conn, 'executeStatement')) {
+                if ($conn instanceof Connection && method_exists($conn, 'executeStatement')) {
                     $conn->executeStatement($sql);
                 } else {
                     $conn->exec($sql);
@@ -296,7 +294,7 @@ class PdoStore implements PersistingStoreInterface
                 throw new \DomainException(sprintf('Creating the lock table is currently not implemented for platform "%s".', $driver));
         }
 
-        if (method_exists($conn, 'executeStatement')) {
+        if ($conn instanceof Connection && method_exists($conn, 'executeStatement')) {
             $conn->executeStatement($sql);
         } else {
             $conn->exec($sql);
@@ -327,7 +325,7 @@ class PdoStore implements PersistingStoreInterface
         $sql = "DELETE FROM $this->table WHERE $this->expirationCol <= {$this->getCurrentTimestampStatement()}";
 
         $conn = $this->getConnection();
-        if (method_exists($conn, 'executeStatement')) {
+        if ($conn instanceof Connection && method_exists($conn, 'executeStatement')) {
             $conn->executeStatement($sql);
         } else {
             $conn->exec($sql);

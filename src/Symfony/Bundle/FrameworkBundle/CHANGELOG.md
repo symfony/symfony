@@ -24,6 +24,10 @@ CHANGELOG
 5.4
 ---
 
+ * Add `set_locale_from_accept_language` config option to automatically set the request locale based on the `Accept-Language`
+   HTTP request header and the `framework.enabled_locales` config option
+ * Add `set_content_language_from_locale` config option to automatically set the `Content-Language` HTTP response header based on the Request locale
+ * Deprecate the `framework.translator.enabled_locales`, use `framework.enabled_locales` instead
  * Add autowiring alias for `HttpCache\StoreInterface`
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private

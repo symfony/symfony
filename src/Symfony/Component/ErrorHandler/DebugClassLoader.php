@@ -803,7 +803,7 @@ class DebugClassLoader
                 continue;
             }
 
-            $docTypes = array_merge($docTypes, $t);
+            $docTypes[] = $t;
 
             if ('mixed' === $n || 'void' === $n) {
                 $nullable = false;
@@ -820,6 +820,7 @@ class DebugClassLoader
                 $phpTypes[] = $n;
             }
         }
+        $docTypes = array_merge([], ...$docTypes);
 
         if (!$phpTypes) {
             return;

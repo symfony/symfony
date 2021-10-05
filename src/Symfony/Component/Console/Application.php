@@ -549,14 +549,14 @@ class Application implements ResetInterface
                 continue;
             }
 
-            $namespaces = array_merge($namespaces, $this->extractAllNamespaces($command->getName()));
+            $namespaces[] = $this->extractAllNamespaces($command->getName());
 
             foreach ($command->getAliases() as $alias) {
-                $namespaces = array_merge($namespaces, $this->extractAllNamespaces($alias));
+                $namespaces[] = $this->extractAllNamespaces($alias);
             }
         }
 
-        return array_values(array_unique(array_filter($namespaces)));
+        return array_values(array_unique(array_filter(array_merge([], ...$namespaces))));
     }
 
     /**

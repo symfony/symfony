@@ -38,12 +38,15 @@
             <xsd:element name="rate-limiter" type="rate_limiter" minOccurs="0" maxOccurs="1" />
             <xsd:element name="uid" type="uid" minOccurs="0" maxOccurs="1" />
             <xsd:element name="notifier" type="notifier" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="enabled-locale" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />
+        <xsd:attribute name="set_locale_from_accept_language" type="xsd:boolean" />
+        <xsd:attribute name="set_content_language_from_locale" type="xsd:boolean" />
         <xsd:attribute name="test" type="xsd:boolean" />
         <xsd:attribute name="error-controller" type="xsd:string" />
         <xsd:attribute name="trusted-hosts" type="xsd:string" />

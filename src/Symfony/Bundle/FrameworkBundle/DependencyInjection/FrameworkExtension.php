@@ -274,6 +274,9 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $container->getDefinition('locale_listener')->replaceArgument(3, $config['set_locale_from_accept_language']);
+        $container->getDefinition('response_listener')->replaceArgument(1, $config['set_content_language_from_locale']);
+
         // If the slugger is used but the String component is not available, we should throw an error
         if (!ContainerBuilder::willBeAvailable('symfony/string', SluggerInterface::class, ['symfony/framework-bundle'])) {
             $container->register('slugger', 'stdClass')
@@ -296,6 +299,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.http_method_override', $config['http_method_override']);
         $container->setParameter('kernel.trusted_hosts', $config['trusted_hosts']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
+        $container->setParameter('kernel.enabled_locales', $config['enabled_locales']);
         $container->setParameter('kernel.error_controller', $config['error_controller']);
 
         if (($config['trusted_proxies'] ?? false) && ($config['trusted_headers'] ?? false)) {
@@ -417,11 +421,13 @@ class FrameworkExtension extends Extension
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
-        $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale']);
+        $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale'], $config['enabled_locales']);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
-        $this->registerRouterConfiguration($config['router'], $container, $loader, $config['translator']['enabled_locales'] ?? []);
+        // @deprecated since Symfony 5.4, in 6.0 change to:
+        // $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
+        $this->registerRouterConfiguration($config['router'], $container, $loader, $config['translator']['enabled_locales'] ?: $config['enabled_locales']);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
@@ -1187,7 +1193,7 @@ class FrameworkExtension extends Extension
         return new Reference('assets.empty_version_strategy');
     }
 
-    private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, string $defaultLocale)
+    private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, string $defaultLocale, array $enabledLocales)
     {
         if (!$this->isConfigEnabled($container, $config)) {
             $container->removeDefinition('console.command.translation_debug');
@@ -1211,7 +1217,9 @@ class FrameworkExtension extends Extension
         $defaultOptions['cache_dir'] = $config['cache_dir'];
         $translator->setArgument(4, $defaultOptions);
 
-        $translator->setArgument(5, $config['enabled_locales']);
+        // @deprecated since Symfony 5.4, in 6.0 change to:
+        // $translator->setArgument(5, $enabledLocales);
+        $translator->setArgument(5, $config['enabled_locales'] ?: $enabledLocales);
 
         $container->setParameter('translator.logging', $config['logging']);
         $container->setParameter('translator.default_path', $config['default_path']);
@@ -1344,7 +1352,9 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        $locales = $config['enabled_locales'] ?? [];
+        // @deprecated since Symfony 5.4, in 6.0 change to:
+        // $locales = $enabledLocales;
+        $locales = $config['enabled_locales'] ?: $enabledLocales;
 
         foreach ($config['providers'] as $provider) {
             if ($provider['locales']) {

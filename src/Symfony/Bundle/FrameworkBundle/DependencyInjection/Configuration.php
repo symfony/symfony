@@ -73,6 +73,7 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+            ->fixXmlConfig('enabled_locale')
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
@@ -82,6 +83,18 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
+                ->booleanNode('set_locale_from_accept_language')
+                    ->info('Whether to use the Accept-Language HTTP header to set the Request locale (only when the "_locale" request attribute is not passed).')
+                    ->defaultFalse()
+                ->end()
+                ->booleanNode('set_content_language_from_locale')
+                    ->info('Whether to set the Content-Language HTTP header on the Response using the Request locale.')
+                    ->defaultFalse()
+                ->end()
+                ->arrayNode('enabled_locales')
+                    ->info('Defines the possible locales for the application. This list is used for generating translations files, but also to restrict which locales are allowed when it is set from Accept-Language header (using "set_locale_from_accept_language").')
+                    ->prototype('scalar')->end()
+                ->end()
                 ->arrayNode('trusted_hosts')
                     ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
                     ->prototype('scalar')->end()
@@ -792,6 +805,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                         ->arrayNode('enabled_locales')
+                            ->setDeprecated('symfony/framework-bundle', '5.3', 'Option "%node%" at "%path%" is deprecated, set the "framework.enabled_locales" option instead.')
                             ->prototype('scalar')->end()
                             ->defaultValue([])
                         ->end()
@@ -826,7 +840,7 @@ class Configuration implements ConfigurationInterface
                                     ->arrayNode('locales')
                                         ->prototype('scalar')->end()
                                         ->defaultValue([])
-                                        ->info('If not set, all locales listed under framework.translator.enabled_locales are used.')
+                                        ->info('If not set, all locales listed under framework.enabled_locales are used.')
                                     ->end()
                                 ->end()
                             ->end()
@@ -1240,15 +1254,13 @@ class Configuration implements ConfigurationInterface
                                 ->then(function ($v) {
                                     $resources = [];
                                     foreach ($v as $resource) {
-                                        $resources = array_merge_recursive(
-                                            $resources,
-                                            \is_array($resource) && isset($resource['name'])
-                                                ? [$resource['name'] => $resource['value']]
-                                                : ['default' => $resource]
-                                        );
+                                        $resources[] = \is_array($resource) && isset($resource['name'])
+                                            ? [$resource['name'] => $resource['value']]
+                                            : ['default' => $resource]
+                                        ;
                                     }
 
-                                    return $resources;
+                                    return array_merge_recursive([], ...$resources);
                                 })
                             ->end()
                             ->prototype('array')

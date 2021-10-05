@@ -36,6 +36,15 @@ class MockHttpClient implements HttpClientInterface
      */
     public function __construct(callable|iterable|ResponseInterface $responseFactory = null, ?string $baseUri = 'https://example.com')
     {
+        $this->setResponseFactory($responseFactory);
+        $this->defaultOptions['base_uri'] = $baseUri;
+    }
+
+    /**
+     * @param callable|callable[]|ResponseInterface|ResponseInterface[]|iterable|null $responseFactory
+     */
+    public function setResponseFactory($responseFactory): void
+    {
         if ($responseFactory instanceof ResponseInterface) {
             $responseFactory = [$responseFactory];
         }
@@ -47,7 +56,6 @@ class MockHttpClient implements HttpClientInterface
         }
 
         $this->responseFactory = !\is_callable($responseFactory) || $responseFactory instanceof \Closure ? $responseFactory : \Closure::fromCallable($responseFactory);
-        $this->defaultOptions['base_uri'] = $baseUri;
     }
 
     /**

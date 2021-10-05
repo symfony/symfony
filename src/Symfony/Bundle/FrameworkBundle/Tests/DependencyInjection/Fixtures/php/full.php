@@ -3,6 +3,7 @@
 $container->loadFromExtension('framework', [
     'secret' => 's3cr3t',
     'default_locale' => 'fr',
+    'enabled_locales' => ['fr', 'en'],
     'csrf_protection' => true,
     'form' => [
         'csrf_protection' => [
@@ -50,7 +51,6 @@ $container->loadFromExtension('framework', [
         'fallback' => 'fr',
         'paths' => ['%kernel.project_dir%/Fixtures/translations'],
         'cache_dir' => '%kernel.cache_dir%/translations',
-        'enabled_locales' => ['fr', 'en'],
     ],
     'validation' => [
         'enabled' => true,

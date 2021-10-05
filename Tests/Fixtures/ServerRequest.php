@@ -45,95 +45,156 @@ class ServerRequest extends Message implements ServerRequestInterface
         $this->attributes = $attributes;
     }
 
-    public function getRequestTarget()
+    public function getRequestTarget(): string
     {
         return $this->requestTarget;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withRequestTarget($requestTarget)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withMethod($method)
     {
+        throw new \BadMethodCallException('Not implemented.');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return UriInterface
+     */
     public function getUri()
     {
         return $this->uri;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    public function getServerParams()
+    public function getServerParams(): array
     {
         return $this->server;
     }
 
-    public function getCookieParams()
+    public function getCookieParams(): array
     {
         return $this->cookies;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withCookieParams(array $cookies)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    public function getQueryParams()
+    public function getQueryParams(): array
     {
         return $this->query;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withQueryParams(array $query)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    public function getUploadedFiles()
+    public function getUploadedFiles(): array
     {
         return $this->uploadedFiles;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withUploadedFiles(array $uploadedFiles)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return array|object|null
+     */
     public function getParsedBody()
     {
         return $this->data;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withParsedBody($data)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return mixed
+     */
     public function getAttribute($name, $default = null)
     {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
+        return $this->attributes[$name] ?? $default;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withAttribute($name, $value)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withoutAttribute($name)
     {
         throw new \BadMethodCallException('Not implemented.');

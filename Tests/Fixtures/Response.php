@@ -28,17 +28,20 @@ class Response extends Message implements ResponseInterface
         $this->statusCode = $statusCode;
     }
 
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
 
+    /**
+     * @return static
+     */
     public function withStatus($code, $reasonPhrase = '')
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    public function getReasonPhrase()
+    public function getReasonPhrase(): string
     {
         throw new \BadMethodCallException('Not implemented.');
     }

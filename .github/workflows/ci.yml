@@ -19,6 +19,7 @@ jobs:
                       deprecations: max[self]=0
                     - php: '8.0'
                       deps: highest
+                      deprecations: max[indirect]=5
 
         steps:
             - name: Checkout code

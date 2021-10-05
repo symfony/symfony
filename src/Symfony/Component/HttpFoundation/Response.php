@@ -1048,10 +1048,10 @@ class Response
 
         $ret = [];
         foreach ($vary as $item) {
-            $ret = array_merge($ret, preg_split('/[\s,]+/', $item));
+            $ret[] = preg_split('/[\s,]+/', $item);
         }
 
-        return $ret;
+        return array_merge([], ...$ret);
     }
 
     /**

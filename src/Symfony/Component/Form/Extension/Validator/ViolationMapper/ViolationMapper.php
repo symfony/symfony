@@ -185,12 +185,17 @@ class ViolationMapper implements ViolationMapperInterface
 
                     if (null !== $this->translator) {
                         $form = $scope;
-                        $translationParameters = $form->getConfig()->getOption('label_translation_parameters', []);
+                        $translationParameters[] = $form->getConfig()->getOption('label_translation_parameters', []);
 
                         do {
                             $translationDomain = $form->getConfig()->getOption('translation_domain');
-                            $translationParameters = array_merge($form->getConfig()->getOption('label_translation_parameters', []), $translationParameters);
+                            array_unshift(
+                                $translationParameters,
+                                $form->getConfig()->getOption('label_translation_parameters', [])
+                            );
                         } while (null === $translationDomain && null !== $form = $form->getParent());
+
+                        $translationParameters = array_merge([], ...$translationParameters);
 
                         $label = $this->translator->trans(
                             $label,

@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 
+/** @group legacy */
 class ResetLoggersWorkerSubscriberTest extends TestCase
 {
     public function testLogsAreFlushed()

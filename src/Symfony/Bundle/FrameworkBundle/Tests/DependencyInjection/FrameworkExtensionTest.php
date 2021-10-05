@@ -546,6 +546,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(['_locale' => 'fr|en'], $container->getDefinition('routing.loader')->getArgument(2));
     }
 
+    /**
+     * @group legacy
+     */
+    public function testRouterWithLegacyTranslatorEnabledLocales()
+    {
+        $container = $this->createContainerFromFile('legacy_translator_enabled_locales');
+
+        $this->assertTrue($container->has('router'), '->registerRouterConfiguration() loads routing.xml');
+        $arguments = $container->findDefinition('router')->getArguments();
+        $this->assertEquals($container->getParameter('kernel.project_dir').'/config/routing.xml', $container->getParameter('router.resource'), '->registerRouterConfiguration() sets routing resource');
+        $this->assertEquals('%router.resource%', $arguments[1], '->registerRouterConfiguration() sets routing resource');
+        $this->assertEquals('xml', $arguments[2]['resource_type'], '->registerRouterConfiguration() sets routing resource type');
+
+        $this->assertSame(['_locale' => 'fr|en'], $container->getDefinition('routing.loader')->getArgument(2));
+    }
+
     public function testRouterRequiresResourceOption()
     {
         $this->expectException(InvalidConfigurationException::class);

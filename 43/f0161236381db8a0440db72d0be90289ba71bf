@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by GregoireHebert at 2021-09-20T14:27:48Z
+
+Thank you for taking over :-)
+
+---------------------------------------------------------------------------
+
+by stof at 2021-09-20T14:29:04Z
+
+Using the `Accept-Language` should be opt-in IMO. Otherwise, this might break projects that already set the locale based on other rules (the preferences of a logged-in user for instance).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-05T13:47:34Z
+
+This PR is ready.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-05T16:20:33Z
+
+Thanks for the reviews! All fixed now

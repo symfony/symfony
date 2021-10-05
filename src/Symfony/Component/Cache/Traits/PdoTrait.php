@@ -150,7 +150,7 @@ trait PdoTrait
                 throw new \DomainException(sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $this->driver));
         }
 
-        if (method_exists($conn, 'executeStatement')) {
+        if ($conn instanceof Connection && method_exists($conn, 'executeStatement')) {
             $conn->executeStatement($sql);
         } else {
             $conn->exec($sql);
@@ -282,7 +282,7 @@ trait PdoTrait
         }
 
         try {
-            if (method_exists($conn, 'executeStatement')) {
+            if ($conn instanceof Connection && method_exists($conn, 'executeStatement')) {
                 $conn->executeStatement($sql);
             } else {
                 $conn->exec($sql);

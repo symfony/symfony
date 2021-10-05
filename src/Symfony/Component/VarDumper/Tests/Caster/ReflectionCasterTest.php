@@ -586,6 +586,27 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $generator);
     }
 
+    /**
+     * @requires PHP 8.1
+     */
+    public function testNewInInitializer()
+    {
+        $f = eval('return function ($a = new stdClass()) {};');
+        $line = __LINE__ - 1;
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+Closure(\$a = new stdClass) {
+  class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
+  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
+  file: "%sReflectionCasterTest.php($line) : eval()'d code"
+  line: "1 to 1"
+}
+EOTXT
+            , $f
+        );
+    }
+
     public static function stub(): void
     {
     }

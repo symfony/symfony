@@ -24,8 +24,8 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  */
 class ChainEncoder implements ContextAwareEncoderInterface
 {
-    protected $encoders = [];
-    protected $encoderByFormat = [];
+    private array $encoders = [];
+    private array $encoderByFormat = [];
 
     public function __construct(array $encoders = [])
     {

@@ -23,15 +23,15 @@ final class CacheItem implements ItemInterface
 {
     private const METADATA_EXPIRY_OFFSET = 1527506807;
 
-    protected $key;
-    protected $value;
-    protected $isHit = false;
-    protected $expiry;
-    protected $metadata = [];
-    protected $newMetadata = [];
-    protected $innerItem;
-    protected $poolHash;
-    protected $isTaggable = false;
+    protected string $key;
+    protected mixed $value = null;
+    protected bool $isHit = false;
+    protected float|int|null $expiry = null;
+    protected array $metadata = [];
+    protected array $newMetadata = [];
+    protected ?ItemInterface $innerItem = null;
+    protected ?string $poolHash = null;
+    protected bool $isTaggable = false;
 
     /**
      * {@inheritdoc}

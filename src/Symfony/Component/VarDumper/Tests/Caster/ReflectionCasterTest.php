@@ -499,7 +499,7 @@ array:2 [
         Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
         ›     yield 1;
         › }
-        ›
+        › 
       }
     }
     closed: false

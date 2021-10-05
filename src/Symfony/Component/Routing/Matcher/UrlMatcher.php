@@ -45,7 +45,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      *
      * @internal
      */
-    protected $allowSchemes = [];
+    protected array $allowSchemes = [];
 
     protected $routes;
     protected $request;

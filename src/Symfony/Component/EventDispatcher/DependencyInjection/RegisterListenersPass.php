@@ -186,10 +186,10 @@ class RegisterListenersPass implements CompilerPassInterface
  */
 class ExtractingEventDispatcher extends EventDispatcher implements EventSubscriberInterface
 {
-    public $listeners = [];
+    public array $listeners = [];
 
-    public static $aliases = [];
-    public static $subscriber;
+    public static array $aliases = [];
+    public static string $subscriber;
 
     public function addListener(string $eventName, callable|array $listener, int $priority = 0)
     {

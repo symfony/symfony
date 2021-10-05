@@ -35,17 +35,17 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * @internal
      */
-    public static $defaultMutatorPrefixes = ['add', 'remove', 'set'];
+    public static array $defaultMutatorPrefixes = ['add', 'remove', 'set'];
 
     /**
      * @internal
      */
-    public static $defaultAccessorPrefixes = ['get', 'is', 'has', 'can'];
+    public static array $defaultAccessorPrefixes = ['get', 'is', 'has', 'can'];
 
     /**
      * @internal
      */
-    public static $defaultArrayMutatorPrefixes = ['add', 'remove'];
+    public static array $defaultArrayMutatorPrefixes = ['add', 'remove'];
 
     public const ALLOW_PRIVATE = 1;
     public const ALLOW_PROTECTED = 2;

@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class AddRequestFormatsListener implements EventSubscriberInterface
 {
-    protected $formats;
+    private array $formats;
 
     public function __construct(array $formats)
     {

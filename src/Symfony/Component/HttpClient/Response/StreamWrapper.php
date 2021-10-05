@@ -25,8 +25,7 @@ class StreamWrapper
     /** @var resource|string|null */
     public $context;
 
-    /** @var HttpClientInterface */
-    private $client;
+    private HttpClientInterface|ResponseInterface $client;
 
     private ResponseInterface $response;
 
@@ -37,7 +36,7 @@ class StreamWrapper
     private $handle;
 
     private bool $blocking = true;
-    private $timeout;
+    private ?float $timeout = null;
     private bool $eof = false;
     private int $offset = 0;
 

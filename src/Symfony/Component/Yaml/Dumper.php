@@ -24,10 +24,8 @@ class Dumper
 {
     /**
      * The amount of spaces to use for indentation of nested nodes.
-     *
-     * @var int
      */
-    protected $indentation;
+    private int $indentation;
 
     public function __construct(int $indentation = 4)
     {

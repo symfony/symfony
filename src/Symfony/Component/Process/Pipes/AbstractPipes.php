@@ -20,7 +20,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
  */
 abstract class AbstractPipes implements PipesInterface
 {
-    public $pipes = [];
+    public array $pipes = [];
 
     private $inputBuffer = '';
     private $input;

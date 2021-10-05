@@ -52,14 +52,14 @@ class Definition
      *
      * Used to store the name of the inner id when using service decoration together with autowiring
      */
-    public $innerServiceId;
+    public ?string $innerServiceId = null;
 
     /**
      * @internal
      *
      * Used to store the behavior to follow when using service decoration and the decorated service is invalid
      */
-    public $decorationOnInvalid;
+    public ?int $decorationOnInvalid = null;
 
     public function __construct(string $class = null, array $arguments = [])
     {

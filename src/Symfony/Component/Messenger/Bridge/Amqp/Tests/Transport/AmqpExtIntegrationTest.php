@@ -215,7 +215,8 @@ Get envelope with message: Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixture
 with stamps: [
     "Symfony\\Component\\Messenger\\Bridge\\Amqp\\Transport\\AmqpReceivedStamp",
     "Symfony\\Component\\Messenger\\Stamp\\ReceivedStamp",
-    "Symfony\\Component\\Messenger\\Stamp\\ConsumedByWorkerStamp"
+    "Symfony\\Component\\Messenger\\Stamp\\ConsumedByWorkerStamp",
+    "Symfony\\Component\\Messenger\\Stamp\\AckStamp"
 ]
 Done.
 

@@ -32,6 +32,9 @@ if (!function_exists('dump')) {
 }
 
 if (!function_exists('dd')) {
+    /**
+     * @return never
+     */
     function dd(...$vars)
     {
         foreach ($vars as $v) {

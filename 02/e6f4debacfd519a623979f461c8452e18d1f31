@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-10-03T17:05:27Z
+
+This can be a job for fabbot
+
+cc @fabpot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-04T13:41:05Z
+
+even if "cannot" is more common, "can not" is perfectly valid English, not sure we want to do this change.
+
+---------------------------------------------------------------------------
+
+by mvorisek at 2021-10-04T13:48:06Z
+
+Symfony does already use "cannot" - https://github.com/symfony/symfony/search?q=cannot , this PR unifies the other uses.
+
+Citing from https://www.grammarly.com/blog/cannot-or-can-not/ grammar:
+> - In formal writing and where contractions are frowned upon, use cannot.
+> - It is possible to write can not, but you generally find it only as part of some other construction, such as “not only . . . but also.”

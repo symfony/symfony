@@ -24,7 +24,7 @@ use Twig\TokenParser\AbstractTokenParser;
  */
 final class StopwatchTokenParser extends AbstractTokenParser
 {
-    protected $stopwatchIsAvailable;
+    private bool $stopwatchIsAvailable;
 
     public function __construct(bool $stopwatchIsAvailable)
     {

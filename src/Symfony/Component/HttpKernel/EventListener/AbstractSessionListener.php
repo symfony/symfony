@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\SessionUtils;
-use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\UnexpectedSessionUsageException;
@@ -179,7 +178,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
             }
         }
 
-        if ($session instanceof Session ? $session->getUsageIndex() === 0 : !$session->isStarted()) {
+        if ($session instanceof Session ? 0 === $session->getUsageIndex() : !$session->isStarted()) {
             return;
         }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Config\Loader\ParamConfigurator;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -31,7 +32,7 @@ abstract class AbstractConfigurator
     public static $valuePreProcessor;
 
     /** @internal */
-    protected $definition;
+    protected Definition|Alias|null $definition = null;
 
     public function __call(string $method, array $args)
     {

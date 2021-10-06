@@ -21,10 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 final class Target
 {
-    /**
-     * @var string
-     */
-    public $name;
+    public string $name;
 
     public function __construct(string $name)
     {

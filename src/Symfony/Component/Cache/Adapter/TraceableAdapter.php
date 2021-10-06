@@ -270,12 +270,15 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     }
 }
 
+/**
+ * @internal
+ */
 class TraceableAdapterEvent
 {
-    public $name;
-    public $start;
-    public $end;
-    public $result;
-    public $hits = 0;
-    public $misses = 0;
+    public string $name;
+    public float $start;
+    public float $end;
+    public array|bool $result;
+    public int $hits = 0;
+    public int $misses = 0;
 }

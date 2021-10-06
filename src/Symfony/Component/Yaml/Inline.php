@@ -26,8 +26,8 @@ class Inline
 {
     public const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*+(?:\\\\.[^"\\\\]*+)*+)"|\'([^\']*+(?:\'\'[^\']*+)*+)\')';
 
-    public static $parsedLineNumber = -1;
-    public static $parsedFilename;
+    public static int $parsedLineNumber = -1;
+    public static ?string $parsedFilename = null;
 
     private static bool $exceptionOnInvalidType = false;
     private static bool $objectSupport = false;

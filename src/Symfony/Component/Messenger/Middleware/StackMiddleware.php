@@ -65,8 +65,8 @@ class StackMiddleware implements MiddlewareInterface, StackInterface
  */
 class MiddlewareStack
 {
-    public $iterator;
-    public $stack = [];
+    public ?\Iterator $iterator;
+    public array $stack = [];
 
     public function next(int $offset): ?MiddlewareInterface
     {
@@ -74,7 +74,7 @@ class MiddlewareStack
             return $this->stack[$offset];
         }
 
-        if (null === $this->iterator) {
+        if (!isset($this->iterator)) {
             return null;
         }
 

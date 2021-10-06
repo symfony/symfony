@@ -139,6 +139,8 @@ Lock
 
  * Removed the `NotSupportedException`. It shouldn't be thrown anymore.
  * Removed the `RetryTillSaveStore`. Logic has been moved in `Lock` and is not needed anymore.
+ * Removed usage of `PdoStore` with a `Doctrine\DBAL\Connection` or a DBAL url, use the new `DoctrineDbalStore` instead
+ * Removed usage of `PostgreSqlStore` with a `Doctrine\DBAL\Connection` or a DBAL url, use the new `DoctrineDbalPostgreSqlStore` instead
 
 Mailer
 ------

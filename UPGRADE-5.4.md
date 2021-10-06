@@ -41,6 +41,12 @@ HttpFoundation
 
  * Mark `Request::get()` internal, use explicit input sources instead
 
+Lock
+----
+
+ * Deprecate usage of `PdoStore` with a `Doctrine\DBAL\Connection` or a DBAL url, use the new `DoctrineDbalStore` instead
+ * Deprecate usage of `PostgreSqlStore` with a `Doctrine\DBAL\Connection` or a DBAL url, use the new `DoctrineDbalPostgreSqlStore` instead
+
 Messenger
 ---------
 

@@ -3,7 +3,8 @@ CHANGELOG
 
 5.4
 ---
- * Add a middleware to log when transaction has been left open `DoctrineOpenTransactionLoggerMiddleware`
+
+ * Add `DoctrineOpenTransactionLoggerMiddleware` to log when a transaction has been left open
 
 5.3
 ---

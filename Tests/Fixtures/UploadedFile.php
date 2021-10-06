@@ -33,32 +33,32 @@ class UploadedFile implements UploadedFileInterface
         $this->clientMediaType = $clientMediaType;
     }
 
-    public function getStream()
+    public function getStream(): Stream
     {
         return new Stream(file_get_contents($this->filePath));
     }
 
-    public function moveTo($targetPath)
+    public function moveTo($targetPath): void
     {
         rename($this->filePath, $targetPath);
     }
 
-    public function getSize()
+    public function getSize(): ?int
     {
         return $this->size;
     }
 
-    public function getError()
+    public function getError(): int
     {
         return $this->error;
     }
 
-    public function getClientFilename()
+    public function getClientFilename(): ?string
     {
         return $this->clientFileName;
     }
 
-    public function getClientMediaType()
+    public function getClientMediaType(): ?string
     {
         return $this->clientMediaType;
     }

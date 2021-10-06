@@ -26,12 +26,12 @@ class Stream implements StreamInterface
         $this->stringContent = $stringContent;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->stringContent;
     }
 
-    public function close()
+    public function close(): void
     {
     }
 
@@ -40,61 +40,69 @@ class Stream implements StreamInterface
         return fopen('data://text/plain,'.$this->stringContent, 'r');
     }
 
-    public function getSize()
+    public function getSize(): ?int
     {
+        return null;
     }
 
-    public function tell()
+    public function tell(): int
     {
         return 0;
     }
 
-    public function eof()
+    public function eof(): bool
     {
         return $this->eof;
     }
 
-    public function isSeekable()
+    public function isSeekable(): bool
     {
         return true;
     }
 
-    public function seek($offset, $whence = \SEEK_SET)
+    public function seek($offset, $whence = \SEEK_SET): void
     {
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->eof = false;
     }
 
-    public function isWritable()
+    public function isWritable(): bool
     {
         return false;
     }
 
-    public function write($string)
+    public function write($string): int
     {
+        return \strlen($string);
     }
 
-    public function isReadable()
+    public function isReadable(): bool
     {
         return true;
     }
 
-    public function read($length)
+    public function read($length): string
     {
         $this->eof = true;
 
         return $this->stringContent;
     }
 
-    public function getContents()
+    public function getContents(): string
     {
         return $this->stringContent;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return mixed
+     */
     public function getMetadata($key = null)
     {
+        return null;
     }
 }

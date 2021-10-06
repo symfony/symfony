@@ -27,26 +27,26 @@ class Uri implements UriInterface
     private $fragment = '';
     private $uriString;
 
-    public function __construct($uri = '')
+    public function __construct(string $uri = '')
     {
         $parts = parse_url($uri);
 
-        $this->scheme = isset($parts['scheme']) ? $parts['scheme'] : '';
-        $this->userInfo = isset($parts['user']) ? $parts['user'] : '';
-        $this->host = isset($parts['host']) ? $parts['host'] : '';
-        $this->port = isset($parts['port']) ? $parts['port'] : null;
-        $this->path = isset($parts['path']) ? $parts['path'] : '';
-        $this->query = isset($parts['query']) ? $parts['query'] : '';
-        $this->fragment = isset($parts['fragment']) ? $parts['fragment'] : '';
+        $this->scheme = $parts['scheme'] ?? '';
+        $this->userInfo = $parts['user'] ?? '';
+        $this->host = $parts['host'] ?? '';
+        $this->port = $parts['port'] ?? null;
+        $this->path = $parts['path'] ?? '';
+        $this->query = $parts['query'] ?? '';
+        $this->fragment = $parts['fragment'] ?? '';
         $this->uriString = $uri;
     }
 
-    public function getScheme()
+    public function getScheme(): string
     {
         return $this->scheme;
     }
 
-    public function getAuthority()
+    public function getAuthority(): string
     {
         if (empty($this->host)) {
             return '';
@@ -63,72 +63,107 @@ class Uri implements UriInterface
         return $authority;
     }
 
-    public function getUserInfo()
+    public function getUserInfo(): string
     {
         return $this->userInfo;
     }
 
-    public function getHost()
+    public function getHost(): string
     {
         return $this->host;
     }
 
-    public function getPort()
+    public function getPort(): ?int
     {
         return $this->port;
     }
 
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
-    public function getQuery()
+    public function getQuery(): string
     {
         return $this->query;
     }
 
-    public function getFragment()
+    public function getFragment(): string
     {
         return $this->fragment;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withScheme($scheme)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withUserInfo($user, $password = null)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withHost($host)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withPort($port)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withPath($path)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withQuery($query)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return static
+     */
     public function withFragment($fragment)
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->uriString;
     }

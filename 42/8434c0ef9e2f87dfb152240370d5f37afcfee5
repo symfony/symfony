@@ -1,0 +1,202 @@
+---------------------------------------------------------------------------
+
+by norkunas at 2021-02-12T16:21:04Z
+
+Why only hex? Maybe Color constraint with hex, rgb(a),hsl(a) support would be better :)
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-02-12T16:33:06Z
+
+@norkunas Yes, I thought about it. But I was not sure if we have to support hex,rgb(a),hsl(a) in the same Constraint. I think that we should make separate Constraints to avoid to guess the format. WDYT?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-02-12T16:34:02Z
+
+Also good idea :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-02-12T16:39:50Z
+
+Actually, CSS 4 defines four kinds of hexadecimal colors (https://www.w3.org/TR/css-color-4/#typedef-hex-color):
+
+* 6-digit: `#00ff00`
+* 8-digit: `#0000ffcc`
+* 3-digit: `#0f0`
+* 4-digit: `#0f0c`
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-02-12T18:10:41Z
+
+Interesting previous discussions on https://github.com/symfony/symfony/pull/35626
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-12T19:43:43Z
+
+I would prefer HexColor instead of HexaColor
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-05-25T13:22:45Z
+
+Here are some comments in case we want to move this forward:
+
+* I'd rename `HexaColor` to `CssColor`, because this constraint is only about CSS-valid colors
+* `CssColor` would also match Symfony's primary target: the web (and we use CSS colors even when outside the web; e.g. [Symfony's Console true colors](https://symfony.com/blog/new-in-symfony-5-2-true-colors-in-the-console) are defined with some of the CSS-valid formats)
+* Even if it's called `CssColor` we don't need to support from the beginning all current (and future) [ways of defining CSS colors](https://www.w3.org/TR/css-color-4/#resolving-color-values). This is the same as [CardScheme](https://symfony.com/doc/current/reference/constraints/CardScheme.html) constraint: it only supported a few of the most popular cards at first and, in the following years, we added more cards. Even if it's called `CardScheme`, it doesn't support all the existing card schemes yet ... but that's fine; it's still very useful and widely used (so, we can add a `CssColor` without supporting ALL color formats at first, specially the less used ones)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-07-04T09:26:22Z
+
+@welcoMattic How can we move forward?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-07-04T10:12:33Z
+
+@fabpot I intend to apply Javier's comments, and make a first version of this constraint that we can improve later following user's needs.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-07-04T17:14:17Z
+
+I addressed @javiereguiluz's comments about making a first usable version of CssColor Constraint, with common formats support, which are:
+
+- 6-digit: `#00ff00`
+- 8-digit: `#0000ffcc`
+- 3-digit: `#0f0`
+- 4-digit: `#0f0c`
+- basic named colors (`black|red|green|yellow|blue|magenta|cyan|white`) (if required for 1st version, we could copy paste [the official list of named colors](https://www.w3.org/TR/css-color-4/#named-color))
+
+Let me know if we are agree on this 1st version
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-07-05T12:53:34Z
+
+> I'm not comfortable with naming this class CssColor, while it only supported 2 formats (hexa and named colors).
+>
+> reading https://developer.mozilla.org/fr/docs/Web/CSS/color_value we might found
+>
+> ```
+> #f03
+> #f030
+>
+> #ff0033
+> #ff003300
+>
+> rgb(255,0,51)
+> rgb(100%,0%,20%)
+>
+> rgba(255,0,0,0.1)
+> rgba(255 0 0 / 0.4)
+>
+> hsl(0,  100%,50%)
+> hsl(120deg 60% 70%)
+>
+> hsla(240,100%,50%,0.05)
+> ```
+>
+> edit: I'm not asking to support all the patterns. I'm fine with a validator that supports only Hex representation. But in that case it should not be named CssValidator IMHO
+
+As @javiereguiluz says lately, we would like to start a Css Validator, and improve it as it goes along. So, for the first version there are only hex formats + named colors supported, but it belongs to this validator to validate all CSS color formats, including rgb(a), hsl, ...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-07-05T13:09:27Z
+
+@welcoMattic although we'll support a subset of formats at the beginning, let's consider that we'll eventually support all formats. E.g. `PATTERN_HTML5`, `PATTERN_LONG` and `PATTERN_SHORT` should probably be renamed as `PATTERN_HEX_HTML5`, `PATTERN_HEX_LONG` and `PATTERN_HEX_SHORT`.
+
+Also, let's think if this naming is enough to all future formats:
+
+```
+PATTERN_HEX_HTML5
+PATTERN_HEX_LONG
+PATTERN_HEX_SHORT
+PATTERN_NAMED_COLORS
+PATTERN_SYSTEM_COLORS
+PATTERN_KEYWORDS (transparent and currentColor)
+PATTERN_RGB
+PATTERN_RGBA
+PATTERN_HSL
+PATTERN_HSLA
+PATTERN_LCH
+PATTERN_LAB
+```
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-07-05T13:14:28Z
+
+> @welcoMattic although we'll support a subset of formats at the beginning, let's consider that we'll eventually support all formats. E.g. `PATTERN_HTML5`, `PATTERN_LONG` and `PATTERN_SHORT` should probably be renamed as `PATTERN_HEX_HTML5`, `PATTERN_HEX_LONG` and `PATTERN_HEX_SHORT`.
+>
+> Also, let's think if this naming is enough to all future formats:
+>
+> ```
+> PATTERN_HEX_HTML5
+> PATTERN_HEX_LONG
+> PATTERN_HEX_SHORT
+> PATTERN_NAMED_COLORS
+> PATTERN_SYSTEM_COLORS
+> PATTERN_KEYWORDS (transparent and currentColor)
+> PATTERN_RGB
+> PATTERN_RGBA
+> PATTERN_HSL
+> PATTERN_HSLA
+> PATTERN_LCH
+> PATTERN_LAB
+> ```
+
+Yes, this list could be a good start to plan future supported formats, I like it.
+Maybe renaming `PATTERN_HEX_HTML5` to `PATTERN_HEX_DEFAULT`, WDYT @jderusse @javiereguiluz? As long as it could be used outside of the web context.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-04T20:29:16Z
+
+friendly ping for feedback @jderusse @javiereguiluz . Thanks!
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-09-29T17:15:54Z
+
+@jderusse @OskarStark @javiereguiluz, I've reworked the feature with now:
+- `$modes` could be a string or an array
+- all suggested formats (except LCH and LAB, because I couldn't find a clear description of the format to make the matching regex, but as these formats are quite new, I think it's ok to not supported them now, and add them later if needed. WDYT?)
+- tests for all supported formats
+
+status: Needs review
+
+AppVeyor is red because of 20 min timeout.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-09-29T21:05:29Z
+
+@javiereguiluz thanks! About `$modes`, what do you think about renaming it to `$formats`?
+I've addressed all other comments, thanks for the review
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-09-30T13:37:24Z
+
+Fabbot is wrong about the italian typo correction, it's `possibile` and not `possible`.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-10-06T08:23:21Z
+
+@javiereguiluz @derrabus I don't know exactly when the feature freeze will happen, but I think this PR is ready to be merged in 5.4.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-06T16:58:24Z
+
+I agree, this PR is ready. But I need a second approval to merge a feature PR.

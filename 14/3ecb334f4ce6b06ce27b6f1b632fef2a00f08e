@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-05T15:54:47Z
+
+We need to be extra careful with internal classes and traits: Their properties might be inherited by non-internal non-final classes. In that case, we need to treat them as if they were declared in the child class directly. Adding a property type would be a potential BC break then.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-05T16:49:26Z
+
+Agree, thanks for the hints. PR updated;

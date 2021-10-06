@@ -52,7 +52,7 @@ class InputArgumentTest extends TestCase
         $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
         $this->assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
         $argument = new InputArgument('foo', InputArgument::OPTIONAL);
-        $this->assertFalse($argument->isArray(), '->isArray() returns false if the argument can not be an array');
+        $this->assertFalse($argument->isArray(), '->isArray() returns false if the argument cannot be an array');
     }
 
     public function testGetDescription()

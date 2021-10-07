@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by ruudk at 2021-08-26T06:50:34Z
+
+@OskarStark Applied your feedback.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-08-27T10:49:46Z
+
+@Nyholm @jderusse I checked and `psr/log` is already a dependency for Messenger. Is there anything left for me to change/add? Or is it Ok like this?
+
+---------------------------------------------------------------------------
+
+by okwinza at 2021-08-31T13:14:49Z
+
+I think this PR could really benefit from #42335 once that is merged to provide additional context about the worker in the logs.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-08-31T13:31:01Z
+
+@okwinza That's a nice improvement for a future PR indeed :)
+
+Can we get this merged?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-31T13:50:12Z
+
+Could you add a testcase for this new feature? Thank you
+
+---------------------------------------------------------------------------
+
+by okwinza at 2021-08-31T13:57:59Z
+
+I would suggest merging #42335 first and then rebasing and refactoring this PR on top of it since this PR loses a significant part of it's value without the worker context data IMO.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-08-31T14:09:10Z
+
+@okwinza I'm sorry but why would it loose value? This adds value so that it's known that the signal is received and that your signaling works. If it's so important that you know which worker was signaled, then you can already use separate logs. In my case, we run in Kubernetes and all workers are separated and identifiable. If your PR is merged, please improve this further. Let's not creating blocks that are not needed.
+
+@OskarStark I added a test case for stopping the worker. I couldn't add a test for the `pcntl_signal` callback as I don't know how to test that. I can move the callback to a separate public method just for the sake of testing but that also feels wrong. What do you think?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-09-23T13:44:39Z
+
+Could you rebase? Thanks
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-09-27T07:42:23Z
+
+@lyrixx Done :)
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-10-07T07:18:51Z
+
+@lyrixx The PR keeps getting out of date when the changelog changes. Updated the PR again to make it mergeable. Is there anything left that prevents a merge?

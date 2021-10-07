@@ -412,8 +412,6 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             return $tagVersions;
         }
 
-        $tod = gettimeofday();
-        $newVersion = $tod['sec'] * 1000000 + $tod['usec'];
         $updatedTags = [];
         foreach ($this->tags->getItems(array_keys($tags)) as $tag => $version) {
             $tag = $tags[$tag];
@@ -421,12 +419,12 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             if ($version->isHit()) {
                 $tagVersions[$tag] = $version->get();
             } else {
-                $tagVersions[$tag] = $newVersion;
-                $updatedTags[$tag] = $version->set($newVersion);
+                $tagVersions[$tag] = mt_rand(0, \PHP_INT_MAX);
+                $updatedTags[$tag] = $version->set($tagVersions[$tag]);
             }
 
-            if (isset($invalidatedTags[$tag])) {
-                $updatedTags[$tag] = $version->set(++$tagVersions[$tag]);
+            if (isset($invalidatedTags[$tag]) && !isset($updatedTags[$tag])) {
+                $updatedTags[$tag] = $version->set(\PHP_INT_MAX === $tagVersions[$tag] ? 0 : ++$tagVersions[$tag]);
             }
             $this->knownTagVersions[$tag] = [$now, $tagVersions[$tag]];
         }

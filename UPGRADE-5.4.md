@@ -5,6 +5,7 @@ Cache
 -----
 
  * Deprecate `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
+ * Deprecate usage of `PdoAdapter` with a `Doctrine\DBAL\Connection` or a DBAL URL. Use the new `DoctrineDbalAdapter` instead
 
 Console
 -------

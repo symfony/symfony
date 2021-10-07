@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `DoctrineOpenTransactionLoggerMiddleware` to log when a transaction has been left open
+ * Deprecate `PdoCacheAdapterDoctrineSchemaSubscriber` and add `DoctrineDbalCacheAdapterSchemaSubscriber` instead
 
 5.3
 ---

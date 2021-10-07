@@ -20,8 +20,9 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
-use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Component\Messenger\Handler\OptionalHandlerLocator;
 use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
@@ -184,7 +185,18 @@ class MessengerPass implements CompilerPassInterface
         $container->addDefinitions($definitions);
 
         foreach ($busIds as $bus) {
-            $container->register($locatorId = $bus.'.messenger.handlers_locator', HandlersLocator::class)
+            $handlersLocatorClass = OptionalHandlerLocator::class;
+            if ($container->hasParameter($handlersLocatorClassParameterName = $bus.'.messenger.handlers_locator.class')) {
+                $handlersLocatorClass = $container->getParameter($handlersLocatorClassParameterName);
+                if (!\is_string($handlersLocatorClass)) {
+                    throw new \LogicException(sprintf('Handlers locator class must be a string, got "%s".', get_debug_type($handlersLocatorClass)));
+                }
+                if (!is_a($handlersLocatorClass, HandlersLocatorInterface::class, true)) {
+                    throw new \LogicException(sprintf('Class "%s" does not implement "%s".', $handlersLocatorClass, HandlersLocatorInterface::class));
+                }
+                $container->getParameterBag()->remove($handlersLocatorClassParameterName);
+            }
+            $container->register($locatorId = $bus.'.messenger.handlers_locator', $handlersLocatorClass)
                 ->setArgument(0, $handlersLocatorMappingByBus[$bus] ?? [])
             ;
             if ($container->has($handleMessageId = $bus.'.middleware.handle_message')) {

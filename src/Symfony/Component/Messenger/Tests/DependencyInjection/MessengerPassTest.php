@@ -28,9 +28,10 @@ use Symfony\Component\Messenger\Command\SetupTransportsCommand;
 use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\Handler\ExactlyOneHandlerLocator;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Component\Messenger\Handler\OptionalHandlerLocator;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -68,7 +69,7 @@ class MessengerPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('messenger.middleware.debug.logging'));
 
         $handlersLocatorDefinition = $container->getDefinition($busId.'.messenger.handlers_locator');
-        $this->assertSame(HandlersLocator::class, $handlersLocatorDefinition->getClass());
+        $this->assertSame(OptionalHandlerLocator::class, $handlersLocatorDefinition->getClass());
 
         $handlerDescriptionMapping = $handlersLocatorDefinition->getArgument(0);
         $this->assertCount(2, $handlerDescriptionMapping);
@@ -93,7 +94,7 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
 
         $handlersLocatorDefinition = $container->getDefinition($busId.'.messenger.handlers_locator');
-        $this->assertSame(HandlersLocator::class, $handlersLocatorDefinition->getClass());
+        $this->assertSame(OptionalHandlerLocator::class, $handlersLocatorDefinition->getClass());
 
         $handlerDescriptionMapping = $handlersLocatorDefinition->getArgument(0);
         $this->assertCount(1, $handlerDescriptionMapping);
@@ -126,7 +127,7 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
 
         $commandBusHandlersLocatorDefinition = $container->getDefinition($commandBusId.'.messenger.handlers_locator');
-        $this->assertSame(HandlersLocator::class, $commandBusHandlersLocatorDefinition->getClass());
+        $this->assertSame(OptionalHandlerLocator::class, $commandBusHandlersLocatorDefinition->getClass());
 
         $this->assertHandlerDescriptor(
             $container,
@@ -142,7 +143,7 @@ class MessengerPassTest extends TestCase
         );
 
         $queryBusHandlersLocatorDefinition = $container->getDefinition($queryBusId.'.messenger.handlers_locator');
-        $this->assertSame(HandlersLocator::class, $queryBusHandlersLocatorDefinition->getClass());
+        $this->assertSame(OptionalHandlerLocator::class, $queryBusHandlersLocatorDefinition->getClass());
         $this->assertHandlerDescriptor(
             $container,
             $queryBusHandlersLocatorDefinition->getArgument(0),
@@ -722,6 +723,43 @@ class MessengerPassTest extends TestCase
 
         $removeDefinition = $container->getDefinition('console.command.messenger_failed_messages_remove');
         $this->assertNotNull($removeDefinition->getArgument(1));
+    }
+
+    public function testSwitchToAParameterizedHandlersLocatorClass()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container->setParameter($busId.'.messenger.handlers_locator.class', ExactlyOneHandlerLocator::class);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertFalse($container->hasParameter($busId.'.messenger.handlers_locator.class'));
+
+        $handlersLocatorDefinition = $container->getDefinition($busId.'.messenger.handlers_locator');
+        $this->assertSame(ExactlyOneHandlerLocator::class, $handlersLocatorDefinition->getClass());
+    }
+
+    /**
+     * @dataProvider invalidHandlerLocatorsValues
+     */
+    public function testThrowsExceptionWhenInvalidHandlersLocator($value)
+    {
+        $this->expectException(\LogicException::class);
+
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container->setParameter($busId.'.messenger.handlers_locator.class', $value);
+
+        (new MessengerPass())->process($container);
+    }
+
+    public static function invalidHandlerLocatorsValues()
+    {
+        yield 'array' => [['foo', 'bar']];
+        yield 'true' => [true];
+        yield 'false' => [false];
+        yield 'int' => [42];
+        yield 'float' => [\M_PI];
+        yield 'null' => [null];
+        yield 'non instance of HandlersLocatorInterface' => [stdClass::class];
     }
 }
 

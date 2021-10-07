@@ -176,6 +176,10 @@ class Worker
 
     public function stop(): void
     {
+        if (null !== $this->logger) {
+            $this->logger->info('Stopping worker.');
+        }
+
         $this->shouldStop = true;
     }
 

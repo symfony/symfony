@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Add support for `TagHeader` and `MetadataHeader` to the Sendgrid API transport
- * The "mail_settings" property can be set when using the SendgridApiTransport
+ * Add support for setting the "mail_settings" property when using the SendgridApiTransport
 
 4.4.0
 -----

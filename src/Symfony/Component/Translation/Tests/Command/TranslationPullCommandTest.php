@@ -348,7 +348,83 @@ XLIFF
             , file_get_contents($filenameFr));
     }
 
-    private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages']): CommandTester
+    public function testPullMessagesWithDefaultLocale()
+    {
+        $arrayLoader = new ArrayLoader();
+        $filenameFr = $this->createFile(['note' => 'NOTE'], 'fr');
+        $filenameEn = $this->createFile(['note' => 'NOTE']);
+        $locales = ['en', 'fr'];
+        $domains = ['messages'];
+
+        $providerReadTranslatorBag = new TranslatorBag();
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'note' => 'NOTE',
+            'new.foo' => 'nouveauFoo',
+        ], 'fr'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'note' => 'NOTE',
+            'new.foo' => 'newFoo',
+        ], 'en'));
+
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('read')
+            ->with($domains, $locales)
+            ->willReturn($providerReadTranslatorBag);
+
+        $provider->expects($this->once())
+            ->method('__toString')
+            ->willReturn('null://default');
+
+        $tester = $this->createCommandTester($provider, $locales, $domains, 'fr');
+        $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages']]);
+
+        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="fr" target-language="en" datatype="plaintext" original="file.ext">
+        <header>
+            <tool tool-id="symfony" tool-name="Symfony"/>
+        </header>
+        <body>
+            <trans-unit id="994ixRL" resname="new.foo">
+                <source>new.foo</source>
+                <target>newFoo</target>
+            </trans-unit>
+            <trans-unit id="7bRlYkK" resname="note">
+                <source>note</source>
+                <target>NOTE</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+XLIFF
+            , file_get_contents($filenameEn));
+        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="fr" target-language="fr" datatype="plaintext" original="file.ext">
+        <header>
+            <tool tool-id="symfony" tool-name="Symfony"/>
+        </header>
+        <body>
+            <trans-unit id="994ixRL" resname="new.foo">
+                <source>new.foo</source>
+                <target>nouveauFoo</target>
+            </trans-unit>
+            <trans-unit id="7bRlYkK" resname="note">
+                <source>note</source>
+                <target>NOTE</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+XLIFF
+            , file_get_contents($filenameFr));
+    }
+
+    private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en'): CommandTester
     {
         $writer = new TranslationWriter();
         $writer->addDumper('xlf', new XliffFileDumper());
@@ -360,7 +436,7 @@ XLIFF
             $this->getProviderCollection($provider, $locales, $domains),
             $writer,
             $reader,
-            'en',
+            $defaultLocale,
             [$this->translationAppDir.'/translations']
         );
         $application = new Application();

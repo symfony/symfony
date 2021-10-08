@@ -65,22 +65,22 @@ class CssColor extends Constraint
     /**
      * @param array|string $formats The types of CSS colors allowed (e.g. hexadecimal only, RGB and HSL only, etc.).
      */
-    public function __construct($formats, string $message = null, array $groups = null, $payload = null, array $options = null)
+    public function __construct($formats = [], string $message = null, array $groups = null, $payload = null, array $options = null)
     {
-        $validationModesAsString = array_reduce(self::$validationModes, function ($carry, $value) {
-            return $carry ? $carry.', '.$value : $value;
-        }, '');
+        $validationModesAsString = implode(', ', self::$validationModes);
 
-        if (\is_array($formats) && \is_string(key($formats))) {
+        if (!$formats) {
+            $options['value'] = self::$validationModes;
+        } elseif (\is_array($formats) && \is_string(key($formats))) {
             $options = array_merge($formats, $options);
         } elseif (\is_array($formats)) {
-            if ([] === array_intersect(static::$validationModes, $formats)) {
+            if ([] === array_intersect(self::$validationModes, $formats)) {
                 throw new InvalidArgumentException(sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
             }
 
             $options['value'] = $formats;
         } elseif (\is_string($formats)) {
-            if (!\in_array($formats, static::$validationModes)) {
+            if (!\in_array($formats, self::$validationModes)) {
                 throw new InvalidArgumentException(sprintf('The "formats" parameter value is not valid. It must contain one or more of the following values: "%s".', $validationModesAsString));
             }
 

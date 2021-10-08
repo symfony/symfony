@@ -179,6 +179,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         return [
             ['rgb(255, 255, 255)'], ['rgb(0, 0, 0)'], ['rgb(0, 0, 255)'], ['rgb(255, 0, 0)'], ['rgb(122, 122, 122)'], ['rgb(66, 66, 66)'],
             ['rgb(255,255,255)'], ['rgb(0,0,0)'], ['rgb(0,0,255)'], ['rgb(255,0,0)'], ['rgb(122,122,122)'], ['rgb(66,66,66)'],
+            ['rgb(       33   ,      34   ,    12      )'],
         ];
     }
 
@@ -196,6 +197,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         return [
             ['rgba(255, 255, 255, 0.3)'], ['rgba(0, 0, 0, 0.3)'], ['rgba(0, 0, 255, 0.3)'], ['rgba(255, 0, 0, 0.3)'], ['rgba(122, 122, 122, 0.3)'], ['rgba(66, 66, 66, 0.3)'],
             ['rgba(255,255,255,0.3)'], ['rgba(0,0,0,0.3)'], ['rgba(0,0,255,0.3)'], ['rgba(255,0,0,0.3)'], ['rgba(122,122,122,0.3)'], ['rgba(66,66,66,0.3)'],
+            ['rgba(   23   ,   24   ,          24  ,        .3   )'],
         ];
     }
 
@@ -213,6 +215,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         return [
             ['hsl(0, 0%, 20%)'], ['hsl(0, 100%, 50%)'], ['hsl(147, 50%, 47%)'], ['hsl(46, 100%, 0%)'],
             ['hsl(0,0%,20%)'], ['hsl(0,100%,50%)'], ['hsl(147,50%,47%)'], ['hsl(46,100%,0%)'],
+            ['hsl(    0    ,     15%     ,    3%   )'],
         ];
     }
 
@@ -230,6 +233,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
         return [
             ['hsla(0, 0%, 20%, 0.4)'], ['hsla(0, 100%, 50%, 0.4)'], ['hsla(147, 50%, 47%, 0.4)'], ['hsla(46, 100%, 0%, 0.4)'],
             ['hsla(0,0%,20%,0.4)'], ['hsla(0,100%,50%,0.4)'], ['hsla(147,50%,47%,0.4)'], ['hsla(46,100%,0%,0.4)'],
+            ['hsla(   0  ,     13%,      56%,    .4  )'],
         ];
     }
 
@@ -313,7 +317,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidRGB(): array
     {
-        return [['rgb(999,999,999)'], ['rgb(-99,-99,-99)'], ['rgb(a,b,c)']];
+        return [['rgb(999,999,999)'], ['rgb(-99,-99,-99)'], ['rgb(a,b,c)'], ['rgb(99 99, 9 99, 99 9)']];
     }
 
     /**
@@ -336,7 +340,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidRGBA(): array
     {
-        return [['rgba(999,999,999,999)'], ['rgba(-99,-99,-99,-99)'], ['rgba(a,b,c,d)']];
+        return [['rgba(999,999,999,999)'], ['rgba(-99,-99,-99,-99)'], ['rgba(a,b,c,d)'], ['rgba(99 99, 9 99, 99 9, . 9)']];
     }
 
     /**
@@ -359,7 +363,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidHSL(): array
     {
-        return [['hsl(1000, 1000%, 20000%)'], ['hsl(-100, -10%, -2%)'], ['hsl(a, b, c)'], ['hsl(a, b%, c%)']];
+        return [['hsl(1000, 1000%, 20000%)'], ['hsl(-100, -10%, -2%)'], ['hsl(a, b, c)'], ['hsl(a, b%, c%)'], ['hsl( 99 99% , 9 99% , 99 9%)']];
     }
 
     /**
@@ -382,7 +386,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidHSLA(): array
     {
-        return [['hsla(1000, 1000%, 20000%, 999)'], ['hsla(-100, -10%, -2%, 999)'], ['hsla(a, b, c, d)'], ['hsla(a, b%, c%, d)']];
+        return [['hsla(1000, 1000%, 20000%, 999)'], ['hsla(-100, -10%, -2%, 999)'], ['hsla(a, b, c, d)'], ['hsla(a, b%, c%, d)'], ['hsla( 9 99%  , 99 9% ,  9 %']];
     }
 
     public function testUnknownFormatsOnValidateTriggerException()

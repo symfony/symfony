@@ -125,10 +125,7 @@ class SendgridApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            if ('mail_settings' === $name) {
-                // https://docs.sendgrid.com/ui/sending-email/index-suppressions#bypass-filters-and-v3-mail-send
-                $payload['mail_settings'] = json_decode($header->getBodyAsString(), true);
-            } elseif ($header instanceof TagHeader) {
+            if ($header instanceof TagHeader) {
                 if (10 === \count($categories)) {
                     throw new TransportException(sprintf('Too many "%s" instances present in the email headers. Sendgrid does not accept more than 10 categories on an email.', TagHeader::class));
                 }
@@ -146,6 +143,12 @@ class SendgridApiTransport extends AbstractApiTransport
 
         if (\count($customArguments) > 0) {
             $personalization['custom_args'] = $customArguments;
+        }
+
+        foreach ($envelope->getTransportSettings() as $setting) {
+            if ($setting instanceof SendgridMailSetting) {
+                $payload['mail_settings'] = $setting->getValue();
+            }
         }
 
         $payload['personalizations'][] = $personalization;

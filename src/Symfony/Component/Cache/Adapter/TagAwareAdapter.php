@@ -171,7 +171,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         }
 
         foreach ($this->getTagVersions([$itemTags]) as $tag => $version) {
-            if ($itemTags[$tag] !== $version && 1 !== $itemTags[$tag] - $version) {
+            if ($itemTags[$tag] !== $version && $itemTags[$tag] !== $version + 1 && (\PHP_INT_MIN !== $itemTags[$tag] || \PHP_INT_MAX !== $version)) {
                 return false;
             }
         }
@@ -353,7 +353,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
 
                 foreach ($itemTags as $key => $tags) {
                     foreach ($tags as $tag => $version) {
-                        if ($tagVersions[$tag] !== $version && 1 !== $version - $tagVersions[$tag]) {
+                        if ($tagVersions[$tag] !== $version && $tagVersions[$tag] + 1 !== $version && (\PHP_INT_MAX !== $tagVersions[$tag] || \PHP_INT_MIN !== $version)) {
                             unset($itemTags[$key]);
                             continue 2;
                         }
@@ -384,7 +384,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         if (!$fetchTagVersions = 1 !== \func_num_args()) {
             foreach ($tagsByKey as $tags) {
                 foreach ($tags as $tag => $version) {
-                    if ($tagVersions[$tag] > $version) {
+                    if ($tagVersions[$tag] > $version || $version > 0 && $version - $tagVersions[$tag] > \PHP_INT_MAX) {
                         $tagVersions[$tag] = $version;
                     }
                 }
@@ -399,12 +399,14 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
                 $fetchTagVersions = true;
                 continue;
             }
-            $version -= $this->knownTagVersions[$tag][1];
-            if ((0 !== $version && 1 !== $version) || $now - $this->knownTagVersions[$tag][0] >= $this->knownTagVersionsTtl) {
+
+            if (($knownTagVersion = $this->knownTagVersions[$tag][1]) !== $version && $knownTagVersion + 1 !== $version && (\PHP_INT_MAX !== $knownTagVersion || \PHP_INT_MIN !== $version)
+                || $now - $this->knownTagVersions[$tag][0] >= $this->knownTagVersionsTtl
+            ) {
                 // reuse previously fetched tag versions up to the ttl, unless we are storing items or a potential miss arises
                 $fetchTagVersions = true;
             } else {
-                $this->knownTagVersions[$tag][1] += $version;
+                $this->knownTagVersions[$tag][1] = $version;
             }
         }
 
@@ -419,12 +421,13 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             if ($version->isHit()) {
                 $tagVersions[$tag] = $version->get();
             } else {
-                $tagVersions[$tag] = mt_rand(0, \PHP_INT_MAX);
+                $tagVersions[$tag] = mt_rand(\PHP_INT_MIN, \PHP_INT_MAX);
                 $updatedTags[$tag] = $version->set($tagVersions[$tag]);
             }
 
             if (isset($invalidatedTags[$tag]) && !isset($updatedTags[$tag])) {
-                $updatedTags[$tag] = $version->set(\PHP_INT_MAX === $tagVersions[$tag] ? 0 : ++$tagVersions[$tag]);
+                $tagVersions[$tag] = $tagVersions[$tag] < \PHP_INT_MAX ? 1 + $tagVersions[$tag] : \PHP_INT_MIN;
+                $updatedTags[$tag] = $version->set($tagVersions[$tag]);
             }
             $this->knownTagVersions[$tag] = [$now, $tagVersions[$tag]];
         }

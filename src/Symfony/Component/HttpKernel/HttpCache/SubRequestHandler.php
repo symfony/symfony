@@ -38,6 +38,7 @@ class SubRequestHandler
                 'X_FORWARDED_HOST' => $trustedHeaderSet & Request::HEADER_X_FORWARDED_HOST,
                 'X_FORWARDED_PROTO' => $trustedHeaderSet & Request::HEADER_X_FORWARDED_PROTO,
                 'X_FORWARDED_PORT' => $trustedHeaderSet & Request::HEADER_X_FORWARDED_PORT,
+                'X_FORWARDED_PREFIX' => $trustedHeaderSet & Request::HEADER_X_FORWARDED_PREFIX,
             ];
             foreach (array_filter($trustedHeaders) as $name => $key) {
                 $request->headers->remove($name);

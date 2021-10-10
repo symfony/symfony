@@ -63,6 +63,11 @@ class ChoiceType extends AbstractType
             )
         );
 
+        if (null !== $translator && !$translator instanceof TranslatorInterface) {
+            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be han instance of "%s", "%s" given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
+        }
+        $this->translator = $translator;
+
         // BC, to be removed in 6.0
         if ($this->choiceListFactory instanceof CachingFactoryDecorator) {
             return;
@@ -73,11 +78,6 @@ class ChoiceType extends AbstractType
         if ($ref->getNumberOfParameters() < 3) {
             trigger_deprecation('symfony/form', '5.1', 'Not defining a third parameter "callable|null $filter" in "%s::%s()" is deprecated.', $ref->class, $ref->name);
         }
-
-        if (null !== $translator && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be han instance of "%s", "%s" given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
-        }
-        $this->translator = $translator;
     }
 
     /**

@@ -194,7 +194,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     'access_denied_handler' => $firewallConfig->getAccessDeniedHandler(),
                     'access_denied_url' => $firewallConfig->getAccessDeniedUrl(),
                     'user_checker' => $firewallConfig->getUserChecker(),
-                    'listeners' => $firewallConfig->getListeners(),
+                    'authenticators' => $firewallConfig->getAuthenticators(),
                 ];
 
                 // generate exit impersonation path from current request
@@ -215,6 +215,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         }
 
         $this->data['authenticator_manager_enabled'] = $this->authenticatorManagerEnabled;
+        $this->data['authenticators'] = $this->firewall ? $this->firewall->getAuthenticatorsInfo() : [];
     }
 
     /**
@@ -368,6 +369,14 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function getListeners()
     {
         return $this->data['listeners'];
+    }
+
+    /**
+     * @return array|Data
+     */
+    public function getAuthenticators()
+    {
+        return $this->data['authenticators'];
     }
 
     /**

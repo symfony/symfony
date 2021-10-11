@@ -68,11 +68,6 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
         return method_exists($this->authenticator, 'createToken') ? $this->authenticator->createToken($passport, $firewallName) : $this->authenticator->createAuthenticatedToken($passport, $firewallName);
     }
 
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
-    {
-        return $this->authenticator->createAuthenticatedToken($passport, $firewallName);
-    }
-
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return $this->authenticator->onAuthenticationSuccess($request, $token, $firewallName);

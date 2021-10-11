@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-10T06:40:03Z
+
+I haven't looked at the code, but I'd prefer to always have an array. `Data` is more like an internal structure.

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-15T19:15:03Z
+
+Nice! This would fix https://github.com/symfony/symfony/issues/36668 (maybe there are some ideas in there that you didn't think of).
+
+On a related note: I think it would make sense to start using tabs (like on the request page), instead of putting everything (voting, authenticators, firewall config, etc) on a single page.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-15T19:16:56Z
+
+And a DX thing that we probably should not try to fix in this PR: the information of this profiler will mostly be useful for the routes doing authentication. We should maybe introduce a way to link to profilers of previous requests from the toolbar  (maybe even show some info), as e.g. you'll never get to see the profiler data of the actual login requests in the login form (as you're always redirected - either back to the form or to the target page).
+
+`</braindump about profiler improvements for new security>` :wink:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-15T22:54:05Z
+
+I totally forgot about that issue, thank you.
+About the need for improving this screen, I agree. I’ll take some inspiration from other panels. I’d welcome any suggestion also (/cc @javiereguiluz).
+
+> We should maybe introduce a way to link to profilers of previous requests from the toolbar (maybe even show some info), as e.g. you'll never get to see the profiler data of the actual login requests in the login form (as you're always redirected - either back to the form or to the target page).
+
+Definitely, I’ll create an issue for that.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-10T16:49:32Z
+
+Now with tests. Also the security panel content is now split in several tabs, as suggested by Wouter.
+(diff best viewed without whitespaces https://github.com/symfony/symfony/pull/42582/files?w=1)
+
+PR ready!

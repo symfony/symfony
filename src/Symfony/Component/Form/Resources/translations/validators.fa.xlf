@@ -120,7 +120,7 @@
             </trans-unit>
             <trans-unit id="125">
                 <source>Please enter a valid email address.</source>
-                <target>لطفاً یک ایمیل (پست‌الکترونیک) معتبر وارد کنید.</target>
+                <target>لطفاً یک آدرس رایانامه (ایمیل) معتبر وارد کنید.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>Please select a valid option.</source>

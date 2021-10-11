@@ -117,7 +117,9 @@ class RetryableHttpClient implements HttpClientInterface
 
                 if (false === $shouldRetry) {
                     $context->passthru();
-                    yield $firstChunk;
+                    if (null !== $firstChunk) {
+                        yield $firstChunk;
+                    }
                     yield $context->createChunk($content);
                     $content = '';
 

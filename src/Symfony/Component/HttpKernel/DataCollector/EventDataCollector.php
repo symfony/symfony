@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -80,8 +81,10 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * @see TraceableEventDispatcher
+     *
+     * @return array|Data
      */
-    public function getCalledListeners(): array
+    public function getCalledListeners()
     {
         return $this->data['called_listeners'];
     }
@@ -96,8 +99,10 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * @see TraceableEventDispatcher
+     *
+     * @return array|Data
      */
-    public function getNotCalledListeners(): array
+    public function getNotCalledListeners()
     {
         return $this->data['not_called_listeners'];
     }
@@ -114,8 +119,10 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * @see TraceableEventDispatcher
+     *
+     * @return array|Data
      */
-    public function getOrphanedEvents(): array
+    public function getOrphanedEvents()
     {
         return $this->data['orphaned_events'];
     }

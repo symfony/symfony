@@ -194,10 +194,11 @@ trait AbstractAdapterTrait
      */
     public function getItem(mixed $key): CacheItem
     {
-        if ($this->deferred) {
+        $id = $this->getId($key);
+
+        if (isset($this->deferred[$key])) {
             $this->commit();
         }
-        $id = $this->getId($key);
 
         $isHit = false;
         $value = null;
@@ -220,14 +221,18 @@ trait AbstractAdapterTrait
      */
     public function getItems(array $keys = []): iterable
     {
-        if ($this->deferred) {
-            $this->commit();
-        }
         $ids = [];
+        $commit = false;
 
         foreach ($keys as $key) {
             $ids[] = $this->getId($key);
+            $commit = $commit || isset($this->deferred[$key]);
         }
+
+        if ($commit) {
+            $this->commit();
+        }
+
         try {
             $items = $this->doFetch($ids);
         } catch (\Exception $e) {

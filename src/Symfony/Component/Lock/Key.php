@@ -93,7 +93,7 @@ final class Key
     public function __sleep(): array
     {
         if (!$this->serializable) {
-            throw new UnserializableKeyException('The key can not be serialized.');
+            throw new UnserializableKeyException('The key cannot be serialized.');
         }
 
         return ['resource', 'expiringTime', 'state'];

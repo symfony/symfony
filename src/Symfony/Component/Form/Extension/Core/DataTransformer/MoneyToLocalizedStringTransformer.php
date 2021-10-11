@@ -36,7 +36,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      * @param int|float|null $value Normalized number
      *
      * @throws TransformationFailedException if the given value is not numeric or
-     *                                       if the value can not be transformed
+     *                                       if the value cannot be transformed
      */
     public function transform(mixed $value): string
     {
@@ -56,7 +56,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      * @param string $value Localized money string
      *
      * @throws TransformationFailedException if the given value is not a string
-     *                                       or if the value can not be transformed
+     *                                       or if the value cannot be transformed
      */
     public function reverseTransform(mixed $value): int|float|null
     {

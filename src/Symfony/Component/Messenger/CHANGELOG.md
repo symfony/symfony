@@ -16,6 +16,8 @@ CHANGELOG
  * Added `WorkerMetadata` class which allows you to access the configuration details of a worker, like `queueNames` and `transportNames` it consumes from.
  * New method `getMetadata()` was added to `Worker` class which returns the `WorkerMetadata` object.
  * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
+ * Add log when worker should stop.
+ * Add log when `SIGTERM` is received.
 
 5.3
 ---

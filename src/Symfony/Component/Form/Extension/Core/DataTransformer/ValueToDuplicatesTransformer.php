@@ -44,7 +44,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
      * Extracts the duplicated value from an array.
      *
      * @throws TransformationFailedException if the given value is not an array or
-     *                                       if the given array can not be transformed
+     *                                       if the given array cannot be transformed
      */
     public function reverseTransform(mixed $array): mixed
     {

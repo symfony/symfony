@@ -44,7 +44,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * @param int|float|null $value Number value
      *
      * @throws TransformationFailedException if the given value is not numeric
-     *                                       or if the value can not be transformed
+     *                                       or if the value cannot be transformed
      */
     public function transform(mixed $value): string
     {
@@ -75,7 +75,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * @param string $value The localized value
      *
      * @throws TransformationFailedException if the given value is not a string
-     *                                       or if the value can not be transformed
+     *                                       or if the value cannot be transformed
      */
     public function reverseTransform(mixed $value): int|float|null
     {

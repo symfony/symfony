@@ -105,7 +105,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
         }
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Can not verify chmod operations on Windows');
+            $this->markTestSkipped('Cannot verify chmod operations on Windows');
         }
 
         if (!getenv('USER') || 'root' === getenv('USER')) {
@@ -120,7 +120,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
             $this->expectException(\InvalidArgumentException::class);
             $this->getGuesser()->guessMimeType($path);
         } else {
-            $this->markTestSkipped('Can not verify chmod operations, change of file permissions failed');
+            $this->markTestSkipped('Cannot verify chmod operations, change of file permissions failed');
         }
     }
 }

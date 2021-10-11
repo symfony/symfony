@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -328,6 +329,16 @@ class WorkerTest extends TestCase
 
         $envelope = current($receiver->getAcknowledgedEnvelopes());
         $this->assertCount(1, $envelope->all(\get_class($stamp)));
+    }
+
+    public function testWorkerShouldLogOnStop()
+    {
+        $bus = $this->createMock(MessageBusInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('info')->with('Stopping worker.');
+        $worker = new Worker([], $bus, new EventDispatcher(), $logger);
+
+        $worker->stop();
     }
 }
 

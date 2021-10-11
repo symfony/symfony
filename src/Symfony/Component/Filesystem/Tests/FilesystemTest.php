@@ -409,7 +409,7 @@ class FilesystemTest extends FilesystemTestCase
         chdir($basePath);
         $file = str_repeat('T', $maxPathLength - \strlen($basePath) + 1);
         $path = $basePath.$file;
-        exec('TYPE NUL >>'.$file); // equivalent of touch, we can not use the php touch() here because it suffers from the same limitation
+        exec('TYPE NUL >>'.$file); // equivalent of touch, we cannot use the php touch() here because it suffers from the same limitation
         $this->longPathNamesWindows[] = $path; // save this so we can clean up later
         chdir($oldPath);
         $this->filesystem->exists($path);

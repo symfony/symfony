@@ -98,6 +98,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         }
 
         $authenticators = [];
+        $skippedAuthenticators = [];
         $lazy = true;
         foreach ($this->authenticators as $authenticator) {
             if (null !== $this->logger) {
@@ -107,8 +108,11 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             if (false !== $supports = $authenticator->supports($request)) {
                 $authenticators[] = $authenticator;
                 $lazy = $lazy && null === $supports;
-            } elseif (null !== $this->logger) {
-                $this->logger->debug('Authenticator does not support the request.', ['firewall_name' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
+            } else {
+                if (null !== $this->logger) {
+                    $this->logger->debug('Authenticator does not support the request.', ['firewall_name' => $this->firewallName, 'authenticator' => \get_class($authenticator)]);
+                }
+                $skippedAuthenticators[] = $authenticator;
             }
         }
 
@@ -117,6 +121,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         }
 
         $request->attributes->set('_security_authenticators', $authenticators);
+        $request->attributes->set('_security_skipped_authenticators', $skippedAuthenticators);
 
         return $lazy ? null : true;
     }
@@ -125,6 +130,8 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     {
         $authenticators = $request->attributes->get('_security_authenticators');
         $request->attributes->remove('_security_authenticators');
+        $request->attributes->remove('_security_skipped_authenticators');
+
         if (!$authenticators) {
             return null;
         }

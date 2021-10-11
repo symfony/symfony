@@ -155,7 +155,7 @@ class PrototypedArrayNode extends ArrayNode
      */
     public function addChild(NodeInterface $node)
     {
-        throw new Exception('A prototyped array node can not have concrete children.');
+        throw new Exception('A prototyped array node cannot have concrete children.');
     }
 
     /**

@@ -148,7 +148,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($firewallConfig->getAccessDeniedHandler(), $collected['access_denied_handler']);
         $this->assertSame($firewallConfig->getAccessDeniedUrl(), $collected['access_denied_url']);
         $this->assertSame($firewallConfig->getUserChecker(), $collected['user_checker']);
-        $this->assertSame($firewallConfig->getListeners(), $collected['listeners']->getValue());
+        $this->assertSame($firewallConfig->getAuthenticators(), $collected['authenticators']->getValue());
     }
 
     public function testGetFirewallReturnsNull()

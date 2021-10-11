@@ -174,6 +174,10 @@ class Worker
 
     public function stop(): void
     {
+        if (null !== $this->logger) {
+            $this->logger->info('Stopping worker.', ['transport_names' => $this->metadata->getTransportNames()]);
+        }
+
         $this->shouldStop = true;
     }
 

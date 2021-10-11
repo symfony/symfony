@@ -107,7 +107,7 @@ class Question
     }
 
     /**
-     * In case the response can not be hidden, whether to fallback on non-hidden question or not.
+     * In case the response cannot be hidden, whether to fallback on non-hidden question or not.
      */
     public function isHiddenFallback(): bool
     {
@@ -115,7 +115,7 @@ class Question
     }
 
     /**
-     * Sets whether to fallback on non-hidden question if the response can not be hidden.
+     * Sets whether to fallback on non-hidden question if the response cannot be hidden.
      *
      * @return $this
      */

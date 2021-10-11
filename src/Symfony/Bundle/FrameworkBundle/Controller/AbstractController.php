@@ -175,7 +175,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
         try {
             $this->container->get('request_stack')->getSession()->getFlashBag()->add($type, $message);
         } catch (SessionNotFoundException $e) {
-            throw new \LogicException('You can not use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".', 0, $e);
+            throw new \LogicException('You cannot use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".', 0, $e);
         }
     }
 
@@ -216,7 +216,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function renderView(string $view, array $parameters = []): string
     {
         if (!$this->container->has('twig')) {
-            throw new \LogicException('You can not use the "renderView" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
+            throw new \LogicException('You cannot use the "renderView" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
         }
 
         return $this->container->get('twig')->render($view, $parameters);
@@ -274,7 +274,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function stream(string $view, array $parameters = [], StreamedResponse $response = null): StreamedResponse
     {
         if (!$this->container->has('twig')) {
-            throw new \LogicException('You can not use the "stream" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
+            throw new \LogicException('You cannot use the "stream" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
         }
 
         $twig = $this->container->get('twig');
@@ -316,7 +316,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function createAccessDeniedException(string $message = 'Access Denied.', \Throwable $previous = null): AccessDeniedException
     {
         if (!class_exists(AccessDeniedException::class)) {
-            throw new \LogicException('You can not use the "createAccessDeniedException" method if the Security component is not available. Try running "composer require symfony/security-bundle".');
+            throw new \LogicException('You cannot use the "createAccessDeniedException" method if the Security component is not available. Try running "composer require symfony/security-bundle".');
         }
 
         return new AccessDeniedException($message, $previous);
@@ -381,7 +381,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function addLink(Request $request, LinkInterface $link): void
     {
         if (!class_exists(AddLinkHeaderListener::class)) {
-            throw new \LogicException('You can not use the "addLink" method if the WebLink component is not available. Try running "composer require symfony/web-link".');
+            throw new \LogicException('You cannot use the "addLink" method if the WebLink component is not available. Try running "composer require symfony/web-link".');
         }
 
         if (null === $linkProvider = $request->attributes->get('_links')) {

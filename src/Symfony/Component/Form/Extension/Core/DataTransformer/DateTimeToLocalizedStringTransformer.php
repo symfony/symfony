@@ -159,7 +159,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @param bool $ignoreTimezone Use UTC regardless of the configured timezone
      *
-     * @throws TransformationFailedException in case the date formatter can not be constructed
+     * @throws TransformationFailedException in case the date formatter cannot be constructed
      */
     protected function getIntlDateFormatter(bool $ignoreTimezone = false): \IntlDateFormatter
     {

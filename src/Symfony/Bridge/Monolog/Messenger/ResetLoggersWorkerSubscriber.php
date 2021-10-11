@@ -16,10 +16,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 
+trigger_deprecation('symfony/monolog-bridge', '5.4', 'The "%s" class is deprecated, use "reset_on_message" option in messenger configuration instead.', ResetLoggersWorkerSubscriber::class);
+
 /**
  * Reset loggers between messages being handled to release buffered handler logs.
  *
  * @author Laurent VOULLEMIER <laurent.voullemier@gmail.com>
+ *
+ * @deprecated since Symfony 5.4, use "reset_on_message" option in messenger configuration instead.
  */
 class ResetLoggersWorkerSubscriber implements EventSubscriberInterface
 {

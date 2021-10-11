@@ -26,7 +26,7 @@ interface RequestMatcherInterface
     /**
      * Tries to match a request with a set of routes.
      *
-     * If the matcher can not find information, it must throw one of the exceptions documented
+     * If the matcher cannot find information, it must throw one of the exceptions documented
      * below.
      *
      * @throws NoConfigurationException  If no routing configuration could be found

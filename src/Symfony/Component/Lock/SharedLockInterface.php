@@ -26,7 +26,7 @@ interface SharedLockInterface extends LockInterface
      * determines whether or not the call should block until the release of the lock.
      *
      * @throws LockConflictedException If the lock is acquired by someone else in blocking mode
-     * @throws LockAcquiringException  If the lock can not be acquired
+     * @throws LockAcquiringException  If the lock cannot be acquired
      */
     public function acquireRead(bool $blocking = false): bool;
 }

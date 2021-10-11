@@ -155,9 +155,10 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
      */
     public function hasItem(mixed $key): bool
     {
-        if ($this->deferred) {
+        if (\is_string($key) && isset($this->deferred[$key])) {
             $this->commit();
         }
+
         if (!$this->pool->hasItem($key)) {
             return false;
         }
@@ -196,16 +197,19 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
      */
     public function getItems(array $keys = []): iterable
     {
-        if ($this->deferred) {
-            $this->commit();
-        }
         $tagKeys = [];
+        $commit = false;
 
         foreach ($keys as $key) {
             if ('' !== $key && \is_string($key)) {
+                $commit = $commit || isset($this->deferred[$key]);
                 $key = static::TAGS_PREFIX.$key;
                 $tagKeys[$key] = $key;
             }
+        }
+
+        if ($commit) {
+            $this->commit();
         }
 
         try {

@@ -56,7 +56,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
         return $this->authenticator->supports($request);
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
         $startTime = microtime(true);
         $this->passport = $this->authenticator->authenticate($request);

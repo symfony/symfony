@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
-use Symfony\Bundle\SecurityBundle\Debug\Authenticator\TraceableAuthenticatorManagerListener;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**

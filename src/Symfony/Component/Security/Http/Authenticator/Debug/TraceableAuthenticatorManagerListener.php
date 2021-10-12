@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\SecurityBundle\Debug\Authenticator;
+namespace Symfony\Component\Security\Http\Authenticator\Debug;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -21,17 +21,17 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  * Decorates the AuthenticatorManagerListener to collect information about security authenticators.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
- *
- * @internal
  */
-class TraceableAuthenticatorManagerListener extends AbstractListener
+final class TraceableAuthenticatorManagerListener extends AbstractListener
 {
     private $authenticationManagerListener;
     private $authenticatorsInfo = [];
+    private $hasVardumper;
 
     public function __construct(AuthenticatorManagerListener $authenticationManagerListener)
     {
         $this->authenticationManagerListener = $authenticationManagerListener;
+        $this->hasVardumper = class_exists(ClassStub::class);
     }
 
     public function supports(Request $request): ?bool
@@ -50,7 +50,7 @@ class TraceableAuthenticatorManagerListener extends AbstractListener
         foreach ($request->attributes->get('_security_skipped_authenticators') as $skippedAuthenticator) {
             $this->authenticatorsInfo[] = [
                 'supports' => false,
-                'stub' => new ClassStub(\get_class($skippedAuthenticator)),
+                'stub' => $this->hasVardumper ? new ClassStub(\get_class($skippedAuthenticator)) : \get_class($skippedAuthenticator),
                 'passport' => null,
                 'duration' => 0,
             ];

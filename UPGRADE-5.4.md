@@ -48,6 +48,12 @@ Messenger
    its default value will change to `true` in 6.0
  * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
 
+Monolog
+-------
+
+ * Deprecate `ResetLoggersWorkerSubscriber` to reset buffered logs in messenger
+   workers, use "reset_on_message" option in messenger configuration instead.
+
 SecurityBundle
 --------------
 

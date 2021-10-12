@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-12T08:57:51Z
+
+`UPGADE-6.0` also needs an entry about the removal, right?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-12T08:59:16Z
+
+I did it in https://github.com/symfony/symfony/pull/43405, is it OK?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-12T09:01:36Z
+
+The UPGRADE-6.0 entry should be moved here (but not the CHANGELOG one)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-12T09:03:14Z
+
+OK, it should be OK now (and the other PR too)

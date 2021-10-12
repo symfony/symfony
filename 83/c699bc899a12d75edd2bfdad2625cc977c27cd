@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by flohw at 2021-10-08T12:45:02Z
+
+As mentioned on twitter, feel free to pick up some tweaks from my PR. I added some other edge cases and some tests too as the alpha canal value is never testes with numbers like `.3` :wink:
+
+Thanks for this new validator :slightly_smiling_face:

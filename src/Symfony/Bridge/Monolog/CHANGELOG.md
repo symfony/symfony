@@ -6,6 +6,7 @@ CHANGELOG
 
  * The `$actionLevel` constructor argument of `NotFoundActivationStrategy` has been replaced by the `$inner` one which expects an `ActivationStrategyInterface` to decorate instead
  * The `$actionLevel` constructor argument of `HttpCodeActivationStrategy` has been replaced by the `$inner` one which expects an `ActivationStrategyInterface` to decorate instead
+ * Remove `ResetLoggersWorkerSubscriber` in favor of "reset_on_message" option in messenger configuration
 
 5.4
 ---

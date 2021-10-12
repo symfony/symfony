@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\SecurityBundle\Debug\Authenticator;
+namespace Symfony\Component\Security\Http\Authenticator\Debug;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,9 +23,9 @@ use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointExceptio
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
- * @author Robin Chalas <robin.chalas@gmail.com>
+ * Collects info about an authenticator for debugging purposes.
  *
- * @internal
+ * @author Robin Chalas <robin.chalas@gmail.com>
  */
 final class TraceableAuthenticator implements AuthenticatorInterface, InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
 {
@@ -45,7 +45,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
             'supports' => true,
             'passport' => $this->passport,
             'duration' => $this->duration,
-            'stub' => $this->stub ?? $this->stub = new ClassStub(\get_class($this->authenticator)),
+            'stub' => $this->stub ?? $this->stub = class_exists(ClassStub::class) ? new ClassStub(\get_class($this->authenticator)) : \get_class($this->authenticator),
         ];
     }
 

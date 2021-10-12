@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -64,7 +65,7 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
             'allow_extra_fields' => false,
             'extra_fields_message' => 'This form should not contain extra fields.',
         ]);
-
+        $resolver->setAllowedTypes('constraints', [Constraint::class, Constraint::class.'[]']);
         $resolver->setNormalizer('constraints', $constraintsNormalizer);
     }
 

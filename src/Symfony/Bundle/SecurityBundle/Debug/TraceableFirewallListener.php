@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
-use Symfony\Bundle\SecurityBundle\Debug\Authenticator\TraceableAuthenticatorManagerListener;
 use Symfony\Bundle\SecurityBundle\EventListener\FirewallListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 
 /**

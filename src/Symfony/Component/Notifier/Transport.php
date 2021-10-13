@@ -36,6 +36,7 @@ use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
@@ -87,6 +88,7 @@ final class Transport
         SendinblueTransportFactory::class,
         SinchTransportFactory::class,
         SlackTransportFactory::class,
+        Sms77TransportFactory::class,
         SmsapiTransportFactory::class,
         SmsBiurasTransportFactory::class,
         SmscTransportFactory::class,

@@ -192,13 +192,13 @@ class NativeSessionStorageTest extends TestCase
     public function testSessionOptions()
     {
         $options = [
-            'url_rewriter.tags' => 'a=href',
+            'trans_sid_tags' => 'a=href',
             'cache_expire' => '200',
         ];
 
         $this->getStorage($options);
 
-        $this->assertSame('a=href', ini_get('url_rewriter.tags'));
+        $this->assertSame('a=href', ini_get('session.trans_sid_tags'));
         $this->assertSame('200', ini_get('session.cache_expire'));
     }
 

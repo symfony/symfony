@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
@@ -67,7 +66,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
         return $this->passport;
     }
 
-    public function createToken(Passport $passport, string $firewallName): TokenInterface
+    public function createToken(PassportInterface $passport, string $firewallName): TokenInterface
     {
         return method_exists($this->authenticator, 'createToken') ? $this->authenticator->createToken($passport, $firewallName) : $this->authenticator->createAuthenticatedToken($passport, $firewallName);
     }

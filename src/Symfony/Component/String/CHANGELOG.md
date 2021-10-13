@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `trimSuffix()` and `trimPrefix()` methods
+
 5.3
 ---
 

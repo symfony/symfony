@@ -14,14 +14,21 @@ trait SkipUninitializedValuesTestTrait
 
     /**
      * @requires PHP 7.4
+     * @dataProvider skipUninitializedValuesFlagProvider
      */
-    public function testSkipUninitializedValues()
+    public function testSkipUninitializedValues(array $context)
     {
-        $object = new TypedPropertiesObject();
+        $object = new TypedPropertiesObjectWithGetters();
 
         $normalizer = $this->getNormalizerForSkipUninitializedValues();
-        $result = $normalizer->normalize($object, null, ['skip_uninitialized_values' => true, 'groups' => ['foo']]);
+        $result = $normalizer->normalize($object, null, $context);
         $this->assertSame(['initialized' => 'value'], $result);
+    }
+
+    public function skipUninitializedValuesFlagProvider(): iterable
+    {
+        yield 'passed manually' => [['skip_uninitialized_values' => true, 'groups' => ['foo']]];
+        yield 'using default context value' => [['groups' => ['foo']]];
     }
 
     /**
@@ -29,10 +36,17 @@ trait SkipUninitializedValuesTestTrait
      */
     public function testWithoutSkipUninitializedValues()
     {
-        $object = new TypedPropertiesObject();
+        $object = new TypedPropertiesObjectWithGetters();
 
         $normalizer = $this->getNormalizerForSkipUninitializedValues();
-        $this->expectException(UninitializedPropertyException::class);
-        $normalizer->normalize($object, null, ['groups' => ['foo']]);
+
+        try {
+            $normalizer->normalize($object, null, ['skip_uninitialized_values' => false, 'groups' => ['foo']]);
+            $this->fail('Normalizing an object with uninitialized property should have failed');
+        } catch (UninitializedPropertyException $e) {
+            self::assertSame('The property "Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject::$unInitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.', $e->getMessage());
+        } catch (\Error $e) {
+            self::assertSame('Typed property Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject::$unInitialized must not be accessed before initialization', $e->getMessage());
+        }
     }
 }

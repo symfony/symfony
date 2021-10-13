@@ -17,9 +17,6 @@ use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class Sms77TransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return Sms77TransportFactory
-     */
     public function createFactory(): Sms77TransportFactory
     {
         return new Sms77TransportFactory();

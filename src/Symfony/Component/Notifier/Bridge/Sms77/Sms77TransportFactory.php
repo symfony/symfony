@@ -21,9 +21,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class Sms77TransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return Sms77Transport
-     */
     public function create(Dsn $dsn): Sms77Transport
     {
         $scheme = $dsn->getScheme();

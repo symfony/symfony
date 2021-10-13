@@ -140,6 +140,7 @@ use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory as SendinblueNotifierTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
@@ -2469,6 +2470,7 @@ class FrameworkExtension extends Extension
             SendinblueNotifierTransportFactory::class => 'notifier.transport_factory.sendinblue',
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
             SlackTransportFactory::class => 'notifier.transport_factory.slack',
+            Sms77TransportFactory::class => 'notifier.transport_factory.sms77',
             SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
             SmsBiurasTransportFactory::class => 'notifier.transport_factory.smsbiuras',
             SmscTransportFactory::class => 'notifier.transport_factory.smsc',

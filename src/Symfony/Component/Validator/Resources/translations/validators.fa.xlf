@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>مقدار انتخاب شده یک مقدار معتبر نمی‌باشد.</target>
+                <target>مقدار انتخاب شده یک گزینه معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
@@ -144,7 +144,7 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>این مقدار یک محل معتبر نمی‌باشد.</target>
+                <target>این مقدار یک محل (locale) معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
@@ -304,11 +304,11 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>میزبان قابل حل نمی‌باشد.</target>
+                <target>میزبان (Host) شناسایی نشد.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>این مقدار مطابق با مقدار مورد انتظار {{ charset }} نمی‌باشد.</target>
+                <target>این مقدار مطابق charset مورد انتظار {{ charset }} نمی باشد.</target>
             </trans-unit>
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>

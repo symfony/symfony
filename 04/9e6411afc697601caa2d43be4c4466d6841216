@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-13T11:37:19Z
+
+Hey!
+
+I think @fancyweb has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by villfa at 2021-10-13T14:44:32Z
+
+Hi @fabpot,
+The error from *fabbot.io* is a false positive, so I'm wondering if the code of this bot is open in order to fix it.
+Or maybe it relies on open tools?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-13T14:58:44Z
+
+Thank you for your PR, @villfa. The open source tool that fabbot relies on is PHP CS Fixer. Since the failure is a false positive as you already discovered, you can simply ignore it. 🙂

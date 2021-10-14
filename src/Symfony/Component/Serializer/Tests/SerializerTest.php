@@ -41,6 +41,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizedValueInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -209,6 +210,20 @@ class SerializerTest extends TestCase
         $data = ['foo', [5, 3]];
         $result = $serializer->serialize($data, 'json');
         $this->assertEquals(json_encode($data), $result);
+    }
+
+    public function testSerializeNormalizedValue()
+    {
+        $normalizedValue = 'normalizedValue';
+        $normalizedValueObject = $this->createMock(NormalizedValueInterface::class);
+        $normalizedValueObject->method('getNormalization')
+            ->willReturn($normalizedValue);
+
+        $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+        $data = ['foo', [5, $normalizedValueObject]];
+        $expectedData = ['foo', [5, $normalizedValue]];
+        $result = $serializer->serialize($data, 'json');
+        $this->assertEquals(json_encode($expectedData), $result);
     }
 
     public function testSerializeEmpty()

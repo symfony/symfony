@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizedValueInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -159,6 +160,10 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         // If a normalizer supports the given data, use it
         if ($normalizer = $this->getNormalizer($data, $format, $context)) {
             return $normalizer->normalize($data, $format, $context);
+        }
+
+        if ($data instanceof NormalizedValueInterface) {
+            $data = $data->getNormalization();
         }
 
         if (null === $data || is_scalar($data)) {

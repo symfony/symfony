@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Ahummeling at 2021-10-12T14:24:31Z
+
+Perhaps this issue can be resolved without omitting the check entirely. Could it be the case that the `class_exists($runtimeClass)` call is responsible for the failed autoload? If so, does the issue still occur when passing `false` as second parameter to prevent calling autoload by default?
+
+---------------------------------------------------------------------------
+
+by piku235 at 2021-10-13T17:24:21Z
+
+@Ahummelin I'd also like to keep it, but because of how things internally work for composer plugins it seems hard to get and therefore not worth it. The issue is more about the `is_subclass_of()` call in the if statement. When a class does not exist, it tries to reach registered autoloaders, but as the most important one - responsible for project dependencies is not registered when a composer plugin is executed, it returns always `false`.

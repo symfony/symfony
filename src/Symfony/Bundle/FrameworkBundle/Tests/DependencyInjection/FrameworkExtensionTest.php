@@ -659,24 +659,25 @@ abstract class FrameworkExtensionTest extends TestCase
         $versionStrategy = $container->getDefinition((string) $package->getArgument(1));
         $this->assertEquals('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertEquals('/path/to/manifest.json', $versionStrategy->getArgument(0));
-        $this->assertFalse($versionStrategy->getArgument(2));
+        $this->assertTrue($versionStrategy->getArgument(2));
 
         $package = $container->getDefinition($packages['remote_manifest']);
         $versionStrategy = $container->getDefinition($package->getArgument(1));
         $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertSame('https://cdn.example.com/manifest.json', $versionStrategy->getArgument(0));
+        $this->assertFalse($versionStrategy->getArgument(2));
 
         $package = $container->getDefinition($packages['var_manifest']);
         $versionStrategy = $container->getDefinition($package->getArgument(1));
         $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertSame('https://cdn.example.com/manifest.json', $versionStrategy->getArgument(0));
-        $this->assertFalse($versionStrategy->getArgument(2));
+        $this->assertTrue($versionStrategy->getArgument(2));
 
         $package = $container->getDefinition($packages['env_manifest']);
         $versionStrategy = $container->getDefinition($package->getArgument(1));
         $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertStringMatchesFormat('env_%s', $versionStrategy->getArgument(0));
-        $this->assertFalse($versionStrategy->getArgument(2));
+        $this->assertTrue($versionStrategy->getArgument(2));
 
         $package = $container->getDefinition((string) $packages['strict_manifest_strategy']);
         $versionStrategy = $container->getDefinition((string) $package->getArgument(1));

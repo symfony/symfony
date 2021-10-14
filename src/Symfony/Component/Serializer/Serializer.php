@@ -163,7 +163,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         }
 
         if ($data instanceof NormalizedValueInterface) {
-            $data = $data->getNormalization();
+            $data = $data->getValue();
         }
 
         if (null === $data || is_scalar($data)) {

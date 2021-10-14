@@ -216,7 +216,7 @@ class SerializerTest extends TestCase
     {
         $normalizedValue = 'normalizedValue';
         $normalizedValueObject = $this->createMock(NormalizedValueInterface::class);
-        $normalizedValueObject->method('getNormalization')
+        $normalizedValueObject->method('getValue')
             ->willReturn($normalizedValue);
 
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);

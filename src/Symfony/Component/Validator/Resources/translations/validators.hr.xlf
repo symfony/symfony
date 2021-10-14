@@ -392,7 +392,7 @@
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
-                <target>Ova vrijednost nije ispravna CSS boja.</target>
+                <target>Ova vrijednost nije važeća CSS boja.</target>
             </trans-unit>
         </body>
     </file>

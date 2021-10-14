@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+* Ensure sender/from is valid via regex
+
 5.3
 ---
 

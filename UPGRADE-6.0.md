@@ -497,6 +497,8 @@ Validator
   $builder->enableAnnotationMapping(true)
       ->addDefaultDoctrineAnnotationReader();
   ```
+  
+  * Removed email validation mode `loose`; default is now `html5`.
 
 Workflow
 --------

@@ -78,6 +78,398 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Napakaraming nabigong mga pagtatangka sa pag-login, pakisubukan ulit sa% minuto% minuto.</target>
             </trans-unit>
+            <trans-unit id="21">
+                <source>This value should be false.</source>
+                <target>ang halagang ito ay dapat na mali</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>This value should be true.</source>
+                <target>ang halagang ito ay dapat na totoo</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>This value should be of type {{ type }}.</source>
+                <target>Ang halagang ito ay dapat na may uri na {{type}}.</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>This value should be blank.</source>
+                <target>Ang halaga na ito ay dapat na blangko.</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>The value you selected is not a valid choice.</source>
+                <target>Ang halagang pinili mo ay hindi wastong pagpipilian.</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <target>Dapat kang pumili ng hindi bababa sa {{limit}} na pagpipilian. | Dapat kang pumili ng hindi bababa sa {{limitasyon} mga pagpipilian.</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <target>Dapat kang pumili ng pinakamaraming pagpipilian na {{limit}}. | Dapat kang pumili ng pinakamaraming pagpipilian na {{limit}}.</target>
+            </trans-unit>
+            <trans-unit id="28">
+                <source>One or more of the given values is invalid.</source>
+                <target>Isa o higit pa sa mga naibigay na halaga ay hindi wasto.</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>This field was not expected.</source>
+                <target>Ang larangan na ito ay hindi inaasahan.</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>This field is missing.</source>
+                <target>Nawawala ang patlang na ito.</target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>This value is not a valid date.</source>
+                <target>Ang halagang ito ay hindi wastong petsa.</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>This value is not a valid datetime.</source>
+                <target>Ang halagang ito ay hindi isang wastong datime.</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>This value is not a valid email address.</source>
+                <target>Ang halagang ito ay hindi wastong email address.</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be found.</source>
+                <target>Hindi matagpuan ang file.</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>The file is not readable.</source>
+                <target>Ang file ay hindi nababasa.</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Masyadong malaki ang file ({{size}} {{panlapi}}). Pinapayagan ang maximum na laki ay {{limit}} {{panlapi}}.</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
+                <target>Ang uri ng mime ng file ay hindi wasto ({{type}}). Ang pinapayagan na mga uri ng mime ay {{mga uri}}.</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value should be {{ limit }} or less.</source>
+                <target>Ang halagang ito ay dapat na {{limit]} o mas kaunti pa.</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
+                <target>Masyadong mahaba ang halagang ito. Dapat mayroong {{limit}} na character o mas kaunti. | Ang halagang ito ay masyadong mahaba. Dapat ay mayroong {{limit}} na mga character o mas kaunti.</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value should be {{ limit }} or more.</source>
+                <target>Ang halagang ito ay dapat na {{limit}} o higit pa.</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
+                <target>Masyadong maikli ang halagang ito. Dapat mayroong {{limit}} na character o higit pa. | Ang halagang ito ay masyadong maikli. Dapat ay mayroong {{limit}} na mga character o higit pa.</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>This value should not be blank.</source>
+                <target>Ang halagang ito ay hindi dapat blangko.</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>This value should not be null.</source>
+                <target>Ang halagang ito ay hindi dapat maging null.</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>This value is not valid.</source>
+                <target>Ang halaga na ito ay hindi wasto.</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>This value is not a valid time.</source>
+                <target>Ang halagang ito ay hindi isang wastong oras.</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>This value is not a valid URL.</source>
+                <target>Ang halagang ito ay hindi isang wastong URL.</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>The two values should be equal.</source>
+                <target>Ang dalawang halaga ay dapat pantay.</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>The file is too large.</source>
+                <target>Masyadong malaki ang file.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file could not be uploaded.</source>
+                <target>Hindi mai-upload ang file.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>This value should be a valid number.</source>
+                <target>Ang halagang ito ay dapat na isang wastong numero.</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>This file is not a valid image.</source>
+                <target>Ang file na ito ay hindi wastong imahe.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>This is not a valid IP address.</source>
+                <target>Hindi ito wastong IP address.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>This value is not a valid language.</source>
+                <target>Ang halagang ito ay hindi wastong wika.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This value is not a valid locale.</source>
+                <target>Ang halagang ito ay hindi isang wastong lokal.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This value is not a valid country.</source>
+                <target>Ang halagang ito ay hindi isang wastong bansa.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This value is already used.</source>
+                <target>Nagamit na ang halagang ito.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>The size of the image could not be detected.</source>
+                <target>Ang sukat ng imahe ay hindi napansin.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>Masyadong malaki ang lapad ng imahe ({{lapad}} px). Pinapayagan ang maximum na lapad ay {{max_width}} px.</target>
+            </trans-unit>
+            <trans-unit id="59">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>Masyadong maliit ang lapad ng imahe ({{lapad}} px). Inaasahan ang minimum na lapad ay {{min_width}} px.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>Masyadong malaki ang taas ng imahe ({{taas}} px). Pinapayagan ang maximum na taas ay {{max_height}} px.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>Ang taas ng imahe ay masyadong maliit ({{taas}} px). Inaasahan ang minimum na taas na taas ay {{min_height}} px.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value should be the user's current password.</source>
+                <target>Ang halagang ito ay dapat na kasalukuyang password ng gumagamit.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
+                <target>Ang halagang ito ay dapat na may eksaktong character na {{limit}}. | Ang halagang ito ay dapat na may eksaktong {{limit}} na mga character.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>The file was only partially uploaded.</source>
+                <target>Bahagyang na-upload lamang ang file.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>No file was uploaded.</source>
+                <target>Walang na-upload na file.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>No temporary folder was configured in php.ini.</source>
+                <target>Walang pansamantalang folder na na-configure sa php.ini.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>Cannot write temporary file to disk.</source>
+                <target>Hindi makasulat ng pansamantalang file sa disk.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>Ang isang extension ng PHP ay nagdulot ng pagkabigo sa pag-upload.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
+                <target>Dapat maglaman ang koleksyon na ito ng elemento ng {{limit}} o higit pa. | Ang koleksyon na ito ay dapat maglaman ng mga elemento ng {{limit}} o higit pa.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
+                <target>Ang koleksyon na ito ay dapat maglaman ng elemento ng {{limit}} o mas kaunti. | Ang koleksyon na ito ay dapat maglaman ng mga elemento ng {{limit}} o mas kaunti.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
+                <target>Dapat maglaman ang koleksyon na ito ng eksaktong elemento ng {{limit}}. | Ang koleksyon na ito ay dapat maglaman ng eksaktong {{limit}} na mga elemento.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>Invalid card number.</source>
+                <target>Di-wastong numero ng card.</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Hindi sinusuportahang uri ng card o hindi wastong numero ng card.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Hindi ito wastong wastong International Bank Account Number (IBAN).</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Hindi ito wastong wastong International Bank Account Number (IBAN).</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Ang halagang ito ay hindi wastong ISBN-10.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Ang halagang ito ay hindi wastong ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Ang halagang ito ay hindi isang wastong ISBN-10 o isang wastong ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>This value is not a valid ISSN.</source>
+                <target>Ang halagang ito ay hindi wastong ISSN.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value is not a valid currency.</source>
+                <target>Ang halagang ito ay hindi isang wastong pera.</target>
+            </trans-unit>
+            <trans-unit id="81">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Ang halagang ito ay dapat na katumbas ng {{Compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Ang halagang ito ay dapat na mas malaki sa {{Compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="83">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Ang halagang ito ay dapat na mas malaki sa o katumbas ng {{Compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Ang halagang ito ay dapat na magkapareho sa {{Compare_value_type}} {{Compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Ang halagang ito ay dapat mas mababa sa {{Compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Ang halagang ito ay dapat mas mababa sa o katumbas ng {{Compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Ang halagang ito ay hindi dapat katumbas ng {{Compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Ang halagang ito ay hindi dapat magkapareho sa {{Compare_value_type}} {{Compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>Masyadong malaki ang ratio ng imahe ({{ratio}}). Pinapayagan ang maximum na ratio ay {{max_ratio}}.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>Masyadong maliit ang ratio ng imahe ({{ratio}}). Inaasahan ang minimum na ratio na {{min_ratio}}.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>Ang imahe ay parisukat ({{lapad}} x {{taas}} px). Hindi pinapayagan ang mga parisukat na imahe.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>Ang imahe ay naka-orient sa landscape ({{width}} x {{taas}} px). Hindi pinapayagan ang mga naka-orient na imahe na Landscape.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed</source>
+                <target>Ang larawan ay nakatuon sa larawan ({{lapad}} x {{taas}} px). Hindi pinapayagan ang mga larawan na nakatuon sa larawan</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>An empty file is not allowed.</source>
+                <target>Hindi pinapayagan ang isang walang laman na file.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>An empty file is not allowed.</source>
+                <target>Hindi pinapayagan ang isang walang laman na file.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The host could not be resolved.</source>
+                <target>Hindi malutas ang host.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Ang halagang ito ay hindi tugma sa inaasahang charset na {{charset}}.</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>This is not a valid Business Identifier Code (BIC).</source>
+                <target>Hindi ito isang wastong Business Identifier Code (BIC).</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>Error</source>
+                <target>Error</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This is not a valid UUID.</source>
+                <target>Hindi ito wastong UUID.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>Ang halagang ito ay dapat na isang maramihang ng {{Compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>Ang Business Identifier Code (BIC) na ito ay hindi naiugnay sa IBAN {{iban}}.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>This value should be valid JSON.</source>
+                <target>Ang halagang ito ay dapat na wasto JSON.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>This collection should contain only unique elements.</source>
+                <target>Ang koleksyon na ito ay dapat maglaman lamang ng mga natatanging elemento.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>This value should be positive.</source>
+                <target>Ang halaga na ito ay dapat na positibo.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value should be either positive or zero.</source>
+                <target>Ang halagang ito ay dapat na positibo o zero.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>This value should be negative.</source>
+                <target>Ang halagang ito ay dapat na negatibo.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>This value should be either negative or zero.</source>
+                <target>Ang halagang ito ay dapat na alinman sa negatibo o zero.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>This value is not a valid timezone.</source>
+                <target>Ang halagang ito ay hindi isang wastong timezone.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Ang password na ito ay na-leak sa isang paglabag sa data, hindi ito dapat gamitin. Mangyaring gumamit ng isa pang password.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Ang halagang ito ay dapat nasa pagitan ng {{min}} at {{max}}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid hostname.</source>
+                <target>Ang halagang ito ay hindi isang wastong hostname.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Ang bilang ng mga elemento sa koleksyon na ito ay dapat na isang maramihang ng {{Compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Ang halaga na ito ay dapat masiyahan ang hindi bababa sa isa sa mga sumusunod na hadlang:</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Ang bawat elemento ng koleksyon na ito ay dapat masiyahan ang sarili nitong hanay ng mga hadlang.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Ang halagang ito ay hindi wastong numero ng International Securities Identification Number (ISIN).</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>This value should be a valid expression.</source>
+                <target>Ang halagang ito ay dapat na isang wastong pagpapahayag.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>This value is not a valid CSS color.</source>
+                <target>Ang halagang ito ay hindi wastong kulay ng CSS.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -114,7 +114,6 @@ class ProfilerController
             'request' => $request,
             'templates' => $this->getTemplateManager()->getNames($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
-            'profiler_markup_version' => 2, // 1 = original profiler, 2 = Symfony 2.8+ profiler
         ]), 200, ['Content-Type' => 'text/html']);
     }
 
@@ -157,7 +156,6 @@ class ProfilerController
             'templates' => $this->getTemplateManager()->getNames($profile),
             'profiler_url' => $url,
             'token' => $token,
-            'profiler_markup_version' => 2, // 1 = original toolbar, 2 = Symfony 2.8+ toolbar
         ]);
     }
 

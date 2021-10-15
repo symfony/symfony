@@ -117,7 +117,7 @@
                         {% for name, template in templates %}
                             {% set menu -%}
                                 {%- if block('menu', template) is defined -%}
-                                    {% with { collector: profile.getcollector(name), profiler_markup_version: profiler_markup_version } %}
+                                    {% with { collector: profile.getcollector(name) } %}
                                         {{- block('menu', template) -}}
                                     {% endwith %}
                                 {%- endif -%}

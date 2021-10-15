@@ -409,6 +409,26 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
+    public function trimPrefix($prefix): parent
+    {
+        if (!$this->ignoreCase) {
+            return parent::trimPrefix($prefix);
+        }
+
+        $str = clone $this;
+
+        if ($prefix instanceof \Traversable) {
+            $prefix = iterator_to_array($prefix, false);
+        } elseif ($prefix instanceof parent) {
+            $prefix = $prefix->string;
+        }
+
+        $prefix = implode('|', array_map('preg_quote', (array) $prefix));
+        $str->string = preg_replace("{^(?:$prefix)}iuD", '', $this->string);
+
+        return $str;
+    }
+
     public function trimStart(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}"): parent
     {
         if (" \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}" !== $chars && !preg_match('//u', $chars)) {
@@ -418,6 +438,26 @@ abstract class AbstractUnicodeString extends AbstractString
 
         $str = clone $this;
         $str->string = preg_replace("{^[$chars]++}uD", '', $str->string);
+
+        return $str;
+    }
+
+    public function trimSuffix($suffix): parent
+    {
+        if (!$this->ignoreCase) {
+            return parent::trimSuffix($suffix);
+        }
+
+        $str = clone $this;
+
+        if ($suffix instanceof \Traversable) {
+            $suffix = iterator_to_array($suffix, false);
+        } elseif ($suffix instanceof parent) {
+            $suffix = $suffix->string;
+        }
+
+        $suffix = implode('|', array_map('preg_quote', (array) $suffix));
+        $str->string = preg_replace("{(?:$suffix)$}iuD", '', $this->string);
 
         return $str;
     }

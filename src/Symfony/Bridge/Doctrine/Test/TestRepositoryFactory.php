@@ -19,7 +19,7 @@ use Doctrine\Persistence\ObjectRepository;
 /**
  * @author Andreas Braun <alcaeus@alcaeus.org>
  *
- * @deprecated in 5.3, will be removed in 6.0.
+ * @deprecated since Symfony 5.3
  */
 class TestRepositoryFactory implements RepositoryFactory
 {

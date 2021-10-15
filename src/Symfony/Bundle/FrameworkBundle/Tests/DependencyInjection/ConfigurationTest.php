@@ -370,6 +370,9 @@ class ConfigurationTest extends TestCase
             'http_method_override' => true,
             'ide' => null,
             'default_locale' => 'en',
+            'enabled_locales' => [],
+            'set_locale_from_accept_language' => false,
+            'set_content_language_from_locale' => false,
             'secret' => 's3cr3t',
             'trusted_hosts' => [],
             'trusted_headers' => [
@@ -535,6 +538,7 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
+                'reset_on_message' => null,
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [
@@ -578,6 +582,7 @@ class ConfigurationTest extends TestCase
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 6,
             ],
+            'exceptions' => [],
         ];
     }
 }

@@ -25,6 +25,7 @@ Form
 FrameworkBundle
 ---------------
 
+ * Deprecate the `framework.translator.enabled_locales` config option, use `framework.enabled_locales` instead
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private
  * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
@@ -39,16 +40,25 @@ HttpFoundation
 --------------
 
  * Mark `Request::get()` internal, use explicit input sources instead
+ * Deprecate `upload_progress.*` and `url_rewriter.tags` session options
 
 Messenger
 ---------
 
  * Deprecate not setting the `delete_after_ack` config option (or DSN parameter) using the Redis transport,
    its default value will change to `true` in 6.0
+ * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
+
+Monolog
+-------
+
+ * Deprecate `ResetLoggersWorkerSubscriber` to reset buffered logs in messenger
+   workers, use "reset_on_message" option in messenger configuration instead.
 
 SecurityBundle
 --------------
 
+ * Deprecate `FirewallConfig::getListeners()`, use `FirewallConfig::getAuthenticators()` instead
  * Deprecate `security.authentication.basic_entry_point` and `security.authentication.retry_entry_point` services, the logic is moved into the
    `HttpBasicAuthenticator` and `ChannelListener` respectively
  * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`

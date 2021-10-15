@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Deprecate `ResetLoggersWorkerSubscriber` to reset buffered logs in messenger
+   workers, use "reset_on_message" option in messenger configuration instead.
+
 5.3
 ---
 

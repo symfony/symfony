@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `litespeed_finish_request` method to work with Litespeed
+ * Deprecate `upload_progress.*` and `url_rewriter.tags` session options
 
 5.3
 ---

@@ -43,6 +43,7 @@
     "conflict": {
         "symfony/dependency-injection": "<5.3",
         "symfony/framework-bundle": "<5.0",
+        "symfony/service-contracts": ">=3.0",
         "symfony/translation": "<5.0"
     },
     "autoload": {

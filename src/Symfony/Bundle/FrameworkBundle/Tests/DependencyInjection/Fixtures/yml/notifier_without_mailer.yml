@@ -3,6 +3,7 @@ framework:
         enabled: false
     messenger:
         enabled: true
+        reset_on_message: true
     notifier:
         enabled: true
         notification_on_failed_messages: true

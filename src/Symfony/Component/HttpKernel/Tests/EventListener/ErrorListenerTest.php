@@ -97,6 +97,27 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(3, $logger->getLogs('critical'));
     }
 
+    public function testHandleWithLoggerAndCustomConfiguration()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new \RuntimeException('bar'));
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger, false, [
+            \RuntimeException::class => [
+                'log_level' => 'warning',
+                'status_code' => 401,
+            ],
+        ]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(new Response('foo', 401), $event->getResponse());
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogs('critical'));
+        $this->assertCount(1, $logger->getLogs('warning'));
+    }
+
     public function provider()
     {
         if (!class_exists(Request::class)) {

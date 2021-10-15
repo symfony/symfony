@@ -276,7 +276,7 @@ class ProcessTest extends TestCase
     public function testSetInputWhileRunningThrowsAnException()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Input can not be set while the process is running.');
+        $this->expectExceptionMessage('Input cannot be set while the process is running.');
         $process = $this->getProcessForCode('sleep(30);');
         $process->start();
         try {
@@ -938,7 +938,7 @@ class ProcessTest extends TestCase
     public function testSignalProcessNotRunning()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Can not send signal on a non running process.');
+        $this->expectExceptionMessage('Cannot send signal on a non running process.');
         $process = $this->getProcess('foo');
         $process->signal(1); // SIGHUP
     }
@@ -1057,7 +1057,7 @@ class ProcessTest extends TestCase
     public function testDisableOutputWhileIdleTimeoutIsSet()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Output can not be disabled while an idle timeout is set.');
+        $this->expectExceptionMessage('Output cannot be disabled while an idle timeout is set.');
         $process = $this->getProcess('foo');
         $process->setIdleTimeout(1);
         $process->disableOutput();
@@ -1066,7 +1066,7 @@ class ProcessTest extends TestCase
     public function testSetIdleTimeoutWhileOutputIsDisabled()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('timeout can not be set while the output is disabled.');
+        $this->expectExceptionMessage('timeout cannot be set while the output is disabled.');
         $process = $this->getProcess('foo');
         $process->disableOutput();
         $process->setIdleTimeout(1);

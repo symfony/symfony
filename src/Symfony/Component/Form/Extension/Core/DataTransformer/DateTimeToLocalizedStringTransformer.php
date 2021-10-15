@@ -165,7 +165,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @return \IntlDateFormatter
      *
-     * @throws TransformationFailedException in case the date formatter can not be constructed
+     * @throws TransformationFailedException in case the date formatter cannot be constructed
      */
     protected function getIntlDateFormatter(bool $ignoreTimezone = false)
     {

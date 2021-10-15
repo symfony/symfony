@@ -18,8 +18,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
@@ -95,6 +97,55 @@ class ConsumeMessagesCommandTest extends TestCase
             '--bus' => 'dummy-bus',
             '--limit' => 1,
         ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+    }
+
+    public function provideRunWithResetServicesOption(): iterable
+    {
+        yield [true];
+        yield [false];
+    }
+
+    /**
+     * @dataProvider provideRunWithResetServicesOption
+     */
+    public function testRunWithResetServicesOption(bool $shouldReset)
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver
+            ->expects($this->exactly(3))
+            ->method('get')
+            ->willReturnOnConsecutiveCalls(
+                [$envelope],
+                [/* idle */],
+                [$envelope, $envelope]
+            );
+        $msgCount = 3;
+
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->expects($this->once())->method('has')->with('dummy-receiver')->willReturn(true);
+        $receiverLocator->expects($this->once())->method('get')->with('dummy-receiver')->willReturn($receiver);
+
+        $bus = $this->createMock(RoutableMessageBus::class);
+        $bus->expects($this->exactly($msgCount))->method('dispatch');
+
+        $servicesResetter = $this->createMock(ServicesResetter::class);
+        $servicesResetter->expects($this->exactly($shouldReset ? $msgCount : 0))->method('reset');
+
+        $command = new ConsumeMessagesCommand($bus, $receiverLocator, new EventDispatcher(), null, [], new ResetServicesListener($servicesResetter));
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute(array_merge([
+            'receivers' => ['dummy-receiver'],
+            '--sleep' => '0.001', // do not sleep too long
+            '--limit' => $msgCount,
+        ], $shouldReset ? [] : ['--no-reset' => null]));
 
         $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());

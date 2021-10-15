@@ -259,12 +259,30 @@ class AutowirePassTest extends TestCase
     }
 
     /**
+     * @requires PHP 8
+     */
+    public function testGuessableUnionType()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('b', \stcClass::class);
+        $container->setAlias(CollisionA::class.' $collision', 'b');
+        $container->setAlias(CollisionB::class.' $collision', 'b');
+
+        $aDefinition = $container->register('a', UnionClasses::class);
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame('b', (string) $aDefinition->getArgument(0));
+    }
+
+    /**
      * @requires PHP 8.1
      */
     public function testTypeNotGuessableIntersectionType()
     {
-        $this->expectException(AutowiringFailedException::class);
-        $this->expectExceptionMessage('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\IntersectionClasses::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface&Symfony\Component\DependencyInjection\Tests\Compiler\AnotherInterface" but this class was not found.');
         $container = new ContainerBuilder();
 
         $container->register(CollisionInterface::class);
@@ -274,7 +292,31 @@ class AutowirePassTest extends TestCase
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
+
+        $this->expectException(AutowiringFailedException::class);
+        $this->expectExceptionMessage('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\IntersectionClasses::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\AnotherInterface&Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but this class was not found.');
         $pass->process($container);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testGuessableIntersectionType()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('b', \stcClass::class);
+        $container->setAlias(CollisionInterface::class, 'b');
+        $container->setAlias(AnotherInterface::class, 'b');
+        $container->setAlias(DummyInterface::class, 'b');
+
+        $aDefinition = $container->register('a', IntersectionClasses::class);
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame('b', (string) $aDefinition->getArgument(0));
     }
 
     public function testTypeNotGuessableWithTypeSet()
@@ -516,7 +558,7 @@ class AutowirePassTest extends TestCase
     public function testUnionScalarArgsCannotBeAutowired()
     {
         $this->expectException(AutowiringFailedException::class);
-        $this->expectExceptionMessage('Cannot autowire service "union_scalars": argument "$timeout" of method "Symfony\Component\DependencyInjection\Tests\Compiler\UnionScalars::__construct()" is type-hinted "int|float", you should configure its value explicitly.');
+        $this->expectExceptionMessage('Cannot autowire service "union_scalars": argument "$timeout" of method "Symfony\Component\DependencyInjection\Tests\Compiler\UnionScalars::__construct()" is type-hinted "float|int", you should configure its value explicitly.');
         $container = new ContainerBuilder();
 
         $container->register('union_scalars', UnionScalars::class)

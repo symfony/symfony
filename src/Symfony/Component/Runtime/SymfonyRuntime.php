@@ -82,26 +82,31 @@ class SymfonyRuntime extends GenericRuntime
      *   use_putenv?: ?bool,
      *   runtimes?: ?array,
      *   error_handler?: string|false,
+     *   env_var_name?: string,
+     *   debug_var_name?: string,
      * } $options
      */
     public function __construct(array $options = [])
     {
+        $envKey = $options['env_var_name'] ?? $options['env_var_name'] = 'APP_ENV';
+        $debugKey = $options['debug_var_name'] ?? $options['debug_var_name'] = 'APP_DEBUG';
+
         if (isset($options['env'])) {
-            $_SERVER['APP_ENV'] = $options['env'];
+            $_SERVER[$envKey] = $options['env'];
         } elseif (isset($_SERVER['argv']) && class_exists(ArgvInput::class)) {
             $this->options = $options;
             $this->getInput();
         }
 
         if (!($options['disable_dotenv'] ?? false) && isset($options['project_dir']) && !class_exists(MissingDotenv::class, false)) {
-            (new Dotenv())
+            (new Dotenv($envKey, $debugKey))
                 ->setProdEnvs((array) ($options['prod_envs'] ?? ['prod']))
                 ->usePutenv($options['use_putenv'] ?? false)
                 ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']));
-            $options['debug'] ?? $options['debug'] = '1' === $_SERVER['APP_DEBUG'];
+            $options['debug'] ?? $options['debug'] = '1' === $_SERVER[$debugKey];
             $options['disable_dotenv'] = true;
         } else {
-            $_SERVER['APP_ENV'] ?? $_SERVER['APP_ENV'] = 'dev';
+            $_SERVER[$envKey] ?? $_SERVER[$envKey] = 'dev';
         }
 
         $options['error_handler'] ?? $options['error_handler'] = SymfonyErrorHandler::class;
@@ -140,7 +145,7 @@ class SymfonyRuntime extends GenericRuntime
             }
 
             set_time_limit(0);
-            $defaultEnv = !isset($this->options['env']) ? ($_SERVER['APP_ENV'] ?? 'dev') : null;
+            $defaultEnv = !isset($this->options['env']) ? ($_SERVER[$this->options['env_var_name']] ?? 'dev') : null;
             $output = $this->output ?? $this->output = new ConsoleOutput();
 
             return new ConsoleApplicationRunner($application, $defaultEnv, $this->getInput(), $output);
@@ -208,11 +213,11 @@ class SymfonyRuntime extends GenericRuntime
         }
 
         if (null !== $env = $input->getParameterOption(['--env', '-e'], null, true)) {
-            putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $env);
+            putenv($this->options['env_var_name'].'='.$_SERVER[$this->options['env_var_name']] = $_ENV[$this->options['env_var_name']] = $env);
         }
 
         if ($input->hasParameterOption('--no-debug', true)) {
-            putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
+            putenv($this->options['debug_var_name'].'='.$_SERVER[$this->options['debug_var_name']] = $_ENV[$this->options['debug_var_name']] = '0');
         }
 
         return $this->input = $input;

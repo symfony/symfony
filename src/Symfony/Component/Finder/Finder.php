@@ -584,16 +584,16 @@ class Finder implements \IteratorAggregate, \Countable
 
         foreach ((array) $dirs as $dir) {
             if (is_dir($dir)) {
-                $resolvedDirs[] = $this->normalizeDir($dir);
+                $resolvedDirs[] = [$this->normalizeDir($dir)];
             } elseif ($glob = glob($dir, (\defined('GLOB_BRACE') ? \GLOB_BRACE : 0) | \GLOB_ONLYDIR | \GLOB_NOSORT)) {
                 sort($glob);
-                $resolvedDirs = array_merge($resolvedDirs, array_map([$this, 'normalizeDir'], $glob));
+                $resolvedDirs[] = array_map([$this, 'normalizeDir'], $glob);
             } else {
                 throw new DirectoryNotFoundException(sprintf('The "%s" directory does not exist.', $dir));
             }
         }
 
-        $this->dirs = array_merge($this->dirs, $resolvedDirs);
+        $this->dirs = array_merge($this->dirs, ...$resolvedDirs);
 
         return $this;
     }
@@ -709,14 +709,6 @@ class Finder implements \IteratorAggregate, \Countable
             $notPaths[] = '#(^|/)\..+(/|$)#';
         }
 
-        if (static::IGNORE_VCS_IGNORED_FILES === (static::IGNORE_VCS_IGNORED_FILES & $this->ignore)) {
-            $gitignoreFilePath = sprintf('%s/.gitignore', $dir);
-            if (!is_readable($gitignoreFilePath)) {
-                throw new \RuntimeException(sprintf('The "ignoreVCSIgnored" option cannot be used by the Finder as the "%s" file is not readable.', $gitignoreFilePath));
-            }
-            $notPaths = array_merge($notPaths, [Gitignore::toRegex(file_get_contents($gitignoreFilePath))]);
-        }
-
         $minDepth = 0;
         $maxDepth = \PHP_INT_MAX;
 
@@ -783,6 +775,10 @@ class Finder implements \IteratorAggregate, \Countable
 
         if ($this->paths || $notPaths) {
             $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $notPaths);
+        }
+
+        if (static::IGNORE_VCS_IGNORED_FILES === (static::IGNORE_VCS_IGNORED_FILES & $this->ignore)) {
+            $iterator = new Iterator\VcsIgnoredFilterIterator($iterator, $dir);
         }
 
         return $iterator;

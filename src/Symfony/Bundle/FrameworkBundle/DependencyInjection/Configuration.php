@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
+use Psr\Log\LogLevel;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -76,6 +77,7 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+            ->fixXmlConfig('enabled_locale')
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
@@ -85,6 +87,18 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
+                ->booleanNode('set_locale_from_accept_language')
+                    ->info('Whether to use the Accept-Language HTTP header to set the Request locale (only when the "_locale" request attribute is not passed).')
+                    ->defaultFalse()
+                ->end()
+                ->booleanNode('set_content_language_from_locale')
+                    ->info('Whether to set the Content-Language HTTP header on the Response using the Request locale.')
+                    ->defaultFalse()
+                ->end()
+                ->arrayNode('enabled_locales')
+                    ->info('Defines the possible locales for the application. This list is used for generating translations files, but also to restrict which locales are allowed when it is set from Accept-Language header (using "set_locale_from_accept_language").')
+                    ->prototype('scalar')->end()
+                ->end()
                 ->arrayNode('trusted_hosts')
                     ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
                     ->prototype('scalar')->end()
@@ -139,6 +153,7 @@ class Configuration implements ConfigurationInterface
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
         $this->addCacheSection($rootNode, $willBeAvailable);
         $this->addPhpErrorsSection($rootNode);
+        $this->addExceptionsSection($rootNode);
         $this->addWebLinkSection($rootNode, $enableIfStandalone);
         $this->addLockSection($rootNode, $enableIfStandalone);
         $this->addMessengerSection($rootNode, $enableIfStandalone);
@@ -812,6 +827,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                         ->arrayNode('enabled_locales')
+                            ->setDeprecated('symfony/framework-bundle', '5.3', 'Option "%node%" at "%path%" is deprecated, set the "framework.enabled_locales" option instead.')
                             ->prototype('scalar')->end()
                             ->defaultValue([])
                         ->end()
@@ -846,7 +862,7 @@ class Configuration implements ConfigurationInterface
                                     ->arrayNode('locales')
                                         ->prototype('scalar')->end()
                                         ->defaultValue([])
-                                        ->info('If not set, all locales listed under framework.translator.enabled_locales are used.')
+                                        ->info('If not set, all locales listed under framework.enabled_locales are used.')
                                     ->end()
                                 ->end()
                             ->end()
@@ -1163,6 +1179,64 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    private function addExceptionsSection(ArrayNodeDefinition $rootNode)
+    {
+        $logLevels = (new \ReflectionClass(LogLevel::class))->getConstants();
+
+        $rootNode
+            ->children()
+                ->arrayNode('exceptions')
+                    ->info('Exception handling configuration')
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(function (array $v): array {
+                            if (!\array_key_exists('exception', $v)) {
+                                return $v;
+                            }
+
+                            // Fix XML normalization
+                            $data = isset($v['exception'][0]) ? $v['exception'] : [$v['exception']];
+                            $exceptions = [];
+                            foreach ($data as $exception) {
+                                $config = [];
+                                if (\array_key_exists('log-level', $exception)) {
+                                    $config['log_level'] = $exception['log-level'];
+                                }
+                                if (\array_key_exists('status-code', $exception)) {
+                                    $config['status_code'] = $exception['status-code'];
+                                }
+                                $exceptions[$exception['name']] = $config;
+                            }
+
+                            return $exceptions;
+                        })
+                    ->end()
+                    ->prototype('array')
+                        ->fixXmlConfig('exception')
+                        ->children()
+                            ->scalarNode('log_level')
+                                ->info('The level of log message. Null to let Symfony decide.')
+                                ->validate()
+                                    ->ifTrue(function ($v) use ($logLevels) { return !\in_array($v, $logLevels); })
+                                    ->thenInvalid(sprintf('The log level is not valid. Pick one among "%s".', implode('", "', $logLevels)))
+                                ->end()
+                                ->defaultNull()
+                            ->end()
+                            ->scalarNode('status_code')
+                                ->info('The status code of the response. Null to let Symfony decide.')
+                                ->validate()
+                                    ->ifTrue(function ($v) { return $v < 100 || $v > 599; })
+                                    ->thenInvalid('The log level is not valid. Pick a value between 100 and 599.')
+                                ->end()
+                                ->defaultNull()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addLockSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
@@ -1202,15 +1276,13 @@ class Configuration implements ConfigurationInterface
                                 ->then(function ($v) {
                                     $resources = [];
                                     foreach ($v as $resource) {
-                                        $resources = array_merge_recursive(
-                                            $resources,
-                                            \is_array($resource) && isset($resource['name'])
-                                                ? [$resource['name'] => $resource['value']]
-                                                : ['default' => $resource]
-                                        );
+                                        $resources[] = \is_array($resource) && isset($resource['name'])
+                                            ? [$resource['name'] => $resource['value']]
+                                            : ['default' => $resource]
+                                        ;
                                     }
 
-                                    return $resources;
+                                    return array_merge_recursive([], ...$resources);
                                 })
                             ->end()
                             ->prototype('array')
@@ -1333,10 +1405,6 @@ class Configuration implements ConfigurationInterface
                                 ->fixXmlConfig('option')
                                 ->children()
                                     ->scalarNode('dsn')->end()
-                                    ->booleanNode('reset_on_message')
-                                        ->defaultFalse()
-                                        ->info('Reset container services after each message. Turn it on when the transport is async and run in a worker.')
-                                    ->end()
                                     ->scalarNode('serializer')->defaultNull()->info('Service id of a custom serializer to use.')->end()
                                     ->arrayNode('options')
                                         ->normalizeKeys(false)
@@ -1373,6 +1441,10 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('failure_transport')
                             ->defaultNull()
                             ->info('Transport name to send failed messages to (after all retries have failed).')
+                        ->end()
+                        ->booleanNode('reset_on_message')
+                            ->defaultNull()
+                            ->info('Reset container services after each message.')
                         ->end()
                         ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')

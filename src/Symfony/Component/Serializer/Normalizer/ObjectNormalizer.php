@@ -182,9 +182,11 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             }
 
             if (null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
+                $attributes = [];
                 foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
-                    $allowedAttributes = array_merge($allowedAttributes, parent::getAllowedAttributes($mappedClass, $context, $attributesAsString));
+                    $attributes[] = parent::getAllowedAttributes($mappedClass, $context, $attributesAsString);
                 }
+                $allowedAttributes = array_merge($allowedAttributes, ...$attributes);
             }
         }
 

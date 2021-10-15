@@ -42,7 +42,7 @@ class TemplateController
     public function templateAction(string $template, int $maxAge = null, int $sharedAge = null, bool $private = null, array $context = []): Response
     {
         if (null === $this->twig) {
-            throw new \LogicException('You can not use the TemplateController if the Twig Bundle is not available.');
+            throw new \LogicException('You cannot use the TemplateController if the Twig Bundle is not available.');
         }
 
         $response = new Response($this->twig->render($template, $context));

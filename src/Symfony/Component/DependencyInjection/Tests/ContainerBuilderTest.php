@@ -290,7 +290,7 @@ class ContainerBuilderTest extends TestCase
             $builder->setAlias('foobar', 'foobar');
             $this->fail('->setAlias() throws an InvalidArgumentException if the alias references itself');
         } catch (\InvalidArgumentException $e) {
-            $this->assertEquals('An alias can not reference itself, got a circular reference on "foobar".', $e->getMessage(), '->setAlias() throws an InvalidArgumentException if the alias references itself');
+            $this->assertEquals('An alias cannot reference itself, got a circular reference on "foobar".', $e->getMessage(), '->setAlias() throws an InvalidArgumentException if the alias references itself');
         }
 
         try {
@@ -1752,6 +1752,18 @@ class ContainerBuilderTest extends TestCase
         $container->get(B::class);
 
         $this->addToAssertionCount(1);
+    }
+
+    public function testFindTags()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register(A::class)
+            ->addTag('tag1')
+            ->addTag('tag2')
+            ->addTag('tag3');
+
+        $this->assertSame(['tag1', 'tag2', 'tag3'], $container->findTags());
     }
 }
 

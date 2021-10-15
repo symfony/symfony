@@ -19,6 +19,7 @@ use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
 use Symfony\Component\Form\Tests\Extension\Core\Type\TextTypeTest;
 use Symfony\Component\Form\Tests\Fixtures\Author;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -59,6 +60,19 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $form = $this->createForm(['constraints' => $valid = new Valid()]);
 
         $this->assertSame([$valid], $form->getConfig()->getOption('constraints'));
+    }
+
+    public function testValidConstraintsArray()
+    {
+        $form = $this->createForm(['constraints' => [$valid = new Valid()]]);
+
+        $this->assertSame([$valid], $form->getConfig()->getOption('constraints'));
+    }
+
+    public function testInvalidConstraint()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->createForm(['constraints' => ['foo' => 'bar']]);
     }
 
     public function testGroupSequenceWithConstraintsOption()

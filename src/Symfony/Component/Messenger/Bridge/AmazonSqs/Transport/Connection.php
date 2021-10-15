@@ -186,7 +186,7 @@ class Connection
     }
 
     /**
-     * @return array[]
+     * @return \Generator<int, array>
      */
     private function getNextMessages(): \Generator
     {
@@ -195,7 +195,7 @@ class Connection
     }
 
     /**
-     * @return array[]
+     * @return \Generator<int, array>
      */
     private function getPendingMessages(): \Generator
     {
@@ -205,7 +205,7 @@ class Connection
     }
 
     /**
-     * @return array[]
+     * @return \Generator<int, array>
      */
     private function getNewMessages(): \Generator
     {

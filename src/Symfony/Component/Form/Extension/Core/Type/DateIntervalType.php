@@ -55,7 +55,7 @@ class DateIntervalType extends AbstractType
             throw new InvalidConfigurationException('The single_text widget does not support invertible intervals.');
         }
         if ($options['with_weeks'] && $options['with_days']) {
-            throw new InvalidConfigurationException('You can not enable weeks and days fields together.');
+            throw new InvalidConfigurationException('You cannot enable weeks and days fields together.');
         }
         $format = 'P';
         $parts = [];

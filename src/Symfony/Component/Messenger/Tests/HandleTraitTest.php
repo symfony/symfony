@@ -82,7 +82,9 @@ class TestQueryBus
 
     public function __construct(?MessageBusInterface $messageBus)
     {
-        $this->messageBus = $messageBus;
+        if ($messageBus) {
+            $this->messageBus = $messageBus;
+        }
     }
 
     public function query($query): string

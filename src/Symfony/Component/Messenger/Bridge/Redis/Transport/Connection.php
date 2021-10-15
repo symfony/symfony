@@ -111,7 +111,10 @@ class Connection
         $this->claimInterval = $configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval'];
     }
 
-    private static function initializeRedis(\Redis $redis, string $host, int $port, ?string $auth, int $serializer, int $dbIndex): \Redis
+    /**
+     * @param string|string[]|null $auth
+     */
+    private static function initializeRedis(\Redis $redis, string $host, int $port, $auth, int $serializer, int $dbIndex): \Redis
     {
         $redis->connect($host, $port);
         $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
@@ -127,7 +130,10 @@ class Connection
         return $redis;
     }
 
-    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, ?string $auth, int $serializer): \RedisCluster
+    /**
+     * @param string|string[]|null $auth
+     */
+    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, $auth, int $serializer): \RedisCluster
     {
         if (null === $redis) {
             $redis = new \RedisCluster(null, $hosts, 0.0, 0.0, false, $auth);
@@ -235,7 +241,8 @@ class Connection
             $connectionCredentials = [
                 'host' => $parsedUrl['host'] ?? '127.0.0.1',
                 'port' => $parsedUrl['port'] ?? 6379,
-                'auth' => $redisOptions['auth'] ?? $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
+                // See: https://github.com/phpredis/phpredis/#auth
+                'auth' => $redisOptions['auth'] ?? (isset($parsedUrl['pass']) && isset($parsedUrl['user']) ? [$parsedUrl['user'], $parsedUrl['pass']] : $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null),
             ];
 
             $pathParts = explode('/', rtrim($parsedUrl['path'] ?? '', '/'));
@@ -349,13 +356,13 @@ class Connection
                 }
 
                 foreach ($queuedMessages as $queuedMessage => $time) {
-                    $queuedMessage = json_decode($queuedMessage, true);
+                    $decodedQueuedMessage = json_decode($queuedMessage, true);
                     // if a futured placed message is actually popped because of a race condition with
                     // another running message consumer, the message is readded to the queue by add function
                     // else its just added stream and will be available for all stream consumers
                     $this->add(
-                        $queuedMessage['body'],
-                        $queuedMessage['headers'],
+                        \array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage,
+                        $decodedQueuedMessage['headers'] ?? [],
                         $time - $this->getCurrentTimeInMilliseconds()
                     );
                 }
@@ -399,12 +406,9 @@ class Connection
         }
 
         foreach ($messages[$this->stream] ?? [] as $key => $message) {
-            $redisEnvelope = json_decode($message['message'], true);
-
             return [
                 'id' => $key,
-                'body' => $redisEnvelope['body'],
-                'headers' => $redisEnvelope['headers'],
+                'data' => $message,
             ];
         }
 
@@ -522,7 +526,7 @@ class Connection
                 // support for Redis extension version 4.x
                 || (\is_string($groups) && substr_count($groups, '"name"'))
             ) {
-                throw new LogicException(sprintf('More than one group exists for stream "%s", delete_after_ack and delete_after_reject can not be enabled as it risks deleting messages before all groups could consume them.', $this->stream));
+                throw new LogicException(sprintf('More than one group exists for stream "%s", delete_after_ack and delete_after_reject cannot be enabled as it risks deleting messages before all groups could consume them.', $this->stream));
             }
         }
 

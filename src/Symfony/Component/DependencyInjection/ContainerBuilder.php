@@ -846,7 +846,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($alias === (string) $id) {
-            throw new InvalidArgumentException(sprintf('An alias can not reference itself, got a circular reference on "%s".', $alias));
+            throw new InvalidArgumentException(sprintf('An alias cannot reference itself, got a circular reference on "%s".', $alias));
         }
 
         unset($this->definitions[$alias], $this->removedIds[$alias]);
@@ -1280,10 +1280,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $tags = [];
         foreach ($this->getDefinitions() as $id => $definition) {
-            $tags = array_merge(array_keys($definition->getTags()), $tags);
+            $tags[] = array_keys($definition->getTags());
         }
 
-        return array_unique($tags);
+        return array_unique(array_merge([], ...$tags));
     }
 
     /**

@@ -120,7 +120,7 @@ class FullTransformer
      *
      * @return int|false The corresponding Unix timestamp
      *
-     * @throws \InvalidArgumentException When the value can not be matched with pattern
+     * @throws \InvalidArgumentException When the value cannot be matched with pattern
      */
     public function parse(\DateTime $dateTime, string $value)
     {

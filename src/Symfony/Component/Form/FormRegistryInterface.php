@@ -25,7 +25,7 @@ interface FormRegistryInterface
      *
      * @return ResolvedFormTypeInterface
      *
-     * @throws Exception\InvalidArgumentException if the type can not be retrieved from any extension
+     * @throws Exception\InvalidArgumentException if the type cannot be retrieved from any extension
      */
     public function getType(string $name);
 

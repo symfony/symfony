@@ -143,11 +143,11 @@ class Form extends Link implements \ArrayAccess
             if (!empty($qs)) {
                 parse_str($qs, $expandedValue);
                 $varName = substr($name, 0, \strlen(key($expandedValue)));
-                $values = array_replace_recursive($values, [$varName => current($expandedValue)]);
+                $values[] = [$varName => current($expandedValue)];
             }
         }
 
-        return $values;
+        return array_replace_recursive([], ...$values);
     }
 
     /**
@@ -182,11 +182,11 @@ class Form extends Link implements \ArrayAccess
 
                 reset($expandedValue);
 
-                $values = array_replace_recursive($values, [$varName => current($expandedValue)]);
+                $values[] = [$varName => current($expandedValue)];
             }
         }
 
-        return $values;
+        return array_replace_recursive([], ...$values);
     }
 
     /**

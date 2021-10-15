@@ -163,15 +163,26 @@ class ConnectionTest extends TestCase
         $this->assertNotNull($connection->get());
     }
 
-    public function testAuth()
+    /**
+     * @param string|array $expected
+     *
+     * @dataProvider provideAuthDsn
+     */
+    public function testAuth($expected, string $dsn)
     {
         $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('auth')
-            ->with('password')
+            ->with($expected)
             ->willReturn(true);
 
-        Connection::fromDsn('redis://password@localhost/queue', ['delete_after_ack' => true], $redis);
+        Connection::fromDsn($dsn, ['delete_after_ack' => true], $redis);
+    }
+
+    public function provideAuthDsn(): \Generator
+    {
+        yield 'Password only' => ['password', 'redis://password@localhost/queue'];
+        yield 'User and password' => [['user', 'password'], 'redis://user:password@localhost/queue'];
     }
 
     public function testAuthFromOptions()
@@ -240,7 +251,17 @@ class ConnectionTest extends TestCase
             ->willReturn(['queue' => [['message' => '{"body":"1","headers":[]}']]]);
 
         $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
-        $connection->get();
+        $message = $connection->get();
+
+        $this->assertSame([
+            'id' => 0,
+            'data' => [
+                'message' => json_encode([
+                    'body' => '1',
+                    'headers' => [],
+                ]),
+            ],
+        ], $message);
     }
 
     public function testClaimAbandonedMessageWithRaceCondition()

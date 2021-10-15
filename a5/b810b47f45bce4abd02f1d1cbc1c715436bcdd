@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-13T19:24:06Z
+
+> the console component is one of the most widely used
+
+Usually projects using the component don't need to provide own implementations of that interface. This is why I was so curious about your use-case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-13T19:31:14Z
+
+`expected-missing-return-types.diff` needs to be changed, see hints in the file
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-10-13T19:31:42Z
+
+> Usually projects using the component don't need to provide own implementations of that interface.
+
+This is true.
+
+> This is why I was so curious about your use-case.
+
+For the record, my use-case is a decorator object that implements `InputInterface`, `OutputInterface` and `StyleInterface` to improve DX.
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-10-13T20:05:57Z
+
+I'm having some trouble updating `expected-missing-return-types.diff`. When I run the commands, it changes dozens of files and overrides a ton of lines in `expected-missing-return-types.diff`.
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-10-13T20:36:24Z
+
+I _think_ I finagled it to work correctly - CI's happy at least :)
+
+I believe `.editorconfig` caused extra line trims. Not sure if that's a problem or not...

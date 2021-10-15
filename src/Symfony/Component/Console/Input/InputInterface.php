@@ -50,8 +50,10 @@ interface InputInterface
      * @param string|array                     $values     The value(s) to look for in the raw parameters (can be an array)
      * @param string|bool|int|float|array|null $default    The default value to return if no result is found
      * @param bool                             $onlyParams Only check real parameters, skip those following an end of options (--) signal
+     *
+     * @return mixed
      */
-    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed;
+    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false);
 
     /**
      * Binds the current Input instance with the given arguments and options.
@@ -77,9 +79,11 @@ interface InputInterface
     /**
      * Returns the argument value for a given argument name.
      *
+     * @return mixed
+     *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function getArgument(string $name): mixed;
+    public function getArgument(string $name);
 
     /**
      * Sets an argument value by name.
@@ -103,9 +107,11 @@ interface InputInterface
     /**
      * Returns the option value for a given option name.
      *
+     * @return mixed
+     *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function getOption(string $name): mixed;
+    public function getOption(string $name);
 
     /**
      * Sets an option value by name.

@@ -848,3 +848,28 @@ index 012a483de2..6573ad7ec5 100644
 +    public function getTargets(): string|array
      {
          return self::PROPERTY_CONSTRAINT;
+diff --git a/src/Symfony/Component/Console/Input/InputInterface.php b/src/Symfony/Component/Console/Input/InputInterface.php
+index 024da1884e..943790e875 100644
+--- a/src/Symfony/Component/Console/Input/InputInterface.php
++++ b/src/Symfony/Component/Console/Input/InputInterface.php
+@@ -54,5 +54,5 @@ interface InputInterface
+      * @return mixed
+      */
+-    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false);
++    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed;
+ 
+     /**
+@@ -84,5 +84,5 @@ interface InputInterface
+      * @throws InvalidArgumentException When argument given doesn't exist
+      */
+-    public function getArgument(string $name);
++    public function getArgument(string $name): mixed;
+ 
+     /**
+@@ -112,5 +112,5 @@ interface InputInterface
+      * @throws InvalidArgumentException When option given doesn't exist
+      */
+-    public function getOption(string $name);
++    public function getOption(string $name): mixed;
+ 
+     /**

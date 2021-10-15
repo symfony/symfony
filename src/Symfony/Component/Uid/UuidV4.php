@@ -24,7 +24,7 @@ class UuidV4 extends Uuid
     {
         if (null === $uuid) {
             $uuid = random_bytes(16);
-            $uuid[6] = $uuid[6] & "\x0F" | "\x4F";
+            $uuid[6] = $uuid[6] & "\x0F" | "\x40";
             $uuid[8] = $uuid[8] & "\x3F" | "\x80";
             $uuid = bin2hex($uuid);
 

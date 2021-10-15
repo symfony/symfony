@@ -245,4 +245,18 @@ EODUMP
             ],
         ];
     }
+
+    public function testWithUninitializedXMLReader()
+    {
+        $this->reader = new \XmlReader();
+
+        $expectedDump = <<<'EODUMP'
+XMLReader {
+  +nodeType: NONE
+   …13
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $this->reader);
+    }
 }

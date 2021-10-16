@@ -59,7 +59,7 @@ class RetryableHttpClient implements HttpClientInterface
         return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options, &$retryCount, &$content, &$firstChunk) {
             $exception = null;
             try {
-                if ($chunk->isTimeout() || null !== $chunk->getInformationalStatus()) {
+                if ($chunk->isTimeout() || null !== $chunk->getInformationalStatus() || $context->getInfo('canceled')) {
                     yield $chunk;
 
                     return;
@@ -76,23 +76,14 @@ class RetryableHttpClient implements HttpClientInterface
                     }
 
                     if (false === $shouldRetry) {
-                        $context->passthru();
-                        if (null !== $firstChunk) {
-                            yield $firstChunk;
-                            yield $context->createChunk($content);
-                            yield $chunk;
-                        } else {
-                            yield $chunk;
-                        }
-                        $content = '';
+                        yield from $this->passthru($context, $firstChunk, $content, $chunk);
 
                         return;
                     }
                 }
             } elseif ($chunk->isFirst()) {
                 if (false === $shouldRetry = $this->strategy->shouldRetry($context, null, null)) {
-                    $context->passthru();
-                    yield $chunk;
+                    yield from $this->passthru($context, $firstChunk, $content, $chunk);
 
                     return;
                 }
@@ -105,9 +96,9 @@ class RetryableHttpClient implements HttpClientInterface
                     return;
                 }
             } else {
-                $content .= $chunk->getContent();
-
                 if (!$chunk->isLast()) {
+                    $content .= $chunk->getContent();
+
                     return;
                 }
 
@@ -116,10 +107,7 @@ class RetryableHttpClient implements HttpClientInterface
                 }
 
                 if (false === $shouldRetry) {
-                    $context->passthru();
-                    yield $firstChunk;
-                    yield $context->createChunk($content);
-                    $content = '';
+                    yield from $this->passthru($context, $firstChunk, $content, $chunk);
 
                     return;
                 }
@@ -158,5 +146,23 @@ class RetryableHttpClient implements HttpClientInterface
         }
 
         return null;
+    }
+
+    private function passthru(AsyncContext $context, ?ChunkInterface $firstChunk, string &$content, ChunkInterface $lastChunk): \Generator
+    {
+        $context->passthru();
+
+        if (null !== $firstChunk) {
+            yield $firstChunk;
+        }
+
+        if ('' !== $content) {
+            $chunk = $context->createChunk($content);
+            $content = '';
+
+            yield $chunk;
+        }
+
+        yield $lastChunk;
     }
 }

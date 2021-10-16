@@ -35,6 +35,11 @@ final class GuardEvent extends Event
         $this->transitionBlockerList = new TransitionBlockerList();
     }
 
+    public function getTransition(): Transition
+    {
+        return parent::getTransition();
+    }
+
     public function isBlocked(): bool
     {
         return !$this->transitionBlockerList->isEmpty();

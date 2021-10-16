@@ -556,7 +556,71 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     abstract public function trimEnd(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}"): static;
 
+    /**
+     * @param string|string[] $prefix
+     */
+    public function trimPrefix($prefix): static
+    {
+        if (\is_array($prefix) || $prefix instanceof \Traversable) {
+            foreach ($prefix as $s) {
+                $t = $this->trimPrefix($s);
+
+                if ($t->string !== $this->string) {
+                    return $t;
+                }
+            }
+
+            return clone $this;
+        }
+
+        $str = clone $this;
+
+        if ($prefix instanceof self) {
+            $prefix = $prefix->string;
+        } else {
+            $prefix = (string) $prefix;
+        }
+
+        if ('' !== $prefix && \strlen($this->string) >= \strlen($prefix) && 0 === substr_compare($this->string, $prefix, 0, \strlen($prefix), $this->ignoreCase)) {
+            $str->string = substr($this->string, \strlen($prefix));
+        }
+
+        return $str;
+    }
+
     abstract public function trimStart(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}"): static;
+
+    /**
+     * @param string|string[] $suffix
+     */
+    public function trimSuffix($suffix): static
+    {
+        if (\is_array($suffix) || $suffix instanceof \Traversable) {
+            foreach ($suffix as $s) {
+                $t = $this->trimSuffix($s);
+
+                if ($t->string !== $this->string) {
+                    return $t;
+                }
+            }
+
+            return clone $this;
+        }
+
+        $str = clone $this;
+
+        if ($suffix instanceof self) {
+            $suffix = $suffix->string;
+        } else {
+            $suffix = (string) $suffix;
+        }
+
+        if ('' !== $suffix && \strlen($this->string) >= \strlen($suffix) && 0 === substr_compare($this->string, $suffix, -\strlen($suffix), null, $this->ignoreCase)) {
+            $str->string = substr($this->string, 0, -\strlen($suffix));
+        }
+
+        return $str;
+    }
 
     public function truncate(int $length, string $ellipsis = '', bool $cut = true): static
     {

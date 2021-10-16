@@ -21,6 +21,7 @@ CHANGELOG
 5.4
 ---
 
+ * Deprecate passing `null` as `$requestIp` to `IpUtils::__checkIp()`, `IpUtils::__checkIp4()` or `IpUtils::__checkIp6()`, pass an empty string instead.
  * Add the `litespeed_finish_request` method to work with Litespeed
  * Deprecate `upload_progress.*` and `url_rewriter.tags` session options
 

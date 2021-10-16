@@ -78,7 +78,7 @@ final class EventSourceHttpClient implements HttpClientInterface
             try {
                 $isTimeout = $chunk->isTimeout();
 
-                if (null !== $chunk->getInformationalStatus()) {
+                if (null !== $chunk->getInformationalStatus() || $context->getInfo('canceled')) {
                     yield $chunk;
 
                     return;

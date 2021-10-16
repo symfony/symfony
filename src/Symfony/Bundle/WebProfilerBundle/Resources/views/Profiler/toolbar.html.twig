@@ -22,6 +22,22 @@
             {% endwith %}
         {% endif %}
     {% endfor %}
+    {% if full_stack %}
+        <div class="sf-full-stack sf-toolbar-block sf-toolbar-block-full-stack sf-toolbar-status-red sf-toolbar-block-right">
+            <div class="sf-toolbar-icon">
+                <span class="sf-toolbar-value">Using symfony/symfony is NOT supported</span>
+            </div>
+            <div class="sf-toolbar-info sf-toolbar-status-red">
+                <p>This project is using Symfony via the "symfony/symfony" package.</p>
+                <p>This is NOT supported anymore since Symfony 4.0.</p>
+                <p>Even if it seems to work well, it has some important limitations with no workarounds.</p>
+                <p>Using this package also makes your project slower.</p>
+
+                <strong>Please, stop using this package and replace it with individual packages instead.</strong>
+            </div>
+            <div></div>
+        </div>
+    {% endif %}
 
     <button class="hide-button" type="button" id="sfToolbarHideButton-{{ token }}" title="Close Toolbar" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}">
         {{ include('@WebProfiler/Icon/close.svg') }}

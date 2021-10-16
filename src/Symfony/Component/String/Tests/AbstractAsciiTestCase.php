@@ -733,6 +733,15 @@ abstract class AbstractAsciiTestCase extends TestCase
         ];
     }
 
+    public function testTrimPrefix()
+    {
+        $str = static::createFromString('abc.def');
+
+        $this->assertEquals(static::createFromString('def'), $str->trimPrefix('abc.'));
+        $this->assertEquals(static::createFromString('def'), $str->trimPrefix(['abc.', 'def']));
+        $this->assertEquals(static::createFromString('def'), $str->ignoreCase()->trimPrefix('ABC.'));
+    }
+
     /**
      * @dataProvider provideTrimStart
      */
@@ -742,6 +751,15 @@ abstract class AbstractAsciiTestCase extends TestCase
         $result = null !== $chars ? $result->trimStart($chars) : $result->trimStart();
 
         $this->assertEquals(static::createFromString($expected), $result);
+    }
+
+    public function testTrimSuffix()
+    {
+        $str = static::createFromString('abc.def');
+
+        $this->assertEquals(static::createFromString('abc'), $str->trimSuffix('.def'));
+        $this->assertEquals(static::createFromString('abc'), $str->trimSuffix(['.def', 'abc']));
+        $this->assertEquals(static::createFromString('abc'), $str->ignoreCase()->trimSuffix('.DEF'));
     }
 
     public static function provideTrimStart()

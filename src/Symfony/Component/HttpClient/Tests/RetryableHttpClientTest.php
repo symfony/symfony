@@ -4,6 +4,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
@@ -158,5 +159,23 @@ class RetryableHttpClientTest extends TestCase
         }
         $this->assertCount(2, $logger->logs);
         $this->assertSame('Try #{count} after {delay}ms: Could not resolve host "does.not.exists".', $logger->logs[0]);
+    }
+
+    public function testCancelOnTimeout()
+    {
+        $client = HttpClient::create();
+
+        if ($client instanceof NativeHttpClient) {
+            $this->markTestSkipped('NativeHttpClient cannot timeout before receiving headers');
+        }
+
+        $client = new RetryableHttpClient($client);
+
+        $response = $client->request('GET', 'https://example.com/');
+
+        foreach ($client->stream($response, 0) as $chunk) {
+            $this->assertTrue($chunk->isTimeout());
+            $response->cancel();
+        }
     }
 }

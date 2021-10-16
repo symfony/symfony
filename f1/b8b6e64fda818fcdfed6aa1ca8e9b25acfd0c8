@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by chr-hertel at 2021-08-20T21:30:24Z
+
+@derrabus would it be sufficient to extend the `isEnabled()` to not only check for `$_SERVER['SYMFONY_DOTENV_VARS']` but also add `class_exists(DotEnv::class)`?
+
+edit: needed some additional changes to `AddConsoleCommandPass` to make `isEnabled` really count ... not really sure about that
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-08-22T10:11:59Z
+
+We should add a line to FrameworkBundle's ChangeLog:
+
+```md
+ * Add DotenvDebugCommand
+```
+
+And since your changes to FrameworkBundle rely on the `is_enabled` attribute you've added to the Console component, FrameworkBundle should conflict with
+
+```
+"symfony/console": "<5.4",
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-22T13:46:31Z
+
+What about moving this command to the Dotenv component (that's what we are doing for component related commands)?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-14T13:58:53Z
+
+@symfony/mergers Is there anything left to do here? From my POV, this PR is ready to be merged.

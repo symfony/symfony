@@ -247,7 +247,7 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
                 }
             }
 
-            if (!$client) {
+            if (!$client || !$wrappedResponses) {
                 return;
             }
 

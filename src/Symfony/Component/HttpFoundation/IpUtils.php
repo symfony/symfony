@@ -32,14 +32,8 @@ class IpUtils
      *
      * @param string|array $ips List of IPs or subnets (can be a string if only a single one)
      */
-    public static function checkIp(?string $requestIp, string|array $ips): bool
+    public static function checkIp(string $requestIp, string|array $ips): bool
     {
-        if (null === $requestIp) {
-            trigger_deprecation('symfony/http-foundation', '5.4', 'Passing null as $requestIp to "%s()" is deprecated, pass an empty string instead.', __METHOD__);
-
-            return false;
-        }
-
         if (!\is_array($ips)) {
             $ips = [$ips];
         }
@@ -63,14 +57,8 @@ class IpUtils
      *
      * @return bool Whether the request IP matches the IP, or whether the request IP is within the CIDR subnet
      */
-    public static function checkIp4(?string $requestIp, string $ip): bool
+    public static function checkIp4(string $requestIp, string $ip): bool
     {
-        if (null === $requestIp) {
-            trigger_deprecation('symfony/http-foundation', '5.4', 'Passing null as $requestIp to "%s()" is deprecated, pass an empty string instead.', __METHOD__);
-
-            return false;
-        }
-
         $cacheKey = $requestIp.'-'.$ip;
         if (isset(self::$checkedIps[$cacheKey])) {
             return self::$checkedIps[$cacheKey];
@@ -114,14 +102,8 @@ class IpUtils
      *
      * @throws \RuntimeException When IPV6 support is not enabled
      */
-    public static function checkIp6(?string $requestIp, string $ip): bool
+    public static function checkIp6(string $requestIp, string $ip): bool
     {
-        if (null === $requestIp) {
-            trigger_deprecation('symfony/http-foundation', '5.4', 'Passing null as $requestIp to "%s()" is deprecated, pass an empty string instead.', __METHOD__);
-
-            return false;
-        }
-
         $cacheKey = $requestIp.'-'.$ip;
         if (isset(self::$checkedIps[$cacheKey])) {
             return self::$checkedIps[$cacheKey];

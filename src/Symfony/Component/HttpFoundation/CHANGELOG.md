@@ -17,6 +17,7 @@ CHANGELOG
  * Retrieving non-scalar values using `InputBag::get()` will throw `BadRequestException` (use `InputBad::all()` instead to retrieve an array)
  * Passing non-scalar default value as the second argument `InputBag::get()` will throw `\InvalidArgumentException`
  * Passing non-scalar, non-array value as the second argument `InputBag::set()` will throw `\InvalidArgumentException`
+ * Passing `null` as `$requestIp` to `IpUtils::__checkIp()`, `IpUtils::__checkIp4()` or `IpUtils::__checkIp6()` is not supported anymore.
 
 5.4
 ---

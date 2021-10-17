@@ -80,7 +80,7 @@ class AccessDeniedException extends RuntimeException
     }
 
     /**
-     * Gets the access decision
+     * Gets the access decision.
      */
     public function getAccessDecision(): ?AccessDecision
     {

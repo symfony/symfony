@@ -94,7 +94,7 @@ class AuthorizationCheckerTest extends TestCase
             ->with($this->identicalTo($token), ['foo'])
             ->willReturn(AccessDecision::createGranted());
 
-        $authorizationChecker = new AuthorizationChecker($this->tokenStorage,  $accessDecisionManager, false, false);
+        $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $accessDecisionManager, false, false);
 
         // first run the token has not been re-authenticated yet, after isGranted is called, it should be equal
         $this->assertSame($token, $this->tokenStorage->getToken());

@@ -203,6 +203,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Symfony\Component\Messenger\Handler\OptionalHandlerLocator;
 
 /**
  * Process the configuration and prepare the dependency injection container with
@@ -1914,12 +1915,29 @@ class FrameworkExtension extends Extension
         foreach ($config['buses'] as $busId => $bus) {
             $middleware = $bus['middleware'];
 
+            $handlersLocatorClassParameterName = $busId.'.messenger.handlers_locator.class';
+            $container->setParameter($handlersLocatorClassParameterName, OptionalHandlerLocator::class);
+            if ($bus['handlers_strategy']) {
+                if ('at_least_one' === $bus['handlers_strategy']) {
+                    $container->setParameter($handlersLocatorClassParameterName, AtLeastOneHandlerLocator::class);
+                } else if ('exactly_one' === $bus['handlers_strategy']) {
+                    $container->setParameter($handlersLocatorClassParameterName, ExactlyOneHandlerLocator::class);
+                }
+            }
+
             if ($bus['default_middleware']) {
                 if ('allow_no_handlers' === $bus['default_middleware']) {
-                    $defaultMiddleware['after'][1]['arguments'] = [true];
-                } else {
-                    unset($defaultMiddleware['after'][1]['arguments']);
+                    trigger_deprecation('symfony/framework-bundle', '5.4', 'Using the "allow_no_handlers" value with the "messenger.buses.default_middleware" parameter is deprecated, use the "messenger.buses.handlers_strategy" parameter instead.');
+                    if (
+                        $container->hasParameter($handlersLocatorClassParameterName)
+                        && OptionalHandlerLocator::class !== $container->getParameter($handlersLocatorClassParameterName)
+                    ) {
+                        throw new LogicException('Conflict detected between handlers_strategy and default_middleware value');
+                    }
+
+                    $container->setParameter($handlersLocatorClassParameterName, OptionalHandlerLocator::class);
                 }
+                unset($defaultMiddleware['after'][1]['arguments']);
 
                 // argument to add_bus_name_stamp_middleware
                 $defaultMiddleware['before'][0]['arguments'] = [$busId];

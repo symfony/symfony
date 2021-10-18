@@ -78,6 +78,6 @@
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
                 <target>Napakaraming nabigong mga pagtatangka sa pag-login, pakisubukan ulit sa% minuto% minuto.</target>
             </trans-unit>
-                    </body>
+        </body>
     </file>
 </xliff>

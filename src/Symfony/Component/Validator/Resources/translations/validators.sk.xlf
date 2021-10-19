@@ -390,6 +390,10 @@
                 <source>This value should be a valid expression.</source>
                 <target>Táto hodnota by mala byť platným výrazom.</target>
             </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Táto hodnota nie je platná CSS farba.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

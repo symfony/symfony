@@ -361,4 +361,16 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             $this->assertCount(0, $clientState->openHandles);
         }
     }
+
+    public function testDebugInfoOnDestruct()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $traceInfo = [];
+        $client->request('GET', 'http://localhost:8057', ['on_progress' => function (int $dlNow, int $dlSize, array $info) use (&$traceInfo) {
+            $traceInfo = $info;
+        }]);
+
+        $this->assertNotEmpty($traceInfo['debug']);
+    }
 }

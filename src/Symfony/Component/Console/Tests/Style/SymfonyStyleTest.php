@@ -13,10 +13,12 @@ namespace Symfony\Component\Console\Tests\Style;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -104,6 +106,39 @@ class SymfonyStyleTest extends TestCase
 
         $io = new SymfonyStyle($input, $output);
         $io->getErrorStyle()->write('');
+    }
+
+    public function testCreateTableWithConsoleOutput()
+    {
+        $input = $this->createMock(InputInterface::class);
+        $output = $this->createMock(ConsoleOutputInterface::class);
+        $output
+            ->method('getFormatter')
+            ->willReturn(new OutputFormatter());
+        $output
+            ->expects($this->once())
+            ->method('section')
+            ->willReturn($this->createMock(ConsoleSectionOutput::class));
+
+        $style = new SymfonyStyle($input, $output);
+
+        $style->createTable();
+    }
+
+    public function testCreateTableWithoutConsoleOutput()
+    {
+        $input = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
+        $output
+            ->method('getFormatter')
+            ->willReturn(new OutputFormatter());
+
+        $style = new SymfonyStyle($input, $output);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectDeprecationMessage('Output should be an instance of "Symfony\Component\Console\Output\ConsoleSectionOutput"');
+
+        $style->createTable()->appendRow(['row']);
     }
 
     public function testGetErrorStyleUsesTheCurrentOutputIfNoErrorOutputIsAvailable()

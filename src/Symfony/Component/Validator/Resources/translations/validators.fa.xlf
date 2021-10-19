@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>مقدار انتخاب شده یک گزینه معتبر نمی‌ باشد.</target>
+                <target>مقدار انتخاب شده یک گزینه معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
@@ -44,15 +44,15 @@
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
-                <target>این مقدار یک تاریخ معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک تاریخ معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime.</source>
-                <target>این مقدار یک تاریخ و زمان معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک تاریخ و زمان معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>این یک پست الکترونیکی (ایمیل) معتبر نمی‌ باشد.</target>
+                <target>این یک پست الکترونیکی (ایمیل) معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
@@ -100,15 +100,15 @@
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>این مقدار معتبر نمی‌ باشد.</target>
+                <target>این مقدار معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
-                <target>این مقدار یک زمان معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک زمان معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>این مقدار شامل یک URL معتبر نمی‌ باشد.</target>
+                <target>این مقدار شامل یک URL معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
@@ -132,7 +132,7 @@
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>این فایل یک تصویر معتبر نمی‌ باشد.</target>
+                <target>این فایل یک تصویر معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
@@ -140,15 +140,15 @@
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>این مقدار یک زبان معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک زبان معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>این مقدار یک محل (locale) معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک محل (locale) معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>این مقدار یک کشور معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک کشور معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -156,7 +156,7 @@
             </trans-unit>
             <trans-unit id="42">
                 <source>The size of the image could not be detected.</source>
-                <target>اندازه تصویر قابل شناسایی نمی‌ باشد.</target>
+                <target>اندازه تصویر قابل شناسایی نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
@@ -224,27 +224,27 @@
             </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>این یک شماره حساب بانک بین المللی معتبر نمی‌ باشد(IBAN).</target>
+                <target>این یک شماره حساب بانک بین المللی معتبر نمی‌باشد(IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
-                <target>این مقدار یک ISBN-10 معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک ISBN-10 معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="61">
                 <source>This value is not a valid ISBN-13.</source>
-                <target>این مقدار یک ISBN-13 معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک ISBN-13 معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>این مقدار یک ISBN-10 معتبر و یا ISBN-13 معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک ISBN-10 معتبر و یا ISBN-13 معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>
-                <target>این مقدار یک ISSN معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک ISSN معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>این مقدار یک واحد پول معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک واحد پول معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
@@ -288,23 +288,23 @@
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
-                <target>این تصویر یک مربع ({{ width }}x{{ height }}px) می‌باشد. تصاویر مربع شکل مجاز نمی‌ باشند.</target>
+                <target>این تصویر یک مربع ({{ width }}x{{ height }}px) می‌باشد. تصاویر مربع شکل مجاز نمی‌باشند.</target>
             </trans-unit>
             <trans-unit id="76">
                 <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
-                <target>این تصویر افقی ({{ width }}x{{ height }}px) می‌باشد. تصاویر افقی مجاز نمی‌ باشند.</target>
+                <target>این تصویر افقی ({{ width }}x{{ height }}px) می‌باشد. تصاویر افقی مجاز نمی‌باشند.</target>
             </trans-unit>
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
-                <target>این تصویر عمودی ({{ width }}x{{ height }}px) می‌باشد. تصاویر عمودی مجاز نمی‌ باشند.</target>
+                <target>این تصویر عمودی ({{ width }}x{{ height }}px) می‌باشد. تصاویر عمودی مجاز نمی‌باشند.</target>
             </trans-unit>
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
-                <target>فایل خالی مجاز نمی ‌باشد.</target>
+                <target>فایل خالی مجاز نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>میزبان قابل حل شدن نبود.</target>
+                <target>میزبان (Host) شناسایی نشد.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83">
                 <source>This is not a valid UUID.</source>
-                <target>این مقدار یک UUID معتبر نمی‌ باشد.</target>
+                <target>این مقدار یک UUID معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -360,7 +360,7 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>این رمزعبور در یک رخنه‌ی اطلاعاتی نشت کرده اس، نباید از آن استفاده کرد. لطفا از یک رمز عبور دیگری استفاده کنید.</target>
+                <target>این رمزعبور در یک رخنه‌ی اطلاعاتی نشت کرده اس، نباید از آن استفاده کرد. لطفا از یک رمزعبور دیگری استفاده کنید.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
@@ -376,11 +376,11 @@
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>این مقدار باید حداقل یکی از محدودیت های زیر را برآورده کند:</target>
+                <target>این مقدار باید حداقل یکی از محدودیت‌های زیر را برآورده کند:</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
-                <target>هر یک از عناصر این مجموعه باید محدودیت های خاص خود را برآورده کند.</target>
+                <target>هر یک از عناصر این مجموعه باید محدودیت‌های خاص خود را برآورده کند.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
@@ -392,7 +392,7 @@
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
-                <target>این مقدار یک رنگ CSS معتبر نمی باشد.</target>
+                <target>این مقدار یک رنگ CSS معتبر نمی‌باشد.</target>
             </trans-unit>
         </body>
     </file>

@@ -41,7 +41,6 @@ class DoctrineDbalStore implements PersistingStoreInterface
     use ExpiringStoreTrait;
 
     private $conn;
-    private $dsn;
 
     /**
      * List of available options:

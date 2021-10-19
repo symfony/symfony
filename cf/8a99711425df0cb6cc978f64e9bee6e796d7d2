@@ -1,0 +1,385 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-25T06:18:35Z
+
+Thank you.
+
+This looks super cool. =)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-07-25T10:50:05Z
+
+Thanks :)
+
+I've updated this PR to complete most of the important TODO items (and also updated the usage in the PR description). It still needs more unit tests (I used a local shell script to test things, I need to convert it to unit tests) and I need to add a line to the CHANGELOG. Other than that, I think this in a final state, so ready for reviews :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-01T16:26:49Z
+
+Should we target `6.0` and mark this big new feature as `@experimental`?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-08-01T16:29:57Z
+
+My general opinion is that we mark too many classes experimental.
+
+But I let @wouterj decide in this specific case.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-02T10:47:44Z
+
+The public API side of this feature is quite minimal (one method in `Console` which needs full BC and 2 classes that we should mark as `@final`). The feature itself is purely DX (i.e. it's not that big of a deal if it stops working), so I agree with not marking this as experimental.
+
+Adding support for ZSH might break things, but a community member already stepped up to provide a PR for this if this is merged, so this can be caught before the 5.4 release. Other than that, all complexity of this feature is in the `CompletionInput::bind()` method, which will all be normal "bug fixes".
+
+---
+
+I guess the lack of reviewers in this PR indicates that it's probably a bit difficult to review. Some hints:
+
+- The main logic is in `CompleteCommand` and `CompletionInput`. The command receives an array of input "words" (similar to `$argv`) and the index in that array of the current cursor position (to know where completion is requested). Based on this, `CompletionInput` has to provide the correct type, value, option name, etc. That is the core logic of this PR (see also its tests).
+- From a DX side, see `SecretsRemoveCommand::complete()`, `Command::complete()` and `Application::complete()` for PHP usage of this feature.
+- If you're into bash, consider reviewing `completion.bash` and `BashCompletionOutput`. That latter is not doing much (only providing completion options as space-separated values). The first one is a bit more complex than the basic bash completion function, in order to simplify working with colons in the command names and `=` signs in between option name and value.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-08-03T11:36:59Z
+
+@wouterj I'm looking for a simple way to test this in my actual app, IMO it would be most beneficial to figure it all out. I'll provide my findings if I find a way to do that.
+
+Other than that, a cool sample might be to make a fork of Composer with this enabled. It might make it simple to visualize once you can test it for yourself easily.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-08-03T11:37:45Z
+
+Also, this is an absurdly valuable feature, thank you a lot for working on this! 😍
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-03T12:44:46Z
+
+@dkarlovi if you have an app running Symfony 5.3, you can try to clone my fork locally and use the `link` utility:
+
+```
+git clone https://github.com/wouterj/symfony -b issue-38275/shell-autocomplete
+cd symfony
+./link /path/to/project
+```
+
+And then use the `eval $(bin/console completion bash)` in your app.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-08-05T09:33:42Z
+
+@wouterj playing with this currently in my own app. It seems there's some fragility, for example:
+
+## Arguments not properly marked as mandatory
+
+```
+  Symfony\Component\Console\Completion\CompletionInput::fromTokens(): Argumen
+  t #2 ($currentIndex) must be of type int, null given, called in /home/dalib
+  or.karlovic/Development/RandD/symfony-autocomplete/src/Symfony/Component/Co
+  nsole/Command/CompleteCommand.php on line 109
+  ```
+
+## Argument types not properly validated / cast
+
+  ```
+    Symfony\Component\Console\Completion\CompletionInput::fromTokens(): Argumen
+  t #2 ($currentIndex) must be of type int, string given, called in /home/dal
+  ibor.karlovic/Development/RandD/symfony-autocomplete/src/Symfony/Component/
+  Console/Command/CompleteCommand.php on line 109
+  ```
+
+  ## Arguments boundaries not properly validated
+
+  ```
+  In CompletionInput.php line 198:
+
+  [ErrorException]
+  Warning: Undefined array key 9
+  ```
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-08-05T09:54:50Z
+
+@wouterj which Bash did you use to test this? For me, if I test with `bin/console`, it doesn't work, but `./console` works, but need to change CWD obviously.
+
+To get it to work, I needed to change it like this:
+
+```
+complete -F _sf_console bin/console
+```
+
+Also, the `eval` trick you gave didn't register the completion for me (checked with `complete -p console`), had to pipe it to a file and source it
+
+```
+bin/console completion bash > foo.sh
+source foo.sh
+```
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-08-05T10:11:55Z
+
+One thing which might be neat to have is to provide a flag for the dumper, something like
+
+```
+bin/console completion bash --verbose-completion
+```
+
+or similar, where it would create additional code in there to help you debug it if you're working on it. Might be too niche, maybe wait for use cases, but as I was testing this, I needed to edit the completion function to add them myself.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-08-05T10:21:05Z
+
+> See how we can better support standalone usage (e.g. Composer)
+
+Typically on systems which embrace this, they ship the completion file with the tool, example
+
+```
+$ rpm -ql kubernetes-client | grep comple
+/usr/share/bash-completion/completions/kubectl
+```
+
+This automagically enabled completion for end users. If Composer integrated this, it would be able to generate its own completion file (already here) and the people packaging it would build the completion file as they're building the package. Then it's up to Composer itself to autocomplete everything properly, which would need to be done per command basis (for example `composer require <tab>`, etc).
+
+This seems like exactly the correct first step, Composer would need to embrace this feature once released.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-05T14:04:49Z
+
+> @wouterj which Bash did you use to test this? For me, if I test with bin/console, it doesn't work, but ./console works, but need to change CWD obviously.
+
+Oh, I see. I used `bin/console completion bash > /etc/bash_completion.d/console` when testing this patch (on bash 5.1.8). I expected `eval()` to work but apparently it doesn't.
+Also seems like sourcing the file separately (like you show) requires `./console <tab>`, while putting it in `bash_completion.d` works with `bin/console <tab>` :thinking:
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-05T15:23:58Z
+
+Thanks for testing this thoroughly @dkarlovi !
+
+I've added more validation to the command (still need to write test for this command) and updated the installation instructions. I also found some more bugs for the `CompletionInput` by adding some more tests. I'll need to dig a bit deeper in the setup (i.e. bamarni's package suggests `eval`, so I'm not sure why it doesn't work here).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-05T15:29:12Z
+
+Looks super promising!
+Does this support zsh? I couldn’t manage to make it work on my machine yet, I probably need to try harder.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-05T15:41:22Z
+
+No, currently only bash is supported (ZSH has its own completion system and some basic bash completion support, but not enough to support this file - due to the magic required to make colons work).
+
+I don't want to add more implementations in this PR, it's big enough on its own imho. A community member already volunteered to write a zsh script after this is merged (and I also have some basic script ready, as I started working on this PR in zsh before switching to bash). So I'm certain that we will have bash and zsh support before the release (and, if someone has time, fish support, but I have no personal need for that).
+
+At this moment, I'm using the `bash` command in zsh to open a bash shell and test this :)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-29T12:19:53Z
+
+Updated this PR to fix the 2 open comments:
+
+- It turns out `eval $(...)` doesn't work when run in an open shell. You'll have to add it to your `.bashrc`/`.bash_profile` instead
+- I've removed the logger and implemented a basic custom debug helper.
+  1. You can enable debug mode by running `export SYMFONY_COMPLETION_DEBUG=1` once in your shell
+  2. Then open another terminal window and run `bin/console completion --debug`.
+  3. Enjoy live debugging information when trying to use the bash completion in the shell of (1):
+     ![image](https://user-images.githubusercontent.com/749025/131250086-1178da81-16ea-410e-9d19-27d63eaad5c7.png)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-08-29T19:42:13Z
+
+I'm unsure how to fix the phpt test of runtime on low-deps: increase the minimum version of `symfony/console`?
+
+Other than that, the build is :green_book:  (fabbot is a false positive)
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2021-08-30T19:17:15Z
+
+> @wouterj which Bash did you use to test this? For me, if I test with `bin/console`, it doesn't work, but `./console` works, but need to change CWD obviously.
+>
+> To get it to work, I needed to change it like this:
+>
+> ```
+> complete -F _sf_console bin/console
+> ```
+>
+> Also, the `eval` trick you gave didn't register the completion for me (checked with `complete -p console`), had to pipe it to a file and source it
+>
+> ```
+> bin/console completion bash > foo.sh
+> source foo.sh
+> ```
+
+I find this to be the best approach. It allows for multiple completion version on different symfony projects. Simple and flexible but need to be added to the default `.gitignore` of symfony.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-04T13:30:27Z
+
+Made some final changes and added some more docs (phpdoc + command help about installation).
+
+Fabbot errors are both false positives. Imho, this is now ready.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-09-10T09:15:38Z
+
+@wouterj just saw [the screenshot example](https://github.com/symfony/symfony/pull/42251#issuecomment-907782832) of the debugging and I must say, that's straight up **amazing** work!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-09-11T08:55:33Z
+
+https://github.com/posener/complete/tree/master is an interesting Go project that does the same for Bash, fish, and zsh.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-09-30T15:49:54Z
+
+To make my intentions with this PR clear: the library mentioned by @fabpot takes an interesting approach of "predicting" values, or something or nothing. I'm not sure yet whether the approach in this PR, or the approach by the bundle would be optimal.
+
+There is also an open discussion still how to better support multiple symfony projects on the same machine: https://github.com/symfony/symfony/pull/42251#discussion_r703313508
+
+All in all, I think the API of this feature is too undefined to merge it as experimental in 6.0. And given my open source attention is now on the security documentation, I won't have any time to polish it before 5.4/6.0. So I think we have to postpone this to 6.1 unfortunately
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-10-01T07:45:10Z
+
+@wouterj let me preface this by again saying thanks a lot for the effort of working on this!
+
+From my POV, this code actually looks pretty much feature complete, the new API footprint is IMO small and seems good to me, not something obviously wrong with it.
+
+> There is also an open discussion still how to better support multiple symfony projects on the same machine
+
+From my POV this is very clear, especially since there's loads of real examples how this ends up working in practice. To possibly further the discussion, let me outline my understanding here.
+
+# Multiple projects
+
+- the completion script is **global** to the shell, user, system, you can only have one completion script running at a time, for simplicity sake here let's say it's system-wide, it's NOT related to your project
+- the completion command is **local** to the Symfony app you're working with, let's say we have three apps called `sf53`, `sf54` and `sf61`
+- the same completion script (again, global) would need to work for all three (again, local) completion commands, as the user is moving about their system, the completion script can exist even if there are **zero** Symfony projects on the system, for example, Symfony might have been installed via [Symfony RPM packages](https://centos.pkgs.org/8/remi-x86_64/php-symfony-common-2.8.52-2.el8.remi.noarch.rpm.html) which can contain the completion script generated with that version of Symfony
+- this means that **the same completion script** installed in `/usr/share/bash-completion/completions/console` will trigger completion for `~/sf53/bin/console`, `~/sf54/bin/console`, ``~/sf61/bin/console``
+- this means the completion script generation is shipped **as a convenience** in each project, it's not meant to be run each time you switch projects, it's meant to be run once (or zero times) and then work with all of your existing projects (where possible, of course), it is absolutely not meant to be built and installed from each project or with each container build, it shouldn't be hidden or removed, other projects ship theirs without qualm:
+```shell
+$ rpm -ql kubernetes-client | grep completion
+/usr/share/bash-completion/completions/kubectl
+/usr/share/man/man1/kubectl-completion.1.gz
+$ kubectl | grep completion
+  completion    Output shell completion code for the specified shell (bash or zsh)
+```
+
+The completion script is more similar in nature to the `symfony` CLI than `bin/console`.
+
+# Compatibility
+
+What could be a good idea is to generate the completion script in a way where it's saying the completion command which version generated it. Something like
+
+```
+bin/console _complete -v -s bash -c a -i 2 --symfony=5.4.2
+```
+
+This gives the completion command an opportunity to either patch the behavior across versions (which is unlikely to even be required since it's so simple) or signal to the completion script to hint to the user it needs to be refreshed.
+
+For example:
+1. `bin/console _complete -v -s bash -c a -i 2 --symfony=6.1.1`
+2. there's a known bug in the completion script generated with this version
+3. completion command sees the version it was invoked with, echoes the message and returns `255` or similar exit code
+4. completion script is generated in a way to know what to do with this when it happens from the start
+
+# Remaining steps
+
+IMO, we should:
+- [x] add this version param to the completion command, it doesn't need to do anything yet
+- [x] tweak completion script generator to add the version into the script
+- [x] tweak completion script generator to handle the "signal" `255` described above
+- [x] tweak completion script generator to handle errors from Symfony 5.3 gracefully
+
+Other than that, this seems pretty complete to me.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-10T18:14:11Z
+
+Thank you for writing it down so clearly @dkarlovi, much appreciated.
+
+I've just pushed the changes you listed. So this is a mergeable feature now. I do fully agree with @dkarlovi that having a global shell script and a runtime command to provide the suggestions is the best solution here. There must always be one manual action to hook into the local shell completion, so there must always be some shell script installation process.
+
+Making changes to use cache warmers to generate the suggestions will make the suggestions potentially outdated and it will not work with all standalone Console applications (Composer, Behat, artisan, etc). Note that performance is not really a big thing here, I'm on a 8 year old laptop with an HDD and the suggestions come pretty quick for me (not slower than other completions).
+
+I'll leave this to the core team to review and decide if it's worth for 5.4, 6.0 or 6.1 :) The build failures are intentional: fabbot has false positives, and Psalm discovers an unlikely edge case that is not worth fixing imho
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-10-11T08:47:00Z
+
+> Making changes to use cache warmers to generate the suggestions will make the suggestions potentially outdated and it will not work with all standalone Console applications
+
+IMO this could be the next step after this feature is merged: allowing apps to "bake in" some static completions which could then be resolved ASAP. If you're resolving command/parameter names (especially in prod mode where they're not expected to change), there might be some opportunity to resolve them without invoking the complete command lifecycle.
+
+ But, I'd do that once we see the issue, can profile it and see where it's coming from, if at all. I wouldn't solve the feature starting with the optimization.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-10-11T10:22:13Z
+
+One more thing which came up in discussion in Slack: assuming you want to enable Linux distro packagers to build the completion at package's build time ([example for `kubectl`](https://src.fedoraproject.org/rpms/kubernetes/blob/rawhide/f/kubernetes.spec#_211)), what would be the suggested way to do that for, let's say, Composer (assuming they get a chance to integrate this work)?
+
+Would Composer (or any other standalone tool) simply integrate the `complete` command to generate their own completion shell script and that's it?
+
+Here's Composer's current Fedora SPEC file (used to build the RPMs):
+https://src.fedoraproject.org/rpms/composer/blob/rawhide/f/composer.spec
+
+Edit: maybe @remicollet can weigh in here, hopefully he'll not mind the mention. :crossed_fingers:
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-11T10:31:36Z
+
+> Would Composer (or any other standalone tool) simply integrate the complete command to generate their own completion shell script and that's it?
+
+Aside from whether this is the wanted behavior: this is currently possible (the Laravel demo in the PR description was made just by adding a `complete()` method to one Laravel command).
+
+I guess from a package maintainer perspective, we would need to support a partially static completion script for this to be considered (e.g. generate a script based on the `InputDefinition` and only when things are unknown invoke the `_complete` command).
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2021-10-11T10:52:12Z
+
+@wouterj assuming
+1. Composer integrates this current work as-is
+2. this means the `composer` app provides the `completion` command, ie. `composer completion bash` will work
+3. the packager runs it, places the output script in the proper place
+
+It should already work, no? The script will target the `composer` "binary", invoke the `_complete` command properly, etc. I don't see what special casing would actually be needed.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-18T19:08:07Z
+
+Thanks for the review @theofidry!
+
+PR updated and rebased. We have a new failure (7.2) but I can't find any error logs whatsoever about this failure.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-19T08:38:20Z
+
+Thanks, PR updated.

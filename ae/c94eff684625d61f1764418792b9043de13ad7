@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-06T07:10:53Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-06T14:27:59Z
+
+I think, we can simplify `PdoStore` already:
+
+* `PdoStore` gets a new private property `$dbalStore`.
+* If `PdoStore` is constructed with a DBAL connection instance or a DBAL-compatible DSN, a deprecation is triggered and `$dbalStore` is initialized with a `DbalStore` instance.
+* In all public methods, we check if `$dbalStore` is not null and if that is the case, we simply proxy the call to `$dbalStore`.
+
+This should allow us to remove all DBAL-related code from `PdoStore` already. And on 6.0, we simply remove the proxy mechanism.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-06T14:29:00Z
+
+Oh, and thank you very much for working on this topic!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-07T08:51:36Z
+
+Can you take a look at the failing tests?

@@ -19,6 +19,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\SchemaListener\PdoCacheAdapterDoctrineSchemaSubscriber;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
+/**
+ * @group legacy
+ */
 class PdoCacheAdapterDoctrineSchemaSubscriberTest extends TestCase
 {
     public function testPostGenerateSchema()

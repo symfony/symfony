@@ -16,10 +16,14 @@ use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
+trigger_deprecation('symfony/doctrine-bridge', '5.4', 'The "%s" class is deprecated, use "%s" instead.', PdoCacheAdapterDoctrineSchemaSubscriber::class, DoctrineDbalCacheAdapterSchemaSubscriber::class);
+
 /**
  * Automatically adds the cache table needed for the PdoAdapter.
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
+ *
+ * @deprecated since symfony 5.4 use DoctrineDbalCacheAdapterSchemaSubscriber
  */
 final class PdoCacheAdapterDoctrineSchemaSubscriber implements EventSubscriber
 {

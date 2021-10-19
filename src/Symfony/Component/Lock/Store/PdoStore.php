@@ -12,9 +12,6 @@
 namespace Symfony\Component\Lock\Store;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Exception as DBALException;
-use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
@@ -37,25 +34,22 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class PdoStore implements PersistingStoreInterface
 {
+    use DatabaseTableTrait;
     use ExpiringStoreTrait;
 
-    private \PDO|Connection $conn;
+    private \PDO $conn;
     private string $dsn;
     private string $driver;
-    private string $table = 'lock_keys';
-    private string $idCol = 'key_id';
-    private string $tokenCol = 'key_token';
-    private string $expirationCol = 'key_expiration';
     private string $username = '';
     private string $password = '';
     private array $connectionOptions = [];
-    private float $gcProbability;
-    private int $initialTtl;
+
+    private $dbalStore;
 
     /**
-     * You can either pass an existing database connection as PDO instance or
-     * a Doctrine DBAL Connection or a DSN string that will be used to
-     * lazy-connect to the database when the lock is actually used.
+     * You can either pass an existing database connection as PDO instance
+     * or a DSN string that will be used to lazy-connect to the database
+     * when the lock is actually used.
      *
      * List of available options:
      *  * db_table: The name of the table [default: lock_keys]
@@ -76,12 +70,14 @@ class PdoStore implements PersistingStoreInterface
      */
     public function __construct(\PDO|Connection|string $connOrDsn, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
     {
-        if ($gcProbability < 0 || $gcProbability > 1) {
-            throw new InvalidArgumentException(sprintf('"%s" requires gcProbability between 0 and 1, "%f" given.', __METHOD__, $gcProbability));
+        if ($connOrDsn instanceof Connection || (\is_string($connOrDsn) && str_contains($connOrDsn, '://'))) {
+            trigger_deprecation('symfony/lock', '5.4', 'Usage of a DBAL Connection with "%s" is deprecated and will be removed in symfony 6.0. Use "%s" instead.', __CLASS__, DoctrineDbalStore::class);
+            $this->dbalStore = new DoctrineDbalStore($connOrDsn, $options, $gcProbability, $initialTtl);
+
+            return;
         }
-        if ($initialTtl < 1) {
-            throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, "%d" given.', __METHOD__, $initialTtl));
-        }
+
+        $this->init($options, $gcProbability, $initialTtl);
 
         if ($connOrDsn instanceof \PDO) {
             if (\PDO::ERRMODE_EXCEPTION !== $connOrDsn->getAttribute(\PDO::ATTR_ERRMODE)) {
@@ -89,22 +85,13 @@ class PdoStore implements PersistingStoreInterface
             }
 
             $this->conn = $connOrDsn;
-        } elseif ($connOrDsn instanceof Connection) {
-            $this->conn = $connOrDsn;
         } else {
             $this->dsn = $connOrDsn;
         }
 
-        $this->table = $options['db_table'] ?? $this->table;
-        $this->idCol = $options['db_id_col'] ?? $this->idCol;
-        $this->tokenCol = $options['db_token_col'] ?? $this->tokenCol;
-        $this->expirationCol = $options['db_expiration_col'] ?? $this->expirationCol;
         $this->username = $options['db_username'] ?? $this->username;
         $this->password = $options['db_password'] ?? $this->password;
         $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
-
-        $this->gcProbability = $gcProbability;
-        $this->initialTtl = $initialTtl;
     }
 
     /**
@@ -112,16 +99,17 @@ class PdoStore implements PersistingStoreInterface
      */
     public function save(Key $key)
     {
+        if (isset($this->dbalStore)) {
+            $this->dbalStore->save($key);
+
+            return;
+        }
+
         $key->reduceLifetime($this->initialTtl);
 
         $sql = "INSERT INTO $this->table ($this->idCol, $this->tokenCol, $this->expirationCol) VALUES (:id, :token, {$this->getCurrentTimestampStatement()} + $this->initialTtl)";
         $conn = $this->getConnection();
         try {
-            $stmt = $conn->prepare($sql);
-        } catch (TableNotFoundException $e) {
-            if (!$conn->isTransactionActive() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
-                $this->createTable();
-            }
             $stmt = $conn->prepare($sql);
         } catch (\PDOException $e) {
             if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
@@ -135,23 +123,12 @@ class PdoStore implements PersistingStoreInterface
 
         try {
             $stmt->execute();
-        } catch (TableNotFoundException $e) {
-            if (!$conn->isTransactionActive() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
-                $this->createTable();
-            }
-            $stmt->execute();
-        } catch (DBALException $e) {
-            // the lock is already acquired. It could be us. Let's try to put off.
-            $this->putOffExpiration($key, $this->initialTtl);
         } catch (\PDOException $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         }
 
-        if ($this->gcProbability > 0 && (1.0 === $this->gcProbability || (random_int(0, \PHP_INT_MAX) / \PHP_INT_MAX) <= $this->gcProbability)) {
-            $this->prune();
-        }
-
+        $this->randomlyPrune();
         $this->checkNotExpired($key);
     }
 
@@ -160,6 +137,12 @@ class PdoStore implements PersistingStoreInterface
      */
     public function putOffExpiration(Key $key, float $ttl)
     {
+        if (isset($this->dbalStore)) {
+            $this->dbalStore->putOffExpiration($key, $ttl);
+
+            return;
+        }
+
         if ($ttl < 1) {
             throw new InvalidTtlException(sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
         }
@@ -188,6 +171,12 @@ class PdoStore implements PersistingStoreInterface
      */
     public function delete(Key $key)
     {
+        if (isset($this->dbalStore)) {
+            $this->dbalStore->delete($key);
+
+            return;
+        }
+
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token";
         $stmt = $this->getConnection()->prepare($sql);
 
@@ -201,6 +190,10 @@ class PdoStore implements PersistingStoreInterface
      */
     public function exists(Key $key): bool
     {
+        if (isset($this->dbalStore)) {
+            return $this->dbalStore->exists($key);
+        }
+
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
         $stmt = $this->getConnection()->prepare($sql);
 
@@ -211,36 +204,11 @@ class PdoStore implements PersistingStoreInterface
         return (bool) (\is_object($result) ? $result->fetchOne() : $stmt->fetchColumn());
     }
 
-    /**
-     * Returns a hashed version of the key.
-     */
-    private function getHashedKey(Key $key): string
-    {
-        return hash('sha256', (string) $key);
-    }
-
-    private function getUniqueToken(Key $key): string
-    {
-        if (!$key->hasState(__CLASS__)) {
-            $token = base64_encode(random_bytes(32));
-            $key->setState(__CLASS__, $token);
-        }
-
-        return $key->getState(__CLASS__);
-    }
-
-    private function getConnection(): \PDO|Connection
+    private function getConnection(): \PDO
     {
         if (!isset($this->conn)) {
-            if (strpos($this->dsn, '://')) {
-                if (!class_exists(DriverManager::class)) {
-                    throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $this->dsn));
-                }
-                $this->conn = DriverManager::getConnection(['url' => $this->dsn]);
-            } else {
-                $this->conn = new \PDO($this->dsn, $this->username, $this->password, $this->connectionOptions);
-                $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            }
+            $this->conn = new \PDO($this->dsn, $this->username, $this->password, $this->connectionOptions);
+            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
 
         return $this->conn;
@@ -250,29 +218,19 @@ class PdoStore implements PersistingStoreInterface
      * Creates the table to store lock keys which can be called once for setup.
      *
      * @throws \PDOException    When the table already exists
-     * @throws DBALException    When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
      */
     public function createTable(): void
     {
-        // connect if we are not yet
-        $conn = $this->getConnection();
-        $driver = $this->getDriver();
-
-        if ($conn instanceof Connection) {
-            $schema = new Schema();
-            $this->addTableToSchema($schema);
-
-            foreach ($schema->toSql($conn->getDatabasePlatform()) as $sql) {
-                if ($conn instanceof Connection && method_exists($conn, 'executeStatement')) {
-                    $conn->executeStatement($sql);
-                } else {
-                    $conn->exec($sql);
-                }
-            }
+        if (isset($this->dbalStore)) {
+            $this->dbalStore->createTable();
 
             return;
         }
+
+        // connect if we are not yet
+        $conn = $this->getConnection();
+        $driver = $this->getDriver();
 
         switch ($driver) {
             case 'mysql':
@@ -294,27 +252,23 @@ class PdoStore implements PersistingStoreInterface
                 throw new \DomainException(sprintf('Creating the lock table is currently not implemented for platform "%s".', $driver));
         }
 
-        if ($conn instanceof Connection && method_exists($conn, 'executeStatement')) {
-            $conn->executeStatement($sql);
-        } else {
-            $conn->exec($sql);
-        }
+        $conn->exec($sql);
     }
 
     /**
      * Adds the Table to the Schema if it doesn't exist.
+     *
+     * @deprecated since symfony/lock 5.4 use DoctrineDbalStore instead
      */
     public function configureSchema(Schema $schema): void
     {
-        if (!$this->getConnection() instanceof Connection) {
-            throw new \BadMethodCallException(sprintf('"%s::%s()" is only supported when using a doctrine/dbal Connection.', __CLASS__, __METHOD__));
-        }
+        if (isset($this->dbalStore)) {
+            $this->dbalStore->configureSchema($schema);
 
-        if ($schema->hasTable($this->table)) {
             return;
         }
 
-        $this->addTableToSchema($schema);
+        throw new \BadMethodCallException(sprintf('"%s::%s()" is only supported when using a doctrine/dbal Connection.', __CLASS__, __METHOD__));
     }
 
     /**
@@ -324,12 +278,7 @@ class PdoStore implements PersistingStoreInterface
     {
         $sql = "DELETE FROM $this->table WHERE $this->expirationCol <= {$this->getCurrentTimestampStatement()}";
 
-        $conn = $this->getConnection();
-        if ($conn instanceof Connection && method_exists($conn, 'executeStatement')) {
-            $conn->executeStatement($sql);
-        } else {
-            $conn->exec($sql);
-        }
+        $this->getConnection()->exec($sql);
     }
 
     private function getDriver(): string
@@ -338,41 +287,8 @@ class PdoStore implements PersistingStoreInterface
             return $this->driver;
         }
 
-        $con = $this->getConnection();
-        if ($con instanceof \PDO) {
-            $this->driver = $con->getAttribute(\PDO::ATTR_DRIVER_NAME);
-        } else {
-            $driver = $con->getDriver();
-            $platform = $driver->getDatabasePlatform();
-
-            if ($driver instanceof \Doctrine\DBAL\Driver\Mysqli\Driver) {
-                throw new \LogicException(sprintf('The adapter "%s" does not support the mysqli driver, use pdo_mysql instead.', static::class));
-            }
-
-            switch (true) {
-                case $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform:
-                case $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform:
-                    $this->driver = 'mysql';
-                    break;
-                case $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform:
-                    $this->driver = 'sqlite';
-                    break;
-                case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform:
-                case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform:
-                    $this->driver = 'pgsql';
-                    break;
-                case $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform:
-                    $this->driver = 'oci';
-                    break;
-                case $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform:
-                case $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform:
-                    $this->driver = 'sqlsrv';
-                    break;
-                default:
-                    $this->driver = \get_class($platform);
-                    break;
-            }
-        }
+        $conn = $this->getConnection();
+        $this->driver = $conn->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
         return $this->driver;
     }
@@ -394,16 +310,7 @@ class PdoStore implements PersistingStoreInterface
             case 'sqlsrv':
                 return 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())';
             default:
-                return time();
+                return (string) time();
         }
-    }
-
-    private function addTableToSchema(Schema $schema): void
-    {
-        $table = $schema->createTable($this->table);
-        $table->addColumn($this->idCol, 'string', ['length' => 64]);
-        $table->addColumn($this->tokenCol, 'string', ['length' => 44]);
-        $table->addColumn($this->expirationCol, 'integer', ['unsigned' => true]);
-        $table->setPrimaryKey([$this->idCol]);
     }
 }

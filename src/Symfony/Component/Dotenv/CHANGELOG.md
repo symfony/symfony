@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `dotenv:dump` command to compile the contents of the .env files into a PHP-optimized file called `.env.local.php`
+ * Add `debug:dotenv` command to list all dotenv files with variables and values
 
 5.1.0
 -----

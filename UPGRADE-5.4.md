@@ -5,6 +5,7 @@ Cache
 -----
 
  * Deprecate `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
+ * Deprecate usage of `PdoAdapter` with a `Doctrine\DBAL\Connection` or a DBAL URL. Use the new `DoctrineDbalAdapter` instead
 
 Console
 -------
@@ -42,6 +43,12 @@ HttpFoundation
  * Deprecate passing `null` as `$requestIp` to `IpUtils::checkIp()`, `IpUtils::checkIp4()` or `IpUtils::checkIp6()`, pass an empty string instead.
  * Mark `Request::get()` internal, use explicit input sources instead
  * Deprecate `upload_progress.*` and `url_rewriter.tags` session options
+
+Lock
+----
+
+ * Deprecate usage of `PdoStore` with a `Doctrine\DBAL\Connection` or a DBAL url, use the new `DoctrineDbalStore` instead
+ * Deprecate usage of `PostgreSqlStore` with a `Doctrine\DBAL\Connection` or a DBAL url, use the new `DoctrineDbalPostgreSqlStore` instead
 
 Messenger
 ---------

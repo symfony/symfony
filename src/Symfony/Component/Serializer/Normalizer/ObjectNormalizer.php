@@ -109,17 +109,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
         // properties
         foreach ($reflClass->getProperties() as $reflProperty) {
-            $isPublic = $reflProperty->isPublic();
-
-            if (!$isPublic) {
-                $reflProperty->setAccessible(true);
-            }
-            if (!$reflProperty->isInitialized($object)) {
-                unset($attributes[$reflProperty->name]);
-                continue;
-            }
-
-            if (!$isPublic) {
+            if (!$reflProperty->isPublic()) {
                 continue;
             }
 

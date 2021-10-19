@@ -122,6 +122,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] = array_merge($this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] ?? [], [self::CIRCULAR_REFERENCE_LIMIT_COUNTERS]);
+        $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] = true;
 
         $this->propertyTypeExtractor = $propertyTypeExtractor;
 
@@ -190,7 +191,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             try {
                 $attributeValue = $this->getAttributeValue($object, $attribute, $format, $attributeContext);
             } catch (UninitializedPropertyException $e) {
-                if ($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? false) {
+                if ($this->shouldSkipUninitializedValues($context)) {
+                    continue;
+                }
+                throw $e;
+            } catch (\Error $e) {
+                if ($this->shouldSkipUninitializedValues($context) && $this->isUninitializedValueError($e)) {
                     continue;
                 }
                 throw $e;
@@ -714,5 +720,22 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // The context cannot be serialized, skip the cache
             return false;
         }
+    }
+
+    private function shouldSkipUninitializedValues(array $context): bool
+    {
+        return $context[self::SKIP_UNINITIALIZED_VALUES]
+            ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES]
+            ?? false;
+    }
+
+    /**
+     * This error may occur when specific object normalizer implementation gets attribute value
+     * by accessing a public uninitialized property or by calling a method accessing such property.
+     */
+    private function isUninitializedValueError(\Error $e): bool
+    {
+        return str_starts_with($e->getMessage(), 'Typed property')
+            && str_ends_with($e->getMessage(), 'must not be accessed before initialization');
     }
 }

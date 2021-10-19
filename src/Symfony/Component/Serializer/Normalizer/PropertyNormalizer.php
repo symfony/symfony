@@ -104,14 +104,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
 
         do {
             foreach ($reflectionObject->getProperties() as $property) {
-                if (!$property->isPublic()) {
-                    $property->setAccessible(true);
-                }
-
-                if (!$property->isInitialized($object)) {
-                    continue;
-                }
-
                 if (!$this->isAllowedAttribute($reflectionObject->getName(), $property->name, $format, $context)) {
                     continue;
                 }

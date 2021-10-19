@@ -180,7 +180,6 @@
         <xsd:sequence>
             <xsd:element name="fallback" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="path" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="enabled-locale" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="pseudo-localization" type="pseudo_localization" minOccurs="0" maxOccurs="1" />
             <xsd:element name="provider" type="translation_provider" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>

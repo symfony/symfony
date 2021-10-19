@@ -432,9 +432,7 @@ class FrameworkExtension extends Extension
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
-        // @deprecated since Symfony 5.4, in 6.0 change to:
-        // $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
-        $this->registerRouterConfiguration($config['router'], $container, $loader, $config['translator']['enabled_locales'] ?: $config['enabled_locales']);
+        $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
@@ -1223,10 +1221,7 @@ class FrameworkExtension extends Extension
         $defaultOptions = $translator->getArgument(4);
         $defaultOptions['cache_dir'] = $config['cache_dir'];
         $translator->setArgument(4, $defaultOptions);
-
-        // @deprecated since Symfony 5.4, in 6.0 change to:
-        // $translator->setArgument(5, $enabledLocales);
-        $translator->setArgument(5, $config['enabled_locales'] ?: $enabledLocales);
+        $translator->setArgument(5, $enabledLocales);
 
         $container->setParameter('translator.logging', $config['logging']);
         $container->setParameter('translator.default_path', $config['default_path']);
@@ -1359,9 +1354,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        // @deprecated since Symfony 5.4, in 6.0 change to:
-        // $locales = $enabledLocales;
-        $locales = $config['enabled_locales'] ?: $enabledLocales;
+        $locales = $enabledLocales;
 
         foreach ($config['providers'] as $provider) {
             if ($provider['locales']) {

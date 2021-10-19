@@ -225,13 +225,15 @@ final class CurlResponse implements ResponseInterface
 
     public function __destruct()
     {
-        curl_setopt($this->handle, \CURLOPT_VERBOSE, false);
+        try {
+            if (null === $this->timeout) {
+                return; // Unused pushed response
+            }
 
-        if (null === $this->timeout) {
-            return; // Unused pushed response
+            $this->doDestruct();
+        } finally {
+            curl_setopt($this->handle, \CURLOPT_VERBOSE, false);
         }
-
-        $this->doDestruct();
     }
 
     /**

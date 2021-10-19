@@ -141,7 +141,7 @@ final class CompletionInput extends ArgvInput
      * TYPE_OPTION_NAME    when completing the name of an input option
      * TYPE_NONE           when nothing should be completed
      *
-     * @return self::TYPE_* TYPE_OPTION_NAME and TYPE_NONE are already implemented by the Console component
+     * @return string One of self::TYPE_* constants. TYPE_OPTION_NAME and TYPE_NONE are already implemented by the Console component
      */
     public function getCompletionType(): string
     {

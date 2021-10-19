@@ -14,34 +14,31 @@ namespace Symfony\Bridge\Doctrine\SchemaListener;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
-use Symfony\Component\Cache\Adapter\PdoAdapter;
-
-trigger_deprecation('symfony/doctrine-bridge', '5.4', 'The "%s" class is deprecated, use "%s" instead.', PdoCacheAdapterDoctrineSchemaSubscriber::class, DoctrineDbalCacheAdapterSchemaSubscriber::class);
+use Symfony\Component\Cache\Adapter\DoctrineSchemaConfiguratorInterface;
 
 /**
- * Automatically adds the cache table needed for the PdoAdapter.
+ * Automatically adds the cache table needed for the DoctrineDbalAdapter of
+ * the Cache component.
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @deprecated since symfony 5.4 use DoctrineDbalCacheAdapterSchemaSubscriber
  */
-final class PdoCacheAdapterDoctrineSchemaSubscriber implements EventSubscriber
+final class DoctrineDbalCacheAdapterSchemaSubscriber implements EventSubscriber
 {
-    private $pdoAdapters;
+    private $dbalAdapters;
 
     /**
-     * @param iterable|PdoAdapter[] $pdoAdapters
+     * @param iterable<mixed, DoctrineSchemaConfiguratorInterface> $dbalAdapters
      */
-    public function __construct(iterable $pdoAdapters)
+    public function __construct(iterable $dbalAdapters)
     {
-        $this->pdoAdapters = $pdoAdapters;
+        $this->dbalAdapters = $dbalAdapters;
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void
     {
         $dbalConnection = $event->getEntityManager()->getConnection();
-        foreach ($this->pdoAdapters as $pdoAdapter) {
-            $pdoAdapter->configureSchema($event->getSchema(), $dbalConnection);
+        foreach ($this->dbalAdapters as $dbalAdapter) {
+            $dbalAdapter->configureSchema($event->getSchema(), $dbalConnection);
         }
     }
 

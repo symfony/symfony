@@ -19,18 +19,14 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\Cache\Adapter\PdoAdapter;
+use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\DriverWrapper;
 
 /**
  * @group time-sensitive
- * @group legacy
  */
-class PdoDbalAdapterTest extends AdapterTestCase
+class DoctrineDbalAdapterTest extends AdapterTestCase
 {
-    use ExpectDeprecationTrait;
-
     protected static $dbFile;
 
     public static function setUpBeforeClass(): void
@@ -49,14 +45,11 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
-        $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
-
-        return new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]), '', $defaultLifetime);
+        return new DoctrineDbalAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]), '', $defaultLifetime);
     }
 
     public function testConfigureSchemaDecoratedDbalDriver()
     {
-        $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
         if (!interface_exists(Middleware::class)) {
             $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
@@ -72,7 +65,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config);
 
-        $adapter = new PdoAdapter($connection);
+        $adapter = new DoctrineDbalAdapter($connection);
         $adapter->createTable();
 
         $item = $adapter->getItem('key');
@@ -82,11 +75,10 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
     public function testConfigureSchema()
     {
-        $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
         $schema = new Schema();
 
-        $adapter = new PdoAdapter($connection);
+        $adapter = new DoctrineDbalAdapter($connection);
         $adapter->configureSchema($schema, $connection);
         $this->assertTrue($schema->hasTable('cache_items'));
     }
@@ -103,12 +95,11 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
     public function testConfigureSchemaTableExists()
     {
-        $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
         $schema = new Schema();
         $schema->createTable('cache_items');
 
-        $adapter = new PdoAdapter($connection);
+        $adapter = new DoctrineDbalAdapter($connection);
         $adapter->configureSchema($schema, $connection);
         $table = $schema->getTable('cache_items');
         $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
@@ -119,9 +110,8 @@ class PdoDbalAdapterTest extends AdapterTestCase
      */
     public function testDsn(string $dsn, string $file = null)
     {
-        $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
         try {
-            $pool = new PdoAdapter($dsn);
+            $pool = new DoctrineDbalAdapter($dsn);
             $pool->createTable();
 
             $item = $pool->getItem('key');
@@ -142,17 +132,14 @@ class PdoDbalAdapterTest extends AdapterTestCase
         yield ['sqlite://localhost/:memory:'];
     }
 
-    protected function isPruned(PdoAdapter $cache, string $name): bool
+    protected function isPruned(DoctrineDbalAdapter $cache, string $name): bool
     {
-        $dbalAdapterProp = (new \ReflectionObject($cache))->getProperty('dbalAdapter');
-        $dbalAdapterProp->setAccessible(true);
-        $dbalAdapter = $dbalAdapterProp->getValue($cache);
-
-        $connProp = (new \ReflectionObject($dbalAdapter))->getProperty('conn');
+        $o = new \ReflectionObject($cache);
+        $connProp = $o->getProperty('conn');
         $connProp->setAccessible(true);
 
         /** @var Connection $conn */
-        $conn = $connProp->getValue($dbalAdapter);
+        $conn = $connProp->getValue($cache);
         $result = $conn->executeQuery('SELECT 1 FROM cache_items WHERE item_id LIKE ?', [sprintf('%%%s', $name)]);
 
         return 1 !== (int) $result->fetchOne();

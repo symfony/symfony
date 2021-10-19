@@ -16,13 +16,10 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\SchemaListener\PdoCacheAdapterDoctrineSchemaSubscriber;
-use Symfony\Component\Cache\Adapter\PdoAdapter;
+use Symfony\Bridge\Doctrine\SchemaListener\DoctrineDbalCacheAdapterSchemaSubscriber;
+use Symfony\Component\Cache\Adapter\DoctrineSchemaConfiguratorInterface;
 
-/**
- * @group legacy
- */
-class PdoCacheAdapterDoctrineSchemaSubscriberTest extends TestCase
+class DoctrineDbalCacheAdapterSchemaSubscriberTest extends TestCase
 {
     public function testPostGenerateSchema()
     {
@@ -34,12 +31,12 @@ class PdoCacheAdapterDoctrineSchemaSubscriberTest extends TestCase
             ->willReturn($dbalConnection);
         $event = new GenerateSchemaEventArgs($entityManager, $schema);
 
-        $pdoAdapter = $this->createMock(PdoAdapter::class);
+        $pdoAdapter = $this->createMock(DoctrineSchemaConfiguratorInterface::class);
         $pdoAdapter->expects($this->once())
             ->method('configureSchema')
             ->with($schema, $dbalConnection);
 
-        $subscriber = new PdoCacheAdapterDoctrineSchemaSubscriber([$pdoAdapter]);
+        $subscriber = new DoctrineDbalCacheAdapterSchemaSubscriber([$pdoAdapter]);
         $subscriber->postGenerateSchema($event);
     }
 }

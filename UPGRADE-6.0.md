@@ -15,6 +15,7 @@ Cache
 -----
 
  * Remove `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
+ * `PdoAdapter` does not accept `Doctrine\DBAL\Connection` or DBAL URL. Use the new `DoctrineDbalAdapter` instead
 
 Config
 ------

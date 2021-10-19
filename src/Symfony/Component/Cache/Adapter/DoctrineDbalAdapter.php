@@ -27,16 +27,16 @@ final class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInte
 {
     protected $maxIdLength = 255;
 
-    private $marshaller;
-    private $conn;
-    private $platformName;
-    private $serverVersion;
-    private $table = 'cache_items';
-    private $idCol = 'item_id';
-    private $dataCol = 'item_data';
-    private $lifetimeCol = 'item_lifetime';
-    private $timeCol = 'item_time';
-    private $namespace;
+    private MarshallerInterface $marshaller;
+    private Connection $conn;
+    private string $platformName;
+    private string $serverVersion;
+    private string $table = 'cache_items';
+    private string $idCol = 'item_id';
+    private string $dataCol = 'item_data';
+    private string $lifetimeCol = 'item_lifetime';
+    private string $timeCol = 'item_time';
+    private string $namespace;
 
     /**
      * You can either pass an existing database Doctrine DBAL Connection or
@@ -52,11 +52,9 @@ final class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInte
      *  * db_lifetime_col: The column where to store the lifetime [default: item_lifetime]
      *  * db_time_col: The column where to store the timestamp [default: item_time]
      *
-     * @param Connection|string $connOrDsn
-     *
      * @throws InvalidArgumentException When namespace contains invalid characters
      */
-    public function __construct($connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], MarshallerInterface $marshaller = null)
+    public function __construct(Connection|string $connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], MarshallerInterface $marshaller = null)
     {
         if (isset($namespace[0]) && preg_match('#[^-+.A-Za-z0-9]#', $namespace, $match)) {
             throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+.A-Za-z0-9] are allowed.', $match[0]));
@@ -64,13 +62,11 @@ final class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInte
 
         if ($connOrDsn instanceof Connection) {
             $this->conn = $connOrDsn;
-        } elseif (\is_string($connOrDsn)) {
+        } else {
             if (!class_exists(DriverManager::class)) {
                 throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $connOrDsn));
             }
             $this->conn = DriverManager::getConnection(['url' => $connOrDsn]);
-        } else {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be "%s" or string, "%s" given.', Connection::class, __METHOD__, get_debug_type($connOrDsn)));
         }
 
         $this->table = $options['db_table'] ?? $this->table;
@@ -92,7 +88,7 @@ final class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInte
      *
      * @throws DBALException When the table already exists
      */
-    public function createTable()
+    public function createTable(): void
     {
         $schema = new Schema();
         $this->addTableToSchema($schema);

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Remove `DoctrineProvider` and `DoctrineAdapter`
+ * Remove support of Doctrine DBAL in `PdoAdapter`
 
 5.4
 ---

@@ -102,16 +102,6 @@ final class FirewallConfig
         return $this->accessDeniedUrl;
     }
 
-    /**
-     * @deprecated since Symfony 5.4, use {@see getListeners()} instead
-     */
-    public function getListeners(): array
-    {
-        trigger_deprecation('symfony/security-bundle', '5.4', 'Method "%s()" is deprecated, use "%s::getAuthenticators()" instead.', __METHOD__, __CLASS__);
-
-        return $this->getAuthenticators();
-    }
-
     public function getAuthenticators(): array
     {
         return $this->authenticators;

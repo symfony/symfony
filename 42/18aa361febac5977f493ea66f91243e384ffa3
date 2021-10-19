@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-19T15:23:10Z
+
+That's a behavior change, so should be on 5.4.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-10-19T15:27:54Z
+
+@fabpot I don't think it changes the behavior. casting the SplFileInfo to string (when passing the value to `strnatcmp`) produces the same value than the key in the array (but slower). So the behavior should still be the same (and the proof is the fact that tests have not required changes).
+
+For the initial sort, this is an optimisation to try to have an array that is already partially sorted when merging the arrays of different paths. Using `natsort` there is also a bugfix making the optimization actually work (by using the same sorting than in the final array)

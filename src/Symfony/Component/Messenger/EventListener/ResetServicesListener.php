@@ -37,7 +37,7 @@ class ResetServicesListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            WorkerRunningEvent::class => ['resetServices'],
+            WorkerRunningEvent::class => ['resetServices', -1024],
         ];
     }
 }

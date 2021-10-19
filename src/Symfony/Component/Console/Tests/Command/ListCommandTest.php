@@ -40,8 +40,9 @@ class ListCommandTest extends TestCase
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName(), '--raw' => true]);
         $output = <<<'EOF'
-help   Display help for a command
-list   List commands
+completion   Dump the shell completion script
+help         Display help for a command
+list         List commands
 
 EOF;
 
@@ -85,10 +86,11 @@ Options:
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 Available commands:
-  help      Display help for a command
-  list      List commands
+  completion  Dump the shell completion script
+  help        Display help for a command
+  list        List commands
  0foo
-  0foo:bar  0foo:bar command
+  0foo:bar    0foo:bar command
 EOF;
 
         $this->assertEquals($output, trim($commandTester->getDisplay(true)));
@@ -102,9 +104,10 @@ EOF;
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName(), '--raw' => true]);
         $output = <<<'EOF'
-help       Display help for a command
-list       List commands
-0foo:bar   0foo:bar command
+completion   Dump the shell completion script
+help         Display help for a command
+list         List commands
+0foo:bar     0foo:bar command
 EOF;
 
         $this->assertEquals($output, trim($commandTester->getDisplay(true)));

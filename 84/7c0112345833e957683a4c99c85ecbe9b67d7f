@@ -1,0 +1,159 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-14T10:53:59Z
+
+Why does this require a new interface? Can't a webpusher we implemented as a texter or a chatter like the other bridges?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2020-12-14T11:03:35Z
+
+> Why does this require a new interface? Can't a webpusher we implemented as a texter or a chatter like the other bridges?
+
+No preference, just thought that it'd be better to separate web push transports from texter/chatter.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-14T11:06:20Z
+
+> No preference, just thought that it'd be better to separate web push transports from texter/chatter.
+
+OK thanks. Then, unless there is a real reason that'd need to be discussed, this should be implemented as a transport really.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2020-12-14T11:18:47Z
+
+> > No preference, just thought that it'd be better to separate web push transports from texter/chatter.
+>
+> OK thanks. Then, unless there is a real reason that'd need to be discussed, this should be implemented as a transport really.
+
+Hmm, but then if we don't introduce webpusher as a transport, all the texter or chatter transports would be injected to the web push channel. Is that okay?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-08T07:48:44Z
+
+What is the status on this PR.
+
+Isn't this something @dunglas would be super interested to see?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-04-08T07:49:56Z
+
+I am just waiting for reviews :)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-08T07:51:47Z
+
+=)
+
+While waiting, could you do a rebase on this PR to the latest CI jobs will run?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-04-08T07:53:26Z
+
+> =)
+>
+> While waiting, could you do a rebase on this PR to the latest CI jobs will run?
+
+Sure, done. :)
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-04-13T05:28:02Z
+
+@OskarStark I've renamed to webpush to push :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-13T05:42:51Z
+
+Please make fabbot happy 😊
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-13T05:46:58Z
+
+Not need before merging, but having a docs PR would be super helpful 👌🏻
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-04-13T05:50:44Z
+
+> Not need before merging, but having a docs PR would be super helpful 👌🏻
+
+I think I could add them later with a first provider integration for push :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-13T08:17:08Z
+
+I think a first integration would be needed before merging. Right now, this looks quite abstract to me, and there are no tests... I'm also not really deep into the topic. /cc @fabpot I think this is for you :)
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-04-13T08:36:12Z
+
+> I think a first integration would be needed before merging. Right now, this looks quite abstract to me, and there are no tests... I'm also not really deep into the topic. /cc @fabpot I think this is for you :)
+
+Preparing one :) there were no channel tests, but will add some for push message then
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-13T11:04:28Z
+
+Lets add the first integration in this PR to proof the abstraction 👍
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-21T05:53:54Z
+
+@norkunas good work :+1:  You have conflicting files :+1:
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-04-21T06:00:19Z
+
+> You have conflicting files
+
+This is not surprising :) resolved conflicts
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-07-07T06:36:38Z
+
+> Other than some lingering PHP 8 test failures this implementation LGTM!
+
+failures resolved :)
+
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2021-09-23T17:34:19Z
+
+Not sure but if a "Push Channel" is introduced then it would make sense to move `symfony/firebase-notifier` from the "Chat Channel" (docs: https://symfony.com/doc/current/notifier.html#chat-channel) to the new "Push Channel" because it is not a chat but a service for push notifications?
+
+Maybe this affects other chatters too, this I don't know.
+
+I guess this would break backward compatibility.
+
+I could try to make a PR for `symfony/firebase-notifier` if it is wanted.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-09-25T07:20:12Z
+
+Firebase Notifier can provide chat AND push functionality, while we can deprecate chat functionality in 5.4 and remove it in 6.0
+
+From my POV we should merge this new channel
+
+cc @fabpot
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-10-11T06:30:54Z
+
+What's so special with this PR that nobody other wants to approve? :grin:

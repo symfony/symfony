@@ -40,8 +40,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     use DatabaseTableTrait;
     use ExpiringStoreTrait;
 
-    private $conn;
-    private $dsn;
+    private Connection $conn;
 
     /**
      * List of available options:
@@ -58,19 +57,17 @@ class DoctrineDbalStore implements PersistingStoreInterface
      * @throws InvalidArgumentException When namespace contains invalid characters
      * @throws InvalidArgumentException When the initial ttl is not valid
      */
-    public function __construct($connOrUrl, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
+    public function __construct(Connection|string $connOrUrl, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
     {
         $this->init($options, $gcProbability, $initialTtl);
 
         if ($connOrUrl instanceof Connection) {
             $this->conn = $connOrUrl;
-        } elseif (\is_string($connOrUrl)) {
+        } else {
             if (!class_exists(DriverManager::class)) {
                 throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $connOrUrl));
             }
             $this->conn = DriverManager::getConnection(['url' => $connOrUrl]);
-        } else {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be "%s" or string, "%s" given.', Connection::class, __METHOD__, get_debug_type($connOrUrl)));
         }
     }
 

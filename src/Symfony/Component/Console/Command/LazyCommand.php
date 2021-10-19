@@ -12,6 +12,9 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionInterface;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class LazyCommand extends Command
+final class LazyCommand extends Command implements CompletionInterface
 {
     private \Closure|Command $command;
     private ?bool $isEnabled;
@@ -67,6 +70,13 @@ final class LazyCommand extends Command
     public function run(InputInterface $input, OutputInterface $output): int
     {
         return $this->getCommand()->run($input, $output);
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($this->getCommand() instanceof CompletionInterface) {
+            $this->getCommand()->complete($input, $suggestions);
+        }
     }
 
     public function setCode(callable $code): static

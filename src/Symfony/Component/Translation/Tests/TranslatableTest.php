@@ -13,6 +13,8 @@ namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Message\FormattedTranslatableMessage;
+use Symfony\Component\Translation\Message\NonTranslatableMessage;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
 
@@ -45,6 +47,8 @@ class TranslatableTest extends TestCase
     public function testToString()
     {
         $this->assertSame('Symfony is great!', (string) new TranslatableMessage('Symfony is great!'));
+        $this->assertSame('Symfony is %s!', (string) new FormattedTranslatableMessage('Symfony is %s!', new TranslatableMessage('great')));
+        $this->assertSame('Symfony is great!', (string) new NonTranslatableMessage('Symfony is great!'));
     }
 
     public function getTransTests()

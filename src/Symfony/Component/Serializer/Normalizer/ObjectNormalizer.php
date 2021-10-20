@@ -190,7 +190,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Extract accessor prefix from method name if possible
+     * Extract accessor prefix from method name if possible.
      *
      * @psalm-pure
      * @psalm-return (value-of<self::ACCESSOR_PREFIXES>)|null
@@ -206,19 +206,19 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        $nextChar = $methodName[strlen($prefix)] ?? '';
+        $nextChar = $methodName[\strlen($prefix)] ?? '';
 
         return $prefix && ctype_upper($nextChar) ? $prefix : null;
     }
 
     /**
-     * Extract attribute name from accessor method name if possible
+     * Extract attribute name from accessor method name if possible.
      *
      * @psalm-pure
      * @psalm-param (value-of<self::ACCESSOR_PREFIXES>) $accessorPrefix
      */
     private function extractAttributeName(string $accessorMethod, string $accessorPrefix): ?string
     {
-        return substr($accessorMethod, strlen($accessorPrefix)) ?: null;
+        return substr($accessorMethod, \strlen($accessorPrefix)) ?: null;
     }
 }

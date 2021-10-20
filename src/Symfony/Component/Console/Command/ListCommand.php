@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Completion\CompletionInterface;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Helper\DescriptorHelper;
@@ -26,7 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ListCommand extends Command implements CompletionInterface
+class ListCommand extends Command
 {
     /**
      * {@inheritdoc}

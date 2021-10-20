@@ -13,7 +13,6 @@ namespace Symfony\Component\Console\Tester;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Completion\CompletionInterface;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 
 /**
@@ -35,10 +34,6 @@ class CommandCompletionTester
      */
     public function complete(array $input): array
     {
-        if (!$this->command instanceof CompletionInterface) {
-            throw new \LogicException(sprintf('Command "%s" must implement "%s" to support completion.', \get_class($this->command), CompletionInput::class));
-        }
-
         $currentIndex = \count($input);
         if ('' === end($input)) {
             array_pop($input);

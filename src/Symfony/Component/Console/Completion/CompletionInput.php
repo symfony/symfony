@@ -117,7 +117,11 @@ final class CompletionInput extends ArgvInput
             }
 
             $this->completionName = $argumentName;
-            $this->completionValue = \is_array($argumentValue ?? '') ? $argumentValue[array_key_last($argumentValue)] : $argumentValue;
+            if (\is_array($argumentValue)) {
+                $this->completionValue = $argumentValue ? $argumentValue[array_key_last($argumentValue)] : null;
+            } else {
+                $this->completionValue = $argumentValue;
+            }
         }
 
         if ($this->currentIndex >= \count($this->tokens)) {

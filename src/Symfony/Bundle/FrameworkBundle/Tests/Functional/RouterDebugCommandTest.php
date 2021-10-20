@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -67,6 +68,37 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->expectExceptionMessage('The route "gerard" does not exist.');
         $tester = $this->createCommandTester();
         $tester->execute(['name' => 'gerard'], ['interactive' => true]);
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        if (!class_exists(CommandCompletionTester::class)) {
+            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+        }
+
+        $tester = new CommandCompletionTester($this->application->get('debug:router'));
+        $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'option --format' => [
+            ['--format', ''],
+            ['txt', 'xml', 'json', 'md'],
+        ];
+
+        yield 'route_name' => [
+            [''],
+            [
+                'routerdebug_session_welcome',
+                'routerdebug_session_welcome_name',
+                'routerdebug_session_logout',
+                'routerdebug_test',
+            ],
+        ];
     }
 
     private function createCommandTester(): CommandTester

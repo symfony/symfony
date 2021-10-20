@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -159,19 +161,7 @@ EOF
 
     private function getFqcnTypeClass(InputInterface $input, SymfonyStyle $io, string $shortClassName): string
     {
-        $classes = [];
-        sort($this->namespaces);
-        foreach ($this->namespaces as $namespace) {
-            if (class_exists($fqcn = $namespace.'\\'.$shortClassName)) {
-                $classes[] = $fqcn;
-            } elseif (class_exists($fqcn = $namespace.'\\'.ucfirst($shortClassName))) {
-                $classes[] = $fqcn;
-            } elseif (class_exists($fqcn = $namespace.'\\'.ucfirst($shortClassName).'Type')) {
-                $classes[] = $fqcn;
-            } elseif (str_ends_with($shortClassName, 'type') && class_exists($fqcn = $namespace.'\\'.ucfirst(substr($shortClassName, 0, -4).'Type'))) {
-                $classes[] = $fqcn;
-            }
-        }
+        $classes = $this->getFqcnTypeClasses($shortClassName);
 
         if (0 === $count = \count($classes)) {
             $message = sprintf("Could not find type \"%s\" into the following namespaces:\n    %s", $shortClassName, implode("\n    ", $this->namespaces));
@@ -196,6 +186,25 @@ EOF
         }
 
         return $io->choice(sprintf("The type \"%s\" is ambiguous.\n\nSelect one of the following form types to display its information:", $shortClassName), $classes, $classes[0]);
+    }
+
+    private function getFqcnTypeClasses(string $shortClassName): array
+    {
+        $classes = [];
+        sort($this->namespaces);
+        foreach ($this->namespaces as $namespace) {
+            if (class_exists($fqcn = $namespace.'\\'.$shortClassName)) {
+                $classes[] = $fqcn;
+            } elseif (class_exists($fqcn = $namespace.'\\'.ucfirst($shortClassName))) {
+                $classes[] = $fqcn;
+            } elseif (class_exists($fqcn = $namespace.'\\'.ucfirst($shortClassName).'Type')) {
+                $classes[] = $fqcn;
+            } elseif (str_ends_with($shortClassName, 'type') && class_exists($fqcn = $namespace.'\\'.ucfirst(substr($shortClassName, 0, -4).'Type'))) {
+                $classes[] = $fqcn;
+            }
+        }
+
+        return $classes;
     }
 
     private function getCoreTypes(): array
@@ -241,5 +250,43 @@ EOF
         ksort($alternatives, \SORT_NATURAL | \SORT_FLAG_CASE);
 
         return array_keys($alternatives);
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('class')) {
+            $suggestions->suggestValues(array_merge($this->getCoreTypes(), $this->types));
+
+            return;
+        }
+
+        if ($input->mustSuggestArgumentValuesFor('option') && null !== $class = $input->getArgument('class')) {
+            $this->completeOptions($class, $suggestions);
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $helper = new DescriptorHelper();
+            $suggestions->suggestValues($helper->getFormats());
+        }
+    }
+
+    private function completeOptions(string $class, CompletionSuggestions $suggestions): void
+    {
+        if (!class_exists($class) || !is_subclass_of($class, FormTypeInterface::class)) {
+            $classes = $this->getFqcnTypeClasses($class);
+
+            if (1 === count($classes)) {
+                $class = $classes[0];
+            }
+        }
+
+        if (!$this->formRegistry->hasType($class)) {
+            return;
+        }
+
+        $resolvedType = $this->formRegistry->getType($class);
+        $suggestions->suggestValues($resolvedType->getOptionsResolver()->getDefinedOptions());
     }
 }

@@ -33,7 +33,6 @@ final class CompletionInput extends ArgvInput
 
     private $tokens;
     private $currentIndex;
-    private $indexToArgumentIndex = [];
     private $completionType;
     private $completionName = null;
     private $completionValue = '';
@@ -58,7 +57,7 @@ final class CompletionInput extends ArgvInput
      */
     public static function fromTokens(array $tokens, int $currentIndex): self
     {
-        $input = new static($tokens);
+        $input = new self($tokens);
         $input->tokens = $tokens;
         $input->currentIndex = $currentIndex;
 
@@ -189,17 +188,6 @@ final class CompletionInput extends ArgvInput
         }
 
         return $parseOptions;
-    }
-
-    private function getOptionValueFromToken(string $optionToken): string
-    {
-        if (str_starts_with($optionToken, '--')) {
-            // long option name
-            return $this->getParameterOption($optionToken) ?: '';
-        }
-
-        // short option name (might include value already if it directly followed the name)
-        return $this->getParameterOption(substr($optionToken, 0, 2)) ?: '';
     }
 
     private function getOptionFromToken(string $optionToken): ?InputOption

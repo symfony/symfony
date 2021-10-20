@@ -84,6 +84,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.cache_pool_clear', CachePoolClearCommand::class)
             ->args([
                 service('cache.global_clearer'),
+                null,
             ])
             ->tag('console.command')
 
@@ -96,6 +97,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.cache_pool_delete', CachePoolDeleteCommand::class)
             ->args([
                 service('cache.global_clearer'),
+                null,
             ])
             ->tag('console.command')
 

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-18T19:11:08Z
+
+Thanks for the PR. This looks like a new feature to me. As such, that's for 5.4.
+Looking at other handlers, they would too benefit from options.
+Also, `MemcachedSessionHandler` uses `expiretime` instead of `ttl` and defaults to 86400 instead of `ini_get('session.gc_maxlifetime')` :facepalm:
+Can you please have a look and try to add some consistency there?
+Don't forget to update the CHANGELOG of the component while doing so.
+Thanks!
+
+---------------------------------------------------------------------------
+
+by makraz at 2021-05-19T02:44:34Z
+
+> Thanks for the PR. This looks like a new feature to me. As such, that's for 5.4.
+> Looking at other handlers, they would too benefit from options.
+> Also, `MemcachedSessionHandler` uses `expiretime` instead of `ttl` and defaults to 86400 instead of `ini_get('session.gc_maxlifetime')` 🤦
+> Can you please have a look and try to add some consistency there?
+> Don't forget to update the CHANGELOG of the component while doing so.
+> Thanks!
+
+@nicolas-grekas thank you for the feedback. I updated the PR to let other handlers benefit from options.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-22T14:45:07Z
+
+@makraz I force-pushed some changes on your fork. Could you please fetch it and add some test cases?
+
+---------------------------------------------------------------------------
+
+by makraz at 2021-06-23T13:27:41Z
+
+> @makraz, I force-pushed some changes on your fork. Could you please fetch it and add some test cases?
+
+Thank you, @nicolas-grekas, for the update. I will work on the test cases
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-08T10:34:35Z
+
+Friendly ping @makraz (rebase needed also)

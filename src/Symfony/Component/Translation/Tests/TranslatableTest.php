@@ -99,6 +99,9 @@ class TranslatableTest extends TestCase
             ['Symfony est super!', $messages, new TranslatableMessage('symfony.is.great', [], '')],
             ['Foo Bar Baz', $messages, new TranslatableMessage('foo.bar.baz', [], '')],
             ['Foo Baz', $messages, new TranslatableMessage('foo.baz', [], '')],
+            ['Result: Foo Baz', $messages, new FormattedTranslatableMessage('Result: %s', new TranslatableMessage('foo.baz', [], ''))],
+            ['Foo Baz ~ Foo Bar Baz', $messages, new ImplodedTranslatableMessage(' ~ ', new TranslatableMessage('foo.baz', [], ''), new TranslatableMessage('foo.bar.baz', [] , ''))],
+            ['foo.bar.baz', $messages, new NonTranslatableMessage('foo.bar.baz')]
         ];
     }
 }

@@ -95,7 +95,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             if ($prefix = $this->extractAccessorPrefix($name)) {
                 $attributeName = $this->extractAttributeName($name, $prefix);
 
-                if (!$reflClass->hasProperty($attributeName)) {
+                if ($attributeName && !$reflClass->hasProperty($attributeName)) {
                     $attributeName = lcfirst($attributeName);
                 }
             }

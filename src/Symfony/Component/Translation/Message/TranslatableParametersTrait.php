@@ -29,8 +29,7 @@ trait TranslatableParametersTrait
     public function getTranslatedParameters(
         TranslatorInterface $translator,
         ?string $locale
-    ): array
-    {
+    ): array {
         return array_map(
             static function ($parameter) use ($translator, $locale) {
                 return $parameter instanceof TranslatableInterface ? $parameter->trans($translator, $locale) : $parameter;

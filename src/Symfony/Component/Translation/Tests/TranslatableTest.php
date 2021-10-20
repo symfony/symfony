@@ -69,13 +69,13 @@ class TranslatableTest extends TestCase
             ['Symfony est super ! 100 times !', new FormattedTranslatableMessage('%s %d times !', new TranslatableMessage('Symfony is great!', [], ''), 100), [
                 'Symfony is great!' => 'Symfony est super !',
             ], 'fr'],
-            ['Symfony est superbe', new ImplodedTranslatableMessage(' ', 'Symfony', new TranslatableMessage('is', [] ,''), new TranslatableMessage('super', [] ,'')), [
+            ['Symfony est superbe', new ImplodedTranslatableMessage(' ', 'Symfony', new TranslatableMessage('is', [], ''), new TranslatableMessage('super', [], '')), [
                 'is' => 'est',
-                'super' => 'superbe'
+                'super' => 'superbe',
             ], 'fr'],
             ['Symfony is great!', new NonTranslatableMessage('Symfony is great!'), [
                 'Symfony is great!' => 'Symfony est super !',
-            ], 'fr']
+            ], 'fr'],
         ];
     }
 
@@ -100,8 +100,8 @@ class TranslatableTest extends TestCase
             ['Foo Bar Baz', $messages, new TranslatableMessage('foo.bar.baz', [], '')],
             ['Foo Baz', $messages, new TranslatableMessage('foo.baz', [], '')],
             ['Result: Foo Baz', $messages, new FormattedTranslatableMessage('Result: %s', new TranslatableMessage('foo.baz', [], ''))],
-            ['Foo Baz ~ Foo Bar Baz', $messages, new ImplodedTranslatableMessage(' ~ ', new TranslatableMessage('foo.baz', [], ''), new TranslatableMessage('foo.bar.baz', [] , ''))],
-            ['foo.bar.baz', $messages, new NonTranslatableMessage('foo.bar.baz')]
+            ['Foo Baz ~ Foo Bar Baz', $messages, new ImplodedTranslatableMessage(' ~ ', new TranslatableMessage('foo.baz', [], ''), new TranslatableMessage('foo.bar.baz', [], ''))],
+            ['foo.bar.baz', $messages, new NonTranslatableMessage('foo.bar.baz')],
         ];
     }
 }

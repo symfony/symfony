@@ -25,7 +25,7 @@ class ImplodedTranslatableMessage implements TranslatableInterface
 
     public function __construct(
         string $glue = '',
-        array $parameters = []
+        ...$parameters
     ) {
         $this->glue = $glue;
         $this->parameters = $parameters;

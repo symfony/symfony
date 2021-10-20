@@ -14,20 +14,22 @@ namespace Symfony\Component\Translation\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Message\FormattedTranslatableMessage;
+use Symfony\Component\Translation\Message\ImplodedTranslatableMessage;
 use Symfony\Component\Translation\Message\NonTranslatableMessage;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 class TranslatableTest extends TestCase
 {
     /**
      * @dataProvider getTransTests
      */
-    public function testTrans(string $expected, TranslatableMessage $translatable, array $translation, string $locale)
+    public function testTrans(string $expected, TranslatableInterface $translatable, array $translation, string $locale)
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', $translation, $locale, $translatable->getDomain());
+        $translator->addResource('array', $translation, $locale, '');
 
         $this->assertSame($expected, $translatable->trans($translator, $locale));
     }
@@ -64,6 +66,16 @@ class TranslatableTest extends TestCase
                 'Symfony is %what%!' => 'Symfony est %what% !',
                 'awesome' => 'superbe',
             ], 'fr'],
+            ['Symfony est super ! 100 times !', new FormattedTranslatableMessage('%s %d times !', new TranslatableMessage('Symfony is great!', [], ''), 100), [
+                'Symfony is great!' => 'Symfony est super !',
+            ], 'fr'],
+            ['Symfony est superbe', new ImplodedTranslatableMessage(' ', 'Symfony', new TranslatableMessage('is', [] ,''), new TranslatableMessage('super', [] ,'')), [
+                'is' => 'est',
+                'super' => 'superbe'
+            ], 'fr'],
+            ['Symfony is great!', new NonTranslatableMessage('Symfony is great!'), [
+                'Symfony is great!' => 'Symfony est super !',
+            ], 'fr']
         ];
     }
 

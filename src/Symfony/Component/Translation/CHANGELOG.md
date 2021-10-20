@@ -7,6 +7,7 @@ CHANGELOG
  * Add `github` format & autodetection to render errors as annotations when
    running the XLIFF linter command in a Github Actions environment.
  * Translation providers are not experimental anymore
+ * Add `FormattedTranslatableMessage`, `ImplodedTranslatableMessage` and `NotTranslatableMessage` classes and their helper functions `ft`, `it` and `nt`
 
 5.3
 ---

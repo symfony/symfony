@@ -86,14 +86,14 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             $name = $reflMethod->name;
             $attributeName = null;
 
-            if (str_starts_with($name, 'get') || str_starts_with($name, 'has')) {
+            if ($this->strStartsWith($name, 'get') || $this->strStartsWith($name, 'has')) {
                 // getters and hassers
                 $attributeName = substr($name, 3);
 
                 if (!$reflClass->hasProperty($attributeName)) {
                     $attributeName = lcfirst($attributeName);
                 }
-            } elseif (str_starts_with($name, 'is')) {
+            } elseif ($this->strStartsWith($name, 'is')) {
                 // issers
                 $attributeName = substr($name, 2);
 
@@ -189,5 +189,12 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         return $allowedAttributes;
+    }
+
+    private function strStartsWith(string $str, string $prefix): bool
+    {
+        $nextChar = $str[\strlen($prefix)] ?? '';
+
+        return \str_starts_with($str, $prefix) && \ctype_upper($nextChar);
     }
 }

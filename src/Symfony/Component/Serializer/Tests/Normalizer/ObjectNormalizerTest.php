@@ -287,6 +287,20 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->denormalize($data, DummyWithConstructorInexistingObject::class);
     }
 
+    public function testAccessorLikeDistinction()
+    {
+        $obj = new DummyWithAccessorLikes();
+
+        $this->assertEquals(
+            [
+                'hasser' => true,
+                'getter' => true,
+                'isser' => true,
+            ],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     // attributes
 
     protected function getNormalizerForAttributes(): ObjectNormalizer
@@ -1018,5 +1032,38 @@ class DummyWithNullableConstructorObject
     public function getInner()
     {
         return $this->inner;
+    }
+}
+
+class DummyWithAccessorLikes
+{
+    public function hasHasser(): bool
+    {
+        return true;
+    }
+
+    public function hashasserLike(): bool
+    {
+        return true;
+    }
+
+    public function isIsser(): bool
+    {
+        return true;
+    }
+
+    public function isisserLike(): bool
+    {
+        return true;
+    }
+
+    public function getGetter(): bool
+    {
+        return true;
+    }
+
+    public function getgetterLike(): bool
+    {
+        return true;
     }
 }

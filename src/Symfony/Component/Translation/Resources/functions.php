@@ -15,7 +15,7 @@ use Symfony\Component\Translation\Message\FormattedTranslatableMessage;
 use Symfony\Component\Translation\Message\ImplodedTranslatableMessage;
 use Symfony\Component\Translation\Message\NonTranslatableMessage;
 
-if (!\function_exists(t::class)) {
+if (!\function_exists('Symfony\Component\Translation\t')) {
     /**
      * @author Nate Wiebe <nate@northern.co>
      */
@@ -25,7 +25,7 @@ if (!\function_exists(t::class)) {
     }
 }
 
-if (!\function_exists(ft::class)) {
+if (!\function_exists('Symfony\Component\Translation\ft')) {
     /**
      * @author Jakub Caban <kuba.iluvatar@gmail.com>
      */
@@ -35,7 +35,7 @@ if (!\function_exists(ft::class)) {
     }
 }
 
-if (!\function_exists(it::class)) {
+if (!\function_exists('Symfony\Component\Translation\it')) {
     /**
      * @author Jakub Caban <kuba.iluvatar@gmail.com>
      */
@@ -45,7 +45,7 @@ if (!\function_exists(it::class)) {
     }
 }
 
-if (!\function_exists(nt::class)) {
+if (!\function_exists('Symfony\Component\Translation\nt')) {
     /**
      * @author Jakub Caban <kuba.iluvatar@gmail.com>
      */

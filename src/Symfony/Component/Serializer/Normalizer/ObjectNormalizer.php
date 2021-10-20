@@ -95,7 +95,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             if ($prefix = $this->extractAccessorPrefix($name)) {
                 $attributeName = $this->extractAttributeName($name, $prefix);
 
-                if ($attributeName && !$reflClass->hasProperty($attributeName)) {
+                if (!$reflClass->hasProperty($attributeName)) {
                     $attributeName = lcfirst($attributeName);
                 }
             }
@@ -197,7 +197,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      */
     private function extractAccessorPrefix(string $methodName): ?string
     {
-        $prefix = null;
+        $prefix = '';
 
         foreach (self::ACCESSOR_PREFIXES as $accessor) {
             if (str_starts_with($methodName, $accessor)) {

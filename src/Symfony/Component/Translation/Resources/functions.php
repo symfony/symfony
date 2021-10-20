@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Message\FormattedTranslatableMessage;
+use Symfony\Component\Translation\Message\ImplodedTranslatableMessage;
+use Symfony\Component\Translation\Message\NonTranslatableMessage;
+
 if (!\function_exists(t::class)) {
     /**
      * @author Nate Wiebe <nate@northern.co>
@@ -18,5 +22,35 @@ if (!\function_exists(t::class)) {
     function t(string $message, array $parameters = [], string $domain = null): TranslatableMessage
     {
         return new TranslatableMessage($message, $parameters, $domain);
+    }
+}
+
+if (!\function_exists(ft::class)) {
+    /**
+     * @author Jakub Caban <kuba.iluvatar@gmail.com>
+     */
+    function ft(string $format, ...$parameters): FormattedTranslatableMessage
+    {
+        return new FormattedTranslatableMessage($format, $parameters);
+    }
+}
+
+if (!\function_exists(it::class)) {
+    /**
+     * @author Jakub Caban <kuba.iluvatar@gmail.com>
+     */
+    function it(string $glue, ...$parameters): ImplodedTranslatableMessage
+    {
+        return new ImplodedTranslatableMessage($glue, $parameters);
+    }
+}
+
+if (!\function_exists(nt::class)) {
+    /**
+     * @author Jakub Caban <kuba.iluvatar@gmail.com>
+     */
+    function nt(string $message): NonTranslatableMessage
+    {
+        return new NonTranslatableMessage($message);
     }
 }

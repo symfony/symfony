@@ -83,6 +83,8 @@ final class CompleteCommand extends Command
                 '<comment>'.date('Y-m-d H:i:s').'</>',
                 '<info>Input:</> <comment>("|" indicates the cursor position)</>',
                 '  '.(string) $completionInput,
+                '<info>Command:</>',
+                '  '.(string) implode(' ', $_SERVER['argv']),
                 '<info>Messages:</>',
             ]);
 

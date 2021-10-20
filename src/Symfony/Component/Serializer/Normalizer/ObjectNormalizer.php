@@ -28,6 +28,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 class ObjectNormalizer extends AbstractObjectNormalizer
 {
+    private const ACCESSOR_PREFIXES = [
+        'get',
+        'has',
+        'is',
+    ];
+
     protected $propertyAccessor;
 
     private $discriminatorCache = [];
@@ -86,16 +92,8 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             $name = $reflMethod->name;
             $attributeName = null;
 
-            if ($this->strStartsWith($name, 'get') || $this->strStartsWith($name, 'has')) {
-                // getters and hassers
-                $attributeName = substr($name, 3);
-
-                if (!$reflClass->hasProperty($attributeName)) {
-                    $attributeName = lcfirst($attributeName);
-                }
-            } elseif ($this->strStartsWith($name, 'is')) {
-                // issers
-                $attributeName = substr($name, 2);
+            if ($prefix = $this->extractAccessorPrefix($name)) {
+                $attributeName = $this->extractAttributeName($name, $prefix);
 
                 if (!$reflClass->hasProperty($attributeName)) {
                     $attributeName = lcfirst($attributeName);
@@ -191,10 +189,36 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         return $allowedAttributes;
     }
 
-    private function strStartsWith(string $str, string $prefix): bool
+    /**
+     * Extract accessor prefix from method name if possible
+     *
+     * @psalm-pure
+     * @psalm-return (value-of<self::ACCESSOR_PREFIXES>)|null
+     */
+    private function extractAccessorPrefix(string $methodName): ?string
     {
-        $nextChar = $str[\strlen($prefix)] ?? '';
+        $prefix = null;
 
-        return str_starts_with($str, $prefix) && ctype_upper($nextChar);
+        foreach (self::ACCESSOR_PREFIXES as $accessor) {
+            if (str_starts_with($methodName, $accessor)) {
+                $prefix = $accessor;
+                break;
+            }
+        }
+
+        $nextChar = $methodName[strlen($prefix)] ?? '';
+
+        return $prefix && ctype_upper($nextChar) ? $prefix : null;
+    }
+
+    /**
+     * Extract attribute name from accessor method name if possible
+     *
+     * @psalm-pure
+     * @psalm-param (value-of<self::ACCESSOR_PREFIXES>) $accessorPrefix
+     */
+    private function extractAttributeName(string $accessorMethod, string $accessorPrefix): ?string
+    {
+        return substr($accessorMethod, strlen($accessorPrefix)) ?: null;
     }
 }

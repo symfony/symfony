@@ -198,4 +198,12 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
         return new static($violations);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty(): bool
+    {
+        return [] === $this->violations;
+    }
 }

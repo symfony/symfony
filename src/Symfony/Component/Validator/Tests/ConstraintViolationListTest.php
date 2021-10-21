@@ -164,6 +164,23 @@ EOF;
         $this->assertSame('my message', $list[0]->getMessage());
     }
 
+    public function testIsEmpty()
+    {
+        $this->list = new ConstraintViolationList([]);
+
+        $this->assertCount(0, $this->list);
+        $this->assertTrue($this->list->isEmpty());
+    }
+
+    public function testIsEmptyWithViolations()
+    {
+        $violation = $this->getViolation('Error');
+        $this->list = new ConstraintViolationList([$violation]);
+
+        $this->assertCount(1, $this->list);
+        $this->assertFalse($this->list->isEmpty());
+    }
+
     protected function getViolation($message, $root = null, $propertyPath = null, $code = null)
     {
         return new ConstraintViolation($message, $message, [], $root, $propertyPath, null, null, $code);

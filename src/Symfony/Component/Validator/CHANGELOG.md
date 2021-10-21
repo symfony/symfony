@@ -7,6 +7,7 @@ CHANGELOG
  * Add a `CssColor` constraint to validate CSS colors
  * Add support for `ConstraintViolationList::createFromMessage()`
  * Add error's uid to `Count` and `Length` constraints with "exactly" option enabled
+ * Add `ConstraintViolationList::isEmpty` to check if there are constraint violations in the list
 
 5.3
 ---

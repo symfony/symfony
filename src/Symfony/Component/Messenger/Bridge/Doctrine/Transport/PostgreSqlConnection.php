@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
+use Doctrine\DBAL\Driver\PDO\Connection as DoctrinePdoConnection;
 use Doctrine\DBAL\Schema\Table;
 
 /**
@@ -72,7 +73,12 @@ final class PostgreSqlConnection extends Connection
             $this->listening = true;
         }
 
-        $notification = $this->driverConnection->getWrappedConnection()->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
+        $wrappedConnection = $this->driverConnection->getWrappedConnection();
+        if (!$wrappedConnection instanceof \PDO && $wrappedConnection instanceof DoctrinePdoConnection) {
+            $wrappedConnection = $wrappedConnection->getWrappedConnection();
+        }
+
+        $notification = $wrappedConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
         if (
             // no notifications, or for another table or queue
             (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name']) &&

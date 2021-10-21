@@ -44,7 +44,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Το Username δε βρέθηκε.</target>
+                <target>Το όνομα χρήστη δε βρέθηκε.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>

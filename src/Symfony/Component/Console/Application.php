@@ -20,7 +20,6 @@ use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Completion\CompletionInterface;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
@@ -69,7 +68,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Application implements ResetInterface, CompletionInterface
+class Application implements ResetInterface
 {
     private $commands = [];
     private $wantHelps = false;
@@ -356,7 +355,7 @@ class Application implements ResetInterface, CompletionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Adds suggestions to $suggestions for the current completion input (e.g. option or argument).
      */
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {

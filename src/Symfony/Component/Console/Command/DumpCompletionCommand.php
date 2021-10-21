@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Completion\CompletionInterface;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,7 +25,7 @@ use Symfony\Component\Process\Process;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-final class DumpCompletionCommand extends Command implements CompletionInterface
+final class DumpCompletionCommand extends Command
 {
     protected static $defaultName = 'completion';
     protected static $defaultDescription = 'Dump the shell completion script';

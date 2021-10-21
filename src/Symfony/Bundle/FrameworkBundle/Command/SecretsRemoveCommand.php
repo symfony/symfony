@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Completion\CompletionInterface;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +28,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @internal
  */
-final class SecretsRemoveCommand extends Command implements CompletionInterface
+final class SecretsRemoveCommand extends Command
 {
     protected static $defaultName = 'secrets:remove';
     protected static $defaultDescription = 'Remove a secret from the vault';

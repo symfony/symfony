@@ -12,6 +12,8 @@
 namespace Symfony\Component\Uid\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -174,14 +176,14 @@ EOF
                 break;
         }
 
-        switch ($input->getOption('format')) {
-            case 'base32': $format = 'toBase32'; break;
-            case 'base58': $format = 'toBase58'; break;
-            case 'rfc4122': $format = 'toRfc4122'; break;
-            default:
-                $io->error(sprintf('Invalid format "%s", did you mean "base32", "base58" or "rfc4122"?', $input->getOption('format')));
+        $formatOption = $input->getOption('format');
 
-                return 1;
+        if (\in_array($formatOption, $this->getAvailableFormatOptions())) {
+            $format = 'to'.ucfirst($formatOption);
+        } else {
+            $io->error(sprintf('Invalid format "%s", did you mean "base32", "base58" or "rfc4122"?', $formatOption));
+
+            return 1;
         }
 
         $count = (int) $input->getOption('count');
@@ -196,5 +198,21 @@ EOF
         }
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
+        }
+    }
+
+    private function getAvailableFormatOptions(): array
+    {
+        return [
+            'base32',
+            'base58',
+            'rfc4122',
+        ];
     }
 }

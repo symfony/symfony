@@ -306,11 +306,11 @@ class ObjectNormalizerTest extends TestCase
     {
         $obj = new DummyWithAccessorLikes();
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'hasser' => true,
-                'getter' => true,
                 'isser' => true,
+                'getter' => true,
             ],
             $this->normalizer->normalize($obj, 'any')
         );
@@ -1059,7 +1059,7 @@ class DummyWithAccessorLikes
 
     public function hashasserLike(): bool
     {
-        return true;
+        return false;
     }
 
     public function isIsser(): bool
@@ -1069,7 +1069,7 @@ class DummyWithAccessorLikes
 
     public function isisserLike(): bool
     {
-        return true;
+        return false;
     }
 
     public function getGetter(): bool
@@ -1079,6 +1079,6 @@ class DummyWithAccessorLikes
 
     public function getgetterLike(): bool
     {
-        return true;
+        return false;
     }
 }

@@ -27,6 +27,24 @@ class BashCompletionOutput implements CompletionOutputInterface
         }
         $output->write(implode(' ', $options));
 
-        $output->writeln(implode(' ', $suggestions->getValueSuggestions()));
+        $output->writeln($this->normalizeSuggestions($suggestions->getValueSuggestions()));
+    }
+
+    /**
+     * Escapes special chars (e.g. backslash or space) and puts quotes around
+     * the suggestions whenever escaping was needed.
+     */
+    private function normalizeSuggestions(array $suggestions): string
+    {
+        $includesUnsafeChars = false;
+        $suggestions = array_map(function ($value) use (&$includesUnsafeChars) {
+            $newValue = str_replace('\\', '\\\\', $value);
+            $newValue = str_replace(' ', '\ ', $value);
+            $includesUnsafeChars = $includesUnsafeChars || $newValue !== $value;
+
+            return $newValue;
+        }, $suggestions);
+
+        return $includesUnsafeChars ? "\\'".implode("\\' \\'", $suggestions)."\\'" : implode(' ', $suggestions);
     }
 }

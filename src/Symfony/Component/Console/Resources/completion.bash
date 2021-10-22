@@ -21,7 +21,9 @@ _sf_{{ COMMAND_NAME }}() {
 
     local sfcomplete
     if sfcomplete=$(${completecmd[@]} 2>&1); then
-        COMPREPLY=($(compgen -W "$sfcomplete" -- "$cur"))
+        # $sfcomplete is escaped already, escape the input as well
+        local escapedcur=${cur//\\/\\\\}
+        COMPREPLY=($(compgen -W "${sfcomplete}" -- "${escapedcur//\'/\\\'}"))
         __ltrim_colon_completions "$cur"
     else
         if [[ "$sfcomplete" != *"Command \"_complete\" is not defined."* ]]; then

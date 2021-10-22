@@ -44,7 +44,7 @@ class RedisReceiver implements ReceiverInterface
             return [];
         }
 
-        $redisEnvelope = json_decode($message['data'], true);
+        $redisEnvelope = json_decode($message['data']['message'] ?? '', true);
 
         try {
             if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {

@@ -149,7 +149,7 @@ EODUMP;
     %sExceptionCasterTest.php:%d { …}
 %A
 EODUMP;
-        
+
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
@@ -215,7 +215,7 @@ array:2 [
     class: "__TwigTemplate_VarDumperFixture_u75a09"
     src: {
       %sTwig.php:1 {
-        › 
+        ›%s
         › foo bar
         ›   twig source
       }
@@ -230,7 +230,7 @@ array:2 [
       %sExceptionCasterTest.php:2 {
         › foo bar
         ›   twig source
-        › 
+        ›%s
       }
     }
   }

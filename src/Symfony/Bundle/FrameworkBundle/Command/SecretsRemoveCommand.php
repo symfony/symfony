@@ -89,8 +89,14 @@ EOF
             return;
         }
 
-        $vault = $input->getOption('local') ? $this->localVault : $this->vault;
         $vaultKeys = array_keys($this->vault->list(false));
-        $suggestions->suggestValues(array_intersect($vaultKeys, array_keys($vault->list(false))));
+        if ($input->getOption('local')) {
+            if (null === $this->localVault) {
+                return;
+            }
+            $vaultKeys = array_intersect($vaultKeys, array_keys($this->localVault->list(false)));
+        }
+
+        $suggestions->suggestValues($vaultKeys);
     }
 }

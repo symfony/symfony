@@ -15,7 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ExceptionCaster;
 use Symfony\Component\VarDumper\Caster\FrameStub;
+use Symfony\Component\VarDumper\Caster\TraceStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
@@ -44,15 +46,15 @@ Exception {
   #message: "foo"
   #code: 0
   #file: "%sExceptionCasterTest.php"
-  #line: 28
+  #line: %d
   trace: {
-    %s%eTests%eCaster%eExceptionCasterTest.php:28 {
+    %s%eTests%eCaster%eExceptionCasterTest.php:%d {
       Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
       › {
       ›     return new \Exception(''.$msg);
       › }
     }
-    %s%eTests%eCaster%eExceptionCasterTest.php:40 { …}
+    %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
 %A
 EODUMP;
 
@@ -66,13 +68,13 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 {
-  %s%eTests%eCaster%eExceptionCasterTest.php:28 {
+  %s%eTests%eCaster%eExceptionCasterTest.php:%d {
     Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
     › {
     ›     return new \Exception(''.$msg);
     › }
   }
-  %s%eTests%eCaster%eExceptionCasterTest.php:65 { …}
+  %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
 %A
 EODUMP;
 
@@ -89,15 +91,15 @@ Exception {
   #message: "1"
   #code: 0
   #file: "%sExceptionCasterTest.php"
-  #line: 28
+  #line: %d
   trace: {
-    %sExceptionCasterTest.php:28 {
+    %sExceptionCasterTest.php:%d {
       Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
       › {
       ›     return new \Exception(''.$msg);
       › }
     }
-    %s%eTests%eCaster%eExceptionCasterTest.php:84 { …}
+    %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
 %A
 EODUMP;
 
@@ -114,14 +116,41 @@ Exception {
   #message: "1"
   #code: 0
   #file: "%sExceptionCasterTest.php"
-  #line: 28
+  #line: %d
   trace: {
-    %s%eTests%eCaster%eExceptionCasterTest.php:28
+    %s%eTests%eCaster%eExceptionCasterTest.php:%d
     %s%eTests%eCaster%eExceptionCasterTest.php:%d
 %A
 EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
+    }
+
+    public function testShouldReturnTraceForConcreteTwigWithError()
+    {
+        require_once \dirname(__DIR__).'/Fixtures/ConcreteBug.php';
+
+        $cloner = new VarCloner();
+        $innerExc = (new \__TwigTemplate_VarDumperFixture_concreteBug(null, __FILE__))->provideError();
+        $nestingWrapper = new \stdClass();
+        $nestingWrapper->trace = new TraceStub($innerExc->getTrace());
+
+        $dumper = new CliDumper();
+        $dump = $dumper->dump($cloner->cloneVar($nestingWrapper)->withRefHandles(false), true);
+        $expectedDump = <<<'EODUMP'
+{
+  +"trace": {
+    %sConcreteBug.php:%d {
+      __TwigTemplate_VarDumperFixture_abstractBug->provideError()
+      › {
+      ›     return $this->createError();
+      › }
+    }
+    %sExceptionCasterTest.php:%d { …}
+%A
+EODUMP;
+        
+        $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
     public function testHtmlDump()
@@ -146,10 +175,10 @@ EODUMP;
   #<span class=sf-dump-protected title="Protected property">code</span>: <span class=sf-dump-num>0</span>
   #<span class=sf-dump-protected title="Protected property">file</span>: "<span class=sf-dump-str title="%sExceptionCasterTest.php
 %d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span>Tests%eCaster%eExceptionCasterTest.php</span>"
-  #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>28</span>
+  #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>%d</span>
   <span class=sf-dump-meta>trace</span>: {<samp>
     <span class=sf-dump-meta title="%sExceptionCasterTest.php
-Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span>Tests%eCaster%eExceptionCasterTest.php</span>:<span class=sf-dump-num>28</span>
+Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span>Tests%eCaster%eExceptionCasterTest.php</span>:<span class=sf-dump-num>%d</span>
      &hellip;%d
   </samp>}
 </samp>}
@@ -221,7 +250,7 @@ Exception {
   #message: "foo"
   #code: 0
   #file: "%sExceptionCasterTest.php"
-  #line: 28
+  #line: %d
 }
 EODUMP;
 

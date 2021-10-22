@@ -218,19 +218,19 @@ class ExceptionCaster
                         if (isset($f['object'])) {
                             $template = $f['object'];
                         } elseif ((new \ReflectionClass($f['class']))->isInstantiable()) {
-                            $template = unserialize(sprintf('O:%d:"%s":0:{}', strlen($f['class']), $f['class']));
+                            $template = unserialize(sprintf('O:%d:"%s":0:{}', \strlen($f['class']), $f['class']));
                         }
                         if (isset($template)) {
                             $ellipsis = 0;
                             $templateSrc = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : '');
                             $templateInfo = $template->getDebugInfo();
                             if (isset($templateInfo[$f['line']])) {
-                            if (!method_exists($template, 'getSourceContext') || !file_exists($templatePath = $template->getSourceContext()->getPath())) {
+                                if (!method_exists($template, 'getSourceContext') || !file_exists($templatePath = $template->getSourceContext()->getPath())) {
                                     $templatePath = null;
                                 }
                                 if ($templateSrc) {
                                     $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, 'twig', $templatePath, $f);
-                                    $srcKey = ($templatePath ?: $template->getTemplateName()) . ':' . $templateInfo[$f['line']];
+                                    $srcKey = ($templatePath ?: $template->getTemplateName()).':'.$templateInfo[$f['line']];
                                 }
                             }
                         }

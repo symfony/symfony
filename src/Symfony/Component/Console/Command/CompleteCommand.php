@@ -108,7 +108,7 @@ final class CompleteCommand extends Command
                     $suggestions->suggestOptions($command->getDefinition()->getOptions());
                 } else {
                     $this->log([
-                        '  Completing using the <comment>'.\get_class($command).'</> class.',
+                        '  Completing using the <comment>'.\get_class($command instanceof LazyCommand ? $command->getCommand() : $command).'</> class.',
                         '  Completing <comment>'.$completionInput->getCompletionType().'</> for <comment>'.$completionInput->getCompletionName().'</>',
                     ]);
                     if (null !== $compval = $completionInput->getCompletionValue()) {

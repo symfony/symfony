@@ -83,6 +83,21 @@ class SymfonyStyleTest extends TestCase
         return array_map(null, glob($baseDir.'/command/command_*.php'), glob($baseDir.'/output/output_*.txt'));
     }
 
+    public function testOutputProgressIterate()
+    {
+        $code = require __DIR__.'/../Fixtures/Style/SymfonyStyle/progress/command_progress_iterate.php';
+
+        if ('\\' === \DIRECTORY_SEPARATOR || 'Hyper' === getenv('TERM_PROGRAM')) {
+            $outputFilepath = __DIR__.'/../Fixtures/Style/SymfonyStyle/progress/output_progress_iterate_no_shade.txt';
+        } else {
+            $outputFilepath = __DIR__.'/../Fixtures/Style/SymfonyStyle/progress/output_progress_iterate_shade.txt';
+        }
+
+        $this->command->setCode($code);
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
+    }
+
     public function testGetErrorStyle()
     {
         $input = $this->createMock(InputInterface::class);

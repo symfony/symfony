@@ -33,17 +33,22 @@ class DoctrineIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->sqliteFile = sys_get_temp_dir().'/symfony.messenger.'.$this->getName(false).'.sqlite';
         $this->sqliteFile = sys_get_temp_dir().'/symfony.messenger.sqlite';
         $dsn = getenv('MESSENGER_DOCTRINE_DSN') ?: 'sqlite:///'.$this->sqliteFile;
+        var_dump($this->getName(false));
         $this->driverConnection = DriverManager::getConnection(['url' => $dsn]);
         $this->connection = new Connection([], $this->driverConnection);
     }
 
     protected function tearDown(): void
     {
+        var_dump($this->getName(false));
         $this->driverConnection->close();
         if (file_exists($this->sqliteFile)) {
-            @unlink($this->sqliteFile);
+            var_dump('clean up');
+            unlink($this->sqliteFile);
+            var_dump('cleaned up');
         }
     }
 

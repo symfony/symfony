@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-23T07:04:31Z
+
+@shokhaa Can you add translations for id 100 and 101 in src/Symfony/Component/Validator/Resources/translations/validators.uz.xlf as well?
+
+---------------------------------------------------------------------------
+
+by shokhaa at 2021-10-23T07:39:16Z
+
+@fabpot done

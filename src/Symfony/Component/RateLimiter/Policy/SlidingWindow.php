@@ -39,7 +39,7 @@ final class SlidingWindow implements LimiterStateInterface
     private $intervalInSeconds;
 
     /**
-     * @var int the unix timestamp when the current window ends
+     * @var float the unix timestamp when the current window ends
      */
     private $windowEndAt;
 
@@ -55,7 +55,7 @@ final class SlidingWindow implements LimiterStateInterface
         }
         $this->id = $id;
         $this->intervalInSeconds = $intervalInSeconds;
-        $this->windowEndAt = time() + $intervalInSeconds;
+        $this->windowEndAt = microtime(true) + $intervalInSeconds;
         $this->cached = false;
     }
 
@@ -64,7 +64,7 @@ final class SlidingWindow implements LimiterStateInterface
         $new = new self($window->id, $intervalInSeconds);
         $windowEndAt = $window->windowEndAt + $intervalInSeconds;
 
-        if (time() < $windowEndAt) {
+        if (microtime(true) < $windowEndAt) {
             $new->hitCountForLastWindow = $window->hitCount;
             $new->windowEndAt = $windowEndAt;
         }
@@ -101,7 +101,7 @@ final class SlidingWindow implements LimiterStateInterface
 
     public function isExpired(): bool
     {
-        return time() > $this->windowEndAt;
+        return microtime(true) > $this->windowEndAt;
     }
 
     public function add(int $hits = 1)
@@ -115,13 +115,13 @@ final class SlidingWindow implements LimiterStateInterface
     public function getHitCount(): int
     {
         $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
-        $percentOfCurrentTimeFrame = min((time() - $startOfWindow) / $this->intervalInSeconds, 1);
+        $percentOfCurrentTimeFrame = min((microtime(true) - $startOfWindow) / $this->intervalInSeconds, 1);
 
         return (int) floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame) + $this->hitCount);
     }
 
     public function getRetryAfter(): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromFormat('U', $this->windowEndAt);
+        return \DateTimeImmutable::createFromFormat('U.u', $this->windowEndAt);
     }
 }

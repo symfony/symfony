@@ -360,7 +360,7 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>این رمزعبور در یک رخنه‌ی اطلاعاتی نشت کرده اس، نباید از آن استفاده کرد. لطفا از یک رمزعبور دیگری استفاده کنید.</target>
+                <target>این رمزعبور در یک رخنه‌ی اطلاعاتی نشت کرده است، نباید از آن استفاده کرد. لطفا از یک رمزعبور دیگری استفاده کنید.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>

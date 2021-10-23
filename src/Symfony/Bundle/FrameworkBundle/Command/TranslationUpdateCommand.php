@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -40,6 +42,10 @@ class TranslationUpdateCommand extends Command
     private const ASC = 'asc';
     private const DESC = 'desc';
     private const SORT_ORDERS = [self::ASC, self::DESC];
+    private const FORMATS = [
+        'xlf12' => ['xlf', '1.2'],
+        'xlf20' => ['xlf', '2.0'],
+    ];
 
     protected static $defaultName = 'translation:update';
     protected static $defaultDescription = 'Update the translation file';
@@ -52,8 +58,9 @@ class TranslationUpdateCommand extends Command
     private $defaultViewsPath;
     private $transPaths;
     private $codePaths;
+    private $enabledLocales;
 
-    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [])
+    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
     {
         parent::__construct();
 
@@ -65,6 +72,7 @@ class TranslationUpdateCommand extends Command
         $this->defaultViewsPath = $defaultViewsPath;
         $this->transPaths = $transPaths;
         $this->codePaths = $codePaths;
+        $this->enabledLocales = $enabledLocales;
     }
 
     /**
@@ -147,10 +155,8 @@ EOF
             trigger_deprecation('symfony/framework-bundle', '5.3', 'The "--output-format" option is deprecated, use "--format=xlf%d" instead.', 10 * $xliffVersion);
         }
 
-        switch ($format) {
-            case 'xlf20': $xliffVersion = '2.0';
-            // no break
-            case 'xlf12': $format = 'xlf';
+        if (\in_array($format, array_keys(self::FORMATS), true)) {
+            [$format, $xliffVersion] = self::FORMATS[$format];
         }
 
         // check format
@@ -165,15 +171,9 @@ EOF
         $kernel = $this->getApplication()->getKernel();
 
         // Define Root Paths
-        $transPaths = $this->transPaths;
-        if ($this->defaultTransPath) {
-            $transPaths[] = $this->defaultTransPath;
-        }
-        $codePaths = $this->codePaths;
-        $codePaths[] = $kernel->getProjectDir().'/src';
-        if ($this->defaultViewsPath) {
-            $codePaths[] = $this->defaultViewsPath;
-        }
+        $transPaths = $this->getRootTransPaths();
+        $codePaths = $this->getRootCodePaths($kernel);
+
         $currentName = 'default directory';
 
         // Override with provided Bundle info
@@ -206,24 +206,11 @@ EOF
         $io->title('Translation Messages Extractor and Dumper');
         $io->comment(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
 
-        // load any messages from templates
-        $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $io->comment('Parsing templates...');
-        $this->extractor->setPrefix($input->getOption('prefix'));
-        foreach ($codePaths as $path) {
-            if (is_dir($path) || is_file($path)) {
-                $this->extractor->extract($path, $extractedCatalogue);
-            }
-        }
+        $extractedCatalogue = $this->extractMessages($input->getArgument('locale'), $codePaths, $input->getOption('prefix'));
 
-        // load any existing messages from the translation files
-        $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $io->comment('Loading translation files...');
-        foreach ($transPaths as $path) {
-            if (is_dir($path)) {
-                $this->reader->read($path, $currentCatalogue);
-            }
-        }
+        $currentCatalogue = $this->loadCurrentMessages($input->getArgument('locale'), $transPaths);
 
         if (null !== $domain = $input->getOption('domain')) {
             $currentCatalogue = $this->filterCatalogue($currentCatalogue, $domain);
@@ -321,6 +308,60 @@ EOF
         return 0;
     }
 
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('locale')) {
+            $suggestions->suggestValues($this->enabledLocales);
+
+            return;
+        }
+
+        /** @var KernelInterface $kernel */
+        $kernel = $this->getApplication()->getKernel();
+        if ($input->mustSuggestArgumentValuesFor('bundle')) {
+            $bundles = [];
+
+            foreach ($kernel->getBundles() as $bundle) {
+                $bundles[] = $bundle->getName();
+                if ($bundle->getContainerExtension()) {
+                    $bundles[] = $bundle->getContainerExtension()->getAlias();
+                }
+            }
+
+            $suggestions->suggestValues($bundles);
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues(array_merge(
+                $this->writer->getFormats(),
+                array_keys(self::FORMATS)
+            ));
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('domain') && $locale = $input->getArgument('locale')) {
+            $extractedCatalogue = $this->extractMessages($locale, $this->getRootCodePaths($kernel), $input->getOption('prefix'));
+
+            $currentCatalogue = $this->loadCurrentMessages($locale, $this->getRootTransPaths());
+
+            // process catalogues
+            $operation = $input->getOption('clean')
+                ? new TargetOperation($currentCatalogue, $extractedCatalogue)
+                : new MergeOperation($currentCatalogue, $extractedCatalogue);
+
+            $suggestions->suggestValues($operation->getDomains());
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('sort')) {
+            $suggestions->suggestValues(self::SORT_ORDERS);
+        }
+    }
+
     private function filterCatalogue(MessageCatalogue $catalogue, string $domain): MessageCatalogue
     {
         $filteredCatalogue = new MessageCatalogue($catalogue->getLocale());
@@ -352,5 +393,51 @@ EOF
         }
 
         return $filteredCatalogue;
+    }
+
+    private function extractMessages(string $locale, array $transPaths, string $prefix): MessageCatalogue
+    {
+        $extractedCatalogue = new MessageCatalogue($locale);
+        $this->extractor->setPrefix($prefix);
+        foreach ($transPaths as $path) {
+            if (is_dir($path) || is_file($path)) {
+                $this->extractor->extract($path, $extractedCatalogue);
+            }
+        }
+
+        return $extractedCatalogue;
+    }
+
+    private function loadCurrentMessages(string $locale, array $transPaths): MessageCatalogue
+    {
+        $currentCatalogue = new MessageCatalogue($locale);
+        foreach ($transPaths as $path) {
+            if (is_dir($path)) {
+                $this->reader->read($path, $currentCatalogue);
+            }
+        }
+
+        return $currentCatalogue;
+    }
+
+    private function getRootTransPaths(): array
+    {
+        $transPaths = $this->transPaths;
+        if ($this->defaultTransPath) {
+            $transPaths[] = $this->defaultTransPath;
+        }
+
+        return $transPaths;
+    }
+
+    private function getRootCodePaths(KernelInterface $kernel): array
+    {
+        $codePaths = $this->codePaths;
+        $codePaths[] = $kernel->getProjectDir().'/src';
+        if ($this->defaultViewsPath) {
+            $codePaths[] = $this->defaultViewsPath;
+        }
+
+        return $codePaths;
     }
 }

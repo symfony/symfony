@@ -13,7 +13,9 @@ namespace Symfony\Component\Translation\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Translation\Command\XliffLintCommand;
 
@@ -201,7 +203,7 @@ XLIFF;
         return $filename;
     }
 
-    private function createCommandTester($requireStrictFileNames = true, $application = null): CommandTester
+    private function createCommand($requireStrictFileNames = true, $application = null): Command
     {
         if (!$application) {
             $application = new Application();
@@ -214,7 +216,12 @@ XLIFF;
             $command->setApplication($application);
         }
 
-        return new CommandTester($command);
+        return $command;
+    }
+
+    private function createCommandTester($requireStrictFileNames = true, $application = null): CommandTester
+    {
+        return new CommandTester($this->createCommand($requireStrictFileNames, $application));
     }
 
     protected function setUp(): void
@@ -243,5 +250,20 @@ XLIFF;
         yield [true, 'messages.%locale%.xlf', 'es', true];
         yield [true, '%locale%.messages.xlf', 'en', true];
         yield [true, '%locale%.messages.xlf', 'es', true];
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $tester = new CommandCompletionTester($this->createCommand());
+
+        $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
     }
 }

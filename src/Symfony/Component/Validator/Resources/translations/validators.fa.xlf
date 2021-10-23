@@ -308,7 +308,7 @@
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>این مقدار با کاراکتر مورد انتظار {{ charset }} مطابقت ندارد.</target>
+                <target>این مقدار با کاراکترست مورد انتظار {{ charset }} مطابقت ندارد.</target>
             </trans-unit>
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>

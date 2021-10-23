@@ -587,6 +587,27 @@ class ProcessTest extends TestCase
         $this->assertEquals('foo'.\PHP_EOL, $process->getOutput());
     }
 
+    public function testMustRunWithFiber()
+    {
+        $process = new Process(['sleep', 1]);
+        $fiber = new \Fiber(function () use ($process) {
+            $process->mustRun();
+        });
+        $fiber->start();
+
+        $fiberHasBeenSuspended = false;
+        while (!$fiber->isTerminated()) {
+            $fiberHasBeenSuspended = true;
+            $this->assertTrue($fiber->isSuspended());
+            $fiber->resume();
+
+            usleep(900);
+        }
+
+        $this->assertTrue($process->isTerminated());
+        $this->assertTrue($fiberHasBeenSuspended);
+    }
+
     public function testSuccessfulMustRunHasCorrectExitCode()
     {
         $process = $this->getProcess('echo foo')->mustRun();

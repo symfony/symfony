@@ -429,12 +429,31 @@ class Process implements \IteratorAggregate
         do {
             $this->checkTimeout();
             $running = $this->isRunning() && ('\\' === \DIRECTORY_SEPARATOR || $this->processPipes->areOpen());
-            $this->readPipes($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);
+            if ($fiber = \Fiber::getCurrent()) {
+                $this->readPipes(false, '\\' !== \DIRECTORY_SEPARATOR || !$running);
+                $startedAt = microtime(true);
+                $fiber->suspend();
+                $sleepFor = (int) (1000 - (microtime(true) - $startedAt) * 1000000);
+                if (0 < $sleepFor) {
+                    usleep($sleepFor);
+                }
+            } else {
+                $this->readPipes($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);
+            }
         } while ($running);
 
         while ($this->isRunning()) {
             $this->checkTimeout();
-            usleep(1000);
+            if ($fiber = \Fiber::getCurrent()) {
+                $startedAt = microtime(true);
+                $fiber->suspend();
+                $sleepFor = (int) (1000 - (microtime(true) - $startedAt) * 1000000);
+                if (0 < $sleepFor) {
+                    usleep($sleepFor);
+                }
+            } else {
+                usleep(1000);
+            }
         }
 
         if ($this->processInformation['signaled'] && $this->processInformation['termsig'] !== $this->latestSignal) {

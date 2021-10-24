@@ -12,9 +12,13 @@
 namespace Symfony\Component\RateLimiter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
 use Symfony\Component\RateLimiter\RateLimit;
 
+/**
+ * @group time-sensitive
+ */
 class RateLimitTest extends TestCase
 {
     public function testEnsureAcceptedDoesNotThrowExceptionIfAccepted()
@@ -39,5 +43,15 @@ class RateLimitTest extends TestCase
         }
 
         $this->fail('RateLimitExceededException not thrown.');
+    }
+
+    public function testWaitUsesMicrotime()
+    {
+        ClockMock::register(RateLimit::class);
+        $rateLimit = new RateLimit(10, new \DateTimeImmutable('+2500 ms'), true, 10);
+
+        $start = microtime(true);
+        $rateLimit->wait(); // wait 2.5 seconds
+        $this->assertEqualsWithDelta($start + 2.5, microtime(true), 0.1);
     }
 }

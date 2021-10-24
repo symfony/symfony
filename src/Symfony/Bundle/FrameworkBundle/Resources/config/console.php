@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerLintCommand;
 use Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand;
 use Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand;
+use Symfony\Bundle\FrameworkBundle\Command\MailerSendCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsDecryptToLocalCommand;
@@ -147,6 +148,12 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.event_dispatcher_debug', EventDispatcherDebugCommand::class)
             ->args([
                 tagged_locator('event_dispatcher.dispatcher', 'name'),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.mailer_send', MailerSendCommand::class)
+            ->args([
+                service('mailer'),
             ])
             ->tag('console.command')
 

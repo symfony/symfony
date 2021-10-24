@@ -533,6 +533,16 @@ class FrameworkExtension extends Extension
             }
         }
 
+        if ($this->httpClientConfigEnabled = $this->isConfigEnabled($container, $config['http_client'])) {
+            $this->registerHttpClientConfiguration($config['http_client'], $container, $loader, $config['profiler']);
+        }
+
+        if ($this->mailerConfigEnabled = $this->isConfigEnabled($container, $config['mailer'])) {
+            $this->registerMailerConfiguration($config['mailer'], $container, $loader);
+        } else {
+            $container->removeDefinition('console.command.mailer_send');
+        }
+
         // notifier depends on messenger, mailer being registered
         if ($this->notifierConfigEnabled = $this->isConfigEnabled($container, $config['notifier'])) {
             $this->registerNotifierConfiguration($config['notifier'], $container, $loader);

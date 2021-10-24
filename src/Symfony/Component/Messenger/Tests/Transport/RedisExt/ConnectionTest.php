@@ -133,6 +133,9 @@ class ConnectionTest extends TestCase
     {
         yield 'Password only' => ['password', 'redis://password@localhost/queue'];
         yield 'User and password' => [['user', 'password'], 'redis://user:password@localhost/queue'];
+        yield 'User and colon' => ['user', 'redis://user:@localhost/queue'];
+        yield 'Colon and password' => ['password', 'redis://:password@localhost/queue'];
+        yield 'Colon and falsy password' => ['0', 'redis://:0@localhost/queue'];
     }
 
     public function testNoAuthWithEmptyPassword()

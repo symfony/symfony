@@ -93,12 +93,14 @@ class Connection
         $stream = $pathParts[1] ?? $redisOptions['stream'] ?? null;
         $group = $pathParts[2] ?? $redisOptions['group'] ?? null;
         $consumer = $pathParts[3] ?? $redisOptions['consumer'] ?? null;
+        $pass = '' !== ($parsedUrl['pass'] ?? '') ? $parsedUrl['pass'] : null;
+        $user = '' !== ($parsedUrl['user'] ?? '') ? $parsedUrl['user'] : null;
 
         $connectionCredentials = [
             'host' => $parsedUrl['host'] ?? '127.0.0.1',
             'port' => $parsedUrl['port'] ?? 6379,
             // See: https://github.com/phpredis/phpredis/#auth
-            'auth' => isset($parsedUrl['pass']) && isset($parsedUrl['user']) ? [$parsedUrl['user'], $parsedUrl['pass']] : $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
+            'auth' => null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user),
         ];
 
         if (isset($parsedUrl['query'])) {

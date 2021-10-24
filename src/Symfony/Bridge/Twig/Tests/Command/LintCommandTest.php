@@ -14,7 +14,9 @@ namespace Symfony\Bridge\Twig\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Command\LintCommand;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -134,7 +136,27 @@ class LintCommandTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $tester = new CommandCompletionTester($this->createCommand());
+
+        $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
+    }
+
     private function createCommandTester(): CommandTester
+    {
+        return new CommandTester($this->createCommand());
+    }
+
+    private function createCommand(): Command
     {
         $environment = new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/'));
         $environment->addFilter(new TwigFilter('deprecated_filter', function ($v) {
@@ -145,9 +167,8 @@ class LintCommandTest extends TestCase
 
         $application = new Application();
         $application->add($command);
-        $command = $application->find('lint:twig');
 
-        return new CommandTester($command);
+        return $application->find('lint:twig');
     }
 
     private function createFile($content): string

@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-10-19T16:49:50Z
+
+ref #41202 :)
+
+---------------------------------------------------------------------------
+
+by alirezamirsepassi at 2021-10-19T17:02:59Z
+
+> ref #41202 :)
+
+Oh sorry, didn't see that! :)
+
+I suppose #41202 PR could not be merged right away because of lacking test and configurable attributes since May 13.
+I would really appreciate it if @nicolas-grekas and @fabpot could help here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-20T09:36:46Z
+
+Oh, please also add a changelog entry in the component
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-20T09:38:09Z
+
+And can you please prepare a PR for the doc?

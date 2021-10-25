@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Completion\CompletionInterface;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Output\BashCompletionOutput;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
@@ -107,9 +106,9 @@ final class CompleteCommand extends Command
                     $this->log('  Completing option names for the <comment>'.\get_class($command instanceof LazyCommand ? $command->getCommand() : $command).'</> command.');
 
                     $suggestions->suggestOptions($command->getDefinition()->getOptions());
-                } elseif ($command instanceof CompletionInterface) {
+                } else {
                     $this->log([
-                        '  Completing using the <comment>'.\get_class($command).'</> class.',
+                        '  Completing using the <comment>'.\get_class($command instanceof LazyCommand ? $command->getCommand() : $command).'</> class.',
                         '  Completing <comment>'.$completionInput->getCompletionType().'</> for <comment>'.$completionInput->getCompletionName().'</>',
                     ]);
                     if (null !== $compval = $completionInput->getCompletionValue()) {

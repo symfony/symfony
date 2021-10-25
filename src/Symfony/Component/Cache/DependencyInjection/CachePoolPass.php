@@ -203,8 +203,18 @@ class CachePoolPass implements CompilerPassInterface
             }
         }
 
+        $allPoolsKeys = array_keys($allPools);
+
         if ($container->hasDefinition('console.command.cache_pool_list')) {
-            $container->getDefinition('console.command.cache_pool_list')->replaceArgument(0, array_keys($allPools));
+            $container->getDefinition('console.command.cache_pool_list')->replaceArgument(0, $allPoolsKeys);
+        }
+
+        if ($container->hasDefinition('console.command.cache_pool_clear')) {
+            $container->getDefinition('console.command.cache_pool_clear')->addArgument($allPoolsKeys);
+        }
+
+        if ($container->hasDefinition('console.command.cache_pool_delete')) {
+            $container->getDefinition('console.command.cache_pool_delete')->addArgument($allPoolsKeys);
         }
     }
 

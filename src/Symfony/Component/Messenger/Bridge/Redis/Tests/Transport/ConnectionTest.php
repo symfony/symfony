@@ -115,7 +115,7 @@ class ConnectionTest extends TestCase
 
         $redis->expects($this->exactly(3))->method('xreadgroup')
             ->with('symfony', 'consumer', ['queue' => 0], 1, null)
-            ->willReturn(['queue' => [['message' => '{"body":"Test","headers":[]}']]]);
+            ->willReturn(['queue' => [['message' => json_encode(['body' => 'Test', 'headers' => []])]]]);
 
         $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
         $this->assertNotNull($connection->get());
@@ -141,6 +141,9 @@ class ConnectionTest extends TestCase
     {
         yield 'Password only' => ['password', 'redis://password@localhost/queue'];
         yield 'User and password' => [['user', 'password'], 'redis://user:password@localhost/queue'];
+        yield 'User and colon' => ['user', 'redis://user:@localhost/queue'];
+        yield 'Colon and password' => ['password', 'redis://:password@localhost/queue'];
+        yield 'Colon and falsy password' => ['0', 'redis://:0@localhost/queue'];
     }
 
     public function testAuthFromOptions()

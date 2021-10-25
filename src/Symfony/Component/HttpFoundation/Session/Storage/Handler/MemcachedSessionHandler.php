@@ -38,7 +38,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
      *
      * List of available options:
      *  * prefix: The prefix to use for the memcached keys in order to avoid collision
-     *  * expiretime: The time to live in seconds.
+     *  * ttl: The time to live in seconds.
      *
      * @throws \InvalidArgumentException When unsupported options are passed
      */
@@ -46,11 +46,11 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     {
         $this->memcached = $memcached;
 
-        if ($diff = array_diff(array_keys($options), ['prefix', 'expiretime'])) {
+        if ($diff = array_diff(array_keys($options), ['prefix', 'expiretime', 'ttl'])) {
             throw new \InvalidArgumentException(sprintf('The following options are not supported "%s".', implode(', ', $diff)));
         }
 
-        $this->ttl = isset($options['expiretime']) ? (int) $options['expiretime'] : 86400;
+        $this->ttl = $options['expiretime'] ?? $options['ttl'] ?? null;
         $this->prefix = $options['prefix'] ?? 'sf2s';
     }
 
@@ -69,7 +69,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
 
     public function updateTimestamp(string $sessionId, string $data): bool
     {
-        $this->memcached->touch($this->prefix.$sessionId, time() + $this->ttl);
+        $this->memcached->touch($this->prefix.$sessionId, time() + (int) ($this->ttl ?? ini_get('session.gc_maxlifetime')));
 
         return true;
     }
@@ -79,7 +79,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
      */
     protected function doWrite(string $sessionId, string $data): bool
     {
-        return $this->memcached->set($this->prefix.$sessionId, $data, time() + $this->ttl);
+        return $this->memcached->set($this->prefix.$sessionId, $data, time() + (int) ($this->ttl ?? ini_get('session.gc_maxlifetime')));
     }
 
     /**

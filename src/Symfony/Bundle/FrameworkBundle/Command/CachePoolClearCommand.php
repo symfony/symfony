@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,12 +32,14 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 final class CachePoolClearCommand extends Command
 {
     private $poolClearer;
+    private $poolNames;
 
-    public function __construct(Psr6CacheClearer $poolClearer)
+    public function __construct(Psr6CacheClearer $poolClearer, array $poolNames = null)
     {
         parent::__construct();
 
         $this->poolClearer = $poolClearer;
+        $this->poolNames = $poolNames;
     }
 
     /**
@@ -111,5 +115,12 @@ EOF
         $io->success('Cache was successfully cleared.');
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if (\is_array($this->poolNames) && $input->mustSuggestArgumentValuesFor('pools')) {
+            $suggestions->suggestValues($this->poolNames);
+        }
     }
 }

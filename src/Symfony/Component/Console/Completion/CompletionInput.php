@@ -33,7 +33,6 @@ final class CompletionInput extends ArgvInput
 
     private $tokens;
     private $currentIndex;
-    private $indexToArgumentIndex = [];
     private $completionType;
     private $completionName = null;
     private $completionValue = '';
@@ -58,7 +57,7 @@ final class CompletionInput extends ArgvInput
      */
     public static function fromTokens(array $tokens, int $currentIndex): self
     {
-        $input = new static($tokens);
+        $input = new self($tokens);
         $input->tokens = $tokens;
         $input->currentIndex = $currentIndex;
 
@@ -117,7 +116,11 @@ final class CompletionInput extends ArgvInput
             }
 
             $this->completionName = $argumentName;
-            $this->completionValue = \is_array($argumentValue ?? '') ? $argumentValue[array_key_last($argumentValue)] : $argumentValue;
+            if (\is_array($argumentValue)) {
+                $this->completionValue = $argumentValue ? $argumentValue[array_key_last($argumentValue)] : null;
+            } else {
+                $this->completionValue = $argumentValue;
+            }
         }
 
         if ($this->currentIndex >= \count($this->tokens)) {
@@ -141,7 +144,7 @@ final class CompletionInput extends ArgvInput
      * TYPE_OPTION_NAME    when completing the name of an input option
      * TYPE_NONE           when nothing should be completed
      *
-     * @return self::TYPE_* TYPE_OPTION_NAME and TYPE_NONE are already implemented by the Console component
+     * @return string One of self::TYPE_* constants. TYPE_OPTION_NAME and TYPE_NONE are already implemented by the Console component
      */
     public function getCompletionType(): string
     {
@@ -185,17 +188,6 @@ final class CompletionInput extends ArgvInput
         }
 
         return $parseOptions;
-    }
-
-    private function getOptionValueFromToken(string $optionToken): string
-    {
-        if (str_starts_with($optionToken, '--')) {
-            // long option name
-            return $this->getParameterOption($optionToken) ?: '';
-        }
-
-        // short option name (might include value already if it directly followed the name)
-        return $this->getParameterOption(substr($optionToken, 0, 2)) ?: '';
     }
 
     private function getOptionFromToken(string $optionToken): ?InputOption

@@ -92,6 +92,7 @@ class CompletionInputTest extends TestCase
 
     public function provideBindWithLastArrayArgumentData()
     {
+        yield [CompletionInput::fromTokens(['bin/console'], 1), null];
         yield [CompletionInput::fromTokens(['bin/console', 'symfony', 'sensiolabs'], 3), null];
         yield [CompletionInput::fromTokens(['bin/console', 'symfony', 'sen'], 2), 'sen'];
     }

@@ -53,6 +53,18 @@ class PhpSerializerTest extends TestCase
         ]);
     }
 
+    public function testDecodingFailsWithBadBase64Body()
+    {
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessageMatches('/Could not decode/');
+
+        $serializer = new PhpSerializer();
+
+        $serializer->decode([
+            'body' => 'x',
+        ]);
+    }
+
     public function testDecodingFailsWithBadClass()
     {
         $this->expectException(MessageDecodingFailedException::class);

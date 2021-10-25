@@ -240,7 +240,8 @@ class ContextListener extends AbstractListener
                     $context = ['provider' => \get_class($provider), 'username' => $refreshedUser->getUserIdentifier()];
 
                     if ($token instanceof SwitchUserToken) {
-                        $context['impersonator_username'] = $token->getUserIdentifier();
+                        $originalToken = $token->getOriginalToken();
+                        $context['impersonator_username'] = $originalToken->getUserIdentifier();
                     }
 
                     $this->logger->debug('User was reloaded from a user provider.', $context);

@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class ListCommandTest extends TestCase
@@ -111,5 +112,36 @@ list         List commands
 EOF;
 
         $this->assertEquals($output, trim($commandTester->getDisplay(true)));
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        require_once realpath(__DIR__.'/../Fixtures/FooCommand.php');
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $tester = new CommandCompletionTester($application->get('list'));
+        $suggestions = $tester->complete($input, 2);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'option --format' => [
+            ['--format', ''],
+            ['txt', 'xml', 'json', 'md'],
+        ];
+
+        yield 'namespace' => [
+            [''],
+            ['_global', 'foo'],
+        ];
+
+        yield 'namespace started' => [
+            ['f'],
+            ['_global', 'foo'],
+        ];
     }
 }

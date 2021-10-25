@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,6 +29,13 @@ final class DumpCompletionCommand extends Command
 {
     protected static $defaultName = 'completion';
     protected static $defaultDescription = 'Dump the shell completion script';
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('shell')) {
+            $suggestions->suggestValues($this->getSupportedShells());
+        }
+    }
 
     protected function configure()
     {
@@ -82,9 +91,7 @@ EOH
         $shell = $input->getArgument('shell') ?? self::guessShell();
         $completionFile = __DIR__.'/../Resources/completion.'.$shell;
         if (!file_exists($completionFile)) {
-            $supportedShells = array_map(function ($f) {
-                return pathinfo($f, \PATHINFO_EXTENSION);
-            }, glob(__DIR__.'/../Resources/completion.*'));
+            $supportedShells = $this->getSupportedShells();
 
             ($output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output)
                 ->writeln(sprintf('<error>Detected shell "%s", which is not supported by Symfony shell completion (supported shells: "%s").</>', $shell, implode('", "', $supportedShells)));
@@ -112,5 +119,15 @@ EOH
         $process->run(function (string $type, string $line) use ($output): void {
             $output->write($line);
         });
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getSupportedShells(): array
+    {
+        return array_map(function ($f) {
+            return pathinfo($f, \PATHINFO_EXTENSION);
+        }, glob(__DIR__.'/../Resources/completion.*'));
     }
 }

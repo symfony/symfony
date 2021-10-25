@@ -85,6 +85,7 @@ class Worker
 
         while (false === $this->shouldStop) {
             $envelopeHandled = false;
+            $envelopeHandledStart = microtime(true);
             foreach ($this->receivers as $transportName => $receiver) {
                 if ($queueNames) {
                     $envelopes = $receiver->getFromQueues($queueNames);
@@ -111,10 +112,12 @@ class Worker
                 }
             }
 
-            if (false === $envelopeHandled) {
+            if (!$envelopeHandled) {
                 $this->dispatchEvent(new WorkerRunningEvent($this, true));
 
-                usleep($options['sleep']);
+                if (0 < $sleep = (int) ($options['sleep'] - 1e6 * (microtime(true) - $envelopeHandledStart))) {
+                    usleep($sleep);
+                }
             }
         }
 

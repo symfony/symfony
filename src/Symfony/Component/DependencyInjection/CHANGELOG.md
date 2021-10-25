@@ -12,7 +12,7 @@ CHANGELOG
 
 5.4
 ---
-
+ * Add `$defaultIndexMethod` and `$defaultPriorityMethod` to `TaggedIterator` and `TaggedLocator` attributes
  * Add `service_closure()` to the PHP-DSL
  * Add support for autoconfigurable attributes on methods, properties and parameters
  * Make auto-aliases private by default

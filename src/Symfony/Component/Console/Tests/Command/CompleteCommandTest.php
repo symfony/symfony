@@ -16,7 +16,6 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\CompleteCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Completion\CompletionInterface;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -115,7 +114,7 @@ class CompleteCommandTest extends TestCase
     }
 }
 
-class CompleteCommandTest_HelloCommand extends Command implements CompletionInterface
+class CompleteCommandTest_HelloCommand extends Command
 {
     public function configure(): void
     {

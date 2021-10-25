@@ -27,7 +27,7 @@ final class NoLimiter implements LimiterInterface
 {
     public function reserve(int $tokens = 1, float $maxTime = null): Reservation
     {
-        return new Reservation(time(), new RateLimit(\PHP_INT_MAX, new \DateTimeImmutable(), true, \PHP_INT_MAX));
+        return new Reservation(microtime(true), new RateLimit(\PHP_INT_MAX, new \DateTimeImmutable(), true, \PHP_INT_MAX));
     }
 
     public function consume(int $tokens = 1): RateLimit

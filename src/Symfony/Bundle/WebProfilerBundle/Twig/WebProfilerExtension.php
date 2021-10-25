@@ -71,8 +71,14 @@ class WebProfilerExtension extends ProfilerExtension
         ];
     }
 
-    public function dumpData(Environment $env, Data $data, int $maxDepth = 0)
+    /**
+     * @param Data|mixed $data
+     */
+    public function dumpData(Environment $env, $data, int $maxDepth = 0)
     {
+        if (!$data instanceof Data) {
+            $data = (new VarCloner)->cloneVar($data);
+        }
         $this->dumper->setCharset($env->getCharset());
         $this->dumper->dump($data, null, [
             'maxDepth' => $maxDepth,

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-10-25T14:59:47Z
+
+This issue was initially fixed on the `4.4` branch in #43484 but broke when merging `4.4` into `5.3`.

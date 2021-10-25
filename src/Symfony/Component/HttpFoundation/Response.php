@@ -408,8 +408,6 @@ class Response
      * Sets the response content.
      *
      * @return $this
-     *
-     * @throws \UnexpectedValueException
      */
     public function setContent(?string $content)
     {

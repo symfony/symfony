@@ -25,6 +25,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnInactivityLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
@@ -72,6 +73,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('failure-limit', 'f', InputOption::VALUE_REQUIRED, 'The number of failed messages the worker can consume'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can handle new messages'),
+                new InputOption('inactivity-limit', 'i', InputOption::VALUE_REQUIRED, 'The time in seconds after which a worker without messages will stop'),
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
@@ -103,6 +105,11 @@ Use the --time-limit option to stop the worker when the given time limit (in sec
 If a message is being handled, the worker will stop after the processing is finished:
 
     <info>php %command.full_name% <receiver-name> --time-limit=3600</info>
+
+Use the --inactivity-limit option to stop the worker when no messages has been handled in the given time limit (in seconds).
+If a message is being handled, the worker will stop after the processing is finished:
+
+    <info>php %command.full_name% <receiver-name> --inactivity-limit=60</info>
 
 Use the --bus option to specify the message bus to dispatch received messages
 to instead of trying to determine it automatically. This is required if the
@@ -190,6 +197,11 @@ EOF
         if ($timeLimit = $input->getOption('time-limit')) {
             $stopsWhen[] = "been running for {$timeLimit}s";
             $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitListener($timeLimit, $this->logger));
+        }
+
+        if ($inactivityLimit = $input->getOption('inactivity-limit')) {
+            $stopsWhen[] = "is idle for {$inactivityLimit}s";
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnInactivityLimitListener($inactivityLimit, $this->logger));
         }
 
         $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';

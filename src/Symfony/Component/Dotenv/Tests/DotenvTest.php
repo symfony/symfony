@@ -226,12 +226,20 @@ class DotenvTest extends TestCase
 
     public function testLoadEnv()
     {
-        unset($_ENV['FOO']);
-        unset($_ENV['BAR']);
-        unset($_SERVER['FOO']);
-        unset($_SERVER['BAR']);
-        putenv('FOO');
-        putenv('BAR');
+        $resetContext = static function (): void {
+            unset($_ENV['SYMFONY_DOTENV_VARS']);
+            unset($_ENV['FOO']);
+            unset($_ENV['BAR']);
+            unset($_ENV['TEST_APP_ENV']);
+            unset($_SERVER['SYMFONY_DOTENV_VARS']);
+            unset($_SERVER['FOO']);
+            unset($_SERVER['BAR']);
+            unset($_SERVER['TEST_APP_ENV']);
+            putenv('SYMFONY_DOTENV_VARS');
+            putenv('FOO');
+            putenv('BAR');
+            putenv('TEST_APP_ENV');
+        };
 
         @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
 
@@ -239,6 +247,7 @@ class DotenvTest extends TestCase
 
         // .env
 
+        $resetContext();
         file_put_contents($path, 'FOO=BAR');
         (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('BAR', getenv('FOO'));
@@ -246,6 +255,7 @@ class DotenvTest extends TestCase
 
         // .env.local
 
+        $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'local';
         file_put_contents("$path.local", 'FOO=localBAR');
         (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
@@ -253,32 +263,34 @@ class DotenvTest extends TestCase
 
         // special case for test
 
+        $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'test';
         (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('BAR', getenv('FOO'));
 
         // .env.dev
 
-        unset($_SERVER['TEST_APP_ENV']);
+        $resetContext();
         file_put_contents("$path.dev", 'FOO=devBAR');
         (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('devBAR', getenv('FOO'));
 
         // .env.dev.local
 
+        $resetContext();
         file_put_contents("$path.dev.local", 'FOO=devlocalBAR');
         (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('devlocalBAR', getenv('FOO'));
 
         // .env.dist
 
+        $resetContext();
         unlink($path);
         file_put_contents("$path.dist", 'BAR=distBAR');
         (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('distBAR', getenv('BAR'));
 
-        putenv('FOO');
-        putenv('BAR');
+        $resetContext();
         unlink("$path.dist");
         unlink("$path.local");
         unlink("$path.dev");

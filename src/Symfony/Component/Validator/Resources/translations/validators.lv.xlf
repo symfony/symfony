@@ -340,15 +340,15 @@
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
-                <target>Šai vērtībāi jābūt pozitīvai.</target>
+                <target>Šai vērtībai jābūt pozitīvai.</target>
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>Šai vērtībāi jābūt pozitīvai vai vienādai ar nulli.</target>
+                <target>Šai vērtībai jābūt pozitīvai vai vienādai ar nulli.</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
-                <target>Šai vērtībāi jābūt negatīvai.</target>
+                <target>Šai vērtībai jābūt negatīvai.</target>
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>

@@ -48,10 +48,10 @@ class RateLimitTest extends TestCase
     public function testWaitUsesMicrotime()
     {
         ClockMock::register(RateLimit::class);
-        $rateLimit = new RateLimit(10, new \DateTimeImmutable('+2500 ms'), true, 10);
+        $retryAfter = time() + 2.5; // get timestamp in the middle of a second (xxx.5)
+        $rateLimit = new RateLimit(10, \DateTimeImmutable::createFromFormat('U.u', $retryAfter), true, 10);
 
-        $start = microtime(true);
-        $rateLimit->wait(); // wait 2.5 seconds
-        $this->assertEqualsWithDelta($start + 2.5, microtime(true), 0.1);
+        $rateLimit->wait(); // wait until $retryAfter (~2.5 seconds)
+        $this->assertEqualsWithDelta($retryAfter, microtime(true), 0.49);
     }
 }

@@ -11,6 +11,7 @@ CHANGELOG
  * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
  * Add log when worker should stop.
  * Add log when `SIGTERM` is received.
+ * Add a new `inactivity-limit` option to the consume command.
 
 5.3
 ---

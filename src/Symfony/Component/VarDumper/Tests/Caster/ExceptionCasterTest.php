@@ -17,10 +17,8 @@ use Symfony\Component\VarDumper\Caster\ExceptionCaster;
 use Symfony\Component\VarDumper\Caster\FrameStub;
 use Symfony\Component\VarDumper\Caster\TraceStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
-use Symfony\Component\VarDumper\Tests\Fixtures\DumpClassWithErrors;
 
 class ExceptionCasterTest extends TestCase
 {

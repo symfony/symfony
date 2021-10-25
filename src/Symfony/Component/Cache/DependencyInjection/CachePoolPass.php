@@ -237,11 +237,11 @@ class CachePoolPass implements CompilerPassInterface
         }
 
         if ($container->hasDefinition('console.command.cache_pool_clear')) {
-            $container->getDefinition('console.command.cache_pool_clear')->replaceArgument(1, $allPoolsKeys);
+            $container->getDefinition('console.command.cache_pool_clear')->addArgument($allPoolsKeys);
         }
 
         if ($container->hasDefinition('console.command.cache_pool_delete')) {
-            $container->getDefinition('console.command.cache_pool_delete')->replaceArgument(1, $allPoolsKeys);
+            $container->getDefinition('console.command.cache_pool_delete')->addArgument($allPoolsKeys);
         }
     }
 

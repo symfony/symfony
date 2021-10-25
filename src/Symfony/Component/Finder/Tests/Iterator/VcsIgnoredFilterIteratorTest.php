@@ -202,6 +202,15 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
         ];
     }
 
+    public function testAcceptAtRootDirectory()
+    {
+        $inner = new InnerNameIterator([__FILE__]);
+
+        $iterator = new VcsIgnoredFilterIterator($inner, '/');
+
+        $this->assertIterator([__FILE__], $iterator);
+    }
+
     private function toAbsolute(array $files): array
     {
         foreach ($files as &$path) {

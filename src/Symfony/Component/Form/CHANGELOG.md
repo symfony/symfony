@@ -7,6 +7,7 @@ CHANGELOG
  * Deprecate calling `FormErrorIterator::children()` if the current element is not iterable.
  * Allow to pass `TranslatableMessage` objects to the `help` option
  * Add the `EnumType`
+ * Deprecate usage of `UrlType` without option `'default_protocol_skip_email' => true`, added to prevent emails from being converted to valid URLs.
 
 5.3
 ---

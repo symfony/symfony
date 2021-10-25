@@ -27,7 +27,13 @@ class UrlType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (null !== $options['default_protocol']) {
-            $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
+            $subscriber = new FixUrlProtocolListener($options['default_protocol']);
+            if ($options['default_protocol_skip_email']) {
+                $subscriber->skipEmail();
+            } else {
+                trigger_deprecation('symfony/form', '5.4', 'Type "%s" option "default_protocol_skip_email" will be "true" in 6.0.', static::class);
+            }
+            $builder->addEventSubscriber($subscriber);
         }
     }
 
@@ -54,9 +60,11 @@ class UrlType extends AbstractType
                     ? $previousValue
                     : 'Please enter a valid URL.';
             },
+            'default_protocol_skip_email' => false,
         ]);
 
         $resolver->setAllowedTypes('default_protocol', ['null', 'string']);
+        $resolver->setAllowedTypes('default_protocol_skip_email', 'bool');
     }
 
     /**

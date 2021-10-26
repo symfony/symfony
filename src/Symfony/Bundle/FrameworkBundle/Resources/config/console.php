@@ -224,7 +224,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('console.command')
 
-        ->set('console.command.translation_update', TranslationUpdateCommand::class)
+        ->set('console.command.translation_extract', TranslationUpdateCommand::class)
             ->args([
                 service('translation.writer'),
                 service('translation.reader'),

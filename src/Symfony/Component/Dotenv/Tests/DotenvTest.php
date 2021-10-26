@@ -485,24 +485,30 @@ class DotenvTest extends TestCase
 
     public function testBootEnv()
     {
+        $resetContext = static function (): void {
+            unset($_SERVER['SYMFONY_DOTENV_VARS'], $_ENV['SYMFONY_DOTENV_VARS']);
+            unset($_SERVER['TEST_APP_ENV'], $_ENV['TEST_APP_ENV']);
+            unset($_SERVER['TEST_APP_DEBUG'], $_ENV['TEST_APP_DEBUG']);
+            unset($_SERVER['FOO'], $_ENV['FOO']);
+        };
+
         @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
         $path = tempnam($tmpdir, 'sf-');
 
         file_put_contents($path, 'FOO=BAR');
+        $resetContext();
         (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path);
-
         $this->assertSame('BAR', $_SERVER['FOO']);
-
-        unset($_SERVER['FOO'], $_ENV['FOO']);
         unlink($path);
 
         file_put_contents($path.'.local.php', '<?php return ["TEST_APP_ENV" => "dev", "FOO" => "BAR"];');
+        $resetContext();
         (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path);
         $this->assertSame('BAR', $_SERVER['FOO']);
         $this->assertSame('1', $_SERVER['TEST_APP_DEBUG']);
-
-        unset($_SERVER['FOO'], $_ENV['FOO']);
         unlink($path.'.local.php');
+
+        $resetContext();
         rmdir($tmpdir);
     }
 }

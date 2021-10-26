@@ -18,7 +18,7 @@ use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\PersistingStoreInterface;
+use Symfony\Component\Lock\SharedLockStoreInterface;
 
 /**
  * PostgreSqlStore is a PersistingStoreInterface implementation using
@@ -276,7 +276,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         }
     }
 
-    private function getInternalStore(): PersistingStoreInterface
+    private function getInternalStore(): SharedLockStoreInterface
     {
         $namespace = spl_object_hash($this->getConnection());
 

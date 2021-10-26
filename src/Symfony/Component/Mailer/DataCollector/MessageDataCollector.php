@@ -43,6 +43,14 @@ final class MessageDataCollector extends DataCollector
     }
 
     /**
+     * @internal
+     */
+    public function base64Encode(string $data): string
+    {
+        return base64_encode($data);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function reset()

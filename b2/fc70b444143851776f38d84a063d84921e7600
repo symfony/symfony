@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-10-26T15:15:15Z
+
+needed to make the tests green again after #43579 has been merged from `5.3` into `5.4`

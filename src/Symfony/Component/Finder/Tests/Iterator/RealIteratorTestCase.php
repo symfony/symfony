@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Tests\FinderTest;
+
 abstract class RealIteratorTestCase extends IteratorTestCase
 {
     protected static $tmpDir;
@@ -44,6 +47,10 @@ abstract class RealIteratorTestCase extends IteratorTestCase
             'qux/baz_100_1.py',
         ];
 
+        if (FinderTest::class === static::class) {
+            self::$files[] = 'gitignore/';
+        }
+
         self::$files = self::toAbsolute(self::$files);
 
         if (is_dir(self::$tmpDir)) {
@@ -65,14 +72,39 @@ abstract class RealIteratorTestCase extends IteratorTestCase
 
         touch(self::toAbsolute('foo/bar.tmp'), strtotime('2005-10-15'));
         touch(self::toAbsolute('test.php'), strtotime('2005-10-15'));
+
+        if (FinderTest::class === static::class) {
+            $fs = new Filesystem();
+            $fs->mirror(__DIR__.'/../Fixtures/gitignore', self::toAbsolute('gitignore'));
+
+            foreach ([
+                'gitignore/search_root/a.txt',
+                'gitignore/search_root/c.txt',
+                'gitignore/search_root/dir/b.txt',
+                'gitignore/search_root/dir/c.txt',
+                'gitignore/git_root/search_root/a.txt',
+                'gitignore/git_root/search_root/c.txt',
+                'gitignore/git_root/search_root/dir/b.txt',
+                'gitignore/git_root/search_root/dir/c.txt',
+            ] as $file) {
+                $fs->touch(self::toAbsolute($file));
+            }
+
+            $fs->mkdir(self::toAbsolute('gitignore/git_root/.git'));
+        }
     }
 
     public static function tearDownAfterClass(): void
     {
-        $paths = new \RecursiveIteratorIterator(
-             new \RecursiveDirectoryIterator(self::$tmpDir, \RecursiveDirectoryIterator::SKIP_DOTS),
-             \RecursiveIteratorIterator::CHILD_FIRST
-         );
+        try {
+            $paths = new \RecursiveIteratorIterator(
+                 new \RecursiveDirectoryIterator(self::$tmpDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                 \RecursiveIteratorIterator::CHILD_FIRST
+            );
+        } catch (\UnexpectedValueException $exception) {
+            // open_basedir restriction in effect
+            return;
+        }
 
         foreach ($paths as $path) {
             if ($path->isDir()) {

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-10-20T17:10:31Z
+
+Just asking: would replacing `http_build_query()` by `array_walk_recursive()` hurt performance noticeably in real-world scenarios?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-21T05:44:28Z
+
+Those arrays are pretty small, any impact should be neglectible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-26T16:13:04Z
+
+/cc @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-10-26T17:02:57Z
+
+Thanks for taking over Nicolas 👍

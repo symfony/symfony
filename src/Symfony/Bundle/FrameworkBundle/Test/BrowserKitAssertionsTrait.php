@@ -94,6 +94,11 @@ trait BrowserKitAssertionsTrait
         ), $message);
     }
 
+    public static function assertResponseIsUnprocessable(string $message = ''): void
+    {
+        self::assertThatForResponse(new ResponseConstraint\ResponseIsUnprocessable(), $message);
+    }
+
     public static function assertBrowserHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
         self::assertThatForClient(new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain), $message);

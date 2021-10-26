@@ -433,14 +433,18 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 ->ignoreVCSIgnored(true)
         );
 
-        copy(__DIR__.'/Fixtures/gitignore/b.txt', __DIR__.'/Fixtures/gitignore/a.txt');
-        copy(__DIR__.'/Fixtures/gitignore/dir/a.txt', __DIR__.'/Fixtures/gitignore/dir/b.txt');
+        copy(__DIR__.'/Fixtures/gitignore/search_root/b.txt', __DIR__.'/Fixtures/gitignore/search_root/a.txt');
+        copy(__DIR__.'/Fixtures/gitignore/search_root/b.txt', __DIR__.'/Fixtures/gitignore/search_root/c.txt');
+        copy(__DIR__.'/Fixtures/gitignore/search_root/dir/a.txt', __DIR__.'/Fixtures/gitignore/search_root/dir/b.txt');
+        copy(__DIR__.'/Fixtures/gitignore/search_root/dir/a.txt', __DIR__.'/Fixtures/gitignore/search_root/dir/c.txt');
 
         $this->assertIterator($this->toAbsoluteFixtures([
-            'gitignore/b.txt',
-            'gitignore/dir',
-            'gitignore/dir/a.txt',
-        ]), $finder->in(__DIR__.'/Fixtures/gitignore')->getIterator());
+            'gitignore/search_root/b.txt',
+            'gitignore/search_root/c.txt',
+            'gitignore/search_root/dir',
+            'gitignore/search_root/dir/a.txt',
+            'gitignore/search_root/dir/c.txt',
+        ]), $finder->in(__DIR__.'/Fixtures/gitignore/search_root')->getIterator());
     }
 
     public function testIgnoreVCSCanBeDisabledAfterFirstIteration()

@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-19T10:03:09Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-20T10:54:16Z
+
+Thanks for the PR, I think moving attributes resolution from `AutowirePass` to `AttributeAutoconfigurationPass` is a nice approach.
+
+Yet I see three issues that should be fixed to me:
+- this targets 5.4 while 5.3 is affected
+- this requires enabling autoconfiguration (as seen in patched tests)
+- this moves registering the attributes to FrameworkBundle (as seen in patched tests and highlighted by @stof).
+
+I think all 3 issues can be solved by patching `AttributeAutoconfigurationPass` on 5.3 so that it hardcodes a special behavior for those two attributes (they were already hardcoded in `AutowirePass` anyway.). This should allow *not* patching most test cases, which is desired.
+
+---------------------------------------------------------------------------
+
+by Okhoshi at 2021-10-20T12:11:15Z
+
+Thanks for the comments !
+
+Is it possible to target 5.3 since the `AttributeAutoconfigurationPass` has drastically changed with 5.4 ? AFAIK, there's no logic to apply attributes from parameters, only on the classes.
+
+When you say that you would hardcode the attributes in the `AttributeAutoconfigurationPass`, do you mean that you would register them in the `$parameterAttributeConfigurators` or that you would hardcode the transformation in `processValue` directly ?
+As a personal taste, I would do the former, but it would still require enabling the autoconfiguration. By passing the autoconfiguration would likely require deep changes in `AttributeAutoconfiguration`.
+
+As a side note, I had to change the behavior of `ResolveInstanceofConditionalsPass` to recursively resolve nested Definition (without that, one of the tests was not passing anymore).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-20T12:23:32Z
+
+We need to fix this issue in 5.3, and I don't have a better idea.
+We should not require autconfiguration to be enabled as that'd be a behavior change (booo scary BC breaks :ghost:).
+It'd suggest starting with a copy/paste from 5.4 and then removing everything that is not strictly needed to fix this issue, while keeping the common parts as near as possible to ease merging up.
+
+> I had to change the behavior of ResolveInstanceofConditionalsPass to recursively resolve nested Definition
+
+Yes, I didn't full grasp this part but I'll review more carefully after the rest is fixed :)
+
+---------------------------------------------------------------------------
+
+by Okhoshi at 2021-10-20T21:33:16Z
+
+@nicolas-grekas I pushed a rework of the branch. It works with the IntegrationTest, but it breaks some tests on the side, mainly because the `AttributeAutoconfigurationPass` needs to run every time now (I spotted errors in the tests because getConstructor was called on a Definition for which the factory was not existing, not sure how I should handle that ?)
+
+I'll fix the other tests tomorrow.
+
+Also, I noticed that #43386 has been merged on 5.4 only and it's modifying the tags, so conflicts will arise :(.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-22T18:07:10Z
+
+I figured out an even simpler patch, PR updated.

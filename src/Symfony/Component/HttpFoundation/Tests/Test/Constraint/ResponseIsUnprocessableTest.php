@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Test\Constraint;
 
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\TestFailure;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseIsUnprocessable;
 

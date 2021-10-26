@@ -175,6 +175,33 @@ class IntegrationTest extends TestCase
         $this->assertSame($container->get('foo'), $container->get(DecoratedServiceLocator::class)->get('foo'));
     }
 
+    public function testAliasDecoratedService()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('service', ServiceLocator::class)
+            ->setPublic(true)
+            ->setArguments([[]])
+        ;
+        $container->register('decorator', DecoratedServiceLocator::class)
+            ->setDecoratedService('service')
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+        $container->setAlias(ServiceLocator::class, 'decorator.inner')
+            ->setPublic(true)
+        ;
+        $container->register('user_service', DecoratedServiceLocator::class)
+            ->setAutowired(true)
+        ;
+
+        $container->compile();
+
+        $this->assertInstanceOf(DecoratedServiceLocator::class, $container->get('service'));
+        $this->assertInstanceOf(ServiceLocator::class, $container->get(ServiceLocator::class));
+        $this->assertSame($container->get('service'), $container->get('decorator'));
+    }
+
     /**
      * @dataProvider getYamlCompileTests
      */

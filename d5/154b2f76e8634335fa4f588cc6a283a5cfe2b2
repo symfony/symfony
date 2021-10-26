@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-25T19:05:08Z
+
+Yes, this should go to 4.4.
+
+Is there a way to test this form before we accept it? I'm curious to see it in action.
+
+---------------------------------------------------------------------------
+
+by colinodell at 2021-10-25T19:17:15Z
+
+Per GitHub's documentation:
+
+> Issue templates are stored on the repository's default branch, in a hidden `.github/ISSUE_TEMPLATE` directory. If you create a template in another branch, it will not be available for collaborators to use.
+
+Because this repository's default branch is currently 5.4 I've targeted this PR for that branch.  I can certainly retarget the branch to 4.4 if desired, but the contents in that branch will never be used, and the new form templates won't work until 4.4 gets merged up into 5.4.
+
+> Is there a way to test this form before we accept it? I'm curious to see it in action.
+
+Yep! The forms can be tested on my fork: https://github.com/colinodell/symfony/issues/new/choose Feel free to do as much testing as you'd like over there!

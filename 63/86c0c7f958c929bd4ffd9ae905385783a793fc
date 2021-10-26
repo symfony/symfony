@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by garak at 2021-10-23T15:18:49Z
+
+Failures in tests with php 7.2/7.4 look unrelated to this PR.
+I'm not sure about psalm errors, instead: I used the same phpdoc annotations of other similar tests...

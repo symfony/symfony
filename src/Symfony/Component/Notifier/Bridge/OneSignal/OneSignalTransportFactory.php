@@ -21,10 +21,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class OneSignalTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return OneSignalTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): OneSignalTransport
     {
         if ('onesignal' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'onesignal', $this->getSupportedSchemes());

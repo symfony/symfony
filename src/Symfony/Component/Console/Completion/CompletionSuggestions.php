@@ -28,7 +28,7 @@ class CompletionSuggestions
      *
      * @return $this
      */
-    public function suggestValue(string $value): self
+    public function suggestValue(string $value): static
     {
         $this->valueSuggestions[] = $value;
 
@@ -42,7 +42,7 @@ class CompletionSuggestions
      *
      * @return $this
      */
-    public function suggestValues(array $values): self
+    public function suggestValues(array $values): static
     {
         $this->valueSuggestions = array_merge($this->valueSuggestions, $values);
 
@@ -54,7 +54,7 @@ class CompletionSuggestions
      *
      * @return $this
      */
-    public function suggestOption(InputOption $option): self
+    public function suggestOption(InputOption $option): static
     {
         $this->optionSuggestions[] = $option;
 
@@ -68,7 +68,7 @@ class CompletionSuggestions
      *
      * @return $this
      */
-    public function suggestOptions(array $options): self
+    public function suggestOptions(array $options): static
     {
         foreach ($options as $option) {
             $this->suggestOption($option);

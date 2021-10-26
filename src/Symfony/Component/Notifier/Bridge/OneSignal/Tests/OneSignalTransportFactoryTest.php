@@ -20,10 +20,7 @@ use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
  */
 final class OneSignalTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return OneSignalTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): OneSignalTransportFactory
     {
         return new OneSignalTransportFactory();
     }

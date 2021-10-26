@@ -990,8 +990,8 @@ class AutowirePassTest extends TestCase
             ->setAutowired(true)
         ;
 
-        (new AutowirePass())->process($container);
         (new DecoratorServicePass())->process($container);
+        (new AutowirePass())->process($container);
 
         $definition = $container->getDefinition(Decorator::class);
         $this->assertSame(Decorator::class.'.inner', (string) $definition->getArgument(1));
@@ -1013,8 +1013,8 @@ class AutowirePassTest extends TestCase
             ->setAutowired(true)
         ;
 
-        (new AutowirePass())->process($container);
         (new DecoratorServicePass())->process($container);
+        (new AutowirePass())->process($container);
 
         $definition = $container->getDefinition(DecoratedDecorator::class);
         $this->assertSame(DecoratedDecorator::class.'.inner', (string) $definition->getArgument(0));
@@ -1031,8 +1031,8 @@ class AutowirePassTest extends TestCase
             ->setAutowired(true)
         ;
 
-        (new AutowirePass())->process($container);
         (new DecoratorServicePass())->process($container);
+        (new AutowirePass())->process($container);
 
         $definition = $container->getDefinition(Decorator::class);
         $this->assertSame('renamed', (string) $definition->getArgument(1));
@@ -1049,11 +1049,12 @@ class AutowirePassTest extends TestCase
             ->setAutowired(true)
         ;
 
+        (new DecoratorServicePass())->process($container);
         try {
             (new AutowirePass())->process($container);
             $this->fail('AutowirePass should have thrown an exception');
         } catch (AutowiringFailedException $e) {
-            $this->assertSame('Cannot autowire service "Symfony\Component\DependencyInjection\Tests\Compiler\NonAutowirableDecorator": argument "$decorated1" of method "__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\DecoratorInterface" but no such service exists. You should maybe alias this interface to one of these existing services: "Symfony\Component\DependencyInjection\Tests\Compiler\Decorated", "Symfony\Component\DependencyInjection\Tests\Compiler\NonAutowirableDecorator".', (string) $e->getMessage());
+            $this->assertSame('Cannot autowire service "Symfony\Component\DependencyInjection\Tests\Compiler\NonAutowirableDecorator": argument "$decorated1" of method "__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\DecoratorInterface" but no such service exists. You should maybe alias this interface to one of these existing services: "Symfony\Component\DependencyInjection\Tests\Compiler\NonAutowirableDecorator", "Symfony\Component\DependencyInjection\Tests\Compiler\NonAutowirableDecorator.inner".', (string) $e->getMessage());
         }
     }
 

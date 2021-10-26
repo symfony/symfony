@@ -126,7 +126,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         });
 
         $this->expectException(OutOfBoundsException::class);
-        $this->expectExceptionMessage('The argument "2" doesn\'t exist.');
+        $this->expectExceptionMessageMatches('/^The argument "2" doesn\'t exist.*\.$/');
 
         $container->getDefinition('limiter.without_lock')->getArgument(2);
     }

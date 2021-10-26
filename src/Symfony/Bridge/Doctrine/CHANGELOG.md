@@ -11,6 +11,7 @@ CHANGELOG
 
  * Add `DoctrineOpenTransactionLoggerMiddleware` to log when a transaction has been left open
  * Deprecate `PdoCacheAdapterDoctrineSchemaSubscriber` and add `DoctrineDbalCacheAdapterSchemaSubscriber` instead
+ * `UniqueEntity` constraint retrieves a maximum of two entities if the default repository method is used.
 
 5.3
 ---

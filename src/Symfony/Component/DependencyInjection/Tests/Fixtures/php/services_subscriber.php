@@ -44,6 +44,7 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
+            '.service_locator.DlIAmAe' => true,
             '.service_locator.t5IGRMW' => true,
             '.service_locator.zFfA7ng' => true,
             '.service_locator.zFfA7ng.foo_service' => true,

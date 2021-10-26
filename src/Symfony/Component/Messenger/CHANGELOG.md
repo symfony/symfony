@@ -11,6 +11,7 @@ CHANGELOG
 5.4
 ---
 
+ * Add `AsMessageHandler` attribute for declaring message handlers on PHP 8.
  * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
  * Add support for resetting container services after each messenger message.
  * Added `WorkerMetadata` class which allows you to access the configuration details of a worker, like `queueNames` and `transportNames` it consumes from.

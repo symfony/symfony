@@ -141,6 +141,10 @@ class LintCommandTest extends TestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
+        if (!class_exists(CommandCompletionTester::class)) {
+            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+        }
+
         $tester = new CommandCompletionTester($this->createCommand());
 
         $this->assertSame($expectedSuggestions, $tester->complete($input));

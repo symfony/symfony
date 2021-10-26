@@ -298,7 +298,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.secrets_list', SecretsListCommand::class)
             ->args([
                 service('secrets.vault'),
-                service('secrets.local_vault'),
+                service('secrets.local_vault')->ignoreOnInvalid(),
             ])
             ->tag('console.command')
 
@@ -312,7 +312,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.secrets_encrypt_from_local', SecretsEncryptFromLocalCommand::class)
             ->args([
                 service('secrets.vault'),
-                service('secrets.local_vault'),
+                service('secrets.local_vault')->ignoreOnInvalid(),
             ])
             ->tag('console.command')
     ;

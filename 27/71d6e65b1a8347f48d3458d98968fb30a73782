@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-07-23T13:03:56Z
+
+To make the trait usable in 5.4 without WTF, we would need a way to opt-in for the new behavior (here, there is nothing that will stop registering other private methods, with no way to avoid the deprecation warning if they are not meant to be subscribed)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-23T13:11:32Z
+
+What about deprecating the trait instead?
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-07-23T13:12:32Z
+
+> To make the trait usable in 5.4 without WTF, we would need a way to opt-in for the new behavior
+
+What about, if using the attribute on any method, you've opted into the new way and methods without the attribute are ignored?
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-07-23T13:13:01Z
+
+> What about deprecating the trait instead?
+
+And creating a new trait entirely? Suggestions on a new name? `SubscribedServiceTrait`?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-07-23T13:13:02Z
+
+Well, providing an easy implemention of the `getSubscribedServices` method to provide better DX might make sense.
+but maybe it should be a new trait entirely instead (and deprecating the existing one)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-23T13:17:19Z
+
+I was considering deprecating the trait and not replacing it, but if you think we should keep it, no need to create a new one if we can make a nice deprecation layer.
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-07-23T13:25:36Z
+
+> I was considering deprecating the trait and not replacing it, but if you think we should keep it...
+
+I personally like this feature so I think we should keep it but I understand it's a bit... controversial (and could be easily abused).
+
+If you're ok keeping it, I'll add the nice deprecation layer and finish this PR. Alternatively, if you want to deprecate/remove, I can easily maintain this feature in a 3rd party package.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-07-23T13:28:53Z
+
+I'm fine keeping it now that we have it.
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-07-23T15:14:43Z
+
+I've updated/added tests and improved the deprecation layer:
+
+1. Symfony 5.4 with PHP < 8, everything works as it does currently (no deprecation warnings).
+2. Symfony 5.4 with PHP > 8 and using the trait on a class w/o any methods marked with the `SubscribedService` attribute, works as it does currently but a deprecation warning is triggered.
+2. Symfony 5.4 with PHP > 8 and using the trait on a class with at least one method marked with the `SubscribedService` attribute, you've opted-into the new functionality (methods w/o the attribute are ignored).
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-07-23T15:37:13Z
+
+I could use some direction on fixing the remaining CI errors.
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-10-20T13:37:55Z
+
+Assuming this is still wanted for 5.4, once merged, I'll work on a PR to drop the deprecation layer in 6.0.
+
+Still need a bit of direction for fixing the tests. I believe it's a dependency issue, `symfony/dependency-injection` is requiring the wrong version of `symfony/service-contracts`.
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-10-20T15:31:05Z
+
+I believe all related tests are now passing. I fixed some pslam issues but don't understand the remaining ones.

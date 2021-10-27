@@ -7,7 +7,7 @@ CHANGELOG
  * Add a `CssColor` constraint to validate CSS colors
  * Add support for `ConstraintViolationList::createFromMessage()`
  * Add error's uid to `Count` and `Length` constraints with "exactly" option enabled
- * Deprecated email validation mode `loose`; will be removed in Symfony 6 in favor of `html5` (= new default)
+ * Deprecate email validation mode `loose`, use `html5` instead
 
 5.3
 ---

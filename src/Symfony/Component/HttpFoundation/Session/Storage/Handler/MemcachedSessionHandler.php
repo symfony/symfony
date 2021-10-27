@@ -26,7 +26,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     /**
      * Time to live in seconds.
      */
-    private int $ttl;
+    private ?int $ttl;
 
     /**
      * Key prefix for shared environments.
@@ -50,7 +50,10 @@ class MemcachedSessionHandler extends AbstractSessionHandler
             throw new \InvalidArgumentException(sprintf('The following options are not supported "%s".', implode(', ', $diff)));
         }
 
-        $this->ttl = $options['expiretime'] ?? $options['ttl'] ?? null;
+        if ($options['expiretime'] ?? $options['ttl'] ?? false) {
+            $this->ttl = $options['expiretime'] ?? $options['ttl'];
+        }
+
         $this->prefix = $options['prefix'] ?? 'sf2s';
     }
 

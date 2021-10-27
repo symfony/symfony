@@ -22,19 +22,6 @@ use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
 class ServiceSubscriberTraitTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
-    {
-        $expected = [LegacyTestService::class.'::aService' => '?'.Service2::class];
-
-        $this->assertEquals($expected, LegacyChildTestService::getSubscribedServices());
-    }
-
-    /**
-     * @requires PHP 8
-     */
     public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
     {
         $expected = [
@@ -64,22 +51,6 @@ class ParentTestService
     public function setContainer(ContainerInterface $container)
     {
         return $container;
-    }
-}
-
-class LegacyTestService extends ParentTestService implements ServiceSubscriberInterface
-{
-    use ServiceSubscriberTrait;
-
-    public function aService(): Service2
-    {
-    }
-}
-
-class LegacyChildTestService extends LegacyTestService
-{
-    public function aChildService(): Service3
-    {
     }
 }
 

@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "psr/container": "^1.1"
+        "psr/container": "^1.1",
+        "symfony/deprecation-contracts": "^2.1"
     },
     "conflict": {
         "ext-psr": "<1.1|>=2"

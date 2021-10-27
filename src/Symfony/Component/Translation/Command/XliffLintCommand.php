@@ -153,7 +153,7 @@ EOF
         libxml_clear_errors();
         libxml_use_internal_errors($internal);
 
-        return ['file' => $file, 'valid' => 0 === \count($errors), 'messages' => $errors];
+        return ['file' => $file, 'valid' => [] === $errors, 'messages' => $errors];
     }
 
     private function display(SymfonyStyle $io, array $files)

@@ -169,7 +169,7 @@ final class Headers
         $header->setMaxLineLength($this->lineLength);
         $name = strtolower($header->getName());
 
-        if (\in_array($name, self::UNIQUE_HEADERS, true) && isset($this->headers[$name]) && \count($this->headers[$name]) > 0) {
+        if (\in_array($name, self::UNIQUE_HEADERS, true) && isset($this->headers[$name]) && $this->headers[$name] !== []) {
             throw new LogicException(sprintf('Impossible to set header "%s" as it\'s already defined and must be unique.', $header->getName()));
         }
 

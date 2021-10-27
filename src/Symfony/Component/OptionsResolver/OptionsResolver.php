@@ -892,7 +892,7 @@ class OptionsResolver implements Options
         // Make sure that no unknown options are passed
         $diff = array_diff_key($options, $clone->defined);
 
-        if (\count($diff) > 0) {
+        if ($diff !== []) {
             ksort($clone->defined);
             ksort($diff);
 
@@ -909,7 +909,7 @@ class OptionsResolver implements Options
         // Check whether any required option is missing
         $diff = array_diff_key($clone->required, $clone->defaults);
 
-        if (\count($diff) > 0) {
+        if ($diff !== []) {
             ksort($diff);
 
             throw new MissingOptionsException(sprintf(\count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is missing.', $this->formatOptions(array_keys($diff))));
@@ -1092,7 +1092,7 @@ class OptionsResolver implements Options
                     $this->formatValue($value)
                 );
 
-                if (\count($printableAllowedValues) > 0) {
+                if ($printableAllowedValues !== []) {
                     $message .= sprintf(
                         ' Accepted values are: %s.',
                         $this->formatValues($printableAllowedValues)

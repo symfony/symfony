@@ -71,7 +71,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
             }
         }
 
-        if (\count($emptyKeys) > 0) {
+        if ($emptyKeys !== []) {
             if (\count($emptyKeys) == \count($this->keys)) {
                 // All keys empty
                 return null;

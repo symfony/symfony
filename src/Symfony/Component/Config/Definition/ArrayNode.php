@@ -312,7 +312,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
             $msg = sprintf('Unrecognized option%s "%s" under "%s"', 1 === \count($value) ? '' : 's', implode(', ', array_keys($value)), $this->getPath());
 
-            if (\count($guesses)) {
+            if ($guesses !== []) {
                 asort($guesses);
                 $msg .= sprintf('. Did you mean "%s"?', implode('", "', array_keys($guesses)));
             } else {

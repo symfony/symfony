@@ -27,7 +27,7 @@ abstract class AbstractRequestRateLimiter implements RequestRateLimiterInterface
     public function consume(Request $request): RateLimit
     {
         $limiters = $this->getLimiters($request);
-        if (0 === \count($limiters)) {
+        if ([] === $limiters) {
             $limiters = [new NoLimiter()];
         }
 

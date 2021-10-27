@@ -70,7 +70,7 @@ class ArrayToPartsTransformer implements DataTransformerInterface
             }
         }
 
-        if (\count($emptyKeys) > 0) {
+        if ($emptyKeys !== []) {
             if (\count($emptyKeys) === \count($this->partMapping)) {
                 // All parts empty
                 return null;

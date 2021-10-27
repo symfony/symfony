@@ -119,7 +119,7 @@ final class PropertyInfoLoader implements LoaderInterface
             }
             if (!$hasTypeConstraint) {
                 if (1 === \count($builtinTypes)) {
-                    if ($types[0]->isCollection() && \count($collectionValueType = $types[0]->getCollectionValueTypes()) > 0) {
+                    if ($types[0]->isCollection() && ($collectionValueType = $types[0]->getCollectionValueTypes()) !== []) {
                         [$collectionValueType] = $collectionValueType;
                         $this->handleAllConstraint($property, $allConstraint, $collectionValueType, $metadata);
                     }

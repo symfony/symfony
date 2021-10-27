@@ -80,7 +80,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
             $attributes['id'] = $options['id'];
         }
         $renderedAttributes = '';
-        if (\count($attributes) > 0) {
+        if ($attributes !== []) {
             $flags = \ENT_QUOTES | \ENT_SUBSTITUTE;
             foreach ($attributes as $attribute => $value) {
                 $renderedAttributes .= sprintf(

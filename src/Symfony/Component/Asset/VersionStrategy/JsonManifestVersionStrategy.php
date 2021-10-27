@@ -98,7 +98,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
         if ($this->strictMode) {
             $message = sprintf('Asset "%s" not found in manifest "%s".', $path, $this->manifestPath);
             $alternatives = $this->findAlternatives($path, $this->manifestData);
-            if (\count($alternatives) > 0) {
+            if ($alternatives !== []) {
                 $message .= sprintf(' Did you mean one of these? "%s".', implode('", "', $alternatives));
             }
 

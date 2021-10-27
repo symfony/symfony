@@ -674,7 +674,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $key = strtolower(str_replace('HTTP_', '', $key));
 
             if ('cookie' === $key) {
-                if (\count($request->cookies->all())) {
+                if ($request->cookies->all() !== []) {
                     return true;
                 }
             } elseif ($request->headers->has($key)) {

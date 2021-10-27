@@ -79,7 +79,7 @@ class MailjetApiTransport extends AbstractApiTransport
         }
 
         // The response needs to contains a 'Messages' key that is an array
-        if (!\array_key_exists('Messages', $result) || !\is_array($result['Messages']) || 0 === \count($result['Messages'])) {
+        if (!\array_key_exists('Messages', $result) || !\is_array($result['Messages']) || [] === $result['Messages']) {
             throw new HttpTransportException(sprintf('Unable to send an email: "%s" malformed api response.', $response->getContent(false)), $response);
         }
 

@@ -148,7 +148,7 @@ abstract class Constraint
                     $invalidOptions[] = $option;
                 }
             }
-        } elseif (null !== $options && !(\is_array($options) && 0 === \count($options))) {
+        } elseif (null !== $options && !(\is_array($options) && [] === $options)) {
             if (null === $defaultOption) {
                 throw new ConstraintDefinitionException(sprintf('No default option is configured for constraint "%s".', static::class));
             }
@@ -161,11 +161,11 @@ abstract class Constraint
             }
         }
 
-        if (\count($invalidOptions) > 0) {
+        if ($invalidOptions !== []) {
             throw new InvalidOptionsException(sprintf('The options "%s" do not exist in constraint "%s".', implode('", "', $invalidOptions), static::class), $invalidOptions);
         }
 
-        if (\count($missingOptions) > 0) {
+        if ($missingOptions !== []) {
             throw new MissingOptionsException(sprintf('The options "%s" must be set for constraint "%s".', implode('", "', array_keys($missingOptions)), static::class), array_keys($missingOptions));
         }
 

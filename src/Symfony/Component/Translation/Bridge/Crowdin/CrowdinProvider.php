@@ -64,7 +64,7 @@ final class CrowdinProvider implements ProviderInterface
 
         foreach ($translatorBag->getCatalogues() as $catalogue) {
             foreach ($catalogue->getDomains() as $domain) {
-                if (0 === \count($catalogue->all($domain))) {
+                if ([] === $catalogue->all($domain)) {
                     continue;
                 }
 
@@ -218,7 +218,7 @@ final class CrowdinProvider implements ProviderInterface
             }
 
             $offset += $limit;
-        } while (\count($strings) > 0);
+        } while ($strings !== []);
 
         return $result;
     }

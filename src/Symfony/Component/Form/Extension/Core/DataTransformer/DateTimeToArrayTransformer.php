@@ -127,7 +127,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             }
         }
 
-        if (\count($emptyFields) > 0) {
+        if ($emptyFields !== []) {
             throw new TransformationFailedException(sprintf('The fields "%s" should not be empty.', implode('", "', $emptyFields)));
         }
 

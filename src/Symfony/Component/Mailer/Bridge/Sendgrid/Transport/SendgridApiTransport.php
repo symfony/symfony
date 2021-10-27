@@ -137,11 +137,11 @@ class SendgridApiTransport extends AbstractApiTransport
             }
         }
 
-        if (\count($categories) > 0) {
+        if ($categories !== []) {
             $payload['categories'] = $categories;
         }
 
-        if (\count($customArguments) > 0) {
+        if ($customArguments !== []) {
             $personalization['custom_args'] = $customArguments;
         }
 

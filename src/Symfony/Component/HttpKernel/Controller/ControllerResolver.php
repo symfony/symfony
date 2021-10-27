@@ -200,7 +200,7 @@ class ControllerResolver implements ControllerResolverInterface
 
         $message = sprintf('Expected method "%s" on class "%s"', $method, $className);
 
-        if (\count($alternatives) > 0) {
+        if ($alternatives !== []) {
             $message .= sprintf(', did you mean "%s"?', implode('", "', $alternatives));
         } else {
             $message .= sprintf('. Available methods: "%s".', implode('", "', $collection));

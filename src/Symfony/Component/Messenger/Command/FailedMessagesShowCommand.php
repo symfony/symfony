@@ -120,7 +120,7 @@ EOF
             ];
         }
 
-        if (0 === \count($rows)) {
+        if ([] === $rows) {
             $io->success('No failed messages were found.');
 
             return;

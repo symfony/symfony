@@ -201,7 +201,7 @@ class GenericMetadata implements MetadataInterface
      */
     public function hasConstraints()
     {
-        return \count($this->constraints) > 0;
+        return $this->constraints !== [];
     }
 
     /**

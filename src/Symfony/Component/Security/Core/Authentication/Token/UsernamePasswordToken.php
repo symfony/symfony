@@ -49,7 +49,7 @@ class UsernamePasswordToken extends AbstractToken
         $this->credentials = $credentials ?? null;
         $this->firewallName = $firewallName;
 
-        parent::setAuthenticated(\count($roles) > 0, false);
+        parent::setAuthenticated($roles !== [], false);
     }
 
     /**

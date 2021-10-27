@@ -289,7 +289,7 @@ class Connection
     {
         $availableOptions = array_keys(self::DEFAULT_OPTIONS);
 
-        if (0 < \count($invalidOptions = array_diff(array_keys($options), $availableOptions))) {
+        if ([] !== ($invalidOptions = array_diff(array_keys($options), $availableOptions))) {
             trigger_deprecation('symfony/messenger', '5.1', 'Invalid option(s) "%s" passed to the Redis Messenger transport. Passing invalid options is deprecated.', implode('", "', $invalidOptions));
         }
     }
@@ -317,7 +317,7 @@ class Connection
             }
         }
 
-        if (\count($claimableIds) > 0) {
+        if ($claimableIds !== []) {
             try {
                 $this->connection->xclaim(
                     $this->stream,

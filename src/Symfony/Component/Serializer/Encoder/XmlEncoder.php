@@ -265,7 +265,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
         $value = $this->parseXmlValue($node, $context);
 
-        if (!\count($data)) {
+        if ($data === []) {
             return $value;
         }
 

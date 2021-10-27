@@ -96,7 +96,7 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
         }
 
         $this->isRootDispatchCallRunning = false;
-        if (\count($exceptions) > 0) {
+        if ($exceptions !== []) {
             throw new DelayedMessageHandlingException($exceptions);
         }
 

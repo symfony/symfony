@@ -125,7 +125,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
                 $emptyFields[] = $field;
             }
         }
-        if (\count($emptyFields) > 0) {
+        if ($emptyFields !== []) {
             throw new TransformationFailedException(sprintf('The fields "%s" should not be empty.', implode('", "', $emptyFields)));
         }
         if (isset($value['invert']) && !\is_bool($value['invert'])) {

@@ -236,7 +236,7 @@ EOF
             : new MergeOperation($currentCatalogue, $extractedCatalogue);
 
         // Exit if no messages found.
-        if (!\count($operation->getDomains())) {
+        if ($operation->getDomains() === []) {
             $errorIo->warning('No translation messages were found.');
 
             return 0;

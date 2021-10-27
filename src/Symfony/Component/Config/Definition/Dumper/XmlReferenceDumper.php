@@ -187,7 +187,7 @@ class XmlReferenceDumper
         }
 
         // attribute comments
-        if (\count($rootAttributeComments)) {
+        if ($rootAttributeComments !== []) {
             foreach ($rootAttributeComments as $attrName => $comment) {
                 $commentDepth = $depth + 4 + \strlen($attrName) + 2;
                 $commentLines = explode("\n", $comment);
@@ -206,7 +206,7 @@ class XmlReferenceDumper
 
         // render start tag + attributes
         $rootIsVariablePrototype = isset($prototypeValue);
-        $rootIsEmptyTag = (0 === \count($rootChildren) && !$rootIsVariablePrototype);
+        $rootIsEmptyTag = ([] === $rootChildren && !$rootIsVariablePrototype);
         $rootOpenTag = '<'.$rootName;
         if (1 >= ($attributesCount = \count($rootAttributes))) {
             if (1 === $attributesCount) {

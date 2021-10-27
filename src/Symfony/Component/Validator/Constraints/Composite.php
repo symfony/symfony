@@ -99,7 +99,7 @@ abstract class Composite extends Constraint
             if (property_exists($constraint, 'groups')) {
                 $excessGroups = array_diff($constraint->groups, $this->groups);
 
-                if (\count($excessGroups) > 0) {
+                if ($excessGroups !== []) {
                     throw new ConstraintDefinitionException(sprintf('The group(s) "%s" passed to the constraint "%s" should also be passed to its containing constraint "%s".', implode('", "', $excessGroups), get_debug_type($constraint), static::class));
                 }
             } else {

@@ -1208,7 +1208,7 @@ class Request
             throw new SuspiciousOperationException(sprintf('Invalid Host "%s".', $host));
         }
 
-        if (\count(self::$trustedHostPatterns) > 0) {
+        if (self::$trustedHostPatterns !== []) {
             // to avoid host header injection attacks, you should provide a list of trusted host patterns
 
             if (\in_array($host, self::$trustedHosts)) {

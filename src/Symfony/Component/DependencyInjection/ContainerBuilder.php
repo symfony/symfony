@@ -1409,21 +1409,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * When parent packages are provided and if any of them is in dev-only mode,
      * the class will be considered available even if it is also in dev-only mode.
+     *
+     * @throws \LogicException If dependencies have been installed with Composer 1
      */
     final public static function willBeAvailable(string $package, string $class, array $parentPackages): bool
     {
-        $skipDeprecation = 3 < \func_num_args() && func_get_arg(3);
-        $hasRuntimeApi = class_exists(InstalledVersions::class);
-
-        if (!$hasRuntimeApi && !$skipDeprecation) {
-            trigger_deprecation('symfony/dependency-injection', '5.4', 'Calling "%s" when dependencies have been installed with Composer 1 is deprecated. Consider upgrading to Composer 2.', __METHOD__);
+        if (!class_exists(InstalledVersions::class)) {
+            throw new \LogicException(sprintf('Calling "%s" when dependencies have been installed with Composer 1 is not supported. Consider upgrading to Composer 2.', __METHOD__));
         }
 
         if (!class_exists($class) && !interface_exists($class, false) && !trait_exists($class, false)) {
             return false;
         }
 
-        if (!$hasRuntimeApi || !InstalledVersions::isInstalled($package) || InstalledVersions::isInstalled($package, false)) {
+        if (!InstalledVersions::isInstalled($package) || InstalledVersions::isInstalled($package, false)) {
             return true;
         }
 

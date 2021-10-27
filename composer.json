@@ -33,6 +33,7 @@
     },
     "require": {
         "php": ">=8.0.2",
+        "composer-runtime-api": ">=2.1",
         "ext-xml": "*",
         "friendsofphp/proxy-manager-lts": "^1.0.2",
         "doctrine/event-manager": "~1.0",

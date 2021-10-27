@@ -298,11 +298,11 @@ class ContextListener extends AbstractListener
 
     private function safelyUnserialize(string $serializedToken)
     {
-        $e = $token = null;
+        $token = null;
         $prevUnserializeHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
         $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler) {
             if (__FILE__ === $file) {
-                throw new \ErrorException($msg, 0x37313bc, $type, $file, $line);
+                throw new \ErrorException($msg, 0x37313BC, $type, $file, $line);
             }
 
             return $prevErrorHandler ? $prevErrorHandler($type, $msg, $file, $line, $context) : false;
@@ -310,17 +310,16 @@ class ContextListener extends AbstractListener
 
         try {
             $token = unserialize($serializedToken);
-        } catch (\Throwable $e) {
-        }
-        restore_error_handler();
-        ini_set('unserialize_callback_func', $prevUnserializeHandler);
-        if ($e) {
-            if (!$e instanceof \ErrorException || 0x37313bc !== $e->getCode()) {
+        } catch (\ErrorException $e) {
+            if (0x37313BC !== $e->getCode()) {
                 throw $e;
             }
             if ($this->logger) {
                 $this->logger->warning('Failed to unserialize the security token from the session.', ['key' => $this->sessionKey, 'received' => $serializedToken, 'exception' => $e]);
             }
+        } finally {
+            restore_error_handler();
+            ini_set('unserialize_callback_func', $prevUnserializeHandler);
         }
 
         return $token;
@@ -388,7 +387,7 @@ class ContextListener extends AbstractListener
      */
     public static function handleUnserializeCallback(string $class)
     {
-        throw new \ErrorException('Class not found: '.$class, 0x37313bc);
+        throw new \ErrorException('Class not found: '.$class, 0x37313BC);
     }
 
     /**

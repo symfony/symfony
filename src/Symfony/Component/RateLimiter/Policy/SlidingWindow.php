@@ -25,7 +25,7 @@ final class SlidingWindow implements LimiterStateInterface
     private int $hitCount = 0;
     private int $hitCountForLastWindow = 0;
     private int $intervalInSeconds;
-    private int $windowEndAt;
+    private float $windowEndAt;
     private bool $cached = true;
 
     public function __construct(string $id, int $intervalInSeconds)

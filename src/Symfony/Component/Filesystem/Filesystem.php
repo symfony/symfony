@@ -737,15 +737,10 @@ class Filesystem
         self::$lastError = null;
         set_error_handler(__CLASS__.'::handleError');
         try {
-            $result = $func(...$args);
+            return $func(...$args);
+        } finally {
             restore_error_handler();
-
-            return $result;
-        } catch (\Throwable $e) {
         }
-        restore_error_handler();
-
-        throw $e;
     }
 
     /**

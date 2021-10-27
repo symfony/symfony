@@ -254,14 +254,19 @@ class ArrayNodeTest extends TestCase
         };
 
         $prevErrorHandler = set_error_handler($deprecationHandler);
-        $node->finalize([]);
-        restore_error_handler();
-
+        try {
+            $node->finalize([]);
+        } finally {
+            restore_error_handler();
+        }
         $this->assertFalse($deprecationTriggered, '->finalize() should not trigger if the deprecated node is not set');
 
         $prevErrorHandler = set_error_handler($deprecationHandler);
-        $node->finalize(['foo' => []]);
-        restore_error_handler();
+        try {
+            $node->finalize(['foo' => []]);
+        } finally {
+            restore_error_handler();
+        }
         $this->assertTrue($deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
     }
 

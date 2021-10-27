@@ -223,6 +223,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
         $this->validator->validate('example@example..com', $constraint);
 
+        $this->expectDeprecation();
         $this->assertNoViolation();
     }
 

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-09-20T13:44:44Z
+
+@soyuka what is the state of this PR ?
+
+---------------------------------------------------------------------------
+
+by soyuka at 2021-10-22T12:11:05Z
+
+@stof I'm wondering as well, I'm really not sure that we've come to an agreement on what needs to be done. If the community knows exactly how we can go on, it'll be my pleasure to continue working on it!
+
+Do we actually want this feature?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-10-22T14:15:34Z
+
+I'd like to use this feature. Currently to always expose extended datime format I override datetime normalizer context in compiler pass.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-10-23T11:52:03Z
+
+I'm in favor of merging this feature
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-23T16:15:08Z
+
+Me too. @soyuka do you have time to finish it, or do you need help?
+
+---------------------------------------------------------------------------
+
+by soyuka at 2021-10-25T09:41:28Z
+
+No problem I'll finish this. About the code I should use `setBinding` then? Won't that be a possible conflict with userland? If someone declares a $defaultContext it'll overwrite ours right?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-25T09:58:56Z
+
+> No problem I'll finish this. About the code I should use `setBinding` then? Won't that be a possible conflict with userland? If someone declares a $defaultContext it'll overwrite ours right?
+
+yes 👍🏼

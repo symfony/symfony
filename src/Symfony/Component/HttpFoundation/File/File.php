@@ -87,8 +87,11 @@ class File extends \SplFileInfo
         $target = $this->getTargetFile($directory, $name);
 
         set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
-        $renamed = rename($this->getPathname(), $target);
-        restore_error_handler();
+        try {
+            $renamed = rename($this->getPathname(), $target);
+        } finally {
+            restore_error_handler();
+        }
         if (!$renamed) {
             throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s).', $this->getPathname(), $target, strip_tags($error)));
         }

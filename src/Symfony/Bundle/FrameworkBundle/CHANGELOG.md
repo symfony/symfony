@@ -37,6 +37,7 @@ CHANGELOG
  * Add support for resetting container services after each messenger message
  * Add `configureContainer()`, `configureRoutes()`, `getConfigDir()` and `getBundlesPath()` to `MicroKernelTrait`
  * Add support for configuring log level, and status code by exception class
+ * Bind the `default_context` parameter onto serializer's encoders and normalizers
 
 5.3
 ---

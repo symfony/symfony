@@ -524,11 +524,13 @@ class OptionsResolverTest extends TestCase
         });
         $e = error_reporting(0);
 
-        $configureOptions($this->resolver);
-        $this->resolver->resolve($options);
-
-        error_reporting($e);
-        restore_error_handler();
+        try {
+            $configureOptions($this->resolver);
+            $this->resolver->resolve($options);
+        } finally {
+            error_reporting($e);
+            restore_error_handler();
+        }
 
         $lastError = error_get_last();
         unset($lastError['file'], $lastError['line']);

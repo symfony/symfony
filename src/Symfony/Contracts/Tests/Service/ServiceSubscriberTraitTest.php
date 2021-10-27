@@ -13,15 +13,34 @@ namespace Symfony\Contracts\Tests\Service;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Component1\Dir1\Service1;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Component1\Dir2\Service2;
+use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
 class ServiceSubscriberTraitTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
+    public function testLegacyMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
+    {
+        $expected = [LegacyTestService::class.'::aService' => '?'.Service2::class];
+
+        $this->assertEquals($expected, LegacyChildTestService::getSubscribedServices());
+    }
+
+    /**
+     * @requires PHP 8
+     */
     public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
     {
-        $expected = [TestService::class.'::aService' => '?Symfony\Contracts\Tests\Service\Service2'];
+        $expected = [
+            TestService::class.'::aService' => Service2::class,
+            TestService::class.'::nullableService' => '?'.Service2::class,
+        ];
 
         $this->assertEquals($expected, ChildTestService::getSubscribedServices());
     }
@@ -48,7 +67,7 @@ class ParentTestService
     }
 }
 
-class TestService extends ParentTestService implements ServiceSubscriberInterface
+class LegacyTestService extends ParentTestService implements ServiceSubscriberInterface
 {
     use ServiceSubscriberTrait;
 
@@ -57,9 +76,36 @@ class TestService extends ParentTestService implements ServiceSubscriberInterfac
     }
 }
 
-class ChildTestService extends TestService
+class LegacyChildTestService extends LegacyTestService
 {
     public function aChildService(): Service3
     {
     }
+}
+
+class TestService extends ParentTestService implements ServiceSubscriberInterface
+{
+    use ServiceSubscriberTrait;
+
+    #[SubscribedService]
+    public function aService(): Service2
+    {
+    }
+
+    #[SubscribedService]
+    public function nullableService(): ?Service2
+    {
+    }
+}
+
+class ChildTestService extends TestService
+{
+    #[SubscribedService]
+    public function aChildService(): Service3
+    {
+    }
+}
+
+class Service3
+{
 }

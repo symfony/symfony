@@ -265,6 +265,7 @@
     <xsd:complexType name="serializer">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="mapping" type="file_mapping" />
+            <xsd:element name="default-context" type="metadata" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />

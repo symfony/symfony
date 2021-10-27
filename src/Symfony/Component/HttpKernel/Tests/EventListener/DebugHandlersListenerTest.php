@@ -47,9 +47,10 @@ class DebugHandlersListenerTest extends TestCase
         try {
             $listener->configure();
         } catch (\Exception $exception) {
+        } finally {
+            restore_exception_handler();
+            restore_error_handler();
         }
-        restore_exception_handler();
-        restore_error_handler();
 
         if (null !== $exception) {
             throw $exception;
@@ -113,9 +114,10 @@ class DebugHandlersListenerTest extends TestCase
         try {
             $dispatcher->dispatch($event, ConsoleEvents::COMMAND);
         } catch (\Exception $exception) {
+        } finally {
+            restore_exception_handler();
+            restore_error_handler();
         }
-        restore_exception_handler();
-        restore_error_handler();
 
         if (null !== $exception) {
             throw $exception;

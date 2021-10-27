@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-05-26T11:47:08Z
+
+Dale, thanks for proposing this contribution! Don't worry about the actual contribution process because we have a lot of patience with newcomers. However, if you have any questions or comments during this process or if you don't feel treated well for any reasons, please tell us so we can quickly fix that. Thanks!
+
+---------------------------------------------------------------------------
+
+by dayallnash at 2021-05-26T11:55:41Z
+
+Thanks @javiereguiluz - I've got the PR in a state where it's passing all of the workflows now at least!
+
+---------------------------------------------------------------------------
+
+by dayallnash at 2021-05-28T07:52:25Z
+
+@carsonbot find me a reviewer please
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-28T07:53:15Z
+
+I'm sorry. I could not find any suitable reviewer.
+
+---------------------------------------------------------------------------
+
+by dayallnash at 2021-05-28T07:54:24Z
+
+>
+>
+> I'm sorry. I could not find any suitable reviewer.
+
+It's ok, you tried. Good bot.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-05-30T17:42:14Z
+
+Nice feature. Useful to return a 410 when a page is removed.
+
+---------------------------------------------------------------------------
+
+by dayallnash at 2021-06-02T08:15:23Z
+
+Sorry about all the commits - I am still getting my head around rebasing (I normally do merging instead). PR should be in a good state now for final review.
+
+---------------------------------------------------------------------------
+
+by dayallnash at 2021-06-04T11:56:56Z
+
+The failed tests on TravisCI (PHP 7.2 build) seem unrelated to my change
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-09T11:18:59Z
+
+There are a lot of commits in the PR that don't belong here. Can you sort that out?
+
+---------------------------------------------------------------------------
+
+by dayallnash at 2021-06-09T11:22:00Z
+
+>
+>
+> There are a lot of commits in the PR that don't belong here. Can you sort that out?
+
+I am trying - I just still don't understand rebasing yet. Every time I do it I am prompted to fix loads of conflicts and end up with loads of extra commits on the PR 😞
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-27T17:44:42Z
+
+To help finish this PR, I've squashed the commits, and rebased on the current 5.4 branch.

@@ -23,7 +23,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {
-        return new EmailValidator(Email::VALIDATION_MODE_HTML5);
+        return new EmailValidator(Email::VALIDATION_MODE_LOOSE);
     }
 
     public function testUnknownDefaultModeTriggerException()

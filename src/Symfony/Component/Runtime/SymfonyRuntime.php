@@ -40,6 +40,7 @@ class_exists(MissingDotenv::class, false) || class_exists(Dotenv::class) || clas
  *  - "prod_envs" to define the names of the production envs - defaults to ["prod"];
  *  - "test_envs" to define the names of the test envs - defaults to ["test"];
  *  - "use_putenv" to tell Dotenv to set env vars using putenv() (NOT RECOMMENDED.)
+ *  - "dotenv_overload" to tell Dotenv to override existing vars
  *
  * When the "debug" / "env" options are not defined, they will fallback to the
  * "APP_DEBUG" / "APP_ENV" environment variables, and to the "--env|-e" / "--no-debug"
@@ -84,6 +85,7 @@ class SymfonyRuntime extends GenericRuntime
      *   error_handler?: string|false,
      *   env_var_name?: string,
      *   debug_var_name?: string,
+     *   dotenv_overload?: ?bool,
      * } $options
      */
     public function __construct(array $options = [])
@@ -102,7 +104,7 @@ class SymfonyRuntime extends GenericRuntime
             (new Dotenv($envKey, $debugKey))
                 ->setProdEnvs((array) ($options['prod_envs'] ?? ['prod']))
                 ->usePutenv($options['use_putenv'] ?? false)
-                ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']));
+                ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $options['dotenv_overload'] ?? false);
             $options['debug'] ?? $options['debug'] = '1' === $_SERVER[$debugKey];
             $options['disable_dotenv'] = true;
         } else {

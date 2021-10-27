@@ -48,7 +48,7 @@ final class MercureTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('mercure://%s?%s', $this->hubId, http_build_query(['topic' => $this->topics]));
+        return sprintf('mercure://%s?%s', $this->hubId, http_build_query(['topic' => $this->topics], '', '&'));
     }
 
     public function supports(MessageInterface $message): bool

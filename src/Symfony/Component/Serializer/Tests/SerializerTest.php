@@ -997,7 +997,6 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
-    /** @requires PHP 8.0 */
     public function testCollectDenormalizationErrorsWithConstructor()
     {
         $json = '{"bool": "bool"}';

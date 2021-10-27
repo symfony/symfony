@@ -134,9 +134,6 @@ class ArgumentMetadataFactoryTest extends TestCase
         $this->assertCount(1, $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg'])[0]->getAttributes());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testIssue41478()
     {
         $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'issue41478']);

@@ -27,7 +27,7 @@ class ExtensionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container::willBeAvailable('symfony/asset', Packages::class, ['symfony/twig-bundle'])) {
+        if (!$container->hasDefinition('assets.packages') && !$container::willBeAvailable('symfony/asset', Packages::class, ['symfony/twig-bundle'])) {
             $container->removeDefinition('twig.extension.assets');
         }
 

@@ -214,7 +214,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
              ->assertRaised();
     }
 
-    /** 
+    /**
      * @group legacy
      */
     public function testModeLoose()

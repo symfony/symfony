@@ -26,7 +26,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     /**
      * Time to live in seconds.
      */
-    private int $ttl;
+    private ?int $ttl;
 
     /**
      * Key prefix for shared environments.

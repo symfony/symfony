@@ -40,7 +40,7 @@ class EmailValidator extends ConstraintValidator
             throw new \InvalidArgumentException('The "defaultMode" parameter value is not valid.');
         }
         
-        if ($defaultMode === Email::VALIDATION_MODE_LOOSE) {
+        if (Email::VALIDATION_MODE_LOOSE === $defaultMode) {
             trigger_deprecation('symfony/validator', '5.4', 'The email validation mode "loose" is deprecated; in Symfony 6.0 the default mode will be "html5".');
         }
 

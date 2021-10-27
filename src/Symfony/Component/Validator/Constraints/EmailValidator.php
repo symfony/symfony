@@ -78,7 +78,7 @@ class EmailValidator extends ConstraintValidator
         }
 
         if (Email::VALIDATION_MODE_LOOSE === $constraint->mode) {
-            trigger_deprecation('symfony/validator', '5.4', 'The email validation mode `loose` is deprecated since Symfony 5.4, and will be removed in Symfony 6.0 in favor of `html5` (= new default)');
+            trigger_deprecation('symfony/validator', '5.4', 'The "loose" email validation mode is deprecated, use "html5" instead');
         }
 
         if (!\in_array($constraint->mode, Email::$validationModes, true)) {

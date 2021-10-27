@@ -59,4 +59,19 @@ class TemplateControllerTest extends TestCase
         $this->assertEquals($expected, $controller->templateAction($templateName, null, null, null, $context)->getContent());
         $this->assertEquals($expected, $controller($templateName, null, null, null, $context)->getContent());
     }
+
+    public function testStatusCode()
+    {
+        $templateName = 'template_controller.html.twig';
+        $statusCode = 201;
+
+        $loader = new ArrayLoader();
+        $loader->setTemplate($templateName, '<h1>{{param}}</h1>');
+
+        $twig = new Environment($loader);
+        $controller = new TemplateController($twig);
+
+        $this->assertSame(201, $controller->templateAction($templateName, null, null, null, [], $statusCode)->getStatusCode());
+        $this->assertSame(200, $controller->templateAction($templateName)->getStatusCode());
+    }
 }

@@ -446,6 +446,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ],
             'serializer' => [
+                'default_context' => [],
                 'enabled' => !class_exists(FullStack::class),
                 'enable_annotations' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],

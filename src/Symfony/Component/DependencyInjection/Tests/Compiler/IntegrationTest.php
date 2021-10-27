@@ -384,9 +384,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedIteratorWithDefaultIndexMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -411,9 +408,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tag_class' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedIteratorWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -438,9 +432,6 @@ class IntegrationTest extends TestCase
         $this->assertSame([0 => $container->get(FooTagClass::class), 1 => $container->get(BarTagClass::class)], $param);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedIteratorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -491,9 +482,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo'));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedLocatorConfiguredViaAttributeWithoutIndex()
     {
         $container = new ContainerBuilder();
@@ -520,9 +508,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get(FooTagClass::class));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedLocatorWithDefaultIndexMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -549,9 +534,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedLocatorWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -582,9 +564,6 @@ class IntegrationTest extends TestCase
         self::assertSame([FooTagClass::class, BarTagClass::class], array_keys($factories->getValue($locator)));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -617,9 +596,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testNestedDefinitionWithAutoconfiguredConstructorArgument()
     {
         $container = new ContainerBuilder();
@@ -904,9 +880,6 @@ class IntegrationTest extends TestCase
         ], $collector->collectedTags);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTagsViaAttributeOnPropertyMethodAndParameter()
     {
         $container = new ContainerBuilder();

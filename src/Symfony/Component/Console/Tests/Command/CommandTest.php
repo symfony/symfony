@@ -420,9 +420,6 @@ class CommandTest extends TestCase
         $this->assertSame(['f'], $command->getAliases());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testDefaultCommand()
     {
         $apl = new Application();

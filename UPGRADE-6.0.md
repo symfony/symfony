@@ -498,7 +498,7 @@ Validator
       ->addDefaultDoctrineAnnotationReader();
   ```
   
-  * Removed email validation mode `loose`; default is now `html5`.
+  * Removed email validation mode `loose`; default is now `html5`
 
 Workflow
 --------

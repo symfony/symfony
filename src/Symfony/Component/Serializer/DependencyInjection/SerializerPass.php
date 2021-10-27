@@ -52,7 +52,7 @@ class SerializerPass implements CompilerPassInterface
         }
 
         $defaultContext = $container->getParameter('serializer.default_context');
-        foreach (array_keys(array_merge($container->findTaggedServiceIds($this->normalizerTag), $container->findTaggedServiceIds($this->encoderTag))) as $service) {
+        foreach (array_keys(array_merge($container->findTaggedServiceIds('serializer.normalizer'), $container->findTaggedServiceIds('serializer.encoder'))) as $service) {
             $definition = $container->getDefinition($service);
             $definition->setBindings(['array $defaultContext' => new BoundArgument($defaultContext, false)] + $definition->getBindings());
         }

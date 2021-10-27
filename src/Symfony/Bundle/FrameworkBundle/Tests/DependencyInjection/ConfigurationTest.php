@@ -412,7 +412,6 @@ class ConfigurationTest extends TestCase
                 'formatter' => 'translator.formatter.default',
                 'paths' => [],
                 'default_path' => '%kernel.project_dir%/translations',
-                'enabled_locales' => [],
                 'pseudo_localization' => [
                     'enabled' => false,
                     'accents' => true,

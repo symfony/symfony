@@ -151,3 +151,8 @@ Security
        }
    }
    ```
+
+Validator
+---------
+
+   * Deprecated email validation mode `loose`; will be removed in Symfony 6 in favor of `html5` (= new default)

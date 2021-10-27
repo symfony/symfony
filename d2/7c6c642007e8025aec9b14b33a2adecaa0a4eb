@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-10-27T10:12:54Z
+
+see https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/RateLimiter/Policy/SlidingWindow.php#L42 and https://github.com/symfony/symfony/blob/6.0/src/Symfony/Component/RateLimiter/Policy/SlidingWindow.php#L38

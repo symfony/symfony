@@ -64,16 +64,18 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider getValidEmails
      */
-    public function testValidEmails($email)
+    public function testValidEmailsLoose($email)
     {
-        $this->validator->validate($email, new Email());
+        $this->validator->validate($email, new Email(['mode' => Email::VALIDATION_MODE_LOOSE]));
 
+        $this->expectDeprecation('Since symfony/validator 5.4: The "loose" email validation mode is deprecated, use "html5" instead');
         $this->assertNoViolation();
     }
 
-    public function getValidEmails()
+    public function getValidEmailsLoose()
     {
         return [
             ['fabien@symfony.com'],

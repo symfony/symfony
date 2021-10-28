@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `Path` class
+ * Add `$lock` argument to `Filesystem::appendToFile()`
 
 5.0.0
 -----

@@ -22,7 +22,7 @@ Form
 ------
 
  * Deprecate calling `FormErrorIterator::children()` if the current element is not iterable.
- * Add `'default_protocol_skip_email' => true` to `UrlType` options.
+ * `UrlType` does not add the default protocol to urls that looks like emails or does not contain a dot or a slash.
 
 FrameworkBundle
 ---------------

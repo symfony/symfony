@@ -2296,7 +2296,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testUrlWithDefaultProtocol()
     {
         $url = 'http://www.example.com?foo1=bar1&foo2=bar2';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => 'http', 'default_protocol_skip_email' => true]);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => 'http']);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
@@ -2311,7 +2311,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testUrlWithoutDefaultProtocol()
     {
         $url = 'http://www.example.com?foo1=bar1&foo2=bar2';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => null, 'default_protocol_skip_email' => true]);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => null]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input

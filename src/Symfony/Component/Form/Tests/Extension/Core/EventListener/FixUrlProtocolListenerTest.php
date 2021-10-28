@@ -30,7 +30,6 @@ class FixUrlProtocolListenerTest extends TestCase
         $event = new FormEvent($form, $data);
 
         $filter = new FixUrlProtocolListener('http');
-        $filter->skipEmail();
         $filter->onSubmit($event);
 
         $this->assertEquals('http://www.symfony.com', $event->getData());
@@ -45,8 +44,6 @@ class FixUrlProtocolListenerTest extends TestCase
             ['h323://foo'],
             ['iris.beep://foo'],
             ['foo+bar://foo'],
-            ['fabien@symfony.com'],
-            ['Contact+42@subdomain.example.com'],
         ];
     }
 
@@ -59,7 +56,6 @@ class FixUrlProtocolListenerTest extends TestCase
         $event = new FormEvent($form, $url);
 
         $filter = new FixUrlProtocolListener('http');
-        $filter->skipEmail();
         $filter->onSubmit($event);
 
         $this->assertEquals($url, $event->getData());
@@ -67,18 +63,26 @@ class FixUrlProtocolListenerTest extends TestCase
 
     /**
      * @group legacy
+     * @dataProvider provideNonUrls
      */
-    public function testDeprecatedFixEmail()
+    public function testDeprecatedFixEmail($url)
     {
-        $this->expectDeprecation('Since symfony/form 5.4: Class "Symfony\Component\Form\Extension\Core\EventListener\FixUrlProtocolListener", will add a scheme to urls that looks like emails in 6.0. Call "setIgnoreEmail(true)"');
+        $this->expectDeprecation('Since symfony/form 5.4: Form type "url", does not add a default protocol to urls that looks like emails or does not contain a dot or slash.');
 
-        $data = 'fabien@symfony.com';
         $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
-        $event = new FormEvent($form, $data);
+        $event = new FormEvent($form, $url);
 
         $filter = new FixUrlProtocolListener('http');
         $filter->onSubmit($event);
 
-        $this->assertEquals('http://fabien@symfony.com', $event->getData());
+        $this->assertEquals($url, $event->getData());
+    }
+
+    public function provideNonUrls()
+    {
+        return [
+            ['fabien@symfony.com'],
+            ['foo'],
+        ];
     }
 }

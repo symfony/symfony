@@ -23,7 +23,6 @@ use Symfony\Component\Form\FormEvents;
 class FixUrlProtocolListener implements EventSubscriberInterface
 {
     private $defaultProtocol;
-    private $skipEmail = false;
 
     /**
      * @param string|null $defaultProtocol The URL scheme to add when there is none or null to not modify the data
@@ -33,24 +32,16 @@ class FixUrlProtocolListener implements EventSubscriberInterface
         $this->defaultProtocol = $defaultProtocol;
     }
 
-    /**
-     * @param bool $skipEmail the URL scheme is not added to values that match an email pattern
-     */
-    public function skipEmail(): void
-    {
-        $this->skipEmail = true;
-    }
-
     public function onSubmit(FormEvent $event)
     {
         $data = $event->getData();
 
         if ($this->defaultProtocol && $data && \is_string($data) && !preg_match('~^[\w+.-]+://~', $data)) {
-            if (preg_match('~^[^:/]+@[A-Za-z0-9-.]+\.[A-Za-z0-9]+$~', $data)) {
-                if ($this->skipEmail) {
-                    return;
-                }
-                trigger_deprecation('symfony/form', '5.4', 'Class "%s", will add a scheme to urls that looks like emails in 6.0. Call "setIgnoreEmail(true)"', __CLASS__);
+            // Detect email & non-url
+            if (preg_match('~^([^:/?@]++@|[^./]+$)~', $data)) {
+                trigger_deprecation('symfony/form', '5.4', 'Form type "url", does not add a default protocol to urls that looks like emails or does not contain a dot or slash.');
+
+                return;
             }
             $event->setData($this->defaultProtocol.'://'.$data);
         }

@@ -105,11 +105,4 @@ class UrlTypeTest extends TextTypeTest
         $this->assertSame($expectedData, $form->getNormData());
         $this->assertSame($expectedData, $form->getData());
     }
-
-    protected function getTestOptions(): array
-    {
-        return [
-            'default_protocol_skip_email' => true,
-        ];
-    }
 }

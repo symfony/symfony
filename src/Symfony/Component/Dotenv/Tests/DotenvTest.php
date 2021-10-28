@@ -544,7 +544,7 @@ class DotenvTest extends TestCase
         unset($_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS'], $_ENV['FOO']);
         $_SERVER['FOO'] = 'CCC';
 
-        (new Dotenv(false))->populate(['FOO' => 'BAR']);
+        (new Dotenv())->populate(['FOO' => 'BAR']);
 
         $this->assertSame('CCC', $_ENV['FOO']);
     }

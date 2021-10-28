@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-09-16T19:08:25Z
+
+Should we explore dedicated PHP8 class attributes?
+
+IIUC eg. `#[VotesOn(attributes, class)]` enables compling a warm cache?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-17T08:31:07Z
+
+> `#[VotesOn(attributes, class)]` enables compling a warm cache
+
+I don't know if we need an attribute for that, but what about a method that exposes what a voter cares about @jderusse, instead of the current approach?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-09-17T08:45:34Z
+
+@jderusse what about voters that vote only on `null` subjects (for instance the RoleVoter) ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-09-17T09:17:09Z
+
+@nicolas-grekas i generally like attributes enforcing static/cachable rules to us :) but runtime api also fits yes. As an end user taking care of such issues, an attribute looks elegant IMHO.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-09-17T09:25:01Z
+
+An attribute might make the architecture of the AccessDecisionManager harder, if we want to avoid calling Reflection on each `decide()` call. A `$voter instanceof CacheableAbstainVotesInterface` check is much more efficient than reading attributes at runtime. Having to implement a caching layer for the metadata of the caching layer seems weird to me.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-09-17T09:30:33Z
+
+Understood. I meant levaraging DI at compile time.
+
+Writing another set of support method implementations already bugs/confuses me somewhat. But it'll be the edge case... WFM.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-09-17T09:31:07Z
+
+> what about a method that exposes what a voter cares about instead of the current approach?
+
+Yeah, I hesitated with this approach: but it can not work for voters that use a pattern for attributes: ie RoleVoter => `ROLES_whatever` (Which one of the much-used Voters)
+
+> @jderusse what about voters that vote only on `null` subjects (for instance the RoleVoter) ?
+
+This will work: the current approach is to let voters reporting "I will always **abstain** for this attribute" and/or "I will always **abstain** for this object", everything else will always be called.
+
+If voters don't care about subjects (like RoleVoter) they can return `false` telling `I will **not** always abstain...` which means `call me, in all case`.
+
+The code will still be optimized because the voter will not be called when the attribute does not start with `ROLE_`
+
+note: to be accurate RoleVoter does not vote "only on null subject", they vote on "whatever the content of the subject".
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-10-20T21:51:50Z
+
+Cmments addressed, and tests added

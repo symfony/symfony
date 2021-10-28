@@ -24,23 +24,15 @@ class ValidationTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    /**
-     * @group legacy
-     */
     public function testCreateCallableValid()
     {
-        $validator = Validation::createCallable(new Email());
-        $this->expectDeprecation('Since symfony/validator 5.4: The "loose" email validation mode is deprecated, use "html5" instead');
+        $validator = Validation::createCallable(new Email(Email::VALIDATION_MODE_HTML5));
         $this->assertEquals('test@example.com', $validator('test@example.com'));
     }
 
-    /**
-     * @group legacy
-     */
     public function testCreateCallableInvalid()
     {
-        $validator = Validation::createCallable(new Email());
-        $this->expectDeprecation('Since symfony/validator 5.4: The "loose" email validation mode is deprecated, use "html5" instead');
+        $validator = Validation::createCallable(new Email(Email::VALIDATION_MODE_HTML5));
         try {
             $validator('test');
             $this->fail('No ValidationFailedException thrown');
@@ -53,23 +45,15 @@ class ValidationTest extends TestCase
         }
     }
 
-    /**
-     * @group legacy
-     */
     public function testCreateIsValidCallableValid()
     {
-        $validator = Validation::createIsValidCallable(new Email());
-        $this->expectDeprecation('Since symfony/validator 5.4: The "loose" email validation mode is deprecated, use "html5" instead');
+        $validator = Validation::createIsValidCallable(new Email(Email::VALIDATION_MODE_HTML5));
         $this->assertTrue($validator('test@example.com'));
     }
 
-    /**
-     * @group legacy
-     */
     public function testCreateIsValidCallableInvalid()
     {
-        $validator = Validation::createIsValidCallable(new Email());
-        $this->expectDeprecation('Since symfony/validator 5.4: The "loose" email validation mode is deprecated, use "html5" instead');
+        $validator = Validation::createIsValidCallable(new Email(Email::VALIDATION_MODE_HTML5));
         $this->assertFalse($validator('test', $violations));
         $this->assertCount(1, $violations);
         $this->assertEquals('This value is not a valid email address.', $violations->get(0)->getMessage());

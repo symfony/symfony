@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-26T16:47:28Z
+
+While at it, let's move the command to the component instead of fwb, wdyt?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-10-26T16:51:31Z
+
+When renaming a command, we need to have the old name as an alias of the new name in the command. Otherwise, it is a BC break for people calling the command in the CLI.
+
+@nicolas-grekas the command currently relies on getting the Kernel from the Application, which relies on the FrameworkBundle Application, so it does not make sense to move it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-26T16:57:04Z
+
+But the kernel can be injected to the constructor instead of relying on getApplication, isn't it?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-10-26T16:59:19Z
+
+@stof by alias do you mean something like that in console.php ?
+```
+->alias('console.command.translation_update', 'console.command.translation_extract')
+```
+
+@nicolas-grekas I'm not comfortable to move the command in the component right now (at least in this PR). Moreover it relies to the Kernel as @stof said, so I'm not sure we can move it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-26T17:07:02Z
+
+Moving means deprecating, we'd better not deprecate twice the same command, that's why I'm wondering.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-10-26T17:10:17Z
+
+@welcoMattic no, I'm not talking about aliasing the service. I'm talking about defining aliases for the command *name* in the Command itself
+
+---------------------------------------------------------------------------
+
+by stof at 2021-10-26T17:12:10Z
+
+Note that there is really 2 separate renamings here:
+
+- renaming the PHP class
+- renaming the CLI command
+
+If we are not sure the new location of the class, we might delay that class renaming until Symfony 6.1, doing only the command renaming before the feature freeze.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-10-26T17:14:16Z
+
+@stof Ok, I got it. But renaming the CLI command without renaming the file is kind of half done job. I'll try to move it to the Component, I'm just not sure about how to inject the Kernel (like any other service?).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-26T17:15:23Z
+
+>  we'd better not deprecate twice the same command
+
+Moving does not necessarily imply deprecating in this case since the command uses the kernel mainly for extracting translations from a given bundle. So the command could be split in one base command located in the component and one bundle-aware decorator in framework-bundle, as we did for yaml and twig lint commands.
+Also this move could apply to other translation commands, I vote for postponing it.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-10-26T17:16:00Z
+
+@welcoMattic I would still say more than half, as it is the part of the renaming that solves the DX issue (devs using FrameworkBundle don't care about the class names of commands, as FrameworkBundle is registering them)
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-10-26T17:25:44Z
+
+I've just push the renaming of the CLI command only, with the deprecation trigger in case of usage of `translation:update`.
+Are we ok to postpone the renaming/moving of the file to 6.1?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-27T19:44:10Z
+
+When deprecating something, we try to keep at least one test covering the legacy behavior. Can you please do that?
+Rebase needed also
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-10-28T07:08:40Z
+
+@chalasr thanks for the advice, it's done [here](https://github.com/symfony/symfony/pull/43758/files#diff-31da7cae0444fc6b56e28552e06cde537747f528d5fec6af7c551ff36330928fR32), rebase too.

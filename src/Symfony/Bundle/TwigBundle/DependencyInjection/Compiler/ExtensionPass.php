@@ -27,19 +27,19 @@ class ExtensionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container::willBeAvailable('symfony/asset', Packages::class, ['symfony/twig-bundle'])) {
+        if (!class_exists(Packages::class)) {
             $container->removeDefinition('twig.extension.assets');
         }
 
-        if (!$container::willBeAvailable('symfony/expression-language', Expression::class, ['symfony/twig-bundle'])) {
+        if (!class_exists(Expression::class)) {
             $container->removeDefinition('twig.extension.expression');
         }
 
-        if (!$container::willBeAvailable('symfony/routing', UrlGeneratorInterface::class, ['symfony/twig-bundle'])) {
+        if (!interface_exists(UrlGeneratorInterface::class)) {
             $container->removeDefinition('twig.extension.routing');
         }
 
-        if (!$container::willBeAvailable('symfony/yaml', Yaml::class, ['symfony/twig-bundle'])) {
+        if (!class_exists(Yaml::class)) {
             $container->removeDefinition('twig.extension.yaml');
         }
 
@@ -115,7 +115,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
         }
 
-        if (!$container::willBeAvailable('symfony/workflow', Workflow::class, ['symfony/twig-bundle']) || !$container->has('workflow.registry')) {
+        if (!class_exists(Workflow::class) || !$container->has('workflow.registry')) {
             $container->removeDefinition('workflow.twig_extension');
         } else {
             $container->getDefinition('workflow.twig_extension')->addTag('twig.extension');

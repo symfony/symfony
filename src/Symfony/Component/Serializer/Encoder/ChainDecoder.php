@@ -63,7 +63,7 @@ class ChainDecoder implements ContextAwareDecoderInterface
     {
         $hasContext = 0 < \count($context);
         if (
-            $hasContext
+            !$hasContext
             && isset($this->decoderByFormat[$format])
             && isset($this->decoders[$this->decoderByFormat[$format]])
         ) {
@@ -72,7 +72,7 @@ class ChainDecoder implements ContextAwareDecoderInterface
 
         foreach ($this->decoders as $i => $decoder) {
             if ($decoder->supportsDecoding($format, $context)) {
-                if ($hasContext) {
+                if (!$hasContext) {
                     // cache decoder if no dynamic context is given
                     $this->decoderByFormat[$format] = $i;
                 }

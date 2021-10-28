@@ -24,12 +24,8 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 {
     use ExpectDeprecationTrait;
 
-    /**
-     * @group legacy
-     */
     protected function createValidator()
     {
-        $this->expectDeprecation('Since symfony/validator 5.4: The "loose" email validation mode is deprecated, use "html5" instead');
         return new EmailValidator(Email::VALIDATION_MODE_LOOSE);
     }
 
@@ -40,10 +36,14 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         new EmailValidator('Unknown Mode');
     }
 
+    /**
+     * @group legacy
+     */
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Email());
 
+        $this->expectDeprecation('Since symfony/validator 5.4: The "loose" email validation mode is deprecated, use "html5" instead');
         $this->assertNoViolation();
     }
 

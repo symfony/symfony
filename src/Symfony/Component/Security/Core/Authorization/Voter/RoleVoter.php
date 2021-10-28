@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RoleVoter implements VoterInterface
+class RoleVoter implements CacheableVoterInterface
 {
     private $prefix;
 
@@ -53,6 +53,16 @@ class RoleVoter implements VoterInterface
         }
 
         return $result;
+    }
+
+    public function supportsAttribute(string $attribute): bool
+    {
+        return str_starts_with($attribute, $this->prefix);
+    }
+
+    public function supportsType(string $subjectType): bool
+    {
+        return true;
     }
 
     protected function extractRoles(TokenInterface $token)

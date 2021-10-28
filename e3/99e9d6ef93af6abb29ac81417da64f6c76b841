@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-06T19:40:17Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-08-06T20:34:13Z
+
+Maybe push channel #39402 should be merged before? :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-19T07:25:01Z
+
+Now that the push channel feature has been merged (see #39402), I think this PR can be finished. @zairigimad Do you have time to update the code?
+
+---------------------------------------------------------------------------
+
+by zairigimad at 2021-10-19T08:22:43Z
+
+> Now that the push channel feature has been merged (see #39402), I think this PR can be finished. @zairigimad Do you have time to update the code?
+
+Yes, I will take some time today to update the code.
+
+---------------------------------------------------------------------------
+
+by zairigimad at 2021-10-19T15:14:39Z
+
+@fabpot I updated the code with the new PushChannel.

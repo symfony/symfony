@@ -539,6 +539,16 @@ class DotenvTest extends TestCase
         $this->assertFalse(getenv('TEST_USE_PUTENV'));
     }
 
+    public function testSERVERVarsDuplicationInENV()
+    {
+        unset($_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS'], $_ENV['FOO']);
+        $_SERVER['FOO'] = 'CCC';
+
+        (new Dotenv(false))->populate(['FOO' => 'BAR']);
+
+        $this->assertSame('CCC', $_ENV['FOO']);
+    }
+
     public function testBootEnv()
     {
         $resetContext = static function (): void {

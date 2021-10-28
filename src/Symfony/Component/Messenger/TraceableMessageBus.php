@@ -62,8 +62,8 @@ class TraceableMessageBus implements MessageBusInterface
     {
         $trace = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 8);
 
-        $file = $trace[1]['file'];
-        $line = $trace[1]['line'];
+        $file = $trace[1]['file'] ?? null;
+        $line = $trace[1]['line'] ?? null;
 
         $handleTraitFile = (new \ReflectionClass(HandleTrait::class))->getFileName();
         $found = false;
@@ -97,9 +97,12 @@ class TraceableMessageBus implements MessageBusInterface
             }
         }
 
-        $name = str_replace('\\', '/', $file);
-        $name = substr($name, strrpos($name, '/') + 1);
+        $name = str_replace('\\', '/', (string) $file);
 
-        return compact('name', 'file', 'line');
+        return [
+            'name' => substr($name, strrpos($name, '/') + 1),
+            'file' => $file,
+            'line' => $line,
+        ];
     }
 }

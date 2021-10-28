@@ -16,7 +16,7 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>
-                <target>Ova vrijednost nije ispravna HTML5 boja.</target>
+                <target>Ova vrijednost nije važeća HTML5 boja.</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>Please enter a valid birthdate.</source>

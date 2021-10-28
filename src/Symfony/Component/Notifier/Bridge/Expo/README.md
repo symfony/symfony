@@ -1,5 +1,5 @@
 Expo Notifier
-=================
+=============
 
 Provides [Expo](https://docs.expo.dev/versions/latest/sdk/notifications/) integration for Symfony Notifier.
 

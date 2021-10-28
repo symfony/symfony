@@ -122,7 +122,7 @@ while (!file_exists($root.'/'.$COMPOSER_JSON) || file_exists($root.'/Deprecation
 }
 
 $oldPwd = getcwd();
-$PHPUNIT_DIR = $getEnvVar('SYMFONY_PHPUNIT_DIR', $root.'/vendor/bin/.phpunit');
+$PHPUNIT_DIR = rtrim($getEnvVar('SYMFONY_PHPUNIT_DIR', $root.'/vendor/bin/.phpunit'), '/'.\DIRECTORY_SEPARATOR);
 $PHP = defined('PHP_BINARY') ? \PHP_BINARY : 'php';
 $PHP = escapeshellarg($PHP);
 if ('phpdbg' === \PHP_SAPI) {
@@ -239,6 +239,10 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         $passthruOrFail("$COMPOSER config --unset platform.php");
     }
     if (file_exists($path = $root.'/vendor/symfony/phpunit-bridge')) {
+        $p = str_repeat('../', substr_count("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR", '/', strlen($root))).'vendor/symfony/phpunit-bridge';
+        if (realpath($p) === realpath($path)) {
+            $path = $p;
+        }
         $passthruOrFail("$COMPOSER require --no-update symfony/phpunit-bridge \"*@dev\"");
         $passthruOrFail("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', \DIRECTORY_SEPARATOR, $path)));
         if ('\\' === \DIRECTORY_SEPARATOR) {

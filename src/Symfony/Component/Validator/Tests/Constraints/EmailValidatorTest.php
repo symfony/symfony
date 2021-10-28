@@ -65,7 +65,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
-     * @dataProvider getValidEmails
+     * @dataProvider getValidEmailsLoose
      */
     public function testValidEmailsLoose($email)
     {

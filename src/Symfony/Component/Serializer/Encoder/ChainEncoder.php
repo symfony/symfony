@@ -81,7 +81,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
     {
         $hasContext = 0 < \count($context);
         if (
-            true !== $hasContext
+            $hasContext
             && isset($this->encoderByFormat[$format])
             && isset($this->encoders[$this->encoderByFormat[$format]])
         ) {
@@ -90,7 +90,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
 
         foreach ($this->encoders as $i => $encoder) {
             if ($encoder->supportsEncoding($format, $context)) {
-                if (true !== $hasContext) {
+                if ($hasContext) {
                     // cache encoder if no dynamic context is given
                     $this->encoderByFormat[$format] = $i;
                 }

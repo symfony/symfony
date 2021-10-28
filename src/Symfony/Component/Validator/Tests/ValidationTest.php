@@ -24,6 +24,9 @@ class ValidationTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
+    /**
+     * @group legacy
+     */
     public function testCreateCallableValid()
     {
         $validator = Validation::createCallable(new Email());
@@ -31,6 +34,9 @@ class ValidationTest extends TestCase
         $this->assertEquals('test@example.com', $validator('test@example.com'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateCallableInvalid()
     {
         $validator = Validation::createCallable(new Email());
@@ -47,6 +53,9 @@ class ValidationTest extends TestCase
         }
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateIsValidCallableValid()
     {
         $validator = Validation::createIsValidCallable(new Email());
@@ -54,6 +63,9 @@ class ValidationTest extends TestCase
         $this->assertTrue($validator('test@example.com'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateIsValidCallableInvalid()
     {
         $validator = Validation::createIsValidCallable(new Email());

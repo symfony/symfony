@@ -692,10 +692,11 @@ class Filesystem
      * Appends content to an existing file.
      *
      * @param string|resource $content The content to append
+     * @param bool            $lock    Whether the file should be locked when writing to it
      *
      * @throws IOException If the file is not writable
      */
-    public function appendToFile(string $filename, $content)
+    public function appendToFile(string $filename, $content/*, bool $lock = false*/)
     {
         if (\is_array($content)) {
             throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be string or resource, array given.', __METHOD__));
@@ -707,7 +708,9 @@ class Filesystem
             $this->mkdir($dir);
         }
 
-        if (false === self::box('file_put_contents', $filename, $content, \FILE_APPEND)) {
+        $lock = \func_num_args() > 2 && func_get_arg(2);
+
+        if (false === self::box('file_put_contents', $filename, $content, \FILE_APPEND | ($lock ? \LOCK_EX : 0))) {
             throw new IOException(sprintf('Failed to write file "%s": ', $filename).self::$lastError, 0, null, $filename);
         }
     }

@@ -59,7 +59,7 @@ class ChainDecoder implements ContextAwareDecoderInterface
      *
      * @throws RuntimeException if no decoder is found
      */
-    public function getDecoder(string $format, array $context): DecoderInterface
+    private function getDecoder(string $format, array $context): DecoderInterface
     {
         $hasContext = 0 < \count($context);
         if (

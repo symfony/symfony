@@ -55,19 +55,26 @@ class ChainDecoderTest extends TestCase
 
     public function testSupportsDecoding()
     {
+        $this->decoder1
+            ->method('decode')
+            ->willReturn('result1');
+        $this->decoder2
+            ->method('decode')
+            ->willReturn('result2');
+
         $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_1));
-        $this->assertSame($this->decoder1, $this->chainDecoder->getDecoder(self::FORMAT_1, []));
+        $this->assertEquals('result1', $this->chainDecoder->decode('', self::FORMAT_1, []));
 
         $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_2));
-        $this->assertSame($this->decoder2, $this->chainDecoder->getDecoder(self::FORMAT_2, []));
+        $this->assertEquals('result2', $this->chainDecoder->decode('', self::FORMAT_2, []));
 
         $this->assertFalse($this->chainDecoder->supportsDecoding(self::FORMAT_3));
 
         $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_3, ['foo' => 'bar']));
-        $this->assertSame($this->decoder1, $this->chainDecoder->getDecoder(self::FORMAT_3, ['foo' => 'bar']));
+        $this->assertEquals('result1', $this->chainDecoder->decode('', self::FORMAT_3, ['foo' => 'bar']));
 
         $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_3, ['foo' => 'bar2']));
-        $this->assertSame($this->decoder2, $this->chainDecoder->getDecoder(self::FORMAT_3, ['foo' => 'bar2']));
+        $this->assertEquals('result2', $this->chainDecoder->decode('', self::FORMAT_3, ['foo' => 'bar2']));
     }
 
     public function testDecode()

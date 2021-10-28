@@ -77,7 +77,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
      *
      * @throws RuntimeException if no encoder is found
      */
-    public function getEncoder(string $format, array $context): EncoderInterface
+    private function getEncoder(string $format, array $context): EncoderInterface
     {
         $hasContext = 0 < \count($context);
         if (

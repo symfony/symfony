@@ -33,7 +33,7 @@ class TranslationPathsPassTest extends TestCase
         $debugCommand = $container->register('console.command.translation_debug')
             ->setArguments([null, null, null, null, null, [], []])
         ;
-        $updateCommand = $container->register('console.command.translation_update')
+        $updateCommand = $container->register('console.command.translation_extract')
             ->setArguments([null, null, null, null, null, null, [], []])
         ;
         $container->register(ControllerArguments::class, ControllerArguments::class)

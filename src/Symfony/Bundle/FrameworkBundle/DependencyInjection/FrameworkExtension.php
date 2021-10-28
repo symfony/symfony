@@ -1253,7 +1253,7 @@ class FrameworkExtension extends Extension
     {
         if (!$this->isConfigEnabled($container, $config)) {
             $container->removeDefinition('console.command.translation_debug');
-            $container->removeDefinition('console.command.translation_update');
+            $container->removeDefinition('console.command.translation_extract');
             $container->removeDefinition('console.command.translation_pull');
             $container->removeDefinition('console.command.translation_push');
 
@@ -1320,8 +1320,8 @@ class FrameworkExtension extends Extension
             $container->getDefinition('console.command.translation_debug')->replaceArgument(5, $transPaths);
         }
 
-        if ($container->hasDefinition('console.command.translation_update')) {
-            $container->getDefinition('console.command.translation_update')->replaceArgument(6, $transPaths);
+        if ($container->hasDefinition('console.command.translation_extract')) {
+            $container->getDefinition('console.command.translation_extract')->replaceArgument(6, $transPaths);
         }
 
         if (null === $defaultDir) {

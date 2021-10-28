@@ -342,25 +342,16 @@ class NativeSessionStorage implements SessionStorageInterface
             'gc_divisor', 'gc_maxlifetime', 'gc_probability',
             'lazy_write', 'name', 'referer_check',
             'serialize_handler', 'use_strict_mode', 'use_cookies',
-            'use_only_cookies', 'use_trans_sid', 'upload_progress.enabled',
-            'upload_progress.cleanup', 'upload_progress.prefix', 'upload_progress.name',
-            'upload_progress.freq', 'upload_progress.min_freq', 'url_rewriter.tags',
+            'use_only_cookies', 'use_trans_sid',
             'sid_length', 'sid_bits_per_character', 'trans_sid_hosts', 'trans_sid_tags',
         ]);
 
         foreach ($options as $key => $value) {
             if (isset($validOptions[$key])) {
-                if (str_starts_with($key, 'upload_progress.')) {
-                    trigger_deprecation('symfony/http-foundation', '5.4', 'Support for the "%s" session option is deprecated. The settings prefixed with "session.upload_progress." can not be changed at runtime.', $key);
-                    continue;
-                }
-                if ('url_rewriter.tags' === $key) {
-                    trigger_deprecation('symfony/http-foundation', '5.4', 'Support for the "%s" session option is deprecated. Use "trans_sid_tags" instead.', $key);
-                }
                 if ('cookie_secure' === $key && 'auto' === $value) {
                     continue;
                 }
-                ini_set('url_rewriter.tags' !== $key ? 'session.'.$key : $key, $value);
+                ini_set('session.'.$key, $value);
             }
         }
     }

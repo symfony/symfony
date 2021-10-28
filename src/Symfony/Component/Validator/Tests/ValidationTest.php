@@ -34,6 +34,7 @@ class ValidationTest extends TestCase
     public function testCreateCallableInvalid()
     {
         $validator = Validation::createCallable(new Email());
+        $this->expectDeprecation('Since symfony/validator 5.4: The "loose" email validation mode is deprecated, use "html5" instead');
         try {
             $validator('test');
             $this->fail('No ValidationFailedException thrown');
@@ -49,12 +50,14 @@ class ValidationTest extends TestCase
     public function testCreateIsValidCallableValid()
     {
         $validator = Validation::createIsValidCallable(new Email());
+        $this->expectDeprecation('Since symfony/validator 5.4: The "loose" email validation mode is deprecated, use "html5" instead');
         $this->assertTrue($validator('test@example.com'));
     }
 
     public function testCreateIsValidCallableInvalid()
     {
         $validator = Validation::createIsValidCallable(new Email());
+        $this->expectDeprecation('Since symfony/validator 5.4: The "loose" email validation mode is deprecated, use "html5" instead');
         $this->assertFalse($validator('test', $violations));
         $this->assertCount(1, $violations);
         $this->assertEquals('This value is not a valid email address.', $violations->get(0)->getMessage());

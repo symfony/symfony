@@ -44,6 +44,8 @@ class FixUrlProtocolListenerTest extends TestCase
             ['h323://foo'],
             ['iris.beep://foo'],
             ['foo+bar://foo'],
+            ['fabien@symfony.com'],
+            ['foo'],
         ];
     }
 
@@ -59,30 +61,5 @@ class FixUrlProtocolListenerTest extends TestCase
         $filter->onSubmit($event);
 
         $this->assertEquals($url, $event->getData());
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider provideNonUrls
-     */
-    public function testDeprecatedFixEmail($url)
-    {
-        $this->expectDeprecation('Since symfony/form 5.4: Form type "url", does not add a default protocol to urls that looks like emails or does not contain a dot or slash.');
-
-        $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
-        $event = new FormEvent($form, $url);
-
-        $filter = new FixUrlProtocolListener('http');
-        $filter->onSubmit($event);
-
-        $this->assertEquals($url, $event->getData());
-    }
-
-    public function provideNonUrls()
-    {
-        return [
-            ['fabien@symfony.com'],
-            ['foo'],
-        ];
     }
 }

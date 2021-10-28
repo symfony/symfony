@@ -93,7 +93,7 @@ class UrlTypeTest extends TextTypeTest
         ]);
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = 'http://empty')
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty.com', $expectedData = 'http://empty.com')
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array_merge($this->getTestOptions(), [
             'empty_data' => $emptyData,

@@ -26,13 +26,13 @@ class ValidationTest extends TestCase
 
     public function testCreateCallableValid()
     {
-        $validator = Validation::createCallable(new Email(Email::VALIDATION_MODE_HTML5));
+        $validator = Validation::createCallable(new Email('mode' => Email::VALIDATION_MODE_HTML5));
         $this->assertEquals('test@example.com', $validator('test@example.com'));
     }
 
     public function testCreateCallableInvalid()
     {
-        $validator = Validation::createCallable(new Email(Email::VALIDATION_MODE_HTML5));
+        $validator = Validation::createCallable(new Email('mode' => Email::VALIDATION_MODE_HTML5));
         try {
             $validator('test');
             $this->fail('No ValidationFailedException thrown');
@@ -47,13 +47,13 @@ class ValidationTest extends TestCase
 
     public function testCreateIsValidCallableValid()
     {
-        $validator = Validation::createIsValidCallable(new Email(Email::VALIDATION_MODE_HTML5));
+        $validator = Validation::createIsValidCallable(new Email('mode' => Email::VALIDATION_MODE_HTML5));
         $this->assertTrue($validator('test@example.com'));
     }
 
     public function testCreateIsValidCallableInvalid()
     {
-        $validator = Validation::createIsValidCallable(new Email(Email::VALIDATION_MODE_HTML5));
+        $validator = Validation::createIsValidCallable(new Email('mode' => Email::VALIDATION_MODE_HTML5));
         $this->assertFalse($validator('test', $violations));
         $this->assertCount(1, $violations);
         $this->assertEquals('This value is not a valid email address.', $violations->get(0)->getMessage());

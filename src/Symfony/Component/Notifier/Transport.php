@@ -16,6 +16,7 @@ use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
+use Symfony\Component\Notifier\Bridge\Expo\ExpoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
@@ -70,6 +71,7 @@ class Transport
         ClickatellTransportFactory::class,
         DiscordTransportFactory::class,
         EsendexTransportFactory::class,
+        ExpoTransportFactory::class,
         FirebaseTransportFactory::class,
         FreeMobileTransportFactory::class,
         GatewayApiTransportFactory::class,

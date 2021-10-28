@@ -36,6 +36,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Esendex\EsendexTransportFactory::class,
             'package' => 'symfony/esendex-notifier',
         ],
+        'expo' => [
+            'class' => Bridge\Expo\ExpoTransportFactory::class,
+            'package' => 'symfony/expo-notifier',
+        ],
         'fakechat' => [
             'class' => Bridge\FakeChat\FakeChatTransportFactory::class,
             'package' => 'symfony/fake-chat-notifier',

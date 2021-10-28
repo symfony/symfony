@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-28T09:26:07Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-28T09:50:27Z
+
+By accepting `FILE_*` flags, we would leak implementation details. I believe, locking the file while appending content to it might be a common use case, so we might as well add a boolean parameter for that.
+
+---------------------------------------------------------------------------
+
+by fwolfsjaeger at 2021-10-28T10:28:23Z
+
+To test this you'd need 2 threads running in parallel, plus a write-operation that takes long enough to check if the file is locked in the second thread. I don't think this is doable with PHPUnit.

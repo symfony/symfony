@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validation;
@@ -22,8 +21,6 @@ use Symfony\Component\Validator\Validation;
  */
 class ValidationTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testCreateCallableValid()
     {
         $validator = Validation::createCallable(new Email(['mode' => Email::VALIDATION_MODE_HTML5]));

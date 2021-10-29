@@ -45,6 +45,33 @@ class FunctionsTest extends TestCase
 
         $this->assertEquals([$var1, $var2, $var3], $return);
     }
+    public function testEDumpReturnsFirstArg()
+    {
+        $this->setupVarDumper();
+
+        $var1 = 'a';
+
+        ob_start();
+        $return = edump($var1);
+        ob_end_clean();
+
+        $this->assertEquals($var1, $return);
+    }
+
+    public function testEDumpReturnsAllArgsInArray()
+    {
+        $this->setupVarDumper();
+
+        $var1 = 'a';
+        $var2 = 'b';
+        $var3 = 'c';
+
+        ob_start();
+        $return = edump($var1, $var2, $var3);
+        ob_end_clean();
+
+        $this->assertEquals([$var1, $var2, $var3], $return);
+    }
 
     protected function setupVarDumper()
     {

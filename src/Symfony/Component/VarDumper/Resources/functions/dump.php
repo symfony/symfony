@@ -48,3 +48,46 @@ if (!function_exists('dd')) {
         exit(1);
     }
 }
+
+if (!function_exists('edump')) {
+    /**
+     * @author Sebastian Hädrich <shaedrich@users.noreply.github.com>
+     */
+    function edump($var, ...$moreVars)
+    {
+        VarDumper::dump($var);
+
+        foreach ($moreVars as $v) {
+            VarDumper::dump($v, null, [
+                'maxDepth' => 0
+            ]);
+        }
+
+        if (1 < func_num_args()) {
+            return func_get_args();
+        }
+
+        return $var;
+    }
+}
+
+if (!function_exists('edd')) {
+    /**
+     * @author Sebastian Hädrich <shaedrich@users.noreply.github.com>
+     * @return never
+     */
+    function edd(...$vars)
+    {
+        if (!in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && !headers_sent()) {
+            header('HTTP/1.1 500 Internal Server Error');
+        }
+
+        foreach ($vars as $v) {
+            VarDumper::dump($v, null, [
+                'maxDepth' => 0
+            ]);
+        }
+
+        exit(1);
+    }
+}

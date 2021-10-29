@@ -59,7 +59,7 @@ if (!function_exists('edump')) {
 
         foreach ($moreVars as $v) {
             VarDumper::dump($v, null, [
-                'maxDepth' => 0
+                'maxDepth' => 0,
             ]);
         }
 
@@ -74,6 +74,7 @@ if (!function_exists('edump')) {
 if (!function_exists('edd')) {
     /**
      * @author Sebastian Hädrich <shaedrich@users.noreply.github.com>
+     *
      * @return never
      */
     function edd(...$vars)
@@ -84,7 +85,7 @@ if (!function_exists('edd')) {
 
         foreach ($vars as $v) {
             VarDumper::dump($v, null, [
-                'maxDepth' => 0
+                'maxDepth' => 0,
             ]);
         }
 

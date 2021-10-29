@@ -430,6 +430,7 @@ SecurityBundle
  * Remove the `security.authentication.provider.*` services, use the new authenticator system instead
  * Remove the `security.authentication.listener.*` services, use the new authenticator system instead
  * Remove the Guard component integration, use the new authenticator system instead
+ * Remove the default provider for custom_authenticators when there is more than one registered provider
 
 Serializer
 ----------

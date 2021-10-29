@@ -17,6 +17,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -36,7 +37,7 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  *
  * @final
  */
-#[AsCommand(name: 'translation:update', description: 'Update the translation file')]
+#[AsCommand(name: 'translation:extract', description: 'Extract missing translations keys from code to translation files.')]
 class TranslationUpdateCommand extends Command
 {
     private const ASC = 'asc';
@@ -78,9 +79,9 @@ class TranslationUpdateCommand extends Command
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
                 new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'xlf12'),
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
-                new InputOption('force', null, InputOption::VALUE_NONE, 'Should the update be done'),
+                new InputOption('force', null, InputOption::VALUE_NONE, 'Should the extract be done'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
-                new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
+                new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to extract'),
                 new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically', 'asc'),
                 new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
             ])
@@ -122,6 +123,13 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
+        $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
+
+        if ('translation:update' === $input->getFirstArgument()) {
+            $errorIo->caution('Command "translation:update" is deprecated since version 5.4 and will be removed in Symfony 6.0. Use "translation:extract" instead.');
+        }
+
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 

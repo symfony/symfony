@@ -53,6 +53,40 @@ class AuthenticatedVoterTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider provideAttributes
+     */
+    public function testSupportsAttribute(string $attribute, bool $expected)
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->assertSame($expected, $voter->supportsAttribute($attribute));
+    }
+
+    public function provideAttributes()
+    {
+        yield [AuthenticatedVoter::IS_AUTHENTICATED_FULLY, true];
+        yield [AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED, true];
+        yield [AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY, true];
+        yield [AuthenticatedVoter::IS_ANONYMOUS, true];
+        yield [AuthenticatedVoter::IS_AUTHENTICATED, true];
+        yield [AuthenticatedVoter::IS_IMPERSONATOR, true];
+        yield [AuthenticatedVoter::IS_REMEMBERED, true];
+        yield [AuthenticatedVoter::PUBLIC_ACCESS, true];
+
+        yield ['', false];
+        yield ['foo', false];
+    }
+
+    public function testSupportsType()
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->assertTrue($voter->supportsType(get_debug_type('foo')));
+        $this->assertTrue($voter->supportsType(get_debug_type(null)));
+        $this->assertTrue($voter->supportsType(get_debug_type(new \StdClass())));
+    }
+
     protected function getToken($authenticated)
     {
         $user = new InMemoryUser('wouter', '', ['ROLE_USER']);

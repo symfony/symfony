@@ -70,8 +70,8 @@ class TranslatorPathsPass extends AbstractRecursivePass
                     $definition = $container->getDefinition('console.command.translation_debug');
                     $definition->replaceArgument(6, array_merge($definition->getArgument(6), $paths));
                 }
-                if ($container->hasDefinition('console.command.translation_update')) {
-                    $definition = $container->getDefinition('console.command.translation_update');
+                if ($container->hasDefinition('console.command.translation_extract')) {
+                    $definition = $container->getDefinition('console.command.translation_extract');
                     $definition->replaceArgument(7, array_merge($definition->getArgument(7), $paths));
                 }
             }

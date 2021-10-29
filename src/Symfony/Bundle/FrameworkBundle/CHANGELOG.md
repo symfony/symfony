@@ -38,6 +38,8 @@ CHANGELOG
  * Add `configureContainer()`, `configureRoutes()`, `getConfigDir()` and `getBundlesPath()` to `MicroKernelTrait`
  * Add support for configuring log level, and status code by exception class
  * Bind the `default_context` parameter onto serializer's encoders and normalizers
+ * Add support for `statusCode` default parameter when loading a template directly from route using the `Symfony\Bundle\FrameworkBundle\Controller\TemplateController` controller
+ * Deprecate `translation:update` command, use `translation:extract` instead
 
 5.3
 ---

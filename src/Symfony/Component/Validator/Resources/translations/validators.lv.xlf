@@ -394,6 +394,14 @@
                 <source>This value is not a valid CSS color.</source>
                 <target>Šī vērtība nav korekta CSS krāsa.</target>
             </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Šī vērtība nav korekts CIDR apzīmējums.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Tīkla maskas (netmask) vērtībai jābūt starp {{ min }} un {{ max }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+use Composer\InstalledVersions;
 use Symfony\Bridge\Twig\Extension\LogoutUrlExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
@@ -71,6 +72,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
     public function load(array $configs, ContainerBuilder $container)
     {
+        if (!class_exists(InstalledVersions::class)) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'Configuring Symfony without the Composer Runtime API is deprecated. Consider upgrading to Composer 2.');
+        }
+
         if (!array_filter($configs)) {
             return;
         }
@@ -92,7 +97,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $loader->load('security_authenticator.php');
 
-        if ($container::willBeAvailable('symfony/twig-bridge', LogoutUrlExtension::class, ['symfony/security-bundle'])) {
+        if ($container::willBeAvailable('symfony/twig-bridge', LogoutUrlExtension::class, ['symfony/security-bundle'], true)) {
             $loader->load('templating_twig.php');
         }
 
@@ -102,7 +107,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $loader->load('security_debug.php');
         }
 
-        if (!$container::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/security-bundle'])) {
+        if (!$container::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/security-bundle'], true)) {
             $container->removeDefinition('security.expression_language');
             $container->removeDefinition('security.access.expression_voter');
         }
@@ -797,7 +802,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return $this->expressions[$id];
         }
 
-        if (!$container::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/security-bundle'])) {
+        if (!$container::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/security-bundle'], true)) {
             throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
         }
 

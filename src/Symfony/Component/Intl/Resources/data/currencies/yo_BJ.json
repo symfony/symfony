@@ -6,7 +6,7 @@
         ],
         "ALL": [
             "ALL",
-            "Lɛ́kɛ̀ Àlìbéníà"
+            "Lɛ́ɛ̀kì Àlìbáníà"
         ],
         "AMD": [
             "AMD",
@@ -76,10 +76,6 @@
             "CA$",
             "Dɔ́là Kánádà"
         ],
-        "CHF": [
-            "CHF",
-            "Faransi ti Orílɛ́ède Siwisi"
-        ],
         "CLP": [
             "CLP",
             "Pɛ́sò Shílè"
@@ -146,7 +142,7 @@
         ],
         "GIP": [
             "GIP",
-            "Pɔ́n-ùn Gibraltar"
+            "Pɔ́n-ùn Gibúrátà"
         ],
         "GNS": [
             "GNS",
@@ -167,6 +163,10 @@
         "HNL": [
             "HNL",
             "Lɛmipírà Ɔ́ńdúrà"
+        ],
+        "HRK": [
+            "HRK",
+            "Kúnà Kúróshíà"
         ],
         "HTG": [
             "HTG",
@@ -274,7 +274,7 @@
         ],
         "NOK": [
             "NOK",
-            "Kírónì Nɔ́ɔ́wè"
+            "kórónì Nɔ́wè"
         ],
         "NPR": [
             "NPR",
@@ -389,7 +389,7 @@
             "Dɔ́là Ilà Oòrùn Karíbíà"
         ],
         "XOF": [
-            "CFA",
+            "F CFA",
             "Faransì ìwɔ̀-oorùn Afíríkà"
         ],
         "YER": [

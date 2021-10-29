@@ -12,6 +12,14 @@
             "EUR",
             "euro"
         ],
+        "HTG": [
+            "HTG",
+            "gourde haitiano"
+        ],
+        "KZT": [
+            "KZT",
+            "tenge kazajo"
+        ],
         "MWK": [
             "MWK",
             "kwacha malauí"

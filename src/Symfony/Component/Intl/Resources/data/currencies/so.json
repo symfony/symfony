@@ -364,6 +364,10 @@
             "LRD",
             "Doolarka Liberiya"
         ],
+        "LSL": [
+            "LSL",
+            "Lesotho Loti"
+        ],
         "LVR": [
             "LVR",
             "Rubalka Latfiya"
@@ -473,7 +477,7 @@
             "Kinada Babua Niyuu Gini"
         ],
         "PHP": [
-            "PHP",
+            "₱",
             "Biso Filibin"
         ],
         "PKR": [
@@ -649,7 +653,7 @@
             "Doolarka Iist Kaaribyan"
         ],
         "XOF": [
-            "CFA",
+            "F CFA",
             "Faranka CFA Galbeedka Afrika"
         ],
         "XPF": [

@@ -328,6 +328,10 @@
             "LRD",
             "Dólar Liberiano"
         ],
+        "LSL": [
+            "LSL",
+            "Lesoto Loti Qullqi"
+        ],
         "LYD": [
             "LYD",
             "Dinar Libio"
@@ -601,7 +605,7 @@
             "Dólar del Caribe Oriental"
         ],
         "XOF": [
-            "CFA",
+            "F CFA",
             "Franco CFA de África Occidental"
         ],
         "XPF": [

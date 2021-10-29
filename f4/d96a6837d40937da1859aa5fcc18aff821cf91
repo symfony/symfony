@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-19T14:51:06Z
+
+Hey!
+
+I think @aschempp has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by aschempp at 2021-07-27T12:15:27Z
+
+I wonder if you could simply reuse the `strategy` property for the service name instead of an additional `strategy_service` property? Since there are 4 known (old) options, if one of these is given then use the "old" one, otherwise expect it to be a service. Otherwise, should `strategy` be deprecated?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-27T14:21:35Z
+
+> I wonder if you could simply reuse the `strategy` property for the service name instead of an additional `strategy_service` property? Since there are 4 known (old) options, if one of these is given then use the "old" one, otherwise expect it to be a service.
+
+Yeah, I thought about that too. But that'll give you very cryptic error messages if want to select one of the core strategies and make a typo.
+
+> Otherwise, should `strategy` be deprecated?
+
+I wouldn't do that. As long as you don't want to specify your own custom strategy, the DX is better with the old set of options.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2021-07-28T09:20:29Z
+
+I just looked into the issue with a custom access decision manager. As far as I see, using a custom access decision strategy seems like an edge case only relevant in an app context, would you agree to that? If you simply replace the `security.access.decision_manager` with your own class (instead of decorating or configuring the service), wouldn't that basically give you the same result, same constructor arguments etc. to implement a custom strategy?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-07-28T09:39:48Z
+
+@aschempp Yes, you can basically hack this with a small compiler pass. This PR creates an official extension point for strategies and provides you with tools to test them.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-29T08:42:43Z
+
+I've addressed all comments from @chalasr and fixed conflict's coming from @jderusse's #43066. PR is ready again.

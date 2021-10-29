@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-10-22T07:18:12Z
+
+Completion don't have to be exhaustive. Bundle names can be completed getting the name of each bundle provided by `$kernel->getBundles()`. That would be useful.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-10-22T07:29:08Z
+
+> Completion don't have to be exhaustive. Bundle names can be completed getting the name of each bundle provided by `$kernel->getBundles()`. That would be useful.
+
+Suits me fine. Added!

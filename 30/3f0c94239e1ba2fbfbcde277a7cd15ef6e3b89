@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-16T14:56:48Z
+
+Tests please. 🙂
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-09-16T15:04:49Z
+
+@derrabus indeed! Wasn't sure which tests to add though. But I'll definitely try to find some! 😄
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-16T15:17:49Z
+
+Well, you should be able to come up with a test that fails on 5.4 and passes after your changes. After all, you're fixing a problem here. 😎
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-09-16T15:56:36Z
+
+Oh yeah of course you're right! Just added them. If you see anything else, please tell me!
+
+Speaking of that, should this be rebased to 5.3 as a bug fix or is it considered as a feature and 5.4 is fine?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-09-17T04:50:07Z
+
+That’s a new feature

@@ -7,6 +7,10 @@ in 5.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.3.0...v5.3.1
 
+* 5.3.11 (2021-10-30)
+
+ * feature #43799 [VarDumper] Support expanded dumps
+
 * 5.3.10 (2021-10-29)
 
  * bug #43798 [Dotenv] Duplicate $_SERVER values in $_ENV if they don't exist (fancyweb)

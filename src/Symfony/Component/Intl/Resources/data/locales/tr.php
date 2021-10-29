@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'Kinyarwanda (Ruanda)',
         'sa' => 'Sanskrit',
         'sa_IN' => 'Sanskrit (Hindistan)',
+        'sc' => 'Sardunya dili',
+        'sc_IT' => 'Sardunya dili (İtalya)',
         'sd' => 'Sindhi dili',
         'sd_Arab' => 'Sindhi dili (Arap)',
         'sd_Arab_PK' => 'Sindhi dili (Arap, Pakistan)',

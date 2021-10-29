@@ -371,6 +371,7 @@ return [
         'raj' => 'radžastančina',
         'rap' => 'rapanujčina',
         'rar' => 'rarotongská maorijčina',
+        'rhg' => 'rohingčina',
         'rm' => 'rétorománčina',
         'rn' => 'rundčina',
         'ro' => 'rumunčina',

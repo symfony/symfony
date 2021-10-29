@@ -25,6 +25,7 @@ return [
     ],
     'LocalizedNames' => [
         'ar_001' => 'savremeni standardni arapski',
+        'de_CH' => 'švajcarski visoki njemački',
         'en_GB' => 'engleski (Velika Britanija)',
         'es_ES' => 'španski (Evropa)',
         'fa_AF' => 'dari',

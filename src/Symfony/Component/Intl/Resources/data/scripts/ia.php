@@ -3,7 +3,7 @@
 return [
     'Names' => [
         'Arab' => 'arabe',
-        'Armn' => 'armenian',
+        'Armn' => 'armenie',
         'Beng' => 'bengalese',
         'Bopo' => 'bopomofo',
         'Brai' => 'braille',
@@ -39,7 +39,7 @@ return [
         'Telu' => 'telugu',
         'Thaa' => 'thaana',
         'Thai' => 'thailandese',
-        'Tibt' => 'tibetano',
+        'Tibt' => 'tibetan',
         'Zmth' => 'notation mathematic',
         'Zsye' => 'emoji',
         'Zsym' => 'symbolos',

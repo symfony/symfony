@@ -455,6 +455,8 @@ return [
         'rw_RW' => 'kînyariwandayî (Rwanda)',
         'sa' => 'sanskrîtî',
         'sa_IN' => 'sanskrîtî (Hindistan)',
+        'sc' => 'sardînî',
+        'sc_IT' => 'sardînî (Îtalya)',
         'sd' => 'sindhî',
         'sd_Arab' => 'sindhî (erebî)',
         'sd_Arab_PK' => 'sindhî (erebî, Pakistan)',

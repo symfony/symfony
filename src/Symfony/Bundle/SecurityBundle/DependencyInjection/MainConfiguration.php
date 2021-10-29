@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
@@ -28,6 +27,15 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
  */
 class MainConfiguration implements ConfigurationInterface
 {
+    /** @internal */
+    public const STRATEGY_AFFIRMATIVE = 'affirmative';
+    /** @internal */
+    public const STRATEGY_CONSENSUS = 'consensus';
+    /** @internal */
+    public const STRATEGY_UNANIMOUS = 'unanimous';
+    /** @internal */
+    public const STRATEGY_PRIORITY = 'priority';
+
     private $factories;
     private $userProviderFactories;
 
@@ -55,14 +63,18 @@ class MainConfiguration implements ConfigurationInterface
                         return true;
                     }
 
-                    if (!isset($v['access_decision_manager']['strategy']) && !isset($v['access_decision_manager']['service'])) {
+                    if (!isset($v['access_decision_manager']['strategy'])
+                        && !isset($v['access_decision_manager']['service'])
+                        && !isset($v['access_decision_manager']['strategy_service'])
+                        && !isset($v['access_decision_manager']['strategy-service'])
+                    ) {
                         return true;
                     }
 
                     return false;
                 })
                 ->then(function ($v) {
-                    $v['access_decision_manager']['strategy'] = AccessDecisionManager::STRATEGY_AFFIRMATIVE;
+                    $v['access_decision_manager']['strategy'] = self::STRATEGY_AFFIRMATIVE;
 
                     return $v;
                 })
@@ -83,12 +95,21 @@ class MainConfiguration implements ConfigurationInterface
                             ->values($this->getAccessDecisionStrategies())
                         ->end()
                         ->scalarNode('service')->end()
+                        ->scalarNode('strategy_service')->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) { return isset($v['strategy']) && isset($v['service']); })
+                        ->ifTrue(function ($v) { return isset($v['strategy'], $v['service']); })
                         ->thenInvalid('"strategy" and "service" cannot be used together.')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) { return isset($v['strategy'], $v['strategy_service']); })
+                        ->thenInvalid('"strategy" and "strategy_service" cannot be used together.')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) { return isset($v['service'], $v['strategy_service']); })
+                        ->thenInvalid('"service" and "strategy_service" cannot be used together.')
                     ->end()
                 ->end()
             ->end()
@@ -416,18 +437,13 @@ class MainConfiguration implements ConfigurationInterface
         ->end();
     }
 
-    private function getAccessDecisionStrategies()
+    private function getAccessDecisionStrategies(): array
     {
-        $strategies = [
-            AccessDecisionManager::STRATEGY_AFFIRMATIVE,
-            AccessDecisionManager::STRATEGY_CONSENSUS,
-            AccessDecisionManager::STRATEGY_UNANIMOUS,
+        return [
+            self::STRATEGY_AFFIRMATIVE,
+            self::STRATEGY_CONSENSUS,
+            self::STRATEGY_UNANIMOUS,
+            self::STRATEGY_PRIORITY,
         ];
-
-        if (\defined(AccessDecisionManager::class.'::STRATEGY_PRIORITY')) {
-            $strategies[] = AccessDecisionManager::STRATEGY_PRIORITY;
-        }
-
-        return $strategies;
     }
 }

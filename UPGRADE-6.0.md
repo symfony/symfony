@@ -402,6 +402,8 @@ Security
        }
    }
    ```
+ * `AccessDecisionManager` does not accept strings as strategy anymore,
+   pass an instance of `AccessDecisionStrategyInterface` instead
 
 SecurityBundle
 --------------

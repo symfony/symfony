@@ -159,3 +159,6 @@ Security
        }
    }
    ```
+ * Deprecate passing the strategy as string to `AccessDecisionManager`,
+   pass an instance of `AccessDecisionStrategyInterface` instead
+ * Flag `AccessDecisionManager` as `@final`

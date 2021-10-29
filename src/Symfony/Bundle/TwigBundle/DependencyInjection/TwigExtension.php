@@ -37,7 +37,7 @@ class TwigExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         if (!class_exists(InstalledVersions::class)) {
-            trigger_deprecation('symfony/twig-bundle', '5.4', 'Configuring Symfony without the Composer Runtime API is deprecated. Consider upgrading to Composer 2.');
+            trigger_deprecation('symfony/twig-bundle', '5.4', 'Configuring Symfony without the Composer Runtime API is deprecated. Consider upgrading to Composer 2.1 or later.');
         }
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));

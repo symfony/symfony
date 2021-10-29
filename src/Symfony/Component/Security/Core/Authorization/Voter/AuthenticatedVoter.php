@@ -93,9 +93,7 @@ class AuthenticatedVoter implements CacheableVoterInterface
         return \in_array($attribute, [
             self::IS_AUTHENTICATED_FULLY,
             self::IS_AUTHENTICATED_REMEMBERED,
-            self::IS_AUTHENTICATED_ANONYMOUSLY,
             self::IS_AUTHENTICATED,
-            self::IS_ANONYMOUS,
             self::IS_IMPERSONATOR,
             self::IS_REMEMBERED,
             self::PUBLIC_ACCESS,

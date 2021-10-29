@@ -67,8 +67,6 @@ class AuthenticatedVoterTest extends TestCase
     {
         yield [AuthenticatedVoter::IS_AUTHENTICATED_FULLY, true];
         yield [AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED, true];
-        yield [AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY, true];
-        yield [AuthenticatedVoter::IS_ANONYMOUS, true];
         yield [AuthenticatedVoter::IS_AUTHENTICATED, true];
         yield [AuthenticatedVoter::IS_IMPERSONATOR, true];
         yield [AuthenticatedVoter::IS_REMEMBERED, true];

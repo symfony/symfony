@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-09-20T12:11:24Z
+
+@derrabus the work is in progress to create them.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-09-20T12:30:33Z
+
+@nicolas-grekas I suggest we avoid merging this PR until they merge the work on the FIG side, for safety.
+
+---------------------------------------------------------------------------
+
+by interlab at 2021-10-03T11:56:56Z
+
+> Error: Interface 'Psr\SimpleCache\CacheInterface' not found
+
+symfony/cache (v5.3.8)
+
+```php
+$cache = new Psr16Cache(new FilesystemAdapter('', 0, CACHE_DIR));
+```
+
+Solution:
+`composer require psr/simple-cache`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-29T14:46:22Z
+
+psr/simple-cache v2&3 now released, PR rebased and ready

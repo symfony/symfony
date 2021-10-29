@@ -7,6 +7,27 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.33 (2021-10-29)
+
+ * bug #43798 [Dotenv] Duplicate $_SERVER values in $_ENV if they don't exist (fancyweb)
+ * bug #43799 [PhpUnitBridge] fix symlink to bridge in docker by making its path relative (nicolas-grekas)
+ * bug #43781 [Messenger] Fix `TraceableMessageBus` implementation so it can compute caller even when used within a callback (Ocramius)
+ * bug #43655 [VarDumper] Fix dumping twig templates found in exceptions (event15)
+ * bug #43484 [Messenger] Fix Redis Transport when username is empty (villfa)
+ * bug #43568 [Messenger] fix: TypeError in PhpSerializer::encode() (dsech)
+ * bug #43591 [Config] Fix files sorting in GlobResource (lyrixx)
+ * bug #43569 [HttpClient] fix collecting debug info on destruction of CurlResponse (nicolas-grekas)
+ * bug #43545 [DependencyInjection] fix "url" env var processor (nicolas-grekas)
+ * bug #43413 [VarDumper] Fix error with uninitialized XMLReader (villfa)
+ * bug #43388 [Validator] Fixes URL validation for single-char subdomains (DfKimera)
+ * bug #43333 [HttpClient] fix missing kernel.reset tag on TraceableHttpClient services (nicolas-grekas)
+ * bug #43302 [Cache] Commit items implicitly only when deferred keys are requested (Sergey Belyshkin)
+ * bug #43330 [Cache][Lock] fix SQLSRV throws for method_exists() (GDmac)
+ * bug #43270 [VarDumper] Fix handling of "new" in initializers on PHP 8.1 (nicolas-grekas)
+ * bug #43277 [DependencyInjection] fix support for "new" in initializers on PHP 8.1 (nicolas-grekas)
+ * bug #43243 [HttpClient] accept headers when CURLE_RECV_ERROR is received before the content (nicolas-grekas)
+ * bug #43205 [Serializer] Fix denormalizing XML array with empty body (4.4) (alexandre-daubois)
+
 * 4.4.32 (2021-09-28)
 
  * Fix subtree split issues

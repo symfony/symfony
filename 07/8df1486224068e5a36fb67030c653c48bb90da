@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-01T09:00:58Z
+
+Thanks for the PR! I spend some time on the topic this morning and shared our findings with Nikita.
+He's proposing https://github.com/php/php-src/pull/7540 and that'd be perfect for our use case!
+This also needs to be taken into account for attributes. Note that since 8.1, `ReflectionAttribute` has a `__toString` method that we can use to compute their hash. Can you please update the PR accordingly?
+
+---------------------------------------------------------------------------
+
+by agustingomes at 2021-10-01T09:52:45Z
+
+I will add a scenario for the attributes as well. I'll keep an eye on that PR from Nikita.
+
+---------------------------------------------------------------------------
+
+by agustingomes at 2021-10-01T17:24:58Z
+
+@nicolas-grekas given the proposal of Nikita was merged, I'll wait for the next RC to come out and I'll validate if any implementation changes are still needed. If not, I'll still add the test cases for completeness. Thank you for looking into it!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-02T08:19:16Z
+
+We should make this pass:
+```diff
+--- a/src/Symfony/Component/Config/Tests/Resource/ReflectionClassResourceTest.php
++++ b/src/Symfony/Component/Config/Tests/Resource/ReflectionClassResourceTest.php
+@@ -126,6 +126,10 @@ EOPHP;
+             yield [true, 0, '#[Foo]'];
+         }
+
++        if (\PHP_VERSION_ID >= 80100) {
++            yield [true, 0, '#[Foo(new MissingClass)]'];
++        }
++
+         yield [true, 1, 'abstract class %s'];
+         yield [true, 1, 'final class %s'];
+         yield [true, 1, 'class %s extends Exception'];
+@@ -162,6 +166,10 @@ EOPHP;
+             yield [false, 9, 'private string $priv;'];
+         }
+
++        if (\PHP_VERSION_ID >= 80100) {
++            yield [true, 17, 'public function ccc($bar = new MissingClass()) {}'];
++        }
++
+         yield [true, 17, 'public function ccc($bar = 187) {}'];
+         yield [true, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}'];
+```
+
+---------------------------------------------------------------------------
+
+by agustingomes at 2021-10-15T07:48:16Z
+
+@nicolas-grekas I validated that the https://github.com/php/php-src/pull/7540 fixes the initially reported behavior, and I added changes to account for the scenarios you mentioned.
+
+However, the 7.4 tests are failing because something in the Core component. seems unrelated to my changes at first. Can you advice how to proceed?

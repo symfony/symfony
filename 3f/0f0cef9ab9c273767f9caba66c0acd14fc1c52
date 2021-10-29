@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-10-25T16:10:29Z
+
+@GromNaN It's ready for review here
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-26T08:34:44Z
+
+Can you skip the tests for older versions of Symfony? Like in #43731 for instance.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-10-26T08:54:50Z
+
+~The last failing test seems to be related to https://github.com/symfony/symfony/pull/43688~
+Rebased on 5.4, everything is green.

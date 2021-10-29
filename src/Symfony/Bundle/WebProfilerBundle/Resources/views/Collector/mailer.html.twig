@@ -142,6 +142,18 @@
                                             {% if message.htmlBody is defined %}
                                                 {# Email instance #}
                                                 <div class="tab">
+                                                    <h3 class="tab-title">HTML preview</h3>
+                                                    <div class="tab-content">
+                                                        <pre class="prewrap" style="max-height: 600px">
+                                                            <iframe
+                                                                src="data:text/html;base64;charset=utf-8,{{ collector.base64Encode(message.htmlBody()) }}"
+                                                                style="height: 80vh;width: 100%;"
+                                                            >
+                                                            </iframe>
+                                                        </pre>
+                                                    </div>
+                                                </div>
+                                                <div class="tab">
                                                     <h3 class="tab-title">HTML Content</h3>
                                                     <div class="tab-content">
                                                         <pre class="prewrap" style="max-height: 600px">

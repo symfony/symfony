@@ -64,12 +64,14 @@ class RedisReceiverTest extends TestCase
         yield [
             [
                 'id' => 1,
-                'data' => json_encode([
-                    'body' => '{"message": "Hi"}',
-                    'headers' => [
-                        'type' => DummyMessage::class,
-                    ],
-                ]),
+                'data' => [
+                    'message' => json_encode([
+                        'body' => '{"message": "Hi"}',
+                        'headers' => [
+                            'type' => DummyMessage::class,
+                        ],
+                    ]),
+                ],
             ],
             new DummyMessage('Hi'),
             new Serializer(
@@ -80,12 +82,14 @@ class RedisReceiverTest extends TestCase
         yield [
             [
                 'id' => 2,
-                'data' => json_encode([
-                    'foo' => 'fooValue',
-                    'bar' => [
-                        'baz' => 'bazValue',
-                    ],
-                ]),
+                'data' => [
+                    'message' => json_encode([
+                        'foo' => 'fooValue',
+                        'bar' => [
+                            'baz' => 'bazValue',
+                        ],
+                    ]),
+                ],
             ],
             (new ExternalMessage('fooValue'))->setBar(['baz' => 'bazValue']),
             new ExternalMessageSerializer(),
@@ -97,24 +101,28 @@ class RedisReceiverTest extends TestCase
         yield [
             [
                 'id' => 1,
-                'data' => json_encode([
-                    'body' => '{"message": "Hi"}',
-                    'headers' => [
-                        'type' => DummyMessage::class,
-                    ],
-                ]),
+                'data' => [
+                    'message' => json_encode([
+                        'body' => '{"message": "Hi"}',
+                        'headers' => [
+                            'type' => DummyMessage::class,
+                        ],
+                    ]),
+                ],
             ],
         ];
 
         yield [
             [
                 'id' => 2,
-                'data' => json_encode([
-                    'foo' => 'fooValue',
-                    'bar' => [
-                        'baz' => 'bazValue',
-                    ],
-                ]),
+                'data' => [
+                    'message' => json_encode([
+                        'foo' => 'fooValue',
+                        'bar' => [
+                            'baz' => 'bazValue',
+                        ],
+                    ]),
+                ],
             ],
         ];
     }

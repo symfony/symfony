@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * The component is not experimental anymore
+ * Add support for long intervals (months and years)
 
 5.2.0
 -----

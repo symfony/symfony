@@ -49,6 +49,16 @@ final class Rate
         return new static(new \DateInterval('P1D'), $rate);
     }
 
+    public static function perMonth(int $rate = 1): self
+    {
+        return new static(new \DateInterval('P1M'), $rate);
+    }
+
+    public static function perYear(int $rate = 1): self
+    {
+        return new static(new \DateInterval('P1Y'), $rate);
+    }
+
     /**
      * @param string $string using the format: "%interval_spec%-%rate%", {@see DateInterval}
      */
@@ -91,6 +101,6 @@ final class Rate
 
     public function __toString(): string
     {
-        return $this->refillTime->format('P%dDT%HH%iM%sS').'-'.$this->refillAmount;
+        return $this->refillTime->format('P%y%m%dDT%HH%iM%sS').'-'.$this->refillAmount;
     }
 }

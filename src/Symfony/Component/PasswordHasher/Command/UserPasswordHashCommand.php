@@ -13,6 +13,8 @@ namespace Symfony\Component\PasswordHasher\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -164,6 +166,15 @@ EOF
         $errorIo->success('Password hashing succeeded');
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('user-class')) {
+            $suggestions->suggestValues($this->userClasses);
+
+            return;
+        }
     }
 
     /**

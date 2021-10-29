@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,8 +57,9 @@ class TranslationDebugCommand extends Command
     private $defaultViewsPath;
     private $transPaths;
     private $codePaths;
+    private $enabledLocales;
 
-    public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [])
+    public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
     {
         parent::__construct();
 
@@ -67,6 +70,7 @@ class TranslationDebugCommand extends Command
         $this->defaultViewsPath = $defaultViewsPath;
         $this->transPaths = $transPaths;
         $this->codePaths = $codePaths;
+        $this->enabledLocales = $enabledLocales;
     }
 
     /**
@@ -133,15 +137,8 @@ EOF
         $kernel = $this->getApplication()->getKernel();
 
         // Define Root Paths
-        $transPaths = $this->transPaths;
-        if ($this->defaultTransPath) {
-            $transPaths[] = $this->defaultTransPath;
-        }
-        $codePaths = $this->codePaths;
-        $codePaths[] = $kernel->getProjectDir().'/src';
-        if ($this->defaultViewsPath) {
-            $codePaths[] = $this->defaultViewsPath;
-        }
+        $transPaths = $this->getRootTransPaths();
+        $codePaths = $this->getRootCodePaths($kernel);
 
         // Override with provided Bundle info
         if (null !== $input->getArgument('bundle')) {
@@ -257,6 +254,44 @@ EOF
         return $exitCode;
     }
 
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('locale')) {
+            $suggestions->suggestValues($this->enabledLocales);
+
+            return;
+        }
+
+        /** @var KernelInterface $kernel */
+        $kernel = $this->getApplication()->getKernel();
+
+        if ($input->mustSuggestArgumentValuesFor('bundle')) {
+            $availableBundles = [];
+            foreach ($kernel->getBundles() as $bundle) {
+                $availableBundles[] = $bundle->getName();
+
+                if ($extension = $bundle->getContainerExtension()) {
+                    $availableBundles[] = $extension->getAlias();
+                }
+            }
+
+            $suggestions->suggestValues($availableBundles);
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('domain')) {
+            $locale = $input->getArgument('locale');
+
+            $mergeOperation = new MergeOperation(
+                $this->extractMessages($locale, $this->getRootCodePaths($kernel)),
+                $this->loadCurrentMessages($locale, $this->getRootTransPaths())
+            );
+
+            $suggestions->suggestValues($mergeOperation->getDomains());
+        }
+    }
+
     private function formatState(int $state): string
     {
         if (self::MESSAGE_MISSING === $state) {
@@ -351,5 +386,26 @@ EOF
         }
 
         return $fallbackCatalogues;
+    }
+
+    private function getRootTransPaths(): array
+    {
+        $transPaths = $this->transPaths;
+        if ($this->defaultTransPath) {
+            $transPaths[] = $this->defaultTransPath;
+        }
+
+        return $transPaths;
+    }
+
+    private function getRootCodePaths(KernelInterface $kernel): array
+    {
+        $codePaths = $this->codePaths;
+        $codePaths[] = $kernel->getProjectDir().'/src';
+        if ($this->defaultViewsPath) {
+            $codePaths[] = $this->defaultViewsPath;
+        }
+
+        return $codePaths;
     }
 }

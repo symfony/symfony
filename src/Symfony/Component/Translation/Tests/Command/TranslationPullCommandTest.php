@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Tests\Command;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Translation\Command\TranslationPullCommand;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
@@ -424,7 +425,51 @@ XLIFF
             , file_get_contents($filenameFr));
     }
 
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        if (!class_exists(CommandCompletionTester::class)) {
+            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+        }
+
+        $application = new Application();
+        $application->add($this->createCommand($this->createMock(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], 'en', ['loco', 'crowdin', 'lokalise']));
+
+        $tester = new CommandCompletionTester($application->get('translation:pull'));
+        $suggestions = $tester->complete($input);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions(): \Generator
+    {
+        yield 'provider' => [
+            [''],
+            ['loco', 'crowdin', 'lokalise'],
+        ];
+
+        yield '--domains' => [
+            ['loco', '--domains'],
+            ['messages', 'validators'],
+        ];
+
+        yield '--locales' => [
+            ['loco', '--locales'],
+            ['en', 'fr', 'it'],
+        ];
+    }
+
     private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en'): CommandTester
+    {
+        $command = $this->createCommand($provider, $locales, $domains, $defaultLocale);
+        $application = new Application();
+        $application->add($command);
+
+        return new CommandTester($application->find('translation:pull'));
+    }
+
+    private function createCommand(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en', array $providerNames = ['loco']): TranslationPullCommand
     {
         $writer = new TranslationWriter();
         $writer->addDumper('xlf', new XliffFileDumper());
@@ -432,16 +477,13 @@ XLIFF
         $reader = new TranslationReader();
         $reader->addLoader('xlf', new XliffFileLoader());
 
-        $command = new TranslationPullCommand(
-            $this->getProviderCollection($provider, $locales, $domains),
+        return new TranslationPullCommand(
+            $this->getProviderCollection($provider, $providerNames, $locales, $domains),
             $writer,
             $reader,
             $defaultLocale,
-            [$this->translationAppDir.'/translations']
+            [$this->translationAppDir.'/translations'],
+            $locales
         );
-        $application = new Application();
-        $application->add($command);
-
-        return new CommandTester($application->find('translation:pull'));
     }
 }

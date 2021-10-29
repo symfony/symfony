@@ -12,6 +12,7 @@
 namespace Symfony\Component\PasswordHasher\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\PasswordHasher\Command\UserPasswordHashCommand;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
@@ -284,6 +285,34 @@ EOTXT
         $tester->execute([
             'password' => 'password',
         ], ['interactive' => false]);
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testCompletionSuggestions(array $input, array $expectedSuggestions)
+    {
+        if (!class_exists(CommandCompletionTester::class)) {
+            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+        }
+
+        $command = new UserPasswordHashCommand($this->createMock(PasswordHasherFactoryInterface::class), ['App\Entity\User']);
+        $tester = new CommandCompletionTester($command);
+
+        $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'user_class_empty' => [
+            [''],
+            ['App\Entity\User'],
+        ];
+
+        yield 'user_class_given' => [
+            ['App'],
+            ['App\Entity\User'],
+        ];
     }
 
     protected function setUp(): void

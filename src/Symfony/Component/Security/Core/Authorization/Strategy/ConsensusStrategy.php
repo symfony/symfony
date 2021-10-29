@@ -32,8 +32,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 final class ConsensusStrategy implements AccessDecisionStrategyInterface, \Stringable
 {
-    private $allowIfAllAbstainDecisions;
-    private $allowIfEqualGrantedDeniedDecisions;
+    private bool $allowIfAllAbstainDecisions;
+    private bool $allowIfEqualGrantedDeniedDecisions;
 
     public function __construct(bool $allowIfAllAbstainDecisions = false, bool $allowIfEqualGrantedDeniedDecisions = true)
     {

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DataCollector;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -24,7 +25,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -231,7 +231,7 @@ class SecurityDataCollectorTest extends TestCase
         $decoratedVoter1 = new TraceableVoter($voter1, $eventDispatcher);
 
         yield [
-            AccessDecisionManager::STRATEGY_AFFIRMATIVE,
+            MainConfiguration::STRATEGY_AFFIRMATIVE,
             [[
                 'attributes' => ['view'],
                 'object' => new \stdClass(),
@@ -255,7 +255,7 @@ class SecurityDataCollectorTest extends TestCase
         ];
 
         yield [
-            AccessDecisionManager::STRATEGY_UNANIMOUS,
+            MainConfiguration::STRATEGY_UNANIMOUS,
             [
                 [
                     'attributes' => ['view', 'edit'],

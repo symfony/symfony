@@ -221,6 +221,7 @@ return static function (ContainerConfigurator $container) {
                 null, // twig.default_path
                 [], // Translator paths
                 [], // Twig paths
+                param('kernel.enabled_locales'),
             ])
             ->tag('console.command')
 

@@ -45,6 +45,7 @@ class FunctionsTest extends TestCase
 
         $this->assertEquals([$var1, $var2, $var3], $return);
     }
+
     public function testEDumpReturnsFirstArg()
     {
         $this->setupVarDumper();

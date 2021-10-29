@@ -37,13 +37,13 @@ class VarDumper
      */
     private static $handler;
 
-    public static function dump($var)
+    public static function dump($var, $output = null, array $extraDisplayOptions = [])
     {
         if (null === self::$handler) {
             self::register();
         }
 
-        return (self::$handler)($var);
+        return (self::$handler)($var, $output, $extraDisplayOptions);
     }
 
     /**
@@ -90,8 +90,8 @@ class VarDumper
             $dumper = new ContextualizedDumper($dumper, [new SourceContextProvider()]);
         }
 
-        self::$handler = function ($var) use ($cloner, $dumper) {
-            $dumper->dump($cloner->cloneVar($var));
+        self::$handler = function ($var, $output, $extraDisplayOptions) use ($cloner, $dumper) {
+            $dumper->dump($cloner->cloneVar($var, $output, $extraDisplayOptions));
         };
     }
 

@@ -124,7 +124,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         if (\PHP_VERSION_ID >= 80000) {
             $attributes = [];
             foreach ($class->getAttributes() as $a) {
-                $attributes[] = [$a->getName(), $a->getArguments()];
+                $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
             }
             yield print_r($attributes, true);
             $attributes = [];
@@ -148,7 +148,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED) as $p) {
                 if (\PHP_VERSION_ID >= 80000) {
                     foreach ($p->getAttributes() as $a) {
-                        $attributes[] = [$a->getName(), $a->getArguments()];
+                        $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
                     }
                     yield print_r($attributes, true);
                     $attributes = [];
@@ -168,7 +168,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
             if (\PHP_VERSION_ID >= 80000) {
                 foreach ($m->getAttributes() as $a) {
-                    $attributes[] = [$a->getName(), $a->getArguments()];
+                    $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
                 }
                 yield print_r($attributes, true);
                 $attributes = [];
@@ -179,7 +179,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             foreach ($m->getParameters() as $p) {
                 if (\PHP_VERSION_ID >= 80000) {
                     foreach ($p->getAttributes() as $a) {
-                        $attributes[] = [$a->getName(), $a->getArguments()];
+                        $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
                     }
                     yield print_r($attributes, true);
                     $attributes = [];
@@ -187,6 +187,12 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
 
                 if (!$p->isDefaultValueAvailable()) {
                     $defaults[$p->name] = null;
+
+                    continue;
+                }
+
+                if (\PHP_VERSION_ID >= 80100) {
+                    $defaults[$p->name] = (string) $p;
 
                     continue;
                 }

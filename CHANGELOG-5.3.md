@@ -9,7 +9,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 5.3.11 (2021-10-30)
 
- * feature #43799 [VarDumper] Support expanded dumps
+ * feature [VarDumper] Support expanded dumps
 
 * 5.3.10 (2021-10-29)
 

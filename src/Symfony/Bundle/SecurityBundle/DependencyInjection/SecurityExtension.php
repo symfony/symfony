@@ -80,7 +80,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     public function load(array $configs, ContainerBuilder $container)
     {
         if (!class_exists(InstalledVersions::class)) {
-            trigger_deprecation('symfony/security-bundle', '5.4', 'Configuring Symfony without the Composer Runtime API is deprecated. Consider upgrading to Composer 2.');
+            trigger_deprecation('symfony/security-bundle', '5.4', 'Configuring Symfony without the Composer Runtime API is deprecated. Consider upgrading to Composer 2.1 or later.');
         }
 
         if (!array_filter($configs)) {

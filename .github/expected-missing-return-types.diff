@@ -1,8 +1,10 @@
-Run these steps to update this file:
- - sed -i 's/ *"\*\*\/Tests\/"//' composer.json
- - composer u -o
- - SYMFONY_PATCH_TYPE_DECLARATIONS='force=2' php .github/patch-types.php
- - git diff -U2 composer.json src/ >.github/expected-missing-return-types.diff
+# Run these steps to update this file:
+sed -i 's/ *"\*\*\/Tests\/"//' composer.json
+composer u -o
+SYMFONY_PATCH_TYPE_DECLARATIONS='force=2' php .github/patch-types.php
+head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
+(echo "$head" && echo && git diff -U2 composer.json src/) > .github/expected-missing-return-types.diff
+
 diff --git a/composer.json b/composer.json
 index 0ad5f625a7..f614f93465 100644
 --- a/composer.json

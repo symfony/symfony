@@ -16,6 +16,7 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
+use Symfony\Component\RateLimiter\Util\TimeUtil;
 
 /**
  * @group time-sensitive
@@ -49,16 +50,19 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertSame(10, $rateLimit->getLimit());
     }
 
-    public function testConsumeOutsideInterval()
+    /**
+     * @dataProvider provideConsumeOutsideInterval
+     */
+    public function testConsumeOutsideInterval(string $dateIntervalString)
     {
-        $limiter = $this->createLimiter();
+        $limiter = $this->createLimiter($dateIntervalString);
 
         // start window...
         $limiter->consume();
-        // ...add a max burst at the end of the window...
-        sleep(55);
+        // ...add a max burst, 5 seconds before the end of the window...
+        sleep(TimeUtil::dateIntervalToSeconds(new \DateInterval($dateIntervalString)) - 5);
         $limiter->consume(9);
-        // ...try bursting again at the start of the next window
+        // ...try bursting again at the start of the next window, 10 seconds later
         sleep(10);
         $rateLimit = $limiter->consume(10);
         $this->assertEquals(0, $rateLimit->getRemainingTokens());
@@ -74,8 +78,21 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertEquals(9, $rateLimit->getRemainingTokens());
     }
 
-    private function createLimiter(): FixedWindowLimiter
+    private function createLimiter(string $dateIntervalString = 'PT1M'): FixedWindowLimiter
     {
-        return new FixedWindowLimiter('test', 10, new \DateInterval('PT1M'), $this->storage);
+        return new FixedWindowLimiter('test', 10, new \DateInterval($dateIntervalString), $this->storage);
+    }
+
+    public function provideConsumeOutsideInterval(): \Generator
+    {
+        yield ['PT15S'];
+
+        yield ['PT1M'];
+
+        yield ['PT1H'];
+
+        yield ['P1M'];
+
+        yield ['P1Y'];
     }
 }

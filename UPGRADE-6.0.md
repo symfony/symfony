@@ -125,6 +125,7 @@ HttpFoundation
  * Passing non-scalar default value as the second argument `InputBag::get()` will throw `\InvalidArgumentException`
  * Passing non-scalar, non-array value as the second argument `InputBag::set()` will throw `\InvalidArgumentException`
  * Passing `null` as `$requestIp` to `IpUtils::__checkIp()`, `IpUtils::__checkIp4()` or `IpUtils::__checkIp6()` is not supported anymore.
+ * Remove the `upload_progress.*` and `url_rewriter.tags` session options
 
 HttpKernel
 ----------

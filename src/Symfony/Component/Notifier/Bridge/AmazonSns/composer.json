@@ -17,8 +17,8 @@
     ],
     "require": {
         "php": ">=8.0.2",
-        "symfony/http-client": "^4.4|^5.2",
-        "symfony/notifier": "^5.4",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^5.4|^6.0",
         "async-aws/sns": "^1.0"
     },
     "autoload": {

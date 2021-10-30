@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
-use Composer\InstalledVersions;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Console\Application;
@@ -36,26 +35,22 @@ class TwigExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
-        if (!class_exists(InstalledVersions::class)) {
-            trigger_deprecation('symfony/twig-bundle', '5.4', 'Configuring Symfony without the Composer Runtime API is deprecated. Consider upgrading to Composer 2.1 or later.');
-        }
-
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.php');
 
-        if ($container::willBeAvailable('symfony/form', Form::class, ['symfony/twig-bundle'], true)) {
+        if ($container::willBeAvailable('symfony/form', Form::class, ['symfony/twig-bundle'])) {
             $loader->load('form.php');
         }
 
-        if ($container::willBeAvailable('symfony/console', Application::class, ['symfony/twig-bundle'], true)) {
+        if ($container::willBeAvailable('symfony/console', Application::class, ['symfony/twig-bundle'])) {
             $loader->load('console.php');
         }
 
-        if ($container::willBeAvailable('symfony/mailer', Mailer::class, ['symfony/twig-bundle'], true)) {
+        if ($container::willBeAvailable('symfony/mailer', Mailer::class, ['symfony/twig-bundle'])) {
             $loader->load('mailer.php');
         }
 
-        if (!$container::willBeAvailable('symfony/translation', Translator::class, ['symfony/twig-bundle'], true)) {
+        if (!$container::willBeAvailable('symfony/translation', Translator::class, ['symfony/twig-bundle'])) {
             $container->removeDefinition('twig.translation.extractor');
         }
 

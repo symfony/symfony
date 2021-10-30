@@ -122,7 +122,7 @@ class Configuration implements ConfigurationInterface
             $parentPackages = (array) $parentPackage;
             $parentPackages[] = 'symfony/framework-bundle';
 
-            return ContainerBuilder::willBeAvailable($package, $class, $parentPackages, true);
+            return ContainerBuilder::willBeAvailable($package, $class, $parentPackages);
         };
 
         $enableIfStandalone = static function (string $package, string $class) use ($willBeAvailable) {

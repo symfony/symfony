@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=8.0.2",
+        "composer-runtime-api": ">=2.1",
         "ext-xml": "*",
         "symfony/cache": "^5.4|^6.0",
         "symfony/config": "^5.4|^6.0",

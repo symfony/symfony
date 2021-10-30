@@ -22,9 +22,9 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  */
 class StopWorkerOnMessageLimitListener implements EventSubscriberInterface
 {
-    private $maximumNumberOfMessages;
-    private $logger;
-    private $receivedMessages = 0;
+    private int $maximumNumberOfMessages;
+    private ?LoggerInterface $logger;
+    private int $receivedMessages = 0;
 
     public function __construct(int $maximumNumberOfMessages, LoggerInterface $logger = null)
     {

@@ -18,10 +18,10 @@ namespace Symfony\Component\Messenger\Handler;
  */
 final class HandlerDescriptor
 {
-    private $handler;
-    private $name;
-    private $batchHandler;
-    private $options;
+    private \Closure $handler;
+    private string $name;
+    private ?BatchHandlerInterface $batchHandler = null;
+    private array $options;
 
     public function __construct(callable $handler, array $options = [])
     {

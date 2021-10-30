@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ValidationMiddleware implements MiddlewareInterface
 {
-    private $validator;
+    private ValidatorInterface $validator;
 
     public function __construct(ValidatorInterface $validator)
     {

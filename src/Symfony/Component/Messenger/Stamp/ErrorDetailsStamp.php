@@ -20,10 +20,10 @@ use Throwable;
  */
 final class ErrorDetailsStamp implements StampInterface
 {
-    private $exceptionClass;
-    private $exceptionCode;
-    private $exceptionMessage;
-    private $flattenException;
+    private string $exceptionClass;
+    private int|string $exceptionCode;
+    private string $exceptionMessage;
+    private ?FlattenException $flattenException;
 
     public function __construct(string $exceptionClass, int|string $exceptionCode, string $exceptionMessage, FlattenException $flattenException = null)
     {

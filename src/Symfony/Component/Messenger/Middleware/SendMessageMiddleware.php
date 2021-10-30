@@ -28,8 +28,8 @@ class SendMessageMiddleware implements MiddlewareInterface
 {
     use LoggerAwareTrait;
 
-    private $sendersLocator;
-    private $eventDispatcher;
+    private SendersLocatorInterface $sendersLocator;
+    private ?EventDispatcherInterface $eventDispatcher;
 
     public function __construct(SendersLocatorInterface $sendersLocator, EventDispatcherInterface $eventDispatcher = null)
     {

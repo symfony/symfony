@@ -40,7 +40,7 @@ abstract class AbstractFailedMessagesCommand extends Command
 {
     protected $failureTransports;
 
-    private $globalFailureReceiverName;
+    private ?string $globalFailureReceiverName;
 
     public function __construct(?string $globalFailureReceiverName, ServiceProviderInterface $failureTransports)
     {

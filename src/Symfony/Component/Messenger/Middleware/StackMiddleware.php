@@ -18,8 +18,8 @@ use Symfony\Component\Messenger\Envelope;
  */
 class StackMiddleware implements MiddlewareInterface, StackInterface
 {
-    private $stack;
-    private $offset = 0;
+    private MiddlewareStack $stack;
+    private int $offset = 0;
 
     /**
      * @param iterable<mixed, MiddlewareInterface>|MiddlewareInterface|null $middlewareIterator

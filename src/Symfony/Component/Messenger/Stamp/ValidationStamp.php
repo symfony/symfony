@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  */
 final class ValidationStamp implements StampInterface
 {
-    private $groups;
+    private array|GroupSequence $groups;
 
     /**
      * @param string[]|GroupSequence $groups

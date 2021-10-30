@@ -15,8 +15,8 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 final class AmazonSqsFifoStamp implements NonSendableStampInterface
 {
-    private $messageGroupId;
-    private $messageDeduplicationId;
+    private ?string $messageGroupId;
+    private ?string $messageDeduplicationId;
 
     public function __construct(string $messageGroupId = null, string $messageDeduplicationId = null)
     {

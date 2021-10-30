@@ -23,8 +23,8 @@ final class Envelope
     /**
      * @var array<string, list<StampInterface>>
      */
-    private $stamps = [];
-    private $message;
+    private array $stamps = [];
+    private object $message;
 
     /**
      * @param object|Envelope  $message

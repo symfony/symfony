@@ -21,17 +21,16 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
  */
 class StopWorkerOnMemoryLimitListener implements EventSubscriberInterface
 {
-    private $memoryLimit;
-    private $logger;
-    private $memoryResolver;
+    private int $memoryLimit;
+    private ?LoggerInterface $logger;
+    private \Closure $memoryResolver;
 
     public function __construct(int $memoryLimit, LoggerInterface $logger = null, callable $memoryResolver = null)
     {
         $this->memoryLimit = $memoryLimit;
         $this->logger = $logger;
-        $this->memoryResolver = $memoryResolver ?: static function () {
-            return memory_get_usage(true);
-        };
+        $memoryResolver ??= static fn () => memory_get_usage(true);
+        $this->memoryResolver = $memoryResolver instanceof \Closure ? $memoryResolver : \Closure::fromCallable($memoryResolver);
     }
 
     public function onWorkerRunning(WorkerRunningEvent $event): void

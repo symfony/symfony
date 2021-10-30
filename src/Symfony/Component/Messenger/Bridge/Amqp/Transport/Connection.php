@@ -74,32 +74,21 @@ class Connection
         'arguments',
     ];
 
-    private $connectionOptions;
-    private $exchangeOptions;
-    private $queuesOptions;
-    private $amqpFactory;
-    private $autoSetupExchange;
-    private $autoSetupDelayExchange;
+    private array $connectionOptions;
+    private array $exchangeOptions;
+    private array $queuesOptions;
+    private AmqpFactory $amqpFactory;
+    private mixed $autoSetupExchange;
+    private mixed $autoSetupDelayExchange;
+    private \AMQPChannel $amqpChannel;
+    private \AMQPExchange $amqpExchange;
 
     /**
-     * @var \AMQPChannel|null
+     * @var \AMQPQueue[]
      */
-    private $amqpChannel;
+    private array $amqpQueues = [];
 
-    /**
-     * @var \AMQPExchange|null
-     */
-    private $amqpExchange;
-
-    /**
-     * @var \AMQPQueue[]|null
-     */
-    private $amqpQueues = [];
-
-    /**
-     * @var \AMQPExchange|null
-     */
-    private $amqpDelayExchange;
+    private \AMQPExchange $amqpDelayExchange;
 
     public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, AmqpFactory $amqpFactory = null)
     {
@@ -367,7 +356,7 @@ class Connection
 
     private function getDelayExchange(): \AMQPExchange
     {
-        if (null === $this->amqpDelayExchange) {
+        if (!isset($this->amqpDelayExchange)) {
             $this->amqpDelayExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpDelayExchange->setName($this->connectionOptions['delay']['exchange_name']);
             $this->amqpDelayExchange->setType(\AMQP_EX_TYPE_DIRECT);
@@ -483,7 +472,7 @@ class Connection
 
     public function channel(): \AMQPChannel
     {
-        if (null === $this->amqpChannel) {
+        if (!isset($this->amqpChannel)) {
             $connection = $this->amqpFactory->createConnection($this->connectionOptions);
             $connectMethod = 'true' === ($this->connectionOptions['persistent'] ?? 'false') ? 'pconnect' : 'connect';
 
@@ -531,7 +520,7 @@ class Connection
 
     public function exchange(): \AMQPExchange
     {
-        if (null === $this->amqpExchange) {
+        if (!isset($this->amqpExchange)) {
             $this->amqpExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpExchange->setName($this->exchangeOptions['name']);
             $this->amqpExchange->setType($this->exchangeOptions['type'] ?? \AMQP_EX_TYPE_FANOUT);
@@ -548,10 +537,8 @@ class Connection
     private function clearWhenDisconnected(): void
     {
         if (!$this->channel()->isConnected()) {
-            $this->amqpChannel = null;
+            unset($this->amqpChannel, $this->amqpExchange, $this->amqpDelayExchange);
             $this->amqpQueues = [];
-            $this->amqpExchange = null;
-            $this->amqpDelayExchange = null;
         }
     }
 

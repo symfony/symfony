@@ -38,12 +38,12 @@ use Symfony\Component\Messenger\Worker;
 #[AsCommand(name: 'messenger:consume', description: 'Consume messages')]
 class ConsumeMessagesCommand extends Command
 {
-    private $routableBus;
-    private $receiverLocator;
-    private $eventDispatcher;
-    private $logger;
-    private $receiverNames;
-    private $resetServicesListener;
+    private RoutableMessageBus $routableBus;
+    private ContainerInterface $receiverLocator;
+    private EventDispatcherInterface $eventDispatcher;
+    private ?LoggerInterface $logger;
+    private array $receiverNames;
+    private ?ResetServicesListener $resetServicesListener;
 
     public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null)
     {

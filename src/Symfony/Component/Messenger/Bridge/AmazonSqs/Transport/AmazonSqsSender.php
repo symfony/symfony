@@ -23,8 +23,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class AmazonSqsSender implements SenderInterface
 {
-    private $connection;
-    private $serializer;
+    private Connection $connection;
+    private SerializerInterface $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer)
     {

@@ -19,10 +19,10 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 final class AmqpStamp implements NonSendableStampInterface
 {
-    private $routingKey;
-    private $flags;
-    private $attributes;
-    private $isRetryAttempt = false;
+    private ?string $routingKey;
+    private int $flags;
+    private array $attributes;
+    private bool $isRetryAttempt = false;
 
     public function __construct(string $routingKey = null, int $flags = \AMQP_NOPARAM, array $attributes = [])
     {

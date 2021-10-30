@@ -39,9 +39,9 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 {
     private const DEFAULT_TRANSPORT_OPTION = 'choose';
 
-    private $eventDispatcher;
-    private $messageBus;
-    private $logger;
+    private EventDispatcherInterface $eventDispatcher;
+    private MessageBusInterface $messageBus;
+    private ?LoggerInterface $logger;
 
     public function __construct(?string $globalReceiverName, ServiceProviderInterface $failureTransports, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null)
     {

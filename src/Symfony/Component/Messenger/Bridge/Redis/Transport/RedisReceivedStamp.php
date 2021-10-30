@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class RedisReceivedStamp implements NonSendableStampInterface
 {
-    private $id;
+    private string $id;
 
     public function __construct(string $id)
     {

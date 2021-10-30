@@ -16,6 +16,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
 use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
@@ -160,6 +161,7 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
@@ -1832,6 +1834,14 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('property_info.php');
+
+        if (
+            ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/property-info'], true)
+            && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/property-info'], true)
+        ) {
+            $definition = $container->register('property_info.phpstan_extractor', PhpStanExtractor::class);
+            $definition->addTag('property_info.type_extractor', ['priority' => -1000]);
+        }
 
         if (ContainerBuilder::willBeAvailable('phpdocumentor/reflection-docblock', DocBlockFactoryInterface::class, ['symfony/framework-bundle', 'symfony/property-info'], true)) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');

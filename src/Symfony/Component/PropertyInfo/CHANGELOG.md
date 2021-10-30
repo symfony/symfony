@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add PhpStanExtractor
+
 5.3
 ---
 

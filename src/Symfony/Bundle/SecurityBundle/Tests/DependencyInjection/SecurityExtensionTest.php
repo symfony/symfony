@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
@@ -44,6 +45,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
 class SecurityExtensionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testInvalidCheckPath()
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -371,6 +374,33 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->has(UserProviderInterface::class));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testFirewallWithNoUserProviderTriggerDeprecation()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+
+            'providers' => [
+                'first' => ['id' => 'foo'],
+                'second' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'some_firewall' => [
+                    'custom_authenticator' => 'my_authenticator',
+                ],
+            ],
+        ]);
+
+        $this->expectDeprecation('Since symfony/security-bundle 5.4: Not configuring explicitly the provider for the "custom_authenticators" listener on "some_firewall" firewall is deprecated because it\'s ambiguous as there is more than one registered provider.');
+
+        $container->compile();
     }
 
     /**

@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-20T15:20:01Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-07T13:32:41Z
+
+This would be a new feature to me.
+But now I'm wondering why this isn't handled by `ResolveParameterPlaceHoldersPass`.
+Can you please give it a try?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-26T19:42:37Z
+
+@wbloszyk friendly ping :) Do you plan to update this PR according to Nicolas' suggestion?
+
+---------------------------------------------------------------------------
+
+by wbloszyk at 2021-09-26T21:11:05Z
+
+> @wbloszyk friendly ping :) Do you plan to update this PR according to Nicolas' suggestion?
+
+Thanks for pinging. I really forgot about it. I will check it tomorrow.
+
+For first look IT look like it is should be handler by `ResolveParameterPlaceHoldersPass` or even more probably by `AbstractRecursivePass`.
+
+---------------------------------------------------------------------------
+
+by wbloszyk at 2021-09-28T16:04:28Z
+
+@chalasr
+I have not more time for this now. I analyse code and this is results:
+
+**Problem description**
+Can not use parameter as argument in tag, example:
+```xml
+<tag name="doctrine.event_subscriber" connection="%simplethings.entityaudit.connection%"/>
+```
+
+**Will throw**
+```
+The Doctrine connection "%simplethings.entityaudit.connection%" referenced
+!!    in service "simplethings_entityaudit.log_revisions_listener" does not exist
+!!    . Available connections names: "default".
+```
+
+**Description**
+While running `RegisterEventListenersAndSubscribersPass` for `doctrine-bridge` argument `connection` is not resolve.
+
+**Sugestion**
+- ~~`ResolveParameterPlaceHoldersPass` - is dedicated for service attributes, arguments and methodCalls.~~
+- `RegisterEventListenersAndSubscribersPass` is call before `ResolveTaggedIteratorArgumentPass`
+- `ResolveTaggedIteratorArgumentPass` - do not work correctly
+- `RegisterEventListenersAndSubscribersPass` - do not work correctly or arguments are resolve correctly but compilerPass does not see it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-29T17:25:12Z
+
+Can you please add an entry in the changelog of the component?

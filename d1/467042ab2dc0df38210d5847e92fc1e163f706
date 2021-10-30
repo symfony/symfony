@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by acran at 2021-08-11T12:06:47Z
+
+/cc @yceruto
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-26T06:16:02Z
+
+@acran Could you add a unit test?
+
+---------------------------------------------------------------------------
+
+by acran at 2021-09-02T12:31:06Z
+
+> @acran Could you add a unit test?
+
+I can try :nerd_face:
+But I'll need probably some feedback on this.
+
+Also digging a bit further in this I found though 33e6af5850ce167ddef96c467cd86b9a6f986f2c was the commit that introduced the offending _line_ it was actually just the result of refactorings and code style fixes and the problem was introduced in c71dfb96737ed3d79b664dcc2138a1c3929354c0. Looking at that commit it definitely smells like a copy&paste mistake.
+
+---------------------------------------------------------------------------
+
+by acran at 2021-10-28T12:06:02Z
+
+Any progress on this? Who could best review this PR??

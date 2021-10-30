@@ -1,0 +1,130 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-27T16:14:44Z
+
+I'm personally fine doing that but we should throw a deprecation somewhere in 5.4.
+Maybe at compile time in the DI component would be appropriate?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-27T17:13:25Z
+
+> I'm personally fine doing that but we should throw a deprecation somewhere in 5.4. Maybe at compile time in the DI component would be appropriate?
+
+In `ContainerBuilder::compile()` directly?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-27T18:36:58Z
+
+> In ContainerBuilder::compile() directly?
+
+Possibly yes. In a place that allows the deprecation to be collected for the profiler (with other compile-time deprecations).
+
+:+1: for Composer 2.1
+
+but let's remove the change on ErrorHandler to allow using the component with less constraints if that doesn't matter much
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-27T18:38:11Z
+
+Oh btw, if Symfony 6.0 is Composer 2.1 only, we could release Flex 2, which would bump to the same, with a cleaned up code base (eg the http downloader which is now in C2)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-28T10:40:38Z
+
+I've bumped to 2.1 and reverted the ErrorHandler changes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-28T10:45:09Z
+
+What about moving this to frameworkbundle actually? That would give better guarantees for what we consider "Symfony 6 apps", without imposing a restriction on standalone DI users.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-28T11:05:26Z
+
+> What about moving this to frameworkbundle actually?
+
+What do you mean by "this"? The `willBeAvailable()` method?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-28T11:42:21Z
+
+I mean the composer constraint
+
+---------------------------------------------------------------------------
+
+by stof at 2021-10-28T12:16:31Z
+
+The usage of the composer runtime api is in the DI component, not in FrameworkBundle. So that's where the dependency is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-28T12:27:51Z
+
+If we keep the "class_exists" check that is in place, DI doesn't have a dependency on C2.1.
+This change is motivated by the will to provide a predictable behavior accross the board.
+Adding the constraint to FWB found achieve this goal.
+
+My fear is that by adding the constraint to DI, ppl that try to upgrade to SF6 with C1 will get dependencies resolved just fine... with DI 5.4...
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-28T14:47:16Z
+
+> If we keep the "class_exists" check that is in place, DI doesn't have a dependency on C2.1.
+
+But that `class_exists()` check is precisely what bothers me. It's causes the unpredictable behavior. Alternatively, we could let `willBeAvailable()` throw on the 6.0 branch if the Runtime API is not available.
+
+> This change is motivated by the will to provide a predictable behavior accross the board. Adding the constraint to FWB found achieve this goal.
+
+… for full-stack Symfony apps. The component standalone would still behave undpredictably if `willBeAvailable()` is used.
+
+> My fear is that by adding the constraint to DI, ppl that try to upgrade to SF6 with C1 will get dependencies resolved just fine... with DI 5.4...
+
+We could solve that by either adding the Runtime API dependency to FWB as well or by letting FWB conflict with DI 5.4.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-28T15:11:05Z
+
+> The component standalone would still behave undpredictably if willBeAvailable() is used.
+
+*if* willBeAvailable() is used yes.
+
+this might not be enough a reason to force requiring C2.1 in DI, nor to make FWB 6 conflict with DI 5.4
+
+> We could solve that by either adding the Runtime API dependency to FWB as well or by letting FWB conflict with DI 5.4.
+
+I'm all for adding the bump to fwb. Not for conflicting. And then I wonder why we should add it to DI. We like optional deps everywhere else.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-28T15:26:18Z
+
+> We like optional deps everywhere else.
+
+Okay, what about my proposal of letting `willBeAvailable()` throw on the 6.0 branch if the Runtime API is not available? The unpredictable behavior would be replaced with a clear error message and by adding the runtime API to FWB's dependencies we make sure, a Symfony 6 app won't run into the exception.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-28T15:31:19Z
+
+Throwing works for me, with a deprecation on 5.4 :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-28T16:31:42Z
+
+Here you go: #43804
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-29T09:38:53Z
+
+Ready.

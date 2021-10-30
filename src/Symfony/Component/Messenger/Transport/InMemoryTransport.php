@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Transport;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -41,6 +43,8 @@ class InMemoryTransport implements TransportInterface, ResetInterface
      */
     private $queue = [];
 
+    private $nextId = 1;
+
     /**
      * {@inheritdoc}
      */
@@ -55,8 +59,12 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     public function ack(Envelope $envelope): void
     {
         $this->acknowledged[] = $envelope;
-        $id = spl_object_hash($envelope->getMessage());
-        unset($this->queue[$id]);
+
+        if (!$transportMessageIdStamp = $envelope->last(TransportMessageIdStamp::class)) {
+            throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
+        }
+
+        unset($this->queue[$transportMessageIdStamp->getId()]);
     }
 
     /**
@@ -65,8 +73,12 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     public function reject(Envelope $envelope): void
     {
         $this->rejected[] = $envelope;
-        $id = spl_object_hash($envelope->getMessage());
-        unset($this->queue[$id]);
+
+        if (!$transportMessageIdStamp = $envelope->last(TransportMessageIdStamp::class)) {
+            throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
+        }
+
+        unset($this->queue[$transportMessageIdStamp->getId()]);
     }
 
     /**
@@ -75,7 +87,8 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     public function send(Envelope $envelope): Envelope
     {
         $this->sent[] = $envelope;
-        $id = spl_object_hash($envelope->getMessage());
+        $id = $this->nextId++;
+        $envelope = $envelope->with(new TransportMessageIdStamp($id));
         $this->queue[$id] = $envelope;
 
         return $envelope;

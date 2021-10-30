@@ -58,7 +58,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     {
         $context = array_merge($this->defaultContext, $context);
 
-        if (isset($context[self::PRESERVE_EMPTY_OBJECTS])) {
+        if ($context[self::PRESERVE_EMPTY_OBJECTS] ?? false) {
             $context[self::YAML_FLAGS] |= Yaml::DUMP_OBJECT_AS_MAP;
         }
 

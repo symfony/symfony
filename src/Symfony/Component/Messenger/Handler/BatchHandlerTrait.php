@@ -38,7 +38,7 @@ trait BatchHandlerTrait
      * @return mixed The number of pending messages in the batch if $ack is not null,
      *               the result from handling the message otherwise
      */
-    private function handle(object $message, ?Acknowledger $ack)
+    private function handle(object $message, ?Acknowledger $ack): mixed
     {
         if (null === $ack) {
             $ack = new Acknowledger(get_debug_type($this));

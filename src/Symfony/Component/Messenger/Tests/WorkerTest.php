@@ -524,7 +524,7 @@ class DummyBatchHandler implements BatchHandlerInterface
         return $this->handle($message, $ack);
     }
 
-    private function shouldFlush()
+    private function shouldFlush(): bool
     {
         return 2 <= \count($this->jobs);
     }

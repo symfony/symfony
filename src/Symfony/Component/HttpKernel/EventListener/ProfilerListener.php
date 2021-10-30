@@ -36,13 +36,14 @@ class ProfilerListener implements EventSubscriberInterface
     protected $exception;
     protected $profiles;
     protected $requestStack;
+    protected $collectParameter;
     protected $parents;
 
     /**
      * @param bool $onlyException    True if the profiler only collects data when an exception occurs, false otherwise
      * @param bool $onlyMainRequests True if the profiler only collects data when the request is the main request, false otherwise
      */
-    public function __construct(Profiler $profiler, RequestStack $requestStack, RequestMatcherInterface $matcher = null, bool $onlyException = false, bool $onlyMainRequests = false)
+    public function __construct(Profiler $profiler, RequestStack $requestStack, RequestMatcherInterface $matcher = null, bool $onlyException = false, bool $onlyMainRequests = false, string $collectParameter = null)
     {
         $this->profiler = $profiler;
         $this->matcher = $matcher;
@@ -51,6 +52,7 @@ class ProfilerListener implements EventSubscriberInterface
         $this->profiles = new \SplObjectStorage();
         $this->parents = new \SplObjectStorage();
         $this->requestStack = $requestStack;
+        $this->collectParameter = $collectParameter;
     }
 
     /**
@@ -79,6 +81,10 @@ class ProfilerListener implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
+        if (null !== $this->collectParameter && null !== $collectParameterValue = $request->get($this->collectParameter)) {
+            true === $collectParameterValue || filter_var($collectParameterValue, \FILTER_VALIDATE_BOOLEAN) ? $this->profiler->enable() : $this->profiler->disable();
+        }
+
         $exception = $this->exception;
         $this->exception = null;
 

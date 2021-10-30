@@ -778,6 +778,9 @@ class FrameworkExtension extends Extension
         $container->getDefinition('profiler')
             ->addArgument($config['collect'])
             ->addTag('kernel.reset', ['method' => 'reset']);
+
+        $container->getDefinition('profiler_listener')
+            ->addArgument($config['collect_parameter']);
     }
 
     private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

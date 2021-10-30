@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-25T14:09:30Z
+
+@nicolas-grekas Thanks for the review. I updated the PR
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-29T15:13:24Z
+
+> not pretty :)
+
+Yes! I agree, I'm not really proud of it !
+
+> aren't there a way to create a shared SelfCheckingResourceChecker and make this property non-static?
+
+This class is instantiated in https://github.com/symfony/symfony/blob/12f8faefd0cf539c3cecbdc375f87605c96a4376/src/Symfony/Component/Config/ConfigCache.php#L40 when symfony is in debug mode
+
+and `ConfigCache` is instantiated in many different location (config, kernel, and routing component).
+
+So I guess we may find a way to share it, but the code will be even uglier

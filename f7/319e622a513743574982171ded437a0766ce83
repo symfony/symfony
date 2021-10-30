@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-26T21:46:22Z
+
+👍 Thanks. Can you check if other commands have the same problem btw?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-10-27T07:21:32Z
+
+@chalasr I've found 4 `trigger_deprecation` calls in `Symfony\Component\Messenger\Command\AbstractFailedMessagesCommand`, but as it's in Abstract, I don't have access to `$output` to trigger a warning. Should I leave it as it is?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-27T11:39:18Z
+
+Maybe we can add an `abstract getOutput(): OutputInterface` method to that abstract class, implement it from concrete commands and call it where needed? The abstract command is internal so no BC to worry about
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-10-27T12:00:59Z
+
+It works, expect for the `trigger_deprecation` located in the constructor of the abstract
+
+---------------------------------------------------------------------------
+
+by stof at 2021-10-27T12:15:14Z
+
+if it is in the constructor, it means that it is a deprecation targetting the code running the constructor (i.e. the code registering the command).
+
+Deprecation messages needing to use stderr are only deprecation messages where fixing them involves changing the CLI command you run
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-10-28T14:20:09Z
+
+Ok, so as discussed in https://github.com/symfony/symfony/pull/43765#discussion_r738424110, we don't need to change the way to deprecated _methods_ here. Let's close this, ok for you @chalasr ?

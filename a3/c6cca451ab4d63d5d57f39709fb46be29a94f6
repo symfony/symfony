@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-23T12:36:30Z
+
+Hmm, so there are 2 approaches to this problem (this PR and #43664). Both approaches have a different advantage:
+1. as this PR uses a shell built-in, it's probably more correct (e.g. it catches other characters as well that we didn't yet think about)
+2. the other PR wraps things within single quotes, allowing less escaping and thus more readable arguments
+
+As an example, instead of `Symfony\\Component\\Form\\Extension\\Core\\Type\\TelType`, we can also use `'Symfony\Component\Form\Extension\Core\Type\TelType'`. Similar with `multiple\ words`, we can also do `'multiple words'`.
+
+I'm personally not sure which approach I favor, so I hope others can share their opinions knowing this context :)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-23T12:39:16Z
+
+_sorry, I've hidden my comment. The PR changed a lot from what I looked at yesterday night. I'll have to look again before sharing my opinion_
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-10-24T12:46:39Z
+
+I'm rewriting this solution to use more native bash and less PHP. Mainly to remove dependency of the input in BashOutput.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-10-25T15:06:02Z
+
+@wouterj I'm done with something more bash-native. The only limitation is with some values that are not unescaped: the token `two\ words` is not converted to `two words` in completion input.
+
+It would be awesome if we find a way to add tests to the bash script (unit or functional).
+
+---------------------------------------------------------------------------
+
+by stof at 2021-10-25T15:15:57Z
+
+> It would be awesome if we find a way to add tests to the bash script (unit or functional).
+
+I agree with that, but I have no idea how.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-28T11:52:46Z
+
+Hi!
+
+I just tested it and I think this is perfect now you support both ways! I have 2 suggestions after quickly testing this:
+
+1. What do you think about favoring quoted values with special chars (especially `\` or ` `)? For example:
+    ```
+    $ bin/console debug:form
+
+    # would become:
+    $ bin/console debug:form 'Symfony\Component\Form\Extension\Core\Type\
+
+    # instead of:
+    $ bin/console debug:form Symfony\\Component\\Form\\Extension\\Core\\Type\\
+    ```
+2. There is an error when the value only contains a quote:
+    ```
+    $ bin/console debug:form '
+    [critical] Error thrown while running command "_complete -sbash -c2 -S5.4.0-DEV -ibin/console -idebug:form -i". Message: "The "--input" option requires a value."
+                                 The "--input" option requires a value.                                              _complete [-s|--shell SHELL] [-i|--input INPUT] [-c|--current CURRENT] [-S|--symfony SYMFONY]
+
+    ```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-29T12:40:08Z
+
+@GromNaN Do you have time to have a look at Wouter's comments? I'd love to be able to merge this one to unlock some other PRs. Thank you.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-29T13:11:07Z
+
+Imho, we can also merge this one and fix both of them between beta1 and rc1. The feature is complete - it's just some minor polishing.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-10-29T15:02:03Z
+
+I'm going to make the requested changes tonight.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-10-29T15:09:34Z
+
+> What do you think about favoring quoted values with special chars
+
+By default, completion of a FQCN will contain only a single quote, since namespaces are different. Not a big deal.

@@ -202,7 +202,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
             row.appendChild(durationCell);
 
             request.liveDurationHandle = setInterval(function() {
-                durationCell.textContent = (new Date() - request.start) + 'ms';
+                durationCell.textContent = (new Date() - request.start) + ' ms';
             }, 100);
 
             row.className = 'sf-ajax-request sf-ajax-request-loading';
@@ -266,7 +266,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
             }
 
             if (request.duration) {
-                durationCell.textContent = request.duration + 'ms';
+                durationCell.textContent = request.duration + ' ms';
             }
 
             if (request.profilerUrl) {

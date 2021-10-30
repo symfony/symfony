@@ -302,15 +302,15 @@ EOTXT
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
-    public function provideCompletionSuggestions()
+    public function provideCompletionSuggestions(): iterable
     {
         yield 'user_class_empty' => [
-            [''],
+            ['p@ssw0rd', ''],
             ['App\Entity\User'],
         ];
 
         yield 'user_class_given' => [
-            ['App'],
+            ['p@ssw0rd', 'App'],
             ['App\Entity\User'],
         ];
     }

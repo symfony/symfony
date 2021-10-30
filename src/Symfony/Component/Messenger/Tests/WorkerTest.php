@@ -23,7 +23,14 @@ use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Handler\Acknowledger;
+use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
+use Symfony\Component\Messenger\Handler\BatchHandlerTrait;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
+use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
@@ -49,23 +56,25 @@ class WorkerTest extends TestCase
         ]);
 
         $bus = $this->createMock(MessageBusInterface::class);
+        $envelopes = [];
 
         $bus->expects($this->exactly(2))
             ->method('dispatch')
-            ->withConsecutive(
-                [new Envelope($apiMessage, [new ReceivedStamp('transport'), new ConsumedByWorkerStamp()])],
-                [new Envelope($ipaMessage, [new ReceivedStamp('transport'), new ConsumedByWorkerStamp()])]
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->returnArgument(0),
-                $this->returnArgument(0)
-            );
+            ->willReturnCallback(function ($envelope) use (&$envelopes) {
+                return $envelopes[] = $envelope;
+            });
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
 
         $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
         $worker->run();
+
+        $this->assertSame($apiMessage, $envelopes[0]->getMessage());
+        $this->assertSame($ipaMessage, $envelopes[1]->getMessage());
+        $this->assertCount(1, $envelopes[0]->all(ReceivedStamp::class));
+        $this->assertCount(1, $envelopes[0]->all(ConsumedByWorkerStamp::class));
+        $this->assertSame('transport', $envelopes[0]->last(ReceivedStamp::class)->getTransportName());
 
         $this->assertSame(2, $receiver->getAcknowledgeCount());
     }
@@ -340,6 +349,109 @@ class WorkerTest extends TestCase
 
         $worker->stop();
     }
+
+    public function testBatchProcessing()
+    {
+        $expectedMessages = [
+            new DummyMessage('Hey'),
+            new DummyMessage('Bob'),
+        ];
+
+        $receiver = new DummyReceiver([
+            [new Envelope($expectedMessages[0])],
+            [new Envelope($expectedMessages[1])],
+        ]);
+
+        $handler = new DummyBatchHandler();
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]));
+
+        $bus = new MessageBus([$middleware]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver) {
+            static $i = 0;
+            if (1 < ++$i) {
+                $event->getWorker()->stop();
+                $this->assertSame(2, $receiver->getAcknowledgeCount());
+            } else {
+                $this->assertSame(0, $receiver->getAcknowledgeCount());
+            }
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher);
+        $worker->run();
+
+        $this->assertSame($expectedMessages, $handler->processedMessages);
+    }
+
+    public function testFlushBatchOnIdle()
+    {
+        $expectedMessages = [
+            new DummyMessage('Hey'),
+        ];
+
+        $receiver = new DummyReceiver([
+            [new Envelope($expectedMessages[0])],
+            [],
+        ]);
+
+        $handler = new DummyBatchHandler();
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]));
+
+        $bus = new MessageBus([$middleware]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver) {
+            static $i = 0;
+            if (1 < ++$i) {
+                $event->getWorker()->stop();
+                $this->assertSame(1, $receiver->getAcknowledgeCount());
+            } else {
+                $this->assertSame(0, $receiver->getAcknowledgeCount());
+            }
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher);
+        $worker->run();
+
+        $this->assertSame($expectedMessages, $handler->processedMessages);
+    }
+
+    public function testFlushBatchOnStop()
+    {
+        $expectedMessages = [
+            new DummyMessage('Hey'),
+        ];
+
+        $receiver = new DummyReceiver([
+            [new Envelope($expectedMessages[0])],
+        ]);
+
+        $handler = new DummyBatchHandler();
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]));
+
+        $bus = new MessageBus([$middleware]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver) {
+            $event->getWorker()->stop();
+            $this->assertSame(0, $receiver->getAcknowledgeCount());
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher);
+        $worker->run();
+
+        $this->assertSame($expectedMessages, $handler->processedMessages);
+    }
 }
 
 class DummyReceiver implements ReceiverInterface
@@ -398,5 +510,31 @@ class DummyQueueReceiver extends DummyReceiver implements QueueReceiverInterface
     public function getFromQueues(array $queueNames): iterable
     {
         return $this->get();
+    }
+}
+
+class DummyBatchHandler implements BatchHandlerInterface
+{
+    use BatchHandlerTrait;
+
+    public $processedMessages;
+
+    public function __invoke(DummyMessage $message, Acknowledger $ack = null)
+    {
+        return $this->handle($message, $ack);
+    }
+
+    private function shouldFlush()
+    {
+        return 2 <= \count($this->jobs);
+    }
+
+    private function process(array $jobs): void
+    {
+        $this->processedMessages = array_column($jobs, 0);
+
+        foreach ($jobs as [$job, $ack]) {
+            $ack->ack($job);
+        }
     }
 }

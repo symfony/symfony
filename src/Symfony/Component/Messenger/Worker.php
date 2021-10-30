@@ -23,7 +23,10 @@ use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
+use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
+use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -43,6 +46,8 @@ class Worker
     private $logger;
     private $shouldStop = false;
     private $metadata;
+    private $acks = [];
+    private $unacks;
 
     /**
      * @param ReceiverInterface[] $receivers Where the key is the transport name
@@ -56,6 +61,7 @@ class Worker
         $this->metadata = new WorkerMetadata([
             'transportNames' => array_keys($receivers),
         ]);
+        $this->unacks = new \SplObjectStorage();
     }
 
     /**
@@ -85,7 +91,7 @@ class Worker
             }
         }
 
-        while (false === $this->shouldStop) {
+        while (!$this->shouldStop) {
             $envelopeHandled = false;
             $envelopeHandledStart = microtime(true);
             foreach ($this->receivers as $transportName => $receiver) {
@@ -98,7 +104,7 @@ class Worker
                 foreach ($envelopes as $envelope) {
                     $envelopeHandled = true;
 
-                    $this->handleMessage($envelope, $receiver, $transportName);
+                    $this->handleMessage($envelope, $transportName);
                     $this->dispatchEvent(new WorkerRunningEvent($this, false));
 
                     if ($this->shouldStop) {
@@ -114,6 +120,10 @@ class Worker
                 }
             }
 
+            if (!$envelopeHandled && $this->flush(false)) {
+                continue;
+            }
+
             if (!$envelopeHandled) {
                 $this->dispatchEvent(new WorkerRunningEvent($this, true));
 
@@ -123,10 +133,11 @@ class Worker
             }
         }
 
+        $this->flush(true);
         $this->dispatchEvent(new WorkerStoppedEvent($this));
     }
 
-    private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $transportName): void
+    private function handleMessage(Envelope $envelope, string $transportName): void
     {
         $event = new WorkerMessageReceivedEvent($envelope, $transportName);
         $this->dispatchEvent($event);
@@ -136,45 +147,101 @@ class Worker
             return;
         }
 
+        $acked = false;
+        $ack = function (Envelope $envelope, \Throwable $e = null) use ($transportName, &$acked) {
+            $acked = true;
+            $this->acks[] = [$transportName, $envelope, $e];
+        };
+
         try {
-            $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName), new ConsumedByWorkerStamp()));
-        } catch (\Throwable $throwable) {
-            $rejectFirst = $throwable instanceof RejectRedeliveredMessageException;
-            if ($rejectFirst) {
-                // redelivered messages are rejected first so that continuous failures in an event listener or while
-                // publishing for retry does not cause infinite redelivery loops
-                $receiver->reject($envelope);
-            }
-
-            if ($throwable instanceof HandlerFailedException) {
-                $envelope = $throwable->getEnvelope();
-            }
-
-            $failedEvent = new WorkerMessageFailedEvent($envelope, $transportName, $throwable);
-            $this->dispatchEvent($failedEvent);
-            $envelope = $failedEvent->getEnvelope();
-
-            if (!$rejectFirst) {
-                $receiver->reject($envelope);
-            }
-
-            return;
+            $e = null;
+            $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName), new ConsumedByWorkerStamp(), new AckStamp($ack)));
+        } catch (\Throwable $e) {
         }
 
-        $handledEvent = new WorkerMessageHandledEvent($envelope, $transportName);
-        $this->dispatchEvent($handledEvent);
-        $envelope = $handledEvent->getEnvelope();
+        $noAutoAckStamp = $envelope->last(NoAutoAckStamp::class);
 
-        if (null !== $this->logger) {
-            $message = $envelope->getMessage();
-            $context = [
-                'message' => $message,
-                'class' => \get_class($message),
-            ];
-            $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);
+        if (!$acked && !$noAutoAckStamp) {
+            $this->acks[] = [$transportName, $envelope, $e];
+        } elseif ($noAutoAckStamp) {
+            $this->unacks[$noAutoAckStamp->getHandlerDescriptor()->getBatchHandler()] = [$envelope->withoutAll(AckStamp::class), $transportName];
         }
 
-        $receiver->ack($envelope);
+        $this->ack();
+    }
+
+    private function ack(): bool
+    {
+        $acks = $this->acks;
+        $this->acks = [];
+
+        foreach ($acks as [$transportName, $envelope, $e]) {
+            $receiver = $this->receivers[$transportName];
+
+            if (null !== $e) {
+                if ($rejectFirst = $e instanceof RejectRedeliveredMessageException) {
+                    // redelivered messages are rejected first so that continuous failures in an event listener or while
+                    // publishing for retry does not cause infinite redelivery loops
+                    $receiver->reject($envelope);
+                }
+
+                if ($e instanceof HandlerFailedException) {
+                    $envelope = $e->getEnvelope();
+                }
+
+                $failedEvent = new WorkerMessageFailedEvent($envelope, $transportName, $e);
+
+                $this->dispatchEvent($failedEvent);
+                $envelope = $failedEvent->getEnvelope();
+
+                if (!$rejectFirst) {
+                    $receiver->reject($envelope);
+                }
+
+                continue;
+            }
+
+            $handledEvent = new WorkerMessageHandledEvent($envelope, $transportName);
+            $this->dispatchEvent($handledEvent);
+            $envelope = $handledEvent->getEnvelope();
+
+            if (null !== $this->logger) {
+                $message = $envelope->getMessage();
+                $context = [
+                    'message' => $message,
+                    'class' => \get_class($message),
+                ];
+                $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);
+            }
+
+            $receiver->ack($envelope);
+        }
+
+        return (bool) $acks;
+    }
+
+    private function flush(bool $force): bool
+    {
+        $unacks = $this->unacks;
+
+        if (!$unacks->count()) {
+            return false;
+        }
+
+        $this->unacks = new \SplObjectStorage();
+
+        foreach ($unacks as $batchHandler) {
+            [$envelope, $transportName] = $unacks[$batchHandler];
+            try {
+                $this->bus->dispatch($envelope->with(new FlushBatchHandlersStamp($force)));
+                $envelope = $envelope->withoutAll(NoAutoAckStamp::class);
+                unset($unacks[$batchHandler], $batchHandler);
+            } catch (\Throwable $e) {
+                $this->acks[] = [$transportName, $envelope, $e];
+            }
+        }
+
+        return $this->ack();
     }
 
     public function stop(): void

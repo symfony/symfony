@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class TransportFactory implements TransportFactoryInterface
 {
-    private $factories;
+    private iterable $factories;
 
     /**
      * @param iterable<mixed, TransportFactoryInterface> $factories

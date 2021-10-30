@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  */
 class RouterContextMiddleware implements MiddlewareInterface
 {
-    private $router;
+    private RequestContextAwareInterface $router;
 
     public function __construct(RequestContextAwareInterface $router)
     {

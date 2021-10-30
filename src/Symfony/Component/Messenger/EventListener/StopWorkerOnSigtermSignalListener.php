@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Event\WorkerStartedEvent;
  */
 class StopWorkerOnSigtermSignalListener implements EventSubscriberInterface
 {
-    private $logger;
+    private ?LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger = null)
     {

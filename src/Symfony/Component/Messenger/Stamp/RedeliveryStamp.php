@@ -18,8 +18,8 @@ use Symfony\Component\Messenger\Envelope;
  */
 final class RedeliveryStamp implements StampInterface
 {
-    private $retryCount;
-    private $redeliveredAt;
+    private int $retryCount;
+    private \DateTimeInterface $redeliveredAt;
 
     public function __construct(int $retryCount, \DateTimeInterface $redeliveredAt = null)
     {

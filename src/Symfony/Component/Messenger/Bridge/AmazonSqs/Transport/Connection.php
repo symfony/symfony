@@ -49,15 +49,12 @@ class Connection
         'debug' => null,
     ];
 
-    private $configuration;
-    private $client;
-
-    /** @var ReceiveMessageResult */
-    private $currentResponse;
+    private array $configuration;
+    private SqsClient $client;
+    private ?ReceiveMessageResult $currentResponse = null;
     /** @var array[] */
-    private $buffer = [];
-    /** @var string|null */
-    private $queueUrl;
+    private array $buffer = [];
+    private ?string $queueUrl;
 
     public function __construct(array $configuration, SqsClient $client = null, string $queueUrl = null)
     {

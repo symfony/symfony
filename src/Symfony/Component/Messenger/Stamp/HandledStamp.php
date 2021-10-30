@@ -27,8 +27,8 @@ use Symfony\Component\Messenger\Handler\HandlerDescriptor;
  */
 final class HandledStamp implements StampInterface
 {
-    private $result;
-    private $handlerName;
+    private mixed $result;
+    private string $handlerName;
 
     public function __construct(mixed $result, string $handlerName)
     {

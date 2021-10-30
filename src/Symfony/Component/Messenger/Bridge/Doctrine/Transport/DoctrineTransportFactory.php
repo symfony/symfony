@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class DoctrineTransportFactory implements TransportFactoryInterface
 {
-    private $registry;
+    private ConnectionRegistry $registry;
 
     public function __construct(ConnectionRegistry $registry)
     {

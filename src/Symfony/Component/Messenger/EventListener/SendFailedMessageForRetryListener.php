@@ -32,11 +32,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class SendFailedMessageForRetryListener implements EventSubscriberInterface
 {
-    private $sendersLocator;
-    private $retryStrategyLocator;
-    private $logger;
-    private $eventDispatcher;
-    private $historySize;
+    private ContainerInterface $sendersLocator;
+    private ContainerInterface $retryStrategyLocator;
+    private ?LoggerInterface $logger;
+    private ?EventDispatcherInterface $eventDispatcher;
+    private int $historySize;
 
     public function __construct(ContainerInterface $sendersLocator, ContainerInterface $retryStrategyLocator, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, int $historySize = 10)
     {

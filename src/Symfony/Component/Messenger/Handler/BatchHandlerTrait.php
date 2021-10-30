@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Exception\LogicException;
  */
 trait BatchHandlerTrait
 {
-    private $jobs = [];
+    private array $jobs = [];
 
     /**
      * {@inheritdoc}

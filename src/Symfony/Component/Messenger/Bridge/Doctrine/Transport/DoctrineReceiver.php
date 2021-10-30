@@ -30,9 +30,9 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
     private const MAX_RETRIES = 3;
-    private $retryingSafetyCounter = 0;
-    private $connection;
-    private $serializer;
+    private int $retryingSafetyCounter = 0;
+    private Connection $connection;
+    private SerializerInterface $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {

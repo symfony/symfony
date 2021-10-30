@@ -34,7 +34,7 @@ final class PostgreSqlConnection extends Connection
         'get_notify_timeout' => 0,
     ];
 
-    private $listening = false;
+    private bool $listening = false;
 
     public function __sleep(): array
     {

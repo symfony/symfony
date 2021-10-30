@@ -43,19 +43,19 @@ class Connection
         'serializer' => \Redis::SERIALIZER_PHP,
     ];
 
-    private $connection;
-    private $stream;
-    private $queue;
-    private $group;
-    private $consumer;
-    private $autoSetup;
-    private $maxEntries;
-    private $redeliverTimeout;
-    private $nextClaim = 0;
-    private $claimInterval;
-    private $deleteAfterAck;
-    private $deleteAfterReject;
-    private $couldHavePendingMessages = true;
+    private \Redis|\RedisCluster|RedisProxy|RedisClusterProxy $connection;
+    private string $stream;
+    private string $queue;
+    private string $group;
+    private string $consumer;
+    private bool $autoSetup;
+    private int $maxEntries;
+    private int $redeliverTimeout;
+    private int $nextClaim = 0;
+    private mixed $claimInterval;
+    private mixed $deleteAfterAck;
+    private mixed $deleteAfterReject;
+    private bool $couldHavePendingMessages = true;
 
     public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis|\RedisCluster $redis = null)
     {

@@ -21,9 +21,9 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
  */
 class RedisProxy
 {
-    private $redis;
-    private $initializer;
-    private $ready = false;
+    private \Redis $redis;
+    private \Closure $initializer;
+    private bool $ready = false;
 
     public function __construct(\Redis $redis, \Closure $initializer)
     {

@@ -21,9 +21,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class TraceableMiddleware implements MiddlewareInterface
 {
-    private $stopwatch;
-    private $busName;
-    private $eventCategory;
+    private Stopwatch $stopwatch;
+    private string $busName;
+    private string $eventCategory;
 
     public function __construct(Stopwatch $stopwatch, string $busName, string $eventCategory = 'messenger.middleware')
     {
@@ -52,11 +52,11 @@ class TraceableMiddleware implements MiddlewareInterface
  */
 class TraceableStack implements StackInterface
 {
-    private $stack;
-    private $stopwatch;
-    private $busName;
-    private $eventCategory;
-    private $currentEvent;
+    private StackInterface $stack;
+    private Stopwatch $stopwatch;
+    private string $busName;
+    private string $eventCategory;
+    private ?string $currentEvent = null;
 
     public function __construct(StackInterface $stack, Stopwatch $stopwatch, string $busName, string $eventCategory)
     {

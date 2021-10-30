@@ -22,9 +22,9 @@ use Symfony\Component\Messenger\Event\WorkerStartedEvent;
  */
 class StopWorkerOnTimeLimitListener implements EventSubscriberInterface
 {
-    private $timeLimitInSeconds;
-    private $logger;
-    private $endTime;
+    private int $timeLimitInSeconds;
+    private ?LoggerInterface $logger;
+    private float $endTime = 0;
 
     public function __construct(int $timeLimitInSeconds, LoggerInterface $logger = null)
     {

@@ -25,27 +25,24 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     /**
      * @var Envelope[]
      */
-    private $sent = [];
+    private array $sent = [];
 
     /**
      * @var Envelope[]
      */
-    private $acknowledged = [];
+    private array $acknowledged = [];
 
     /**
      * @var Envelope[]
      */
-    private $rejected = [];
+    private array $rejected = [];
 
     /**
      * @var Envelope[]
      */
-    private $queue = [];
+    private array $queue = [];
 
-    /**
-     * @var SerializerInterface|null
-     */
-    private $serializer;
+    private ?SerializerInterface $serializer;
 
     public function __construct(SerializerInterface $serializer = null)
     {

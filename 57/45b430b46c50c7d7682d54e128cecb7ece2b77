@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-13T08:31:29Z
+
+I would propose to name it PHPStanExtractor
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-03-14T15:28:08Z
+
+@OskarStark IIRC the current name is more in sync with our coding conventions.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-14T20:24:39Z
+
+I know for sure, but this could be hard to read/understand because of the word "Php" and the word "Stan", additionally PHPStan is a proper name.
+
+IIRC we use sth like ORM instead of Orm, but not 100% sure. I am currently on a phone 📱
+
+Anyway it was just a proposal and a personal opinion, otherwise I would go with PhpstanExtractor then ....
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-14T20:28:30Z
+
+> IIRC we use sth like ORM instead of Orm, but not 100% sure. I am currently on a phone 📱
+
+We do :) I agree with Oscar here.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-14T21:25:51Z
+
+> I know for sure, but this could be hard to read/understand because of the word "Php" and the word "Stan", additionally PHPStan is a proper name.
+
+How so we deal with other PHPSomething project names? The extractor for PHPDoc is named `PhpDocExtractor`, the PHPUnit bridge resides in `Symfony\Bridge\PhpUnit`… I think, I'm team @dunglas here. 🙃
+
+Oh well, naming things is hard. 😓
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-14T21:29:54Z
+
+Fair enough :) consistency first.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-15T06:02:19Z
+
+Stay consistent, because of PhpUnit
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-16T08:14:53Z
+
+How does this compare to using `phpdocumentor/reflection-docblock`? Can we drop one for the other?
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2021-03-16T17:10:53Z
+
+> How does this compare to using `phpdocumentor/reflection-docblock`? Can we drop one for the other?
+
+Actually, `phpdocumentor/reflection-docblock` implementation supports 3 interfaces:
+- `Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface`
+- `Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface`
+- `Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface`
+
+I do support 2 of them. I'll try to take a look at `Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface` later but if I support it aswell we can plan to remove the extractor later.
+It would be nice to make some benchmark to see if it doesn't have too much impact on performance aswell.
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2021-10-27T08:42:44Z
+
+We do have a test on https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/PropertyInfo/Tests/Fixtures/Dummy.php#L86-L89 for a property with a `@var ?string|int` PhpDoc.
+But this is no valid syntax https://3v4l.org/r7KOM so the PhpStan type resolver does not support it. I would like to remove that test, what you guys think about it ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-27T08:47:15Z
+
+phpdoc is declarative, parsers should tolerant in what they accept (robustness principle)
+why should we skip it if another extractor can read it?
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2021-10-27T19:04:14Z
+
+And this is now open to reviews :)

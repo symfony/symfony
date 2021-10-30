@@ -42,8 +42,8 @@ final class Headers
     /**
      * @var HeaderInterface[][]
      */
-    private $headers = [];
-    private $lineLength = 76;
+    private array $headers = [];
+    private int $lineLength = 76;
 
     public function __construct(HeaderInterface ...$headers)
     {

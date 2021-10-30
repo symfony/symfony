@@ -18,7 +18,7 @@ namespace Symfony\Component\Mime\Header;
  */
 class UnstructuredHeader extends AbstractHeader
 {
-    private $value;
+    private string $value;
 
     public function __construct(string $name, string $value)
     {

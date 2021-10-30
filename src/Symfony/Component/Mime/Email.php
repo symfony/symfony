@@ -38,11 +38,20 @@ class Email extends Message
         self::PRIORITY_LOWEST => 'Lowest',
     ];
 
+    /**
+     * @var resource|string|null
+     */
     private $text;
-    private $textCharset;
+
+    private ?string $textCharset = null;
+
+    /**
+     * @var resource|string|null
+     */
     private $html;
-    private $htmlCharset;
-    private $attachments = [];
+
+    private ?string $htmlCharset = null;
+    private array $attachments = [];
 
     /**
      * @return $this

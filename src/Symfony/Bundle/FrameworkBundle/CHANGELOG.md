@@ -30,6 +30,7 @@ CHANGELOG
  * Add `set_content_language_from_locale` config option to automatically set the `Content-Language` HTTP response header based on the Request locale
  * Deprecate the `framework.translator.enabled_locales`, use `framework.enabled_locales` instead
  * Add autowiring alias for `HttpCache\StoreInterface`
+ * Add the ability to enable the profiler using a request query parameter, body parameter or attribute
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private
  * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
@@ -40,6 +41,7 @@ CHANGELOG
  * Bind the `default_context` parameter onto serializer's encoders and normalizers
  * Add support for `statusCode` default parameter when loading a template directly from route using the `Symfony\Bundle\FrameworkBundle\Controller\TemplateController` controller
  * Deprecate `translation:update` command, use `translation:extract` instead
+ * Add `PhpStanExtractor` support for the PropertyInfo component
 
 5.3
 ---

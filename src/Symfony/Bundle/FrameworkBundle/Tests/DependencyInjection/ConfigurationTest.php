@@ -403,6 +403,7 @@ class ConfigurationTest extends TestCase
                 'only_main_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
+                'collect_parameter' => null,
             ],
             'translator' => [
                 'enabled' => !class_exists(FullStack::class),

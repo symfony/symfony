@@ -79,32 +79,32 @@ class CompleteCommandTest extends TestCase
     /**
      * @dataProvider provideCompleteCommandNameInputs
      */
-    public function testCompleteCommandName(array $input, string $suggestions = 'help list completion hello'.\PHP_EOL)
+    public function testCompleteCommandName(array $input, array $suggestions)
     {
         $this->execute(['--current' => '1', '--input' => $input]);
-        $this->assertEquals($suggestions, $this->tester->getDisplay());
+        $this->assertEquals(implode("\n", $suggestions)."\n", $this->tester->getDisplay());
     }
 
     public function provideCompleteCommandNameInputs()
     {
-        yield 'empty' => [['bin/console']];
-        yield 'partial' => [['bin/console', 'he']];
-        yield 'complete-shortcut-name' => [['bin/console', 'hell'], 'hello'.\PHP_EOL];
+        yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello']];
+        yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello']];
+        yield 'complete-shortcut-name' => [['bin/console', 'hell'], ['hello']];
     }
 
     /**
      * @dataProvider provideCompleteCommandInputDefinitionInputs
      */
-    public function testCompleteCommandInputDefinition(array $input, string $suggestions)
+    public function testCompleteCommandInputDefinition(array $input, array $suggestions)
     {
         $this->execute(['--current' => '2', '--input' => $input]);
-        $this->assertEquals($suggestions, $this->tester->getDisplay());
+        $this->assertEquals(implode("\n", $suggestions)."\n", $this->tester->getDisplay());
     }
 
     public function provideCompleteCommandInputDefinitionInputs()
     {
-        yield 'definition' => [['bin/console', 'hello', '-'], '--help --quiet --verbose --version --ansi --no-interaction'.\PHP_EOL];
-        yield 'custom' => [['bin/console', 'hello'], 'Fabien Robin Wouter'.\PHP_EOL];
+        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--quiet', '--verbose', '--version', '--ansi', '--no-interaction']];
+        yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];
     }
 
     private function execute(array $input)

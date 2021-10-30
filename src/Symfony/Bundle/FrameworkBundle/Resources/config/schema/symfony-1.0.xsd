@@ -91,6 +91,7 @@
 
     <xsd:complexType name="profiler">
         <xsd:attribute name="collect" type="xsd:string" />
+        <xsd:attribute name="collect-parameter" type="xsd:string" />
         <xsd:attribute name="only-exceptions" type="xsd:string" />
         <xsd:attribute name="only-main-requests" type="xsd:string" />
         <xsd:attribute name="only-master-requests" type="xsd:string" />

@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Output\BashCompletionOutput;
+use Symfony\Component\Console\Completion\Output\CompletionOutputInterface;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -82,6 +83,8 @@ final class CompleteCommand extends Command
                 '<comment>'.date('Y-m-d H:i:s').'</>',
                 '<info>Input:</> <comment>("|" indicates the cursor position)</>',
                 '  '.(string) $completionInput,
+                '<info>Command:</>',
+                '  '.(string) implode(' ', $_SERVER['argv']),
                 '<info>Messages:</>',
             ]);
 
@@ -119,6 +122,7 @@ final class CompleteCommand extends Command
                 }
             }
 
+            /** @var CompletionOutputInterface $completionOutput */
             $completionOutput = new $completionOutput();
 
             $this->log('<info>Suggestions:</>');
@@ -154,10 +158,7 @@ final class CompleteCommand extends Command
             throw new \RuntimeException('The "--current" option must be set and it must be an integer.');
         }
 
-        $completionInput = CompletionInput::fromTokens(array_map(
-            function (string $i): string { return trim($i, "'"); },
-            $input->getOption('input')
-        ), (int) $currentIndex);
+        $completionInput = CompletionInput::fromTokens($input->getOption('input'), (int) $currentIndex);
 
         try {
             $completionInput->bind($this->getApplication()->getDefinition());

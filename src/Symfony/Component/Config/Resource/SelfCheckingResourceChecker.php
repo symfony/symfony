@@ -23,14 +23,24 @@ use Symfony\Component\Config\ResourceCheckerInterface;
  */
 class SelfCheckingResourceChecker implements ResourceCheckerInterface
 {
+    // Common shared cache, because this checker can be used in different
+    // situations. For example, when using the full stack framework, the router
+    // and the container have their own cache. But they may check the very same
+    // resources
+    private static array $cache = [];
+
     public function supports(ResourceInterface $metadata): bool
     {
         return $metadata instanceof SelfCheckingResourceInterface;
     }
 
+    /**
+     * @param SelfCheckingResourceInterface $resource
+     */
     public function isFresh(ResourceInterface $resource, int $timestamp): bool
     {
-        /* @var SelfCheckingResourceInterface $resource */
-        return $resource->isFresh($timestamp);
+        $key = "$resource:$timestamp";
+
+        return self::$cache[$key] ?? self::$cache[$key] = $resource->isFresh($timestamp);
     }
 }

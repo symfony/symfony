@@ -6,6 +6,8 @@
 # https://symfony.com/doc/current/contributing/code/license.html
 
 _sf_{{ COMMAND_NAME }}() {
+    # Use newline as only separator to allow space in completion values
+    IFS=$'\n'
     local sf_cmd="${COMP_WORDS[0]}"
     if [ ! -f "$sf_cmd" ]; then
         return 1
@@ -16,12 +18,49 @@ _sf_{{ COMMAND_NAME }}() {
 
     local completecmd=("$sf_cmd" "_complete" "-sbash" "-c$cword" "-S{{ VERSION }}")
     for w in ${words[@]}; do
-        completecmd+=(-i "'$w'")
+        w=$(printf -- '%b' "$w")
+        # remove quotes from typed values
+        quote="${w:0:1}"
+        if [ "$quote" == \' ]; then
+            w="${w%\'}"
+            w="${w#\'}"
+        elif [ "$quote" == \" ]; then
+            w="${w%\"}"
+            w="${w#\"}"
+        fi
+        # empty values are ignored
+        if [ ! -z "$w" ]; then
+            completecmd+=("-i$w")
+        fi
     done
 
     local sfcomplete
     if sfcomplete=$(${completecmd[@]} 2>&1); then
-        COMPREPLY=($(compgen -W "$sfcomplete" -- "$cur"))
+        local quote suggestions
+        quote=${cur:0:1}
+
+        # Use single quotes by default if suggestions contains backslash (FQCN)
+        if [ "$quote" == '' ] && [[ "$sfcomplete" =~ \\ ]]; then
+            quote=\'
+        fi
+
+        if [ "$quote" == \' ]; then
+            # single quotes: no additional escaping (does not accept ' in values)
+            suggestions=$(for s in $sfcomplete; do printf $'%q%q%q\n' "$quote" "$s" "$quote"; done)
+        elif [ "$quote" == \" ]; then
+            # double quotes: double escaping for \ $ ` "
+            suggestions=$(for s in $sfcomplete; do
+                s=${s//\\/\\\\}
+                s=${s//\$/\\\$}
+                s=${s//\`/\\\`}
+                s=${s//\"/\\\"}
+                printf $'%q%q%q\n' "$quote" "$s" "$quote";
+            done)
+        else
+            # no quotes: double escaping
+            suggestions=$(for s in $sfcomplete; do printf $'%q\n' $(printf '%q' "$s"); done)
+        fi
+        COMPREPLY=($(IFS=$'\n' compgen -W "$suggestions" -- $(printf -- "%q" "$cur")))
         __ltrim_colon_completions "$cur"
     else
         if [[ "$sfcomplete" != *"Command \"_complete\" is not defined."* ]]; then

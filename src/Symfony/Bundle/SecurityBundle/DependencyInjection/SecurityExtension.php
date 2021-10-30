@@ -608,6 +608,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey || 'custom_authenticators' === $factoryKey) {
+            if ('custom_authenticators' === $factoryKey) {
+                trigger_deprecation('symfony/security-bundle', '5.4', 'Not configuring explicitly the provider for the "%s" listener on "%s" firewall is deprecated because it\'s ambiguous as there is more than one registered provider.', $factoryKey, $id);
+            }
+
             return 'security.user_providers';
         }
 

@@ -21,12 +21,10 @@ class BashCompletionOutput implements CompletionOutputInterface
 {
     public function write(CompletionSuggestions $suggestions, OutputInterface $output): void
     {
-        $options = [];
+        $options = $suggestions->getValueSuggestions();
         foreach ($suggestions->getOptionSuggestions() as $option) {
             $options[] = '--'.$option->getName();
         }
-        $output->write(implode(' ', $options));
-
-        $output->writeln(implode(' ', $suggestions->getValueSuggestions()));
+        $output->writeln(implode("\n", $options));
     }
 }

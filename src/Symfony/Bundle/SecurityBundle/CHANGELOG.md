@@ -30,6 +30,7 @@ CHANGELOG
  * Deprecate the `always_authenticate_before_granting` option
  * Display the roles of the logged-in user in the Web Debug Toolbar
  * Add the `security.access_decision_manager.strategy_service` option
+ * Deprecate not configuring explicitly a provider for custom_authenticators when there is more than one registered provider
 
 
 5.3
@@ -52,6 +53,7 @@ CHANGELOG
  * Deprecate the `security.authentication.provider.*` services, use the new authenticator system instead
  * Deprecate the `security.authentication.listener.*` services, use the new authenticator system instead
  * Deprecate the Guard component integration, use the new authenticator system instead
+ * Add `form_login.form_only` option
 
 5.2.0
 -----

@@ -59,6 +59,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             'password_parameter' => '_password',
             'check_path' => '/login_check',
             'post_only' => true,
+            'form_only' => false,
             'enable_csrf' => false,
             'csrf_parameter' => '_csrf_token',
             'csrf_token_id' => 'authenticate',
@@ -73,7 +74,8 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     public function supports(Request $request): bool
     {
         return ($this->options['post_only'] ? $request->isMethod('POST') : true)
-            && $this->httpUtils->checkRequestPath($request, $this->options['check_path']);
+            && $this->httpUtils->checkRequestPath($request, $this->options['check_path'])
+            && ($this->options['form_only'] ? 'form' === $request->getContentType() : true);
     }
 
     public function authenticate(Request $request): Passport

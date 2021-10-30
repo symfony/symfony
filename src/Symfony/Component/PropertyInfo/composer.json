@@ -31,6 +31,7 @@
         "symfony/cache": "^5.4|^6.0",
         "symfony/dependency-injection": "^5.4|^6.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
+        "phpstan/phpdoc-parser": "^0.4",
         "doctrine/annotations": "^1.10.4"
     },
     "conflict": {

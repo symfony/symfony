@@ -139,6 +139,7 @@ Security
  * Deprecate `AuthenticatorInterface::createAuthenticatedToken()`, use `AuthenticatorInterface::createToken()` instead
  * Deprecate `PassportInterface`, `UserPassportInterface` and `PassportTrait`, use `Passport` instead.
    As such, the return type declaration of `AuthenticatorInterface::authenticate()` will change to `Passport` in 6.0
+ * Deprecate not configuring explicitly a provider for custom_authenticators when there is more than one registered provider
 
    Before:
    ```php

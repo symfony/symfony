@@ -155,6 +155,7 @@ class InflectorTest extends TestCase
             ['trees', 'tree'],
             ['waltzes', ['waltz', 'waltze']],
             ['wives', 'wife'],
+            ['zombies', 'zombie'],
 
             // test casing: if the first letter was uppercase, it should remain so
             ['Men', 'Man'],

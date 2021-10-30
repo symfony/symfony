@@ -384,7 +384,7 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>ค่า​รหัสหลักทรัพย์สากล (ISIN) ไม่ถูกต้อง</target>
+                <target>ค่ารหัสหลักทรัพย์สากล (ISIN) ไม่ถูกต้อง</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
@@ -393,6 +393,14 @@
            <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
                 <target>ค่านี้ไม่ใช่สี CSS ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>ค่านี้ไม่ใช่รูปแบบ CIDR ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>ค่าของ netmask ควรมีค่าระหว่าง {{ min }} ถึง {{ max }}</target>
             </trans-unit>
         </body>
     </file>

@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-20T03:52:42Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-20T23:57:14Z
+
+Hey!
+
+I think @TimoBakx has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2021-10-21T11:01:08Z
+
+The `DebugFirewallCommand` part looks good. 👍
+
+---------------------------------------------------------------------------
+
+by IonBazan at 2021-10-22T12:03:30Z
+
+@GromNaN these missing backslashes seem like an issue with the completion command escaping itself and input escaping. The suggestions provided by the `debug:form` do contain the backslashes so it must be something wrong with the terminal or the completion engine. Are there any similar issues in other commands too?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-10-22T12:10:31Z
+
+Same issue with backslashes in #43653.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-22T19:24:59Z
+
+I've proposed a (quite ugly) fix for the backslashes: https://github.com/symfony/symfony/pull/43664 I welcome more testers of this script, as I'm not sure how well this actually works (it works on my machine™)
+
+---------------------------------------------------------------------------
+
+by IonBazan at 2021-10-27T03:19:36Z
+
+@GromNaN please review again
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-10-27T06:16:45Z
+
+LGTM. I used this PR to test https://github.com/symfony/symfony/pull/43665 and it worked very well.
+
+Regarding class types, the short names could have been completed in case someone type "ButtonType" for example. But name conflicts can appear and the completion made the FQCN  lot easier to type.

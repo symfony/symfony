@@ -156,11 +156,11 @@ EOF
         $xliffVersion = $input->getOption('xliff-version') ?? '1.2';
 
         if ($input->getOption('xliff-version')) {
-            trigger_deprecation('symfony/framework-bundle', '5.3', 'The "--xliff-version" option is deprecated, use "--format=xlf%d" instead.', 10 * $xliffVersion);
+            $errorIo->warning(sprintf('The "--xliff-version" option is deprecated since version 5.3, use "--format=xlf%d" instead.', 10 * $xliffVersion));
         }
 
         if ($input->getOption('output-format')) {
-            trigger_deprecation('symfony/framework-bundle', '5.3', 'The "--output-format" option is deprecated, use "--format=xlf%d" instead.', 10 * $xliffVersion);
+            $errorIo->warning(sprintf('The "--output-format" option is deprecated since version 5.3, use "--format=xlf%d" instead.', 10 * $xliffVersion));
         }
 
         if (\in_array($format, array_keys(self::FORMATS), true)) {

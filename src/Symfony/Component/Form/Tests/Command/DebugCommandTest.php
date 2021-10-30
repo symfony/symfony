@@ -14,11 +14,14 @@ namespace Symfony\Component\Form\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Command\DebugCommand;
+use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -184,6 +187,96 @@ Symfony\Component\Form\Tests\Command\FooType (foo)
 
 TXT
             , $tester->getDisplay(true));
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        if (!class_exists(CommandCompletionTester::class)) {
+            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+        }
+
+        $formRegistry = new FormRegistry([], new ResolvedFormTypeFactory());
+        $command = new DebugCommand($formRegistry);
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandCompletionTester($application->get('debug:form'));
+        $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    public function provideCompletionSuggestions(): iterable
+    {
+        yield 'option --format' => [
+            ['--format', ''],
+            ['txt', 'json'],
+        ];
+
+        yield 'form_type' => [
+            [''],
+            $this->getCoreTypes(),
+        ];
+
+        yield 'option for FQCN' => [
+            ['Symfony\\Component\\Form\\Extension\\Core\\Type\\ButtonType', ''],
+            [
+                'block_name',
+                'block_prefix',
+                'disabled',
+                'label',
+                'label_format',
+                'row_attr',
+                'label_html',
+                'label_translation_parameters',
+                'attr_translation_parameters',
+                'attr',
+                'translation_domain',
+                'auto_initialize',
+                'priority',
+            ],
+        ];
+
+        yield 'option for short name' => [
+            ['ButtonType', ''],
+            [
+                'block_name',
+                'block_prefix',
+                'disabled',
+                'label',
+                'label_format',
+                'row_attr',
+                'label_html',
+                'label_translation_parameters',
+                'attr_translation_parameters',
+                'attr',
+                'translation_domain',
+                'auto_initialize',
+                'priority',
+            ],
+        ];
+
+        yield 'option for ambiguous form type' => [
+            ['Type', ''],
+            [],
+        ];
+
+        yield 'option for invalid form type' => [
+            ['NotExistingFormType', ''],
+            [],
+        ];
+    }
+
+    private function getCoreTypes(): array
+    {
+        $coreExtension = new CoreExtension();
+        $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
+        $loadTypesRefMethod->setAccessible(true);
+        $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
+        $coreTypes = array_map(function (FormTypeInterface $type) { return \get_class($type); }, $coreTypes);
+        sort($coreTypes);
+
+        return $coreTypes;
     }
 
     private function createCommandTester(array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [])

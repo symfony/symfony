@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-14T11:58:19Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Ahummeling at 2021-10-28T16:11:25Z
+
+> Looks good to me. Is it possible to write a test for that change?
+
+Oh I hadn't looked into that actually.
+I'll see if there are related tests and see if it's possible to test it. And if so, write a test:)
+
+---------------------------------------------------------------------------
+
+by Ahummeling at 2021-10-29T09:45:03Z
+
+So @derrabus I am running into an issue here attempting to test this. The relevant codeblock is only executed when the constant `PHPUNIT_COMPOSER_INSTALL` is not defined. I found that I can "undefine" a constant using `uopz_undefine`, however, I'd have to install the extension in the ci flow and I am not really sure it's worth the hassle.
+Maybe I am overthinking this, I am open to suggestions, but as it stands right now, I'm unable to test it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-29T09:46:45Z
+
+I'm not sure this can be tested, because I suspect this might happen only in some race conditions.
+
+---------------------------------------------------------------------------
+
+by Ahummeling at 2021-10-29T09:49:09Z
+
+> I'm not sure this can be tested, because I suspect this might happen only in some race conditions.
+
+I am quite sure you can replicate it without race conditions by truncating the file to size 0 before warming cache
+as `unserialize(file_get_contents('empty_file'))` returns `false`. Which causes a type error as it's not an array
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-29T09:52:02Z
+
+Oh, can you figure out a test case then?
+
+---------------------------------------------------------------------------
+
+by Ahummeling at 2021-10-29T09:54:30Z
+
+Yeah give me a few minutes and I'll push my testcase
+
+---------------------------------------------------------------------------
+
+by Ahummeling at 2021-10-29T10:03:34Z
+
+So without the `\is_array` check in there, running with php8.0, I get the expected error:
+```
+There was 1 error:
+
+1) Symfony\Component\HttpKernel\Tests\CacheWarmer\CacheWarmerAggregateTest::testWarmupEmptyFile
+TypeError: array_merge(): Argument #1 must be of type array, bool given
+```
+With the `\is_array` check, it runs fine. I am a little stuck looking for a cleaner solution for getting the `$collectDeprecations` to be true.
+Maybe the `\defined('PHPUNIT_COMPOSER_INSTALL')` could be taken out? I am really not sure about this part

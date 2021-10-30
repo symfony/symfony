@@ -196,7 +196,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 [],
                 service('security.exception_listener'),
-                abstract_arg('LogoutListener'),
                 abstract_arg('FirewallConfig'),
             ])
 
@@ -205,7 +204,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 [],
                 service('security.exception_listener'),
-                abstract_arg('LogoutListener'),
                 abstract_arg('FirewallConfig'),
                 service('security.untracked_token_storage'),
             ])

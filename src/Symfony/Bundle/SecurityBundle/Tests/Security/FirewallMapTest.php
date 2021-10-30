@@ -35,7 +35,7 @@ class FirewallMapTest extends TestCase
 
         $firewallMap = new FirewallMap($container, $map);
 
-        $this->assertEquals([[], null, null], $firewallMap->getListeners($request));
+        $this->assertEquals([], $firewallMap->getFirewallListeners($request));
         $this->assertNull($firewallMap->getFirewallConfig($request));
         $this->assertFalse($request->attributes->has(self::ATTRIBUTE_FIREWALL_CONTEXT));
     }
@@ -51,11 +51,14 @@ class FirewallMapTest extends TestCase
 
         $firewallMap = new FirewallMap($container, $map);
 
-        $this->assertEquals([[], null, null], $firewallMap->getListeners($request));
+        $this->assertEquals([], $firewallMap->getFirewallListeners($request));
         $this->assertNull($firewallMap->getFirewallConfig($request));
         $this->assertFalse($request->attributes->has(self::ATTRIBUTE_FIREWALL_CONTEXT));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetListeners()
     {
         $request = new Request();
@@ -67,9 +70,10 @@ class FirewallMapTest extends TestCase
 
         $listener = function () {};
         $firewallContext->expects($this->once())->method('getListeners')->willReturn([$listener]);
+        $firewallContext->expects($this->once())->method('getFirewallListeners')->willReturn([$listener]);
 
         $exceptionListener = $this->createMock(ExceptionListener::class);
-        $firewallContext->expects($this->once())->method('getExceptionListener')->willReturn($exceptionListener);
+        $firewallContext->expects($this->exactly(2))->method('getExceptionListener')->willReturn($exceptionListener);
 
         $logoutListener = $this->createMock(LogoutListener::class);
         $firewallContext->expects($this->once())->method('getLogoutListener')->willReturn($logoutListener);
@@ -81,11 +85,13 @@ class FirewallMapTest extends TestCase
             ->willReturn(true);
 
         $container = $this->createMock(Container::class);
-        $container->expects($this->exactly(2))->method('get')->willReturn($firewallContext);
+        $container->expects($this->exactly(4))->method('get')->willReturn($firewallContext);
 
         $firewallMap = new FirewallMap($container, ['security.firewall.map.context.foo' => $matcher]);
 
-        $this->assertEquals([[$listener], $exceptionListener, $logoutListener], $firewallMap->getListeners($request));
+        $this->assertEquals([[$listener], $exceptionListener, $logoutListener], $firewallMap->getListeners($request, false));
+        $this->assertEquals([$listener], $firewallMap->getFirewallListeners($request));
+        $this->assertEquals($exceptionListener, $firewallMap->getExceptionListener($request));
         $this->assertEquals($firewallConfig, $firewallMap->getFirewallConfig($request));
         $this->assertEquals('security.firewall.map.context.foo', $request->attributes->get(self::ATTRIBUTE_FIREWALL_CONTEXT));
     }

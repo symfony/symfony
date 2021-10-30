@@ -120,7 +120,7 @@ abstract class CompleteConfigurationTest extends TestCase
             $arguments = $contextDef->getArguments();
             $listeners[] = array_map('strval', $arguments[0]->getValues());
 
-            $configDef = $container->getDefinition((string) $arguments[3]);
+            $configDef = $container->getDefinition((string) $arguments[2]);
             $configs[] = array_values($configDef->getArguments());
         }
 
@@ -208,6 +208,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.channel_listener',
                 'security.firewall.authenticator.secure',
                 'security.authentication.switchuser_listener.secure',
+                'security.logout_listener.secure',
                 'security.access_listener',
             ],
             [
@@ -241,7 +242,7 @@ abstract class CompleteConfigurationTest extends TestCase
             $arguments = $contextDef->getArguments();
             $listeners[] = array_map('strval', $arguments[0]->getValues());
 
-            $configDef = $container->getDefinition((string) $arguments[3]);
+            $configDef = $container->getDefinition((string) $arguments[2]);
             $configs[] = array_values($configDef->getArguments());
         }
 
@@ -337,6 +338,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.authentication.listener.rememberme.secure',
                 'security.authentication.listener.anonymous.secure',
                 'security.authentication.switchuser_listener.secure',
+                'security.logout_listener.secure',
                 'security.access_listener',
             ],
             [

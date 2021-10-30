@@ -24,13 +24,15 @@ class FirewallContextTest extends TestCase
         $config = new FirewallConfig('main', 'user_checker', 'request_matcher');
         $exceptionListener = $this->getExceptionListenerMock();
         $logoutListener = $this->getLogoutListenerMock();
-        $listeners = [function () {}];
+        $listeners = [function () {}, $logoutListener];
+        $listenersMinusLogoutListener = [function () {}];
 
-        $context = new FirewallContext($listeners, $exceptionListener, $logoutListener, $config);
+        $context = new FirewallContext($listeners, $exceptionListener, $config);
 
-        $this->assertEquals($listeners, $context->getListeners());
+        $this->assertEquals($listenersMinusLogoutListener, iterator_to_array($context->getListeners(false)));
         $this->assertEquals($exceptionListener, $context->getExceptionListener());
-        $this->assertEquals($logoutListener, $context->getLogoutListener());
+        $this->assertEquals($logoutListener, $context->getLogoutListener(false));
+        $this->assertEquals($listeners, iterator_to_array($context->getFirewallListeners()));
         $this->assertEquals($config, $context->getConfig());
     }
 

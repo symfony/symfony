@@ -18,6 +18,7 @@ CHANGELOG
  * Display the roles of the logged-in user in the Web Debug Toolbar
  * Add the `security.access_decision_manager.strategy_service` option
  * Deprecate not configuring explicitly a provider for custom_authenticators when there is more than one registered provider
+ * Deprecate `FirewallContext::getListeners`, use `FirewallContext::getFirewallListeners` and `FirewallContext::getExceptionListener` instead
 
 5.3
 ---

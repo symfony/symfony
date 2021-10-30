@@ -23,6 +23,9 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
 
 class FirewallTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testOnKernelRequestRegistersExceptionListener()
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -50,6 +53,9 @@ class FirewallTest extends TestCase
         $firewall->onKernelRequest($event);
     }
 
+    /**
+     * @group legacy
+     */
     public function testOnKernelRequestStopsWhenThereIsAResponse()
     {
         $called = [];

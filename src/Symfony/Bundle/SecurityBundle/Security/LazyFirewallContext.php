@@ -16,7 +16,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
-use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 /**
  * Lazily calls authentication listeners when actually required by the access listener.
@@ -27,13 +26,33 @@ class LazyFirewallContext extends FirewallContext
 {
     private $tokenStorage;
 
-    public function __construct(iterable $listeners, ?ExceptionListener $exceptionListener, ?LogoutListener $logoutListener, ?FirewallConfig $config, TokenStorage $tokenStorage)
+    /**
+     * @param iterable<mixed, callable> $listeners
+     */
+    public function __construct(iterable $listeners, ?ExceptionListener $exceptionListener, /*?FirewallConfig*/ $config, /*TokenStorage*/ $tokenStorage)
     {
-        parent::__construct($listeners, $exceptionListener, $logoutListener, $config);
+        $arguments = \func_get_args();
+
+        if (\count($arguments) > 4 && $arguments[4] instanceof TokenStorage) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'Passing the LogoutListener as third argument is deprecated, add it to $listeners instead.', __METHOD__);
+
+            $logoutListener = $arguments[2];
+            $config = $arguments[3];
+            $this->tokenStorage = $arguments[4];
+
+            parent::__construct($listeners, $exceptionListener, $logoutListener, $config);
+
+            return;
+        }
+
+        parent::__construct($listeners, $exceptionListener, $config);
 
         $this->tokenStorage = $tokenStorage;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getListeners(): iterable
     {
         return [$this];
@@ -45,7 +64,7 @@ class LazyFirewallContext extends FirewallContext
         $request = $event->getRequest();
         $lazy = $request->isMethodCacheable();
 
-        foreach (parent::getListeners() as $listener) {
+        foreach (parent::getListeners(false) as $listener) {
             if (!$lazy || !$listener instanceof FirewallListenerInterface) {
                 $listeners[] = $listener;
                 $lazy = $lazy && $listener instanceof FirewallListenerInterface;

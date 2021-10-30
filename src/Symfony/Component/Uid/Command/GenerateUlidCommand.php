@@ -44,7 +44,7 @@ class GenerateUlidCommand extends Command
             ->setDefinition([
                 new InputOption('time', null, InputOption::VALUE_REQUIRED, 'The ULID timestamp: a parsable date/time string'),
                 new InputOption('count', 'c', InputOption::VALUE_REQUIRED, 'The number of ULID to generate', 1),
-                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'The ULID output format: base32, base58 or rfc4122', 'base32'),
+                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, sprintf('The ULID output format: %s', $this->getNaturalLanguageJoin($this->getAvailableFormatOptions())), 'base32'),
             ])
             ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
@@ -90,7 +90,7 @@ EOF
         if (\in_array($formatOption, $this->getAvailableFormatOptions())) {
             $format = 'to'.ucfirst($formatOption);
         } else {
-            $io->error(sprintf('Invalid format "%s", did you mean "base32", "base58" or "rfc4122"?', $input->getOption('format')));
+            $io->error(sprintf('Invalid format "%s", did you mean %s?', $input->getOption('format'), $this->getNaturalLanguageJoin($this->getAvailableFormatOptions())));
 
             return 1;
         }
@@ -123,5 +123,16 @@ EOF
             'base58',
             'rfc4122',
         ];
+    }
+
+    private function getNaturalLanguageJoin(array $list, string $conjunction = 'or') {
+        $last = array_pop($list);
+        if ($list) {
+            return implode(', ', array_map(function($item) {
+                return sprintf('"%s"', $item);
+                }, $list)) . ' ' . $conjunction . ' "' . $last . '"';
+        }
+
+        return $last;
     }
 }

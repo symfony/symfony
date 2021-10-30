@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-10T08:34:07Z
+
+Looks like failure is related :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-10T08:36:49Z
+
+Yes, I'm on it. 🙂
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-09-10T09:09:08Z
+
+I don't understand the failure of `Symfony\Component\Mime\Tests\MessageTest::testSymfonySerialize`:
+
+> The type of the "disposition" attribute for class "Symfony\Component\Mime\Part\TextPart" must be one of "string" ("null" given).
+
+It is true that `TextPart::setDisposition()` does not accept `null`. But I did not change that. And the property itself was documented as nullable before. 🤔
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-30T11:46:21Z
+
+Let's revert what does not work to be able to merge this one.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-30T15:04:52Z
+
+Done. I've reverted all `Part` classes as well as `RawMessage`.

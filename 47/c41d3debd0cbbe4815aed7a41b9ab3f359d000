@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-09-22T20:11:52Z
+
+Symfony 2.0 used to have a config setting allowing to provide a RequestMatcher service to activate collecting. This is more flexible than giving a parameter name in the config.
+
+Also note that part of the overhead is caused by the fact that services are decorated with Traceable wrappers, and those would still be used if you enable the profiler with `collect: false`
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-09-23T06:09:37Z
+
+@stof most of the overhead looks caused by the extra IOs, at least on my configuration (Docker for Mac). I checked and just disabling the collection improves the performance of 30%.
+
+Regarding the request matcher, do you know why it has been removed? This probably more flexible but less practicable. Here you can just pass a query parameter to enable/disable the tool without having to change the config. We could even think about a tiny WebExtension to do that (similar to the Blackfire companion).
+
+---------------------------------------------------------------------------
+
+by florentdestremau at 2021-09-23T07:33:30Z
+
+Suggestion: why not enabling / disabling with a cookie or with some switch in the symfony debug bar ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-23T15:26:04Z
+
+The motivation for removing it was to discourage using the profiler in production, as the `matcher` option was mostly used for that: https://github.com/symfony/symfony/pull/24158.
+
+But as you can see in the PR discussion, it was already useful to save some resources in dev at the time, and the performance cost related to collectors is growing since then.
+IMHO a query param is good enough.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-08T13:16:04Z
+
+Rebase needed to make the CI green

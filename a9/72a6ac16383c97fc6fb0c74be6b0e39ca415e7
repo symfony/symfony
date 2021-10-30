@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-07-18T16:00:47Z
+
+Hey!
+
+I think @kbond has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-07-18T23:10:39Z
+
+Thank you.
+It is indeed a bug. But Im not sure you have the correct solution.
+
+Isn't the correct behaviour to not accept that you are trying to overconsume?
+
+---------------------------------------------------------------------------
+
+by jlekowski at 2021-07-19T09:27:48Z
+
+>Isn't the correct behaviour to not accept that you are trying to overconsume?
+
+@Nyholm, thanks for looking at this PR. I think you can always call `->consume()`, but you can check something like `var_dump($limit->getRemainingTokens(), $limit->isAccepted());` afterwards to see there are still 2 tokens remaining and that it has not been accepted.
+
+Here's a code I used to compare different policies:
+```php
+foreach (['fixed_window', 'sliding_window', 'token_bucket'] as $policy) {
+    echo "\nPOLICY: $policy\n";
+
+    $factory = new RateLimiterFactory([
+        'id' => 'db_write',
+        'policy' => $policy,
+        'limit' => 10,
+        'interval' => '2 seconds',
+        'rate' => ['amount' => 10,'interval' => '2 seconds'],
+    ], new InMemoryStorage());
+
+    $limiter = $factory->create();
+
+    $limit = $limiter->consume(8);
+
+    $limit = $limiter->consume(4);
+    echo "REMAINING TOKENS: " . $limit->getRemainingTokens() . PHP_EOL;
+    echo "IS ACCEPTED: " . (int)$limit->isAccepted() . PHP_EOL;
+    $start = microtime(true);
+    $limit->wait();
+    echo 'WAITED: ' . 1000 * (microtime(true) - $start) . PHP_EOL;
+    $limit = $limiter->consume(4);
+    echo "REMAINING TOKENS: " . $limit->getRemainingTokens() . PHP_EOL;
+    echo "IS ACCEPTED: " . (int)$limit->isAccepted() . PHP_EOL;
+}
+```
+BTW, there might be another issue with `sliding_window` policy, but it's not for this ticket.
+
+---------------------------------------------------------------------------
+
+by jlekowski at 2021-08-02T13:27:01Z
+
+@Nyholm, would you have any suggestions for this PR? Could this be merged, or requires a change?
+
+Also, could you have a look at https://github.com/symfony/symfony/issues/42194, please?
+
+---------------------------------------------------------------------------
+
+by jlekowski at 2021-10-20T10:46:26Z
+
+@Nyholm, thanks for having a closer look into this.
+
+Fixing the number of tokens to calculate time for works too.
+
+I made the changes according to your suggestions. If that looks fine, I will:
+* squash my commits
+* rebase the branch from 5.3 and point the PR to 5.3 branch (as the milestone here was set)
+
+The reason behind removing `calculateTimeForTokens()` was that the class is marked as `@internal` and in the current flow `$window->calculateTimeForTokens($tokens);` will always return the equivalent of `$this->interval;` (see my comment in https://github.com/symfony/symfony/pull/42168/commits/44807a638aed81e458e9d98ef83f494fa5da9a53#diff-26af5f9f51ed8bd11b4b02e6d02eef2872e174b3ba50a6f6aa9edb218400ac13).
+That means that even if we keep `calculateTimeForTokens()` for BC, we can avoid calling it.
+
+---------------------------------------------------------------------------
+
+by jlekowski at 2021-10-23T20:26:09Z
+
+Thank you @Nyholm. I squashed and rebased my changes.
+
+> About removing the method. I didn't see the class was internal, if so, you are correct. Removing a method from an internal class is not a BC break.
+
+@wouterj, please have a look how you feel about this change. My original commit was here https://github.com/jlekowski/symfony/commit/44807a638aed81e458e9d98ef83f494fa5da9a53 with `Symfony\Component\RateLimiter\Policy\Window::calculateTimeForTokens()` being removed as it does not need to be used in `FixedWindowLimiter`. But it's your party, so I'm fine with either change :)

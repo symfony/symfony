@@ -125,12 +125,13 @@ EOF
         ];
     }
 
-    private function getNaturalLanguageJoin(array $list, string $conjunction = 'or') {
+    private function getNaturalLanguageJoin(array $list, string $conjunction = 'or')
+    {
         $last = array_pop($list);
         if ($list) {
-            return implode(', ', array_map(function($item) {
+            return implode(', ', array_map(function ($item) {
                 return sprintf('"%s"', $item);
-                }, $list)) . ' ' . $conjunction . ' "' . $last . '"';
+            }, $list)).' '.$conjunction.' "'.$last.'"';
         }
 
         return $last;

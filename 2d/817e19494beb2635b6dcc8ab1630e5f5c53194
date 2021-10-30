@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-06T22:27:57Z
+
+Could you add a full example?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-15T12:01:09Z
+
+This PR is ready, tests included :tada:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-19T09:32:43Z
+
+@lyrixx I think you were very interested in this feature :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-19T10:52:07Z
+
+This misses a CHANGELOG entry
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-19T12:04:46Z
+
+CHANGELOG added
+
+---------------------------------------------------------------------------
+
+by yched at 2021-10-19T12:21:59Z
+
+I'm super interested in this feature  as well, the PR looks great, I'm just wondering if it will allow for "grab whatever pending messages exist and process them in a batch (N max, but don't wait for more if there are less than N)" ? Will the --time-limit worker option trigger a batch flush ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-19T14:37:38Z
+
+> don't wait for more if there are less than N
+
+Yes, PR just updated. Batches will be flushed when the worker is idle or when it is stopped.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-22T12:18:25Z
+
+PR updated to inform handlers if flushing is called while the worker is idle (in which case the handler can decide not to flush) or if the flush happens while the worker is stopping.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-10-23T18:42:18Z
+
+One question: as soon as I implement the interface, the handler is forced to be used in batch mode?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-28T15:42:31Z
+
+@lyrixx thanks for the review, I should have addressed your comments.

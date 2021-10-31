@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-30T16:23:04Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-30T16:33:54Z
+
+The tests are still failing on AppVeyor.
+
+---------------------------------------------------------------------------
+
+by wkania at 2021-10-30T16:42:42Z
+
+@derrabus yes, fixing without Windows. This time it's ok.
+The rest of the failing tests is not related to this bug.

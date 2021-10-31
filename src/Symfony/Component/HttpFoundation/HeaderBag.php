@@ -208,7 +208,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Adds a custom Cache-Control directive.
      *
-     * @param bool|string $value The Cache-Control directive value
+     * @param bool|int|string $value The Cache-Control directive value
      */
     public function addCacheControlDirective(string $key, $value = true)
     {

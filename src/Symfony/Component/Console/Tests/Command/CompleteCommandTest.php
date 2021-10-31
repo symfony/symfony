@@ -82,7 +82,7 @@ class CompleteCommandTest extends TestCase
     public function testCompleteCommandName(array $input, array $suggestions)
     {
         $this->execute(['--current' => '1', '--input' => $input]);
-        $this->assertEquals(implode("\n", $suggestions)."\n", $this->tester->getDisplay());
+        $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
     }
 
     public function provideCompleteCommandNameInputs()
@@ -98,7 +98,7 @@ class CompleteCommandTest extends TestCase
     public function testCompleteCommandInputDefinition(array $input, array $suggestions)
     {
         $this->execute(['--current' => '2', '--input' => $input]);
-        $this->assertEquals(implode("\n", $suggestions)."\n", $this->tester->getDisplay());
+        $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
     }
 
     public function provideCompleteCommandInputDefinitionInputs()

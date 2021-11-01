@@ -21,9 +21,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 abstract class AbstractToken implements TokenInterface, \Serializable
 {
-    private $user;
-    private $roleNames = [];
-    private $attributes = [];
+    private ?UserInterface $user = null;
+    private array $roleNames = [];
+    private array $attributes = [];
 
     /**
      * @param string[] $roles An array of roles

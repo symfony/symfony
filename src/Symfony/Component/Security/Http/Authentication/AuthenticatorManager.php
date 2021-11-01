@@ -45,17 +45,17 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {
-    private $authenticators;
-    private $tokenStorage;
-    private $eventDispatcher;
-    private $eraseCredentials;
-    private $logger;
-    private $firewallName;
-    private $hideUserNotFoundExceptions;
-    private $requiredBadges;
+    private iterable $authenticators;
+    private TokenStorageInterface $tokenStorage;
+    private EventDispatcherInterface $eventDispatcher;
+    private bool $eraseCredentials;
+    private ?LoggerInterface $logger;
+    private string $firewallName;
+    private bool $hideUserNotFoundExceptions;
+    private array $requiredBadges;
 
     /**
-     * @param AuthenticatorInterface[] $authenticators
+     * @param iterable<mixed, AuthenticatorInterface> $authenticators
      */
     public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, LoggerInterface $logger = null, bool $eraseCredentials = true, bool $hideUserNotFoundExceptions = true, array $requiredBadges = [])
     {

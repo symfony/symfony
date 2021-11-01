@@ -25,9 +25,9 @@ use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
  */
 class ImpersonateUrlGenerator
 {
-    private $requestStack;
-    private $tokenStorage;
-    private $firewallMap;
+    private RequestStack $requestStack;
+    private TokenStorageInterface $tokenStorage;
+    private FirewallMap $firewallMap;
 
     public function __construct(RequestStack $requestStack, FirewallMap $firewallMap, TokenStorageInterface $tokenStorage)
     {

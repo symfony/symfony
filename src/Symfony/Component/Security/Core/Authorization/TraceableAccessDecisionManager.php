@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -24,11 +25,11 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 {
-    private $manager;
-    private $strategy;
-    private $voters = [];
-    private $decisionLog = []; // All decision logs
-    private $currentLog = [];  // Logs being filled in
+    private AccessDecisionManagerInterface $manager;
+    private AccessDecisionStrategyInterface $strategy;
+    private iterable $voters = [];
+    private array $decisionLog = []; // All decision logs
+    private array $currentLog = [];  // Logs being filled in
 
     public function __construct(AccessDecisionManagerInterface $manager)
     {

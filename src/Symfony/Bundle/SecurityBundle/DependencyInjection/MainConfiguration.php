@@ -36,8 +36,8 @@ class MainConfiguration implements ConfigurationInterface
     /** @internal */
     public const STRATEGY_PRIORITY = 'priority';
 
-    private $factories;
-    private $userProviderFactories;
+    private array $factories;
+    private array $userProviderFactories;
 
     /**
      * @param AuthenticatorFactoryInterface[] $factories

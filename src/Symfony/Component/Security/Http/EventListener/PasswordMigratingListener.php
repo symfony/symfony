@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
  */
 class PasswordMigratingListener implements EventSubscriberInterface
 {
-    private $hasherFactory;
+    private PasswordHasherFactoryInterface $hasherFactory;
 
     public function __construct(PasswordHasherFactoryInterface $hasherFactory)
     {

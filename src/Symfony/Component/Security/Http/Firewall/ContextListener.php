@@ -43,14 +43,14 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class ContextListener extends AbstractListener
 {
-    private $tokenStorage;
-    private $sessionKey;
-    private $logger;
-    private $userProviders;
-    private $dispatcher;
-    private $registered;
-    private $trustResolver;
-    private $sessionTrackerEnabler;
+    private TokenStorageInterface $tokenStorage;
+    private string $sessionKey;
+    private ?LoggerInterface $logger;
+    private iterable $userProviders;
+    private ?EventDispatcherInterface $dispatcher;
+    private bool $registered = false;
+    private AuthenticationTrustResolverInterface $trustResolver;
+    private ?\Closure $sessionTrackerEnabler;
 
     /**
      * @param iterable|UserProviderInterface[] $userProviders
@@ -68,7 +68,7 @@ class ContextListener extends AbstractListener
         $this->dispatcher = $dispatcher;
 
         $this->trustResolver = $trustResolver ?? new AuthenticationTrustResolver();
-        $this->sessionTrackerEnabler = $sessionTrackerEnabler;
+        $this->sessionTrackerEnabler = null === $sessionTrackerEnabler || $sessionTrackerEnabler instanceof \Closure ? $sessionTrackerEnabler : \Closure::fromCallable($sessionTrackerEnabler);
     }
 
     /**

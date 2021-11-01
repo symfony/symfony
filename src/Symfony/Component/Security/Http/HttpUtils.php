@@ -27,10 +27,10 @@ use Symfony\Component\Security\Core\Security;
  */
 class HttpUtils
 {
-    private $urlGenerator;
-    private $urlMatcher;
-    private $domainRegexp;
-    private $secureDomainRegexp;
+    private ?UrlGeneratorInterface $urlGenerator;
+    private UrlMatcherInterface|RequestMatcherInterface|null $urlMatcher;
+    private ?string $domainRegexp;
+    private ?string $secureDomainRegexp;
 
     /**
      * @param $domainRegexp       A regexp the target of HTTP redirections must match, scheme included

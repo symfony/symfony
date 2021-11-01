@@ -17,11 +17,11 @@ use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
 class ExpressionCacheWarmer implements CacheWarmerInterface
 {
-    private $expressions;
-    private $expressionLanguage;
+    private iterable $expressions;
+    private ExpressionLanguage $expressionLanguage;
 
     /**
-     * @param iterable|Expression[] $expressions
+     * @param iterable<mixed, Expression|string> $expressions
      */
     public function __construct(iterable $expressions, ExpressionLanguage $expressionLanguage)
     {

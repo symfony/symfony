@@ -18,11 +18,11 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
  */
 final class PersistentToken implements PersistentTokenInterface
 {
-    private $class;
-    private $userIdentifier;
-    private $series;
-    private $tokenValue;
-    private $lastUsed;
+    private string $class;
+    private string $userIdentifier;
+    private string $series;
+    private string $tokenValue;
+    private \DateTime $lastUsed;
 
     public function __construct(string $class, string $userIdentifier, string $series, string $tokenValue, \DateTime $lastUsed)
     {

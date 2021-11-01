@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class RoleVoter implements CacheableVoterInterface
 {
-    private $prefix;
+    private string $prefix;
 
     public function __construct(string $prefix = 'ROLE_')
     {

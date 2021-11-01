@@ -45,17 +45,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
 {
-    private $options;
-    private $httpUtils;
-    private $userProvider;
-    private $propertyAccessor;
-    private $successHandler;
-    private $failureHandler;
-
-    /**
-     * @var TranslatorInterface|null
-     */
-    private $translator;
+    private array $options;
+    private HttpUtils $httpUtils;
+    private UserProviderInterface $userProvider;
+    private PropertyAccessorInterface $propertyAccessor;
+    private ?AuthenticationSuccessHandlerInterface $successHandler;
+    private ?AuthenticationFailureHandlerInterface $failureHandler;
+    private ?TranslatorInterface $translator = null;
 
     public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], PropertyAccessorInterface $propertyAccessor = null)
     {

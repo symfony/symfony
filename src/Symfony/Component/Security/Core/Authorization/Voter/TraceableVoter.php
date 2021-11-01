@@ -24,8 +24,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class TraceableVoter implements CacheableVoterInterface
 {
-    private $voter;
-    private $eventDispatcher;
+    private VoterInterface $voter;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(VoterInterface $voter, EventDispatcherInterface $eventDispatcher)
     {

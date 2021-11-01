@@ -33,7 +33,7 @@ class AuthenticatedVoter implements CacheableVoterInterface
     public const IS_REMEMBERED = 'IS_REMEMBERED';
     public const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
 
-    private $authenticationTrustResolver;
+    private AuthenticationTrustResolverInterface $authenticationTrustResolver;
 
     public function __construct(AuthenticationTrustResolverInterface $authenticationTrustResolver)
     {

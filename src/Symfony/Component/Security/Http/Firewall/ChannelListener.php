@@ -27,11 +27,10 @@ use Symfony\Component\Security\Http\AccessMapInterface;
  */
 class ChannelListener extends AbstractListener
 {
-    private $map;
-    private $authenticationEntryPoint = null;
-    private $logger;
-    private $httpPort;
-    private $httpsPort;
+    private AccessMapInterface $map;
+    private ?LoggerInterface $logger;
+    private int $httpPort;
+    private int $httpsPort;
 
     public function __construct(AccessMapInterface $map, LoggerInterface $logger = null, int $httpPort = 80, int $httpsPort = 443)
     {
@@ -82,10 +81,6 @@ class ChannelListener extends AbstractListener
 
     private function createRedirectResponse(Request $request): RedirectResponse
     {
-        if (null !== $this->authenticationEntryPoint) {
-            return $this->authenticationEntryPoint->start($request);
-        }
-
         $scheme = $request->isSecure() ? 'http' : 'https';
         if ('http' === $scheme && 80 != $this->httpPort) {
             $port = ':'.$this->httpPort;

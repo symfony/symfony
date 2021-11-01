@@ -16,8 +16,8 @@ namespace Symfony\Component\Security\Http\LoginLink;
  */
 class LoginLinkDetails
 {
-    private $url;
-    private $expiresAt;
+    private string $url;
+    private \DateTimeImmutable $expiresAt;
 
     public function __construct(string $url, \DateTimeImmutable $expiresAt)
     {

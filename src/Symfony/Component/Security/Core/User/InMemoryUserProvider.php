@@ -24,7 +24,10 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  */
 class InMemoryUserProvider implements UserProviderInterface
 {
-    private $users;
+    /**
+     * @var array<string, UserInterface>
+     */
+    private array $users = [];
 
     /**
      * The user array is a hash where the keys are usernames and the values are

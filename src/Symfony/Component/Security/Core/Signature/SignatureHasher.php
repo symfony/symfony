@@ -24,11 +24,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class SignatureHasher
 {
-    private $propertyAccessor;
-    private $signatureProperties;
-    private $secret;
-    private $expiredSignaturesStorage;
-    private $maxUses;
+    private PropertyAccessorInterface $propertyAccessor;
+    private array $signatureProperties;
+    private string $secret;
+    private ?ExpiredSignatureStorage $expiredSignaturesStorage;
+    private ?int $maxUses;
 
     /**
      * @param array                        $signatureProperties      properties of the User; the hash is invalidated if these properties change

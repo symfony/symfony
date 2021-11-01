@@ -43,11 +43,11 @@ use Symfony\Component\Security\Http\RememberMe\ResponseListener;
  */
 class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 {
-    private $rememberMeHandler;
-    private $secret;
-    private $tokenStorage;
-    private $cookieName;
-    private $logger;
+    private RememberMeHandlerInterface $rememberMeHandler;
+    private string $secret;
+    private TokenStorageInterface $tokenStorage;
+    private string $cookieName;
+    private ?LoggerInterface $logger;
 
     public function __construct(RememberMeHandlerInterface $rememberMeHandler, string $secret, TokenStorageInterface $tokenStorage, string $cookieName, LoggerInterface $logger = null)
     {

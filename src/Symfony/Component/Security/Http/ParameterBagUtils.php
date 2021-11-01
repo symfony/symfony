@@ -16,13 +16,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @internal
  */
 final class ParameterBagUtils
 {
-    private static $propertyAccessor;
+    private static PropertyAccessorInterface $propertyAccessor;
 
     /**
      * Returns a "parameter" value.
@@ -43,9 +44,7 @@ final class ParameterBagUtils
             return null;
         }
 
-        if (null === self::$propertyAccessor) {
-            self::$propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
+        self::$propertyAccessor ??= PropertyAccess::createPropertyAccessor();
 
         try {
             return self::$propertyAccessor->getValue($value, substr($path, $pos));
@@ -73,9 +72,7 @@ final class ParameterBagUtils
             return null;
         }
 
-        if (null === self::$propertyAccessor) {
-            self::$propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
+        self::$propertyAccessor ??= PropertyAccess::createPropertyAccessor();
 
         try {
             return self::$propertyAccessor->getValue($value, substr($path, $pos));

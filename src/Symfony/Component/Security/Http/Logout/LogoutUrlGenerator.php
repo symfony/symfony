@@ -24,11 +24,12 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 class LogoutUrlGenerator
 {
-    private $requestStack;
-    private $router;
-    private $tokenStorage;
-    private $listeners = [];
-    private $currentFirewall;
+    private ?RequestStack $requestStack;
+    private ?UrlGeneratorInterface $router;
+    private ?TokenStorageInterface $tokenStorage;
+    private array $listeners = [];
+    private ?string $currentFirewallName = null;
+    private ?string $currentFirewallContext = null;
 
     public function __construct(RequestStack $requestStack = null, UrlGeneratorInterface $router = null, TokenStorageInterface $tokenStorage = null)
     {
@@ -69,7 +70,8 @@ class LogoutUrlGenerator
 
     public function setCurrentFirewall(?string $key, string $context = null)
     {
-        $this->currentFirewall = [$key, $context];
+        $this->currentFirewallName = $key;
+        $this->currentFirewallContext = $context;
     }
 
     /**
@@ -135,14 +137,12 @@ class LogoutUrlGenerator
         }
 
         // Fetch from injected current firewall information, if possible
-        [$key, $context] = $this->currentFirewall;
-
-        if (isset($this->listeners[$key])) {
-            return $this->listeners[$key];
+        if (isset($this->listeners[$this->currentFirewallName])) {
+            return $this->listeners[$this->currentFirewallName];
         }
 
         foreach ($this->listeners as $listener) {
-            if (isset($listener[4]) && $context === $listener[4]) {
+            if (isset($listener[4]) && $this->currentFirewallContext === $listener[4]) {
                 return $listener;
             }
         }

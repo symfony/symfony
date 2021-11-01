@@ -23,10 +23,10 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class VoteEvent extends Event
 {
-    private $voter;
-    private $subject;
-    private $attributes;
-    private $vote;
+    private VoterInterface $voter;
+    private mixed $subject;
+    private array $attributes;
+    private int $vote;
 
     public function __construct(VoterInterface $voter, mixed $subject, array $attributes, int $vote)
     {

@@ -19,7 +19,7 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class UserNotFoundException extends AuthenticationException
 {
-    private $identifier;
+    private ?string $identifier = null;
 
     /**
      * {@inheritdoc}

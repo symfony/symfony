@@ -20,8 +20,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class SwitchUserToken extends UsernamePasswordToken
 {
-    private $originalToken;
-    private $originatedFromUri;
+    private TokenInterface $originalToken;
+    private ?string $originatedFromUri = null;
 
     /**
      * @param $user              The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method

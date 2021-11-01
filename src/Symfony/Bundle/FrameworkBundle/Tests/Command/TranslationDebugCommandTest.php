@@ -224,10 +224,6 @@ class TranslationDebugCommandTest extends TestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $extractedMessagesWithDomains = [
             'messages' => [
                 'foo' => 'foo',

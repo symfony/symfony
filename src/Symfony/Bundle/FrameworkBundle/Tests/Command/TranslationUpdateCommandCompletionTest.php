@@ -35,10 +35,6 @@ class TranslationUpdateCommandCompletionTest extends TestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $tester = $this->createCommandCompletionTester(['messages' => ['foo' => 'foo']]);
 
         $suggestions = $tester->complete($input);

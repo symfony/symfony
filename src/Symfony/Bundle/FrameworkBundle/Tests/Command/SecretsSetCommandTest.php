@@ -14,10 +14,6 @@ class SecretsSetCommandTest extends TestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $vault = $this->createMock(AbstractVault::class);
         $vault->method('list')->willReturn(['SECRET' => null, 'OTHER_SECRET' => null]);
         $localVault = $this->createMock(AbstractVault::class);

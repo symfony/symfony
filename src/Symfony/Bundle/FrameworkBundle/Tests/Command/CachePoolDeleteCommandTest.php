@@ -89,10 +89,6 @@ class CachePoolDeleteCommandTest extends TestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $application = new Application($this->getKernel());
         $application->add(new CachePoolDeleteCommand(new Psr6CacheClearer(['foo' => $this->cachePool]), ['foo']));
         $tester = new CommandCompletionTester($application->get('cache:pool:delete'));

@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-11-01T08:38:15Z
+
+@fabpot disabled IDE and tried to clean my code.
+Fabbot not happy
+![image](https://user-images.githubusercontent.com/2715254/139644817-0aa0296a-6138-4359-ba14-5566b2365aab.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-11-01T08:51:36Z
+
+You can ignore fabbot :)
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-11-01T08:59:18Z
+
+> You can ignore fabbot :)
+
+OK 🤣
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-11-01T09:26:06Z
+
+@wouterj thanks for code review. I missed that we have two methods for execute() displayGeneralText() and displayGeneralJson()
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-11-01T12:27:03Z
+
+@wouterj thanks optimized code :)

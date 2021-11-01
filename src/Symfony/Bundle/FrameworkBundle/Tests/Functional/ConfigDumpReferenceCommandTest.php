@@ -88,6 +88,10 @@ EOL
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
+        if (!class_exists(CommandCompletionTester::class)) {
+            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+        }
+
         $this->application->add(new ConfigDumpReferenceCommand());
         $tester = new CommandCompletionTester($this->application->get('config:dump-reference'));
         $suggestions = $tester->complete($input, 2);

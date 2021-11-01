@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -36,6 +37,9 @@ class RouterMatchCommand extends Command
     private $router;
     private $expressionLanguageProviders;
 
+    /**
+     * @param iterable<mixed, ExpressionFunctionProviderInterface> $expressionLanguageProviders
+     */
     public function __construct(RouterInterface $router, iterable $expressionLanguageProviders = [])
     {
         parent::__construct();

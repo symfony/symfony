@@ -43,13 +43,13 @@ class UnusedTagsPassTest extends TestCase
 
     private function getKnownTags(): array
     {
-        // get tags in UnusedTagsPass
-        $target = \dirname(__DIR__, 3).'/DependencyInjection/Compiler/UnusedTagsPass.php';
-        $contents = file_get_contents($target);
-        preg_match('{private \$knownTags = \[(.+?)\];}sm', $contents, $matches);
-        $tags = array_values(array_filter(array_map(function ($str) {
-            return trim(preg_replace('{^ +\'(.+)\',}', '$1', $str));
-        }, explode("\n", $matches[1]))));
+        $tags = \Closure::bind(
+            static function () {
+                return UnusedTagsPass::KNOWN_TAGS;
+            },
+            null,
+            UnusedTagsPass::class
+        )();
         sort($tags);
 
         return $tags;

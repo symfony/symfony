@@ -49,9 +49,9 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
         $this->setOptions($options);
 
         if ($parameters) {
-            $this->paramFetcher = [$parameters, 'get'];
+            $this->paramFetcher = \Closure::fromCallable([$parameters, 'get']);
         } elseif ($container instanceof SymfonyContainerInterface) {
-            $this->paramFetcher = [$container, 'getParameter'];
+            $this->paramFetcher = \Closure::fromCallable([$container, 'getParameter']);
         } else {
             throw new \LogicException(sprintf('You should either pass a "%s" instance or provide the $parameters argument of the "%s" method.', SymfonyContainerInterface::class, __METHOD__));
         }

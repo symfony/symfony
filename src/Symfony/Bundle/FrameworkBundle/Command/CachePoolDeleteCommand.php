@@ -33,6 +33,9 @@ final class CachePoolDeleteCommand extends Command
     private $poolClearer;
     private $poolNames;
 
+    /**
+     * @param string[]|null $poolNames
+     */
     public function __construct(Psr6CacheClearer $poolClearer, array $poolNames = null)
     {
         parent::__construct();

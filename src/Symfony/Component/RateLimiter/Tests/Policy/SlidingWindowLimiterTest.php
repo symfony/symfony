@@ -66,7 +66,7 @@ class SlidingWindowLimiterTest extends TestCase
 
         $start = microtime(true);
         $rateLimit->wait(); // wait 12 seconds
-        $this->assertEqualsWithDelta($start + 12, microtime(true), 0.5);
+        $this->assertEqualsWithDelta($start + 12, microtime(true), 1);
     }
 
     public function testReserve()

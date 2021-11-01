@@ -82,7 +82,7 @@ class FixedWindowLimiterTest extends TestCase
 
         $start = microtime(true);
         $rateLimit->wait(); // wait 1 minute
-        $this->assertEqualsWithDelta($start + 60, microtime(true), 0.5);
+        $this->assertEqualsWithDelta($start + 60, microtime(true), 1);
     }
 
     public function testWrongWindowFromCache()

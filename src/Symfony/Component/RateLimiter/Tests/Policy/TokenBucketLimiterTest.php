@@ -102,7 +102,7 @@ class TokenBucketLimiterTest extends TestCase
 
         $start = microtime(true);
         $rateLimit->wait(); // wait 1 second
-        $this->assertEqualsWithDelta($start + 1, microtime(true), 0.5);
+        $this->assertEqualsWithDelta($start + 1, microtime(true), 1);
     }
 
     public function testWrongWindowFromCache()

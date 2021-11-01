@@ -29,9 +29,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class Application extends BaseApplication
 {
-    private $kernel;
-    private $commandsRegistered = false;
-    private $registrationErrors = [];
+    private KernelInterface $kernel;
+    private bool $commandsRegistered = false;
+    private array $registrationErrors = [];
 
     public function __construct(KernelInterface $kernel)
     {

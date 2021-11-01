@@ -24,8 +24,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
-    private $container;
-    private $translator;
+    private ContainerInterface $container;
+    private TranslatorInterface $translator;
 
     public function __construct(ContainerInterface $container)
     {
@@ -40,9 +40,7 @@ class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
      */
     public function warmUp(string $cacheDir): array
     {
-        if (null === $this->translator) {
-            $this->translator = $this->container->get('translator');
-        }
+        $this->translator ??= $this->container->get('translator');
 
         if ($this->translator instanceof WarmableInterface) {
             return (array) $this->translator->warmUp($cacheDir);

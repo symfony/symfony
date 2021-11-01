@@ -30,9 +30,9 @@ class HttpCache extends BaseHttpCache
     protected $cacheDir;
     protected $kernel;
 
-    private $store;
-    private $surrogate;
-    private $options;
+    private ?StoreInterface $store = null;
+    private ?SurrogateInterface $surrogate;
+    private array $options;
 
     /**
      * @param $cache The cache directory (default used if null) or the storage instance

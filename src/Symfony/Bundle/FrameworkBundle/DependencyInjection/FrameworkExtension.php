@@ -216,17 +216,17 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
  */
 class FrameworkExtension extends Extension
 {
-    private $formConfigEnabled = false;
-    private $translationConfigEnabled = false;
-    private $sessionConfigEnabled = false;
-    private $annotationsConfigEnabled = false;
-    private $validatorConfigEnabled = false;
-    private $messengerConfigEnabled = false;
-    private $mailerConfigEnabled = false;
-    private $httpClientConfigEnabled = false;
-    private $notifierConfigEnabled = false;
-    private $propertyAccessConfigEnabled = false;
-    private static $lockConfigEnabled = false;
+    private bool $formConfigEnabled = false;
+    private bool $translationConfigEnabled = false;
+    private bool $sessionConfigEnabled = false;
+    private bool $annotationsConfigEnabled = false;
+    private bool $validatorConfigEnabled = false;
+    private bool $messengerConfigEnabled = false;
+    private bool $mailerConfigEnabled = false;
+    private bool $httpClientConfigEnabled = false;
+    private bool $notifierConfigEnabled = false;
+    private bool $propertyAccessConfigEnabled = false;
+    private static bool $lockConfigEnabled = false;
 
     /**
      * Responds to the app.config configuration parameter.

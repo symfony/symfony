@@ -50,15 +50,15 @@ class TranslationUpdateCommand extends Command
         'xlf20' => ['xlf', '2.0'],
     ];
 
-    private $writer;
-    private $reader;
-    private $extractor;
-    private $defaultLocale;
-    private $defaultTransPath;
-    private $defaultViewsPath;
-    private $transPaths;
-    private $codePaths;
-    private $enabledLocales;
+    private TranslationWriterInterface $writer;
+    private TranslationReaderInterface $reader;
+    private ExtractorInterface $extractor;
+    private string $defaultLocale;
+    private ?string $defaultTransPath;
+    private ?string $defaultViewsPath;
+    private array $transPaths;
+    private array $codePaths;
+    private array $enabledLocales;
 
     public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
     {

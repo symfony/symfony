@@ -50,14 +50,14 @@ class TranslationDebugCommand extends Command
     public const MESSAGE_UNUSED = 1;
     public const MESSAGE_EQUALS_FALLBACK = 2;
 
-    private $translator;
-    private $reader;
-    private $extractor;
-    private $defaultTransPath;
-    private $defaultViewsPath;
-    private $transPaths;
-    private $codePaths;
-    private $enabledLocales;
+    private TranslatorInterface $translator;
+    private TranslationReaderInterface $reader;
+    private ExtractorInterface $extractor;
+    private ?string $defaultTransPath;
+    private ?string $defaultViewsPath;
+    private array $transPaths;
+    private array $codePaths;
+    private array $enabledLocales;
 
     public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
     {

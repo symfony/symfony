@@ -47,10 +47,8 @@ interface AuthenticatorInterface
      * a UserNotFoundException when the user cannot be found).
      *
      * @throws AuthenticationException
-     *
-     * @return Passport
      */
-    public function authenticate(Request $request); /*: Passport;*/
+    public function authenticate(Request $request): Passport;
 
     /**
      * Create an authenticated token for the given user.

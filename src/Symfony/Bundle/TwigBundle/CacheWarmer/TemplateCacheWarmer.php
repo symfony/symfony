@@ -24,9 +24,9 @@ use Twig\Error\Error;
  */
 class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
-    private $container;
-    private $twig;
-    private $iterator;
+    private ContainerInterface $container;
+    private Environment $twig;
+    private iterable $iterator;
 
     public function __construct(ContainerInterface $container, iterable $iterator)
     {
@@ -42,9 +42,7 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
      */
     public function warmUp(string $cacheDir): array
     {
-        if (null === $this->twig) {
-            $this->twig = $this->container->get('twig');
-        }
+        $this->twig ??= $this->container->get('twig');
 
         $files = [];
 

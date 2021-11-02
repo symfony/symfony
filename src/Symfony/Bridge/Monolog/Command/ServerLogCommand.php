@@ -158,7 +158,6 @@ EOF
         }
     }
 
-
     private function getLogs($socket): iterable
     {
         $sockets = [(int) $socket => $socket];

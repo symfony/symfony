@@ -23,6 +23,12 @@ use Symfony\Component\Uid\Factory\UlidFactory;
 
 class GenerateUlidCommand extends Command
 {
+    private const FORMAT_OPTIONS = [
+        'base32',
+        'base58',
+        'rfc4122',
+    ];
+
     protected static $defaultName = 'ulid:generate';
     protected static $defaultDescription = 'Generate a ULID';
 
@@ -87,7 +93,7 @@ EOF
 
         $formatOption = $input->getOption('format');
 
-        if (\in_array($formatOption, $this->getAvailableFormatOptions())) {
+        if (\in_array($formatOption, self::FORMAT_OPTIONS)) {
             $format = 'to'.ucfirst($formatOption);
         } else {
             $io->error(sprintf('Invalid format "%s", did you mean "base32", "base58" or "rfc4122"?', $input->getOption('format')));
@@ -112,16 +118,7 @@ EOF
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         if ($input->mustSuggestOptionValuesFor('format')) {
-            $suggestions->suggestValues($this->getAvailableFormatOptions());
+            $suggestions->suggestValues(self::FORMAT_OPTIONS);
         }
-    }
-
-    private function getAvailableFormatOptions(): array
-    {
-        return [
-            'base32',
-            'base58',
-            'rfc4122',
-        ];
     }
 }

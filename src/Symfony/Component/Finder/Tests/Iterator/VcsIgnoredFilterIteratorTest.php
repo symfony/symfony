@@ -200,6 +200,53 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
                 'nested/nested/dir/a.txt',
             ],
         ];
+
+        yield 'negated pattern in nested .gitignore' => [
+            [
+                '.gitignore' => '*.txt',
+                'nested/.gitignore' => "!a.txt\ndir/",
+            ],
+            [
+                'a.txt',
+                'b.txt',
+                'nested/a.txt',
+                'nested/b.txt',
+                'nested/dir/a.txt',
+                'nested/dir/b.txt',
+            ],
+            [
+                'nested/a.txt',
+            ],
+        ];
+
+        yield 'negated pattern in ignored nested .gitignore' => [
+            [
+                '.gitignore' => "*.txt\n/nested/",
+                'nested/.gitignore' => "!a.txt\ndir/",
+            ],
+            [
+                'a.txt',
+                'b.txt',
+                'nested/a.txt',
+                'nested/b.txt',
+                'nested/dir/a.txt',
+                'nested/dir/b.txt',
+            ],
+            [],
+        ];
+
+        yield 'directory pattern negated in a subdirectory' => [
+            [
+                '.gitignore' => 'c/',
+                'a/.gitignore' => '!c/',
+            ],
+            [
+                'a/b/c/d.txt',
+            ],
+            [
+                'a/b/c/d.txt',
+            ],
+        ];
     }
 
     public function testAcceptAtRootDirectory()

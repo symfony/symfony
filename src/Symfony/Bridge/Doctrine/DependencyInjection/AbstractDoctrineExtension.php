@@ -89,25 +89,8 @@ abstract class AbstractDoctrineExtension extends Extension
                 if (!$mappingConfig) {
                     continue;
                 }
-            } elseif (!$mappingConfig['type'] && \PHP_VERSION_ID < 80000) {
-                $mappingConfig['type'] = 'annotation';
             } elseif (!$mappingConfig['type']) {
-                $mappingConfig['type'] = 'attribute';
-
-                $glob = new GlobResource($mappingConfig['dir'], '*', true);
-                $container->addResource($glob);
-
-                foreach ($glob as $file) {
-                    $content = file_get_contents($file);
-
-                    if (preg_match('/^#\[.*Entity\b/m', $content)) {
-                        break;
-                    }
-                    if (preg_match('/^ \* @.*Entity\b/m', $content)) {
-                        $mappingConfig['type'] = 'annotation';
-                        break;
-                    }
-                }
+                $mappingConfig['type'] = $this->detectMappingType($mappingConfig['dir'], $container);
             }
 
             $this->assertValidMappingConfiguration($mappingConfig, $objectManager['name']);
@@ -278,11 +261,42 @@ abstract class AbstractDoctrineExtension extends Extension
             }
             $container->fileExists($resource, false);
 
-            return $container->fileExists($dir.'/'.$this->getMappingObjectDefaultName(), false) ? 'annotation' : null;
+            if ($container->fileExists($dir.'/'.$this->getMappingObjectDefaultName(), false)) {
+                return $this->detectMappingType($dir, $container);
+            }
+
+            return null;
         }
         $container->fileExists($dir.'/'.$configPath, false);
 
         return $driver;
+    }
+
+    /**
+     * Detects what mapping type to use for the supplied directory.
+     *
+     * @return string A mapping type 'attribute' or 'annotation'
+     */
+    private function detectMappingType(string $directory, ContainerBuilder $container): string
+    {
+        $type = 'attribute';
+
+        $glob = new GlobResource($directory, '*', true);
+        $container->addResource($glob);
+
+        foreach ($glob as $file) {
+            $content = file_get_contents($file);
+
+            if (preg_match('/^#\[.*Entity\b/m', $content)) {
+                break;
+            }
+            if (preg_match('/^ \* @.*Entity\b/m', $content)) {
+                $type = 'annotation';
+                break;
+            }
+        }
+
+        return $type;
     }
 
     /**

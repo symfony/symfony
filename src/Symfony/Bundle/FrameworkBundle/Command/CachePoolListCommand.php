@@ -28,6 +28,9 @@ final class CachePoolListCommand extends Command
 
     private $poolNames;
 
+    /**
+     * @param string[] $poolNames
+     */
     public function __construct(array $poolNames)
     {
         parent::__construct();

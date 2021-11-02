@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-10-26T15:31:04Z
+
+Can you add a test please?
+
+---------------------------------------------------------------------------
+
+by cinamo at 2021-10-26T15:37:12Z
+
+> Can you add a test please?
+
+@derrabus I would love to. However, the original functionality doesn't have a test to begin with. Also, this test would necessarily need to refer to external files and I don't have any idea how to do that in your test suite. Can you give me a pointer how you would go about this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-28T14:00:51Z
+
+Writing tests could be done by adding a directory with fixtures in a test folder.
+
+---------------------------------------------------------------------------
+
+by cinamo at 2021-10-31T16:36:39Z
+
+> Writing tests could be done by adding a directory with fixtures in a test folder.
+
+Thanks for the suggestion, have made a new folder with an attribute annotation entity and added a test to detect the different kind of types.

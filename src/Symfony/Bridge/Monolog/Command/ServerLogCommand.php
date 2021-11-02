@@ -16,6 +16,8 @@ use Monolog\Logger;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,6 +31,24 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 class ServerLogCommand extends Command
 {
     private const BG_COLOR = ['black', 'blue', 'cyan', 'green', 'magenta', 'red', 'white', 'yellow'];
+    private const HOST_OPTIONS = [
+        '0.0.0.0:9911',
+        '127.0.0.1:80',
+        '127.0.0.1:443',
+        '127.0.0.1:8000',
+        'http://0.0.0.0:9911',
+        'http://127.0.0.1:80',
+        'https://127.0.0.1:443',
+        'http://127.0.0.1:8000',
+    ];
+
+    private const FORMAT_OPTIONS = [
+        '%datetime% %start_tag%%level_name%%end_tag% <comment>[%channel%]</> %message%%context%%extra%\n',
+    ];
+
+    private const DATE_FORMAT_OPTIONS = [
+        'H:i:s',
+    ];
 
     private $el;
     private $handler;
@@ -122,6 +142,22 @@ EOF
 
         return 0;
     }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestOptionValuesFor('host')) {
+            $suggestions->suggestValues(self::HOST_OPTIONS);
+        }
+
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues(self::FORMAT_OPTIONS);
+        }
+
+        if ($input->mustSuggestOptionValuesFor('date-format')) {
+            $suggestions->suggestValues(self::DATE_FORMAT_OPTIONS);
+        }
+    }
+
 
     private function getLogs($socket): iterable
     {

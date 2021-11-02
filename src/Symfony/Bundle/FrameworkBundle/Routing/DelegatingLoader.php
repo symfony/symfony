@@ -28,9 +28,9 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class DelegatingLoader extends BaseDelegatingLoader
 {
-    private $loading = false;
-    private $defaultOptions;
-    private $defaultRequirements;
+    private bool $loading = false;
+    private array $defaultOptions;
+    private array $defaultRequirements;
 
     public function __construct(LoaderResolverInterface $resolver, array $defaultOptions = [], array $defaultRequirements = [])
     {

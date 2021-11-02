@@ -23,7 +23,7 @@ use Twig\Environment;
  */
 class TemplateController
 {
-    private $twig;
+    private ?Environment $twig;
 
     public function __construct(Environment $twig = null)
     {

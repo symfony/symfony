@@ -31,10 +31,7 @@ use Symfony\Component\HttpKernel\Kernel;
 #[AsCommand(name: 'lint:container', description: 'Ensure that arguments injected into services match type declarations')]
 final class ContainerLintCommand extends Command
 {
-    /**
-     * @var ContainerBuilder
-     */
-    private $containerBuilder;
+    private ContainerBuilder $containerBuilder;
 
     /**
      * {@inheritdoc}
@@ -79,7 +76,7 @@ final class ContainerLintCommand extends Command
 
     private function getContainerBuilder(): ContainerBuilder
     {
-        if ($this->containerBuilder) {
+        if (isset($this->containerBuilder)) {
             return $this->containerBuilder;
         }
 

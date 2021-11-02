@@ -35,7 +35,7 @@ abstract class KernelTestCase extends TestCase
 
     protected static $booted = false;
 
-    private static $kernelContainer;
+    private static ?ContainerInterface $kernelContainer = null;
 
     protected function tearDown(): void
     {

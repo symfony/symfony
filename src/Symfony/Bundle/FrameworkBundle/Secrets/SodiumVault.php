@@ -23,10 +23,10 @@ use Symfony\Component\VarExporter\VarExporter;
  */
 class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 {
-    private $encryptionKey;
-    private $decryptionKey;
-    private $pathPrefix;
-    private $secretsDir;
+    private ?string $encryptionKey = null;
+    private string|\Stringable|null $decryptionKey = null;
+    private string $pathPrefix;
+    private ?string $secretsDir;
 
     /**
      * @param $decryptionKey A string or a stringable object that defines the private key to use to decrypt the vault

@@ -30,9 +30,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class KernelBrowser extends HttpKernelBrowser
 {
-    private $hasPerformedRequest = false;
-    private $profiler = false;
-    private $reboot = true;
+    private bool $hasPerformedRequest = false;
+    private bool $profiler = false;
+    private bool $reboot = true;
 
     /**
      * {@inheritdoc}

@@ -28,8 +28,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class TestContainer extends Container
 {
-    private $kernel;
-    private $privateServicesLocatorId;
+    private KernelInterface $kernel;
+    private string $privateServicesLocatorId;
 
     public function __construct(KernelInterface $kernel, string $privateServicesLocatorId)
     {

@@ -41,8 +41,8 @@ class AssetsInstallCommand extends Command
     public const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
     public const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
-    private $filesystem;
-    private $projectDir;
+    private Filesystem $filesystem;
+    private string $projectDir;
 
     public function __construct(Filesystem $filesystem, string $projectDir)
     {

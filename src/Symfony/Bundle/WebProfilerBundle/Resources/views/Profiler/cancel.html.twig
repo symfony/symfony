@@ -4,7 +4,6 @@
 
         <span class="sf-toolbar-value sf-toolbar-ajax-request-counter">
             Loading&hellip;
-            <span id="sfLoadCounter-{{ token }}"></span>
         </span>
     {% endset %}
 
@@ -13,8 +12,11 @@
             <b>Loading the web debug toolbar&hellip;</b>
         </div>
         <div class="sf-toolbar-info-piece">
+            Attempt #<span id="sfLoadCounter-{{ token }}"></span>
+        </div>
+        <div class="sf-toolbar-info-piece">
             <b>
-                <a id="sfLoadCancel-{{ token }}" href="#">Cancel</a>
+                <button class="sf-cancel-button" type="button" id="sfLoadCancel-{{ token }}" title="Cancel loading">Cancel</button>
             </b>
         </div>
     {% endset %}

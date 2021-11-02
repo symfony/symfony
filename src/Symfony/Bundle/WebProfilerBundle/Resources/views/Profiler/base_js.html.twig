@@ -54,7 +54,10 @@ if (typeof Sfjs === 'undefined') {
                 }
 
                 if (xhr.status == 404 && options.retry && !options.stop) {
-                    setTimeout(function(){
+                    setTimeout(function() {
+                        if (options.stop) {
+                            return;
+                        }
                         request(url, onSuccess, onError, payload, options, tries + 1);
                     }, delay);
 
@@ -493,12 +496,12 @@ if (typeof Sfjs === 'undefined') {
                 var options = {
                     retry: true,
                     onSend: function (count) {
-                        if (count > 5) {
+                        if (count === 3) {
                             that.initToolbar(token);
                         }
 
                         if (triesCounter) {
-                            triesCounter.innerHTML = count;
+                            triesCounter.textContent = count;
                         }
                     },
                 };

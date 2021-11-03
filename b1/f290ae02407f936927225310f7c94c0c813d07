@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-11-02T11:24:29Z
+
+Well, to me, letting the solver know about the conflict is better than forcing the user to manage dependencies manually.
+
+Cases where the latest versions of packages are incompatible together need to be resolved by the user anyway to choose which requirement they want to relax, but that's only happening properly if the solver knows about the incompatibility.
+And `composer why-not symfony/console 5.3.7` will tell you why you don't get the 5.3.7 version for instance.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-02T11:44:31Z
+
+Shouldn't we have a mix here? This exception in 5.3 and the conflict in 5.4?
+Since 5.3.2 is already tagged without the conflict, the harm is already done for 5.3.
+
+What about moving the check to the constructor though?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-11-02T11:54:38Z
+
+> Since 5.3.2 is already tagged without the conflict, the harm is already done for 5.3.
+
+Good point. If we restore the conflict in 5.4, I'm 👍
+
+> What about moving the check to the constructor though?
+
+That wouldn't work because the class definition itself raises a fatal error, doesn't it?

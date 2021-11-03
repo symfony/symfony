@@ -47,24 +47,6 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode = $tb->getRootNode();
 
         $rootNode
-            ->beforeNormalization()
-                ->ifTrue(function ($v) {
-                    if (!isset($v['access_decision_manager'])) {
-                        return true;
-                    }
-
-                    if (!isset($v['access_decision_manager']['strategy']) && !isset($v['access_decision_manager']['service'])) {
-                        return true;
-                    }
-
-                    return false;
-                })
-                ->then(function ($v) {
-                    $v['access_decision_manager']['strategy'] = AccessDecisionManager::STRATEGY_AFFIRMATIVE;
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
                 ->enumNode('session_fixation_strategy')

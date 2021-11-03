@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\CompleteCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Output\BashCompletionOutput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -48,6 +49,20 @@ class CompleteCommandTest extends TestCase
     {
         $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash").');
         $this->execute(['--shell' => 'unsupported']);
+    }
+
+    public function testAdditionalShellSupport()
+    {
+        $this->command = new CompleteCommand(['supported' => BashCompletionOutput::class]);
+        $this->command->setApplication($this->application);
+        $this->tester = new CommandTester($this->command);
+
+        $this->execute(['--shell' => 'supported', '--current' => '1', '--input' => ['bin/console']]);
+
+        // verify that the default set of shells is still supported
+        $this->execute(['--shell' => 'bash', '--current' => '1', '--input' => ['bin/console']]);
+
+        $this->assertTrue(true);
     }
 
     /**

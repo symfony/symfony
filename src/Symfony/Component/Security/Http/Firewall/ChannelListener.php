@@ -43,7 +43,7 @@ class ChannelListener extends AbstractListener
             $nrOfArgs = \func_num_args();
             $logger = $nrOfArgs > 2 ? func_get_arg(2) : null;
             $httpPort = $nrOfArgs > 3 ? func_get_arg(3) : 80;
-            $httpPort = $nrOfArgs > 4 ? func_get_arg(4) : 443;
+            $httpsPort = $nrOfArgs > 4 ? func_get_arg(4) : 443;
         }
 
         if (null !== $logger && !$logger instanceof LoggerInterface) {

@@ -32,9 +32,9 @@ use Symfony\Component\PropertyInfo\Util\PhpStanTypeHelper;
  */
 final class PhpStanExtractor implements PropertyTypeExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
-    public const PROPERTY = 0;
-    public const ACCESSOR = 1;
-    public const MUTATOR = 2;
+    private const PROPERTY = 0;
+    private const ACCESSOR = 1;
+    private const MUTATOR = 2;
 
     /** @var PhpDocParser */
     private $phpDocParser;
@@ -45,12 +45,18 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
     /** @var NameScopeFactory */
     private $nameScopeFactory;
 
+    /** @var array<string, array{PhpDocNode|null, int|null, string|null}> */
     private $docBlocks = [];
     private $phpStanTypeHelper;
     private $mutatorPrefixes;
     private $accessorPrefixes;
     private $arrayMutatorPrefixes;
 
+    /**
+     * @param list<string>|null $mutatorPrefixes
+     * @param list<string>|null $accessorPrefixes
+     * @param list<string>|null $arrayMutatorPrefixes
+     */
     public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
     {
         $this->phpStanTypeHelper = new PhpStanTypeHelper();
@@ -65,7 +71,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
 
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
-        /** @var $docNode PhpDocNode */
+        /** @var PhpDocNode|null $docNode */
         [$docNode, $source, $prefix] = $this->getDocBlock($class, $property);
         $nameScope = $this->nameScopeFactory->create($class);
         if (null === $docNode) {
@@ -177,6 +183,9 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         return $tags[0]->value;
     }
 
+    /**
+     * @return array{PhpDocNode|null, int|null, string|null}
+     */
     private function getDocBlock(string $class, string $property): array
     {
         $propertyHash = $class.'::'.$property;
@@ -220,6 +229,9 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         return $phpDocNode;
     }
 
+    /**
+     * @return array{PhpDocNode, string}|null
+     */
     private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type): ?array
     {
         $prefixes = self::ACCESSOR === $type ? $this->accessorPrefixes : $this->mutatorPrefixes;

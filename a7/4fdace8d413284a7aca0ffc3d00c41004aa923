@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-08-11T08:45:05Z
+
+👍🏼 for the workflow part
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-08-12T08:21:23Z
+
+Ldap's QueryInterface declares `@return CollectionInterface|Entry[]` but it should be something like `@return CollectionInterface<Entry>`

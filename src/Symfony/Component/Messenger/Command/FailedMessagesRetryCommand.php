@@ -34,8 +34,6 @@ use Symfony\Component\Messenger\Worker;
  */
 class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 {
-    private const DEFAULT_TRANSPORT_OPTION = 'choose';
-
     protected static $defaultName = 'messenger:failed:retry';
     protected static $defaultDescription = 'Retry one or more messages from the failure transport';
 

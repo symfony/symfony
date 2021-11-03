@@ -15,6 +15,9 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \ArrayAccess<string, FormView>
+ * @implements \IteratorAggregate<string, FormView>
  */
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {

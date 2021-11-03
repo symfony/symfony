@@ -27,11 +27,11 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     private $initializableExtractors;
 
     /**
-     * @param iterable|PropertyListExtractorInterface[]          $listExtractors
-     * @param iterable|PropertyTypeExtractorInterface[]          $typeExtractors
-     * @param iterable|PropertyDescriptionExtractorInterface[]   $descriptionExtractors
-     * @param iterable|PropertyAccessExtractorInterface[]        $accessExtractors
-     * @param iterable|PropertyInitializableExtractorInterface[] $initializableExtractors
+     * @param iterable<int, PropertyListExtractorInterface>          $listExtractors
+     * @param iterable<int, PropertyTypeExtractorInterface>          $typeExtractors
+     * @param iterable<int, PropertyDescriptionExtractorInterface>   $descriptionExtractors
+     * @param iterable<int, PropertyAccessExtractorInterface>        $accessExtractors
+     * @param iterable<int, PropertyInitializableExtractorInterface> $initializableExtractors
      */
     public function __construct(iterable $listExtractors = [], iterable $typeExtractors = [], iterable $descriptionExtractors = [], iterable $accessExtractors = [], iterable $initializableExtractors = [])
     {
@@ -100,6 +100,9 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
 
     /**
      * Iterates over registered extractors and return the first value found.
+     *
+     * @param iterable<int, object> $extractors
+     * @param list<mixed>           $arguments
      *
      * @return mixed
      */

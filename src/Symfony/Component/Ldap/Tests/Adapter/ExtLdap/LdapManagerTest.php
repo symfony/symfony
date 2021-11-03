@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Tests\Adapter\ExtLdap;
 
+use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\UpdateOperation;
@@ -160,10 +161,7 @@ class LdapManagerTest extends LdapTestCase
         $em->update(new Entry(''));
     }
 
-    /**
-     * @return Collection|Entry[]
-     */
-    private function executeSearchQuery($expectedResults = 1)
+    private function executeSearchQuery($expectedResults = 1): CollectionInterface
     {
         $results = $this
             ->adapter

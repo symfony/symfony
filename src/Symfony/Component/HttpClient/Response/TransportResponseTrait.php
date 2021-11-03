@@ -146,6 +146,8 @@ trait TransportResponseTrait
     /**
      * Implements an event loop based on a buffer activity queue.
      *
+     * @param iterable<array-key, self> $responses
+     *
      * @internal
      */
     public static function stream(iterable $responses, float $timeout = null): \Generator

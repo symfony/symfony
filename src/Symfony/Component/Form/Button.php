@@ -18,6 +18,8 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  * A form button.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, FormInterface>
  */
 class Button implements \IteratorAggregate, FormInterface
 {
@@ -64,7 +66,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @param mixed $offset
      *
-     * @return mixed
+     * @return FormInterface
      *
      * @throws BadMethodCallException
      */

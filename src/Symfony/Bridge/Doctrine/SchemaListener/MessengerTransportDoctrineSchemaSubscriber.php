@@ -31,7 +31,7 @@ final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscribe
     private $transports;
 
     /**
-     * @param iterable|TransportInterface[] $transports
+     * @param iterable<int, TransportInterface> $transports
      */
     public function __construct(iterable $transports)
     {

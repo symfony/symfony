@@ -15,12 +15,17 @@ namespace Symfony\Component\HttpFoundation;
  * HeaderBag is a container for HTTP headers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @implements \IteratorAggregate<string, array<int, string|null>>
  */
 class HeaderBag implements \IteratorAggregate, \Countable
 {
     protected const UPPER = '_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     protected const LOWER = '-abcdefghijklmnopqrstuvwxyz';
 
+    /**
+     * @var array<string, array<int, string|null>>
+     */
     protected $headers = [];
     protected $cacheControl = [];
 
@@ -60,7 +65,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string|null $key The name of the headers to return or null to get them all
      *
-     * @return array
+     * @return array<string, array<int, string|null>>|array<int, string|null>
      */
     public function all(string $key = null)
     {
@@ -74,7 +79,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameter keys.
      *
-     * @return array
+     * @return string[]
      */
     public function keys()
     {
@@ -250,7 +255,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns an iterator for headers.
      *
-     * @return \ArrayIterator
+     * @return \ArrayIterator<string, array<int, string|null>>
      */
     #[\ReturnTypeWillChange]
     public function getIterator()

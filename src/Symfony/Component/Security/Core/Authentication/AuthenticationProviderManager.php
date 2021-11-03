@@ -47,8 +47,8 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
     private $eventDispatcher;
 
     /**
-     * @param iterable|AuthenticationProviderInterface[] $providers        An iterable with AuthenticationProviderInterface instances as values
-     * @param bool                                       $eraseCredentials Whether to erase credentials after authentication or not
+     * @param iterable<int, AuthenticationProviderInterface> $providers        An iterable with AuthenticationProviderInterface instances as values
+     * @param bool                                           $eraseCredentials Whether to erase credentials after authentication or not
      *
      * @throws \InvalidArgumentException
      */

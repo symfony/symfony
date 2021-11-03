@@ -28,6 +28,10 @@ use Symfony\Component\Validator\ConstraintViolation;
  * flatten the recursive structure into a flat list of errors.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \ArrayAccess<int, FormError|FormErrorIterator>
+ * @implements \RecursiveIterator<int, FormError>
+ * @implements \SeekableIterator<int, FormError>
  */
 class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \ArrayAccess, \Countable
 {
@@ -40,8 +44,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     private $errors;
 
     /**
-     * @param FormError[]|self[] $errors An array of form errors and instances
-     *                                   of FormErrorIterator
+     * @param array<int, FormError|self> $errors
      *
      * @throws InvalidArgumentException If the errors are invalid
      */

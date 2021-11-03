@@ -63,7 +63,7 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @return \Traversable
+     * @return \Traversable<int, Entry>
      */
     #[\ReturnTypeWillChange]
     public function getIterator()
@@ -101,7 +101,7 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @return mixed
+     * @return Entry|null
      */
     #[\ReturnTypeWillChange]
     public function offsetGet($offset)

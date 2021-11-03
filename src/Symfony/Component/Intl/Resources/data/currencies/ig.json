@@ -328,6 +328,10 @@
             "LRD",
             "Ego Dollar obodo Liberia"
         ],
+        "LSL": [
+            "LSL",
+            "This is not a translation"
+        ],
         "LYD": [
             "LYD",
             "Ego Dinar obodo Libya"
@@ -429,7 +433,7 @@
             "Ego Kina obodo Papua New Guinea"
         ],
         "PHP": [
-            "PHP",
+            "₱",
             "Ego piso obodo Philippine"
         ],
         "PKR": [
@@ -601,7 +605,7 @@
             "Ego Dollar obodo East Carribbean"
         ],
         "XOF": [
-            "CFA",
+            "F CFA",
             "Ego CFA Franc obodo West Africa"
         ],
         "XPF": [

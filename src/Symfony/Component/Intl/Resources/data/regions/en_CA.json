@@ -1,0 +1,20 @@
+{
+    "Names": {
+        "AG": "Antigua and Barbuda",
+        "BA": "Bosnia and Herzegovina",
+        "BL": "Saint-Barthélemy",
+        "GS": "South Georgia and South Sandwich Islands",
+        "HM": "Heard and McDonald Islands",
+        "KN": "Saint Kitts and Nevis",
+        "LC": "Saint Lucia",
+        "MF": "Saint Martin",
+        "PM": "Saint-Pierre-et-Miquelon",
+        "SH": "Saint Helena",
+        "SJ": "Svalbard and Jan Mayen",
+        "ST": "São Tomé and Príncipe",
+        "TC": "Turks and Caicos Islands",
+        "TT": "Trinidad and Tobago",
+        "VC": "Saint Vincent and the Grenadines",
+        "WF": "Wallis and Futuna"
+    }
+}

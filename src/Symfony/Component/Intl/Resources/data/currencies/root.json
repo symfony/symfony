@@ -52,6 +52,10 @@
             "NZ$",
             "NZD"
         ],
+        "PHP": [
+            "₱",
+            "PHP"
+        ],
         "TWD": [
             "NT$",
             "TWD"
@@ -73,7 +77,7 @@
             "XCD"
         ],
         "XOF": [
-            "CFA",
+            "F CFA",
             "XOF"
         ],
         "XPF": [

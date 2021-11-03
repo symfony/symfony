@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
@@ -49,7 +50,7 @@ class InMemoryTransportTest extends TestCase
     {
         $envelope = new Envelope(new \stdClass());
         $this->transport->send($envelope);
-        $this->assertSame([$envelope], $this->transport->getSent());
+        $this->assertEquals([$envelope->with(new TransportMessageIdStamp(1))], $this->transport->getSent());
     }
 
     public function testSendWithSerialization()
@@ -58,7 +59,7 @@ class InMemoryTransportTest extends TestCase
         $envelopeDecoded = Envelope::wrap(new DummyMessage('Hello.'));
         $this->serializer
             ->method('encode')
-            ->with($this->equalTo($envelope))
+            ->with($this->equalTo($envelope->with(new TransportMessageIdStamp(1))))
             ->willReturn(['foo' => 'ba'])
         ;
         $this->serializer
@@ -89,7 +90,7 @@ class InMemoryTransportTest extends TestCase
         $envelopeDecoded = Envelope::wrap(new DummyMessage('Hello.'));
         $this->serializer
             ->method('encode')
-            ->with($this->equalTo($envelope))
+            ->with($this->equalTo($envelope->with(new TransportMessageIdStamp(1))))
             ->willReturn(['foo' => 'ba'])
         ;
         $this->serializer
@@ -128,7 +129,7 @@ class InMemoryTransportTest extends TestCase
         $envelopeDecoded = Envelope::wrap(new DummyMessage('Hello.'));
         $this->serializer
             ->method('encode')
-            ->with($this->equalTo($envelope))
+            ->with($this->equalTo($envelope->with(new TransportMessageIdStamp(1))))
             ->willReturn(['foo' => 'ba'])
         ;
         $this->serializer
@@ -136,7 +137,7 @@ class InMemoryTransportTest extends TestCase
             ->with(['foo' => 'ba'])
             ->willReturn($envelopeDecoded)
         ;
-        $this->serializeTransport->ack($envelope);
+        $this->serializeTransport->ack($envelope->with(new TransportMessageIdStamp(1)));
         $this->assertSame([$envelopeDecoded], $this->serializeTransport->getAcknowledged());
     }
 
@@ -154,7 +155,7 @@ class InMemoryTransportTest extends TestCase
         $envelopeDecoded = Envelope::wrap(new DummyMessage('Hello.'));
         $this->serializer
             ->method('encode')
-            ->with($this->equalTo($envelope))
+            ->with($this->equalTo($envelope->with(new TransportMessageIdStamp(1))))
             ->willReturn(['foo' => 'ba'])
         ;
         $this->serializer
@@ -162,7 +163,7 @@ class InMemoryTransportTest extends TestCase
             ->with(['foo' => 'ba'])
             ->willReturn($envelopeDecoded)
         ;
-        $this->serializeTransport->reject($envelope);
+        $this->serializeTransport->reject($envelope->with(new TransportMessageIdStamp(1)));
         $this->assertSame([$envelopeDecoded], $this->serializeTransport->getRejected());
     }
 

@@ -38,7 +38,7 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
             ->setDefinition([
                 new InputArgument('id', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Specific message id(s) to remove'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force the operation without confirmation'),
-                new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport'),
+                new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
                 new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
             ])
             ->setDescription(self::$defaultDescription)
@@ -61,7 +61,7 @@ EOF
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         $failureTransportName = $input->getOption('transport');
-        if (null === $failureTransportName) {
+        if (self::DEFAULT_TRANSPORT_OPTION === $failureTransportName) {
             $failureTransportName = $this->getGlobalFailureReceiverName();
         }
 

@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AuthenticationException extends RuntimeException
 {
-    private $token;
+    private ?TokenInterface $token = null;
 
     public function getToken(): ?TokenInterface
     {

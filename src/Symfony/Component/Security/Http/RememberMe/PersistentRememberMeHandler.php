@@ -32,9 +32,9 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 {
-    private $tokenProvider;
-    private $tokenVerifier;
-    private $secret;
+    private TokenProviderInterface $tokenProvider;
+    private ?TokenVerifierInterface $tokenVerifier;
+    private string $secret;
 
     public function __construct(TokenProviderInterface $tokenProvider, string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null, TokenVerifierInterface $tokenVerifier = null)
     {

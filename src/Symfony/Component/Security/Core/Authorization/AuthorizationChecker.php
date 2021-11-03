@@ -25,9 +25,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
  */
 class AuthorizationChecker implements AuthorizationCheckerInterface
 {
-    private $tokenStorage;
-    private $accessDecisionManager;
-    private $exceptionOnNoToken;
+    private TokenStorageInterface $tokenStorage;
+    private AccessDecisionManagerInterface $accessDecisionManager;
 
     public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, bool $exceptionOnNoToken = false)
     {
@@ -37,7 +36,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 
         $this->tokenStorage = $tokenStorage;
         $this->accessDecisionManager = $accessDecisionManager;
-        $this->exceptionOnNoToken = $exceptionOnNoToken;
     }
 
     /**

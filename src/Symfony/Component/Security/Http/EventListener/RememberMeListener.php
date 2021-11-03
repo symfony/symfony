@@ -34,8 +34,8 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  */
 class RememberMeListener implements EventSubscriberInterface
 {
-    private $rememberMeHandler;
-    private $logger;
+    private RememberMeHandlerInterface $rememberMeHandler;
+    private ?LoggerInterface $logger;
 
     public function __construct(RememberMeHandlerInterface $rememberMeHandler, LoggerInterface $logger = null)
     {

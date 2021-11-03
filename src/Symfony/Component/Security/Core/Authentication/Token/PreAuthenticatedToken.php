@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class PreAuthenticatedToken extends AbstractToken
 {
-    private $firewallName;
+    private string $firewallName;
 
     /**
      * @param string[] $roles

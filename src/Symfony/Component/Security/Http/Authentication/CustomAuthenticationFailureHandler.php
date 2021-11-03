@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class CustomAuthenticationFailureHandler implements AuthenticationFailureHandlerInterface
 {
-    private $handler;
+    private AuthenticationFailureHandlerInterface $handler;
 
     /**
      * @param array $options Options for processing a successful authentication attempt

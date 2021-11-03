@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  */
 class UserProviderListener
 {
-    private $userProvider;
+    private UserProviderInterface $userProvider;
 
     public function __construct(UserProviderInterface $userProvider)
     {

@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class PostAuthenticationToken extends AbstractToken
 {
-    private $firewallName;
+    private string $firewallName;
 
     /**
      * @param string[] $roles An array of roles

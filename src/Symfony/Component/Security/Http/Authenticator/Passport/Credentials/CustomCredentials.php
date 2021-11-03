@@ -23,9 +23,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class CustomCredentials implements CredentialsInterface
 {
-    private $customCredentialsChecker;
-    private $credentials;
-    private $resolved = false;
+    private \Closure $customCredentialsChecker;
+    private mixed $credentials;
+    private bool $resolved = false;
 
     /**
      * @param callable $customCredentialsChecker the check function. If this function does not return `true`, a
@@ -34,7 +34,7 @@ class CustomCredentials implements CredentialsInterface
      */
     public function __construct(callable $customCredentialsChecker, mixed $credentials)
     {
-        $this->customCredentialsChecker = $customCredentialsChecker;
+        $this->customCredentialsChecker = $customCredentialsChecker instanceof \Closure ? $customCredentialsChecker : \Closure::fromCallable($customCredentialsChecker);
         $this->credentials = $credentials;
     }
 

@@ -20,8 +20,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class RememberMeToken extends AbstractToken
 {
-    private $secret;
-    private $firewallName;
+    private string $secret;
+    private string $firewallName;
 
     /**
      * @param string $secret A secret used to make sure the token is created by the app and not by a malicious client

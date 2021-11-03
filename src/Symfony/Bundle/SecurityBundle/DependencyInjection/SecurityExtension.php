@@ -55,14 +55,14 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  */
 class SecurityExtension extends Extension implements PrependExtensionInterface
 {
-    private $requestMatchers = [];
-    private $expressions = [];
-    private $contextListeners = [];
+    private array $requestMatchers = [];
+    private array $expressions = [];
+    private array $contextListeners = [];
     /** @var list<array{0: int, 1: AuthenticatorFactoryInterface}> */
-    private $factories = [];
+    private array $factories = [];
     /** @var AuthenticatorFactoryInterface[] */
-    private $sortedFactories = [];
-    private $userProviderFactories = [];
+    private array $sortedFactories = [];
+    private array $userProviderFactories = [];
 
     public function prepend(ContainerBuilder $container)
     {

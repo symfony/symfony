@@ -16,18 +16,18 @@ namespace Symfony\Bundle\SecurityBundle\Security;
  */
 final class FirewallConfig
 {
-    private $name;
-    private $userChecker;
-    private $requestMatcher;
-    private $securityEnabled;
-    private $stateless;
-    private $provider;
-    private $context;
-    private $entryPoint;
-    private $accessDeniedHandler;
-    private $accessDeniedUrl;
-    private $authenticators;
-    private $switchUser;
+    private string $name;
+    private string $userChecker;
+    private ?string $requestMatcher;
+    private bool $securityEnabled;
+    private bool $stateless;
+    private ?string $provider;
+    private ?string $context;
+    private ?string $entryPoint;
+    private ?string $accessDeniedHandler;
+    private ?string $accessDeniedUrl;
+    private array $authenticators;
+    private ?array $switchUser;
 
     public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $authenticators = [], array $switchUser = null)
     {

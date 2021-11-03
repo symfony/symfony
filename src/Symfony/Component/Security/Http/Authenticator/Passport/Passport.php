@@ -25,8 +25,8 @@ class Passport
 {
     protected $user;
 
-    private $badges = [];
-    private $attributes = [];
+    private array $badges = [];
+    private array $attributes = [];
 
     /**
      * @param CredentialsInterface $credentials the credentials to check for this authentication, use

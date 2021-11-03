@@ -24,8 +24,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TokenStorage implements TokenStorageInterface, ResetInterface
 {
-    private $token;
-    private $initializer;
+    private ?TokenInterface $token = null;
+    private ?\Closure $initializer = null;
 
     /**
      * {@inheritdoc}
@@ -56,7 +56,7 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
 
     public function setInitializer(?callable $initializer): void
     {
-        $this->initializer = $initializer;
+        $this->initializer = null === $initializer || $initializer instanceof \Closure ? $initializer : \Closure::fromCallable($initializer);
     }
 
     public function reset()

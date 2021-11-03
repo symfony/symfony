@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class UsernamePasswordToken extends AbstractToken
 {
-    private $firewallName;
+    private string $firewallName;
 
     public function __construct(UserInterface $user, string $firewallName, array $roles = [])
     {

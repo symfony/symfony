@@ -21,10 +21,10 @@ namespace Symfony\Component\Security\Core\User;
  */
 final class InMemoryUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
-    private $username;
-    private $password;
-    private $enabled;
-    private $roles;
+    private string $username;
+    private ?string $password;
+    private bool $enabled;
+    private array $roles;
 
     public function __construct(?string $username, ?string $password, array $roles = [], bool $enabled = true)
     {

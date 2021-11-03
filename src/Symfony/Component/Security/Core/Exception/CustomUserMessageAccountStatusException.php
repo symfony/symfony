@@ -23,9 +23,8 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class CustomUserMessageAccountStatusException extends AccountStatusException
 {
-    private $messageKey;
-
-    private $messageData = [];
+    private string $messageKey;
+    private array $messageData = [];
 
     public function __construct(string $message = '', array $messageData = [], int $code = 0, \Throwable $previous = null)
     {

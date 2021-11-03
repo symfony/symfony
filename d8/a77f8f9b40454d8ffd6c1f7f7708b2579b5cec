@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-11-01T16:54:13Z
+
+Fabbot failure is a false positive.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-02T11:01:38Z
+
+Can you find a way to work around the fabbot notice? By experience, it'll be confusing for newcomers otherwise.

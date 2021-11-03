@@ -180,7 +180,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     }
 
     /**
-     * Returns the human redable date when this Symfony version ends its
+     * Returns the human readable date when this Symfony version ends its
      * maintenance period.
      *
      * @return string
@@ -191,7 +191,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     }
 
     /**
-     * Returns the human redable date when this Symfony version reaches its
+     * Returns the human readable date when this Symfony version reaches its
      * "end of life" and won't receive bugs or security fixes.
      *
      * @return string

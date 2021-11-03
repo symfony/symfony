@@ -677,7 +677,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return 'security.user_providers';
         }
 
-        throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $factoryKey, $id));
+        throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" %s on "%s" firewall is ambiguous as there is more than one registered provider.', $factoryKey, $this->authenticatorManagerEnabled ? 'authenticator' : 'listener', $id));
     }
 
     private function createEncoders(array $encoders, ContainerBuilder $container)

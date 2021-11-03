@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 class RouterDataCollector extends DataCollector
 {
     /**
-     * @var \SplObjectStorage
+     * @var \SplObjectStorage<Request, callable>
      */
     protected $controllers;
 

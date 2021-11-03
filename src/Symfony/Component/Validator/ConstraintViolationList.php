@@ -15,6 +15,8 @@ namespace Symfony\Component\Validator;
  * Default implementation of {@ConstraintViolationListInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<int, ConstraintViolationInterface>
  */
 class ConstraintViolationList implements \IteratorAggregate, ConstraintViolationListInterface
 {
@@ -131,7 +133,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
         return $this->has($offset);
     }
 
-    public function offsetGet(mixed $offset): mixed
+    public function offsetGet(mixed $offset): ConstraintViolationInterface
     {
         return $this->get($offset);
     }

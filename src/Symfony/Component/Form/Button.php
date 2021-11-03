@@ -20,6 +20,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * A form button.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, FormInterface>
  */
 class Button implements \IteratorAggregate, FormInterface
 {
@@ -50,7 +52,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function offsetGet(mixed $offset): mixed
+    public function offsetGet(mixed $offset): FormInterface
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }

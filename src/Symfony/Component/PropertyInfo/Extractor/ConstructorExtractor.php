@@ -20,11 +20,10 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
  */
 final class ConstructorExtractor implements PropertyTypeExtractorInterface
 {
-    /** @var iterable|ConstructorArgumentTypeExtractorInterface[] */
     private $extractors;
 
     /**
-     * @param iterable|ConstructorArgumentTypeExtractorInterface[] $extractors
+     * @param iterable<int, ConstructorArgumentTypeExtractorInterface> $extractors
      */
     public function __construct(iterable $extractors = [])
     {

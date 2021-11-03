@@ -15,6 +15,9 @@ namespace Symfony\Component\Validator;
  * A list of constraint violations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @extends \ArrayAccess<int, ConstraintViolationInterface>
+ * @extends \Traversable<int, ConstraintViolationInterface>
  */
 interface ConstraintViolationListInterface extends \Traversable, \Countable, \ArrayAccess
 {

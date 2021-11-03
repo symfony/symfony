@@ -363,7 +363,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * @param \ReflectionClass|\ReflectionMethod $reflection
      *
-     * @return iterable|RouteAnnotation[]
+     * @return iterable<int, RouteAnnotation>
      */
     private function getAnnotations(object $reflection): iterable
     {

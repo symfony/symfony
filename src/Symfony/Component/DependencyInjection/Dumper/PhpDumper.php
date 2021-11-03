@@ -62,6 +62,7 @@ class PhpDumper extends Dumper
      */
     public const NON_FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 
+    /** @var \SplObjectStorage<Definition, Variable>|null */
     private ?\SplObjectStorage $definitionVariables = null;
     private ?array $referenceVariables = null;
     private int $variableCount;

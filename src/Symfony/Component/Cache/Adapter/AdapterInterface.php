@@ -32,7 +32,7 @@ interface AdapterInterface extends CacheItemPoolInterface
     /**
      * {@inheritdoc}
      *
-     * @return iterable<CacheItem>
+     * @return iterable<string, CacheItem>
      */
     public function getItems(array $keys = []): iterable;
 

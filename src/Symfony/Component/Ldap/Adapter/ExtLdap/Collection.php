@@ -84,7 +84,7 @@ class Collection implements CollectionInterface
         return isset($this->entries[$offset]);
     }
 
-    public function offsetGet(mixed $offset): mixed
+    public function offsetGet(mixed $offset): ?Entry
     {
         $this->toArray();
 

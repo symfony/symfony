@@ -140,7 +140,7 @@ class EntryManager implements EntryManagerInterface
     }
 
     /**
-     * @param iterable|UpdateOperation[] $operations An array or iterable of UpdateOperation instances
+     * @param iterable<int, UpdateOperation> $operations An array or iterable of UpdateOperation instances
      *
      * @throws UpdateOperationException in case of an error
      */

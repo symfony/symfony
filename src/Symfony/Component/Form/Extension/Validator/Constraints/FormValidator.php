@@ -24,6 +24,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class FormValidator extends ConstraintValidator
 {
+    /**
+     * @var \SplObjectStorage<FormInterface, array<int, string|string[]|GroupSequence>>
+     */
     private \SplObjectStorage $resolvedGroups;
 
     /**

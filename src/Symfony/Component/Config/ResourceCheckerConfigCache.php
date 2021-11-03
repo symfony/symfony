@@ -26,13 +26,13 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     private string $file;
 
     /**
-     * @var iterable|ResourceCheckerInterface[]
+     * @var iterable<int, ResourceCheckerInterface>
      */
     private iterable $resourceCheckers;
 
     /**
-     * @param string                              $file             The absolute cache path
-     * @param iterable|ResourceCheckerInterface[] $resourceCheckers The ResourceCheckers to use for the freshness check
+     * @param string                                  $file             The absolute cache path
+     * @param iterable<int, ResourceCheckerInterface> $resourceCheckers The ResourceCheckers to use for the freshness check
      */
     public function __construct(string $file, iterable $resourceCheckers = [])
     {
@@ -86,7 +86,6 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         $time = filemtime($this->file);
 
         foreach ($meta as $resource) {
-            /* @var ResourceInterface $resource */
             foreach ($this->resourceCheckers as $checker) {
                 if (!$checker->supports($resource)) {
                     continue; // next checker

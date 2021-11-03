@@ -60,7 +60,12 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
     private HttpClientInterface $client;
     private ResponseFactoryInterface $responseFactory;
     private StreamFactoryInterface $streamFactory;
+
+    /**
+     * @var \SplObjectStorage<ResponseInterface, array{RequestInterface, Promise}>|null
+     */
     private ?\SplObjectStorage $promisePool;
+
     private HttplugWaitLoop $waitLoop;
 
     public function __construct(HttpClientInterface $client = null, ResponseFactoryInterface $responseFactory = null, StreamFactoryInterface $streamFactory = null)

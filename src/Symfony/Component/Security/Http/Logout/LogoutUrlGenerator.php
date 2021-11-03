@@ -29,7 +29,10 @@ class LogoutUrlGenerator
     private $router;
     private $tokenStorage;
     private $listeners = [];
-    private $currentFirewall;
+    /** @var string|null */
+    private $currentFirewallName;
+    /** @var string|null */
+    private $currentFirewallContext;
 
     public function __construct(RequestStack $requestStack = null, UrlGeneratorInterface $router = null, TokenStorageInterface $tokenStorage = null)
     {
@@ -74,7 +77,8 @@ class LogoutUrlGenerator
 
     public function setCurrentFirewall(?string $key, string $context = null)
     {
-        $this->currentFirewall = [$key, $context];
+        $this->currentFirewallName = $key;
+        $this->currentFirewallContext = $context;
     }
 
     /**
@@ -130,7 +134,7 @@ class LogoutUrlGenerator
         if (null !== $this->tokenStorage) {
             $token = $this->tokenStorage->getToken();
 
-            // @deprecated since 5.4
+            // @deprecated since Symfony 5.4
             if ($token instanceof AnonymousToken) {
                 throw new \InvalidArgumentException('Unable to generate a logout url for an anonymous token.');
             }
@@ -151,14 +155,12 @@ class LogoutUrlGenerator
         }
 
         // Fetch from injected current firewall information, if possible
-        [$key, $context] = $this->currentFirewall;
-
-        if (isset($this->listeners[$key])) {
-            return $this->listeners[$key];
+        if (isset($this->listeners[$this->currentFirewallName])) {
+            return $this->listeners[$this->currentFirewallName];
         }
 
         foreach ($this->listeners as $listener) {
-            if (isset($listener[4]) && $context === $listener[4]) {
+            if (isset($listener[4]) && $this->currentFirewallContext === $listener[4]) {
                 return $listener;
             }
         }

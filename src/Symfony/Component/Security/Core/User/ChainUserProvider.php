@@ -27,7 +27,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     private $providers;
 
     /**
-     * @param iterable<int, UserProviderInterface> $providers
+     * @param iterable<array-key, UserProviderInterface> $providers
      */
     public function __construct(iterable $providers)
     {

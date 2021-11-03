@@ -30,7 +30,7 @@ final class PdoCacheAdapterDoctrineSchemaSubscriber implements EventSubscriber
     private $pdoAdapters;
 
     /**
-     * @param iterable<int, PdoAdapter> $pdoAdapters
+     * @param iterable<mixed, PdoAdapter> $pdoAdapters
      */
     public function __construct(iterable $pdoAdapters)
     {

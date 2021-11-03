@@ -18,27 +18,27 @@ namespace Symfony\Component\Form\Util;
  *
  * @internal
  *
- * @template TKey
- * @template TValue
+ * @template-covariant TKey of array-key
+ * @template-covariant TValue
  *
  * @implements \Iterator<TKey, TValue>
  */
 class OrderedHashMapIterator implements \Iterator
 {
     /**
-     * @var array
+     * @var array<TKey, TValue>
      */
     private $elements;
 
     /**
-     * @var array
+     * @var list<TKey>
      */
     private $orderedKeys;
 
     /**
      * @var int
      */
-    private $cursor;
+    private $cursor = 0;
 
     /**
      * @var int
@@ -46,26 +46,26 @@ class OrderedHashMapIterator implements \Iterator
     private $cursorId;
 
     /**
-     * @var array
+     * @var array<int, int>
      */
     private $managedCursors;
 
     /**
-     * @var string|int|null
+     * @var TKey|null
      */
     private $key;
 
     /**
-     * @var mixed
+     * @var TValue|null
      */
     private $current;
 
     /**
      * @param array<TKey, TValue> $elements       The elements of the map, indexed by their
      *                                            keys
-     * @param array               $orderedKeys    The keys of the map in the order in which
+     * @param list<TKey>          $orderedKeys    The keys of the map in the order in which
      *                                            they should be iterated
-     * @param array               $managedCursors An array from which to reference the
+     * @param array<int, int>     $managedCursors An array from which to reference the
      *                                            iterator's cursor as long as it is alive.
      *                                            This array is managed by the corresponding
      *                                            {@link OrderedHashMap} instance to support
@@ -105,7 +105,7 @@ class OrderedHashMapIterator implements \Iterator
     /**
      * {@inheritdoc}
      *
-     * @return mixed
+     * @return TValue|null
      */
     #[\ReturnTypeWillChange]
     public function current()
@@ -132,7 +132,7 @@ class OrderedHashMapIterator implements \Iterator
     /**
      * {@inheritdoc}
      *
-     * @return mixed
+     * @return TKey|null
      */
     #[\ReturnTypeWillChange]
     public function key()

@@ -44,7 +44,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     private $errors;
 
     /**
-     * @param array<int, FormError|self> $errors
+     * @param list<FormError|self> $errors
      *
      * @throws InvalidArgumentException If the errors are invalid
      */

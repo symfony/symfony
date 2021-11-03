@@ -16,8 +16,8 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @template TKey
- * @template TValue
+ * @template-covariant TKey
+ * @template-covariant TValue
  *
  * @extends \FilterIterator<TKey, TValue>
  */

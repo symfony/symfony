@@ -17,11 +17,13 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<int, string>
  */
 class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 {
     /**
-     * @var string[]
+     * @var list<string>
      */
     private $elements = [];
 

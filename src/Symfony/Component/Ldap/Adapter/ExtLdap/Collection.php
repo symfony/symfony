@@ -22,6 +22,7 @@ class Collection implements CollectionInterface
 {
     private $connection;
     private $search;
+    /** @var list<Entry>|null */
     private $entries;
 
     public function __construct(Connection $connection, Query $search)

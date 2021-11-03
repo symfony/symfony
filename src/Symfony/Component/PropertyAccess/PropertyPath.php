@@ -32,7 +32,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * The elements of the property path.
      *
-     * @var string[]
+     * @var list<string>
      */
     private $elements = [];
 

@@ -26,6 +26,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 {
     private $manager;
     private $strategy;
+    /** @var iterable<mixed, VoterInterface> */
     private $voters = [];
     private $decisionLog = []; // All decision logs
     private $currentLog = [];  // Logs being filled in
@@ -98,7 +99,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     }
 
     /**
-     * @return iterable<int, VoterInterface>
+     * @return iterable<mixed, VoterInterface>
      */
     public function getVoters(): iterable
     {

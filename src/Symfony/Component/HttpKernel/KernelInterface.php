@@ -31,7 +31,7 @@ interface KernelInterface extends HttpKernelInterface
     /**
      * Returns an array of bundles to register.
      *
-     * @return iterable<BundleInterface>
+     * @return iterable<mixed, BundleInterface>
      */
     public function registerBundles();
 
@@ -55,7 +55,7 @@ interface KernelInterface extends HttpKernelInterface
     /**
      * Gets the registered bundle instances.
      *
-     * @return BundleInterface[]
+     * @return array<string, BundleInterface>
      */
     public function getBundles();
 

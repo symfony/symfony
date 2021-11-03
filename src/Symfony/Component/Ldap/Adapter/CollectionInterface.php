@@ -22,7 +22,7 @@ use Symfony\Component\Ldap\Entry;
 interface CollectionInterface extends \Countable, \IteratorAggregate, \ArrayAccess
 {
     /**
-     * @return array<int, Entry>
+     * @return list<Entry>
      */
     public function toArray();
 }

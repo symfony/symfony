@@ -290,13 +290,15 @@ abstract class AbstractDoctrineExtension extends Extension
         $glob = new GlobResource($directory, '*', true);
         $container->addResource($glob);
 
+        $quotedMappingObjectName = preg_quote($this->getMappingObjectDefaultName(), '/');
+
         foreach ($glob as $file) {
             $content = file_get_contents($file);
 
-            if (preg_match('/^#\[.*Entity\b/m', $content)) {
+            if (preg_match('/^#\[.*'.$quotedMappingObjectName.'\b/m', $content)) {
                 break;
             }
-            if (preg_match('/^ \* @.*Entity\b/m', $content)) {
+            if (preg_match('/^ \* @.*'.$quotedMappingObjectName.'\b/m', $content)) {
                 $type = 'annotation';
                 break;
             }

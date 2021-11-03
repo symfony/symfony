@@ -20,6 +20,7 @@ use Monolog\Logger;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Push logs directly to Elasticsearch and format them according to Logstash specification.
@@ -47,6 +48,10 @@ class ElasticsearchLogstashHandler extends AbstractHandler
     private string $endpoint;
     private string $index;
     private HttpClientInterface $client;
+
+    /**
+     * @var \SplObjectStorage<ResponseInterface, null>
+     */
     private \SplObjectStorage $responses;
 
     public function __construct(string $endpoint = 'http://127.0.0.1:9200', string $index = 'monolog', HttpClientInterface $client = null, string|int $level = Logger::DEBUG, bool $bubble = true)

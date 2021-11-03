@@ -17,6 +17,11 @@ namespace Symfony\Component\Form\Util;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @internal
+ *
+ * @template TKey
+ * @template TValue
+ *
+ * @implements \Iterator<TKey, TValue>
  */
 class OrderedHashMapIterator implements \Iterator
 {
@@ -29,15 +34,15 @@ class OrderedHashMapIterator implements \Iterator
     private mixed $current = null;
 
     /**
-     * @param array $elements       The elements of the map, indexed by their
-     *                              keys
-     * @param array $orderedKeys    The keys of the map in the order in which
-     *                              they should be iterated
-     * @param array $managedCursors An array from which to reference the
-     *                              iterator's cursor as long as it is alive.
-     *                              This array is managed by the corresponding
-     *                              {@link OrderedHashMap} instance to support
-     *                              recognizing the deletion of elements.
+     * @param array<TKey, TValue> $elements       The elements of the map, indexed by their
+     *                                            keys
+     * @param array               $orderedKeys    The keys of the map in the order in which
+     *                                            they should be iterated
+     * @param array               $managedCursors An array from which to reference the
+     *                                            iterator's cursor as long as it is alive.
+     *                                            This array is managed by the corresponding
+     *                                            {@link OrderedHashMap} instance to support
+     *                                            recognizing the deletion of elements.
      */
     public function __construct(array &$elements, array &$orderedKeys, array &$managedCursors)
     {

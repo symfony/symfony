@@ -789,6 +789,8 @@ class FrameworkExtension extends Extension
 
         $registryDefinition = $container->getDefinition('workflow.registry');
 
+        $workflows = [];
+
         foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];
             $workflowId = sprintf('%s.%s', $type, $name);
@@ -875,6 +877,8 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addArgument($transitions);
             $definitionDefinition->addArgument($initialMarking);
             $definitionDefinition->addArgument(new Reference(sprintf('%s.metadata_store', $workflowId)));
+
+            $workflows[$workflowId] = $definitionDefinition;
 
             // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {
@@ -963,6 +967,9 @@ class FrameworkExtension extends Extension
                 $container->setParameter('workflow.has_guard_listeners', true);
             }
         }
+
+        $commandDumpDefinition = $container->getDefinition('console.command.workflow_dump');
+        $commandDumpDefinition->setArgument(0, $workflows);
     }
 
     private function registerDebugConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

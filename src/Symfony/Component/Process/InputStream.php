@@ -17,6 +17,8 @@ use Symfony\Component\Process\Exception\RuntimeException;
  * Provides a way to continuously write to the input of a Process until the InputStream is closed.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @implements \IteratorAggregate<int, string>
  */
 class InputStream implements \IteratorAggregate
 {

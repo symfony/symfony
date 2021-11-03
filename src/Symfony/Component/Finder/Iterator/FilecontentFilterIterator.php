@@ -16,6 +16,8 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier  <fabien@symfony.com>
  * @author Włodzimierz Gajda <gajdaw@gajdaw.pl>
+ *
+ * @extends MultiplePcreFilterIterator<string, \SplFileInfo>
  */
 class FilecontentFilterIterator extends MultiplePcreFilterIterator
 {

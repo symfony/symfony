@@ -20,6 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 {
+    /** @var string[] */
     private array $elements = [];
     private array $isIndex = [];
     private array $mapsForm = [];

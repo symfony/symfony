@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,6 +34,21 @@ use Symfony\Component\Workflow\Marking;
 #[AsCommand(name: 'workflow:dump', description: 'Dump a workflow')]
 class WorkflowDumpCommand extends Command
 {
+    private array $workflows = [];
+
+    private const DUMP_FORMAT_OPTIONS = [
+        'puml',
+        'mermaid',
+        'dot',
+    ];
+
+    public function __construct(array $workflows)
+    {
+        parent::__construct();
+
+        $this->workflows = $workflows;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -42,7 +59,7 @@ class WorkflowDumpCommand extends Command
                 new InputArgument('name', InputArgument::REQUIRED, 'A workflow name'),
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),
                 new InputOption('label', 'l', InputOption::VALUE_REQUIRED, 'Label a graph'),
-                new InputOption('dump-format', null, InputOption::VALUE_REQUIRED, 'The dump format [dot|puml]', 'dot'),
+                new InputOption('dump-format', null, InputOption::VALUE_REQUIRED, 'The dump format ['.implode('|', self::DUMP_FORMAT_OPTIONS).']', 'dot'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the graphical representation of a
@@ -61,18 +78,13 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $container = $this->getApplication()->getKernel()->getContainer();
-        $serviceId = $input->getArgument('name');
+        $workflowId = $input->getArgument('name');
 
-        if ($container->has('workflow.'.$serviceId)) {
-            $workflow = $container->get('workflow.'.$serviceId);
-            $type = 'workflow';
-        } elseif ($container->has('state_machine.'.$serviceId)) {
-            $workflow = $container->get('state_machine.'.$serviceId);
-            $type = 'state_machine';
-        } else {
-            throw new InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $serviceId));
+        if (!\in_array($workflowId, array_keys($this->workflows), true)) {
+            throw new InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $workflowId));
         }
+
+        $type = explode('.', $workflowId)[0];
 
         switch ($input->getOption('dump-format')) {
             case 'puml':
@@ -96,15 +108,28 @@ EOF
             $marking->mark($place);
         }
 
+        $workflow = $this->workflows[$workflowId];
+
         $options = [
-            'name' => $serviceId,
+            'name' => $workflowId,
             'nofooter' => true,
             'graph' => [
                 'label' => $input->getOption('label'),
             ],
         ];
-        $output->writeln($dumper->dump($workflow->getDefinition(), $marking, $options));
+        $output->writeln($dumper->dump($workflow, $marking, $options));
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('name')) {
+            $suggestions->suggestValues(array_keys($this->workflows));
+        }
+
+        if ($input->mustSuggestOptionValuesFor('dump-format')) {
+            $suggestions->suggestValues(self::DUMP_FORMAT_OPTIONS);
+        }
     }
 }

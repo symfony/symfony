@@ -18,14 +18,16 @@ namespace Symfony\Component\Finder\Iterator;
  * to remove files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @extends \FilterIterator<string, \SplFileInfo>
  */
 class CustomFilterIterator extends \FilterIterator
 {
     private array $filters = [];
 
     /**
-     * @param \Iterator  $iterator The Iterator to filter
-     * @param callable[] $filters  An array of PHP callbacks
+     * @param \Iterator<string, \SplFileInfo> $iterator The Iterator to filter
+     * @param callable[]                      $filters  An array of PHP callbacks
      *
      * @throws \InvalidArgumentException
      */

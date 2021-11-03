@@ -34,6 +34,9 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         $this->providers = $providers;
     }
 
+    /**
+     * @return UserProviderInterface[]
+     */
     public function getProviders(): array
     {
         if ($this->providers instanceof \Traversable) {

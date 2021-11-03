@@ -50,9 +50,11 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
         var request = function(url, onSuccess, onError, payload, options, tries) {
             var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
             options = options || {};
-            options.maxTries = options.maxTries || 0;
+            options.retry = options.retry || false;
             tries = tries || 1;
-            var delay = Math.pow(2, tries - 1) * 1000;
+            /* this delays for 125, 375, 625, 875, and 1000, ... */
+            var delay = tries < 5 ? (tries - 0.5) * 250 : 1000;
+
             xhr.open(options.method || 'GET', url, true);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.onreadystatechange = function(state) {
@@ -60,9 +62,11 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                     return null;
                 }
 
-                if (xhr.status == 404 && options.maxTries > 1) {
-                    setTimeout(function(){
-                        options.maxTries--;
+                if (xhr.status == 404 && options.retry && !options.stop) {
+                    setTimeout(function() {
+                        if (options.stop) {
+                            return;
+                        }
                         request(url, onSuccess, onError, payload, options, tries + 1);
                     }, delay);
 
@@ -75,6 +79,11 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                     (onError || noop)(xhr);
                 }
             };
+
+            if (options.onSend) {
+                options.onSend(tries);
+            }
+
             xhr.send(payload || '');
         };
 
@@ -430,8 +439,94 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                 return this;
             },
 
+            showToolbar: function(token) {
+                var sfwdt = document.getElementById('sfwdt' + token);
+                removeClass(sfwdt, 'sf-display-none');
+
+                if (getPreference('toolbar/displayState') == 'none') {
+                    document.getElementById('sfToolbarMainContent-' + token).style.display = 'none';
+                    document.getElementById('sfToolbarClearer-' + token).style.display = 'none';
+                    document.getElementById('sfMiniToolbar-' + token).style.display = 'block';
+                } else {
+                    document.getElementById('sfToolbarMainContent-' + token).style.display = 'block';
+                    document.getElementById('sfToolbarClearer-' + token).style.display = 'block';
+                    document.getElementById('sfMiniToolbar-' + token).style.display = 'none';
+                }
+            },
+
+            hideToolbar: function(token) {
+                var sfwdt = document.getElementById('sfwdt' + token);
+                addClass(sfwdt, 'sf-display-none');
+            },
+
+            initToolbar: function(token) {
+                this.showToolbar(token);
+
+                var hideButton = document.getElementById('sfToolbarHideButton-' + token);
+                var hideButtonSvg = hideButton.querySelector('svg');
+                hideButtonSvg.setAttribute('aria-hidden', 'true');
+                hideButtonSvg.setAttribute('focusable', 'false');
+                addEventListener(hideButton, 'click', function (event) {
+                    event.preventDefault();
+
+                    var p = this.parentNode;
+                    p.style.display = 'none';
+                    (p.previousElementSibling || p.previousSibling).style.display = 'none';
+                    document.getElementById('sfMiniToolbar-' + token).style.display = 'block';
+                    setPreference('toolbar/displayState', 'none');
+                });
+
+                var showButton = document.getElementById('sfToolbarMiniToggler-' + token);
+                var showButtonSvg = showButton.querySelector('svg');
+                showButtonSvg.setAttribute('aria-hidden', 'true');
+                showButtonSvg.setAttribute('focusable', 'false');
+                addEventListener(showButton, 'click', function (event) {
+                    event.preventDefault();
+
+                    var elem = this.parentNode;
+                    if (elem.style.display == 'none') {
+                        document.getElementById('sfToolbarMainContent-' + token).style.display = 'none';
+                        document.getElementById('sfToolbarClearer-' + token).style.display = 'none';
+                        elem.style.display = 'block';
+                    } else {
+                        document.getElementById('sfToolbarMainContent-' + token).style.display = 'block';
+                        document.getElementById('sfToolbarClearer-' + token).style.display = 'block';
+                        elem.style.display = 'none'
+                    }
+
+                    setPreference('toolbar/displayState', 'block');
+                });
+            },
+
             loadToolbar: function(token, newToken) {
+                var that = this;
+                var triesCounter = document.getElementById('sfLoadCounter-' + token);
+
+                var options = {
+                    retry: true,
+                    onSend: function (count) {
+                        if (count === 3) {
+                            that.initToolbar(token);
+                        }
+
+                        if (triesCounter) {
+                            triesCounter.textContent = count;
+                        }
+                    },
+                };
+
+                var cancelButton = document.getElementById('sfLoadCancel-' + token);
+                if (cancelButton) {
+                    addEventListener(cancelButton, 'click', function (event) {
+                        event.preventDefault();
+
+                        options.stop = true;
+                        that.hideToolbar(token);
+                    });
+                }
+
                 newToken = (newToken || token);
+
                 this.load(
                     'sfwdt' + token,
                     '{{ url("_wdt", { "token": "xxxxxx" })|escape('js') }}'.replace(/xxxxxx/, newToken),
@@ -453,15 +548,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                             return;
                         }
 
-                        if (getPreference('toolbar/displayState') == 'none') {
-                            document.getElementById('sfToolbarMainContent-' + newToken).style.display = 'none';
-                            document.getElementById('sfToolbarClearer-' + newToken).style.display = 'none';
-                            document.getElementById('sfMiniToolbar-' + newToken).style.display = 'block';
-                        } else {
-                            document.getElementById('sfToolbarMainContent-' + newToken).style.display = 'block';
-                            document.getElementById('sfToolbarClearer-' + newToken).style.display = 'block';
-                            document.getElementById('sfMiniToolbar-' + newToken).style.display = 'none';
-                        }
+                        that.initToolbar(newToken);
 
                         /* Handle toolbar-info position */
                         var toolbarBlocks = [].slice.call(el.querySelectorAll('.sf-toolbar-block'));
@@ -489,39 +576,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                                 }
                             };
                         }
-                        var hideButton = document.getElementById('sfToolbarHideButton-' + newToken);
-                        var hideButtonSvg = hideButton.querySelector('svg');
-                        hideButtonSvg.setAttribute('aria-hidden', 'true');
-                        hideButtonSvg.setAttribute('focusable', 'false');
-                        addEventListener(hideButton, 'click', function (event) {
-                            event.preventDefault();
 
-                            var p = this.parentNode;
-                            p.style.display = 'none';
-                            (p.previousElementSibling || p.previousSibling).style.display = 'none';
-                            document.getElementById('sfMiniToolbar-' + newToken).style.display = 'block';
-                            setPreference('toolbar/displayState', 'none');
-                        });
-                        var showButton = document.getElementById('sfToolbarMiniToggler-' + newToken);
-                        var showButtonSvg = showButton.querySelector('svg');
-                        showButtonSvg.setAttribute('aria-hidden', 'true');
-                        showButtonSvg.setAttribute('focusable', 'false');
-                        addEventListener(showButton, 'click', function (event) {
-                            event.preventDefault();
-
-                            var elem = this.parentNode;
-                            if (elem.style.display == 'none') {
-                                document.getElementById('sfToolbarMainContent-' + newToken).style.display = 'none';
-                                document.getElementById('sfToolbarClearer-' + newToken).style.display = 'none';
-                                elem.style.display = 'block';
-                            } else {
-                                document.getElementById('sfToolbarMainContent-' + newToken).style.display = 'block';
-                                document.getElementById('sfToolbarClearer-' + newToken).style.display = 'block';
-                                elem.style.display = 'none'
-                            }
-
-                            setPreference('toolbar/displayState', 'block');
-                        });
                         renderAjaxRequests();
                         addEventListener(document.querySelector('.sf-toolbar-ajax-clear'), 'click', function() {
                             requestStack = [];
@@ -550,7 +605,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                         }
                     },
                     function(xhr) {
-                        if (xhr.status !== 0) {
+                        if (xhr.status !== 0 && !options.stop) {
                             var sfwdt = document.getElementById('sfwdt' + token);
                             sfwdt.innerHTML = '\
                                 <div class="sf-toolbarreset">\
@@ -561,7 +616,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                             sfwdt.setAttribute('class', 'sf-toolbar sf-error-toolbar');
                         }
                     },
-                    { maxTries: 5 }
+                    options
                 );
 
                 return this;

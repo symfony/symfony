@@ -37,6 +37,8 @@ interface AttributeBagInterface extends SessionBagInterface
 
     /**
      * Returns attributes.
+     *
+     * @return array<string, mixed>
      */
     public function all(): array;
 

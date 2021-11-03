@@ -15,15 +15,20 @@ namespace Symfony\Component\Finder\Iterator;
  * DepthRangeFilterIterator limits the directory depth.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @template TKey
+ * @template TValue
+ *
+ * @extends \FilterIterator<TKey, TValue>
  */
 class DepthRangeFilterIterator extends \FilterIterator
 {
     private int $minDepth = 0;
 
     /**
-     * @param \RecursiveIteratorIterator $iterator The Iterator to filter
-     * @param int                        $minDepth The min depth
-     * @param int                        $maxDepth The max depth
+     * @param \RecursiveIteratorIterator<\RecursiveIterator<TKey, TValue>> $iterator The Iterator to filter
+     * @param int                                                          $minDepth The min depth
+     * @param int                                                          $maxDepth The max depth
      */
     public function __construct(\RecursiveIteratorIterator $iterator, int $minDepth = 0, int $maxDepth = \PHP_INT_MAX)
     {

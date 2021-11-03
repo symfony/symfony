@@ -21,6 +21,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * A builder for {@link Button} instances.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, FormBuilderInterface>
  */
 class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 {

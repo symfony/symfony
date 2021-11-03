@@ -103,6 +103,9 @@ class ExecutionContext implements ExecutionContextInterface
      */
     private array $initializedObjects = [];
 
+    /**
+     * @var \SplObjectStorage<object, string>
+     */
     private \SplObjectStorage $cachedObjectsRefs;
 
     /**

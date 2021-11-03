@@ -40,7 +40,7 @@ class MainConfiguration implements ConfigurationInterface
     private array $userProviderFactories;
 
     /**
-     * @param AuthenticatorFactoryInterface[] $factories
+     * @param array<int, AuthenticatorFactoryInterface> $factories
      */
     public function __construct(array $factories, array $userProviderFactories)
     {
@@ -187,6 +187,9 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param array<int, AuthenticatorFactoryInterface> $factories
+     */
     private function addFirewallsSection(ArrayNodeDefinition $rootNode, array $factories)
     {
         $firewallNodeBuilder = $rootNode

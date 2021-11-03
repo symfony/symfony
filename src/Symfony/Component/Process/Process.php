@@ -27,6 +27,8 @@ use Symfony\Component\Process\Pipes\WindowsPipes;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Romain Neutron <imprec@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, string>
  */
 class Process implements \IteratorAggregate
 {

@@ -17,14 +17,16 @@ use Symfony\Component\Finder\Comparator\DateComparator;
  * DateRangeFilterIterator filters out files that are not in the given date range (last modified dates).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @extends \FilterIterator<string, \SplFileInfo>
  */
 class DateRangeFilterIterator extends \FilterIterator
 {
     private $comparators = [];
 
     /**
-     * @param \Iterator        $iterator    The Iterator to filter
-     * @param DateComparator[] $comparators An array of DateComparator instances
+     * @param \Iterator<string, \SplFileInfo> $iterator
+     * @param DateComparator[]                $comparators
      */
     public function __construct(\Iterator $iterator, array $comparators)
     {

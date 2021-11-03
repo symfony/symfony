@@ -98,7 +98,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     }
 
     /**
-     * @return iterable|VoterInterface[]
+     * @return iterable<int, VoterInterface>
      */
     public function getVoters(): iterable
     {

@@ -1188,7 +1188,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * @return (AuthenticatorFactoryInterface|SecurityFactoryInterface)[]
+     * @return array<int, SecurityFactoryInterface|AuthenticatorFactoryInterface>
      */
     private function getSortedFactories(): array
     {

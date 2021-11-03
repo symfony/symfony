@@ -67,6 +67,7 @@ class StackMiddleware implements MiddlewareInterface, StackInterface
  */
 class MiddlewareStack
 {
+    /** @var \Iterator<mixed, MiddlewareInterface> */
     public $iterator;
     public $stack = [];
 

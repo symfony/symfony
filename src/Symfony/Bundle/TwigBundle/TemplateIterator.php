@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
+ *
+ * @implements \IteratorAggregate<int, string>
  */
 class TemplateIterator implements \IteratorAggregate
 {

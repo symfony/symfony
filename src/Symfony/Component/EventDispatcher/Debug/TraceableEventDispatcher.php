@@ -32,6 +32,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     protected $logger;
     protected $stopwatch;
 
+    /**
+     * @var \SplObjectStorage<WrappedListener, array{string, string}>
+     */
     private $callStack;
     private $dispatcher;
     private $wrappedListeners;

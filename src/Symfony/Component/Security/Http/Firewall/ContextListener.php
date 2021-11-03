@@ -58,7 +58,7 @@ class ContextListener extends AbstractListener
     private $sessionTrackerEnabler;
 
     /**
-     * @param iterable|UserProviderInterface[] $userProviders
+     * @param iterable<int, UserProviderInterface> $userProviders
      */
     public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null, callable $sessionTrackerEnabler = null)
     {

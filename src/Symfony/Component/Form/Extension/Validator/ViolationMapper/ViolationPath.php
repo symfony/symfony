@@ -21,7 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 {
     /**
-     * @var array
+     * @var string[]
      */
     private $elements = [];
 

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Ldap\Adapter;
 
-use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 
@@ -33,7 +32,7 @@ interface QueryInterface
     /**
      * Executes a query and returns the list of Ldap entries.
      *
-     * @return CollectionInterface|Entry[]
+     * @return CollectionInterface
      *
      * @throws NotBoundException
      * @throws LdapException

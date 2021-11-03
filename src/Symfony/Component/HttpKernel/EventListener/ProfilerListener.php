@@ -12,12 +12,14 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 
 /**
@@ -34,9 +36,11 @@ class ProfilerListener implements EventSubscriberInterface
     protected $onlyException;
     protected $onlyMainRequests;
     protected $exception;
+    /** @var \SplObjectStorage<Request, Profile> */
     protected $profiles;
     protected $requestStack;
     protected $collectParameter;
+    /** @var \SplObjectStorage<Request, Request|null> */
     protected $parents;
 
     /**

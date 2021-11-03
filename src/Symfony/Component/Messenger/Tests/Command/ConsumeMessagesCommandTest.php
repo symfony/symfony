@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -149,5 +150,26 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $bus = $this->createMock(RoutableMessageBus::class);
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $command = new ConsumeMessagesCommand($bus, $receiverLocator, new EventDispatcher(), null, ['async', 'async_high', 'failed'], null, ['messenger.bus.default']);
+        $tester = new CommandCompletionTester($command);
+        $suggestions = $tester->complete($input);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'receiver' => [[''], ['async', 'async_high', 'failed']];
+        yield 'receiver (value)' => [['async'], ['async', 'async_high', 'failed']];
+        yield 'receiver (no repeat)' => [['async', ''], ['async_high', 'failed']];
+        yield 'option --bus' => [['--bus', ''], ['messenger.bus.default']];
     }
 }

@@ -151,6 +151,7 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
                 [], // Receiver names
                 service('messenger.listener.reset_services')->nullOnInvalid(),
+                [], // Bus names
             ])
             ->tag('console.command')
             ->tag('monolog.logger', ['channel' => 'messenger'])

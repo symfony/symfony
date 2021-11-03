@@ -14,6 +14,8 @@ namespace Symfony\Component\Messenger\Command;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,8 +47,9 @@ class ConsumeMessagesCommand extends Command
     private $logger;
     private $receiverNames;
     private $resetServicesListener;
+    private $busIds;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null)
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [])
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
@@ -54,6 +57,7 @@ class ConsumeMessagesCommand extends Command
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
         $this->resetServicesListener = $resetServicesListener;
+        $this->busIds = $busIds;
 
         parent::__construct();
     }
@@ -221,6 +225,19 @@ EOF
         $worker->run($options);
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('receivers')) {
+            $suggestions->suggestValues(array_diff($this->receiverNames, array_diff($input->getArgument('receivers'), [$input->getCompletionValue()])));
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('bus')) {
+            $suggestions->suggestValues($this->busIds);
+        }
     }
 
     private function convertToBytes(string $memoryLimit): int

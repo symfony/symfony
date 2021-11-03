@@ -43,6 +43,7 @@
         "psr/log": "For using the console logger"
     },
     "conflict": {
+        "psr/log": ">=3",
         "symfony/dependency-injection": "<4.4",
         "symfony/dotenv": "<5.1",
         "symfony/event-dispatcher": "<4.4",

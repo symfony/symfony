@@ -19,10 +19,11 @@ namespace Symfony\Component\Security\Core\Role;
 class RoleHierarchy implements RoleHierarchyInterface
 {
     private $hierarchy;
+    /** @var array<string, list<string>> */
     protected $map;
 
     /**
-     * @param array $hierarchy An array defining the hierarchy
+     * @param array<string, list<string>> $hierarchy
      */
     public function __construct(array $hierarchy)
     {

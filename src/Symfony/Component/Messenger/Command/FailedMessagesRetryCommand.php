@@ -37,8 +37,6 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 #[AsCommand(name: 'messenger:failed:retry', description: 'Retry one or more messages from the failure transport')]
 class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 {
-    private const DEFAULT_TRANSPORT_OPTION = 'choose';
-
     private EventDispatcherInterface $eventDispatcher;
     private MessageBusInterface $messageBus;
     private ?LoggerInterface $logger;

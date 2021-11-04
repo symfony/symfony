@@ -22,11 +22,18 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
+ * @template TKey of array-key
+ * @template TValue
+ *
+ * @implements \ArrayAccess<TKey, TValue>
+ *
  * @internal
  */
 class RingBuffer implements \ArrayAccess
 {
+    /** @var array<int, TValue> */
     private array $values = [];
+    /** @var array<TKey, int> */
     private array $indices = [];
     private int $cursor = 0;
     private int $size;

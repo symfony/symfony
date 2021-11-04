@@ -81,11 +81,15 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * The keys of the map in the order in which they were inserted or changed.
+     *
+     * @var list<TKey>
      */
     private array $orderedKeys = [];
 
     /**
      * References to the cursors of all open iterators.
+     *
+     * @var array<int, int>
      */
     private array $managedCursors = [];
 

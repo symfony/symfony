@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'kinyarvanda (Ruanda)',
         'sa' => 'szanszkrit',
         'sa_IN' => 'szanszkrit (India)',
+        'sc' => 'szardíniai',
+        'sc_IT' => 'szardíniai (Olaszország)',
         'sd' => 'szindhi',
         'sd_Arab' => 'szindhi (Arab)',
         'sd_Arab_PK' => 'szindhi (Arab, Pakisztán)',

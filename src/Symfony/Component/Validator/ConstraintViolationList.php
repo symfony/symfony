@@ -21,16 +21,16 @@ namespace Symfony\Component\Validator;
 class ConstraintViolationList implements \IteratorAggregate, ConstraintViolationListInterface
 {
     /**
-     * @var ConstraintViolationInterface[]
+     * @var list<ConstraintViolationInterface>
      */
     private array $violations = [];
 
     /**
      * Creates a new constraint violation list.
      *
-     * @param ConstraintViolationInterface[] $violations The constraint violations to add to the list
+     * @param iterable<mixed, ConstraintViolationInterface> $violations The constraint violations to add to the list
      */
-    public function __construct(array $violations = [])
+    public function __construct(iterable $violations = [])
     {
         foreach ($violations as $violation) {
             $this->add($violation);

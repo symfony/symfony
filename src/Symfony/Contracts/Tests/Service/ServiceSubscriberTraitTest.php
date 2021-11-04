@@ -19,6 +19,7 @@ use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberTrait;
+use Symfony\Contracts\Tests\Fixtures\TestServiceSubscriberUnion;
 
 class ServiceSubscriberTraitTest extends TestCase
 {
@@ -39,6 +40,16 @@ class ServiceSubscriberTraitTest extends TestCase
         };
 
         $this->assertSame($container, (new TestService())->setContainer($container));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testMethodsWithUnionReturnTypesAreIgnored()
+    {
+        $expected = [TestServiceSubscriberUnion::class.'::method1' => '?Symfony\Contracts\Tests\Fixtures\Service1'];
+
+        $this->assertEquals($expected, TestServiceSubscriberUnion::getSubscribedServices());
     }
 }
 

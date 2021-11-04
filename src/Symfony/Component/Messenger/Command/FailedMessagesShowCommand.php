@@ -29,8 +29,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 #[AsCommand(name: 'messenger:failed:show', description: 'Show one or more messages from the failure transport')]
 class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 {
-    private const DEFAULT_TRANSPORT_OPTION = 'choose';
-
     /**
      * {@inheritdoc}
      */

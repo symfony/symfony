@@ -47,7 +47,7 @@ interface PropertyPathInterface extends \Traversable
     /**
      * Returns the elements of the property path as array.
      *
-     * @return string[]
+     * @return list<string>
      */
     public function getElements();
 

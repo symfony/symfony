@@ -33,7 +33,7 @@ class InMemoryUserProvider implements UserProviderInterface
      * The user array is a hash where the keys are usernames and the values are
      * an array of attributes: 'password', 'enabled', and 'roles'.
      *
-     * @param array $users An array of users
+     * @param array<string, array{password?: string, enabled?: bool, roles?: list<string>}> $users An array of users
      */
     public function __construct(array $users = [])
     {

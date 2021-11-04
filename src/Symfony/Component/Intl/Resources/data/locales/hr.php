@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'kinyarwanda (Ruanda)',
         'sa' => 'sanskrtski',
         'sa_IN' => 'sanskrtski (Indija)',
+        'sc' => 'sardski',
+        'sc_IT' => 'sardski (Italija)',
         'sd' => 'sindski',
         'sd_Arab' => 'sindski (arapsko pismo)',
         'sd_Arab_PK' => 'sindski (arapsko pismo, Pakistan)',

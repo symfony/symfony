@@ -58,7 +58,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private array $requestMatchers = [];
     private array $expressions = [];
     private array $contextListeners = [];
-    /** @var list<array{0: int, 1: AuthenticatorFactoryInterface}> */
+    /** @var list<array{int, AuthenticatorFactoryInterface}> */
     private array $factories = [];
     /** @var AuthenticatorFactoryInterface[] */
     private array $sortedFactories = [];
@@ -126,7 +126,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $container
                 ->getDefinition('security.access.decision_manager')
                 ->addArgument($this->createStrategyDefinition(
-                    $config['access_decision_manager']['strategy'],
+                    $config['access_decision_manager']['strategy'] ?? MainConfiguration::STRATEGY_AFFIRMATIVE,
                     $config['access_decision_manager']['allow_if_all_abstain'],
                     $config['access_decision_manager']['allow_if_equal_granted_denied']
                 ));

@@ -115,6 +115,24 @@ class MainConfigurationTest extends TestCase
         $this->assertEquals('app.henk_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }
 
+    public function testConfigMergeWithAccessDecisionManager()
+    {
+        $config = [
+            'access_decision_manager' => [
+                'strategy' => MainConfiguration::STRATEGY_UNANIMOUS,
+            ],
+        ];
+        $config = array_merge(static::$minimalConfig, $config);
+
+        $config2 = [];
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+        $processedConfig = $processor->processConfiguration($configuration, [$config, $config2]);
+
+        $this->assertSame(MainConfiguration::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
+    }
+
     public function testFirewalls()
     {
         $factory = $this->createMock(AuthenticatorFactoryInterface::class);

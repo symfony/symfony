@@ -1,0 +1,4 @@
+invalid:
+  alias: route
+  deprecated:
+    version: "1.0.0"

@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'kínjarvanda (Rúanda)',
         'sa' => 'sanskrít',
         'sa_IN' => 'sanskrít (Indland)',
+        'sc' => 'sardínska',
+        'sc_IT' => 'sardínska (Ítalía)',
         'sd' => 'sindí',
         'sd_Arab' => 'sindí (arabískt)',
         'sd_Arab_PK' => 'sindí (arabískt, Pakistan)',

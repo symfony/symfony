@@ -40,7 +40,7 @@ class MainConfiguration implements ConfigurationInterface
     private array $userProviderFactories;
 
     /**
-     * @param array<int, AuthenticatorFactoryInterface> $factories
+     * @param array<array-key, AuthenticatorFactoryInterface> $factories
      */
     public function __construct(array $factories, array $userProviderFactories)
     {
@@ -57,28 +57,6 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode = $tb->getRootNode();
 
         $rootNode
-            ->beforeNormalization()
-                ->ifTrue(function ($v) {
-                    if (!isset($v['access_decision_manager'])) {
-                        return true;
-                    }
-
-                    if (!isset($v['access_decision_manager']['strategy'])
-                        && !isset($v['access_decision_manager']['service'])
-                        && !isset($v['access_decision_manager']['strategy_service'])
-                        && !isset($v['access_decision_manager']['strategy-service'])
-                    ) {
-                        return true;
-                    }
-
-                    return false;
-                })
-                ->then(function ($v) {
-                    $v['access_decision_manager']['strategy'] = self::STRATEGY_AFFIRMATIVE;
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
                 ->enumNode('session_fixation_strategy')
@@ -188,7 +166,7 @@ class MainConfiguration implements ConfigurationInterface
     }
 
     /**
-     * @param array<int, AuthenticatorFactoryInterface> $factories
+     * @param array<array-key, AuthenticatorFactoryInterface> $factories
      */
     private function addFirewallsSection(ArrayNodeDefinition $rootNode, array $factories)
     {

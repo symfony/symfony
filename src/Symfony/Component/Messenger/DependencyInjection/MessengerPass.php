@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
@@ -294,6 +295,11 @@ class MessengerPass implements CompilerPassInterface
             }
 
             $consumeCommandDefinition->replaceArgument(4, array_values($receiverNames));
+            try {
+                $consumeCommandDefinition->replaceArgument(6, $busIds);
+            } catch (OutOfBoundsException $e) {
+                // ignore to preserve compatibility with symfony/framework-bundle < 5.4
+            }
         }
 
         if ($container->hasDefinition('console.command.messenger_setup_transports')) {

@@ -14,5 +14,9 @@ return [
             0 => 'KPW',
             1 => 'Sjevernokorejski von',
         ],
+        'NIO' => [
+            0 => 'NIO',
+            1 => 'Nikaragvanska zlatna kordoba',
+        ],
     ],
 ];

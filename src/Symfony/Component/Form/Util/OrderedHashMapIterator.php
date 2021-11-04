@@ -18,27 +18,32 @@ namespace Symfony\Component\Form\Util;
  *
  * @internal
  *
- * @template TKey
- * @template TValue
+ * @template-covariant TKey of array-key
+ * @template-covariant TValue
  *
  * @implements \Iterator<TKey, TValue>
  */
 class OrderedHashMapIterator implements \Iterator
 {
+    /** @var array<TKey, TValue> */
     private array $elements;
+    /** @var list<TKey> */
     private array $orderedKeys;
     private int $cursor = 0;
     private int $cursorId;
+    /** @var array<int, int> */
     private array $managedCursors;
+    /** @var TKey|null */
     private string|int|null $key = null;
+    /** @var TValue|null */
     private mixed $current = null;
 
     /**
      * @param array<TKey, TValue> $elements       The elements of the map, indexed by their
      *                                            keys
-     * @param array               $orderedKeys    The keys of the map in the order in which
+     * @param list<TKey>          $orderedKeys    The keys of the map in the order in which
      *                                            they should be iterated
-     * @param array               $managedCursors An array from which to reference the
+     * @param array<int, int>     $managedCursors An array from which to reference the
      *                                            iterator's cursor as long as it is alive.
      *                                            This array is managed by the corresponding
      *                                            {@link OrderedHashMap} instance to support

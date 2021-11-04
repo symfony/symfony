@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Transport;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -42,6 +44,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
      */
     private array $queue = [];
 
+    private int $nextId = 1;
     private ?SerializerInterface $serializer;
 
     public function __construct(SerializerInterface $serializer = null)
@@ -63,8 +66,12 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     public function ack(Envelope $envelope): void
     {
         $this->acknowledged[] = $this->encode($envelope);
-        $id = spl_object_hash($envelope->getMessage());
-        unset($this->queue[$id]);
+
+        if (!$transportMessageIdStamp = $envelope->last(TransportMessageIdStamp::class)) {
+            throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
+        }
+
+        unset($this->queue[$transportMessageIdStamp->getId()]);
     }
 
     /**
@@ -73,8 +80,12 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     public function reject(Envelope $envelope): void
     {
         $this->rejected[] = $this->encode($envelope);
-        $id = spl_object_hash($envelope->getMessage());
-        unset($this->queue[$id]);
+
+        if (!$transportMessageIdStamp = $envelope->last(TransportMessageIdStamp::class)) {
+            throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
+        }
+
+        unset($this->queue[$transportMessageIdStamp->getId()]);
     }
 
     /**
@@ -82,9 +93,10 @@ class InMemoryTransport implements TransportInterface, ResetInterface
      */
     public function send(Envelope $envelope): Envelope
     {
+        $id = $this->nextId++;
+        $envelope = $envelope->with(new TransportMessageIdStamp($id));
         $encodedEnvelope = $this->encode($envelope);
         $this->sent[] = $encodedEnvelope;
-        $id = spl_object_hash($envelope->getMessage());
         $this->queue[$id] = $encodedEnvelope;
 
         return $envelope;
@@ -145,3 +157,4 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         );
     }
 }
+

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -22,6 +24,7 @@ use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\VarDumper\Caster\Caster;
@@ -38,6 +41,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 abstract class AbstractFailedMessagesCommand extends Command
 {
+    protected const DEFAULT_TRANSPORT_OPTION = 'choose';
+
     protected $failureTransports;
 
     private ?string $globalFailureReceiverName;
@@ -201,5 +206,32 @@ abstract class AbstractFailedMessagesCommand extends Command
         $question->setMultiselect(false);
 
         return $io->askQuestion($question);
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestOptionValuesFor('transport')) {
+            $suggestions->suggestValues(array_keys($this->failureTransports->getProvidedServices()));
+
+            return;
+        }
+
+        if ($input->mustSuggestArgumentValuesFor('id')) {
+            $transport = $input->getOption('transport');
+            $transport = self::DEFAULT_TRANSPORT_OPTION === $transport ? $this->getGlobalFailureReceiverName() : $transport;
+            $receiver = $this->getReceiver($transport);
+
+            if (!$receiver instanceof ListableReceiverInterface) {
+                return;
+            }
+
+            $ids = [];
+            foreach ($receiver->all(50) as $envelope) {
+                $ids[] = $this->getMessageId($envelope);
+            }
+            $suggestions->suggestValues($ids);
+
+            return;
+        }
     }
 }

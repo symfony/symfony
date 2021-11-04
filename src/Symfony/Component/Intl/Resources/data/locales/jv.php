@@ -435,6 +435,8 @@ return [
         'nl_SX' => 'Walanda (Sint Martén)',
         'nn' => 'Nynorsk Norwegia',
         'nn_NO' => 'Nynorsk Norwegia (Nurwègen)',
+        'no' => 'Norwegia',
+        'no_NO' => 'Norwegia (Nurwègen)',
         'om' => 'Oromo',
         'om_ET' => 'Oromo (Étiopia)',
         'om_KE' => 'Oromo (Kénya)',

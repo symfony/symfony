@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'kinyarwanda (Rwanda)',
         'sa' => 'sanskrit',
         'sa_IN' => 'sanskrit (Indien)',
+        'sc' => 'sardinsk',
+        'sc_IT' => 'sardinsk (Italien)',
         'sd' => 'sindhi',
         'sd_Arab' => 'sindhi (arabisk)',
         'sd_Arab_PK' => 'sindhi (arabisk, Pakistan)',

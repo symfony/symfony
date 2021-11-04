@@ -390,6 +390,18 @@
                 <source>This value should be a valid expression.</source>
                 <target>Tämän arvon on oltava kelvollinen lauseke.</target>
             </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Tämä arvo ei ole kelvollinen CSS-värimääritys.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Tämä arvo ei ole kelvollinen CIDR-merkintä.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Verkkomaskille annetun arvon tulisi olla {{ min }} ja {{ max }} välillä.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

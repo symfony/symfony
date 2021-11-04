@@ -112,11 +112,11 @@ return [
         ],
         'BGN' => [
             0 => 'BGN',
-            1 => 'lev búlgaro',
+            1 => 'leva búlgara',
         ],
         'BHD' => [
             0 => 'BHD',
-            1 => 'dinar bahreiní',
+            1 => 'dinar bareiní',
         ],
         'BIF' => [
             0 => 'BIF',
@@ -432,7 +432,7 @@ return [
         ],
         'HTG' => [
             0 => 'HTG',
-            1 => 'gourde haitiano',
+            1 => 'gurde haitiano',
         ],
         'HUF' => [
             0 => 'HUF',
@@ -520,7 +520,7 @@ return [
         ],
         'KZT' => [
             0 => 'KZT',
-            1 => 'tenge kazako',
+            1 => 'tengue kazajo',
         ],
         'LAK' => [
             0 => 'LAK',
@@ -540,7 +540,7 @@ return [
         ],
         'LSL' => [
             0 => 'LSL',
-            1 => 'loti lesothense',
+            1 => 'loti lesotense',
         ],
         'LTL' => [
             0 => 'LTL',

@@ -58,7 +58,7 @@ class_exists(ConfigCache::class);
 abstract class Kernel implements KernelInterface, RebootableInterface, TerminableInterface
 {
     /**
-     * @var BundleInterface[]
+     * @var array<string, BundleInterface>
      */
     protected $bundles = [];
 

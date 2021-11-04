@@ -20,6 +20,8 @@ use Symfony\Component\Templating\Storage\StringStorage;
 /**
  * PhpEngine is an engine able to render PHP templates.
  *
+ * @implements \ArrayAccess<string, HelperInterface>
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class PhpEngine implements EngineInterface, \ArrayAccess

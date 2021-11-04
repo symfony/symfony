@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'Kinyarwanda (Rwanda)',
         'sa' => 'Kisanskriti',
         'sa_IN' => 'Kisanskriti (India)',
+        'sc' => 'Kisardinia',
+        'sc_IT' => 'Kisardinia (Italia)',
         'sd' => 'Kisindhi',
         'sd_Arab' => 'Kisindhi (Kiarabu)',
         'sd_Arab_PK' => 'Kisindhi (Kiarabu, Pakistani)',

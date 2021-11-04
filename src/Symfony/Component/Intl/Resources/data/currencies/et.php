@@ -580,7 +580,7 @@ return [
         ],
         'MGF' => [
             0 => 'MGF',
-            1 => 'Madagaskar frank',
+            1 => 'Madagaskari frank',
         ],
         'MKD' => [
             0 => 'MKD',

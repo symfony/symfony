@@ -36,6 +36,7 @@ trait ServiceSubscriberTrait
             return $services;
         }
 
+        $attributeOptIn = false;
         $services = \is_callable(['parent', __FUNCTION__]) ? parent::getSubscribedServices() : [];
 
         foreach ((new \ReflectionClass(self::class))->getMethods() as $method) {
@@ -62,6 +63,31 @@ trait ServiceSubscriberTrait
             }
 
             $services[$attribute->newInstance()->key ?? self::class.'::'.$method->name] = $serviceId;
+            $attributeOptIn = true;
+        }
+
+        if (!$attributeOptIn) {
+            foreach ((new \ReflectionClass(self::class))->getMethods() as $method) {
+                if ($method->isStatic() || $method->isAbstract() || $method->isGenerator() || $method->isInternal() || $method->getNumberOfRequiredParameters()) {
+                    continue;
+                }
+
+                if (self::class !== $method->getDeclaringClass()->name) {
+                    continue;
+                }
+
+                if (!($returnType = $method->getReturnType()) instanceof \ReflectionNamedType) {
+                    continue;
+                }
+
+                if ($returnType->isBuiltin()) {
+                    continue;
+                }
+
+                trigger_deprecation('symfony/service-contracts', '2.5', 'Using "%s" in "%s" without using the "%s" attribute on any method is deprecated.', ServiceSubscriberTrait::class, self::class, SubscribedService::class);
+
+                $services[self::class.'::'.$method->name] = '?'.($returnType instanceof \ReflectionNamedType ? $returnType->getName() : $returnType);
+            }
         }
 
         return $services;

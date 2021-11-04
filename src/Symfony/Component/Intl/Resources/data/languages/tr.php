@@ -433,6 +433,7 @@ return [
         'rap' => 'Rapanui dili',
         'rar' => 'Rarotongan',
         'rgn' => 'Romanyolca',
+        'rhg' => 'Rohingya dili',
         'rif' => 'Rif Berbericesi',
         'rm' => 'Romanşça',
         'rn' => 'Kirundi',

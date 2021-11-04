@@ -281,7 +281,29 @@ class MarkdownDescriptor extends Descriptor
 
     protected function describeContainerEnvVars(array $envs, array $options = [])
     {
-        throw new LogicException('Using the markdown format to debug environment variables is not supported.');
+        $this->write("# Environment Variables\n\n");
+
+        if ([] === $envs) {
+            $this->write("There are no environment variables\n");
+            return;
+        }
+
+        $this->write("NAME | PROCESSOR | DEFAULT | VALUE\n");
+        $this->write("---|---|---|---\n");
+
+        foreach ($envs as $env) {
+            $this->write(
+                sprintf(
+                    '%s | %s | %s | %s'.PHP_EOL,
+                    $env['default_available'] ? $env['name'] : '**'.$env['name'].'**',
+                    $env['processor'],
+                    $env['default_available'] ? $env['default_value'] : 'n/a',
+                    $env['runtime_available'] ? $env['runtime_value'] : 'n/a',
+                )
+            );
+        }
+
+        $this->write("\n");
     }
 
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])

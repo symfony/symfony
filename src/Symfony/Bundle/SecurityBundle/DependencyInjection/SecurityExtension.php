@@ -39,6 +39,7 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
@@ -162,7 +163,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $container
                 ->getDefinition('security.access.decision_manager')
                 ->addArgument($this->createStrategyDefinition(
-                    $config['access_decision_manager']['strategy'],
+                    $config['access_decision_manager']['strategy'] ?? AccessDecisionManager::STRATEGY_AFFIRMATIVE,
                     $config['access_decision_manager']['allow_if_all_abstain'],
                     $config['access_decision_manager']['allow_if_equal_granted_denied']
                 ));

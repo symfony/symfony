@@ -93,7 +93,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         }
 
         // HTTP/2 push crashes before curl 7.61
-        if (!\defined('CURLMOPT_PUSHFUNCTION') || 0x073d00 > self::$curlVersion['version_number'] || !(\CURL_VERSION_HTTP2 & self::$curlVersion['features'])) {
+        if (!\defined('CURLMOPT_PUSHFUNCTION') || 0x073D00 > self::$curlVersion['version_number'] || !(\CURL_VERSION_HTTP2 & self::$curlVersion['features'])) {
             return;
         }
 
@@ -188,7 +188,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $this->multi->dnsCache->evictions = [];
             $port = parse_url($authority, \PHP_URL_PORT) ?: ('http:' === $scheme ? 80 : 443);
 
-            if ($resolve && 0x072a00 > self::$curlVersion['version_number']) {
+            if ($resolve && 0x072A00 > self::$curlVersion['version_number']) {
                 // DNS cache removals require curl 7.42 or higher
                 // On lower versions, we have to create a new multi handle
                 curl_multi_close($this->multi->handle);

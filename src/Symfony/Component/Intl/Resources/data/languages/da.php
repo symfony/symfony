@@ -375,6 +375,7 @@ return [
         'raj' => 'rajasthani',
         'rap' => 'rapanui',
         'rar' => 'rarotonga',
+        'rhg' => 'rohingya',
         'rm' => 'rætoromansk',
         'rn' => 'rundi',
         'ro' => 'rumænsk',

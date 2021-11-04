@@ -596,7 +596,7 @@ return [
         ],
         'LSL' => [
             0 => 'LSL',
-            1 => 'Loti do Lesoto',
+            1 => 'Loti lesotiano',
         ],
         'LTL' => [
             0 => 'LTL',

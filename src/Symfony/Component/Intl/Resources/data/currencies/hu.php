@@ -556,7 +556,7 @@ return [
         ],
         'LSL' => [
             0 => 'LSL',
-            1 => 'Lesothoi loti',
+            1 => 'lesothoi loti',
         ],
         'LTL' => [
             0 => 'LTL',

@@ -375,6 +375,7 @@ return [
         'raj' => 'rajastani',
         'rap' => 'rapanui',
         'rar' => 'rarotongano',
+        'rhg' => 'ruainga',
         'rm' => 'romanche',
         'rn' => 'rundi',
         'ro' => 'romeno',

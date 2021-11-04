@@ -17,6 +17,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
 class MainConfigurationTest extends TestCase
 {
@@ -116,6 +117,24 @@ class MainConfigurationTest extends TestCase
         $processedConfig = $processor->processConfiguration($configuration, [$config]);
 
         $this->assertEquals('app.henk_checker', $processedConfig['firewalls']['stub']['user_checker']);
+    }
+
+    public function testConfigMergeWithAccessDecisionManager()
+    {
+        $config = [
+            'access_decision_manager' => [
+                'strategy' => AccessDecisionManager::STRATEGY_UNANIMOUS,
+            ],
+        ];
+        $config = array_merge(static::$minimalConfig, $config);
+
+        $config2 = [];
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+        $processedConfig = $processor->processConfiguration($configuration, [$config, $config2]);
+
+        $this->assertSame(AccessDecisionManager::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
     }
 
     public function testFirewalls()

@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'quiniaruanda (Ruanda)',
         'sa' => 'sânscrito',
         'sa_IN' => 'sânscrito (Índia)',
+        'sc' => 'sardo',
+        'sc_IT' => 'sardo (Itália)',
         'sd' => 'sindi',
         'sd_Arab' => 'sindi (árabe)',
         'sd_Arab_PK' => 'sindi (árabe, Paquistão)',

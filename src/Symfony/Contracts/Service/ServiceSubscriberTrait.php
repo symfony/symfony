@@ -78,7 +78,7 @@ trait ServiceSubscriberTrait
                     continue;
                 }
 
-                if (!$returnType = $method->getReturnType()) {
+                if (!($returnType = $method->getReturnType()) instanceof \ReflectionNamedType) {
                     continue;
                 }
 

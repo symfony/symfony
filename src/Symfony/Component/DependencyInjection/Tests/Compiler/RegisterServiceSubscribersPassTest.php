@@ -31,7 +31,11 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberChild;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberIntersection;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberIntersectionWithTrait;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberParent;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberUnion;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberUnionWithTrait;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -124,6 +128,78 @@ class RegisterServiceSubscribersPassTest extends TestCase
             'bar' => new ServiceClosureArgument(new TypedReference('bar', CustomDefinition::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'bar')),
             'baz' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'baz')),
             'late_alias' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class, TestDefinition1::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'late_alias')),
+        ];
+
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testUnionServices()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', \stdClass::class);
+        $container->setAlias(TestDefinition1::class, 'bar');
+        $container->setAlias(TestDefinition2::class, 'bar');
+        $container->register('foo', TestServiceSubscriberUnion::class)
+            ->addArgument(new Reference(PsrContainerInterface::class))
+            ->addTag('container.service_subscriber')
+        ;
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getArgument(0));
+
+        $this->assertFalse($locator->isPublic());
+        $this->assertSame(ServiceLocator::class, $locator->getClass());
+
+        $expected = [
+            'string|'.TestDefinition2::class.'|'.TestDefinition1::class => new ServiceClosureArgument(new TypedReference('string|'.TestDefinition2::class.'|'.TestDefinition1::class, 'string|'.TestDefinition2::class.'|'.TestDefinition1::class)),
+            'bar' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'|'.TestDefinition2::class, TestDefinition1::class.'|'.TestDefinition2::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'bar')),
+            'baz' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'|'.TestDefinition2::class, TestDefinition1::class.'|'.TestDefinition2::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'baz')),
+        ];
+
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+
+        (new AutowirePass())->process($container);
+
+        $expected = [
+            'string|'.TestDefinition2::class.'|'.TestDefinition1::class => new ServiceClosureArgument(new TypedReference('bar', TestDefinition1::class.'|'.TestDefinition2::class)),
+            'bar' => new ServiceClosureArgument(new TypedReference('bar', TestDefinition1::class.'|'.TestDefinition2::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'bar')),
+            'baz' => new ServiceClosureArgument(new TypedReference('bar', TestDefinition1::class.'|'.TestDefinition2::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'baz')),
+        ];
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testIntersectionServices()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', TestServiceSubscriberIntersection::class)
+            ->addArgument(new Reference(PsrContainerInterface::class))
+            ->addTag('container.service_subscriber')
+        ;
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getArgument(0));
+
+        $this->assertFalse($locator->isPublic());
+        $this->assertSame(ServiceLocator::class, $locator->getClass());
+
+        $expected = [
+            TestDefinition1::class.'&'.TestDefinition2::class => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'&'.TestDefinition2::class, TestDefinition1::class.'&'.TestDefinition2::class)),
+            'bar' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'&'.TestDefinition2::class, TestDefinition1::class.'&'.TestDefinition2::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'bar')),
+            'baz' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'&'.TestDefinition2::class, TestDefinition1::class.'&'.TestDefinition2::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'baz')),
         ];
 
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
@@ -304,6 +380,65 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->expectException(\LogicException::class);
 
         $subscriber::getSubscribedServices();
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testServiceSubscriberTraitWithUnionReturnType()
+    {
+        if (!class_exists(SubscribedService::class)) {
+            $this->markTestSkipped('SubscribedService attribute not available.');
+        }
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo', TestServiceSubscriberUnionWithTrait::class)
+            ->addMethodCall('setContainer', [new Reference(PsrContainerInterface::class)])
+            ->addTag('container.service_subscriber')
+        ;
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getMethodCalls()[0][1][0]);
+
+        $expected = [
+            TestServiceSubscriberUnionWithTrait::class.'::method1' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'|'.TestDefinition2::class.'|null', TestDefinition1::class.'|'.TestDefinition2::class.'|null', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            TestServiceSubscriberUnionWithTrait::class.'::method2' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'|'.TestDefinition2::class, TestDefinition1::class.'|'.TestDefinition2::class)),
+        ];
+
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testServiceSubscriberTraitWithIntersectionReturnType()
+    {
+        if (!class_exists(SubscribedService::class)) {
+            $this->markTestSkipped('SubscribedService attribute not available.');
+        }
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo', TestServiceSubscriberIntersectionWithTrait::class)
+            ->addMethodCall('setContainer', [new Reference(PsrContainerInterface::class)])
+            ->addTag('container.service_subscriber')
+        ;
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getMethodCalls()[0][1][0]);
+
+        $expected = [
+            TestServiceSubscriberIntersectionWithTrait::class.'::method1' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'&'.TestDefinition2::class, TestDefinition1::class.'&'.TestDefinition2::class)),
+        ];
+
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
     public function testServiceSubscriberWithSemanticId()

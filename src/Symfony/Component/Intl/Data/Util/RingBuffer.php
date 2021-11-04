@@ -61,7 +61,7 @@ class RingBuffer implements \ArrayAccess
     /**
      * {@inheritdoc}
      *
-     * @return TValue
+     * @return mixed
      */
     #[\ReturnTypeWillChange]
     public function offsetGet($key)

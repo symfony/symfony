@@ -105,7 +105,7 @@ class OrderedHashMapIterator implements \Iterator
     /**
      * {@inheritdoc}
      *
-     * @return TValue|null
+     * @return mixed
      */
     #[\ReturnTypeWillChange]
     public function current()
@@ -132,7 +132,7 @@ class OrderedHashMapIterator implements \Iterator
     /**
      * {@inheritdoc}
      *
-     * @return TKey|null
+     * @return mixed
      */
     #[\ReturnTypeWillChange]
     public function key()

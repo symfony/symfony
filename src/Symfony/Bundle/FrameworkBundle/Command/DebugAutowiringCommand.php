@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\Descriptor;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -81,7 +83,8 @@ EOF
         $serviceIds = array_filter($serviceIds, [$this, 'filterToServiceTypes']);
 
         if ($search = $input->getArgument('search')) {
-            $searchNormalized = preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', '', $search);
+            $searchNormalized = preg_replace('/[^a-zA-Z0-9\x7f-\xff $]++/', '', $search);
+
             $serviceIds = array_filter($serviceIds, function ($serviceId) use ($searchNormalized) {
                 return false !== stripos(str_replace('\\', '', $serviceId), $searchNormalized) && !str_starts_with($serviceId, '.');
             });
@@ -161,5 +164,14 @@ EOF
         }
 
         return (string) $this->fileLinkFormatter->format($r->getFileName(), $r->getStartLine());
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('search')) {
+            $builder = $this->getContainerBuilder($this->getApplication()->getKernel());
+
+            $suggestions->suggestValues(array_filter($builder->getServiceIds(), [$this, 'filterToServiceTypes']));
+        }
     }
 }

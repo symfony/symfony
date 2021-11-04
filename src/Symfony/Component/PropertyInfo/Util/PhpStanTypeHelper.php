@@ -110,9 +110,9 @@ final class PhpStanTypeHelper
             return $this->compressNullableType($types);
         }
         if ($node instanceof GenericTypeNode) {
-            $mainTypes = $this->extractTypes($node->type, $nameScope);
+            [$mainType] = $this->extractTypes($node->type, $nameScope);
 
-            $collectionKeyTypes = [];
+            $collectionKeyTypes = $mainType->getCollectionKeyTypes();
             $collectionKeyValues = [];
             if (1 === \count($node->genericTypes)) {
                 foreach ($this->extractTypes($node->genericTypes[0], $nameScope) as $subType) {
@@ -127,7 +127,7 @@ final class PhpStanTypeHelper
                 }
             }
 
-            return [new Type($mainTypes[0]->getBuiltinType(), $mainTypes[0]->isNullable(), $mainTypes[0]->getClassName(), true, $collectionKeyTypes, $collectionKeyValues)];
+            return [new Type($mainType->getBuiltinType(), $mainType->isNullable(), $mainType->getClassName(), true, $collectionKeyTypes, $collectionKeyValues)];
         }
         if ($node instanceof ArrayShapeNode) {
             return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)];
@@ -159,6 +159,8 @@ final class PhpStanTypeHelper
             switch ($node->name) {
                 case 'integer':
                     return [new Type(Type::BUILTIN_TYPE_INT)];
+                case 'list':
+                    return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT))];
                 case 'mixed':
                     return []; // mixed seems to be ignored in all other extractors
                 case 'parent':

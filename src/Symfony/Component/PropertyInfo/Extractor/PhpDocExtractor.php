@@ -36,7 +36,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public const MUTATOR = 2;
 
     /**
-     * @var DocBlock[]
+     * @var array<string, array{DocBlock|null, int|null, string|null}>
      */
     private $docBlocks = [];
 
@@ -238,6 +238,9 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             $docBlock->getLocation(), $docBlock->isTemplateStart(), $docBlock->isTemplateEnd());
     }
 
+    /**
+     * @return array{DocBlock|null, int|null, string|null}
+     */
     private function getDocBlock(string $class, string $property): array
     {
         $propertyHash = sprintf('%s::%s', $class, $property);
@@ -287,13 +290,14 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         try {
             return $this->docBlockFactory->create($reflectionProperty, $this->createFromReflector($reflector));
-        } catch (\InvalidArgumentException $e) {
-            return null;
-        } catch (\RuntimeException $e) {
+        } catch (\InvalidArgumentException|\RuntimeException $e) {
             return null;
         }
     }
 
+    /**
+     * @return array{DocBlock, string}|null
+     */
     private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type): ?array
     {
         $prefixes = self::ACCESSOR === $type ? $this->accessorPrefixes : $this->mutatorPrefixes;
@@ -333,9 +337,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         try {
             return [$this->docBlockFactory->create($reflectionMethod, $this->createFromReflector($reflector)), $prefix];
-        } catch (\InvalidArgumentException $e) {
-            return null;
-        } catch (\RuntimeException $e) {
+        } catch (\InvalidArgumentException|\RuntimeException $e) {
             return null;
         }
     }

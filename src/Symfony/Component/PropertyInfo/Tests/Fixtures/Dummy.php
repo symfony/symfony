@@ -146,6 +146,11 @@ class Dummy extends ParentDummy
     public $arrayOfMixed;
 
     /**
+     * @var list<string>
+     */
+    public $listOfStrings;
+
+    /**
      * @var parent
      */
     public $parentAnnotation;

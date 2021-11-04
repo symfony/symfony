@@ -294,7 +294,7 @@ class MarkdownDescriptor extends Descriptor
         foreach ($envs as $env) {
             $this->write(
                 sprintf(
-                    '%s | %s | %s | %s'.\PHP_EOL,
+                    "%s | %s | %s | %s\n",
                     $env['default_available'] ? $env['name'] : '**'.$env['name'].'**',
                     $env['processor'],
                     $env['default_available'] ? $env['default_value'] : 'n/a',

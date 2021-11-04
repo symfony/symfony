@@ -42,6 +42,9 @@ class ServiceSubscriberTraitTest extends TestCase
         $this->assertSame($container, (new TestService())->setContainer($container));
     }
 
+    /**
+     * @group legacy
+     */
     public function testMethodsWithUnionReturnTypesAreIgnored()
     {
         $expected = [TestServiceSubscriberUnion::class.'::method1' => '?Symfony\Contracts\Tests\Fixtures\Service1'];

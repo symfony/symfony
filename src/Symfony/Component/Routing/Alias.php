@@ -53,7 +53,7 @@ class Alias
      *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    public function setDeprecated(string $package, string $version, string $message): self
+    public function setDeprecated(string $package, string $version, string $message): static
     {
         if ('' !== $message) {
             if (preg_match('#[\r\n]|\*/#', $message)) {

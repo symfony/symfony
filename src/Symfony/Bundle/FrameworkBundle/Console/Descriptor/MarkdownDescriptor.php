@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
-use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -285,6 +284,7 @@ class MarkdownDescriptor extends Descriptor
 
         if ([] === $envs) {
             $this->write("There are no environment variables\n");
+
             return;
         }
 
@@ -294,7 +294,7 @@ class MarkdownDescriptor extends Descriptor
         foreach ($envs as $env) {
             $this->write(
                 sprintf(
-                    '%s | %s | %s | %s'.PHP_EOL,
+                    '%s | %s | %s | %s'.\PHP_EOL,
                     $env['default_available'] ? $env['name'] : '**'.$env['name'].'**',
                     $env['processor'],
                     $env['default_available'] ? $env['default_value'] : 'n/a',

@@ -31,16 +31,25 @@ final class CompleteCommand extends Command
     protected static $defaultName = '|_complete';
     protected static $defaultDescription = 'Internal command to provide shell completion suggestions';
 
-    private static $completionOutputs = [
-        'bash' => BashCompletionOutput::class,
-    ];
+    private $completionOutputs;
 
     private $isDebug = false;
+
+    /**
+     * @param array<string, class-string<CompletionOutputInterface>> $completionOutputs A list of additional completion outputs, with shell name as key and FQCN as value
+     */
+    public function __construct(array $completionOutputs = [])
+    {
+        // must be set before the parent constructor, as the property value is used in configure()
+        $this->completionOutputs = $completionOutputs + ['bash' => BashCompletionOutput::class];
+
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
         $this
-            ->addOption('shell', 's', InputOption::VALUE_REQUIRED, 'The shell type (e.g. "bash")')
+            ->addOption('shell', 's', InputOption::VALUE_REQUIRED, 'The shell type ("'.implode('", "', array_keys($this->completionOutputs)).'")')
             ->addOption('input', 'i', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'An array of input tokens (e.g. COMP_WORDS or argv)')
             ->addOption('current', 'c', InputOption::VALUE_REQUIRED, 'The index of the "input" array that the cursor is in (e.g. COMP_CWORD)')
             ->addOption('symfony', 'S', InputOption::VALUE_REQUIRED, 'The version of the completion script')
@@ -71,8 +80,8 @@ final class CompleteCommand extends Command
                 throw new \RuntimeException('The "--shell" option must be set.');
             }
 
-            if (!$completionOutput = self::$completionOutputs[$shell] ?? false) {
-                throw new \RuntimeException(sprintf('Shell completion is not supported for your shell: "%s" (supported: "%s").', $shell, implode('", "', array_keys(self::$completionOutputs))));
+            if (!$completionOutput = $this->completionOutputs[$shell] ?? false) {
+                throw new \RuntimeException(sprintf('Shell completion is not supported for your shell: "%s" (supported: "%s").', $shell, implode('", "', array_keys($this->completionOutputs))));
             }
 
             $completionInput = $this->createCompletionInput($input);

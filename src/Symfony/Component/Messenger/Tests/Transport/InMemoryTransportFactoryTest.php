@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\InMemoryTransportFactory;
@@ -61,7 +62,7 @@ class InMemoryTransportFactoryTest extends TestCase
         $message = Envelope::wrap(new DummyMessage('Hello.'));
         $transport->send($message);
 
-        $this->assertSame([$message], $transport->get());
+        $this->assertEquals([$message->with(new TransportMessageIdStamp(1))], $transport->get());
     }
 
     public function testCreateTransportWithSerializer()
@@ -72,7 +73,7 @@ class InMemoryTransportFactoryTest extends TestCase
         $serializer
             ->expects($this->once())
             ->method('encode')
-            ->with($this->equalTo($message))
+            ->with($this->equalTo($message->with(new TransportMessageIdStamp(1))))
         ;
         $transport = $this->factory->createTransport('in-memory://?serialize=true', [], $serializer);
         $transport->send($message);

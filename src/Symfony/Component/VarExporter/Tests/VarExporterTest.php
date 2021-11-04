@@ -240,6 +240,11 @@ class VarExporterTest extends TestCase
             yield ['unit-enum', [FooUnitEnum::Bar], true];
         }
     }
+
+    public function testUnicodeDirectionality()
+    {
+        $this->assertSame('"\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"', VarExporter::export("\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"));
+    }
 }
 
 class MyWakeup

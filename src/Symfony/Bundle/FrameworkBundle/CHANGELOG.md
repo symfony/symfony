@@ -21,6 +21,7 @@ CHANGELOG
  * Add support for `statusCode` default parameter when loading a template directly from route using the `Symfony\Bundle\FrameworkBundle\Controller\TemplateController` controller
  * Deprecate `translation:update` command, use `translation:extract` instead
  * Add `PhpStanExtractor` support for the PropertyInfo component
+ * Add markdown format for env vars `debug:container --env-vars --format=md`
 
 5.3
 ---

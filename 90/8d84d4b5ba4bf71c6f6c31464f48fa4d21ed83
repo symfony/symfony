@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-10-08T09:50:55Z
+
+I'm not sure about the `setAttributes` method. It allows deleting attributes, which was not possible before.
+What do you think @wouterj ?
+
+---------------------------------------------------------------------------
+
+by pluk77 at 2021-10-08T10:09:36Z
+
+@stof my reasoning is that one can remove the value of an attribute already by overwriting it with a blank value using the setter. It is indeed not the same as completely removing all attributes by setting a blank array.
+
+But if it does not feel right to be able to complete remove all attributes, I would be extremely happy with just having the getAttributes() method added as that would solve the problem. Without the setAttributes() one can always iterate over an existing array of attributes and set them one by one.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-10-08T10:41:35Z
+
+Yes, I agree with @stof about `setAttributes()`. If we have no use-case, let's not add it.
+
+I'm a bit unsure about `getAttributes()` - the use-case in the referenced issue can indeed be fixed by using [service decoration of the authenticator](https://symfony.com/doc/current/service_container/service_decoration.html). Decoration is one of *the* things that we focused on when designing the new interface. However, it's a small method and adding it probably doesn't hurt much.
+
+---------------------------------------------------------------------------
+
+by pluk77 at 2021-10-08T10:56:08Z
+
+I have updated the PR as per the discussion. Thank you all for supporting this addition.
+
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2021-10-11T09:55:05Z
+
+@wouterj service decoration is a bit overheaded approach in such use-case (as it seems for me). Addition of `getAttributes()` method looks like much more simple and common way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-10-28T15:17:47Z
+
+Works on my side. But can you please add a test case?
+
+---------------------------------------------------------------------------
+
+by pluk77 at 2021-10-29T08:27:54Z
+
+I would not mind adding a test case if you can point me to the place with the existing passport tests or point me to where you want the test to be added?
+I could not find any existing test that specifically test the current getParameter and setParameter function of the passport.

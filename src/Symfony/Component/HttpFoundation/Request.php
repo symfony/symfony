@@ -940,7 +940,7 @@ class Request
      *
      * @return string|null A user name if any and, optionally, scheme-specific information about how to gain authorization to access the server
      */
-    public function getUserInfo(): string
+    public function getUserInfo(): ?string
     {
         $userinfo = $this->getUser();
 

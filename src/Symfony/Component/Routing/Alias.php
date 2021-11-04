@@ -15,18 +15,15 @@ use Symfony\Component\Routing\Exception\InvalidArgumentException;
 
 class Alias
 {
-    private $id;
-    private $deprecation = [];
+    private string $id;
+    private array $deprecation = [];
 
     public function __construct(string $id)
     {
         $this->id = $id;
     }
 
-    /**
-     * @return static
-     */
-    public function withId(string $id): self
+    public function withId(string $id): static
     {
         $new = clone $this;
 

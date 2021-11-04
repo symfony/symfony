@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by Lctrs at 2020-10-07T16:05:14Z
+
+@stof Still WIP but I've made some changes to make deprecated aliases a thing as pointed out in https://github.com/symfony/symfony/pull/38389#issuecomment-702843630. WDYT ?
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2020-10-23T21:13:11Z
+
+Ready for review finally.
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2020-12-30T00:37:49Z
+
+@jderusse I adressed all your comments except the ones where I left a comment indicating otherwise.
+
+---------------------------------------------------------------------------
+
+by haivala at 2021-09-21T21:21:34Z
+
+Hope this gets merged!
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2021-09-21T22:51:13Z
+
+I don't promise anything but I'll try to come back to this in the next weeks.
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2021-10-17T13:23:42Z
+
+@jderusse @derrabus I have rebased the PR on top of `5.4` branch and adressed all your comments.
+
+I tested this on a local test project and it worked as I would expect.
+
+Do you have any more reviews to make ?
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2021-10-17T13:43:00Z
+
+AppVeyor's failure is unrelated.
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2021-11-02T20:22:22Z
+
+@nicolas-grekas @stof I believe I adressed all your comments.
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2021-11-03T20:29:30Z
+
+@nicolas-grekas all done.

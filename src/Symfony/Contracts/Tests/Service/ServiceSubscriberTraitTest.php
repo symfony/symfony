@@ -57,6 +57,7 @@ class ServiceSubscriberTraitTest extends TestCase
 
     /**
      * @requires PHP 8
+     * @group legacy
      */
     public function testMethodsWithUnionReturnTypesAreIgnored()
     {

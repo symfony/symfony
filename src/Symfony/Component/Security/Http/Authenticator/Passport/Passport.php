@@ -103,4 +103,9 @@ class Passport implements UserPassportInterface
     {
         return $this->attributes[$name] ?? $default;
     }
+
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
 }

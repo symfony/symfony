@@ -375,6 +375,7 @@ return [
         'raj' => 'rajasthani',
         'rap' => 'rapa nui',
         'rar' => 'rarotonški',
+        'rhg' => 'rohindža',
         'rm' => 'retoromanski',
         'rn' => 'rundi',
         'ro' => 'rumunjski',

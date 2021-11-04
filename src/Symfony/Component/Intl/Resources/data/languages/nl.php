@@ -433,6 +433,7 @@ return [
         'rap' => 'Rapanui',
         'rar' => 'Rarotongan',
         'rgn' => 'Romagnol',
+        'rhg' => 'Rohingya',
         'rif' => 'Riffijns',
         'rm' => 'Reto-Romaans',
         'rn' => 'Kirundi',
@@ -597,7 +598,9 @@ return [
         'zza' => 'Zaza',
     ],
     'LocalizedNames' => [
+        'ar_001' => 'modern standaard Arabisch',
         'fa_AF' => 'Dari',
         'nds_NL' => 'Nederduits',
+        'nl_BE' => 'Vlaams',
     ],
 ];

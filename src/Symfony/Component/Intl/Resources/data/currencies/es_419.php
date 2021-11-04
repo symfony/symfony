@@ -14,6 +14,14 @@ return [
             0 => 'EUR',
             1 => 'euro',
         ],
+        'HTG' => [
+            0 => 'HTG',
+            1 => 'gourde haitiano',
+        ],
+        'KZT' => [
+            0 => 'KZT',
+            1 => 'tenge kazajo',
+        ],
         'MWK' => [
             0 => 'MWK',
             1 => 'kwacha malauí',

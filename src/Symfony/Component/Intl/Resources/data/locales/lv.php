@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'kiņaruanda (Ruanda)',
         'sa' => 'sanskrits',
         'sa_IN' => 'sanskrits (Indija)',
+        'sc' => 'sardīniešu',
+        'sc_IT' => 'sardīniešu (Itālija)',
         'sd' => 'sindhu',
         'sd_Arab' => 'sindhu (arābu)',
         'sd_Arab_PK' => 'sindhu (arābu, Pakistāna)',

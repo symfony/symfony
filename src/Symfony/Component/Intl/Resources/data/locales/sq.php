@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'kiniaruandisht (Ruandë)',
         'sa' => 'sanskritisht',
         'sa_IN' => 'sanskritisht (Indi)',
+        'sc' => 'sardenjisht',
+        'sc_IT' => 'sardenjisht (Itali)',
         'sd' => 'sindisht',
         'sd_Arab' => 'sindisht (arabik)',
         'sd_Arab_PK' => 'sindisht (arabik, Pakistan)',

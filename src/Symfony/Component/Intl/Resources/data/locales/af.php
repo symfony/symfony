@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'Rwandees (Rwanda)',
         'sa' => 'Sanskrit',
         'sa_IN' => 'Sanskrit (Indië)',
+        'sc' => 'Sardinies',
+        'sc_IT' => 'Sardinies (Italië)',
         'sd' => 'Sindhi',
         'sd_Arab' => 'Sindhi (Arabies)',
         'sd_Arab_PK' => 'Sindhi (Arabies, Pakistan)',

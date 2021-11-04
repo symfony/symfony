@@ -15,6 +15,7 @@ return [
         'kmb' => 'Kimbundu-Sprache',
         'mus' => 'Muskogee-Sprache',
         'prg' => 'Altpreussisch',
+        'rhg' => 'Rohingya',
     ],
     'LocalizedNames' => [
         'ar_001' => 'Modernes Hocharabisch',

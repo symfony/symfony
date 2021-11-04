@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-11-03T18:29:30Z
+
+Can you provide a test that covers your change?
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-11-03T19:20:52Z
+
+Test added. Regarding the failing CI: when I had this issue in #42238, [this was how I solved](https://github.com/symfony/symfony/pull/42238/files#diff-9fa46b505cd04bcd5dfbd65309c41b2f76dac7443883511286712c31e09109dcR210) - not sure what to do here...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-04T10:28:08Z
+
+The test case should be moved to `src/Symfony/Contracts/Tests/Service/ServiceSubscriberTraitTest.php`, that would prevent cross-packages issues.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-04T11:11:46Z
+
+@nicolas-grekas given that the test relies on the DI component, this would be wrong.
+
+I think that the right fix is to bump the min version of `symfony/service-contract` (or whatever the exact package name is) in the requirement of the DI component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-04T11:13:43Z
+
+The test should be updated to not rely on the DI component. There is no need for this dep.
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-11-04T12:35:32Z
+
+Ok, test has been moved.

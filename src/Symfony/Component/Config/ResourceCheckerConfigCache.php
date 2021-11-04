@@ -29,13 +29,13 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     private $file;
 
     /**
-     * @var iterable<int, ResourceCheckerInterface>
+     * @var iterable<mixed, ResourceCheckerInterface>
      */
     private $resourceCheckers;
 
     /**
-     * @param string                                  $file             The absolute cache path
-     * @param iterable<int, ResourceCheckerInterface> $resourceCheckers The ResourceCheckers to use for the freshness check
+     * @param string                                    $file             The absolute cache path
+     * @param iterable<mixed, ResourceCheckerInterface> $resourceCheckers The ResourceCheckers to use for the freshness check
      */
     public function __construct(string $file, iterable $resourceCheckers = [])
     {

@@ -63,9 +63,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private $requestMatchers = [];
     private $expressions = [];
     private $contextListeners = [];
-    /** @var array<array{0: int, 1: AuthenticatorFactoryInterface|SecurityFactoryInterface}> */
+    /** @var list<array{int, AuthenticatorFactoryInterface|SecurityFactoryInterface}> */
     private $factories = [];
-    /** @var (AuthenticatorFactoryInterface|SecurityFactoryInterface)[] */
+    /** @var list<AuthenticatorFactoryInterface|SecurityFactoryInterface> */
     private $sortedFactories = [];
     private $userProviderFactories = [];
     private $statelessFirewallKeys = [];

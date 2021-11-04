@@ -62,7 +62,7 @@ class Crawler implements \Countable, \IteratorAggregate
     private $document;
 
     /**
-     * @var \DOMNode[]
+     * @var list<\DOMNode>
      */
     private $nodes = [];
 

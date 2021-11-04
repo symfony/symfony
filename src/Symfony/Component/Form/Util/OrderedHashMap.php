@@ -82,14 +82,14 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * The keys of the map in the order in which they were inserted or changed.
      *
-     * @var array
+     * @var list<TKey>
      */
     private $orderedKeys = [];
 
     /**
      * References to the cursors of all open iterators.
      *
-     * @var array
+     * @var array<int, int>
      */
     private $managedCursors = [];
 
@@ -116,7 +116,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      *
-     * @return mixed
+     * @return TValue
      */
     #[\ReturnTypeWillChange]
     public function offsetGet($key)

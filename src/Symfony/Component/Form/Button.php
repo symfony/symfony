@@ -49,7 +49,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @param mixed $offset
+     * @param string $offset
      *
      * @return bool
      */
@@ -64,7 +64,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $offset
+     * @param string $offset
      *
      * @return FormInterface
      *
@@ -81,8 +81,8 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $offset
-     * @param mixed $value
+     * @param string        $offset
+     * @param FormInterface $value
      *
      * @return void
      *
@@ -99,7 +99,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $offset
+     * @param string $offset
      *
      * @return void
      *

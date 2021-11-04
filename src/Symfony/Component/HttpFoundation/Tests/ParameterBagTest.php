@@ -168,12 +168,12 @@ class ParameterBagTest extends TestCase
 
         $this->assertFalse($bag->filter('dec', '', \FILTER_VALIDATE_INT, [
             'flags' => \FILTER_FLAG_ALLOW_HEX,
-            'options' => ['min_range' => 1, 'max_range' => 0xff],
+            'options' => ['min_range' => 1, 'max_range' => 0xFF],
         ]), '->filter() gets a value of parameter as integer between boundaries');
 
         $this->assertFalse($bag->filter('hex', '', \FILTER_VALIDATE_INT, [
             'flags' => \FILTER_FLAG_ALLOW_HEX,
-            'options' => ['min_range' => 1, 'max_range' => 0xff],
+            'options' => ['min_range' => 1, 'max_range' => 0xFF],
         ]), '->filter() gets a value of parameter as integer between boundaries');
 
         $this->assertEquals(['bang'], $bag->filter('array', ''), '->filter() gets a value of parameter as an array');

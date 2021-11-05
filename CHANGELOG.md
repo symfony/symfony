@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+# 2.1.2 (2021-11-05)
+
+* Allow Symfony 6
+
 # 2.1.0 (2021-02-17)
 
   * Added a `PsrResponseListener` to automatically convert PSR-7 responses returned by controllers

@@ -103,7 +103,8 @@ class SymfonyRuntime extends GenericRuntime
             $options['debug'] ?? $options['debug'] = '1' === $_SERVER['APP_DEBUG'];
             $options['disable_dotenv'] = true;
         } else {
-            $_SERVER['APP_ENV'] ?? $_SERVER['APP_ENV'] = 'dev';
+            $_SERVER['APP_ENV'] ?? $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] ?? 'dev';
+            $_SERVER['APP_DEBUG'] ?? $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] ?? !\in_array($_SERVER['APP_ENV'], (array) ($options['prod_envs'] ?? ['prod']), true);
         }
 
         $options['error_handler'] ?? $options['error_handler'] = SymfonyErrorHandler::class;

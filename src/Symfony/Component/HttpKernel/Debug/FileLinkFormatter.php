@@ -94,7 +94,7 @@ class FileLinkFormatter
         }
     }
 
-    private function getFileLinkFormat()
+    private function getFileLinkFormat(): array|false
     {
         if ($this->fileLinkFormat) {
             return $this->fileLinkFormat;
@@ -111,6 +111,6 @@ class FileLinkFormatter
             }
         }
 
-        return null;
+        return false;
     }
 }

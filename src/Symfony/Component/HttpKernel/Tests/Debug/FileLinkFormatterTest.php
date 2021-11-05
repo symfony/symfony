@@ -60,4 +60,9 @@ class FileLinkFormatterTest extends TestCase
 
         $this->assertSame("atom://core/open/file?filename=$file&line=3", $sut->format($file, 3));
     }
+
+    public function testSerialize()
+    {
+        $this->assertInstanceOf(FileLinkFormatter::class, unserialize(serialize(new FileLinkFormatter())));
+    }
 }

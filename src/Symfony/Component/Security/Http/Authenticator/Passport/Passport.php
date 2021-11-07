@@ -89,4 +89,9 @@ class Passport
     {
         return $this->attributes[$name] ?? $default;
     }
+
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
 }

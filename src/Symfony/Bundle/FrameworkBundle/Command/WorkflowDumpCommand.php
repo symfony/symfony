@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
 use Symfony\Component\Workflow\Dumper\MermaidDumper;
 use Symfony\Component\Workflow\Dumper\PlantUmlDumper;
@@ -34,6 +35,10 @@ use Symfony\Component\Workflow\Marking;
 #[AsCommand(name: 'workflow:dump', description: 'Dump a workflow')]
 class WorkflowDumpCommand extends Command
 {
+    /**
+     * string is the service id
+     * @var array<string, Definition>
+     */
     private array $workflows = [];
 
     private const DUMP_FORMAT_OPTIONS = [
@@ -78,13 +83,21 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $workflowId = $input->getArgument('name');
+        $workflowName = $input->getArgument('name');
 
-        if (!\in_array($workflowId, array_keys($this->workflows), true)) {
-            throw new InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $workflowId));
+        $workflow = null;
+
+        if (isset($this->workflows['workflow.'.$workflowName])) {
+            $workflow = $this->workflows['workflow.'.$workflowName];
+            $type = 'workflow';
+        } elseif (isset($this->workflows['state_machine.'.$workflowName])) {
+            $workflow = $this->workflows['state_machine.'.$workflowName];
+            $type = 'state_machine';
         }
 
-        $type = explode('.', $workflowId)[0];
+        if (null === $workflow) {
+            throw new InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $workflowName));
+        }
 
         switch ($input->getOption('dump-format')) {
             case 'puml':
@@ -108,10 +121,8 @@ EOF
             $marking->mark($place);
         }
 
-        $workflow = $this->workflows[$workflowId];
-
         $options = [
-            'name' => $workflowId,
+            'name' => $workflowName,
             'nofooter' => true,
             'graph' => [
                 'label' => $input->getOption('label'),

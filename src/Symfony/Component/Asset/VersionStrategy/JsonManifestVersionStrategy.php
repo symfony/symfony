@@ -69,7 +69,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
     private function getManifestPath(string $path): ?string
     {
         if (!isset($this->manifestData)) {
-            if (null !== $this->httpClient && 0 === strpos(parse_url($this->manifestPath, \PHP_URL_SCHEME), 'http')) {
+            if (null !== $this->httpClient && ($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
                 try {
                     $this->manifestData = $this->httpClient->request('GET', $this->manifestPath, [
                         'headers' => ['accept' => 'application/json'],

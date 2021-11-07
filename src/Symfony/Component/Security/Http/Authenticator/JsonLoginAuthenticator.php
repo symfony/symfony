@@ -70,7 +70,7 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
 
     public function supports(Request $request): ?bool
     {
-        if (false === strpos($request->getRequestFormat(), 'json') && false === strpos($request->getContentType(), 'json')) {
+        if (false === strpos($request->getRequestFormat() ?? '', 'json') && false === strpos($request->getContentType() ?? '', 'json')) {
             return false;
         }
 

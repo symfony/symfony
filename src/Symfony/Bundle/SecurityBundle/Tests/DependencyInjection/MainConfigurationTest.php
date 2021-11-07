@@ -134,7 +134,7 @@ class MainConfigurationTest extends TestCase
         $configuration = new MainConfiguration([], []);
         $processedConfig = $processor->processConfiguration($configuration, [$config, $config2]);
 
-        $this->assertSame(AccessDecisionManager::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
+        $this->assertSame(MainConfiguration::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
     }
 
     public function testFirewalls()

@@ -123,7 +123,7 @@ class MainConfigurationTest extends TestCase
     {
         $config = [
             'access_decision_manager' => [
-                'strategy' => AccessDecisionManager::STRATEGY_UNANIMOUS,
+                'strategy' => MainConfiguration::STRATEGY_UNANIMOUS,
             ],
         ];
         $config = array_merge(static::$minimalConfig, $config);

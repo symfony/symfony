@@ -360,6 +360,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 curl_setopt($ch, \CURLOPT_VERBOSE, false);
             }
         }
+
+        curl_multi_close($this->multi->handle);
+        $this->multi->handle = curl_multi_init();
     }
 
     /**

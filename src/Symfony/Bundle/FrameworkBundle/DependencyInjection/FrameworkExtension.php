@@ -2067,16 +2067,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_failed_messages_remove');
         }
 
-        if (false === $config['reset_on_message']) {
-            throw new LogicException('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.');
-        }
-
         if (!$container->hasDefinition('console.command.messenger_consume_messages')) {
-            $container->removeDefinition('messenger.listener.reset_services');
-        } elseif (null === $config['reset_on_message']) {
-            trigger_deprecation('symfony/framework-bundle', '5.4', 'Not setting the "framework.messenger.reset_on_message" configuration option is deprecated, it will default to "true" in version 6.0.');
-
-            $container->getDefinition('console.command.messenger_consume_messages')->replaceArgument(5, null);
             $container->removeDefinition('messenger.listener.reset_services');
         }
     }

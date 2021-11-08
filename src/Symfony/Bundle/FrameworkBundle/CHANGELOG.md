@@ -21,6 +21,7 @@ CHANGELOG
  * Remove support for passing a `RouteCollectionBuilder` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
  * Remove the `cache.adapter.doctrine` service
  * Remove the `framework.translator.enabled_locales` config option, use `framework.enabled_locales` instead
+ * Make the `framework.messenger.reset_on_message` configuration option default to `true`
 
 5.4
 ---

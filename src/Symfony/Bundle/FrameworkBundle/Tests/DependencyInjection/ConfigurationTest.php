@@ -536,7 +536,7 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
-                'reset_on_message' => null,
+                'reset_on_message' => true,
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [

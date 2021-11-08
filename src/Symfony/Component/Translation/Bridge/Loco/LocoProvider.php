@@ -171,6 +171,7 @@ final class LocoProvider implements ProviderInterface
         foreach ($keys as $key) {
             $responses[$key] = $this->client->request('POST', 'assets', [
                 'body' => [
+                    'id' => $key,
                     'text' => $key,
                     'type' => 'text',
                     'default' => 'untranslated',

@@ -196,20 +196,30 @@ XLIFF
     public function testPullForceMessages()
     {
         $arrayLoader = new ArrayLoader();
-        $filenameEn = $this->createFile();
-        $filenameFr = $this->createFile(['note' => 'NOTE'], 'fr');
+        $filenameMessagesEn = $this->createFile(['note' => 'NOTE'], 'en');
+        $filenameMessagesFr = $this->createFile(['note' => 'NOTE'], 'fr');
+        $filenameValidatorsEn = $this->createFile(['foo.error' => 'Wrong value'], 'en', 'validators.%locale%.xlf');
+        $filenameValidatorsFr = $this->createFile(['foo.error' => 'Valeur erronée'], 'fr', 'validators.%locale%.xlf');
         $locales = ['en', 'fr'];
-        $domains = ['messages'];
+        $domains = ['messages', 'validators'];
 
         $providerReadTranslatorBag = new TranslatorBag();
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
             'note' => 'UPDATED NOTE',
             'new.foo' => 'newFoo',
-        ], 'en'));
+        ], 'en', 'messages'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
             'note' => 'NOTE MISE À JOUR',
             'new.foo' => 'nouveauFoo',
-        ], 'fr'));
+        ], 'fr', 'messages'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'foo.error' => 'Bad value',
+            'bar.error' => 'Bar error',
+        ], 'en', 'validators'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'foo.error' => 'Valeur invalide',
+            'bar.error' => 'Bar erreur',
+        ], 'fr', 'validators'));
 
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())
@@ -222,9 +232,9 @@ XLIFF
             ->willReturn('null://default');
 
         $tester = $this->createCommandTester($provider, $locales, $domains);
-        $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--force' => true]);
+        $tester->execute(['--locales' => $locales, '--domains' => $domains, '--force' => true]);
 
-        $this->assertStringContainsString('[OK] Local translations has been updated from "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] Local translations has been updated from "null" (for "en, fr" locale(s), and "messages, validators" domain(s)).', trim($tester->getDisplay()));
         $this->assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
@@ -245,7 +255,7 @@ XLIFF
     </file>
 </xliff>
 XLIFF
-            , file_get_contents($filenameEn));
+            , file_get_contents($filenameMessagesEn));
         $this->assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
@@ -266,7 +276,50 @@ XLIFF
     </file>
 </xliff>
 XLIFF
-            , file_get_contents($filenameFr));
+            , file_get_contents($filenameMessagesFr));
+
+        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+        <header>
+            <tool tool-id="symfony" tool-name="Symfony"/>
+        </header>
+        <body>
+            <trans-unit id="kA4akVr" resname="foo.error">
+                <source>foo.error</source>
+                <target>Bad value</target>
+            </trans-unit>
+            <trans-unit id="OcBtn3X" resname="bar.error">
+                <source>bar.error</source>
+                <target>Bar error</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+XLIFF
+            , file_get_contents($filenameValidatorsEn));
+        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
+        <header>
+            <tool tool-id="symfony" tool-name="Symfony"/>
+        </header>
+        <body>
+            <trans-unit id="kA4akVr" resname="foo.error">
+                <source>foo.error</source>
+                <target>Valeur invalide</target>
+            </trans-unit>
+            <trans-unit id="OcBtn3X" resname="bar.error">
+                <source>bar.error</source>
+                <target>Bar erreur</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+XLIFF
+            , file_get_contents($filenameValidatorsFr));
     }
 
     /**

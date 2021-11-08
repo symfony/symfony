@@ -63,6 +63,7 @@ class LocoProviderTest extends ProviderTestCase
         $responses = [
             'createAsset1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
                 $expectedBody = http_build_query([
+                    'id' => 'a',
                     'text' => 'a',
                     'type' => 'text',
                     'default' => 'untranslated',
@@ -99,6 +100,7 @@ class LocoProviderTest extends ProviderTestCase
             },
             'createAsset2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
                 $expectedBody = http_build_query([
+                    'id' => 'post.num_comments',
                     'text' => 'post.num_comments',
                     'type' => 'text',
                     'default' => 'untranslated',

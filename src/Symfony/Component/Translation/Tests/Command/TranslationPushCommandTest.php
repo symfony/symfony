@@ -90,22 +90,32 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
     public function testPushForceMessages()
     {
         $xliffLoader = new XliffFileLoader();
-        $filenameEn = $this->createFile([
+        $filenameMessagesEn = $this->createFile([
             'note' => 'NOTE UPDATED',
             'new.foo' => 'newFoo',
-        ]);
-        $filenameFr = $this->createFile([
+        ], 'en');
+        $filenameMessagesFr = $this->createFile([
             'note' => 'NOTE MISE À JOUR',
             'new.foo' => 'nouveauFoo',
         ], 'fr');
+        $filenameValidatorsEn = $this->createFile([
+            'foo.error' => 'Wrong value',
+            'bar.success' => 'Form valid!',
+        ], 'en', 'validators.%locale%.xlf');
+        $filenameValidatorsFr = $this->createFile([
+            'foo.error' => 'Valeur erronée',
+            'bar.success' => 'Formulaire valide !',
+        ], 'fr', 'validators.%locale%.xlf');
         $locales = ['en', 'fr'];
-        $domains = ['messages'];
+        $domains = ['messages', 'validators'];
 
         $provider = $this->createMock(ProviderInterface::class);
 
         $localTranslatorBag = new TranslatorBag();
-        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameEn, 'en'));
-        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameFr, 'fr'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameMessagesEn, 'en', 'messages'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameMessagesFr, 'fr', 'messages'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameValidatorsEn, 'en', 'validators'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameValidatorsFr, 'fr', 'validators'));
 
         $provider->expects($this->once())
             ->method('write')
@@ -117,9 +127,9 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester = $this->createCommandTester($provider, $locales, $domains);
 
-        $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--force' => true]);
+        $tester->execute(['--locales' => $locales, '--domains' => $domains, '--force' => true]);
 
-        $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages, validators" domain(s)).', trim($tester->getDisplay()));
     }
 
     public function testDeleteMissingMessages()

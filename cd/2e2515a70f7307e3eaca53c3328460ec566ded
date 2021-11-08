@@ -1,0 +1,128 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-09-27T18:09:29Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-27T18:23:05Z
+
+I know nothing about merging between major branches in Symfony. So I need help to merge it properly.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-09-28T14:22:36Z
+
+Hey!
+
+I think @micheh has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-30T09:47:04Z
+
+Rebase needed. While doing so, please remove the`use ExpectDeprecationTrait` from `FrameworkExtensionTest` and the `symfony/deprecation-contracts` dependency from the FrameworkBundle `composer.json`.
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-30T19:35:52Z
+
+@chalasr without the `ExpectDeprecationTrait` I cannot test notice about the `reset_on_message` option. I added it to indicate changing of default behaviour. Details in https://github.com/symfony/symfony/pull/43133#issuecomment-927140162
+
+Did I something wrong? :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-09-30T19:40:16Z
+
+Indeed sorry, I've been fooled by the current PR title (*remove*...).  Can you please update it so that it reflects what the PR does?
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-09-30T19:45:42Z
+
+My fault. Sorry for that
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-10-12T08:41:39Z
+
+@chalasr :wave:
+Is it still something to fix?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-12T08:48:27Z
+
+@upyx hey :) This looks good to me except one minor detail: https://github.com/symfony/symfony/pull/43203#pullrequestreview-766474612
+The `reset_on_message` option is a FrameworkBundle thing , not Messenger. As such UPGRADE entries should be put under the `FrameworkBundle` section. Same for the CHANGELOG (should be moved from the component's CHANGELOG to the bundle's one).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-27T11:27:23Z
+
+@upyx Do you want us to finish this PR for you? Or are you in capacity to do it?
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-10-27T14:02:00Z
+
+@chalasr I'm in progress right now :runner:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-10-28T13:42:09Z
+
+@upyx We are almost good here. The remaining test fixtures that use `reset_on_message: true` should either be updated to not set the option anymore, or the tests using it should be marked as `@group legacy`. As you prefer :)
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-10-28T14:40:23Z
+
+@chalasr Done :wink:
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-10-29T13:35:46Z
+
+> The deprecation should only happen in 6.1.
+
+Hm... OK.
+So, I'll remove the deprecation notice, but "reset_on_message" configuration still apcepts "true" only. After releasing 6.0, I'll return the notice again.
+
+@fabpot Is it acceptable?
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-10-29T13:52:37Z
+
+I'm following the plan in https://github.com/symfony/symfony/pull/43133#issuecomment-927140162.
+
+More precisely, there isn't the default value of the option. The only assignment of options is indicating that default behavior will change. It might not be the best strategy.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-11-03T07:39:42Z
+
+@upyx Looks like a plan.
+
+---------------------------------------------------------------------------
+
+by upyx at 2021-11-05T19:53:22Z
+
+@chalasr I removed the `symfony/deprecation-contracts` as you asked.
+
+@fabpot The first part is done.

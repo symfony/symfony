@@ -136,6 +136,18 @@ class CurlHttpClientTest extends HttpClientTestCase
         parent::testTimeoutIsNotAFatalError();
     }
 
+    public function testHandleIsReinitOnReset()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+
+        $r = new \ReflectionProperty($httpClient, 'multi');
+        $r->setAccessible(true);
+        $clientState = $r->getValue($httpClient);
+        $initialHandleId = (int) $clientState->handle;
+        $httpClient->reset();
+        self::assertNotSame($initialHandleId, (int) $clientState->handle);
+    }
+
     private function getVulcainClient(): CurlHttpClient
     {
         if (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304) {

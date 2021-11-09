@@ -17,6 +17,7 @@ use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Symfony\Component\Notifier\Bridge\KazInfoTeh\KazInfoTehTransportFactory;
 use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -2469,6 +2470,7 @@ class FrameworkExtension extends Extension
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
             YunpianTransportFactory::class => 'notifier.transport_factory.yunpian',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
+            KazInfoTehTransportFactory::class => 'notifier.transport_factory.kazinfoteh',
         ];
 
         $parentPackages = ['symfony/framework-bundle', 'symfony/notifier'];
@@ -2490,6 +2492,7 @@ class FrameworkExtension extends Extension
                 case 'smsbiuras': $package = 'sms-biuras'; break;
                 case 'spothit': $package = 'spot-hit'; break;
                 case 'turbosms': $package = 'turbo-sms'; break;
+                case 'kazinfoteh': $package = 'kazinfoteh'; break;
             }
 
             if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-notifier', $package), $class, $parentPackages)) {

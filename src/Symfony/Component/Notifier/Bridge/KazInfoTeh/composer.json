@@ -1,0 +1,31 @@
+{
+  "name": "symfony/kazinfoteh-notifier",
+  "type": "symfony-bridge",
+  "description": "Symfony KazInfoTeh Notifier Bridge",
+  "keywords": ["KazInfoTeh", "notifier"],
+  "homepage": "https://symfony.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Egor Taranov",
+      "email": "dev@taranovegor.com",
+      "homepage": "https://taranovegor.com/contribution"
+    },
+    {
+      "name": "Symfony Community",
+      "homepage": "https://symfony.com/contributors"
+    }
+  ],
+  "require": {
+    "php": ">=7.2.5",
+    "symfony/http-client": "^4.3|^5.0",
+    "symfony/notifier": "^5.3"
+  },
+  "autoload": {
+    "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\KazInfoTeh\\": "" },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  },
+  "minimum-stability": "dev"
+}

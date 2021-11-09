@@ -2,12 +2,24 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 
-class ClearableService
+use Symfony\Contracts\Service\ResetInterface;
+
+class ClearableService implements ClearableInterface, ResetInterface
 {
     public static $counter = 0;
 
     public function clear()
     {
         ++self::$counter;
+    }
+
+    public static function create()
+    {
+        return new self();
+    }
+
+    public function reset()
+    {
+        self::$counter = 0;
     }
 }

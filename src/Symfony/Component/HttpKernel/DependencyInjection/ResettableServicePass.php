@@ -57,6 +57,10 @@ class ResettableServicePass implements CompilerPassInterface
                     $methods[$id] = [];
                 }
 
+                if ('ignore' === ($attributes['on_invalid'] ?? null)) {
+                    $attributes['method'] = '?'.$attributes['method'];
+                }
+
                 $methods[$id][] = $attributes['method'];
             }
         }

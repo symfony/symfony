@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
  * completion is expected.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
+ * @author Jitendra A <adhocore@gmail.com>
  */
 final class CompletionInput extends ArgvInput
 {
@@ -32,6 +33,7 @@ final class CompletionInput extends ArgvInput
     public const TYPE_NONE = 'none';
 
     private $tokens;
+    private $shell = '';
     private $currentIndex;
     private $completionType;
     private $completionName = null;
@@ -177,6 +179,16 @@ final class CompletionInput extends ArgvInput
     public function mustSuggestArgumentValuesFor(string $argumentName): bool
     {
         return self::TYPE_ARGUMENT_VALUE === $this->getCompletionType() && $argumentName === $this->getCompletionName();
+    }
+
+    public function setShell(string $shell): void
+    {
+        $this->shell = $shell;
+    }
+
+    public function isShell(string $shell): bool
+    {
+        return $this->shell === $shell;
     }
 
     protected function parseToken(string $token, bool $parseOptions): bool

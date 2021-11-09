@@ -47,7 +47,7 @@ class CompleteCommandTest extends TestCase
 
     public function testUnsupportedShellOption()
     {
-        $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash", "fish").');
+        $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash", "fish", "zsh").');
         $this->execute(['--shell' => 'unsupported']);
     }
 
@@ -125,6 +125,57 @@ class CompleteCommandTest extends TestCase
         yield 'custom-aliased' => [['bin/console', 'ahoy'], ['Fabien', 'Robin', 'Wouter']];
     }
 
+    /**
+     * @dataProvider provideZshCompleteCommandNameInputs
+     */
+    public function testZshCompleteCommandName(array $input, array $suggestions)
+    {
+        $this->execute(['--current' => '1', '--input' => $input, '--shell' => 'zsh']);
+        $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
+    }
+
+    public function provideZshCompleteCommandNameInputs()
+    {
+        yield 'empty' => [['bin/console'], [
+            'help'."\t".'Display help for a command',
+            'list'."\t".'List commands',
+            'completion'."\t".'Dump the shell completion script',
+            'hello'."\t".'Hello test command',
+            'ahoy'."\t".'Hello test command',
+        ]];
+        yield 'partial' => [['bin/console', 'he'], [
+            'help'."\t".'Display help for a command',
+            'list'."\t".'List commands',
+            'completion'."\t".'Dump the shell completion script',
+            'hello'."\t".'Hello test command',
+            'ahoy'."\t".'Hello test command',
+        ]];
+        yield 'complete-shortcut-name' => [['bin/console', 'hell'], ['hello', 'ahoy']];
+    }
+
+    /**
+     * @dataProvider provideZshCompleteCommandInputDefinitionInputs
+     */
+    public function testZshCompleteCommandInputDefinition(array $input, array $suggestions)
+    {
+        $this->execute(['--current' => '2', '--input' => $input, '--shell' => 'zsh']);
+        $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
+    }
+
+    public function provideZshCompleteCommandInputDefinitionInputs()
+    {
+        yield 'definition' => [['bin/console', 'hello', '-'], [
+            '--help'."\t".'Display help for the given command. When no command is given display help for the list command',
+            '--quiet'."\t".'Do not output any message',
+            '--verbose'."\t".'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug',
+            '--version'."\t".'Display this application version',
+            '--ansi'."\t".'Force (or disable --no-ansi) ANSI output',
+            '--no-ansi'."\t".'Force (or disable --no-ansi) ANSI output',
+            '--no-interaction'."\t".'Do not ask any interactive question',
+        ]];
+        yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];
+    }
+
     private function execute(array $input)
     {
         // run in verbose mode to assert exceptions
@@ -138,6 +189,7 @@ class CompleteCommandTest_HelloCommand extends Command
     {
         $this->setName('hello')
              ->setAliases(['ahoy'])
+             ->setDescription('Hello test command')
              ->addArgument('name', InputArgument::REQUIRED)
         ;
     }

@@ -89,7 +89,7 @@
                         "accept_value": true,
                         "is_value_required": true,
                         "is_multiple": false,
-                        "description": "The shell type (\"bash\", \"fish\")",
+                        "description": "The shell type (\"bash\", \"fish\", \"zsh\")",
                         "default": null
                     },
                     "current": {

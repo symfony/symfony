@@ -364,7 +364,7 @@ class Application implements ResetInterface
             && 'command' === $input->getCompletionName()
         ) {
             $suggestions->suggestValues(array_filter(array_map(function (Command $command) use ($input) {
-                return $command->isHidden() ? null : $command->getName() . ($input->isShell('zsh') ? "\t".$command->getDescription() : '');
+                return $command->isHidden() ? null : $command->getName().($input->isShell('zsh') ? "\t".$command->getDescription() : '');
             }, $this->all())));
 
             return;

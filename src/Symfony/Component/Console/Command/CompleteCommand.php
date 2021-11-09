@@ -15,6 +15,7 @@ use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Output\BashCompletionOutput;
 use Symfony\Component\Console\Completion\Output\CompletionOutputInterface;
+use Symfony\Component\Console\Completion\Output\ZshCompletionOutput;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,6 +26,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Responsible for providing the values to the shell completion.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
+ * @author Jitendra A <adhocore@gmail.com>
  */
 final class CompleteCommand extends Command
 {
@@ -41,7 +43,10 @@ final class CompleteCommand extends Command
     public function __construct(array $completionOutputs = [])
     {
         // must be set before the parent constructor, as the property value is used in configure()
-        $this->completionOutputs = $completionOutputs + ['bash' => BashCompletionOutput::class];
+        $this->completionOutputs = $completionOutputs + [
+            'bash' => BashCompletionOutput::class,
+            'zsh' => ZshCompletionOutput::class,
+        ];
 
         parent::__construct();
     }
@@ -168,6 +173,7 @@ final class CompleteCommand extends Command
         }
 
         $completionInput = CompletionInput::fromTokens($input->getOption('input'), (int) $currentIndex);
+        $completionInput->setShell($input->getOption('shell'));
 
         try {
             $completionInput->bind($this->getApplication()->getDefinition());

@@ -1,6 +1,6 @@
 {
     "name": "symfony/postmark-mailer",
-    "type": "symfony-bridge",
+    "type": "symfony-mailer-bridge",
     "description": "Symfony Postmark Mailer Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

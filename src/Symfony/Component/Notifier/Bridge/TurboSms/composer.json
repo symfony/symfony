@@ -1,6 +1,6 @@
 {
     "name": "symfony/turbosms-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony TurboSms Notifier Bridge",
     "keywords": ["sms", "TurboSms", "notifier"],
     "homepage": "https://symfony.com",

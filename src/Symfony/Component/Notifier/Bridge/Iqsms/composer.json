@@ -1,6 +1,6 @@
 {
     "name": "symfony/iqsms-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Iqsms Notifier Bridge",
     "keywords": ["sms", "iqsms", "notifier"],
     "homepage": "https://symfony.com",

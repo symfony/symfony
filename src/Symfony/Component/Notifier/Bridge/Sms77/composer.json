@@ -1,6 +1,6 @@
 {
     "name": "symfony/sms77-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony sms77 Notifier Bridge",
     "keywords": ["sms", "sms77", "notifier"],
     "homepage": "https://symfony.com",

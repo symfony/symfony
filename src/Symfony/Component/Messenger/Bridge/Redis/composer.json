@@ -1,6 +1,6 @@
 {
     "name": "symfony/redis-messenger",
-    "type": "symfony-bridge",
+    "type": "symfony-messenger-bridge",
     "description": "Symfony Redis extension Messenger Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

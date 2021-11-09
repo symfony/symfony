@@ -1,6 +1,6 @@
 {
     "name": "symfony/message-bird-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony MessageBird Notifier Bridge",
     "keywords": ["sms", "message-bird", "notifier"],
     "homepage": "https://symfony.com",

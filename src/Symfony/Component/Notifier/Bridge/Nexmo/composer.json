@@ -1,6 +1,6 @@
 {
     "name": "symfony/nexmo-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Nexmo Notifier Bridge",
     "keywords": ["sms", "nexmo", "notifier"],
     "homepage": "https://symfony.com",

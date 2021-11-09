@@ -40,6 +40,10 @@ class ServicesResetter implements ResetInterface
     {
         foreach ($this->resettableServices as $id => $service) {
             foreach ((array) $this->resetMethods[$id] as $resetMethod) {
+                if ('?' === $resetMethod[0] && !method_exists($service, $resetMethod = substr($resetMethod, 1))) {
+                    continue;
+                }
+
                 $service->$resetMethod();
             }
         }

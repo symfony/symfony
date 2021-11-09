@@ -94,6 +94,11 @@
                                                 Profile
                                             </th>
                                         {% endif %}
+                                        {% if trace.curlCommand is not null %}
+                                            <th>
+                                                <button class="btn btn-sm hidden label" title="Copy as cURL command" data-clipboard-text="{{ trace.curlCommand }}">cURL</button>
+                                            </th>
+                                        {% endif %}
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -110,7 +115,7 @@
                                                 {{ trace.http_code }}
                                             </span>
                                         </th>
-                                        <td>
+                                        <td{% if trace.curlCommand %} colspan="2"{% endif %}>
                                             {{ profiler_dump(trace.info, maxDepth=1) }}
                                         </td>
                                         {% if profiler_token and profiler_link %}

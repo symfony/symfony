@@ -79,6 +79,17 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
             return false;
         }
 
+        // do not overwrite already stored tokens from the same user (i.e. from the session)
+        $token = $this->tokenStorage->getToken();
+
+        if ($token instanceof PreAuthenticatedToken && $this->firewallName === $token->getFirewallName() && $token->getUserIdentifier() === $username) {
+            if (null !== $this->logger) {
+                $this->logger->debug('Skipping pre-authenticated authenticator as the user already has an existing session.', ['authenticator' => static::class]);
+            }
+
+            return false;
+        }
+
         $request->attributes->set('_pre_authenticated_username', $username);
 
         return true;

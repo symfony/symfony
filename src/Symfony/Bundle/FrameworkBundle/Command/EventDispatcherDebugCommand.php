@@ -132,8 +132,15 @@ EOF
             }
 
             $dispatcher = $this->dispatchers->get($dispatcherServiceName);
+            $listeners = $dispatcher->getListeners();
+            $eventNames = array_keys($listeners);
+            $listenersName = [];
+            foreach ($listeners as $listOfListener) {
+                $listenersName = array_merge($listenersName, $listOfListener);
+            }
             $suggestions->suggestValues(array_merge(
-                $dispatcher->getListeners()
+                $eventNames,
+                $listenersName,
             ));
 
             return;

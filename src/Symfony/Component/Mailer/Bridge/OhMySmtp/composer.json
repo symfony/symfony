@@ -1,6 +1,6 @@
 {
     "name": "symfony/oh-my-smtp-mailer",
-    "type": "symfony-bridge",
+    "type": "symfony-mailer-bridge",
     "description": "Symfony OhMySMTP Mailer Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

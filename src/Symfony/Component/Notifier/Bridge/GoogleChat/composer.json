@@ -1,6 +1,6 @@
 {
     "name": "symfony/google-chat-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Google Chat Notifier Bridge",
     "keywords": ["google", "chat", "google chat", "notifier"],
     "homepage": "https://symfony.com",

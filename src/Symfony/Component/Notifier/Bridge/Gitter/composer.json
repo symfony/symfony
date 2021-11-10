@@ -1,6 +1,6 @@
 {
     "name": "symfony/gitter-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Gitter Notifier Bridge",
     "keywords": ["chat", "gitter", "notifier"],
     "homepage": "https://symfony.com",

@@ -1,6 +1,6 @@
 {
     "name": "symfony/mobyt-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Mobyt Notifier Bridge",
     "keywords": ["sms", "mobyt", "notifier"],
     "homepage": "https://symfony.com",

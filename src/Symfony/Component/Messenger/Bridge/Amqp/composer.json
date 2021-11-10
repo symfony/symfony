@@ -1,6 +1,6 @@
 {
     "name": "symfony/amqp-messenger",
-    "type": "symfony-bridge",
+    "type": "symfony-messenger-bridge",
     "description": "Symfony AMQP extension Messenger Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

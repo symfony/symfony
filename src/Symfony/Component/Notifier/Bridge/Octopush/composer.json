@@ -1,6 +1,6 @@
 {
     "name": "symfony/octopush-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Octopush Notifier Bridge",
     "keywords": ["sms", "octopush", "notifier"],
     "homepage": "https://symfony.com",

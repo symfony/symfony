@@ -1,6 +1,6 @@
 {
     "name": "symfony/twilio-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Twilio Notifier Bridge",
     "keywords": ["sms", "twilio", "notifier"],
     "homepage": "https://symfony.com",

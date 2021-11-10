@@ -1,6 +1,6 @@
 {
   "name": "symfony/message-media-notifier",
-  "type": "symfony-bridge",
+  "type": "symfony-notifier-bridge",
   "description": "Symfony MessageMedia Notifier Bridge",
   "keywords": ["sms", "messagemedia", "notifier"],
   "homepage": "https://symfony.com",

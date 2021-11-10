@@ -1,6 +1,6 @@
 {
     "name": "symfony/infobip-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Infobip Notifier Bridge",
     "keywords": ["sms", "infobip", "notifier"],
     "homepage": "https://symfony.com",

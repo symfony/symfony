@@ -119,7 +119,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
             }
         } while ($reflectionObject = $reflectionObject->getParentClass());
 
-        return $attributes;
+        return array_unique($attributes);
     }
 
     /**

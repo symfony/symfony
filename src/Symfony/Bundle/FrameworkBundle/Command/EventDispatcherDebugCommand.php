@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -56,7 +58,8 @@ class EventDispatcherDebugCommand extends Command
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ])
             ->setDescription(self::$defaultDescription)
-            ->setHelp(<<<'EOF'
+            ->setHelp(
+                <<<'EOF'
 The <info>%command.name%</info> command displays all configured listeners:
 
   <info>php %command.full_name%</info>
@@ -118,6 +121,40 @@ EOF
         $helper->describe($io, $dispatcher, $options);
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('event')) {
+            $dispatcherServiceName = $input->getOption('dispatcher');
+            if (!$this->dispatchers->has($dispatcherServiceName)) {
+                return;
+            }
+
+            $dispatcher = $this->dispatchers->get($dispatcherServiceName);
+            $suggestions->suggestValues(array_merge(
+                $dispatcher->getListeners()
+            ));
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('dispatcher')) {
+            $suggestions->suggestValues(array_merge(
+                $this->dispatchers->getServiceIds(),
+                $this->dispatchers->getAliases()
+            ));
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues(
+                (new DescriptorHelper())->getFormats()
+            );
+
+            return;
+        }
     }
 
     private function searchForEvent(EventDispatcherInterface $dispatcher, string $needle): array

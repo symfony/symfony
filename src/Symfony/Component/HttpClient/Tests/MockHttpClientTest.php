@@ -418,4 +418,16 @@ class MockHttpClientTest extends HttpClientTestCase
 
         $this->assertSame('foo=bar', $response->getRequestOptions()['body']);
     }
+
+    public function testResetsRequestCount()
+    {
+        $client = new MockHttpClient([new MockResponse()]);
+        $this->assertSame(0, $client->getRequestsCount());
+
+        $client->request('POST', '/url', ['body' => 'payload']);
+
+        $this->assertSame(1, $client->getRequestsCount());
+        $client->reset();
+        $this->assertSame(0, $client->getRequestsCount());
+    }
 }

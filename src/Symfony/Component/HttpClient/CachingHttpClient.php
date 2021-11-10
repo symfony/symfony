@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\HttpClientKernel;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Adds caching on top of an HTTP client.
@@ -30,7 +31,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CachingHttpClient implements HttpClientInterface
+class CachingHttpClient implements HttpClientInterface, ResetInterface
 {
     use HttpClientTrait;
 
@@ -140,5 +141,12 @@ class CachingHttpClient implements HttpClientInterface
             yield from MockResponse::stream($mockResponses, $timeout);
             yield $this->client->stream($clientResponses, $timeout);
         })());
+    }
+
+    public function reset()
+    {
+        if ($this->client instanceof ResetInterface) {
+            $this->client->reset();
+        }
     }
 }

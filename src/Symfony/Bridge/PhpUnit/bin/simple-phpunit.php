@@ -238,7 +238,10 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         $passthruOrFail("$COMPOSER config --unset platform.php");
     }
     if (file_exists($path = $root.'/vendor/symfony/phpunit-bridge')) {
-        $p = str_repeat('../', substr_count("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR", '/', strlen($root))).'vendor/symfony/phpunit-bridge';
+        $haystack = "$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR";
+        $rootLen = strlen($root);
+
+        $p = ($rootLen <= strlen($haystack) ? str_repeat('../', substr_count($haystack, '/', $rootLen)) : '').'vendor/symfony/phpunit-bridge';
         if (realpath($p) === realpath($path)) {
             $path = $p;
         }

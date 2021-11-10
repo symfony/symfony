@@ -19,6 +19,7 @@
         "php": ">=7.2.5",
         "symfony/http-client": "^5.3",
         "symfony/config": "^5.3",
+        "symfony/polyfill-php80": "^1.23",
         "symfony/translation": "^5.3"
     },
     "autoload": {

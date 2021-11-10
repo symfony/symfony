@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-11-09T11:08:53Z
+
+To me, this kind of discovery is better handled using keywords than using the type (which has a single value).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-09T11:12:44Z
+
+Updating the type still makes sense to me: e.g. `symfony-messenger-bridge` is a better type description than `symfony-bridge` to me.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-11-09T11:34:31Z
+
+On packagist there is a filter on tags, not on type. How would you search a package on its type?
+
+https://packagist.org/?query=symfony-bridge does not return symfony packages.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-09T11:35:31Z
+
+https://packagist.org/?type=symfony-bridge
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-09T11:35:44Z
+
+@GromNaN packagist has both a filter by type and by tags (packagist's name for keywords). But the `query` parameter is about searching by name.

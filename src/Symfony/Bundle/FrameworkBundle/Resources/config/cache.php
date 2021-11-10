@@ -245,7 +245,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(CacheItemPoolInterface::class, 'cache.app')
 
         ->alias(AdapterInterface::class, 'cache.app')
-            ->deprecate('symfony/framework-bundle', '5.4', 'The "%alias_id%" alias is deprecated, use "%s" instead.', CacheItemPoolInterface::class)
+            ->deprecate('symfony/framework-bundle', '5.4', sprintf('The "%%alias_id%%" alias is deprecated, use "%s" instead.', CacheItemPoolInterface::class))
 
         ->alias(CacheInterface::class, 'cache.app')
 

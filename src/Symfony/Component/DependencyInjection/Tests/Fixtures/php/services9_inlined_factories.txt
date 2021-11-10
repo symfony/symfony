@@ -562,7 +562,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
-require __DIR__.'/Container%s/ProjectServiceContainer.php';
+(require __DIR__.'/Container%s/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
 
 $classes = [];
 $classes[] = 'Bar\FooClass';

@@ -215,7 +215,7 @@ class PhpDumper extends Dumper
         }
 
         $code =
-            $this->startClass($options['class'], $baseClass).
+            $this->startClass($options['class'], $baseClass, $this->inlineFactories && $proxyClasses).
             $this->addServices($services).
             $this->addDeprecatedAliases().
             $this->addDefaultParametersMethod()
@@ -270,9 +270,11 @@ EOF;
 
             $code .= $this->endClass();
 
-            if ($this->inlineFactories) {
+            if ($this->inlineFactories && $proxyClasses) {
+                $files['proxy-classes.php'] = "<?php\n\n";
+
                 foreach ($proxyClasses as $c) {
-                    $code .= $c;
+                    $files['proxy-classes.php'] .= $c;
                 }
             }
 
@@ -306,7 +308,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require $autoloadFile;
-require __DIR__.'/Container{$hash}/{$options['class']}.php';
+(require __DIR__.'/Container{$hash}/{$options['class']}.php')->set(\\Container{$hash}\\{$options['class']}::class, null);
 
 \$classes = [];
 
@@ -1124,7 +1126,7 @@ EOTXT
         return $return.sprintf('new %s(%s)', $this->dumpLiteralClass($this->dumpValue($class)), implode(', ', $arguments)).$tail;
     }
 
-    private function startClass(string $class, string $baseClass): string
+    private function startClass(string $class, string $baseClass, bool $hasProxyClasses): string
     {
         $namespaceLine = !$this->asFiles && $this->namespace ? "\nnamespace {$this->namespace};\n" : '';
 
@@ -1187,7 +1189,7 @@ EOF;
         $code .= $this->addMethodMap();
         $code .= $this->asFiles && !$this->inlineFactories ? $this->addFileMap() : '';
         $code .= $this->addAliases();
-        $code .= $this->addInlineRequires();
+        $code .= $this->addInlineRequires($hasProxyClasses);
         $code .= <<<EOF
     }
 
@@ -1387,15 +1389,12 @@ EOF;
         return $code;
     }
 
-    private function addInlineRequires(): string
+    private function addInlineRequires(bool $hasProxyClasses): string
     {
-        if (!$this->hotPathTag || !$this->inlineRequires) {
-            return '';
-        }
-
         $lineage = [];
+        $hotPathServices = $this->hotPathTag && $this->inlineRequires ? $this->container->findTaggedServiceIds($this->hotPathTag) : [];
 
-        foreach ($this->container->findTaggedServiceIds($this->hotPathTag) as $id => $tags) {
+        foreach ($hotPathServices as $id => $tags) {
             $definition = $this->container->getDefinition($id);
 
             if ($this->getProxyDumper()->isProxyCandidate($definition)) {
@@ -1418,6 +1417,10 @@ EOF;
                 $this->inlinedRequires[$file] = true;
                 $code .= sprintf("\n            include_once %s;", $file);
             }
+        }
+
+        if ($hasProxyClasses) {
+            $code .= "\n            include __DIR__.'/proxy-classes.php';";
         }
 
         return $code ? sprintf("\n        \$this->privates['service_container'] = function () {%s\n        };\n", $code) : '';

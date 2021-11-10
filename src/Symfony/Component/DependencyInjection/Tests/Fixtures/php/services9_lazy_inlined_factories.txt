@@ -7,6 +7,13 @@ return [
     'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
 ];
 
+    [Container%s/proxy-classes.php] => <?php
+
+include_once $this->targetDir.''.'/Fixtures/includes/foo.php';
+
+class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualProxyInterface
+%A
+
     [Container%s/ProjectServiceContainer.php] => <?php
 
 namespace Container%s;
@@ -46,6 +53,10 @@ class ProjectServiceContainer extends Container
         ];
 
         $this->aliases = [];
+
+        $this->privates['service_container'] = function () {
+            include_once __DIR__.'/proxy-classes.php';
+        };
     }
 
     public function compile(): void
@@ -161,15 +172,10 @@ class ProjectServiceContainer extends Container
         ];
     }
 }
-include_once $this->targetDir.''.'/Fixtures/includes/foo.php';
-
-class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualProxyInterface
-{
-%A
-}
 
     [ProjectServiceContainer.preload.php] => <?php
 %A
+(require __DIR__.'/Container%s/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
 
 $classes = [];
 $classes[] = 'Bar\FooClass';

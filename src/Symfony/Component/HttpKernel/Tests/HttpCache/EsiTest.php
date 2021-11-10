@@ -221,6 +221,15 @@ class EsiTest extends TestCase
         $this->assertEquals('bar', $esi->handle($cache, '/', '/alt', false));
     }
 
+    public function testHandleWhenResponseIsNotModified()
+    {
+        $esi = new Esi();
+        $response = new Response('');
+        $response->setStatusCode(304);
+        $cache = $this->getCache(Request::create('/'), $response);
+        $this->assertEquals('', $esi->handle($cache, '/', '/alt', true));
+    }
+
     protected function getCache($request, $response)
     {
         $cache = $this->getMockBuilder(HttpCache::class)->setMethods(['getRequest', 'handle'])->disableOriginalConstructor()->getMock();

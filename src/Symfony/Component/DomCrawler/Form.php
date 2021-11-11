@@ -54,9 +54,9 @@ class Form extends Link implements \ArrayAccess
      *
      * @param array $values An array of field values
      *
-     * @return $this
+     * @return static
      */
-    public function setValues(array $values): static
+    public function setValues(array $values)
     {
         foreach ($values as $name => $value) {
             $this->fields->set($name, $value);
@@ -258,7 +258,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
-    public function get(string $name): FormField|array
+    public function get(string $name)
     {
         return $this->fields->get($name);
     }
@@ -300,7 +300,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetGet(mixed $name): FormField|array
+    public function offsetGet(mixed $name)
     {
         return $this->fields->get($name);
     }

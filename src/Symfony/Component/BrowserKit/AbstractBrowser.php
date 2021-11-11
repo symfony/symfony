@@ -132,8 +132,10 @@ abstract class AbstractBrowser
 
     /**
      * Gets single server parameter for specified key.
+     *
+     * @return mixed
      */
-    public function getServerParameter(string $key, mixed $default = ''): mixed
+    public function getServerParameter(string $key, mixed $default = '')
     {
         return $this->server[$key] ?? $default;
     }

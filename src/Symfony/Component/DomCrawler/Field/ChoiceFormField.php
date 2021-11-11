@@ -284,9 +284,9 @@ class ChoiceFormField extends FormField
      *
      * @internal
      *
-     * @return $this
+     * @return static
      */
-    public function disableValidation(): static
+    public function disableValidation()
     {
         $this->validationDisabled = true;
 

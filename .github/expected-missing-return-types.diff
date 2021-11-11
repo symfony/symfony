@@ -17,31 +17,38 @@ index 0ad5f625a7..f614f93465 100644
          ]
      },
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-index 152050159b..e2ec1aeea2 100644
+index ac92a0f85e..93780da419 100644
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-@@ -408,5 +408,5 @@ abstract class AbstractBrowser
+@@ -136,5 +136,5 @@ abstract class AbstractBrowser
+      * @return mixed
+      */
+-    public function getServerParameter(string $key, mixed $default = '')
++    public function getServerParameter(string $key, mixed $default = ''): mixed
+     {
+         return $this->server[$key] ?? $default;
+@@ -410,5 +410,5 @@ abstract class AbstractBrowser
       * @throws \RuntimeException When processing returns exit code
       */
 -    protected function doRequestInProcess(object $request)
 +    protected function doRequestInProcess(object $request): object
      {
          $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
-@@ -441,5 +441,5 @@ abstract class AbstractBrowser
+@@ -443,5 +443,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    abstract protected function doRequest(object $request);
 +    abstract protected function doRequest(object $request): object;
  
      /**
-@@ -460,5 +460,5 @@ abstract class AbstractBrowser
+@@ -462,5 +462,5 @@ abstract class AbstractBrowser
       * @return object
       */
 -    protected function filterRequest(Request $request)
 +    protected function filterRequest(Request $request): object
      {
          return $request;
-@@ -470,5 +470,5 @@ abstract class AbstractBrowser
+@@ -472,5 +472,5 @@ abstract class AbstractBrowser
       * @return Response
       */
 -    protected function filterResponse(object $response)
@@ -327,6 +334,162 @@ index a9d78115dd..8b3b420a9c 100644
 -    public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator);
 +    public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator): object;
  }
+diff --git a/src/Symfony/Component/DomCrawler/Crawler.php b/src/Symfony/Component/DomCrawler/Crawler.php
+index 6f101f2108..c1db1aff24 100644
+--- a/src/Symfony/Component/DomCrawler/Crawler.php
++++ b/src/Symfony/Component/DomCrawler/Crawler.php
+@@ -306,5 +306,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @return static
+      */
+-    public function eq(int $position)
++    public function eq(int $position): static
+     {
+         if (isset($this->nodes[$position])) {
+@@ -346,5 +346,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @return static
+      */
+-    public function slice(int $offset = 0, int $length = null)
++    public function slice(int $offset = 0, int $length = null): static
+     {
+         return $this->createSubCrawler(\array_slice($this->nodes, $offset, $length));
+@@ -360,5 +360,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @return static
+      */
+-    public function reduce(\Closure $closure)
++    public function reduce(\Closure $closure): static
+     {
+         $nodes = [];
+@@ -377,5 +377,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @return static
+      */
+-    public function first()
++    public function first(): static
+     {
+         return $this->eq(0);
+@@ -387,5 +387,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @return static
+      */
+-    public function last()
++    public function last(): static
+     {
+         return $this->eq(\count($this->nodes) - 1);
+@@ -399,5 +399,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @throws \InvalidArgumentException When current node is empty
+      */
+-    public function siblings()
++    public function siblings(): static
+     {
+         if (!$this->nodes) {
+@@ -454,5 +454,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @throws \InvalidArgumentException When current node is empty
+      */
+-    public function nextAll()
++    public function nextAll(): static
+     {
+         if (!$this->nodes) {
+@@ -470,5 +470,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @throws \InvalidArgumentException
+      */
+-    public function previousAll()
++    public function previousAll(): static
+     {
+         if (!$this->nodes) {
+@@ -486,5 +486,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @throws \InvalidArgumentException When the current node is empty
+      */
+-    public function ancestors()
++    public function ancestors(): static
+     {
+         if (!$this->nodes) {
+@@ -512,5 +512,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @throws \RuntimeException         If the CssSelector Component is not available and $selector is provided
+      */
+-    public function children(string $selector = null)
++    public function children(string $selector = null): static
+     {
+         if (!$this->nodes) {
+@@ -715,5 +715,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @return static
+      */
+-    public function filterXPath(string $xpath)
++    public function filterXPath(string $xpath): static
+     {
+         $xpath = $this->relativize($xpath);
+@@ -736,5 +736,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @throws \RuntimeException if the CssSelector Component is not available
+      */
+-    public function filter(string $selector)
++    public function filter(string $selector): static
+     {
+         $converter = $this->createCssSelectorConverter();
+@@ -749,5 +749,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @return static
+      */
+-    public function selectLink(string $value)
++    public function selectLink(string $value): static
+     {
+         return $this->filterRelativeXPath(
+@@ -761,5 +761,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @return static
+      */
+-    public function selectImage(string $value)
++    public function selectImage(string $value): static
+     {
+         $xpath = sprintf('descendant-or-self::img[contains(normalize-space(string(@alt)), %s)]', static::xpathLiteral($value));
+@@ -773,5 +773,5 @@ class Crawler implements \Countable, \IteratorAggregate
+      * @return static
+      */
+-    public function selectButton(string $value)
++    public function selectButton(string $value): static
+     {
+         return $this->filterRelativeXPath(
+diff --git a/src/Symfony/Component/DomCrawler/Field/ChoiceFormField.php b/src/Symfony/Component/DomCrawler/Field/ChoiceFormField.php
+index d72af82d29..122cfc9335 100644
+--- a/src/Symfony/Component/DomCrawler/Field/ChoiceFormField.php
++++ b/src/Symfony/Component/DomCrawler/Field/ChoiceFormField.php
+@@ -287,5 +287,5 @@ class ChoiceFormField extends FormField
+      * @return static
+      */
+-    public function disableValidation()
++    public function disableValidation(): static
+     {
+         $this->validationDisabled = true;
+diff --git a/src/Symfony/Component/DomCrawler/Field/FormField.php b/src/Symfony/Component/DomCrawler/Field/FormField.php
+index bd316e60d2..e952bc4ef4 100644
+--- a/src/Symfony/Component/DomCrawler/Field/FormField.php
++++ b/src/Symfony/Component/DomCrawler/Field/FormField.php
+@@ -88,5 +88,5 @@ abstract class FormField
+      * @return string|array|null
+      */
+-    public function getValue()
++    public function getValue(): string|array|null
+     {
+         return $this->value;
+diff --git a/src/Symfony/Component/DomCrawler/Form.php b/src/Symfony/Component/DomCrawler/Form.php
+index adfbefb73c..98f4d823c6 100644
+--- a/src/Symfony/Component/DomCrawler/Form.php
++++ b/src/Symfony/Component/DomCrawler/Form.php
+@@ -57,5 +57,5 @@ class Form extends Link implements \ArrayAccess
+      * @return static
+      */
+-    public function setValues(array $values)
++    public function setValues(array $values): static
+     {
+         foreach ($values as $name => $value) {
+@@ -259,5 +259,5 @@ class Form extends Link implements \ArrayAccess
+      * @throws \InvalidArgumentException When field is not present in this form
+      */
+-    public function get(string $name)
++    public function get(string $name): FormField|array
+     {
+         return $this->fields->get($name);
+@@ -301,5 +301,5 @@ class Form extends Link implements \ArrayAccess
+      * @throws \InvalidArgumentException if the field does not exist
+      */
+-    public function offsetGet(mixed $name)
++    public function offsetGet(mixed $name): mixed
+     {
+         return $this->fields->get($name);
 diff --git a/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php b/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php
 index 2085e428e9..ca0d6964e5 100644
 --- a/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php

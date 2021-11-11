@@ -84,8 +84,10 @@ abstract class FormField
 
     /**
      * Gets the value of the field.
+     *
+     * @return string|array|null
      */
-    public function getValue(): string|array|null
+    public function getValue()
     {
         return $this->value;
     }

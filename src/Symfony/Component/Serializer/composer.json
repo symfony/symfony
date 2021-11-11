@@ -36,6 +36,7 @@
         "symfony/property-access": "^5.1|^6.0",
         "symfony/property-info": "^5.3|^6.0",
         "symfony/uid": "^5.1|^6.0",
+        "symfony/translation": "^5.2|^6.0",
         "symfony/validator": "^4.4|^5.0|^6.0",
         "symfony/var-dumper": "^4.4|^5.0|^6.0",
         "symfony/var-exporter": "^4.4|^5.0|^6.0",

@@ -40,25 +40,6 @@ class TagAwareAdapterTest extends AdapterTestCase
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
-    /**
-     * Test feature specific to TagAwareAdapter as it implicit needs to save deferred when also saving expiry info.
-     */
-    public function testInvalidateCommitsSeperatePools()
-    {
-        $pool1 = $this->createCachePool();
-
-        $foo = $pool1->getItem('foo');
-        $foo->tag('tag');
-
-        $pool1->saveDeferred($foo->set('foo'));
-        $pool1->invalidateTags(['tag']);
-
-        $pool2 = $this->createCachePool();
-        $foo = $pool2->getItem('foo');
-
-        $this->assertTrue($foo->isHit());
-    }
-
     public function testPrune()
     {
         $cache = new TagAwareAdapter($this->getPruneableMock());
@@ -84,6 +65,7 @@ class TagAwareAdapterTest extends AdapterTestCase
 
         $tag = $this->createMock(CacheItemInterface::class);
         $tag->expects(self::exactly(2))->method('get')->willReturn(10);
+        $tag->expects(self::exactly(2))->method('set')->willReturn($tag);
 
         $tagsPool->expects(self::exactly(2))->method('getItems')->willReturn([
             'baz'.TagAwareAdapter::TAGS_PREFIX => $tag,

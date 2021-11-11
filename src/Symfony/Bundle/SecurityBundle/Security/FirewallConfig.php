@@ -113,7 +113,7 @@ final class FirewallConfig
     }
 
     /**
-     * @deprecated since Symfony 5.4, use {@see getListeners()} instead
+     * @deprecated since Symfony 5.4, use {@see getAuthenticators()} instead
      */
     public function getListeners(): array
     {

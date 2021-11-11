@@ -181,11 +181,9 @@ final class CompletionInput extends ArgvInput
         return self::TYPE_ARGUMENT_VALUE === $this->getCompletionType() && $argumentName === $this->getCompletionName();
     }
 
-    public function setShell(string $shell): string
+    public function setShell(string $shell): void
     {
-        [$this->shell, $old] = [$shell, $this->shell];
-
-        return $old;
+        $this->shell = $shell;
     }
 
     public function isShell(string $shell): bool

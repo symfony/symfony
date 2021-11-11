@@ -30,7 +30,7 @@ class WorkflowTest extends TestCase
         $subject = new Subject();
         $workflow = new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class));
 
-        $workflow->getMarking($subject);
+        $workflow->getWorkflowMarking($subject);
     }
 
     public function testGetMarkingWithEmptyDefinition()
@@ -40,7 +40,7 @@ class WorkflowTest extends TestCase
         $subject = new Subject();
         $workflow = new Workflow(new Definition([], []), new MethodMarkingStore());
 
-        $workflow->getMarking($subject);
+        $workflow->getWorkflowMarking($subject);
     }
 
     public function testGetMarkingWithImpossiblePlace()
@@ -51,7 +51,7 @@ class WorkflowTest extends TestCase
         $subject->setMarking(['nope' => 1]);
         $workflow = new Workflow(new Definition([], []), new MethodMarkingStore());
 
-        $workflow->getMarking($subject);
+        $workflow->getWorkflowMarking($subject);
     }
 
     public function testGetMarkingWithEmptyInitialMarking()
@@ -60,7 +60,7 @@ class WorkflowTest extends TestCase
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
-        $marking = $workflow->getMarking($subject);
+        $marking = $workflow->getWorkflowMarking($subject);
 
         $this->assertInstanceOf(Marking::class, $marking);
         $this->assertTrue($marking->has('a'));
@@ -74,7 +74,7 @@ class WorkflowTest extends TestCase
         $subject->setMarking(['b' => 1, 'c' => 1]);
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
-        $marking = $workflow->getMarking($subject);
+        $marking = $workflow->getWorkflowMarking($subject);
 
         $this->assertInstanceOf(Marking::class, $marking);
         $this->assertTrue($marking->has('b'));

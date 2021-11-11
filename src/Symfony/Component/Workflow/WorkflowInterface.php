@@ -26,8 +26,19 @@ interface WorkflowInterface
      * @return Marking The Marking
      *
      * @throws LogicException
+     *
+     * @deprecated since Symfony 5.3 use getWorkflowMarking instead.
      */
-    public function getMarking(object $subject, array $context = []);
+    public function getMarking(object $subject);
+
+    /**
+     * Returns the object's Marking.
+     *
+     * @return Marking The Marking
+     *
+     * @throws LogicException
+     */
+    public function getWorkflowMarking(object $subject, array $context = []);
 
     /**
      * Returns true if the transition is enabled.

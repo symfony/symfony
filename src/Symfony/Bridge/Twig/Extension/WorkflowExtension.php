@@ -76,7 +76,7 @@ final class WorkflowExtension extends AbstractExtension
      */
     public function hasMarkedPlace(object $subject, string $placeName, string $name = null, array $context = []): bool
     {
-        return $this->workflowRegistry->get($subject, $name)->getMarking($subject, $context)->has($placeName);
+        return $this->workflowRegistry->get($subject, $name)->getWorkflowMarking($subject, $context)->has($placeName);
     }
 
     /**
@@ -86,7 +86,7 @@ final class WorkflowExtension extends AbstractExtension
      */
     public function getMarkedPlaces(object $subject, bool $placesNameOnly = true, string $name = null, array $context = []): array
     {
-        $places = $this->workflowRegistry->get($subject, $name)->getMarking($subject, $context)->getPlaces();
+        $places = $this->workflowRegistry->get($subject, $name)->getWorkflowMarking($subject, $context)->getPlaces();
 
         if ($placesNameOnly) {
             return array_keys($places);

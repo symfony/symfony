@@ -400,6 +400,7 @@ Workflow
 --------
 
  * Remove `InvalidTokenConfigurationException`
+ * Remove `WorkflowInterface::getMarking()` in favor of `WorkflowInterface::getWorkflowMarking()`
 
 Yaml
 ----

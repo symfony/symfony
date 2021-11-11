@@ -3,9 +3,10 @@ CHANGELOG
 
 5.3
 ---
-
+ * Deprecate `WorkflowInterface::getMarking()` method use `WorkflowInterface::getWorkflowMarking()` instead
  * Deprecate `InvalidTokenConfigurationException`
  * Added `MermaidDumper` to dump Workflow graphs in the Mermaid.js flowchart format
+ * Added `$context` to GuardEvent constructor
 
 5.2.0
 -----

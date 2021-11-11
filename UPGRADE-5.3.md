@@ -245,3 +245,4 @@ Workflow
 --------
 
  * Deprecate `InvalidTokenConfigurationException`
+ * Deprecate `WorkflowInterface::getMarking()`, use `WorkflowInterface::getWorkflowMarking()` instead

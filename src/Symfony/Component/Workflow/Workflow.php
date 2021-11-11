@@ -80,7 +80,17 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function getMarking(object $subject, array $context = [])
+    public function getMarking(object $subject)
+    {
+        trigger_deprecation('symfony/workflow', '5.3', 'The method "%s"  is deprecated.You should stop using it, as it will be removed in the future. Use "%s::getWorkflowMarking" instead.', __METHOD__, WorkflowInterface::class);
+        return $this->getWorkflowMarking($subject);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWorkflowMarking(object $subject, array $context = [])
     {
         $marking = $this->markingStore->getMarking($subject);
 
@@ -129,7 +139,7 @@ class Workflow implements WorkflowInterface
     public function can(object $subject, string $transitionName, array $context = [])
     {
         $transitions = $this->definition->getTransitions();
-        $marking = $this->getMarking($subject, $context);
+        $marking = $this->getWorkflowMarking($subject, $context);
 
         foreach ($transitions as $transition) {
             if ($transition->getName() !== $transitionName) {
@@ -152,7 +162,7 @@ class Workflow implements WorkflowInterface
     public function buildTransitionBlockerList(object $subject, string $transitionName, array $context = []): TransitionBlockerList
     {
         $transitions = $this->definition->getTransitions();
-        $marking = $this->getMarking($subject, $context);
+        $marking = $this->getWorkflowMarking($subject, $context);
         $transitionBlockerList = null;
 
         foreach ($transitions as $transition) {
@@ -187,7 +197,7 @@ class Workflow implements WorkflowInterface
      */
     public function apply(object $subject, string $transitionName, array $context = [])
     {
-        $marking = $this->getMarking($subject, $context);
+        $marking = $this->getWorkflowMarking($subject, $context);
 
         $transitionExist = false;
         $approvedTransitions = [];
@@ -254,7 +264,7 @@ class Workflow implements WorkflowInterface
     public function getEnabledTransitions(object $subject, array $context = [])
     {
         $enabledTransitions = [];
-        $marking = $this->getMarking($subject, $context);
+        $marking = $this->getWorkflowMarking($subject, $context);
 
         foreach ($this->definition->getTransitions() as $transition) {
             $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition, $context);
@@ -268,7 +278,7 @@ class Workflow implements WorkflowInterface
 
     public function getEnabledTransition(object $subject, string $name, array $context = []): ?Transition
     {
-        $marking = $this->getMarking($subject, $context);
+        $marking = $this->getWorkflowMarking($subject, $context);
 
         foreach ($this->definition->getTransitions() as $transition) {
             if ($transition->getName() !== $name) {

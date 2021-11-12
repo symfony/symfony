@@ -1,6 +1,6 @@
 {
     "name": "symfony/discord-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Discord Notifier Bridge",
     "keywords": ["discord", "notifier"],
     "homepage": "https://symfony.com",

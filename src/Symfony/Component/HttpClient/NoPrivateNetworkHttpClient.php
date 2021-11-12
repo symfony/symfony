@@ -19,13 +19,14 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Decorator that blocks requests to private networks by default.
  *
  * @author Hallison Boaventura <hallisonboaventura@gmail.com>
  */
-final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwareInterface
+final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {
     use HttpClientTrait;
 
@@ -116,5 +117,12 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         $clone->client = $this->client->withOptions($options);
 
         return $clone;
+    }
+
+    public function reset()
+    {
+        if ($this->client instanceof ResetInterface) {
+            $this->client->reset();
+        }
     }
 }

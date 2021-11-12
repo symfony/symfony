@@ -1,6 +1,6 @@
 {
     "name": "symfony/esendex-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Esendex Notifier Bridge",
     "keywords": ["sms", "esendex", "notifier"],
     "homepage": "https://symfony.com",

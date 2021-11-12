@@ -1,6 +1,6 @@
 {
     "name": "symfony/smsc-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony SMSC Notifier Bridge",
     "keywords": ["sms", "smsc", "notifier"],
     "homepage": "https://symfony.com",

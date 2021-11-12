@@ -1,6 +1,6 @@
 {
     "name": "symfony/clickatell-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Clickatell Notifier Bridge",
     "keywords": ["sms", "clickatell", "notifier"],
     "homepage": "https://symfony.com",

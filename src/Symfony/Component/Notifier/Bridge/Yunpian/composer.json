@@ -1,6 +1,6 @@
 {
     "name": "symfony/yunpian-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Yunpian Notifier Bridge",
     "keywords": ["sms", "yunpian", "notifier"],
     "homepage": "https://symfony.com",

@@ -176,7 +176,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
                 $srcId = $edge->getSourceNode()->getId();
                 $this->connectedIds[$srcId] = true;
                 if ($edge->isWeak() || $edge->isLazy()) {
-                    return false;
+                    return !$this->connectedIds[$id] = true;
                 }
             }
 
@@ -198,9 +198,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
 
         $srcIds = [];
         $srcCount = 0;
-        $isReferencedByConstructor = false;
         foreach ($this->graph->getNode($id)->getInEdges() as $edge) {
-            $isReferencedByConstructor = $isReferencedByConstructor || $edge->isReferencedByConstructor();
             $srcId = $edge->getSourceNode()->getId();
             $this->connectedIds[$srcId] = true;
             if ($edge->isWeak() || $edge->isLazy()) {

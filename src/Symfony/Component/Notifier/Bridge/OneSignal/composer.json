@@ -1,6 +1,6 @@
 {
     "name": "symfony/one-signal-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony OneSignal Notifier Bridge",
     "keywords": ["onesignal", "notifier"],
     "homepage": "https://symfony.com",

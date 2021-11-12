@@ -38,7 +38,6 @@ class ReflectionCasterTest extends TestCase
 ReflectionClass {
   +name: "ReflectionClass"
 %Aimplements: array:%d [
-    0 => "Reflector"
 %A]
   constants: array:3 [
     0 => ReflectionClassConstant {
@@ -95,7 +94,7 @@ Closure($x) {
     $b: & 123
   }
   file: "%sReflectionCasterTest.php"
-  line: "88 to 88"
+  line: "87 to 87"
 }
 EOTXT
             , $var

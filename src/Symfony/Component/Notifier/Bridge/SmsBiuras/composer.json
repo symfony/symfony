@@ -1,6 +1,6 @@
 {
     "name": "symfony/sms-biuras-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony SmsBiuras Notifier Bridge",
     "keywords": ["sms", "smsbiuras", "notifier"],
     "homepage": "https://symfony.com",

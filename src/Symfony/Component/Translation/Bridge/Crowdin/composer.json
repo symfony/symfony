@@ -1,6 +1,6 @@
 {
     "name": "symfony/crowdin-translation-provider",
-    "type": "symfony-bridge",
+    "type": "symfony-translation-bridge",
     "description": "Symfony Crowdin Translation Provider Bridge",
     "keywords": ["crowdin", "translation", "provider"],
     "homepage": "https://symfony.com",

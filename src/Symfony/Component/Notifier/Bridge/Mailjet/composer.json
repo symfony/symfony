@@ -1,6 +1,6 @@
 {
     "name": "symfony/mailjet-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Mailjet Notifier Bridge",
     "keywords": ["sms", "mailjet", "notifier"],
     "homepage": "https://symfony.com",

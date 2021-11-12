@@ -1,6 +1,6 @@
 {
     "name": "symfony/zulip-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Zulip Notifier Bridge",
     "keywords": ["zulip", "notifier"],
     "homepage": "https://symfony.com",

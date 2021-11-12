@@ -1,6 +1,6 @@
 {
     "name": "symfony/sendinblue-mailer",
-    "type": "symfony-bridge",
+    "type": "symfony-mailer-bridge",
     "description": "Symfony Sendinblue Mailer Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

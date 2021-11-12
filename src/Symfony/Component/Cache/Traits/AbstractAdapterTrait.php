@@ -364,6 +364,10 @@ trait AbstractAdapterTrait
         \assert('' !== CacheItem::validateKey($key));
         $this->ids[$key] = $key;
 
+        if (\count($this->ids) > 1000) {
+            array_splice($this->ids, 0, 500); // stop memory leak if there are many keys
+        }
+
         if (null === $this->maxIdLength) {
             return $this->namespace.$this->namespaceVersion.$key;
         }

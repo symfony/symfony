@@ -1,6 +1,6 @@
 {
     "name": "symfony/beanstalkd-messenger",
-    "type": "symfony-bridge",
+    "type": "symfony-messenger-bridge",
     "description": "Symfony Beanstalkd Messenger Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

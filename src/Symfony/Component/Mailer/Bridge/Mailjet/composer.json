@@ -1,6 +1,6 @@
 {
     "name": "symfony/mailjet-mailer",
-    "type": "symfony-bridge",
+    "type": "symfony-mailer-bridge",
     "description": "Symfony Mailjet Mailer Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

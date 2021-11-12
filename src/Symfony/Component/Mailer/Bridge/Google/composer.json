@@ -1,6 +1,6 @@
 {
     "name": "symfony/google-mailer",
-    "type": "symfony-bridge",
+    "type": "symfony-mailer-bridge",
     "description": "Symfony Google Mailer Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

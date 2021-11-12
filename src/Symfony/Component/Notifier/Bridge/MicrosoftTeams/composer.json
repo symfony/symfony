@@ -1,6 +1,6 @@
 {
     "name": "symfony/microsoft-teams-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Microsoft Teams Notifier Bridge",
     "keywords": ["chat", "microsoft-teams", "notifier"],
     "homepage": "https://symfony.com",

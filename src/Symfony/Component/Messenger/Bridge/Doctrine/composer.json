@@ -1,6 +1,6 @@
 {
     "name": "symfony/doctrine-messenger",
-    "type": "symfony-bridge",
+    "type": "symfony-messenger-bridge",
     "description": "Symfony Doctrine Messenger Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

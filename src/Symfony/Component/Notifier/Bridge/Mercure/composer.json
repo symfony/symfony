@@ -1,6 +1,6 @@
 {
     "name": "symfony/mercure-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Mercure Notifier Bridge",
     "keywords": ["mercure", "notifier"],
     "homepage": "https://symfony.com",

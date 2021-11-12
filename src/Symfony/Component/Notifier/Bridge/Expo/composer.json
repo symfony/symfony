@@ -1,6 +1,6 @@
 {
     "name": "symfony/expo-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Expo Notifier Bridge",
     "keywords": ["expo", "notifier"],
     "homepage": "https://symfony.com",

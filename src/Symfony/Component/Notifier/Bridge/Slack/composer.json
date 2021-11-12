@@ -1,6 +1,6 @@
 {
     "name": "symfony/slack-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Slack Notifier Bridge",
     "keywords": ["slack", "notifier"],
     "homepage": "https://symfony.com",

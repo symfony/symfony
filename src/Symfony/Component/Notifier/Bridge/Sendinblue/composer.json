@@ -1,6 +1,6 @@
 {
     "name": "symfony/sendinblue-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Sendinblue Notifier Bridge",
     "keywords": ["sms", "sendinblue", "notifier"],
     "homepage": "https://symfony.com",

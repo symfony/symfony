@@ -1,6 +1,6 @@
 {
     "name": "symfony/sinch-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Sinch Notifier Bridge",
     "keywords": ["sms", "sinch", "notifier"],
     "homepage": "https://symfony.com",

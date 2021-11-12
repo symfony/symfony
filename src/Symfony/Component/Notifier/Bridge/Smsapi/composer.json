@@ -1,6 +1,6 @@
 {
     "name": "symfony/smsapi-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Smsapi Notifier Bridge",
     "keywords": ["sms", "smsapi", "notifier"],
     "homepage": "https://mvpdoers.com",

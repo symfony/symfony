@@ -431,6 +431,8 @@ public function __construct(array $value = [])
             return;
         }
 
+        $class->addUse(ParamConfigurator::class);
+
         $class->addProperty('_extraKeys');
 
         $class->addMethod('set', '

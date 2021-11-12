@@ -38,6 +38,7 @@ use Symfony\Component\HttpClient\Response\HttplugPromise;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 if (!interface_exists(HttplugInterface::class)) {
     throw new \LogicException('You cannot use "Symfony\Component\HttpClient\HttplugClient" as the "php-http/httplug" package is not installed. Try running "composer require php-http/httplug".');
@@ -55,7 +56,7 @@ if (!interface_exists(RequestFactory::class)) {
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestFactory, StreamFactory, UriFactory
+final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestFactory, StreamFactory, UriFactory, ResetInterface
 {
     private HttpClientInterface $client;
     private ResponseFactoryInterface $responseFactory;
@@ -234,6 +235,13 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
     public function __destruct()
     {
         $this->wait();
+    }
+
+    public function reset()
+    {
+        if ($this->client instanceof ResetInterface) {
+            $this->client->reset();
+        }
     }
 
     private function sendPsr7Request(RequestInterface $request, bool $buffer = null): ResponseInterface

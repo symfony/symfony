@@ -1,6 +1,6 @@
 {
     "name": "symfony/amazon-sqs-messenger",
-    "type": "symfony-bridge",
+    "type": "symfony-messenger-bridge",
     "description": "Symfony Amazon SQS extension Messenger Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

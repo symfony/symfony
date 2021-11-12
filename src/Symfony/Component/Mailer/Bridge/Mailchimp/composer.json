@@ -1,6 +1,6 @@
 {
     "name": "symfony/mailchimp-mailer",
-    "type": "symfony-bridge",
+    "type": "symfony-mailer-bridge",
     "description": "Symfony Mailchimp Mailer Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

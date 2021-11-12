@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-11-10T20:49:19Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-10T21:29:19Z
+
+@Jeroeny can you please try this patch a report back if it fixes your issue?
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-11-11T09:33:19Z
+
+> @Jeroeny can you please try this patch a report back if it fixes your issue?
+
+It no longer seems to leak in the reproducer after having applied these changes. 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-11T09:54:09Z
+
+This property has been added to save calling `validateKey()` and to save hashing long keys.
+
+Since #40317, it's possible to skip calling `validateKey()` so I'm fine removing for that part.
+But for hashing, this would still be useful.
+
+This property has been added with the assumption that the number of different keys is upper bounded.
+We could enforce this upper bound by limiting the size of the `ids` array instead. Eg resetting it when it reaches 1000 items?
+
+---------------------------------------------------------------------------
+
+by a1812 at 2021-11-11T16:38:03Z
+
+> But for hashing, this would still be useful.
+ > This property has been added with the assumption that the number of different keys is upper bounded. We could enforce this upper bound by limiting the size of the `ids` array instead. Eg resetting it when it reaches 1000 items?
+
+i agree with the idea of 1000 keys,  a @Jeroeny  ?
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-11-11T16:47:15Z
+
+> > But for hashing, this would still be useful.
+> > This property has been added with the assumption that the number of different keys is upper bounded. We could enforce this upper bound by limiting the size of the `ids` array instead. Eg resetting it when it reaches 1000 items?
+>
+> i agree with the idea of 1000 keys, a @Jeroeny ?
+
+Sounds good to me. Upon reaching the limit, do you want to purge the entire array or slice it so that it's maxed out at 1000 items (like the ArrayAdapter cache) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-11T16:54:27Z
+
+The logic in ArrayAdapter is too involving for this. I'd suggest halving the array instead:
+`array_splice($this->ids, 0, 500);`

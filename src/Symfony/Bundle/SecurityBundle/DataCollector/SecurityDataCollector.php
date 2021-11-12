@@ -194,8 +194,14 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     'access_denied_handler' => $firewallConfig->getAccessDeniedHandler(),
                     'access_denied_url' => $firewallConfig->getAccessDeniedUrl(),
                     'user_checker' => $firewallConfig->getUserChecker(),
-                    'authenticators' => $firewallConfig->getAuthenticators(),
                 ];
+
+                // in 6.0, always fill `$this->data['authenticators'] only
+                if ($this->authenticatorManagerEnabled) {
+                    $this->data['authenticators'] = $firewallConfig->getAuthenticators();
+                } else {
+                    $this->data['listeners'] = $firewallConfig->getAuthenticators();
+                }
 
                 // generate exit impersonation path from current request
                 if ($this->data['impersonated'] && null !== $switchUserConfig = $firewallConfig->getSwitchUser()) {

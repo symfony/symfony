@@ -66,6 +66,9 @@ final class CurlClientState extends ClientState
                 curl_setopt($ch, \CURLOPT_VERBOSE, false);
             }
         }
+
+        curl_multi_close($this->handle);
+        $this->handle = curl_multi_init();
     }
 
     public function __sleep(): array

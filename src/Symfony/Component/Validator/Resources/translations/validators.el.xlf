@@ -388,11 +388,19 @@
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
-                <target>Αυτή η τιμή πρέπει να είναι έγκυρη έκφραση.</target>
+                <target>Αυτή η τιμή θα πρέπει να είναι μία έγκυρη έκφραση.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
                 <target>Αυτή η τιμή δεν είναι έγκυρο χρώμα CSS.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Αυτή η τιμή δεν είναι έγκυρη CIDR σημειογραφία.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Η τιμή του netmask πρέπει να είναι ανάμεσα σε {{ min }} και {{ max }}.</target>
             </trans-unit>
         </body>
     </file>

@@ -133,7 +133,7 @@ class TranslationUpdateCommandCompletionTest extends TestCase
         $application = new Application($kernel);
         $application->add($command);
 
-        return new CommandCompletionTester($application->find('translation:update'));
+        return new CommandCompletionTester($application->find('translation:extract'));
     }
 
     private function getBundle($path)

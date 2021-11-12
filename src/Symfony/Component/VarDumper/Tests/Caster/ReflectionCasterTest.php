@@ -37,7 +37,6 @@ class ReflectionCasterTest extends TestCase
 ReflectionClass {
   +name: "ReflectionClass"
 %Aimplements: array:%d [
-    0 => "Reflector"
 %A]
   constants: array:3 [
     "IS_IMPLICIT_ABSTRACT" => 16
@@ -79,7 +78,7 @@ Closure($x) {
     $b: & 123
   }
   file: "%sReflectionCasterTest.php"
-  line: "72 to 72"
+  line: "71 to 71"
 }
 EOTXT
             , $var

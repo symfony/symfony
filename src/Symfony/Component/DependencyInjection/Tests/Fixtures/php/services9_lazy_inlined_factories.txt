@@ -9,6 +9,19 @@ return [
     'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
 ];
 
+    [Container%s/proxy-classes.php] => <?php
+
+namespace Container%s;
+
+include_once $this->targetDir.''.'/Fixtures/includes/foo.php';
+
+class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualProxyInterface
+%A
+
+if (!\class_exists('FooClass_%s', false)) {
+    \class_alias(__NAMESPACE__.'\\FooClass_%s', 'FooClass_%s', false);
+}
+
     [Container%s/ProjectServiceContainer.php] => <?php
 
 namespace Container%s;
@@ -45,6 +58,10 @@ class ProjectServiceContainer extends Container
         ];
 
         $this->aliases = [];
+
+        $this->privates['service_container'] = function () {
+            include __DIR__.'/proxy-classes.php';
+        };
     }
 
     public function compile(): void
@@ -156,16 +173,6 @@ class ProjectServiceContainer extends Container
         ];
     }
 }
-include_once $this->targetDir.''.'/Fixtures/includes/foo.php';
-
-class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualProxyInterface
-{
-%A
-}
-
-if (!\class_exists('FooClass_%s', false)) {
-    \class_alias(__NAMESPACE__.'\\FooClass_%s', 'FooClass_%s', false);
-}
 
     [ProjectServiceContainer.preload.php] => <?php
 
@@ -179,7 +186,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
-require __DIR__.'/Container%s/ProjectServiceContainer.php';
+(require __DIR__.'/Container%s/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
 
 $classes = [];
 $classes[] = 'Bar\FooClass';

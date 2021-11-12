@@ -198,9 +198,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
                 // in 6.0, always fill `$this->data['authenticators'] only
                 if ($this->authenticatorManagerEnabled) {
-                    $this->data['authenticators'] = $firewallConfig->getAuthenticators();
+                    $this->data['firewall']['authenticators'] = $firewallConfig->getAuthenticators();
                 } else {
-                    $this->data['listeners'] = $firewallConfig->getAuthenticators();
+                    $this->data['firewall']['listeners'] = $firewallConfig->getAuthenticators();
                 }
 
                 // generate exit impersonation path from current request

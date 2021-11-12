@@ -276,7 +276,7 @@ class FlattenException extends LegacyFlattenException
     /**
      * @return $this
      */
-    final public function setPrevious(LegacyFlattenException $previous): self
+    final public function setPrevious(?LegacyFlattenException $previous): self
     {
         $this->previous = $previous;
 

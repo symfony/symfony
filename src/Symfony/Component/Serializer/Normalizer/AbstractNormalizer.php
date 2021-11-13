@@ -235,7 +235,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             // If you update this check, update accordingly the one in Symfony\Component\PropertyInfo\Extractor\SerializerExtractor::getProperties()
             if (
                 !$ignore &&
-                ([] === $groups || array_intersect(array_merge($attributeMetadata->getGroups(), ['*']), $groups)) &&
+                ([] === $groups || array_intersect($this->getAttributeGroups($attributeMetadata), $groups)) &&
                 $this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
@@ -255,6 +255,13 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         $groups = $context[self::GROUPS] ?? $this->defaultContext[self::GROUPS] ?? [];
 
         return is_scalar($groups) ? (array) $groups : $groups;
+    }
+
+    protected function getAttributeGroups(AttributeMetadataInterface $attributeMetadata): array
+    {
+        $groups = empty($attributeMetadata->getGroups()) ? ['_default'] : $attributeMetadata->getGroups();
+
+        return array_merge($groups, ['*']);
     }
 
     /**

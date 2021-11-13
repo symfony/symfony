@@ -87,6 +87,9 @@ class AbstractNormalizerTest extends TestCase
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['*']], true);
         $this->assertEquals(['a1', 'a2', 'a3', 'a4'], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['_default']], true);
+        $this->assertEquals(['a1'], $result);
     }
 
     public function testGetAllowedAttributesAsObjects()
@@ -122,6 +125,9 @@ class AbstractNormalizerTest extends TestCase
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['*']], false);
         $this->assertEquals([$a1, $a2, $a3, $a4], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['_default']], false);
+        $this->assertEquals([$a1], $result);
     }
 
     public function testObjectWithStaticConstructor()

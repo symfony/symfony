@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Extractor;
 
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
@@ -48,11 +49,18 @@ class SerializerExtractor implements PropertyListExtractorInterface
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
             $ignored = method_exists($serializerAttributeMetadata, 'isIgnored') && $serializerAttributeMetadata->isIgnored();
-            if (!$ignored && (null === $context['serializer_groups'] || array_intersect($context['serializer_groups'], $serializerAttributeMetadata->getGroups()))) {
+            if (!$ignored && (null === $context['serializer_groups'] || array_intersect($context['serializer_groups'], $this->getAttributeGroups($serializerAttributeMetadata)))) {
                 $properties[] = $serializerAttributeMetadata->getName();
             }
         }
 
         return $properties;
+    }
+
+    private function getAttributeGroups(AttributeMetadataInterface $serializerAttributeMetadata): array
+    {
+        $groups = empty($serializerAttributeMetadata->getGroups()) ? ['_default'] : $serializerAttributeMetadata->getGroups();
+
+        return array_merge($groups, ['*']);
     }
 }

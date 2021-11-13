@@ -29,6 +29,7 @@ CHANGELOG
  * Return empty collections as `ArrayObject` from `Serializer::normalize()` when `PRESERVE_EMPTY_OBJECTS` is set
  * Add support for collecting type errors during denormalization
  * Add missing arguments in `MissingConstructorArgumentsException`
+ * Add `_default` group serialization context that allow serializing properties without explicit group
 
 5.3
 ---

@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultGroupDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IgnorePropertyDummy;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -51,5 +52,15 @@ class SerializerExtractorTest extends TestCase
     public function testGetPropertiesWithAnyGroup()
     {
         $this->assertSame(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class, ['serializer_groups' => null]));
+    }
+
+    public function testGetPropertiesWithAllGroup()
+    {
+        $this->assertSame(['somethingWithoutGroup', 'somethingWithGroup'], $this->extractor->getProperties(DefaultGroupDummy::class, ['serializer_groups' => ['*']]));
+    }
+
+    public function testGetPropertiesWithDefaultGroup()
+    {
+        $this->assertSame(['somethingWithoutGroup'], $this->extractor->getProperties(DefaultGroupDummy::class, ['serializer_groups' => ['_default']]));
     }
 }

@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 
 class ChildCustomUserMessageAuthenticationException extends CustomUserMessageAuthenticationException
 {
+    public $childMember;
+
     public function __serialize(): array
     {
         return [$this->childMember, parent::__serialize()];

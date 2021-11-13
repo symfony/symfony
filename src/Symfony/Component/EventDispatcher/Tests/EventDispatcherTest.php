@@ -458,6 +458,7 @@ class CallableClass
 
 class TestEventListener
 {
+    public $name;
     public $preFooInvoked = false;
     public $postFooInvoked = false;
 

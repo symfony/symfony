@@ -25,8 +25,6 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  *
  * Constraint instances are immutable and serializable.
  *
- * @property string[] $groups The groups that the constraint belongs to
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class Constraint
@@ -57,6 +55,13 @@ abstract class Constraint
      * @var mixed
      */
     public $payload;
+
+    /**
+     * The groups that the constraint belongs to.
+     *
+     * @var string[]
+     */
+    public $groups;
 
     /**
      * Returns the name of the given error code.
@@ -105,13 +110,12 @@ abstract class Constraint
      */
     public function __construct($options = null)
     {
+        unset($this->groups); // enable lazy initialization
+
         $defaultOption = $this->getDefaultOption();
         $invalidOptions = [];
         $missingOptions = array_flip((array) $this->getRequiredOptions());
         $knownOptions = get_class_vars(static::class);
-
-        // The "groups" option is added to the object lazily
-        $knownOptions['groups'] = true;
 
         if (\is_array($options) && isset($options['value']) && !property_exists($this, 'value')) {
             if (null === $defaultOption) {

@@ -1183,11 +1183,8 @@ EOTXT;
             if (false === $i = strpos($param, '$')) {
                 continue;
             }
-            if (false !== $j = strpos($param, ' $') ?: strpos($param, '&$')) {
-                $i = 1 + $j;
-            }
 
-            $type = 0 === $i ? '' : rtrim(substr($param, 0, $i - 1));
+            $type = 0 === $i ? '' : rtrim(substr($param, 0, $i), ' &');
             $param = substr($param, 1 + $i, (strpos($param, ' ', $i) ?: (1 + $i + \strlen($param))) - $i - 1);
 
             $tags['param'][$param] = $type;

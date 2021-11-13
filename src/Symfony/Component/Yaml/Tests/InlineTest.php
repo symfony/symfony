@@ -905,4 +905,22 @@ class InlineTest extends TestCase
             ["'a　b'", 'a　b'],
         ];
     }
+
+    public function testParseQuotedReferenceLikeStringsInMapping()
+    {
+        $yaml = <<<YAML
+{foo: '&foo', bar: "&bar"}
+YAML;
+
+        $this->assertSame(['foo' => '&foo', 'bar' => '&bar'], Inline::parse($yaml));
+    }
+
+    public function testParseQuotedReferenceLikeStringsInSequence()
+    {
+        $yaml = <<<YAML
+['&foo', "&bar" ]
+YAML;
+
+        $this->assertSame(['&foo', '&bar'], Inline::parse($yaml));
+    }
 }

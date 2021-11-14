@@ -735,7 +735,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
      */
-    protected function loadFile(string $file): array
+    protected function loadFile(string $file): ?array
     {
         if (!class_exists(\Symfony\Component\Yaml\Parser::class)) {
             throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed.');

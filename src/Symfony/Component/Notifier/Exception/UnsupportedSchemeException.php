@@ -22,7 +22,7 @@ class UnsupportedSchemeException extends LogicException
     private const SCHEME_TO_PACKAGE_MAP = [
         'allmysms' => [
             'class' => Bridge\AllMySms\AllMySmsTransportFactory::class,
-            'package' => 'symfony/allmysms-notifier',
+            'package' => 'symfony/all-my-sms-notifier',
         ],
         'clickatell' => [
             'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
@@ -54,7 +54,7 @@ class UnsupportedSchemeException extends LogicException
         ],
         'gatewayapi' => [
             'class' => Bridge\GatewayApi\GatewayApiTransportFactory::class,
-            'package' => 'symfony/gatewayapi-notifier',
+            'package' => 'symfony/gateway-api-notifier',
         ],
         'gitter' => [
             'class' => Bridge\Gitter\GitterTransportFactory::class,

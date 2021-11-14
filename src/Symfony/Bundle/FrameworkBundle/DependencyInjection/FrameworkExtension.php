@@ -2524,7 +2524,7 @@ class FrameworkExtension extends Extension
             SpotHitTransportFactory::class => 'notifier.transport_factory.spothit',
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',
-            TurboSmsTransport::class => 'notifier.transport_factory.turbosms',
+            TurboSmsTransport::class => 'notifier.transport_factory.turbo-sms',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
             YunpianTransportFactory::class => 'notifier.transport_factory.yunpian',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',

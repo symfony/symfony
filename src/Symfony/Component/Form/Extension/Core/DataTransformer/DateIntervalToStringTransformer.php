@@ -39,7 +39,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
     /**
      * Transforms a DateInterval object into a date string with the configured format.
      *
-     * @param \DateInterval $value A DateInterval object
+     * @param \DateInterval|null $value A DateInterval object
      *
      * @throws UnexpectedTypeException if the given value is not a \DateInterval instance
      */

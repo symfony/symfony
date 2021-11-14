@@ -7,6 +7,34 @@ in 6.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.0.0...v6.0.1
 
+* 6.0.0-BETA2 (2021-11-14)
+
+ * bug #44051 [Notifier] Fix package name (fabpot)
+ * bug #44050 [Notifier] Fix package names (fabpot)
+ * bug #44042 Fix DateIntervalToStringTransformer::transform() doc (BenMorel)
+ * bug #44034 [Yaml] don't try to replace references in quoted strings (xabbuh)
+ * bug #44013 [ErrorHandler] fix parsing ``@param`` with dollars in the description (nicolas-grekas)
+ * bug #44010 [DependencyInjection] fix auto-refresh when inline_factories is enabled (nicolas-grekas)
+ * bug #44028 [ErrorHandler] Fix FlattenException::setPrevious argument typing (welcoMattic)
+ * bug #44016 [SecurityBundle] Fix listing listeners in profiler when authenticator manager is disabled (94noni)
+ * bug #44012 [DependencyInjection] fix inlining when non-shared services are involved (nicolas-grekas)
+ * bug #44002 [Cache] Fix Memory leak (a1812)
+ * bug #43993 [FrameworkBundle] fix deprecation message (nicolas-grekas)
+ * feature #43985 [HttpClient] Implement ResetInterface for all http clients (rmikalkenas)
+ * bug #43981 [FrameworkBundle] fix registering late resettable services (nicolas-grekas)
+ * bug #43988 [DoctrineBridge] add support for the JSON type (dunglas)
+ * bug #43987 [PhpUnitBridge] Fix Uncaught ValueError (dunglas)
+ * feature #43983 [HttpKernel] allow ignoring kernel.reset methods that don't exist (nicolas-grekas)
+ * bug #43967 [Loco] Fix Loco Provider ID and pull & push local messages reading (welcoMattic)
+ * bug #43961 [HttpClient] Curl http client has to reinit curl multi handle on reset (rmikalkenas)
+ * bug #43930 [DependencyInjection] Fix support for unions/intersections together with `ServiceSubscriberInterface` (kbond)
+ * bug #43948 [Asset][Security] Fixed leftover deprecations PHP 8.1 (michaljusiega)
+ * bug #43944 [Yaml] revert using functions provided by polyfill packages (xabbuh)
+ * bug #43940 [FrameworkBundle] Fix logic in workflow:dump between workflow name and workflow id (noniagriconomie)
+ * bug #43947 [HttpKernel] Make sure FileLinkFormatter can be serialized (derrabus)
+ * bug #43945 [Runtime] fix defining APP_DEBUG when Dotenv is not enabled (nicolas-grekas)
+ * bug #43946 [HttpKernel] Make sure a serialized DumpDataCollector can be unserialized (derrabus)
+
 * 6.0.0-BETA1 (2021-11-05)
 
  * feature #43916 [PropertyInfo] Support the list pseudo-type (derrabus)

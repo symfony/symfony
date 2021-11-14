@@ -1,5 +1,5 @@
 {
-    "name": "symfony/gatewayapi-notifier",
+    "name": "symfony/gateway-api-notifier",
     "type": "symfony-bridge",
     "description": "Symfony GatewayApi Notifier Bridge",
     "keywords": ["sms", "gatewayapi", "notifier"],

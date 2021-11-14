@@ -225,7 +225,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 
-        ->set('notifier.transport_factory.turbosms', TurboSmsTransportFactory::class)
+        ->set('notifier.transport_factory.turbo-sms', TurboSmsTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 

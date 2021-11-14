@@ -127,7 +127,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
 
     public function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
     {
-        yield ['allmysms', 'symfony/allmysms-notifier'];
+        yield ['allmysms', 'symfony/all-my-sms-notifier'];
         yield ['sns', 'symfony/amazon-sns-notifier'];
         yield ['clickatell', 'symfony/clickatell-notifier'];
         yield ['discord', 'symfony/discord-notifier'];
@@ -136,7 +136,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['fakesms', 'symfony/fake-sms-notifier'];
         yield ['firebase', 'symfony/firebase-notifier'];
         yield ['freemobile', 'symfony/free-mobile-notifier'];
-        yield ['gatewayapi', 'symfony/gatewayapi-notifier'];
+        yield ['gatewayapi', 'symfony/gateway-api-notifier'];
         yield ['gitter', 'symfony/gitter-notifier'];
         yield ['googlechat', 'symfony/google-chat-notifier'];
         yield ['infobip', 'symfony/infobip-notifier'];

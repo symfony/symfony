@@ -1,5 +1,5 @@
 {
-    "name": "symfony/allmysms-notifier",
+    "name": "symfony/all-my-sms-notifier",
     "type": "symfony-notifier-bridge",
     "description": "Symfony AllMySms Notifier Bridge",
     "keywords": ["sms", "allMySms", "notifier"],

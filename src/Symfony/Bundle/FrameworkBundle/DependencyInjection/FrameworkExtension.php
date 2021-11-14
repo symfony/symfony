@@ -2401,7 +2401,7 @@ class FrameworkExtension extends Extension
             ->addTag('texter.transport_factory');
 
         $classToServices = [
-            AllMySmsTransportFactory::class => 'notifier.transport_factory.allmysms',
+            AllMySmsTransportFactory::class => 'notifier.transport_factory.all-my-sms',
             AmazonSnsTransportFactory::class => 'notifier.transport_factory.amazonsns',
             ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
             DiscordTransportFactory::class => 'notifier.transport_factory.discord',
@@ -2411,7 +2411,7 @@ class FrameworkExtension extends Extension
             FakeSmsTransportFactory::class => 'notifier.transport_factory.fakesms',
             FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
             FreeMobileTransportFactory::class => 'notifier.transport_factory.freemobile',
-            GatewayApiTransportFactory::class => 'notifier.transport_factory.gatewayapi',
+            GatewayApiTransportFactory::class => 'notifier.transport_factory.gateway-api',
             GitterTransportFactory::class => 'notifier.transport_factory.gitter',
             GoogleChatTransportFactory::class => 'notifier.transport_factory.googlechat',
             InfobipTransportFactory::class => 'notifier.transport_factory.infobip',
@@ -2440,7 +2440,7 @@ class FrameworkExtension extends Extension
             SpotHitTransportFactory::class => 'notifier.transport_factory.spothit',
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',
-            TurboSmsTransport::class => 'notifier.transport_factory.turbosms',
+            TurboSmsTransport::class => 'notifier.transport_factory.turbo-sms',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
             YunpianTransportFactory::class => 'notifier.transport_factory.yunpian',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',

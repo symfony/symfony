@@ -389,7 +389,7 @@ class Inline
                         }
                     }
 
-                    if (\is_string($value) && '' !== $value && '&' === $value[0] && Parser::preg_match(Parser::REFERENCE_PATTERN, $value, $matches)) {
+                    if (!$isQuoted && \is_string($value) && '' !== $value && '&' === $value[0] && Parser::preg_match(Parser::REFERENCE_PATTERN, $value, $matches)) {
                         $references[$matches['ref']] = $matches['value'];
                         $value = $matches['value'];
                     }
@@ -523,6 +523,7 @@ class Inline
                         }
                         break;
                     default:
+                        $isValueQuoted = \in_array($mapping[$i], ['"', "'"]);
                         $value = self::parseScalar($mapping, $flags, [',', '}', "\n"], $i, null === $tag, $references);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
@@ -531,7 +532,7 @@ class Inline
                         if ('<<' === $key) {
                             $output += $value;
                         } elseif ($allowOverwrite || !isset($output[$key])) {
-                            if (\is_string($value) && '' !== $value && '&' === $value[0] && Parser::preg_match(Parser::REFERENCE_PATTERN, $value, $matches)) {
+                            if (!$isValueQuoted && \is_string($value) && '' !== $value && '&' === $value[0] && Parser::preg_match(Parser::REFERENCE_PATTERN, $value, $matches)) {
                                 $references[$matches['ref']] = $matches['value'];
                                 $value = $matches['value'];
                             }

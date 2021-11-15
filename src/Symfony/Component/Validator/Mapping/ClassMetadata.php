@@ -490,8 +490,8 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         }
 
         if ($constraint instanceof Composite) {
-            foreach ($constraint->getNestedContraints() as $nestedContraint) {
-                $this->checkConstraint($nestedContraint);
+            foreach ($constraint->getNestedConstraints() as $nestedConstraint) {
+                $this->checkConstraint($nestedConstraint);
             }
         }
     }

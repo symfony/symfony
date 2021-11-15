@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
+use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
@@ -93,10 +94,8 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('cache.pool', ['clearer' => 'cache.default_clearer', 'reset' => 'reset'])
             ->tag('monolog.logger', ['channel' => 'cache'])
-        ;
 
-    if (class_exists(DoctrineAdapter::class)) {
-        $container->services()->set('cache.adapter.doctrine', DoctrineAdapter::class)
+        ->set('cache.adapter.doctrine', DoctrineAdapter::class)
             ->abstract()
             ->args([
                 abstract_arg('Doctrine provider service'),
@@ -110,11 +109,8 @@ return static function (ContainerConfigurator $container) {
                 'reset' => 'reset',
             ])
             ->tag('monolog.logger', ['channel' => 'cache'])
-            ->deprecate('symfony/framework-bundle', '5.4', 'The abstract service "%service_id%" is deprecated.')
-        ;
-    }
+            ->deprecate('symfony/framework-bundle', '5.4', 'The "%service_id%" service inherits from "cache.adapter.doctrine" which is deprecated.')
 
-    $container->services()
         ->set('cache.adapter.filesystem', FilesystemAdapter::class)
             ->abstract()
             ->args([
@@ -183,6 +179,23 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('cache.pool', [
                 'provider' => 'cache.default_memcached_provider',
+                'clearer' => 'cache.default_clearer',
+                'reset' => 'reset',
+            ])
+            ->tag('monolog.logger', ['channel' => 'cache'])
+
+        ->set('cache.adapter.doctrine_dbal', DoctrineDbalAdapter::class)
+            ->abstract()
+            ->args([
+                abstract_arg('DBAL connection service'),
+                '', // namespace
+                0, // default lifetime
+                [], // table options
+                service('cache.default_marshaller')->ignoreOnInvalid(),
+            ])
+            ->call('setLogger', [service('logger')->ignoreOnInvalid()])
+            ->tag('cache.pool', [
+                'provider' => 'cache.default_doctrine_dbal_provider',
                 'clearer' => 'cache.default_clearer',
                 'reset' => 'reset',
             ])

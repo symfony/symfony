@@ -2402,42 +2402,42 @@ class FrameworkExtension extends Extension
 
         $classToServices = [
             AllMySmsTransportFactory::class => 'notifier.transport_factory.all-my-sms',
-            AmazonSnsTransportFactory::class => 'notifier.transport_factory.amazonsns',
+            AmazonSnsTransportFactory::class => 'notifier.transport_factory.amazon-sns',
             ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
             DiscordTransportFactory::class => 'notifier.transport_factory.discord',
             EsendexTransportFactory::class => 'notifier.transport_factory.esendex',
             ExpoTransportFactory::class => 'notifier.transport_factory.expo',
-            FakeChatTransportFactory::class => 'notifier.transport_factory.fakechat',
-            FakeSmsTransportFactory::class => 'notifier.transport_factory.fakesms',
+            FakeChatTransportFactory::class => 'notifier.transport_factory.fake-chat',
+            FakeSmsTransportFactory::class => 'notifier.transport_factory.fake-sms',
             FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
-            FreeMobileTransportFactory::class => 'notifier.transport_factory.freemobile',
+            FreeMobileTransportFactory::class => 'notifier.transport_factory.free-mobile',
             GatewayApiTransportFactory::class => 'notifier.transport_factory.gateway-api',
             GitterTransportFactory::class => 'notifier.transport_factory.gitter',
-            GoogleChatTransportFactory::class => 'notifier.transport_factory.googlechat',
+            GoogleChatTransportFactory::class => 'notifier.transport_factory.google-chat',
             InfobipTransportFactory::class => 'notifier.transport_factory.infobip',
             IqsmsTransportFactory::class => 'notifier.transport_factory.iqsms',
-            LightSmsTransportFactory::class => 'notifier.transport_factory.lightsms',
-            LinkedInTransportFactory::class => 'notifier.transport_factory.linkedin',
+            LightSmsTransportFactory::class => 'notifier.transport_factory.light-sms',
+            LinkedInTransportFactory::class => 'notifier.transport_factory.linked-in',
             MailjetNotifierTransportFactory::class => 'notifier.transport_factory.mailjet',
             MattermostTransportFactory::class => 'notifier.transport_factory.mattermost',
             MercureTransportFactory::class => 'notifier.transport_factory.mercure',
-            MessageBirdTransport::class => 'notifier.transport_factory.messagebird',
-            MessageMediaTransportFactory::class => 'notifier.transport_factory.messagemedia',
-            MicrosoftTeamsTransportFactory::class => 'notifier.transport_factory.microsoftteams',
+            MessageBirdTransport::class => 'notifier.transport_factory.message-bird',
+            MessageMediaTransportFactory::class => 'notifier.transport_factory.message-media',
+            MicrosoftTeamsTransportFactory::class => 'notifier.transport_factory.microsoft-teams',
             MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
             NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
             OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
-            OneSignalTransportFactory::class => 'notifier.transport_factory.onesignal',
-            OvhCloudTransportFactory::class => 'notifier.transport_factory.ovhcloud',
-            RocketChatTransportFactory::class => 'notifier.transport_factory.rocketchat',
+            OneSignalTransportFactory::class => 'notifier.transport_factory.one-signal',
+            OvhCloudTransportFactory::class => 'notifier.transport_factory.ovh-cloud',
+            RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',
             SendinblueNotifierTransportFactory::class => 'notifier.transport_factory.sendinblue',
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
             SlackTransportFactory::class => 'notifier.transport_factory.slack',
             Sms77TransportFactory::class => 'notifier.transport_factory.sms77',
             SmsapiTransportFactory::class => 'notifier.transport_factory.smsapi',
-            SmsBiurasTransportFactory::class => 'notifier.transport_factory.smsbiuras',
+            SmsBiurasTransportFactory::class => 'notifier.transport_factory.sms-biuras',
             SmscTransportFactory::class => 'notifier.transport_factory.smsc',
-            SpotHitTransportFactory::class => 'notifier.transport_factory.spothit',
+            SpotHitTransportFactory::class => 'notifier.transport_factory.spot-hit',
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',
             TurboSmsTransport::class => 'notifier.transport_factory.turbo-sms',
@@ -2449,24 +2449,7 @@ class FrameworkExtension extends Extension
         $parentPackages = ['symfony/framework-bundle', 'symfony/notifier'];
 
         foreach ($classToServices as $class => $service) {
-            switch ($package = substr($service, \strlen('notifier.transport_factory.'))) {
-                case 'amazonsns': $package = 'amazon-sns'; break;
-                case 'fakechat': $package = 'fake-chat'; break;
-                case 'fakesms': $package = 'fake-sms'; break;
-                case 'freemobile': $package = 'free-mobile'; break;
-                case 'googlechat': $package = 'google-chat'; break;
-                case 'lightsms': $package = 'light-sms'; break;
-                case 'linkedin': $package = 'linked-in'; break;
-                case 'messagebird': $package = 'message-bird'; break;
-                case 'messagemedia': $package = 'message-media'; break;
-                case 'microsoftteams': $package = 'microsoft-teams'; break;
-                case 'onesignal': $package = 'one-signal'; break;
-                case 'ovhcloud': $package = 'ovh-cloud'; break;
-                case 'rocketchat': $package = 'rocket-chat'; break;
-                case 'smsbiuras': $package = 'sms-biuras'; break;
-                case 'spothit': $package = 'spot-hit'; break;
-                case 'turbosms': $package = 'turbo-sms'; break;
-            }
+            $package = substr($service, \strlen('notifier.transport_factory.'));
 
             if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-notifier', $package), $class, $parentPackages)) {
                 $container->removeDefinition($service);

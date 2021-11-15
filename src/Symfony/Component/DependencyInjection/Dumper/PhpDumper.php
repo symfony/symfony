@@ -1485,7 +1485,7 @@ EOF;
         }
 
         if ($hasProxyClasses) {
-            $code .= "\n            include __DIR__.'/proxy-classes.php';";
+            $code .= "\n            include_once __DIR__.'/proxy-classes.php';";
         }
 
         return $code ? sprintf("\n        \$this->privates['service_container'] = function () {%s\n        };\n", $code) : '';

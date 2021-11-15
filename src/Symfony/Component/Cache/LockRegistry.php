@@ -102,6 +102,7 @@ final class LockRegistry
 
         while (true) {
             try {
+                $locked = false;
                 // race to get the lock in non-blocking mode
                 if ($wouldBlock = \function_exists('sem_get')) {
                     $locked = @sem_acquire($lock, true);
@@ -137,10 +138,12 @@ final class LockRegistry
                     flock($lock, \LOCK_SH);
                 }
             } finally {
-                if (\function_exists('sem_get')) {
-                    sem_remove($lock);
-                } else {
-                    flock($lock, \LOCK_UN);
+                if ($locked) {
+                    if (\function_exists('sem_get')) {
+                        sem_remove($lock);
+                    } else {
+                        flock($lock, \LOCK_UN);
+                    }
                 }
                 unset(self::$lockedKeys[$key]);
             }

@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslatableNormalizerTest extends TestCase
 {
-    public function testNormalize(): void
+    public function testNormalize()
     {
         $enResource = [
             'foo' => 'Hello rambo',
@@ -42,7 +42,7 @@ class TranslatableNormalizerTest extends TestCase
         static::assertSame('你好兰博：第一滴血', $cnNormalizer->normalize(new TestTranslatableMessage('bar', ['%masterpiece%' => '第一滴血'])));
     }
 
-    public function testSupportsNormalization(): void
+    public function testSupportsNormalization()
     {
         $normalizer = new TranslatableNormalizer([], new Translator('en'));
 
@@ -50,7 +50,7 @@ class TranslatableNormalizerTest extends TestCase
         static::assertTrue($normalizer->supportsNormalization(new TestTranslatableMessage('foo')));
     }
 
-    public function testSupportsNormalizationWithoutTranslator(): void
+    public function testSupportsNormalizationWithoutTranslator()
     {
         $normalizer = new TranslatableNormalizer();
 

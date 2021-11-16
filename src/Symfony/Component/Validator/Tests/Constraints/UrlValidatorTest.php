@@ -122,6 +122,8 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://www.symfony.com/doc/current/book/validation.html#supported-constraints'],
             ['http://very.long.domain.name.com/'],
             ['http://localhost/'],
+            ['http://example-hostname/'],
+            ['http://example_hostname/'],
             ['http://myhost123/'],
             ['http://127.0.0.1/'],
             ['http://127.0.0.1:80/'],

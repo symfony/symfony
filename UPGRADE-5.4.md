@@ -12,6 +12,12 @@ Console
 
  * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
 
+DoctrineBridge
+--------------
+
+ * Add argument `$bundleDir` to `AbstractDoctrineExtension::getMappingDriverBundleConfigDefaults()`
+ * Add argument `$bundleDir` to `AbstractDoctrineExtension::getMappingResourceConfigDirectory()`
+
 Finder
 ------
 

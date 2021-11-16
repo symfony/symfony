@@ -70,7 +70,7 @@ final class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInte
             }
             $this->conn = DriverManager::getConnection(['url' => $connOrDsn]);
         } else {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be "%s" or string, "%s" given.', Connection::class, __METHOD__, get_debug_type($connOrDsn)));
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be "%s" or string, "%s" given.', __METHOD__, Connection::class, get_debug_type($connOrDsn)));
         }
 
         $this->table = $options['db_table'] ?? $this->table;

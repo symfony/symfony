@@ -66,7 +66,7 @@ jobs:
 
           SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
           SYMFONY_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+')
-          SYMFONY_FEATURE_BRANCH=$(curl -s https://flex.symfony.com/versions.json | jq -r '."dev-name"')
+          SYMFONY_FEATURE_BRANCH=$(curl -s https://raw.githubusercontent.com/symfony/recipes/flex/main/index.json | jq -r '.versions."dev-name"')
 
           # Install the phpunit-bridge from a PR if required
           #
@@ -187,8 +187,8 @@ jobs:
           (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
           PATCHED_COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
-          # for x.4 branches, checkout and test previous major with the patched components (only for patched components)
-          if [[ $PATCHED_COMPONENTS && $SYMFONY_VERSION = *.4 ]]; then
+          # for 5.4 LTS, checkout and test previous major with the patched components (only for patched components)
+          if [[ $PATCHED_COMPONENTS && $SYMFONY_VERSION = 5.4 ]]; then
               export FLIP='^'
               SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
               echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"

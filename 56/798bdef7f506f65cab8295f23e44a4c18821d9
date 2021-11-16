@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-11-11T05:00:25Z
+
+Is there anything "breaking" if the user now switch to the "new" logic?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-11-11T06:01:28Z
+
+As it's already broken for all projects without the asset alias "name", I don't think so. And for all others projects with this asset alias, I made the check of the prefix key to check if the key starts with the domain name or not.
+
+To be sure, I will made a test project with and without assay alias and process some tests, I'll let you know.

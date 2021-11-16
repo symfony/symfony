@@ -14,6 +14,7 @@ namespace Symfony\Component\Translation\Bridge\Loco;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Component\Translation\TranslatorBagInterface;
@@ -60,7 +61,7 @@ final class LocoProvider implements ProviderInterface
         }
 
         foreach ($catalogue->all() as $domain => $messages) {
-            $createdIds = $this->createAssets(array_keys($messages));
+            $createdIds = $this->createAssets(array_keys($messages), $domain);
             if ($createdIds) {
                 $this->tagsAssets($createdIds, $domain);
             }
@@ -117,7 +118,18 @@ final class LocoProvider implements ProviderInterface
                 throw new ProviderException('Unable to read the Loco response: '.$responseContent, $response);
             }
 
-            $translatorBag->addCatalogue($this->loader->load($responseContent, $locale, $domain));
+            $locoCatalogue = $this->loader->load($responseContent, $locale, $domain);
+            $catalogue = new MessageCatalogue($locale);
+
+            foreach ($locoCatalogue->all($domain) as $key => $message) {
+                if (str_starts_with($key, $domain.'__')) {
+                    $key = substr($key, \strlen($domain) + 2);
+                }
+
+                $catalogue->set($key, $message, $domain);
+            }
+
+            $translatorBag->addCatalogue($catalogue);
         }
 
         return $translatorBag;
@@ -166,13 +178,14 @@ final class LocoProvider implements ProviderInterface
         }, $response->toArray(false));
     }
 
-    private function createAssets(array $keys): array
+    private function createAssets(array $keys, string $domain): array
     {
         $responses = $createdIds = [];
 
         foreach ($keys as $key) {
             $responses[$key] = $this->client->request('POST', 'assets', [
                 'body' => [
+                    'id' => $domain.'__'.$key, // must be globally unique, not only per domain
                     'text' => $key,
                     'type' => 'text',
                     'default' => 'untranslated',

@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-13T17:36:45Z
+
+@mbabker I force-pushed [these changes](https://github.com/symfony/symfony/compare/5fb87138ca5339f94eabcee7917af6e2c9023ab8..fe420942d46fee11dd20b514270f9d0965465502) on your fork, can you please have a look and let me know if that makes sense?
+
+Is that something that can be tested?
+
+---------------------------------------------------------------------------
+
+by mbabker at 2021-11-13T17:57:54Z
+
+> can you please have a look and let me know if that makes sense?
+
+Looks right to me.
+
+> Is that something that can be tested?
+
+Maybe?  I'd have to sit down and work out testing the `AbstractDoctrineExtension` class in general.  Right now, I think more of this extension is being tested in the bundles than here.
+
+Edit: I got PhpStorm to run the bridge tests with coverage to see if there was something existing I could add to, `loadMappingInformation()` has zero coverage right now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-13T18:01:21Z
+
+I guess this is tested in DoctrineBundle?
+
+---------------------------------------------------------------------------
+
+by mbabker at 2021-11-13T18:06:15Z
+
+It would have to be since `loadMappingInformation()` gets called when configuring an entity manager.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-13T18:09:05Z
+
+Can you please send a PR to DoctrineBundle to add the new arguments there?
+
+---------------------------------------------------------------------------
+
+by mbabker at 2021-11-13T18:14:37Z
+
+Sure thing!
+
+---------------------------------------------------------------------------
+
+by mbabker at 2021-11-13T18:41:08Z
+
+DoctrineBundle PR is https://github.com/doctrine/DoctrineBundle/pull/1418
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-11-16T07:59:49Z
+
+Not sure what "newer bundle directory structure" refers to.
+Current docs seem unchanged for many years: https://symfony.com/doc/current/bundles.html
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-11-16T08:01:59Z
+
+To answer my own question: https://github.com/symfony/symfony/pull/32845
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-16T08:05:54Z
+
+See also https://github.com/symfony/symfony-docs/issues/16109, doc has some inconsistencies that should be fixed.

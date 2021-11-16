@@ -112,6 +112,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     public function provideInvalidCreateConnection(): array
     {
         return [
+            ['redis://localhost/foo'],
             ['foo://localhost'],
             ['redis://'],
         ];

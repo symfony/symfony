@@ -313,6 +313,31 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertFalse($manager->decide($token, ['foo'], 'bar'));
     }
 
+    public function testCacheableVotersWithMultipleAttributesAndNonString()
+    {
+        $token = $this->createMock(TokenInterface::class);
+        $voter = $this->getMockBuilder(CacheableVoterInterface::class)->getMockForAbstractClass();
+        $voter
+            ->expects($this->once())
+            ->method('supportsAttribute')
+            ->with('foo')
+            ->willReturn(false);
+        $voter
+            // Voter does not support "foo", but given 1337 is not a string, it implicitly supports it.
+            ->expects($this->once())
+            ->method('supportsType')
+            ->with('string')
+            ->willReturn(true);
+        $voter
+            ->expects($this->once())
+            ->method('vote')
+            ->with($token, 'bar', ['foo', 1337])
+            ->willReturn(VoterInterface::ACCESS_GRANTED);
+
+        $manager = new AccessDecisionManager([$voter]);
+        $this->assertTrue($manager->decide($token, ['foo', 1337], 'bar', true));
+    }
+
     protected function getVoters($grants, $denies, $abstains)
     {
         $voters = [];

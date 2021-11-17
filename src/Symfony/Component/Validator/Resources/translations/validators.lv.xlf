@@ -268,7 +268,7 @@
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>TŠai vērtībai ir jābūt mazākai vai vienādai ar {{ compared_value }}.</target>
+                <target>Šai vērtībai ir jābūt mazākai vai vienādai ar {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>

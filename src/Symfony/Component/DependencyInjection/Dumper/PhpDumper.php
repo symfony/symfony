@@ -331,7 +331,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require $autoloadFile;
-(require __DIR__.'/Container{$hash}/{$options['class']}.php')->set(\\Container{$hash}\\{$options['class']}::class, null);
+(require __DIR__.'/{$options['class']}.php')->set(\\Container{$hash}\\{$options['class']}::class, null);
 $preloadedFiles
 \$classes = [];
 

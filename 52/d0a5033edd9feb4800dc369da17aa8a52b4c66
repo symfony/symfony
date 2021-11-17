@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-11-16T18:02:05Z
+
+I'm taking the opportunity to add tests for the range operator with actual numbers because there are none. My initial implementation in the other PR fails for them but I did not notice it until now because there were no tests.

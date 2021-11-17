@@ -37,6 +37,7 @@ FrameworkBundle
  * Deprecate the public `profiler` service to private
  * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
  * Deprecate the `cache.adapter.doctrine` service: The Doctrine Cache library is deprecated. Either switch to Symfony Cache or use the PSR-6 adapters provided by Doctrine Cache.
+ * In `framework.cache` configuration, using `cache.adapter.pdo` adapter with a Doctrine DBAL connection is deprecated, use `cache.adapter.doctrine_dbal` instead.
 
 HttpKernel
 ----------

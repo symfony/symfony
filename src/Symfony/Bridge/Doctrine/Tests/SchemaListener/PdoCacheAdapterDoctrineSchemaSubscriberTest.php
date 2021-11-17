@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\SchemaListener\PdoCacheAdapterDoctrineSchemaSubscriber;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
@@ -24,20 +25,25 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
  */
 class PdoCacheAdapterDoctrineSchemaSubscriberTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testPostGenerateSchema()
     {
         $schema = new Schema();
         $dbalConnection = $this->createMock(Connection::class);
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects($this->once())
+        $entityManager->expects($this->any())
             ->method('getConnection')
             ->willReturn($dbalConnection);
+
         $event = new GenerateSchemaEventArgs($entityManager, $schema);
 
         $pdoAdapter = $this->createMock(PdoAdapter::class);
         $pdoAdapter->expects($this->once())
             ->method('configureSchema')
-            ->with($schema, $dbalConnection);
+            ->with($event->getSchema(), $event->getEntityManager()->getConnection());
+
+        $this->expectDeprecation('Since symfony/doctrine-bridge 5.4: The "Symfony\Bridge\Doctrine\SchemaListener\PdoCacheAdapterDoctrineSchemaSubscriber" class is deprecated, use "Symfony\Bridge\Doctrine\SchemaListener\DoctrineDbalCacheAdapterSchemaSubscriber" instead.');
 
         $subscriber = new PdoCacheAdapterDoctrineSchemaSubscriber([$pdoAdapter]);
         $subscriber->postGenerateSchema($event);

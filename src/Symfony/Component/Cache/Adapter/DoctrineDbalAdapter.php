@@ -23,7 +23,7 @@ use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\PruneableInterface;
 
-final class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface, DoctrineSchemaConfiguratorInterface
+class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 {
     protected $maxIdLength = 255;
 

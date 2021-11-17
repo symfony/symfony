@@ -1659,13 +1659,8 @@ class Process implements \IteratorAggregate
 
     private function getDefaultEnv(): array
     {
-        $env = [];
-
-        foreach ($_SERVER as $k => $v) {
-            if (\is_string($v) && false !== $v = getenv($k)) {
-                $env[$k] = $v;
-            }
-        }
+        $env = getenv();
+        $env = array_intersect_key($env, $_SERVER) ?: $env;
 
         foreach ($_ENV as $k => $v) {
             if (\is_string($v)) {

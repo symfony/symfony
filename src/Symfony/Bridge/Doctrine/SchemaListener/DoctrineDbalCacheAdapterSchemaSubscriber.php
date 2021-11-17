@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\SchemaListener;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
-use Symfony\Component\Cache\Adapter\DoctrineSchemaConfiguratorInterface;
+use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 
 /**
  * Automatically adds the cache table needed for the DoctrineDbalAdapter of
@@ -27,7 +27,7 @@ final class DoctrineDbalCacheAdapterSchemaSubscriber implements EventSubscriber
     private $dbalAdapters;
 
     /**
-     * @param iterable<mixed, DoctrineSchemaConfiguratorInterface> $dbalAdapters
+     * @param iterable<mixed, DoctrineDbalAdapter> $dbalAdapters
      */
     public function __construct(iterable $dbalAdapters)
     {

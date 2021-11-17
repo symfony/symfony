@@ -284,7 +284,7 @@ class Exporter
         $r = '\\'.Registry::class;
         $j = -1;
 
-        foreach ($value as $k => $class) {
+        foreach ($value->classes as $k => $class) {
             if (':' === ($class[1] ?? null)) {
                 $serializables[$k] = $class;
                 continue;

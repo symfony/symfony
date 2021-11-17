@@ -27,7 +27,6 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  */
 class CouchbaseCollectionAdapter extends AbstractAdapter
 {
-    private const THIRTY_DAYS_IN_SECONDS = 2592000;
     private const MAX_KEY_LENGTH = 250;
 
     private Collection $connection;
@@ -115,7 +114,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
 
     public static function isSupported(): bool
     {
-        return \extension_loaded('couchbase') && version_compare(phpversion('couchbase'), '3.0', '>=') && version_compare(phpversion('couchbase'), '4.0', '<');
+        return \extension_loaded('couchbase') && version_compare(phpversion('couchbase'), '3.0.5', '>=') && version_compare(phpversion('couchbase'), '4.0', '<');
     }
 
     private static function getOptions(string $options): array
@@ -198,7 +197,6 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
             return $failed;
         }
 
-        $lifetime = $this->normalizeExpiry($lifetime);
         $upsertOptions = new UpsertOptions();
         $upsertOptions->expiry($lifetime);
 
@@ -212,14 +210,5 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         }
 
         return [] === $ko ? true : $ko;
-    }
-
-    private function normalizeExpiry(int $expiry): int
-    {
-        if ($expiry && $expiry > static::THIRTY_DAYS_IN_SECONDS) {
-            $expiry += time();
-        }
-
-        return $expiry;
     }
 }

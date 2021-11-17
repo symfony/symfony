@@ -51,7 +51,7 @@ class ProjectServiceContainer extends Container
         $this->aliases = [];
 
         $this->privates['service_container'] = function () {
-            include __DIR__.'/proxy-classes.php';
+            include_once __DIR__.'/proxy-classes.php';
         };
     }
 
@@ -169,7 +169,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
-(require __DIR__.'/Container%s/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
+(require __DIR__.'/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
 
 $classes = [];
 $classes[] = 'Bar\FooClass';

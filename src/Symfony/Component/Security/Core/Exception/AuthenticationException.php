@@ -21,7 +21,16 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AuthenticationException extends RuntimeException
 {
+    /** @internal */
+    protected $serialized;
+
     private ?TokenInterface $token = null;
+
+    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
+    {
+        unset($this->serialized);
+        parent::__construct($message, $code, $previous);
+    }
 
     public function getToken(): ?TokenInterface
     {

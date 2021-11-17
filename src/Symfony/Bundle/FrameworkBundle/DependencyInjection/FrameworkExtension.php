@@ -33,6 +33,8 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
+use Symfony\Component\Cache\Adapter\DoctrineAdapter;
+use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
@@ -2078,6 +2080,14 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('cache.default_marshaller');
         }
 
+        if (!class_exists(DoctrineAdapter::class)) {
+            $container->removeDefinition('cache.adapter.doctrine');
+        }
+
+        if (!class_exists(DoctrineDbalAdapter::class)) {
+            $container->removeDefinition('cache.adapter.doctrine_dbal');
+        }
+
         $version = new Parameter('container.build_id');
         $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
@@ -2090,7 +2100,7 @@ class FrameworkExtension extends Extension
             // Inline any env vars referenced in the parameter
             $container->setParameter('cache.prefix.seed', $container->resolveEnvPlaceholders($container->getParameter('cache.prefix.seed'), true));
         }
-        foreach (['doctrine', 'psr6', 'redis', 'memcached', 'pdo'] as $name) {
+        foreach (['doctrine', 'psr6', 'redis', 'memcached', 'doctrine_dbal', 'pdo'] as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
                 $container->setAlias('cache.'.$name, new Alias(CachePoolPass::getServiceProvider($container, $config[$name]), false));
             }

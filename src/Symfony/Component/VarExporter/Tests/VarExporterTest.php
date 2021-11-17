@@ -391,6 +391,8 @@ class ConcreteClass extends AbstractClass
 
 class Php74Serializable implements \Serializable
 {
+    public $foo;
+
     public function __serialize(): array
     {
         return [$this->foo = new \stdClass()];

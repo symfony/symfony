@@ -324,7 +324,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require $autoloadFile;
-(require __DIR__.'/Container{$hash}/{$options['class']}.php')->set(\\Container{$hash}\\{$options['class']}::class, null);
+(require __DIR__.'/{$options['class']}.php')->set(\\Container{$hash}\\{$options['class']}::class, null);
 $preloadedFiles
 \$classes = [];
 
@@ -1472,7 +1472,7 @@ EOF;
         }
 
         if ($hasProxyClasses) {
-            $code .= "\n            include __DIR__.'/proxy-classes.php';";
+            $code .= "\n            include_once __DIR__.'/proxy-classes.php';";
         }
 
         return $code ? sprintf("\n        \$this->privates['service_container'] = function () {%s\n        };\n", $code) : '';

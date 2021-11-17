@@ -16,6 +16,7 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
@@ -161,6 +162,23 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('cache.pool', [
                 'provider' => 'cache.default_memcached_provider',
+                'clearer' => 'cache.default_clearer',
+                'reset' => 'reset',
+            ])
+            ->tag('monolog.logger', ['channel' => 'cache'])
+
+        ->set('cache.adapter.doctrine_dbal', DoctrineDbalAdapter::class)
+            ->abstract()
+            ->args([
+                abstract_arg('DBAL connection service'),
+                '', // namespace
+                0, // default lifetime
+                [], // table options
+                service('cache.default_marshaller')->ignoreOnInvalid(),
+            ])
+            ->call('setLogger', [service('logger')->ignoreOnInvalid()])
+            ->tag('cache.pool', [
+                'provider' => 'cache.default_doctrine_dbal_provider',
                 'clearer' => 'cache.default_clearer',
                 'reset' => 'reset',
             ])

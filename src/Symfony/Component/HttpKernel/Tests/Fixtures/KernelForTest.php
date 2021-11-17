@@ -27,7 +27,7 @@ class KernelForTest extends Kernel
 
     public function getBundleMap()
     {
-        return $this->bundleMap;
+        return [];
     }
 
     public function registerBundles(): iterable

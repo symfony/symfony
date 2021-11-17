@@ -10,6 +10,8 @@ DoctrineBridge
 --------------
 
  * Remove `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()`
+ * Add argument `$bundleDir` to `AbstractDoctrineExtension::getMappingDriverBundleConfigDefaults()`
+ * Add argument `$bundleDir` to `AbstractDoctrineExtension::getMappingResourceConfigDirectory()`
 
 Cache
 -----
@@ -108,6 +110,7 @@ FrameworkBundle
  * Remove `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
  * Deprecate the `cache.adapter.doctrine` service: The Doctrine Cache library is deprecated. Either switch to Symfony Cache or use the PSR-6 adapters provided by Doctrine Cache.
  * Make the `framework.messenger.reset_on_message` configuration option default to `true`
+ * In `framework.cache` configuration, using the `cache.adapter.pdo` with a Doctrine DBAL connection is no longer supported, use `cache.adapter.doctrine_dbal` instead.
 
 HttpFoundation
 --------------

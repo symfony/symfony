@@ -32,6 +32,8 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
  */
 class MultiplierRetryStrategy implements RetryStrategyInterface
 {
+    use RetryRecoveryBehaviorTrait;
+
     private int $maxRetries;
     private int $delayMilliseconds;
     private float $multiplier;
@@ -61,16 +63,6 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
             throw new InvalidArgumentException(sprintf('Max delay must be greater than or equal to zero: "%s" given.', $maxDelayMilliseconds));
         }
         $this->maxDelayMilliseconds = $maxDelayMilliseconds;
-    }
-
-    /**
-     * @param \Throwable|null $throwable The cause of the failed handling
-     */
-    public function isRetryable(Envelope $message, \Throwable $throwable = null): bool
-    {
-        $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
-
-        return $retries < $this->maxRetries;
     }
 
     /**

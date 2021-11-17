@@ -13,10 +13,12 @@ namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -63,7 +65,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $senderLocator->expects($this->once())->method('has')->willReturn(true);
         $senderLocator->expects($this->once())->method('get')->willReturn($sender);
         $retryStategy = $this->createMock(RetryStrategyInterface::class);
-        $retryStategy->expects($this->never())->method('isRetryable');
+        $retryStategy->expects($this->once())->method('isRetryable')->willReturn(true);
         $retryStategy->expects($this->once())->method('getWaitingTime')->willReturn(1000);
         $retryStrategyLocator = $this->createMock(ContainerInterface::class);
         $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
@@ -186,6 +188,53 @@ class SendFailedMessageForRetryListenerTest extends TestCase
 
         $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator);
 
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
+
+        $listener->onMessageFailed($event);
+    }
+
+    public function testUsesRetryStrategyToDetermineLogSeverityForRecoverableExceptions()
+    {
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->once())->method('send')->willReturn(new Envelope(new \stdClass(), []));
+        $senderLocator = $this->createMock(ContainerInterface::class);
+        $senderLocator->expects($this->once())->method('has')->willReturn(true);
+        $senderLocator->expects($this->once())->method('get')->willReturn($sender);
+        $retryStategy = $this->createMock(RetryStrategyInterface::class);
+        $retryStategy->expects($this->once())->method('isRetryable')->willReturn(true);
+        $retryStategy->expects($this->once())->method('getLogSeverity')->willReturn('info');
+        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
+        $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
+        $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStategy);
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log')->with('info');
+
+        $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator, $logger);
+
+        $exception = new RecoverableMessageHandlingException('retry');
+        $envelope = new Envelope(new \stdClass());
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
+
+        $listener->onMessageFailed($event);
+    }
+
+    public function testUsesRetryStrategyToDetermineLogSeverityForUnrecoverableExceptions()
+    {
+        $senderLocator = $this->createMock(ContainerInterface::class);
+        $retryStategy = $this->createMock(RetryStrategyInterface::class);
+        $retryStategy->expects($this->once())->method('isRetryable')->willReturn(false);
+        $retryStategy->expects($this->once())->method('getLogSeverity')->willReturn('info');
+        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
+        $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
+        $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStategy);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log')->with('info');
+
+        $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator, $logger);
+
+        $exception = new UnrecoverableMessageHandlingException('retry');
+        $envelope = new Envelope(new \stdClass());
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);

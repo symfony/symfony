@@ -12,7 +12,11 @@
 namespace Symfony\Component\Messenger\Tests\Retry;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 
@@ -58,6 +62,45 @@ class MultiplierRetryStrategyTest extends TestCase
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp($previousRetries)]);
 
         $this->assertSame($expectedDelay, $strategy->getWaitingTime($envelope));
+    }
+
+    public function testUnrecoverableExceptionsAreLoggedCritical()
+    {
+        $strategy = new MultiplierRetryStrategy();
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0)]);
+        $exception = new UnrecoverableMessageHandlingException();
+
+        $this->assertSame(LogLevel::CRITICAL, $strategy->getLogSeverity($envelope, $exception));
+        $this->assertSame(LogLevel::CRITICAL, $strategy->getLogSeverity($envelope, new HandlerFailedException($envelope, [$exception])));
+    }
+
+    public function testRecoverableExceptionsAreLoggedWarning()
+    {
+        $strategy = new MultiplierRetryStrategy();
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0)]);
+        $exception = new RecoverableMessageHandlingException();
+
+        $this->assertSame(LogLevel::WARNING, $strategy->getLogSeverity($envelope, $exception));
+        $this->assertSame(LogLevel::WARNING, $strategy->getLogSeverity($envelope, new HandlerFailedException($envelope, [$exception])));
+    }
+
+    public function testNeutralExceptionsAreLoggedWarningAfterNonFinalAttempt()
+    {
+        $strategy = new MultiplierRetryStrategy();
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0)]);
+        $exception = new \Exception();
+
+        $this->assertSame(LogLevel::WARNING, $strategy->getLogSeverity($envelope, $exception));
+        $this->assertSame(LogLevel::WARNING, $strategy->getLogSeverity($envelope, new HandlerFailedException($envelope, [$exception])));
+    }
+
+    public function testNeutralExceptionsAreLoggedCriticalAfterFinalAttempt()
+    {
+        $strategy = new MultiplierRetryStrategy();
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(3)]);
+        $exception = new \Exception();
+
+        $this->assertSame(LogLevel::CRITICAL, $strategy->getLogSeverity($envelope, $exception));
     }
 
     public function getWaitTimeTests(): iterable

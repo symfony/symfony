@@ -5,6 +5,8 @@ namespace Symfony\Component\Messenger\Tests\Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Tests\Fixtures\MyOwnChildException;
 use Symfony\Component\Messenger\Tests\Fixtures\MyOwnException;
 
@@ -56,5 +58,46 @@ class HandlerFailedExceptionTest extends TestCase
 
         $handlerException = new HandlerFailedException($envelope, [$exception]);
         $this->assertCount(0, $handlerException->getNestedExceptionOfClass(MyOwnException::class));
+    }
+
+    public function testFailureIsConsideredUnrecoverableWithSingleNestedUnrecoverableExceptions()
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $handlerException = new HandlerFailedException($envelope, [new UnrecoverableMessageHandlingException()]);
+        $this->assertTrue($handlerException->isUnrecoverable());
+    }
+
+    public function testFailureIsConsideredUnrecoverableWithMultipleNestedUnrecoverableExceptions()
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $handlerException = new HandlerFailedException($envelope, [new UnrecoverableMessageHandlingException(), new UnrecoverableMessageHandlingException()]);
+        $this->assertTrue($handlerException->isUnrecoverable());
+    }
+
+    public function testFailureIsNotConsideredUnrecoverableWhenNotAllExceptionsAreUnrecoverable()
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $handlerException = new HandlerFailedException($envelope, [new UnrecoverableMessageHandlingException(), new \LogicException()]);
+        $this->assertFalse($handlerException->isUnrecoverable());
+    }
+
+    public function testFailureIsConsideredRecoverableWithAnyNestedRecoverableExceptions()
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $handlerException = new HandlerFailedException($envelope, [new \LogicException(), new RecoverableMessageHandlingException()]);
+        $this->assertTrue($handlerException->isRecoverable());
+    }
+
+    public function testFailureIsConsideredNeutralWithNoRecoverableOrUnrecoverableExceptions()
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $handlerException = new HandlerFailedException($envelope, [new \LogicException()]);
+        $this->assertFalse($handlerException->isUnrecoverable());
+        $this->assertFalse($handlerException->isRecoverable());
     }
 }

@@ -64,4 +64,36 @@ class HandlerFailedException extends RuntimeException
             )
         );
     }
+
+    /**
+     * Determine if failure was unrecoverable.
+     *
+     * If ALL nested Exceptions are an instance of UnrecoverableExceptionInterface the failure is unrecoverable
+     */
+    public function isUnrecoverable(): bool
+    {
+        foreach ($this->exceptions as $nestedException) {
+            if (!$nestedException instanceof UnrecoverableExceptionInterface) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if failure was recoverable.
+     *
+     * If one or more nested Exceptions is an instance of RecoverableExceptionInterface the failure is recoverable
+     */
+    public function isRecoverable(): bool
+    {
+        foreach ($this->exceptions as $nestedException) {
+            if ($nestedException instanceof RecoverableExceptionInterface) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Envelope;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Ryan Weaver <ryan@symfonycasts.com>
+ * @author Joris Steyn <symfony@j0r1s.nl>
  */
 interface RetryStrategyInterface
 {
@@ -31,4 +32,9 @@ interface RetryStrategyInterface
      * @return int The time to delay/wait in milliseconds
      */
     public function getWaitingTime(Envelope $message, \Throwable $throwable = null): int;
+
+    /**
+     * @return string The \Psr\Log\LogLevel log severity
+     */
+    public function getLogSeverity(Envelope $message, \Throwable $throwable = null): string;
 }

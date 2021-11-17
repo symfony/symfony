@@ -402,8 +402,6 @@
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
                 <target>Tarmoq niqobining qiymati {{ min }} va {{ max }} oralig'ida bo'lishi kerak.</target>
             </trans-unit>
-            
-            
         </body>
     </file>
 </xliff>

@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-11-16T09:31:26Z
+
+> * remove `final` on DoctrineDbalAdapter, it's not needed
+
+👍🏻 to simplify. That would remove the interface that has been added for mocking.
+Original discussion https://github.com/symfony/symfony/pull/43362#discussion_r724850834.
+
+> * remove the class_exists check in cache.php and move it to the extension
+
+Do you mean the existing one? https://github.com/symfony/symfony/blob/1ad786578d238db5c6f5cdba91b8051d2bfec497/src/Symfony/Bundle/FrameworkBundle/Resources/config/cache.php#L99
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-16T09:33:21Z
+
+yes, please remove the interface
+yes, this line :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-16T09:35:36Z
+
+btw, the deprecation message should be updated also:
+`The "%service_id%" service inherits from "cache.adapter.doctrine" which is deprecated.`
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-11-16T10:35:15Z
+
+Thanks for the review. Ready!

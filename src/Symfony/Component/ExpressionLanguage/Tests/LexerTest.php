@@ -70,7 +70,7 @@ class LexerTest extends TestCase
                 '"foo"',
             ],
             [
-                [new Token('number', '3', 1)],
+                [new Token('number', 3, 1)],
                 '3',
             ],
             [
@@ -84,9 +84,9 @@ class LexerTest extends TestCase
             [
                 [
                     new Token('punctuation', '(', 1),
-                    new Token('number', '3', 2),
+                    new Token('number', 3, 2),
                     new Token('operator', '+', 4),
-                    new Token('number', '5', 6),
+                    new Token('number', 5, 6),
                     new Token('punctuation', ')', 7),
                     new Token('operator', '~', 9),
                     new Token('name', 'foo', 11),
@@ -96,16 +96,24 @@ class LexerTest extends TestCase
                     new Token('punctuation', '.', 21),
                     new Token('name', 'baz', 22),
                     new Token('punctuation', '[', 25),
-                    new Token('number', '4', 26),
+                    new Token('number', 4, 26),
                     new Token('punctuation', ']', 27),
                     new Token('operator', '-', 29),
-                    new Token('number', '1990', 31),
+                    new Token('number', 1990, 31),
                 ],
                 '(3 + 5) ~ foo("bar").baz[4] - 1.99E+3',
             ],
             [
                 [new Token('operator', '..', 1)],
                 '..',
+            ],
+            [
+                [
+                    new Token('number', 23, 1),
+                    new Token('operator', '..', 3),
+                    new Token('number', 26, 5),
+                ],
+                '23..26',
             ],
             [
                 [new Token('string', '#foo', 1)],

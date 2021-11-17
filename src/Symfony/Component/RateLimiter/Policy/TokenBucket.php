@@ -20,6 +20,7 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
+    private string $stringRate;
     private string $id;
     private Rate $rate;
     private int $tokens;
@@ -34,6 +35,8 @@ final class TokenBucket implements LimiterStateInterface
      */
     public function __construct(string $id, int $initialTokens, Rate $rate, float $timer = null)
     {
+        unset($this->stringRate);
+
         if ($initialTokens < 1) {
             throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
         }
@@ -91,10 +94,6 @@ final class TokenBucket implements LimiterStateInterface
      */
     public function __wakeup(): void
     {
-        if (!\is_string($this->stringRate)) {
-            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-        }
-
         $this->rate = Rate::fromString($this->stringRate);
         unset($this->stringRate);
     }

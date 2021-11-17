@@ -134,6 +134,16 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testNormalizeObjectWithUnsetProperties()
+    {
+        $obj = new ObjectInner();
+        unset($obj->foo);
+        $this->assertEquals(
+            ['bar' => null],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     public function testNormalizeObjectWithUninitializedPrivateProperties()
     {
         $obj = new Php74DummyPrivate();

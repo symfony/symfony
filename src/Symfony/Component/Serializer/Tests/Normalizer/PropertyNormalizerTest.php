@@ -102,6 +102,16 @@ class PropertyNormalizerTest extends TestCase
         );
     }
 
+    public function testNormalizeObjectWithUnsetProperties()
+    {
+        $obj = new PropertyDummy();
+        unset($obj->foo);
+        $this->assertEquals(
+            ['bar' => null, 'camelCase' => null],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     public function testDenormalize()
     {
         $obj = $this->normalizer->denormalize(

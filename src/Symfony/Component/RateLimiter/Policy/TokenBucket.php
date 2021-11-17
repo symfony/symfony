@@ -21,6 +21,7 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
+    private $stringRate;
     private $id;
     private $rate;
 
@@ -47,6 +48,8 @@ final class TokenBucket implements LimiterStateInterface
      */
     public function __construct(string $id, int $initialTokens, Rate $rate, float $timer = null)
     {
+        unset($this->stringRate);
+
         if ($initialTokens < 1) {
             throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
         }

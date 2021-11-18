@@ -7,6 +7,28 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.0-BETA3 (2021-11-18)
+
+ * feature #44125 Add a setter on DateTimeNormalizer to change the default context at runtime (Seldaek)
+ * bug #44110 [FrameworkBundle] Fix default PHP attributes support in validation and serializer configuration when doctrine/annotations is not installed with PHP 8 (fancyweb)
+ * bug #44115 [WebProfilerBundle] Tweak the colors of the security panel (javiereguiluz)
+ * bug #44121 [Serializer] fix support for lazy properties (nicolas-grekas)
+ * bug #44108 [FrameworkBundle][Messenger] remove `FlattenExceptionNormalizer` definition if serializer not available (kbond)
+ * bug #44111 [Serializer] fix support for unset properties on PHP < 7.4 (nicolas-grekas)
+ * bug #44098 [DependencyInjection] fix preloading (nicolas-grekas)
+ * bug #44065 [FrameworkBundle] Add framework config for DBAL cache adapter (GromNaN)
+ * bug #44096 Make ExpressionVoter Cacheable (jderusse)
+ * bug #44070 [Process] intersect with getenv() to populate default envs (nicolas-grekas)
+ * feature #43181 Allow AbstractDoctrineExtension implementations to support the newer bundle structure (mbabker)
+ * bug #44060 [Cache] Fix calculate ttl in couchbase sdk 3.0 (ajcerezo)
+ * bug #43990 [Translation] [Loco] Generate id parameter instead of letting Loco do it (welcoMattic)
+ * bug #44043 [Cache] fix dbindex Redis (a1812)
+ * feature #44015 [Cache] Decrease the probability of invalidation loss on tag eviction (nicolas-grekas)
+ * bug #44064 [Cache] fix releasing not acquired locks (nicolas-grekas)
+ * bug #44063 [DependencyInjection] fix creating 2nd container instances (nicolas-grekas)
+ * bug #44051 [Notifier] Fix package name (fabpot)
+ * bug #44050 [Notifier] Fix package names (fabpot)
+
 * 5.4.0-BETA2 (2021-11-14)
 
  * bug #44042 Fix DateIntervalToStringTransformer::transform() doc (BenMorel)

@@ -1936,6 +1936,10 @@ class FrameworkExtension extends Extension
 
         $loader->load('messenger.php');
 
+        if (!interface_exists(DenormalizerInterface::class)) {
+            $container->removeDefinition('serializer.normalizer.flatten_exception');
+        }
+
         if (ContainerBuilder::willBeAvailable('symfony/amqp-messenger', AmqpTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'], true)) {
             $container->getDefinition('messenger.transport.amqp.factory')->addTag('messenger.transport_factory');
         }

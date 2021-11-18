@@ -59,6 +59,8 @@ use Symfony\Component\Notifier\Transport\NullTransportFactory;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+        ->alias('notifier.transport_factory.allmysms', 'notifier.transport_factory.all-my-sms')
+            ->deprecate('symfony/framework-bundle', '5.4', 'The "%alias_id% service is deprecated, use "notifier.transport_factory.all-my-sms" instead.')
         ->alias('notifier.transport_factory.fakechat', 'notifier.transport_factory.fake-chat')
             ->deprecate('symfony/framework-bundle', '5.4', 'The "%alias_id% service is deprecated, use "notifier.transport_factory.fake-chat" instead.')
         ->alias('notifier.transport_factory.fakesms', 'notifier.transport_factory.fake-sms')
@@ -118,7 +120,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 
-        ->set('notifier.transport_factory.allmysms', AllMySmsTransportFactory::class)
+        ->set('notifier.transport_factory.all-my-sms', AllMySmsTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 

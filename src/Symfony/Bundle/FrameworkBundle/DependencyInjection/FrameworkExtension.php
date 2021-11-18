@@ -387,6 +387,8 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
+        } else {
+            $container->removeDefinition('console.command.assets_install');
         }
 
         if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {

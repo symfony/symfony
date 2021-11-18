@@ -67,6 +67,8 @@ return static function (ContainerConfigurator $container) {
             ->deprecate('symfony/framework-bundle', '5.4', 'The "%alias_id% service is deprecated, use "notifier.transport_factory.fake-sms" instead.')
         ->alias('notifier.transport_factory.freemobile', 'notifier.transport_factory.free-mobile')
             ->deprecate('symfony/framework-bundle', '5.4', 'The "%alias_id% service is deprecated, use "notifier.transport_factory.free-mobile" instead.')
+        ->alias('notifier.transport_factory.gatewayapi', 'notifier.transport_factory.gateway-api')
+            ->deprecate('symfony/framework-bundle', '5.4', 'The "%alias_id% service is deprecated, use "notifier.transport_factory.gateway-api" instead.')
         ->alias('notifier.transport_factory.googlechat', 'notifier.transport_factory.google-chat')
             ->deprecate('symfony/framework-bundle', '5.4', 'The "%alias_id% service is deprecated, use "notifier.transport_factory.google-chat" instead.')
         ->alias('notifier.transport_factory.lightsms', 'notifier.transport_factory.light-sms')
@@ -192,7 +194,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
 
-        ->set('notifier.transport_factory.gatewayapi', GatewayApiTransportFactory::class)
+        ->set('notifier.transport_factory.gateway-api', GatewayApiTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 

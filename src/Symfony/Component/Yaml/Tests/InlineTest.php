@@ -906,21 +906,31 @@ class InlineTest extends TestCase
         ];
     }
 
+    public function testParseSingleQuotedTaggedString()
+    {
+        $this->assertSame('foo', Inline::parse("!!str 'foo'"));
+    }
+
+    public function testParseDoubleQuotedTaggedString()
+    {
+        $this->assertSame('foo', Inline::parse('!!str "foo"'));
+    }
+
     public function testParseQuotedReferenceLikeStringsInMapping()
     {
         $yaml = <<<YAML
-{foo: '&foo', bar: "&bar"}
+{foo: '&foo', bar: "&bar", baz: !!str '&baz'}
 YAML;
 
-        $this->assertSame(['foo' => '&foo', 'bar' => '&bar'], Inline::parse($yaml));
+        $this->assertSame(['foo' => '&foo', 'bar' => '&bar', 'baz' => '&baz'], Inline::parse($yaml));
     }
 
     public function testParseQuotedReferenceLikeStringsInSequence()
     {
         $yaml = <<<YAML
-['&foo', "&bar" ]
+['&foo', "&bar", !!str '&baz']
 YAML;
 
-        $this->assertSame(['&foo', '&bar'], Inline::parse($yaml));
+        $this->assertSame(['&foo', '&bar', '&baz'], Inline::parse($yaml));
     }
 }

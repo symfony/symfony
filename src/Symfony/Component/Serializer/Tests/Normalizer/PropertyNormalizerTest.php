@@ -111,6 +111,16 @@ class PropertyNormalizerTest extends TestCase
         );
     }
 
+    public function testNormalizeObjectWithLazyProperties()
+    {
+        $obj = new LazyPropertyDummy();
+        unset($obj->foo);
+        $this->assertEquals(
+            ['foo' => 123, 'bar' => null, 'camelCase' => null],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     public function testDenormalize()
     {
         $obj = $this->normalizer->denormalize(
@@ -505,6 +515,16 @@ class PropertyDummy
     public function setCamelCase($camelCase)
     {
         $this->camelCase = $camelCase;
+    }
+}
+
+class LazyPropertyDummy extends PropertyDummy
+{
+    public function __get($name)
+    {
+        if ('foo' === $name) {
+            return $this->foo = 123;
+        }
     }
 }
 

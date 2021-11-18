@@ -101,13 +101,15 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     {
         $reflectionObject = new \ReflectionObject($object);
         $attributes = [];
-        $propertyValues = (array) $object;
+        $propertyValues = !method_exists($object, '__get') ? (array) $object : null;
 
         do {
             foreach ($reflectionObject->getProperties() as $property) {
-                if (($property->isPublic() && !\array_key_exists($property->name, $propertyValues))
-                    || ($property->isProtected() && !\array_key_exists("\0*\0{$property->name}", $propertyValues))
-                    || ($property->isPrivate() && !\array_key_exists("\0{$property->class}\0{$property->name}", $propertyValues))
+                if ((null !== $propertyValues && (
+                        ($property->isPublic() && !\array_key_exists($property->name, $propertyValues))
+                        || ($property->isProtected() && !\array_key_exists("\0*\0{$property->name}", $propertyValues))
+                        || ($property->isPrivate() && !\array_key_exists("\0{$property->class}\0{$property->name}", $propertyValues))
+                    ))
                     || !$this->isAllowedAttribute($reflectionObject->getName(), $property->name, $format, $context)
                 ) {
                     continue;

@@ -123,7 +123,7 @@ class MailgunApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TagHeader) {
-                $payload['o:tag'] = $header->getValue();
+                $payload[] = ['o:tag' => $header->getValue()];
 
                 continue;
             }

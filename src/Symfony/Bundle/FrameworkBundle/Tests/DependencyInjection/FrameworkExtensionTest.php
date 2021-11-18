@@ -721,6 +721,12 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 
+    public function testAssetsServicesRemovedWhenDisabled()
+    {
+        $container = $this->createContainerFromFile('assets_disabled');
+        $this->assertFalse($container->hasDefinition('console.command.assets_install'));
+    }
+
     public function testWebLink()
     {
         $container = $this->createContainerFromFile('web_link');

@@ -4,12 +4,7 @@
 
 {% block toolbar %}
     {% if collector.firewall %}
-        {% if collector.token %}
-            {% set is_authenticated = collector.enabled and collector.authenticated  %}
-            {% set color_code = not is_authenticated ? 'yellow' %}
-        {% else %}
-            {% set color_code = '' %}
-        {% endif %}
+        {% set color_code = collector.enabled and not collector.authenticatorManagerEnabled ? 'yellow' %}
 
         {% set icon %}
             {{ include('@Security/Collector/icon.svg') }}
@@ -36,7 +31,7 @@
 
                         <div class="sf-toolbar-info-piece">
                             <b>Authenticated</b>
-                            <span class="sf-toolbar-status sf-toolbar-status-{{ is_authenticated ? 'green' : 'yellow' }}">{{ is_authenticated ? 'Yes' : 'No' }}</span>
+                            <span class="sf-toolbar-status sf-toolbar-status-{{ collector.authenticated ? 'green' : 'yellow' }}">{{ collector.authenticated ? 'Yes' : 'No' }}</span>
                         </div>
 
                         <div class="sf-toolbar-info-piece">

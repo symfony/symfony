@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2021-11-17T19:27:01Z
+
+@javiereguiluz Hello, I remembered a discussion ago on this kind of subject here:
+- https://github.com/symfony/symfony/pull/41242
+
++1 to remove the color if no security is involved in this profile :)
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-18T13:11:49Z
+
+the color for the toolbar info seems to be kept as is, using the removed variable.

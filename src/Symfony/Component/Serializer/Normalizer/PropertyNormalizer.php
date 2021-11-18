@@ -133,6 +133,10 @@ class PropertyNormalizer extends AbstractObjectNormalizer
             $reflectionProperty->setAccessible(true);
         }
 
+        if (\PHP_VERSION_ID >= 70400 && $reflectionProperty->hasType()) {
+            return $reflectionProperty->getValue($object);
+        }
+
         if (!method_exists($object, '__get')) {
             $propertyValues = (array) $object;
 

@@ -415,6 +415,10 @@ class PropertyAccessor implements PropertyAccessorInterface
                         throw $e;
                     }
                 } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
+                    if (!method_exists($object, '__get') && !\array_key_exists($name, (array) $object)) {
+                        throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', $class, $name));
+                    }
+
                     $result[self::VALUE] = $object->$name;
 
                     if (isset($zval[self::REF]) && $access->canBeReference()) {

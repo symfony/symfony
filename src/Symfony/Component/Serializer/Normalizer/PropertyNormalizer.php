@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
+
 /**
  * Converts between objects and arrays by mapping properties.
  *
@@ -129,6 +131,17 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         // Override visibility
         if (!$reflectionProperty->isPublic()) {
             $reflectionProperty->setAccessible(true);
+        }
+
+        if (!method_exists($object, '__get')) {
+            $propertyValues = (array) $object;
+
+            if (($reflectionProperty->isPublic() && !\array_key_exists($reflectionProperty->name, $propertyValues))
+                || ($reflectionProperty->isProtected() && !\array_key_exists("\0*\0{$reflectionProperty->name}", $propertyValues))
+                || ($reflectionProperty->isPrivate() && !\array_key_exists("\0{$reflectionProperty->class}\0{$reflectionProperty->name}", $propertyValues))
+            ) {
+                throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', $reflectionProperty->class, $reflectionProperty->name));
+            }
         }
 
         return $reflectionProperty->getValue($object);

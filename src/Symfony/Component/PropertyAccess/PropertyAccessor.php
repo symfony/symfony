@@ -415,7 +415,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                         throw $e;
                     }
                 } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
-                    if (!method_exists($object, '__get') && !\array_key_exists($name, (array) $object)) {
+                    if (!method_exists($object, '__get') && !\array_key_exists($name, (array) $object) && !(new \ReflectionProperty($class, $name))->hasType()) {
                         throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', $class, $name));
                     }
 

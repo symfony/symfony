@@ -39,6 +39,11 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
     public function __construct(array $defaultContext = [])
     {
+        $this->setDefaultContext($defaultContext);
+    }
+
+    public function setDefaultContext(array $defaultContext): void
+    {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 

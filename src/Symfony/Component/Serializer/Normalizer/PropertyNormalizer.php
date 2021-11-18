@@ -133,7 +133,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
             $reflectionProperty->setAccessible(true);
         }
 
-        if (!method_exists($object, '__get')) {
+        if (!$reflectionProperty->hasType() && !method_exists($object, '__get')) {
             $propertyValues = (array) $object;
 
             if (($reflectionProperty->isPublic() && !\array_key_exists($reflectionProperty->name, $propertyValues))

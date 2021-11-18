@@ -194,6 +194,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     continue;
                 }
                 throw $e;
+            } catch (\Error $e) {
+                if (($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? true) && $this->isUninitializedValueError($e)) {
+                    continue;
+                }
+                throw $e;
             }
 
             if ($maxDepthReached) {
@@ -714,5 +719,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // The context cannot be serialized, skip the cache
             return false;
         }
+    }
+
+    /**
+     * This error may occur when specific object normalizer implementation gets attribute value
+     * by accessing a public uninitialized property or by calling a method accessing such property.
+     */
+    private function isUninitializedValueError(\Error $e): bool
+    {
+        return str_starts_with($e->getMessage(), 'Typed property')
+            && str_ends_with($e->getMessage(), 'must not be accessed before initialization');
     }
 }

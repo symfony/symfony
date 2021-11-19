@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by franmomu at 2021-11-18T10:24:04Z
+
+IMHO this should be targeted to `5.4`. The reason is that in `5.4`, since https://github.com/symfony/symfony/pull/43754, using `DoctrineMongoDBBundle` and PHP >= 8 it will set `attribute` as default mapping and will fail having documents with annotations.

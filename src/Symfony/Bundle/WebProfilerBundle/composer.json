@@ -33,6 +33,7 @@
     },
     "conflict": {
         "symfony/form": "<4.4",
+        "symfony/mailer": "<5.4",
         "symfony/messenger": "<4.4",
         "symfony/dependency-injection": "<5.2"
     },

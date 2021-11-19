@@ -139,16 +139,16 @@ class FormType extends BaseType
         };
 
         // Derive "empty_data" closure from "data_class" option
-        $emptyData = static function (Options $options): callable {
+        $emptyData = function (Options $options) {
             $class = $options['data_class'];
 
             if (null !== $class) {
-                return static function (FormInterface $form) use ($class): ?object {
+                return function (FormInterface $form) use ($class) {
                     return $form->isEmpty() && !$form->isRequired() ? null : new $class();
                 };
             }
 
-            return static function (FormInterface $form) {
+            return function (FormInterface $form) {
                 return $form->getConfig()->getCompound() ? [] : '';
             };
         };

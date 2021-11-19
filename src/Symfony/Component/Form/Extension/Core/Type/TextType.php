@@ -27,7 +27,7 @@ class TextType extends AbstractType implements DataTransformerInterface
         // See https://github.com/symfony/symfony/issues/5906#issuecomment-203189375
         if ('' === $options['empty_data']) {
             $builder->addViewTransformer($this);
-        } elseif (is_callable($options['empty_data'])) {
+        } elseif ($options['empty_data'] instanceof \Closure) {
             $scope = (new \ReflectionFunction($options['empty_data']))->getClosureScopeClass();
 
             if (null !== $scope && FormType::class === $scope->getName()) {

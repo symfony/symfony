@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+
 class TextTypeTest extends BaseTypeTest
 {
+    use ExpectDeprecationTrait;
+
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TextType';
     public const TESTED_TYPE_OPTIONS = [
         'empty_data' => null,
@@ -38,8 +42,10 @@ class TextTypeTest extends BaseTypeTest
     /**
      * @group legacy
      */
-    public function testDefaultEmptyDataCallback(): void
+    public function testDefaultEmptyDataCallback()
     {
+        $this->expectDeprecation('Since symfony/form 5.4: The default value of "empty_data" option in "Symfony\Component\Form\Extension\Core\Type\TextType" will be changed to empty string. Declare "NULL" as value for "empty_data" if you still want use "NULL" as data.');
+
         $form = $this->factory->create(static::TESTED_TYPE);
 
         $form->submit(null);

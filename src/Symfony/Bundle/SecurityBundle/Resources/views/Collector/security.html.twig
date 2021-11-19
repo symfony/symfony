@@ -4,8 +4,6 @@
 
 {% block toolbar %}
     {% if collector.firewall %}
-        {% set color_code = collector.enabled and not collector.authenticatorManagerEnabled ? 'yellow' %}
-
         {% set icon %}
             {{ include('@Security/Collector/icon.svg') }}
             <span class="sf-toolbar-value">{{ collector.user|default('n/a') }}</span>
@@ -85,7 +83,7 @@
             </div>
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: color_code }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
     {% endif %}
 {% endblock %}
 
@@ -176,12 +174,6 @@
                                 <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.firewall.stateless ? 'yes' : 'no') ~ '.svg') }}</span>
                                 <span class="label">Stateless</span>
                             </div>
-                            {% if collector.authenticatorManagerEnabled == false %}
-                                <div class="metric">
-                                    <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.firewall.allows_anonymous ? 'yes' : 'no') ~ '.svg') }}</span>
-                                    <span class="label">Allows anonymous</span>
-                                </div>
-                            {% endif %}
                         </div>
 
                         {% if collector.firewall.security_enabled %}
@@ -218,17 +210,10 @@
                                         <th>access_denied_url</th>
                                         <td>{{ collector.firewall.access_denied_url ?: '(none)' }}</td>
                                     </tr>
-                                    {% if collector.authenticatorManagerEnabled %}
-                                        <tr>
-                                            <th>authenticators</th>
-                                            <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth=1) }}</td>
-                                        </tr>
-                                    {% else %}
-                                        <tr>
-                                            <th>listeners</th>
-                                            <td>{{ collector.firewall.listeners is empty ? '(none)' : profiler_dump(collector.firewall.listeners, maxDepth=1) }}</td>
-                                        </tr>
-                                    {% endif %}
+                                    <tr>
+                                        <th>authenticators</th>
+                                        <td>{{ collector.firewall.authenticators is empty ? '(none)' : profiler_dump(collector.firewall.authenticators, maxDepth=1) }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         {% endif %}

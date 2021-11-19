@@ -35,6 +35,19 @@ class TextTypeTest extends BaseTypeTest
         $this->assertSame('', $form->getViewData());
     }
 
+    /**
+     * @group legacy
+     */
+    public function testDefaultEmptyDataCallback(): void
+    {
+        $form = $this->factory->create(static::TESTED_TYPE);
+
+        $form->submit(null);
+        $this->assertNull($form->getData());
+        $this->assertNull($form->getNormData());
+        $this->assertSame('', $form->getViewData());
+    }
+
     public function provideZeros()
     {
         return [

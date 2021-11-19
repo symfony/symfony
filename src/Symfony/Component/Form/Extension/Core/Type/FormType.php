@@ -30,13 +30,6 @@ class FormType extends BaseType
 {
     private DataMapper $dataMapper;
 
-    /**
-     * @internal
-     *
-     * @deprecated Don't use this property. It will be removed in symfony/form 6.0
-     */
-    public static $emptyData = null;
-
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->dataMapper = new DataMapper(new ChainAccessor([
@@ -146,21 +139,19 @@ class FormType extends BaseType
         };
 
         // Derive "empty_data" closure from "data_class" option
-        if (null === self::$emptyData) {
-            self::$emptyData = function (Options $options) {
-                $class = $options['data_class'];
+        $emptyData = static function (Options $options): callable {
+            $class = $options['data_class'];
 
-                if (null !== $class) {
-                    return function (FormInterface $form) use ($class) {
-                        return $form->isEmpty() && !$form->isRequired() ? null : new $class();
-                    };
-                }
-
-                return function (FormInterface $form) {
-                    return $form->getConfig()->getCompound() ? [] : '';
+            if (null !== $class) {
+                return static function (FormInterface $form) use ($class): ?object {
+                    return $form->isEmpty() && !$form->isRequired() ? null : new $class();
                 };
+            }
+
+            return static function (FormInterface $form) {
+                return $form->getConfig()->getCompound() ? [] : '';
             };
-        }
+        };
 
         // Wrap "post_max_size_message" in a closure to translate it lazily
         $uploadMaxSizeMessage = function (Options $options) {
@@ -183,7 +174,7 @@ class FormType extends BaseType
 
         $resolver->setDefaults([
             'data_class' => $dataClass,
-            'empty_data' => self::$emptyData,
+            'empty_data' => $emptyData,
             'trim' => true,
             'required' => true,
             'property_path' => null,

@@ -405,6 +405,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
         if (null !== $this->normalization) {
             $node->setNormalizationClosures($this->normalization->before);
+            $node->setNormalizedTypes($this->normalization->declaredTypes);
             $node->setXmlRemappings($this->normalization->remappings);
         }
 

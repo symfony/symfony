@@ -106,7 +106,13 @@ abstract class NodeDefinition implements NodeParentInterface
         }
 
         if (null !== $this->normalization) {
+            $allowedTypes = [];
+            foreach ($this->normalization->before as $expr) {
+                $allowedTypes[] = $expr->allowedTypes;
+            }
+            $allowedTypes = array_unique($allowedTypes);
             $this->normalization->before = ExprBuilder::buildExpressions($this->normalization->before);
+            $this->normalization->declaredTypes = $allowedTypes;
         }
 
         if (null !== $this->validation) {

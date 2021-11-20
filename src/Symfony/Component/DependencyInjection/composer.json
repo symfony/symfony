@@ -20,6 +20,7 @@
         "psr/container": "^1.1.1",
         "symfony/deprecation-contracts": "^2.1",
         "symfony/polyfill-php80": "^1.16",
+        "symfony/polyfill-php81": "^1.22",
         "symfony/service-contracts": "^1.1.6|^2"
     },
     "require-dev": {

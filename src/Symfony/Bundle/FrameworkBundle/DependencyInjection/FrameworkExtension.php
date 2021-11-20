@@ -81,11 +81,9 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\StoreFactory;
-use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
@@ -1815,7 +1813,7 @@ class FrameworkExtension extends Extension
             $storeDefinitions = [];
             foreach ($resourceStores as $storeDsn) {
                 $storeDsn = $container->resolveEnvPlaceholders($storeDsn, null, $usedEnvs);
-                $storeDefinition = new Definition(interface_exists(StoreInterface::class) ? StoreInterface::class : PersistingStoreInterface::class);
+                $storeDefinition = new Definition(PersistingStoreInterface::class);
                 $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
                 $storeDefinition->setArguments([$storeDsn]);
 
@@ -1837,12 +1835,6 @@ class FrameworkExtension extends Extension
             $factoryDefinition = new ChildDefinition('lock.factory.abstract');
             $factoryDefinition->replaceArgument(0, new Reference($storeDefinitionId));
             $container->setDefinition('lock.'.$resourceName.'.factory', $factoryDefinition);
-
-            // Generate services for lock instances
-            $lockDefinition = new Definition(Lock::class);
-            $lockDefinition->setPublic(false);
-            $lockDefinition->setFactory([new Reference('lock.'.$resourceName.'.factory'), 'createLock']);
-            $lockDefinition->setArguments([$resourceName]);
 
             // provide alias for default resource
             if ('default' === $resourceName) {

@@ -247,10 +247,11 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    public static function parseScalar(string $scalar, int $flags = 0, array $delimiters = null, int &$i = 0, bool $evaluate = true, array &$references = []): mixed
+    public static function parseScalar(string $scalar, int $flags = 0, array $delimiters = null, int &$i = 0, bool $evaluate = true, array &$references = [], bool &$isQuoted = null): mixed
     {
         if (\in_array($scalar[$i], ['"', "'"], true)) {
             // quoted scalar
+            $isQuoted = true;
             $output = self::parseQuotedScalar($scalar, $i);
 
             if (null !== $delimiters) {
@@ -264,6 +265,8 @@ class Inline
             }
         } else {
             // "normal" string
+            $isQuoted = false;
+
             if (!$delimiters) {
                 $output = substr($scalar, $i);
                 $i += \strlen($output);
@@ -286,7 +289,7 @@ class Inline
             }
 
             if ($evaluate) {
-                $output = self::evaluateScalar($output, $flags, $references);
+                $output = self::evaluateScalar($output, $flags, $references, $isQuoted);
             }
         }
 
@@ -298,7 +301,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseQuotedScalar(string $scalar, int &$i): string
+    private static function parseQuotedScalar(string $scalar, int &$i = 0): string
     {
         if (!Parser::preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string: "%s".', substr($scalar, $i)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
@@ -351,8 +354,7 @@ class Inline
                     $value = self::parseMapping($sequence, $flags, $i, $references);
                     break;
                 default:
-                    $isQuoted = \in_array($sequence[$i], ['"', "'"], true);
-                    $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references);
+                    $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references, $isQuoted);
 
                     // the value can be an array if a reference has been resolved to an array var
                     if (\is_string($value) && !$isQuoted && false !== strpos($value, ': ')) {
@@ -497,8 +499,7 @@ class Inline
                         }
                         break;
                     default:
-                        $isValueQuoted = \in_array($mapping[$i], ['"', "'"]);
-                        $value = self::parseScalar($mapping, $flags, [',', '}', "\n"], $i, null === $tag, $references);
+                        $value = self::parseScalar($mapping, $flags, [',', '}', "\n"], $i, null === $tag, $references, $isValueQuoted);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
@@ -535,8 +536,9 @@ class Inline
      *
      * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a reference could not be resolved
      */
-    private static function evaluateScalar(string $scalar, int $flags, array &$references = []): mixed
+    private static function evaluateScalar(string $scalar, int $flags, array &$references = [], bool &$isQuotedString = null): mixed
     {
+        $isQuotedString = false;
         $scalar = trim($scalar);
 
         if (0 === strpos($scalar, '*')) {
@@ -572,7 +574,14 @@ class Inline
             case '!' === $scalar[0]:
                 switch (true) {
                     case 0 === strpos($scalar, '!!str '):
-                        return (string) substr($scalar, 6);
+                        $s = (string) substr($scalar, 6);
+
+                        if (\in_array($s[0] ?? '', ['"', "'"], true)) {
+                            $isQuotedString = true;
+                            $s = self::parseQuotedScalar($s);
+                        }
+
+                        return $s;
                     case 0 === strpos($scalar, '! '):
                         return substr($scalar, 2);
                     case 0 === strpos($scalar, '!php/object'):

@@ -49,6 +49,10 @@ class DoctrineExtensionTest extends TestCase
             ->willReturnCallback(function ($name) {
                 return 'doctrine.orm.'.$name;
             });
+
+        $this->extension
+            ->method('getMappingObjectDefaultName')
+            ->willReturn('Entity');
     }
 
     public function testFixManagersAutoMappingsWithTwoAutomappings()

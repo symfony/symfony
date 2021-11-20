@@ -36,7 +36,6 @@ use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AuthenticatorInterface as GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
@@ -890,45 +889,6 @@ class TestAuthenticator implements AuthenticatorInterface
     }
 
     public function createToken(Passport $passport, string $firewallName): TokenInterface
-    {
-    }
-}
-
-class NullAuthenticator implements GuardAuthenticatorInterface
-{
-    public function start(Request $request, AuthenticationException $authException = null): Response
-    {
-    }
-
-    public function supports(Request $request): bool
-    {
-    }
-
-    public function getCredentials(Request $request)
-    {
-    }
-
-    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
-    {
-    }
-
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-    }
-
-    public function createAuthenticatedToken(UserInterface $user, string $providerKey): GuardTokenInterface
-    {
-    }
-
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
-    }
-
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
-    {
-    }
-
-    public function supportsRememberMe(): bool
     {
     }
 }

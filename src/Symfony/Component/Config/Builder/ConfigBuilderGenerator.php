@@ -435,8 +435,7 @@ public function NAME(): array
 
         $class->addMethod('__construct', '
 public function __construct(array $value = [])
-{
-'.$body.'
+{'.$body.'
 }');
     }
 

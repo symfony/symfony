@@ -53,6 +53,7 @@
         "symfony/process": "^5.4|^6.0",
         "symfony/rate-limiter": "^5.4|^6.0",
         "symfony/security-bundle": "^5.4|^6.0",
+        "symfony/semaphore": "^5.4|^6.0",
         "symfony/serializer": "^5.4|^6.0",
         "symfony/stopwatch": "^5.4|^6.0",
         "symfony/string": "^5.4|^6.0",

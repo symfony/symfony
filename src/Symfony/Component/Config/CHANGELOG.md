@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow using environment variables in `EnumNode`
+ * Add Node's information in generated Config
 
 6.0
 ---

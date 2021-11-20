@@ -94,66 +94,6 @@ class AbstractTokenTest extends TestCase
     }
 }
 
-class TestUser
-{
-    protected $name;
-
-    public function __construct($name)
-    {
-        $this->name = $name;
-    }
-
-    public function __toString(): string
-    {
-        return $this->name;
-    }
-}
-
-class SerializableUser implements UserInterface
-{
-    private $roles;
-    private $name;
-
-    public function __construct($name, array $roles = [])
-    {
-        $this->name = $name;
-        $this->roles = $roles;
-    }
-
-    public function getUsername(): string
-    {
-        return $this->name;
-    }
-
-    public function getUserIdentifier(): string
-    {
-        return $this->name;
-    }
-
-    public function getPassword(): ?string
-    {
-        return '***';
-    }
-
-    public function getRoles(): array
-    {
-        if (empty($this->roles)) {
-            return ['ROLE_USER'];
-        }
-
-        return $this->roles;
-    }
-
-    public function eraseCredentials()
-    {
-    }
-
-    public function getSalt(): ?string
-    {
-        return null;
-    }
-}
-
 class ConcreteToken extends AbstractToken
 {
     private $credentials = 'credentials_value';

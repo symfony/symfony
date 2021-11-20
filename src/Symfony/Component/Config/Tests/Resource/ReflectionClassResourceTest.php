@@ -121,10 +121,7 @@ EOPHP;
     {
         yield [false, 0, "// line change\n\n"];
         yield [true, 0, '/** class docblock */'];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield [true, 0, '#[Foo]'];
-        }
+        yield [true, 0, '#[Foo]'];
 
         if (\PHP_VERSION_ID >= 80100) {
             yield [true, 0, '#[Foo(new MissingClass)]'];
@@ -154,11 +151,8 @@ EOPHP;
         yield [false, 11, "public function pub(\$arg = null) {\nreturn 123;\n}"];
         yield [true, 12, '/** prot docblock */'];
         yield [true, 13, 'protected function prot($a = [123]) {}'];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield [true, 13, '#[Foo] protected function prot($a = []) {}'];
-            yield [true, 13, 'protected function prot(#[Foo] $a = []) {}'];
-        }
+        yield [true, 13, '#[Foo] protected function prot($a = []) {}'];
+        yield [true, 13, 'protected function prot(#[Foo] $a = []) {}'];
 
         if (\PHP_VERSION_ID >= 80100) {
             yield [true, 13, '#[Foo(new MissingClass)] protected function prot($a = []) {}'];

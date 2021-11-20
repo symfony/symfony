@@ -130,7 +130,7 @@ class DebugClassLoader
         $this->patchTypes += [
             'force' => null,
             'php' => \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION,
-            'deprecations' => \PHP_VERSION_ID >= 70400,
+            'deprecations' => true,
         ];
 
         if ('phpdoc' === $this->patchTypes['force']) {
@@ -878,7 +878,7 @@ class DebugClassLoader
      */
     private function patchReturnTypeWillChange(\ReflectionMethod $method)
     {
-        if (\PHP_VERSION_ID >= 80000 && \count($method->getAttributes(\ReturnTypeWillChange::class))) {
+        if (\count($method->getAttributes(\ReturnTypeWillChange::class))) {
             return;
         }
 

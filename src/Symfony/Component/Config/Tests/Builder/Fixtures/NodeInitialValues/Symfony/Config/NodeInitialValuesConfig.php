@@ -16,9 +16,22 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
     private $messenger;
     private $_usedProperties = [];
 
-    public function someCleverName(array $value = []): \Symfony\Config\NodeInitialValues\SomeCleverNameConfig
+    /**
+     * @template TValue
+     * @param TValue $value
+     * @return \Symfony\Config\NodeInitialValues\SomeCleverNameConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\NodeInitialValues\SomeCleverNameConfig : static)
+     */
+    public function someCleverName(mixed $value = []): \Symfony\Config\NodeInitialValues\SomeCleverNameConfig|static
     {
-        if (null === $this->someCleverName) {
+        if (!\is_array($value)) {
+            $this->_usedProperties['someCleverName'] = true;
+            $this->someCleverName = $value;
+
+            return $this;
+        }
+
+        if (!$this->someCleverName instanceof \Symfony\Config\NodeInitialValues\SomeCleverNameConfig) {
             $this->_usedProperties['someCleverName'] = true;
             $this->someCleverName = new \Symfony\Config\NodeInitialValues\SomeCleverNameConfig($value);
         } elseif (0 < \func_num_args()) {
@@ -28,9 +41,22 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
         return $this->someCleverName;
     }
 
-    public function messenger(array $value = []): \Symfony\Config\NodeInitialValues\MessengerConfig
+    /**
+     * @template TValue
+     * @param TValue $value
+     * @return \Symfony\Config\NodeInitialValues\MessengerConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\NodeInitialValues\MessengerConfig : static)
+     */
+    public function messenger(mixed $value = []): \Symfony\Config\NodeInitialValues\MessengerConfig|static
     {
-        if (null === $this->messenger) {
+        if (!\is_array($value)) {
+            $this->_usedProperties['messenger'] = true;
+            $this->messenger = $value;
+
+            return $this;
+        }
+
+        if (!$this->messenger instanceof \Symfony\Config\NodeInitialValues\MessengerConfig) {
             $this->_usedProperties['messenger'] = true;
             $this->messenger = new \Symfony\Config\NodeInitialValues\MessengerConfig($value);
         } elseif (0 < \func_num_args()) {
@@ -49,13 +75,13 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
     {
         if (array_key_exists('some_clever_name', $value)) {
             $this->_usedProperties['someCleverName'] = true;
-            $this->someCleverName = new \Symfony\Config\NodeInitialValues\SomeCleverNameConfig($value['some_clever_name']);
+            $this->someCleverName = \is_array($value['some_clever_name']) ? new \Symfony\Config\NodeInitialValues\SomeCleverNameConfig($value['some_clever_name']) : $value['some_clever_name'];
             unset($value['some_clever_name']);
         }
 
         if (array_key_exists('messenger', $value)) {
             $this->_usedProperties['messenger'] = true;
-            $this->messenger = new \Symfony\Config\NodeInitialValues\MessengerConfig($value['messenger']);
+            $this->messenger = \is_array($value['messenger']) ? new \Symfony\Config\NodeInitialValues\MessengerConfig($value['messenger']) : $value['messenger'];
             unset($value['messenger']);
         }
 
@@ -68,10 +94,10 @@ class NodeInitialValuesConfig implements \Symfony\Component\Config\Builder\Confi
     {
         $output = [];
         if (isset($this->_usedProperties['someCleverName'])) {
-            $output['some_clever_name'] = $this->someCleverName->toArray();
+            $output['some_clever_name'] = $this->someCleverName instanceof \Symfony\Config\NodeInitialValues\SomeCleverNameConfig ? $this->someCleverName->toArray() : $this->someCleverName;
         }
         if (isset($this->_usedProperties['messenger'])) {
-            $output['messenger'] = $this->messenger->toArray();
+            $output['messenger'] = $this->messenger instanceof \Symfony\Config\NodeInitialValues\MessengerConfig ? $this->messenger->toArray() : $this->messenger;
         }
 
         return $output;

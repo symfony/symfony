@@ -16,9 +16,22 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
     private $messenger;
     private $_usedProperties = [];
 
-    public function translator(array $value = []): \Symfony\Config\AddToList\TranslatorConfig
+    /**
+     * @template TValue
+     * @param TValue $value
+     * @return \Symfony\Config\AddToList\TranslatorConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\AddToList\TranslatorConfig : static)
+     */
+    public function translator(mixed $value = []): \Symfony\Config\AddToList\TranslatorConfig|static
     {
-        if (null === $this->translator) {
+        if (!\is_array($value)) {
+            $this->_usedProperties['translator'] = true;
+            $this->translator = $value;
+
+            return $this;
+        }
+
+        if (!$this->translator instanceof \Symfony\Config\AddToList\TranslatorConfig) {
             $this->_usedProperties['translator'] = true;
             $this->translator = new \Symfony\Config\AddToList\TranslatorConfig($value);
         } elseif (0 < \func_num_args()) {
@@ -28,9 +41,22 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
         return $this->translator;
     }
 
-    public function messenger(array $value = []): \Symfony\Config\AddToList\MessengerConfig
+    /**
+     * @template TValue
+     * @param TValue $value
+     * @return \Symfony\Config\AddToList\MessengerConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\AddToList\MessengerConfig : static)
+     */
+    public function messenger(mixed $value = []): \Symfony\Config\AddToList\MessengerConfig|static
     {
-        if (null === $this->messenger) {
+        if (!\is_array($value)) {
+            $this->_usedProperties['messenger'] = true;
+            $this->messenger = $value;
+
+            return $this;
+        }
+
+        if (!$this->messenger instanceof \Symfony\Config\AddToList\MessengerConfig) {
             $this->_usedProperties['messenger'] = true;
             $this->messenger = new \Symfony\Config\AddToList\MessengerConfig($value);
         } elseif (0 < \func_num_args()) {
@@ -49,13 +75,13 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
     {
         if (array_key_exists('translator', $value)) {
             $this->_usedProperties['translator'] = true;
-            $this->translator = new \Symfony\Config\AddToList\TranslatorConfig($value['translator']);
+            $this->translator = \is_array($value['translator']) ? new \Symfony\Config\AddToList\TranslatorConfig($value['translator']) : $value['translator'];
             unset($value['translator']);
         }
 
         if (array_key_exists('messenger', $value)) {
             $this->_usedProperties['messenger'] = true;
-            $this->messenger = new \Symfony\Config\AddToList\MessengerConfig($value['messenger']);
+            $this->messenger = \is_array($value['messenger']) ? new \Symfony\Config\AddToList\MessengerConfig($value['messenger']) : $value['messenger'];
             unset($value['messenger']);
         }
 
@@ -68,10 +94,10 @@ class AddToListConfig implements \Symfony\Component\Config\Builder\ConfigBuilder
     {
         $output = [];
         if (isset($this->_usedProperties['translator'])) {
-            $output['translator'] = $this->translator->toArray();
+            $output['translator'] = $this->translator instanceof \Symfony\Config\AddToList\TranslatorConfig ? $this->translator->toArray() : $this->translator;
         }
         if (isset($this->_usedProperties['messenger'])) {
-            $output['messenger'] = $this->messenger->toArray();
+            $output['messenger'] = $this->messenger instanceof \Symfony\Config\AddToList\MessengerConfig ? $this->messenger->toArray() : $this->messenger;
         }
 
         return $output;

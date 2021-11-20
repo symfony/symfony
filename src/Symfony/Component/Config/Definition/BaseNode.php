@@ -32,7 +32,6 @@ abstract class BaseNode implements NodeInterface
     protected $name;
     protected $parent;
     protected $normalizationClosures = [];
-    protected $normalizedTypes = [];
     protected $finalValidationClosures = [];
     protected $allowOverwrite = true;
     protected $required = false;
@@ -234,28 +233,6 @@ abstract class BaseNode implements NodeInterface
     public function setNormalizationClosures(array $closures)
     {
         $this->normalizationClosures = $closures;
-    }
-
-    /**
-     * Sets the list of types supported by normalization.
-     *
-     * see ExprBuilder::TYPE_* constants.
-     *
-     * @return void
-     */
-    public function setNormalizedTypes(array $types)
-    {
-        $this->normalizedTypes = $types;
-    }
-
-    /**
-     * Gets the list of types supported by normalization.
-     *
-     * see ExprBuilder::TYPE_* constants.
-     */
-    public function getNormalizedTypes(): array
-    {
-        return $this->normalizedTypes;
     }
 
     /**

@@ -24,11 +24,11 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     private $_usedProperties = [];
 
     /**
-     * @param ParamConfigurator|list<ParamConfigurator|mixed>|string $value
+     * @param mixed $value
      *
      * @return $this
      */
-    public function simpleArray(ParamConfigurator|string|array $value): static
+    public function simpleArray(mixed $value): static
     {
         $this->_usedProperties['simpleArray'] = true;
         $this->simpleArray = $value;
@@ -39,7 +39,7 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     /**
      * @return $this
      */
-    public function keyedArray(string $name, ParamConfigurator|string|array $value): static
+    public function keyedArray(string $name, mixed $value): static
     {
         $this->_usedProperties['keyedArray'] = true;
         $this->keyedArray[$name] = $value;
@@ -116,9 +116,22 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
         return $this->keyedListObject[$class];
     }
 
-    public function nested(array $value = []): \Symfony\Config\ScalarNormalizedTypes\NestedConfig
+    /**
+     * @template TValue
+     * @param TValue $value
+     * @return \Symfony\Config\ScalarNormalizedTypes\NestedConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\NestedConfig : static)
+     */
+    public function nested(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\NestedConfig|static
     {
-        if (null === $this->nested) {
+        if (!\is_array($value)) {
+            $this->_usedProperties['nested'] = true;
+            $this->nested = $value;
+
+            return $this;
+        }
+
+        if (!$this->nested instanceof \Symfony\Config\ScalarNormalizedTypes\NestedConfig) {
             $this->_usedProperties['nested'] = true;
             $this->nested = new \Symfony\Config\ScalarNormalizedTypes\NestedConfig($value);
         } elseif (0 < \func_num_args()) {
@@ -167,7 +180,7 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
 
         if (array_key_exists('nested', $value)) {
             $this->_usedProperties['nested'] = true;
-            $this->nested = new \Symfony\Config\ScalarNormalizedTypes\NestedConfig($value['nested']);
+            $this->nested = \is_array($value['nested']) ? new \Symfony\Config\ScalarNormalizedTypes\NestedConfig($value['nested']) : $value['nested'];
             unset($value['nested']);
         }
 
@@ -195,7 +208,7 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
             $output['keyed_list_object'] = array_map(fn ($v) => $v instanceof \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig ? $v->toArray() : $v, $this->keyedListObject);
         }
         if (isset($this->_usedProperties['nested'])) {
-            $output['nested'] = $this->nested->toArray();
+            $output['nested'] = $this->nested instanceof \Symfony\Config\ScalarNormalizedTypes\NestedConfig ? $this->nested->toArray() : $this->nested;
         }
 
         return $output;

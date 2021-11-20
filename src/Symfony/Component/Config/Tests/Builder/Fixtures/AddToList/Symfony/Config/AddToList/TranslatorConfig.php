@@ -42,12 +42,23 @@ class TranslatorConfig
     }
 
     /**
+     * @template TValue
+     * @param TValue $value
      * looks for translation in old fashion way
      * @deprecated The child node "books" at path "translator" is deprecated.
-    */
-    public function books(array $value = []): \Symfony\Config\AddToList\Translator\BooksConfig
+     * @return \Symfony\Config\AddToList\Translator\BooksConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\AddToList\Translator\BooksConfig : static)
+     */
+    public function books(mixed $value = []): \Symfony\Config\AddToList\Translator\BooksConfig|static
     {
-        if (null === $this->books) {
+        if (!\is_array($value)) {
+            $this->_usedProperties['books'] = true;
+            $this->books = $value;
+
+            return $this;
+        }
+
+        if (!$this->books instanceof \Symfony\Config\AddToList\Translator\BooksConfig) {
             $this->_usedProperties['books'] = true;
             $this->books = new \Symfony\Config\AddToList\Translator\BooksConfig($value);
         } elseif (0 < \func_num_args()) {
@@ -73,7 +84,7 @@ class TranslatorConfig
 
         if (array_key_exists('books', $value)) {
             $this->_usedProperties['books'] = true;
-            $this->books = new \Symfony\Config\AddToList\Translator\BooksConfig($value['books']);
+            $this->books = \is_array($value['books']) ? new \Symfony\Config\AddToList\Translator\BooksConfig($value['books']) : $value['books'];
             unset($value['books']);
         }
 
@@ -92,7 +103,7 @@ class TranslatorConfig
             $output['sources'] = $this->sources;
         }
         if (isset($this->_usedProperties['books'])) {
-            $output['books'] = $this->books->toArray();
+            $output['books'] = $this->books instanceof \Symfony\Config\AddToList\Translator\BooksConfig ? $this->books->toArray() : $this->books;
         }
 
         return $output;

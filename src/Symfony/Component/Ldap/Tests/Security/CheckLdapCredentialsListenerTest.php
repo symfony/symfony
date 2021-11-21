@@ -41,10 +41,6 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
-        }
-
         $this->ldap = $this->createMock(LdapInterface::class);
     }
 
@@ -61,10 +57,6 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function provideShouldNotCheckPassport()
     {
-        if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
-        }
-
         // no LdapBadge
         yield [new TestAuthenticator(), new Passport(new UserBadge('test'), new PasswordCredentials('s3cret'))];
 
@@ -110,10 +102,6 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function provideWrongPassportData()
     {
-        if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
-        }
-
         // no password credentials
         yield [new SelfValidatingPassport(new UserBadge('test'), [new LdapBadge('app.ldap')])];
     }
@@ -222,31 +210,29 @@ class CheckLdapCredentialsListenerTest extends TestCase
     }
 }
 
-if (interface_exists(AuthenticatorInterface::class)) {
-    class TestAuthenticator implements AuthenticatorInterface
+class TestAuthenticator implements AuthenticatorInterface
+{
+    public function supports(Request $request): ?bool
     {
-        public function supports(Request $request): ?bool
-        {
-        }
+    }
 
-        public function authenticate(Request $request): PassportInterface
-        {
-        }
+    public function authenticate(Request $request): Passport
+    {
+    }
 
-        public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
-        {
-        }
+    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
+    {
+    }
 
-        public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-        {
-        }
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
+    {
+    }
 
-        public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-        {
-        }
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    {
+    }
 
-        public function createToken(Passport $passport, string $firewallName): TokenInterface
-        {
-        }
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
+    {
     }
 }

@@ -263,7 +263,7 @@ class XmlDumper extends Dumper
 
     private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key')
     {
-        $withKeys = array_keys($parameters) !== range(0, \count($parameters) - 1);
+        $withKeys = !array_is_list($parameters);
         foreach ($parameters as $key => $value) {
             $element = $this->document->createElement($type);
             if ($withKeys) {

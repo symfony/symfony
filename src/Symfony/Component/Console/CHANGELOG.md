@@ -12,6 +12,7 @@ CHANGELOG
  * Add support for bright colors
  * Add `#[AsCommand]` attribute for declaring commands on PHP 8
  * Add `Helper::width()` and `Helper::length()`
+ * The `--ansi` and `--no-ansi` options now default to `null`.
 
 5.2.0
 -----

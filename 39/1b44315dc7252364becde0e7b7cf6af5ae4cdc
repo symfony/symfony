@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-11-21T15:08:58Z
+
+I like snapshot testing for the reasons you mentioned. We are supposed to update the generated code manually when a change is done? Adding an flag (env var) to force update would be very useful.
+
+For reference, I use this library for snapshot testing: https://github.com/spatie/phpunit-snapshot-assertions
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-11-21T16:04:08Z
+
+Not sure it worth a flag, but I added a commented snippet to help people generate code

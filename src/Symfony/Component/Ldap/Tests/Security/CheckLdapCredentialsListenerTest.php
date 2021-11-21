@@ -194,27 +194,25 @@ class CheckLdapCredentialsListenerTest extends TestCase
     }
 }
 
-if (interface_exists(AuthenticatorInterface::class)) {
-    class TestAuthenticator implements AuthenticatorInterface
+class TestAuthenticator implements AuthenticatorInterface
+{
+    public function supports(Request $request): ?bool
     {
-        public function supports(Request $request): ?bool
-        {
-        }
+    }
 
-        public function authenticate(Request $request): PassportInterface
-        {
-        }
+    public function authenticate(Request $request): PassportInterface
+    {
+    }
 
-        public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
-        {
-        }
+    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
+    {
+    }
 
-        public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-        {
-        }
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
+    {
+    }
 
-        public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-        {
-        }
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    {
     }
 }

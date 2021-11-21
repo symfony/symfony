@@ -93,11 +93,3 @@ class SecurityTest extends TestCase
         return $container;
     }
 }
-
-class StringishUser
-{
-    public function __toString(): string
-    {
-        return 'stringish_user';
-    }
-}

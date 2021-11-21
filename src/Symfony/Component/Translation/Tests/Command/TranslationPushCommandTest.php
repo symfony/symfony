@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
+namespace Symfony\Component\Translation\Tests\Command;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -18,7 +18,6 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Reader\TranslationReader;
-use Symfony\Component\Translation\Tests\Command\TranslationProviderTestCase;
 use Symfony\Component\Translation\TranslatorBag;
 
 /**

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-11-21T13:49:07Z
+
+Thanks, that patch fixes the main problem already. But when the app fires multiple concurrent AJAX requests, I get a new error now:
+
+```
+Uncaught TypeError: can't access property "id", sfwdt is null
+    loadToolbar https://localhost:8000/:31
+    load https://localhost:8000/:31
+    onreadystatechange https://localhost:8000/:31
+    request https://localhost:8000/:31
+    load https://localhost:8000/:31
+    loadToolbar https://localhost:8000/:31
+    finishAjaxRequest https://localhost:8000/:31
+    fetch https://localhost:8000/:31
+    promise callback*window.fetch https://localhost:8000/:31
+    fetchContent https://localhost:8000/:16
+    setTimeout handler* https://localhost:8000/:26
+localhost:8000:31:22660
+```
+
+I've pushed a commit to the reproducer repository that reproduces this problem.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-11-21T14:19:39Z
+
+The race condition is gone as well now. Thank you very much!

@@ -95,6 +95,11 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         return $this->defaultLocale;
     }
 
+    public function setSymbolsMap($symbolsMap)
+    {
+        $this->symbolsMap = $symbolsMap;
+    }
+
     /**
      * {@inheritdoc}
      */

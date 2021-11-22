@@ -29,6 +29,9 @@ class ArrayExtraKeys implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('baz')
+                    ->ignoreExtraKeys(false)
+                ->end()
             ;
 
         return $tb;

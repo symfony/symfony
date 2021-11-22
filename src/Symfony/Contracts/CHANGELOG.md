@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5
+---
+
+ *  Add `SubscribedService` attribute, deprecate current `ServiceSubscriberTrait` usage
+
 2.4
 ---
 

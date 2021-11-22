@@ -7,6 +7,35 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.34 (2021-11-22)
+
+ * bug #44188 [VarExporter] fix exporting declared but unset properties when __sleep() is implemented (nicolas-grekas)
+ * bug #44119 [HttpClient][Mime] Add correct IDN flags for IDNA2008 compliance (j-bernard)
+ * bug #44131 [Yaml] properly parse quoted strings tagged with !!str (xabbuh)
+ * bug #42323 [TwigBridge] do not merge label classes into expanded choice labels (xabbuh)
+ * bug #44121 [Serializer] fix support for lazy properties (nicolas-grekas)
+ * bug #44111 [Serializer] fix support for unset properties on PHP < 7.4 (nicolas-grekas)
+ * bug #44070 [Process] intersect with getenv() to populate default envs (nicolas-grekas)
+ * bug #44043 [Cache] fix dbindex Redis (a1812)
+ * bug #44042 Fix DateIntervalToStringTransformer::transform() doc (BenMorel)
+ * bug #44034 [Yaml] don't try to replace references in quoted strings (xabbuh)
+ * bug #44028 [ErrorHandler] Fix FlattenException::setPrevious argument typing (welcoMattic)
+ * bug #44012 [DependencyInjection] fix inlining when non-shared services are involved (nicolas-grekas)
+ * bug #44002 [Cache] Fix Memory leak (a1812)
+ * bug #43981 [FrameworkBundle] fix registering late resettable services (nicolas-grekas)
+ * bug #43988 [DoctrineBridge] add support for the JSON type (dunglas)
+ * bug #43987 [PhpUnitBridge] Fix Uncaught ValueError (dunglas)
+ * bug #43961 [HttpClient] Curl http client has to reinit curl multi handle on reset (rmikalkenas)
+ * bug #43922 [DependencyInjection] only allow `ReflectionNamedType` for `ServiceSubscriberTrait` (kbond)
+ * bug #43901 [SecurityBundle] Default access_decision_manager.strategy option with merge (biozshock)
+ * bug #43909 [VarExporter] escape unicode chars involved in directionality (nicolas-grekas)
+ * bug #43867 [VarDumper] Make dumping DateInterval instances timezone-independent (derrabus)
+ * bug #43096 [Messenger] Use `TransportMessageIdStamp` in `InMemoryTransport` allows retrying (alexndlm)
+ * bug #43501 [HttpKernel] fix ErrorException in CacheWarmerAggregate (Ahummeling)
+ * bug #42361 [Translation] correctly handle intl domains with TargetOperation (acran)
+ * bug #43834 [Inflector] Fix inflector for "zombies" (acodispo)
+ * bug #43267 [Config] Fix signature generation with nested attributes on PHP 8.1 (agustingomes)
+
 * 4.4.33 (2021-10-29)
 
  * bug #43798 [Dotenv] Duplicate $_SERVER values in $_ENV if they don't exist (fancyweb)

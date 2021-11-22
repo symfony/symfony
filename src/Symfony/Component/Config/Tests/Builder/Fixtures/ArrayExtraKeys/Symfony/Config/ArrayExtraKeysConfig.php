@@ -4,6 +4,7 @@ namespace Symfony\Config;
 
 require_once __DIR__.\DIRECTORY_SEPARATOR.'ArrayExtraKeys'.\DIRECTORY_SEPARATOR.'FooConfig.php';
 require_once __DIR__.\DIRECTORY_SEPARATOR.'ArrayExtraKeys'.\DIRECTORY_SEPARATOR.'BarConfig.php';
+require_once __DIR__.\DIRECTORY_SEPARATOR.'ArrayExtraKeys'.\DIRECTORY_SEPARATOR.'BazConfig.php';
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
@@ -15,6 +16,7 @@ class ArrayExtraKeysConfig implements \Symfony\Component\Config\Builder\ConfigBu
 {
     private $foo;
     private $bar;
+    private $baz;
     
     public function foo(array $value = []): \Symfony\Config\ArrayExtraKeys\FooConfig
     {
@@ -30,6 +32,17 @@ class ArrayExtraKeysConfig implements \Symfony\Component\Config\Builder\ConfigBu
     public function bar(array $value = []): \Symfony\Config\ArrayExtraKeys\BarConfig
     {
         return $this->bar[] = new \Symfony\Config\ArrayExtraKeys\BarConfig($value);
+    }
+    
+    public function baz(array $value = []): \Symfony\Config\ArrayExtraKeys\BazConfig
+    {
+        if (null === $this->baz) {
+            $this->baz = new \Symfony\Config\ArrayExtraKeys\BazConfig($value);
+        } elseif ([] !== $value) {
+            throw new InvalidConfigurationException('The node created by "baz()" has already been initialized. You cannot pass values the second time you call baz().');
+        }
+    
+        return $this->baz;
     }
     
     public function getExtensionAlias(): string
@@ -50,6 +63,11 @@ class ArrayExtraKeysConfig implements \Symfony\Component\Config\Builder\ConfigBu
             unset($value['bar']);
         }
     
+        if (isset($value['baz'])) {
+            $this->baz = new \Symfony\Config\ArrayExtraKeys\BazConfig($value['baz']);
+            unset($value['baz']);
+        }
+    
         if ([] !== $value) {
             throw new InvalidConfigurationException(sprintf('The following keys are not supported by "%s": ', __CLASS__).implode(', ', array_keys($value)));
         }
@@ -63,6 +81,9 @@ class ArrayExtraKeysConfig implements \Symfony\Component\Config\Builder\ConfigBu
         }
         if (null !== $this->bar) {
             $output['bar'] = array_map(function ($v) { return $v->toArray(); }, $this->bar);
+        }
+        if (null !== $this->baz) {
+            $output['baz'] = $this->baz->toArray();
         }
     
         return $output;

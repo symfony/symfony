@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2021-11-21T18:47:42Z
+
+We should probably mention this BC break in the CHANGELOG file though
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-11-21T23:11:32Z
+
+Either it's a BC break or it's a bugfix, but not both.
+If we consider this a BC break, we should merge it as a feature and document in the CHANGELOG. Otherwise, it should just be merged as-is with no CHANGELOG update.
+
+Do libs impacted by the previous behavior change that this PR aims to fix (psysh, tinker) have changed their code meanwhile? That may help taking the right decision here.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-11-22T07:06:58Z
+
+> Do libs impacted by the previous behavior change that this PR aims to fix (psysh, tinker) have changed their code meanwhile? That may help taking the right decision here.
+
+`psysh` didn't change the way it parse options
+https://github.com/bobthecow/psysh/blob/29ad19f99ece710577ec9f9022276254f4c8f03e/src/Configuration.php#L239-L246
+
+Switching `false` to `null` fixes their issue because they don't use strict comparison.

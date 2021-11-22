@@ -11,6 +11,8 @@ use Symfony\Component\Config\Tests\Builder\Fixtures\AddToList;
 use Symfony\Component\Config\Tests\Builder\Fixtures\NodeInitialValues;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 use Symfony\Config\AddToListConfig;
 
 /**
@@ -20,6 +22,23 @@ use Symfony\Config\AddToListConfig;
  */
 class GeneratedConfigTest extends TestCase
 {
+    private $tempDir = [];
+
+    protected function setup(): void
+    {
+        parent::setup();
+
+        $this->tempDir = [];
+    }
+
+    protected function tearDown(): void
+    {
+        (new Filesystem())->remove($this->tempDir);
+        $this->tempDir = [];
+
+        parent::tearDown();
+    }
+
     public function fixtureNames()
     {
         $array = [
@@ -49,10 +68,18 @@ class GeneratedConfigTest extends TestCase
     public function testConfig(string $name, string $alias)
     {
         $basePath = __DIR__.'/Fixtures/';
-        $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name);
         $callback = include $basePath.$name.'.config.php';
         $expectedOutput = include $basePath.$name.'.output.php';
+        $expectedCode = $basePath.$name;
+
+        // to regenerate snapshot files, uncomment this line
+        // $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
+
+        $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
+        $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $outputDir);
         $callback($configBuilder);
+
+        $this->assertDirectorySame($expectedCode, $outputDir);
 
         $this->assertInstanceOf(ConfigBuilderInterface::class, $configBuilder);
         $this->assertSame($alias, $configBuilder->getExtensionAlias());
@@ -118,8 +145,13 @@ class GeneratedConfigTest extends TestCase
     /**
      * Generate the ConfigBuilder or return an already generated instance.
      */
-    private function generateConfigBuilder(string $configurationClass)
+    private function generateConfigBuilder(string $configurationClass, string $outputDir = null)
     {
+        $outputDir ?? $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
+        if (!str_contains($outputDir, __DIR__)) {
+            $this->tempDir[] = $outputDir;
+        }
+
         $configuration = new $configurationClass();
         $rootNode = $configuration->getConfigTreeBuilder()->buildTree();
         $rootClass = new ClassBuilder('Symfony\\Config', $rootNode->getName());
@@ -128,13 +160,31 @@ class GeneratedConfigTest extends TestCase
             return new $fqcn();
         }
 
-        $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
-
-        // This line is helpful for debugging
-        // $outputDir = __DIR__.'/.build';
-
         $loader = (new ConfigBuilderGenerator($outputDir))->build(new $configurationClass());
 
         return $loader();
+    }
+
+    private function assertDirectorySame($expected, $current)
+    {
+        $expectedFiles = [];
+        foreach (new \RecursiveIteratorIterator(new RecursiveDirectoryIterator($expected, \FilesystemIterator::SKIP_DOTS)) as $file) {
+            if ($file->isDir()) {
+                continue;
+            }
+            $expectedFiles[substr($file->getPathname(), \strlen($expected))] = $file->getPathname();
+        }
+        $currentFiles = [];
+        foreach (new \RecursiveIteratorIterator(new RecursiveDirectoryIterator($current, \FilesystemIterator::SKIP_DOTS)) as $file) {
+            if ($file->isDir()) {
+                continue;
+            }
+            $currentFiles[substr($file->getPathname(), \strlen($current))] = $file->getPathname();
+        }
+
+        $this->assertSame(array_keys($expectedFiles), array_keys($currentFiles));
+        foreach ($expectedFiles as $fileName => $filePath) {
+            $this->assertFileEquals($filePath, $currentFiles[$fileName]);
+        }
     }
 }

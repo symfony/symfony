@@ -320,6 +320,13 @@ class MyArrayObject extends \ArrayObject
 
 class GoodNight
 {
+    public $good;
+
+    public function __construct()
+    {
+        unset($this->good);
+    }
+
     public function __sleep(): array
     {
         $this->good = 'night';

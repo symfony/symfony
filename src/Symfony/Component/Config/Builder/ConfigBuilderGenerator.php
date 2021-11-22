@@ -301,31 +301,31 @@ public function NAME($value): self
     {
         $comment = '';
         if ('' !== $info = (string) $node->getInfo()) {
-            $comment .= ' * '.$info.\PHP_EOL;
+            $comment .= ' * '.$info."\n";
         }
 
         foreach ((array) ($node->getExample() ?? []) as $example) {
-            $comment .= ' * @example '.$example.\PHP_EOL;
+            $comment .= ' * @example '.$example."\n";
         }
 
         if ('' !== $default = $node->getDefaultValue()) {
-            $comment .= ' * @default '.(null === $default ? 'null' : var_export($default, true)).\PHP_EOL;
+            $comment .= ' * @default '.(null === $default ? 'null' : var_export($default, true))."\n";
         }
 
         if ($node instanceof EnumNode) {
             $comment .= sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_map(function ($a) {
                 return var_export($a, true);
-            }, $node->getValues()))).\PHP_EOL;
+            }, $node->getValues())))."\n";
         } else {
             $parameterType = $this->getParameterType($node);
             if (null === $parameterType || '' === $parameterType) {
                 $parameterType = 'mixed';
             }
-            $comment .= ' * @param ParamConfigurator|'.$parameterType.' $value'.\PHP_EOL;
+            $comment .= ' * @param ParamConfigurator|'.$parameterType.' $value'."\n";
         }
 
         if ($node->isDeprecated()) {
-            $comment .= ' * @deprecated '.$node->getDeprecation($node->getName(), $node->getParent()->getName())['message'].\PHP_EOL;
+            $comment .= ' * @deprecated '.$node->getDeprecation($node->getName(), $node->getParent()->getName())['message']."\n";
         }
 
         return $comment;

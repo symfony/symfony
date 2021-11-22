@@ -80,6 +80,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -416,6 +417,8 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerUidConfiguration($config['uid'], $container, $loader);
+        } else {
+            $container->removeDefinition('argument_resolver.uid');
         }
 
         // register cache before session so both can share the connection services
@@ -2576,6 +2579,10 @@ class FrameworkExtension extends Extension
         if (isset($config['name_based_uuid_namespace'])) {
             $container->getDefinition('name_based_uuid.factory')
                 ->setArguments([$config['name_based_uuid_namespace']]);
+        }
+
+        if (!class_exists(UidValueResolver::class)) {
+            $container->removeDefinition('argument_resolver.uid');
         }
     }
 

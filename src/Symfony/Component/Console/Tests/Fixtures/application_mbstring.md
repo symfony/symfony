@@ -226,7 +226,7 @@ Force (or disable --no-ansi) ANSI output
 * Is value required: no
 * Is multiple: no
 * Is negatable: yes
-* Default: `false`
+* Default: `NULL`
 
 #### `--no-interaction|-n`
 
@@ -353,7 +353,7 @@ Force (or disable --no-ansi) ANSI output
 * Is value required: no
 * Is multiple: no
 * Is negatable: yes
-* Default: `false`
+* Default: `NULL`
 
 #### `--no-interaction|-n`
 
@@ -444,7 +444,7 @@ Force (or disable --no-ansi) ANSI output
 * Is value required: no
 * Is multiple: no
 * Is negatable: yes
-* Default: `false`
+* Default: `NULL`
 
 #### `--no-interaction|-n`
 

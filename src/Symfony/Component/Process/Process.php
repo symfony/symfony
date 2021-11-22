@@ -1673,6 +1673,7 @@ class Process implements \IteratorAggregate
     {
         $env = getenv();
         $env = array_intersect_key($env, $_SERVER) ?: $env;
+        unset($env['argc'], $env['argv']);
 
         foreach ($_ENV as $k => $v) {
             if (\is_string($v)) {

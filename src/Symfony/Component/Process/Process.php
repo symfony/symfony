@@ -335,7 +335,7 @@ class Process implements \IteratorAggregate
 
         $envPairs = [];
         foreach ($env as $k => $v) {
-            if (false !== $v) {
+            if (false !== $v && 'argc' !== $k && 'argv' !== $k) {
                 $envPairs[] = $k.'='.$v;
             }
         }
@@ -1089,25 +1089,12 @@ class Process implements \IteratorAggregate
     /**
      * Sets the environment variables.
      *
-     * Each environment variable value should be a string.
-     * If it is an array, the variable is ignored.
-     * If it is false or null, it will be removed when
-     * env vars are otherwise inherited.
-     *
-     * That happens in PHP when 'argv' is registered into
-     * the $_ENV array for instance.
-     *
-     * @param array $env The new environment variables
+     * @param array<string|\Stringable> $env The new environment variables
      *
      * @return $this
      */
     public function setEnv(array $env): static
     {
-        // Process cannot handle env values that are arrays
-        $env = array_filter($env, function ($value) {
-            return !\is_array($value);
-        });
-
         $this->env = $env;
 
         return $this;
@@ -1602,12 +1589,6 @@ class Process implements \IteratorAggregate
         $env = getenv();
         $env = array_intersect_key($env, $_SERVER) ?: $env;
 
-        foreach ($_ENV as $k => $v) {
-            if (\is_string($v)) {
-                $env[$k] = $v;
-            }
-        }
-
-        return $env;
+        return $_ENV + $env;
     }
 }

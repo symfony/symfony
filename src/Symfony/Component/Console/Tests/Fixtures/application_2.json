@@ -67,7 +67,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Force (or disable --no-ansi) ANSI output",
-                        "default": false
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -76,7 +76,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Negate the \"--ansi\" option",
-                        "default": false
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -179,7 +179,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Force (or disable --no-ansi) ANSI output",
-                        "default": false
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -188,7 +188,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Negate the \"--ansi\" option",
-                        "default": false
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -291,7 +291,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Force (or disable --no-ansi) ANSI output",
-                        "default": false
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -300,7 +300,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Negate the \"--ansi\" option",
-                        "default": false
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -394,7 +394,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Force (or disable --no-ansi) ANSI output",
-                        "default": false
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -403,7 +403,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Negate the \"--ansi\" option",
-                        "default": false
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -482,7 +482,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Force (or disable --no-ansi) ANSI output",
-                        "default": false
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -491,7 +491,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Negate the \"--ansi\" option",
-                        "default": false
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -578,7 +578,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Force (or disable --no-ansi) ANSI output",
-                        "default": false
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -587,7 +587,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Negate the \"--ansi\" option",
-                        "default": false
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -655,7 +655,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Force (or disable --no-ansi) ANSI output",
-                        "default": false
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -664,7 +664,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Negate the \"--ansi\" option",
-                        "default": false
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",
@@ -734,7 +734,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Force (or disable --no-ansi) ANSI output",
-                        "default": false
+                        "default": null
                     },
                     "no-ansi": {
                         "name": "--no-ansi",
@@ -743,7 +743,7 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Negate the \"--ansi\" option",
-                        "default": false
+                        "default": null
                     },
                     "no-interaction": {
                         "name": "--no-interaction",

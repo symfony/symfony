@@ -40,7 +40,6 @@ class ColorValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-
     /**
      * @dataProvider getValidValues
      */

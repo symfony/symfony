@@ -24,8 +24,8 @@
         "php": ">=8.0.2",
         "psr/cache": "^2.0|^3.0",
         "psr/log": "^1.1|^2|^3",
-        "symfony/cache-contracts": "^1.1.7|^2.0|^3.0",
-        "symfony/service-contracts": "^1.1|^2.0|^3.0",
+        "symfony/cache-contracts": "^1.1.7|^2|^3",
+        "symfony/service-contracts": "^1.1|^2|^3",
         "symfony/var-exporter": "^5.4|^6.0"
     },
     "require-dev": {

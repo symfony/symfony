@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=8.0.2",
-        "symfony/event-dispatcher-contracts": "^2.0|^3.0"
+        "symfony/event-dispatcher-contracts": "^2|^3"
     },
     "require-dev": {
         "symfony/dependency-injection": "^5.4|^6.0",
@@ -25,7 +25,7 @@
         "symfony/config": "^5.4|^6.0",
         "symfony/error-handler": "^5.4|^6.0",
         "symfony/http-foundation": "^5.4|^6.0",
-        "symfony/service-contracts": "^1.1|^2.0|^3.0",
+        "symfony/service-contracts": "^1.1|^2|^3",
         "symfony/stopwatch": "^5.4|^6.0",
         "psr/log": "^1|^2|^3"
     },

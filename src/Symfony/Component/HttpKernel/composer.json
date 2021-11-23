@@ -19,7 +19,6 @@
         "php": ">=8.0.2",
         "symfony/error-handler": "^5.4|^6.0",
         "symfony/event-dispatcher": "^5.4|^6.0",
-        "symfony/http-client-contracts": "^1.1|^2.0|^3.0",
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/polyfill-ctype": "^1.8",
         "psr/log": "^1|^2|^3"
@@ -33,11 +32,12 @@
         "symfony/dom-crawler": "^5.4|^6.0",
         "symfony/expression-language": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",
+        "symfony/http-client-contracts": "^1.1|^2|^3",
         "symfony/process": "^5.4|^6.0",
         "symfony/routing": "^5.4|^6.0",
         "symfony/stopwatch": "^5.4|^6.0",
         "symfony/translation": "^5.4|^6.0",
-        "symfony/translation-contracts": "^1.1|^2.0|^3.0",
+        "symfony/translation-contracts": "^1.1|^2|^3",
         "psr/cache": "^1.0|^2.0|^3.0",
         "twig/twig": "^2.13|^3.0.4"
     },

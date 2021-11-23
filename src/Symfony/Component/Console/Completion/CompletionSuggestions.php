@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-class CompletionSuggestions
+final class CompletionSuggestions
 {
     private $valueSuggestions = [];
     private $optionSuggestions = [];
@@ -28,9 +28,9 @@ class CompletionSuggestions
      *
      * @return $this
      */
-    public function suggestValue(string $value): static
+    public function suggestValue(string|Suggestion $value): static
     {
-        $this->valueSuggestions[] = $value;
+        $this->valueSuggestions[] = !$value instanceof Suggestion ? new Suggestion($value) : $value;
 
         return $this;
     }
@@ -38,13 +38,15 @@ class CompletionSuggestions
     /**
      * Add multiple suggested values at once for an input option or argument.
      *
-     * @param string[] $values
+     * @param list<string|Suggestion> $values
      *
      * @return $this
      */
     public function suggestValues(array $values): static
     {
-        $this->valueSuggestions = array_merge($this->valueSuggestions, $values);
+        foreach ($values as $value) {
+            $this->suggestValue($value);
+        }
 
         return $this;
     }
@@ -86,7 +88,7 @@ class CompletionSuggestions
     }
 
     /**
-     * @return string[]
+     * @return Suggestion[]
      */
     public function getValueSuggestions(): array
     {

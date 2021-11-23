@@ -116,14 +116,18 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
      */
     public function invalidateTags(array $tags)
     {
-        $ids = [];
+        $ids = $tagsToUpdate = [];
         foreach ($tags as $tag) {
             \assert('' !== CacheItem::validateKey($tag));
             unset($this->knownTagVersions[$tag]);
             $ids[] = $tag.static::TAGS_PREFIX;
         }
 
-        return !$tags || $this->tags->deleteItems($ids);
+        foreach ($this->tags->getItems($ids) as $tag => $version) {
+            $tagsToUpdate[$tag] = $version->set($newVersion ?? $newVersion = random_int(\PHP_INT_MIN, \PHP_INT_MAX));
+        }
+
+        return !$tagsToUpdate || (self::$saveTags)($this->tags, $tagsToUpdate) || $this->tags->deleteItems($ids);
     }
 
     /**

@@ -23,7 +23,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|bool $value
      * @return $this
      */
-    public function booleanNode($value): self
+    public function booleanNode($value): static
     {
         $this->booleanNode = $value;
     
@@ -35,7 +35,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|'foo'|'bar'|'baz' $value
      * @return $this
      */
-    public function enumNode($value): self
+    public function enumNode($value): static
     {
         $this->enumNode = $value;
     
@@ -47,7 +47,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|float $value
      * @return $this
      */
-    public function floatNode($value): self
+    public function floatNode($value): static
     {
         $this->floatNode = $value;
     
@@ -59,7 +59,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|int $value
      * @return $this
      */
-    public function integerNode($value): self
+    public function integerNode($value): static
     {
         $this->integerNode = $value;
     
@@ -71,7 +71,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function scalarNode($value): self
+    public function scalarNode($value): static
     {
         $this->scalarNode = $value;
     

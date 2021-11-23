@@ -16,10 +16,11 @@ class TranslatorConfig
     private $sources;
     
     /**
-     * @param ParamConfigurator|list<mixed|ParamConfigurator> $value
+     * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
+     *
      * @return $this
      */
-    public function fallbacks($value): self
+    public function fallbacks(ParamConfigurator|array $value): static
     {
         $this->fallbacks = $value;
     
@@ -27,10 +28,9 @@ class TranslatorConfig
     }
     
     /**
-     * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function source(string $source_class, $value): self
+    public function source(string $source_class, mixed $value): static
     {
         $this->sources[$source_class] = $value;
     

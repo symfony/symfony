@@ -20,7 +20,7 @@ class BarConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function corge($value): self
+    public function corge($value): static
     {
         $this->corge = $value;
     
@@ -32,7 +32,7 @@ class BarConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function grault($value): self
+    public function grault($value): static
     {
         $this->grault = $value;
     
@@ -71,9 +71,10 @@ class BarConfig
     
     /**
      * @param ParamConfigurator|mixed $value
+     *
      * @return $this
      */
-    public function set(string $key, $value): self
+    public function set(string $key, mixed $value): static
     {
         if (null === $value) {
             unset($this->_extraKeys[$key]);

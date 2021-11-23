@@ -21,7 +21,7 @@ class TransportsConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function dsn($value): self
+    public function dsn($value): static
     {
         $this->dsn = $value;
     
@@ -33,7 +33,7 @@ class TransportsConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function serializer($value): self
+    public function serializer($value): static
     {
         $this->serializer = $value;
     
@@ -41,10 +41,11 @@ class TransportsConfig
     }
     
     /**
-     * @param ParamConfigurator|list<mixed|ParamConfigurator> $value
+     * @param ParamConfigurator|list<ParamConfigurator|mixed> $value
+     *
      * @return $this
      */
-    public function options($value): self
+    public function options(ParamConfigurator|array $value): static
     {
         $this->options = $value;
     

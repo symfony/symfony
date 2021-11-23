@@ -21,8 +21,8 @@
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
-        "symfony/event-dispatcher-contracts": "^2",
-        "symfony/http-client-contracts": "^2",
+        "symfony/event-dispatcher-contracts": "^2|^3",
+        "symfony/http-client-contracts": "^2|^3",
         "symfony/messenger": "^4.4|^5.0|^6.0"
     },
     "conflict": {

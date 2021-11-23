@@ -1522,6 +1522,18 @@ class ProcessTest extends TestCase
         $this->assertFalse($process->isRunning());
     }
 
+    public function testEnvCaseInsensitiveOnWindows()
+    {
+        $p = $this->getProcessForCode('print_r([$_SERVER[\'PATH\'] ?? 1, $_SERVER[\'Path\'] ?? 2]);', null, ['PATH' => 'bar/baz']);
+        $p->run(null, ['Path' => 'foo/bar']);
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->assertSame('Array ( [0] => 1 [1] => foo/bar )', preg_replace('/\s++/', ' ', trim($p->getOutput())));
+        } else {
+            $this->assertSame('Array ( [0] => bar/baz [1] => foo/bar )', preg_replace('/\s++/', ' ', trim($p->getOutput())));
+        }
+    }
+
     /**
      * @param string|array $commandline
      * @param mixed        $input

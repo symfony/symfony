@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\Logger\DbalLogger;
 
+/**
+ * @group legacy
+ */
 class DbalLoggerTest extends TestCase
 {
     /**

@@ -96,6 +96,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
             ['redis://localhost:1234'],
             ['redis://foo@localhost'],
             ['redis://localhost/123'],
+            ['redis:///some/local/path'],
         ];
     }
 

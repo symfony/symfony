@@ -151,7 +151,7 @@ trait RedisTrait
                 if (preg_match('#/(\d+)$#', $params['path'], $m)) {
                     $params['dbindex'] = $m[1];
                     $params['path'] = substr($params['path'], 0, -\strlen($m[0]));
-                } else {
+                } elseif (isset($params['host'])) {
                     throw new InvalidArgumentException(sprintf('Invalid Redis DSN: "%s", the "dbindex" parameter must be a number.', $dsn));
                 }
             }

@@ -20,7 +20,7 @@ class FooConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function baz($value): self
+    public function baz($value): static
     {
         $this->baz = $value;
     
@@ -32,7 +32,7 @@ class FooConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function qux($value): self
+    public function qux($value): static
     {
         $this->qux = $value;
     
@@ -71,9 +71,10 @@ class FooConfig
     
     /**
      * @param ParamConfigurator|mixed $value
+     *
      * @return $this
      */
-    public function set(string $key, $value): self
+    public function set(string $key, mixed $value): static
     {
         if (null === $value) {
             unset($this->_extraKeys[$key]);

@@ -72,7 +72,8 @@ class GeneratedConfigTest extends TestCase
         $expectedOutput = include $basePath.$name.'.output.php';
         $expectedCode = $basePath.$name;
 
-        // to regenerate snapshot files, uncomment this line
+        // to regenerate snapshot files, uncomment these lines
+        // (new Filesystem())->remove($expectedCode);
         // $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
 
         $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);

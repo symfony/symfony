@@ -43,11 +43,6 @@ class ConcreteAuthenticator extends AbstractAuthenticator
         return parent::createToken($passport, $firewallName);
     }
 
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
-    {
-        return parent::createAuthenticatedToken($passport, $firewallName);
-    }
-
     public function supports(Request $request): ?bool
     {
         return null;

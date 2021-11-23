@@ -875,3 +875,145 @@ index 024da1884e..943790e875 100644
 +    public function getOption(string $name): mixed;
  
      /**
+diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
+index b0a1f32..893fe59 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
++++ b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
+@@ -222,7 +222,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
+      *
+      * @return string[]|AttributeMetadataInterface[]|bool
+      */
+-    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false)
++    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
+     {
+         $allowExtraAttributes = $context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES];
+         if (!$this->classMetadataFactory) {
+@@ -272,7 +272,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
+      *
+      * @return bool
+      */
+-    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = [])
++    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
+     {
+         $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
+         if (\in_array($attribute, $ignoredAttributes)) {
+@@ -323,7 +323,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
+      * @throws RuntimeException
+      * @throws MissingConstructorArgumentsException
+      */
+-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
++    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
+     {
+         if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
+             unset($context[self::OBJECT_TO_POPULATE]);
+diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
+index a241215..c6bcc63 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
++++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
+@@ -143,7 +143,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+     /**
+      * {@inheritdoc}
+      */
+-    public function normalize(mixed $object, string $format = null, array $context = [])
++    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+     {
+         if (!isset($context['cache_key'])) {
+             $context['cache_key'] = $this->getCacheKey($format, $context);
+@@ -276,7 +276,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+     /**
+      * {@inheritdoc}
+      */
+-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
++    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
+     {
+         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
+             if (!isset($data[$mapping->getTypeProperty()])) {
+@@ -338,19 +338,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      *
+      * @return string[]
+      */
+-    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
++    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
+ 
+     /**
+      * Gets the attribute value.
+      *
+      * @return mixed
+      */
+-    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
++    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
+ 
+     /**
+      * {@inheritdoc}
+      */
+-    public function supportsDenormalization(mixed $data, string $type, string $format = null)
++    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool
+     {
+         return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
+     }
+@@ -358,7 +358,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+     /**
+      * {@inheritdoc}
+      */
+-    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
++    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+     {
+         if (!isset($context['cache_key'])) {
+             $context['cache_key'] = $this->getCacheKey($format, $context);
+diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
+index 5e94400..726d89c 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
++++ b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
+@@ -44,7 +44,7 @@ interface DenormalizerInterface
+      * @throws RuntimeException         Occurs if the class cannot be instantiated
+      * @throws ExceptionInterface       Occurs for all the other cases of errors
+      */
+-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []);
++    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed;
+ 
+     /**
+      * Checks whether the given class is supported for denormalization by this normalizer.
+@@ -55,5 +55,5 @@ interface DenormalizerInterface
+      *
+      * @return bool
+      */
+-    public function supportsDenormalization(mixed $data, string $type, string $format = null);
++    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool;
+ }
+diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
+index fb4bee4..00e8ad0 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
++++ b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
+@@ -36,7 +36,7 @@ interface NormalizerInterface
+      * @throws LogicException             Occurs when the normalizer is not called in an expected context
+      * @throws ExceptionInterface         Occurs for all the other cases of errors
+      */
+-    public function normalize(mixed $object, string $format = null, array $context = []);
++    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
+ 
+     /**
+      * Checks whether the given class is supported for normalization by this normalizer.
+diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
+index c6bcc63..2ed1af7 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
++++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
+@@ -135,7 +135,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+     /**
+      * {@inheritdoc}
+      */
+-    public function supportsNormalization(mixed $data, string $format = null)
++    public function supportsNormalization(mixed $data, string $format = null): bool
+     {
+         return \is_object($data) && !$data instanceof \Traversable;
+     }
+diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
+index d9f8df9..a7a60ad 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
++++ b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
+@@ -46,5 +46,5 @@ interface NormalizerInterface
+      *
+      * @return bool
+      */
+-    public function supportsNormalization(mixed $data, string $format = null);
++    public function supportsNormalization(mixed $data, string $format = null): bool;
+ }

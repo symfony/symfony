@@ -23,6 +23,15 @@ $translator->addResource('array', [
 echo $translator->trans('Hello World!'); // outputs « Bonjour ! »
 ```
 
+Sponsor
+-------
+
+The Translation component for Symfony 5.4/6.0 is [backed][1] by:
+
+ * [Crowdin][2], a cloud-based localization management software helping teams to go global and stay agile.
+
+Help Symfony by [sponsoring][3] its development!
+
 Resources
 ---------
 
@@ -31,3 +40,7 @@ Resources
  * [Report issues](https://github.com/symfony/symfony/issues) and
    [send Pull Requests](https://github.com/symfony/symfony/pulls)
    in the [main Symfony repository](https://github.com/symfony/symfony)
+
+[1]: https://symfony.com/backers
+[2]: https://crowdin.com
+[3]: https://symfony.com/sponsor

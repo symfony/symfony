@@ -7,6 +7,25 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.0-RC1 (2021-11-24)
+
+ * security #cve-2021-41268 [SecurityBundle] Default signature_properties to the previous behavior (wouterj)
+ * security #cve-2021-41267 [HttpKernel] Fix missing extra trusted header in sub-request (jderusse)
+ * security #cve-2021-41270 [Serializer] Use single quote to escape formulas (jderusse)
+ * bug #44230 [Console] Add Suggestion class for more advanced completion suggestion (wouterj)
+ * bug #44232 [Cache] fix connecting to local Redis sockets (nicolas-grekas)
+ * bug #44204 [HttpClient] fix closing curl multi handle when destructing client (nicolas-grekas)
+ * bug #44208 [Process] exclude argv/argc from possible default env vars (nicolas-grekas)
+ * bug #44188 [VarExporter] fix exporting declared but unset properties when __sleep() is implemented (nicolas-grekas)
+ * bug #44176 [Console] Default ansi option to null (jderusse)
+ * bug #44179 [WebProfilerBundle] Fix JS error when toolbar is reloaded (jderusse)
+ * bug #44172 [Security] Guard is incompatible with Symfony 6 (derrabus)
+ * bug #44119 [HttpClient][Mime] Add correct IDN flags for IDNA2008 compliance (j-bernard)
+ * bug #44139 [WebProfilerBundle] Prevent installation of incompatible mailer component versions (Anne-Julia Seitz)
+ * bug #43917 Allow autodetecting mapping type for any object (franmomu)
+ * bug #44131 [Yaml] properly parse quoted strings tagged with !!str (xabbuh)
+ * bug #42323 [TwigBridge] do not merge label classes into expanded choice labels (xabbuh)
+
 * 5.4.0-BETA3 (2021-11-18)
 
  * feature #44125 Add a setter on DateTimeNormalizer to change the default context at runtime (Seldaek)

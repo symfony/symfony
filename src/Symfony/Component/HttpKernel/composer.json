@@ -25,7 +25,7 @@
     },
     "require-dev": {
         "symfony/browser-kit": "^5.4|^6.0",
-        "symfony/config": "^5.4|^6.0",
+        "symfony/config": "^6.1",
         "symfony/console": "^5.4|^6.0",
         "symfony/css-selector": "^5.4|^6.0",
         "symfony/dependency-injection": "^6.1",
@@ -48,10 +48,10 @@
     "conflict": {
         "symfony/browser-kit": "<5.4",
         "symfony/cache": "<5.4",
-        "symfony/config": "<5.4",
+        "symfony/config": "<6.1",
         "symfony/console": "<5.4",
         "symfony/form": "<5.4",
-        "symfony/dependency-injection": "<5.4",
+        "symfony/dependency-injection": "<6.1",
         "symfony/doctrine-bridge": "<5.4",
         "symfony/http-client": "<5.4",
         "symfony/mailer": "<5.4",

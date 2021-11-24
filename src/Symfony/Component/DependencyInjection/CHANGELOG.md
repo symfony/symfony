@@ -10,6 +10,7 @@ CHANGELOG
  * Add an `Autowire` attribute to tell a parameter how to be autowired
  * Allow using expressions as service factories
  * Deprecate `ReferenceSetArgumentTrait`
+ * Add `AbstractExtension` class for DI configuration/definition on a single file
 
 6.0
 ---

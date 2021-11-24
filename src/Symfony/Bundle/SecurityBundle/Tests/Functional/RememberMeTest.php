@@ -11,8 +11,15 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\RememberMeBundle\Security\UserChangingUserProvider;
+
 class RememberMeTest extends AbstractWebTestCase
 {
+    protected function setUp(): void
+    {
+        UserChangingUserProvider::$changePassword = false;
+    }
+
     /**
      * @dataProvider provideConfigs
      */
@@ -51,11 +58,19 @@ class RememberMeTest extends AbstractWebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $cookieJar = $client->getCookieJar();
-        $this->assertNotNull($cookieJar->get('REMEMBERME'));
+        $this->assertNotNull($cookie = $cookieJar->get('REMEMBERME'));
 
+        UserChangingUserProvider::$changePassword = true;
+
+        // change password (through user provider), this deauthenticates the session
         $client->request('GET', '/profile');
         $this->assertRedirect($client->getResponse(), '/login');
         $this->assertNull($cookieJar->get('REMEMBERME'));
+
+        // restore the old remember me cookie, it should no longer be valid
+        $cookieJar->set($cookie);
+        $client->request('GET', '/profile');
+        $this->assertRedirect($client->getResponse(), '/login');
     }
 
     public function testSessionLessRememberMeLogout()

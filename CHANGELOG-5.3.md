@@ -7,6 +7,15 @@ in 5.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.3.0...v5.3.1
 
+* 5.3.12 (2021-11-24)
+
+ * security #cve-2021-41268 [SecurityBundle] Default signature_properties to the previous behavior (wouterj)
+ * security #cve-2021-41267 [HttpKernel] Fix missing extra trusted header in sub-request (jderusse)
+ * security #cve-2021-41270 [Serializer] Use single quote to escape formulas (jderusse)
+ * bug #44232 [Cache] fix connecting to local Redis sockets (nicolas-grekas)
+ * bug #44204 [HttpClient] fix closing curl multi handle when destructing client (nicolas-grekas)
+ * bug #44208 [Process] exclude argv/argc from possible default env vars (nicolas-grekas)
+
 * 5.3.11 (2021-11-22)
 
  * bug #44188 [VarExporter] fix exporting declared but unset properties when __sleep() is implemented (nicolas-grekas)

@@ -21,6 +21,8 @@ class UserChangingUserProvider implements UserProviderInterface
 {
     private $inner;
 
+    public static $changePassword = false;
+
     public function __construct(InMemoryUserProvider $inner)
     {
         $this->inner = $inner;
@@ -28,26 +30,31 @@ class UserChangingUserProvider implements UserProviderInterface
 
     public function loadUserByUsername($username)
     {
-        return $this->inner->loadUserByUsername($username);
+        return $this->changeUser($this->inner->loadUserByUsername($username));
     }
 
     public function loadUserByIdentifier(string $userIdentifier): UserInterface
     {
-        return $this->inner->loadUserByIdentifier($userIdentifier);
+        return $this->changeUser($this->inner->loadUserByIdentifier($userIdentifier));
     }
 
     public function refreshUser(UserInterface $user)
     {
-        $user = $this->inner->refreshUser($user);
-
-        $alterUser = \Closure::bind(function (InMemoryUser $user) { $user->password = 'foo'; }, null, class_exists(User::class) ? User::class : InMemoryUser::class);
-        $alterUser($user);
-
-        return $user;
+        return $this->changeUser($this->inner->refreshUser($user));
     }
 
     public function supportsClass($class)
     {
         return $this->inner->supportsClass($class);
+    }
+
+    private function changeUser(UserInterface $user): UserInterface
+    {
+        if (self::$changePassword) {
+            $alterUser = \Closure::bind(function (InMemoryUser $user) { $user->password = 'changed!'; }, null, class_exists(User::class) ? User::class : InMemoryUser::class);
+            $alterUser($user);
+        }
+
+        return $user;
     }
 }

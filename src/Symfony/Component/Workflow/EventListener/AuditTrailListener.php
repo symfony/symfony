@@ -14,6 +14,7 @@ namespace Symfony\Component\Workflow\EventListener;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
+use Symfony\Component\Workflow\Utils\PlaceEnumerationUtils;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -30,7 +31,7 @@ class AuditTrailListener implements EventSubscriberInterface
     public function onLeave(Event $event)
     {
         foreach ($event->getTransition()->getFroms() as $place) {
-            $this->logger->info(sprintf('Leaving "%s" for subject of class "%s" in workflow "%s".', $place, \get_class($event->getSubject()), $event->getWorkflowName()));
+            $this->logger->info(sprintf('Leaving "%s" for subject of class "%s" in workflow "%s".', PlaceEnumerationUtils::getPlaceKey($place), \get_class($event->getSubject()), $event->getWorkflowName()));
         }
     }
 
@@ -42,7 +43,7 @@ class AuditTrailListener implements EventSubscriberInterface
     public function onEnter(Event $event)
     {
         foreach ($event->getTransition()->getTos() as $place) {
-            $this->logger->info(sprintf('Entering "%s" for subject of class "%s" in workflow "%s".', $place, \get_class($event->getSubject()), $event->getWorkflowName()));
+            $this->logger->info(sprintf('Entering "%s" for subject of class "%s" in workflow "%s".', PlaceEnumerationUtils::getPlaceKey($place), \get_class($event->getSubject()), $event->getWorkflowName()));
         }
     }
 

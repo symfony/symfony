@@ -25,11 +25,11 @@ class Transition
      * @param string|string[] $froms
      * @param string|string[] $tos
      */
-    public function __construct(string $name, string|array $froms, string|array $tos)
+    public function __construct(string $name, string|\UnitEnum|array $froms, string|\UnitEnum|array $tos)
     {
         $this->name = $name;
-        $this->froms = (array) $froms;
-        $this->tos = (array) $tos;
+        $this->froms = \is_array($froms) ? $froms : [$froms];
+        $this->tos = \is_array($tos) ? $tos : [$tos];
     }
 
     public function getName(): string

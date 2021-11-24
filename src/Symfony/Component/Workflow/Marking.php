@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Workflow;
 
+use Symfony\Component\Workflow\Utils\PlaceEnumerationUtils;
+
 /**
  * Marking contains the place of every tokens.
  *
@@ -22,33 +24,44 @@ class Marking
     private ?array $context = null;
 
     /**
-     * @param int[] $representation Keys are the place name and values should be 1
+     * @param int[]|\UnitEnum[] $representation Keys are the place name and values should be 1, unless UnitEnums
+     *                                          are used as workflow places
      */
     public function __construct(array $representation = [])
     {
-        foreach ($representation as $place => $nbToken) {
-            $this->mark($place);
+        foreach ($representation as $place => $token) {
+            $this->mark($token instanceof \UnitEnum ? $token : $place);
         }
     }
 
-    public function mark(string $place)
+    public function mark(string|\UnitEnum $place)
     {
-        $this->places[$place] = 1;
+        $this->places[PlaceEnumerationUtils::getPlaceKey($place)] = 1;
     }
 
-    public function unmark(string $place)
+    public function unmark(string|\UnitEnum $place)
     {
-        unset($this->places[$place]);
+        unset($this->places[PlaceEnumerationUtils::getPlaceKey($place)]);
     }
 
-    public function has(string $place)
+    public function has(string|\UnitEnum $place)
     {
-        return isset($this->places[$place]);
+        return isset($this->places[PlaceEnumerationUtils::getPlaceKey($place)]);
     }
 
     public function getPlaces()
     {
-        return $this->places;
+        $places = [];
+        foreach ($this->places as $key => $value) {
+            $typedKey = PlaceEnumerationUtils::getTypedValue($key);
+            if ($typedKey instanceof \UnitEnum) {
+                $places[$key] = $typedKey;
+            } else {
+                $places[$typedKey] = 1;
+            }
+        }
+
+        return $places;
     }
 
     /**

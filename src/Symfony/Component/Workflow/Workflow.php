@@ -24,6 +24,7 @@ use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
+use Symfony\Component\Workflow\Utils\PlaceEnumerationUtils;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -367,7 +368,7 @@ class Workflow implements WorkflowInterface
             $this->dispatcher->dispatch($event, sprintf('workflow.%s.leave', $this->name));
 
             foreach ($places as $place) {
-                $this->dispatcher->dispatch($event, sprintf('workflow.%s.leave.%s', $this->name, $place));
+                $this->dispatcher->dispatch($event, sprintf('workflow.%s.leave.%s', $this->name, PlaceEnumerationUtils::getPlaceKey($place)));
             }
         }
 
@@ -402,7 +403,7 @@ class Workflow implements WorkflowInterface
             $this->dispatcher->dispatch($event, sprintf('workflow.%s.enter', $this->name));
 
             foreach ($places as $place) {
-                $this->dispatcher->dispatch($event, sprintf('workflow.%s.enter.%s', $this->name, $place));
+                $this->dispatcher->dispatch($event, sprintf('workflow.%s.enter.%s', $this->name, PlaceEnumerationUtils::getPlaceKey($place)));
             }
         }
 
@@ -423,7 +424,7 @@ class Workflow implements WorkflowInterface
         $this->dispatcher->dispatch($event, sprintf('workflow.%s.entered', $this->name));
 
         foreach ($marking->getPlaces() as $placeName => $nbToken) {
-            $this->dispatcher->dispatch($event, sprintf('workflow.%s.entered.%s', $this->name, $placeName));
+            $this->dispatcher->dispatch($event, sprintf('workflow.%s.entered.%s', $this->name, PlaceEnumerationUtils::getPlaceKey($placeName)));
         }
     }
 

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Allow use of UnitEnum and BackedEnum in workflow places
+
 6.0
 ---
 

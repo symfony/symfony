@@ -13,6 +13,7 @@ namespace Symfony\Component\Workflow\MarkingStore;
 
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\Utils\PlaceEnumerationUtils;
 
 /**
  * MethodMarkingStore stores the marking with a subject's method.
@@ -61,10 +62,17 @@ final class MethodMarkingStore implements MarkingStoreInterface
         }
 
         if ($this->singleState) {
-            $marking = [(string) $marking => 1];
+            $markingRepresentation = [PlaceEnumerationUtils::getPlaceKey($marking) => 1];
+        } else {
+            $markingRepresentation = [];
+            foreach ($marking as $key => $item) {
+                // When using enumerations, as the enumeration case can't be used as an array key, the value is actually
+                // stored in the item instead of the key.
+                $markingRepresentation[PlaceEnumerationUtils::getPlaceKey($item instanceof \UnitEnum ? $item : $key)] = 1;
+            }
         }
 
-        return new Marking($marking);
+        return new Marking($markingRepresentation);
     }
 
     /**
@@ -75,7 +83,18 @@ final class MethodMarkingStore implements MarkingStoreInterface
         $marking = $marking->getPlaces();
 
         if ($this->singleState) {
-            $marking = key($marking);
+            $markingResult = PlaceEnumerationUtils::getTypedValue(key($marking));
+        } else {
+            $markingResult = [];
+            foreach ($marking as $key => $item) {
+                $value = PlaceEnumerationUtils::getTypedValue($key);
+                if ($value instanceof \UnitEnum) {
+                    // UnitEnum can't be used as array key, put it as a simple value without specific index.
+                    $markingResult[] = $value;
+                } else {
+                    $markingResult[$value] = 1;
+                }
+            }
         }
 
         $method = 'set'.ucfirst($this->property);
@@ -84,6 +103,6 @@ final class MethodMarkingStore implements MarkingStoreInterface
             throw new LogicException(sprintf('The method "%s::%s()" does not exist.', get_debug_type($subject), $method));
         }
 
-        $subject->{$method}($marking, $context);
+        $subject->{$method}($markingResult, $context);
     }
 }

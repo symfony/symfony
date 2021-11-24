@@ -5,11 +5,16 @@ namespace Symfony\Component\Workflow\Tests\MarkingStore;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
+use Symfony\Component\Workflow\Tests\fixtures\FooEnum;
 use Symfony\Component\Workflow\Tests\Subject;
+use Symfony\Component\Workflow\Utils\PlaceEnumerationUtils;
 
 class MethodMarkingStoreTest extends TestCase
 {
-    public function testGetSetMarkingWithMultipleState()
+    /**
+     * @dataProvider providePlaceAndExpectedResultForMultipleState
+     */
+    public function testGetSetMarkingWithMultipleState(string|\UnitEnum $place, array $expectedResult)
     {
         $subject = new Subject();
 
@@ -20,18 +25,30 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertInstanceOf(Marking::class, $marking);
         $this->assertCount(0, $marking->getPlaces());
 
-        $marking->mark('first_place');
+        $marking->mark($place);
 
         $markingStore->setMarking($subject, $marking);
 
-        $this->assertSame(['first_place' => 1], $subject->getMarking());
+        $this->assertSame($expectedResult, $subject->getMarking());
 
         $marking2 = $markingStore->getMarking($subject);
 
         $this->assertEquals($marking, $marking2);
     }
 
-    public function testGetSetMarkingWithSingleState()
+    public function providePlaceAndExpectedResultForMultipleState(): \Generator
+    {
+        yield ['first_place', ['first_place' => 1]];
+
+        if (\PHP_VERSION_ID >= 80100) {
+            yield [FooEnum::Bar, [FooEnum::Bar]];
+        }
+    }
+
+    /**
+     * @dataProvider providePlaceAndExpectedResultForSingleState
+     */
+    public function testGetSetMarkingWithSingleState(string|\UnitEnum $place)
     {
         $subject = new Subject();
 
@@ -42,15 +59,24 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertInstanceOf(Marking::class, $marking);
         $this->assertCount(0, $marking->getPlaces());
 
-        $marking->mark('first_place');
+        $marking->mark($place);
 
         $markingStore->setMarking($subject, $marking);
 
-        $this->assertSame('first_place', $subject->getMarking());
+        $this->assertSame($place, $subject->getMarking());
 
         $marking2 = $markingStore->getMarking($subject);
 
         $this->assertEquals($marking, $marking2);
+    }
+
+    public function providePlaceAndExpectedResultForSingleState(): \Generator
+    {
+        yield ['first_place'];
+
+        if (\PHP_VERSION_ID >= 80100) {
+            yield [FooEnum::Bar];
+        }
     }
 
     public function testGetSetMarkingWithSingleStateAndAlmostEmptyPlaceName()
@@ -65,9 +91,12 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertCount(1, $marking->getPlaces());
     }
 
-    public function testGetMarkingWithValueObject()
+    /**
+     * @dataProvider provideValueObjectMarkingValue
+     */
+    public function testGetMarkingWithValueObject(string|\UnitEnum $value)
     {
-        $subject = new Subject($this->createValueObject('first_place'));
+        $subject = new Subject($this->createValueObject($value));
 
         $markingStore = new MethodMarkingStore(true);
 
@@ -75,23 +104,32 @@ class MethodMarkingStoreTest extends TestCase
 
         $this->assertInstanceOf(Marking::class, $marking);
         $this->assertCount(1, $marking->getPlaces());
-        $this->assertSame('first_place', (string) $subject->getMarking());
+        $this->assertSame(PlaceEnumerationUtils::getPlaceKey($value), (string) $subject->getMarking());
     }
 
-    private function createValueObject(string $markingValue)
+    public function provideValueObjectMarkingValue(): \Generator
+    {
+        yield ['first_place'];
+
+        if (\PHP_VERSION_ID >= 80100) {
+            yield [FooEnum::Bar];
+        }
+    }
+
+    private function createValueObject(string|\UnitEnum $markingValue)
     {
         return new class($markingValue) {
-            /** @var string */
+            /** @var string|\UnitEnum */
             private $markingValue;
 
-            public function __construct(string $markingValue)
+            public function __construct(string|\UnitEnum $markingValue)
             {
                 $this->markingValue = $markingValue;
             }
 
             public function __toString(): string
             {
-                return $this->markingValue;
+                return PlaceEnumerationUtils::getPlaceKey($this->markingValue);
             }
         };
     }

@@ -4,22 +4,29 @@ namespace Symfony\Component\Workflow\Tests;
 
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
+use Symfony\Component\Workflow\Tests\fixtures\AlphabeticalEnum;
 use Symfony\Component\Workflow\Transition;
 
 trait WorkflowBuilderTrait
 {
-    private function createComplexWorkflowDefinition()
+    private function createComplexWorkflowDefinition(bool $useEnumerations = false)
     {
-        $places = range('a', 'g');
+        $places = $useEnumerations ? AlphabeticalEnum::cases() : range('a', 'g');
 
         $transitions = [];
-        $transitions[] = new Transition('t1', 'a', ['b', 'c']);
-        $transitions[] = new Transition('t2', ['b', 'c'], 'd');
-        $transitionWithMetadataDumpStyle = new Transition('t3', 'd', 'e');
+        $transitions[] = new Transition('t1', $this->getTypedPlaceValue('a', $useEnumerations), [
+            $this->getTypedPlaceValue('b', $useEnumerations),
+            $this->getTypedPlaceValue('c', $useEnumerations),
+        ]);
+        $transitions[] = new Transition('t2', [
+            $this->getTypedPlaceValue('b', $useEnumerations),
+            $this->getTypedPlaceValue('c', $useEnumerations),
+        ], $this->getTypedPlaceValue('d', $useEnumerations));
+        $transitionWithMetadataDumpStyle = new Transition('t3', $this->getTypedPlaceValue('d', $useEnumerations), $this->getTypedPlaceValue('e', $useEnumerations));
         $transitions[] = $transitionWithMetadataDumpStyle;
-        $transitions[] = new Transition('t4', 'd', 'f');
-        $transitions[] = new Transition('t5', 'e', 'g');
-        $transitions[] = new Transition('t6', 'f', 'g');
+        $transitions[] = new Transition('t4', $this->getTypedPlaceValue('d', $useEnumerations), $this->getTypedPlaceValue('f', $useEnumerations));
+        $transitions[] = new Transition('t5', $this->getTypedPlaceValue('e', $useEnumerations), $this->getTypedPlaceValue('g', $useEnumerations));
+        $transitions[] = new Transition('t6', $this->getTypedPlaceValue('f', $useEnumerations), $this->getTypedPlaceValue('g', $useEnumerations));
 
         $transitionsMetadata = new \SplObjectStorage();
         $transitionsMetadata[$transitionWithMetadataDumpStyle] = [
@@ -43,18 +50,18 @@ trait WorkflowBuilderTrait
         //           +----+                          +----+     +----+     +----+
     }
 
-    private function createSimpleWorkflowDefinition()
+    private function createSimpleWorkflowDefinition(bool $useEnumerations = false)
     {
-        $places = range('a', 'c');
+        $places = $useEnumerations ? AlphabeticalEnum::cases() : range('a', 'c');
 
         $transitions = [];
-        $transitionWithMetadataDumpStyle = new Transition('t1', 'a', 'b');
+        $transitionWithMetadataDumpStyle = new Transition('t1', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('b', $useEnumerations));
         $transitions[] = $transitionWithMetadataDumpStyle;
-        $transitionWithMetadataArrowColorPink = new Transition('t2', 'b', 'c');
+        $transitionWithMetadataArrowColorPink = new Transition('t2', $this->getTypedPlaceValue('b', $useEnumerations), $this->getTypedPlaceValue('c', $useEnumerations));
         $transitions[] = $transitionWithMetadataArrowColorPink;
 
         $placesMetadata = [];
-        $placesMetadata['c'] = [
+        $placesMetadata[$this->getPlaceKey($useEnumerations ? AlphabeticalEnum::C : 'c')] = [
             'bg_color' => 'DeepSkyBlue',
             'description' => 'My custom place description',
         ];
@@ -78,15 +85,18 @@ trait WorkflowBuilderTrait
         // +---+     +----+     +---+     +----+     +---+
     }
 
-    private function createWorkflowWithSameNameTransition()
+    private function createWorkflowWithSameNameTransition(bool $useEnumerations = false)
     {
-        $places = range('a', 'c');
+        $places = $useEnumerations ? AlphabeticalEnum::cases() : range('a', 'c');
 
         $transitions = [];
-        $transitions[] = new Transition('a_to_bc', 'a', ['b', 'c']);
-        $transitions[] = new Transition('b_to_c', 'b', 'c');
-        $transitions[] = new Transition('to_a', 'b', 'a');
-        $transitions[] = new Transition('to_a', 'c', 'a');
+        $transitions[] = new Transition('a_to_bc', $this->getTypedPlaceValue('a', $useEnumerations), [
+            $this->getTypedPlaceValue('b', $useEnumerations),
+            $this->getTypedPlaceValue('c', $useEnumerations),
+        ]);
+        $transitions[] = new Transition('b_to_c', $this->getTypedPlaceValue('b', $useEnumerations), $this->getTypedPlaceValue('c', $useEnumerations));
+        $transitions[] = new Transition('to_a', $this->getTypedPlaceValue('b', $useEnumerations), $this->getTypedPlaceValue('a', $useEnumerations));
+        $transitions[] = new Transition('to_a', $this->getTypedPlaceValue('c', $useEnumerations), $this->getTypedPlaceValue('a', $useEnumerations));
 
         return new Definition($places, $transitions);
 
@@ -143,5 +153,24 @@ trait WorkflowBuilderTrait
         //             +-----+              |
         //             |  d  | -------------+
         //             +-----+
+    }
+
+    private function getTypedPlaceValue(string $value, bool $useEnumeration = false): string|AlphabeticalEnum
+    {
+        if ($useEnumeration) {
+            $value = AlphabeticalEnum::tryFrom($value) ?? $value;
+        }
+
+        return $value;
+    }
+
+    private function getPlaceKey(string|\UnitEnum $value): string
+    {
+        return $value instanceof \UnitEnum ? \get_class($value).'::'.$value->name : $value;
+    }
+
+    private function getPlaceEventSuffix(string $value, bool $useEnumerations): string
+    {
+        return $useEnumerations ? $this->getPlaceKey(AlphabeticalEnum::tryFrom($value)) : $value;
     }
 }

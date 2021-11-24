@@ -15,7 +15,7 @@ class AuditTrailListenerTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    public function testItWorks()
+    public function testItWorksWithStrings()
     {
         $definition = $this->createSimpleWorkflowDefinition();
 
@@ -34,6 +34,33 @@ class AuditTrailListenerTest extends TestCase
             'Leaving "a" for subject of class "Symfony\Component\Workflow\Tests\Subject" in workflow "unnamed".',
             'Transition "t1" for subject of class "Symfony\Component\Workflow\Tests\Subject" in workflow "unnamed".',
             'Entering "b" for subject of class "Symfony\Component\Workflow\Tests\Subject" in workflow "unnamed".',
+        ];
+
+        $this->assertSame($expected, $logger->logs);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testItWorksWithEnumerations()
+    {
+        $definition = $this->createSimpleWorkflowDefinition(true);
+
+        $object = new Subject();
+
+        $logger = new Logger();
+
+        $ed = new EventDispatcher();
+        $ed->addSubscriber(new AuditTrailListener($logger));
+
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $ed);
+
+        $workflow->apply($object, 't1');
+
+        $expected = [
+            'Leaving "Symfony\Component\Workflow\Tests\fixtures\AlphabeticalEnum::A" for subject of class "Symfony\Component\Workflow\Tests\Subject" in workflow "unnamed".',
+            'Transition "t1" for subject of class "Symfony\Component\Workflow\Tests\Subject" in workflow "unnamed".',
+            'Entering "Symfony\Component\Workflow\Tests\fixtures\AlphabeticalEnum::B" for subject of class "Symfony\Component\Workflow\Tests\Subject" in workflow "unnamed".',
         ];
 
         $this->assertSame($expected, $logger->logs);

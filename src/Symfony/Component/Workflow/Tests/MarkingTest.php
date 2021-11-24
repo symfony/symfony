@@ -4,10 +4,11 @@ namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\Tests\fixtures\FooEnum;
 
 class MarkingTest extends TestCase
 {
-    public function testMarking()
+    public function testMarkingWithPlacesAsString()
     {
         $marking = new Marking(['a' => 1]);
 
@@ -31,6 +32,36 @@ class MarkingTest extends TestCase
 
         $this->assertFalse($marking->has('a'));
         $this->assertFalse($marking->has('b'));
+        $this->assertSame([], $marking->getPlaces());
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testMarkingWithPlacesAsEnumerations()
+    {
+        $marking = new Marking([FooEnum::Bar]);
+
+        $this->assertTrue($marking->has(FooEnum::Bar));
+        $this->assertFalse($marking->has(FooEnum::Baz));
+        $this->assertSame(['Symfony\Component\Workflow\Tests\fixtures\FooEnum::Bar' => FooEnum::Bar], $marking->getPlaces());
+
+        $marking->mark(FooEnum::Baz);
+
+        $this->assertTrue($marking->has(FooEnum::Bar));
+        $this->assertTrue($marking->has(FooEnum::Baz));
+        $this->assertSame(['Symfony\Component\Workflow\Tests\fixtures\FooEnum::Bar' => FooEnum::Bar, 'Symfony\Component\Workflow\Tests\fixtures\FooEnum::Baz' => FooEnum::Baz], $marking->getPlaces());
+
+        $marking->unmark(FooEnum::Bar);
+
+        $this->assertFalse($marking->has(FooEnum::Bar));
+        $this->assertTrue($marking->has(FooEnum::Baz));
+        $this->assertSame(['Symfony\Component\Workflow\Tests\fixtures\FooEnum::Baz' => FooEnum::Baz], $marking->getPlaces());
+
+        $marking->unmark(FooEnum::Baz);
+
+        $this->assertFalse($marking->has(FooEnum::Bar));
+        $this->assertFalse($marking->has(FooEnum::Baz));
         $this->assertSame([], $marking->getPlaces());
     }
 }

@@ -13,6 +13,7 @@ use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
+use Symfony\Component\Workflow\Tests\fixtures\AlphabeticalEnum;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\Workflow;
@@ -43,31 +44,39 @@ class WorkflowTest extends TestCase
         $workflow->getMarking($subject);
     }
 
-    public function testGetMarkingWithEmptyInitialMarking()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testGetMarkingWithEmptyInitialMarking(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $marking = $workflow->getMarking($subject);
 
         $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertTrue($marking->has('a'));
-        $this->assertSame(['a' => 1], $subject->getMarking());
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('a', $useEnumerations)));
+        $this->assertSame($useEnumerations ? [AlphabeticalEnum::A] : ['a' => 1], $subject->getMarking());
     }
 
-    public function testGetMarkingWithExistingMarking()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testGetMarkingWithExistingMarking(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
-        $subject->setMarking(['b' => 1, 'c' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::B, AlphabeticalEnum::C] : ['b' => 1, 'c' => 1]);
+
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $marking = $workflow->getMarking($subject);
 
         $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertTrue($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
+
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('b', $useEnumerations)));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('c', $useEnumerations)));
     }
 
     public function testCanWithUnexistingTransition()
@@ -79,36 +88,42 @@ class WorkflowTest extends TestCase
         $this->assertFalse($workflow->can($subject, 'foobar'));
     }
 
-    public function testCan()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testCan(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $this->assertTrue($workflow->can($subject, 't1'));
         $this->assertFalse($workflow->can($subject, 't2'));
 
-        $subject->setMarking(['b' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::B] : ['b' => 1]);
 
         $this->assertFalse($workflow->can($subject, 't1'));
         // In a workflow net, all "from" places should contain a token to enable
         // the transition.
         $this->assertFalse($workflow->can($subject, 't2'));
 
-        $subject->setMarking(['b' => 1, 'c' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::B, AlphabeticalEnum::C] : ['b' => 1, 'c' => 1]);
 
         $this->assertFalse($workflow->can($subject, 't1'));
         $this->assertTrue($workflow->can($subject, 't2'));
 
-        $subject->setMarking(['f' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::F] : ['f' => 1]);
 
         $this->assertFalse($workflow->can($subject, 't5'));
         $this->assertTrue($workflow->can($subject, 't6'));
     }
 
-    public function testCanWithGuard()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testCanWithGuard(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
@@ -119,9 +134,12 @@ class WorkflowTest extends TestCase
         $this->assertFalse($workflow->can($subject, 't1'));
     }
 
-    public function testCanDoesNotTriggerGuardEventsForNotEnabledTransitions()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testCanDoesNotTriggerGuardEventsForNotEnabledTransitions(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
 
         $dispatchedEvents = [];
@@ -143,9 +161,12 @@ class WorkflowTest extends TestCase
         $this->assertSame(['workflow_name.guard.t3'], $dispatchedEvents);
     }
 
-    public function testCanWithSameNameTransition()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testCanWithSameNameTransition(bool $useEnumerations)
     {
-        $definition = $this->createWorkflowWithSameNameTransition();
+        $definition = $this->createWorkflowWithSameNameTransition($useEnumerations);
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $subject = new Subject();
@@ -153,7 +174,7 @@ class WorkflowTest extends TestCase
         $this->assertFalse($workflow->can($subject, 'b_to_c'));
         $this->assertFalse($workflow->can($subject, 'to_a'));
 
-        $subject->setMarking(['b' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::B] : ['b' => 1]);
         $this->assertFalse($workflow->can($subject, 'a_to_bc'));
         $this->assertTrue($workflow->can($subject, 'b_to_c'));
         $this->assertTrue($workflow->can($subject, 'to_a'));
@@ -170,34 +191,40 @@ class WorkflowTest extends TestCase
         $workflow->buildTransitionBlockerList($subject, '404 Not Found');
     }
 
-    public function testBuildTransitionBlockerList()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testBuildTransitionBlockerList(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $this->assertTrue($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
         $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
 
-        $subject->setMarking(['b' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::B] : ['b' => 1]);
 
         $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
         $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
 
-        $subject->setMarking(['b' => 1, 'c' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::B, AlphabeticalEnum::C] : ['b' => 1, 'c' => 1]);
 
         $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
         $this->assertTrue($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
 
-        $subject->setMarking(['f' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::F] : ['f' => 1]);
 
         $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't5')->isEmpty());
         $this->assertTrue($workflow->buildTransitionBlockerList($subject, 't6')->isEmpty());
     }
 
-    public function testBuildTransitionBlockerListReturnsReasonsProvidedByMarking()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testBuildTransitionBlockerListReturnsReasonsProvidedByMarking(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
@@ -208,9 +235,12 @@ class WorkflowTest extends TestCase
         $this->assertSame('19beefc8-6b1e-4716-9d07-a39bd6d16e34', $blockers[0]->getCode());
     }
 
-    public function testBuildTransitionBlockerListReturnsReasonsProvidedInGuards()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testBuildTransitionBlockerListReturnsReasonsProvidedInGuards(bool $useEnumerations)
     {
-        $definition = $this->createSimpleWorkflowDefinition();
+        $definition = $this->createSimpleWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $dispatcher = new EventDispatcher();
         $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher);
@@ -263,9 +293,12 @@ class WorkflowTest extends TestCase
         }
     }
 
-    public function testApplyWithNotEnabledTransition()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testApplyWithNotEnabledTransition(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
         $context = [
@@ -288,94 +321,119 @@ class WorkflowTest extends TestCase
         }
     }
 
-    public function testApply()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testApply(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $marking = $workflow->apply($subject, 't1');
 
         $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertFalse($marking->has('a'));
-        $this->assertTrue($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('a', $useEnumerations)));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('b', $useEnumerations)));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('c', $useEnumerations)));
     }
 
-    public function testApplyWithSameNameTransition()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testApplyWithSameNameTransition(bool $useEnumerations)
     {
         $subject = new Subject();
-        $definition = $this->createWorkflowWithSameNameTransition();
+        $definition = $this->createWorkflowWithSameNameTransition($useEnumerations);
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $marking = $workflow->apply($subject, 'a_to_bc');
 
-        $this->assertFalse($marking->has('a'));
-        $this->assertTrue($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('a', $useEnumerations)));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('b', $useEnumerations)));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('c', $useEnumerations)));
 
         $marking = $workflow->apply($subject, 'to_a');
 
-        $this->assertTrue($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertFalse($marking->has('c'));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('a', $useEnumerations)));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('b', $useEnumerations)));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('c', $useEnumerations)));
 
         $workflow->apply($subject, 'a_to_bc');
         $marking = $workflow->apply($subject, 'b_to_c');
 
-        $this->assertFalse($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('a', $useEnumerations)));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('b', $useEnumerations)));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('c', $useEnumerations)));
 
         $marking = $workflow->apply($subject, 'to_a');
 
-        $this->assertTrue($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertFalse($marking->has('c'));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('a', $useEnumerations)));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('b', $useEnumerations)));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('c', $useEnumerations)));
     }
 
-    public function testApplyWithSameNameTransition2()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testApplyWithSameNameTransition2(bool $useEnumerations)
     {
         $subject = new Subject();
-        $subject->setMarking(['a' => 1, 'b' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::A, AlphabeticalEnum::B] : ['a' => 1, 'b' => 1]);
 
-        $places = range('a', 'd');
+        $places = $useEnumerations ? [
+            AlphabeticalEnum::A,
+            AlphabeticalEnum::B,
+            AlphabeticalEnum::C,
+            AlphabeticalEnum::D,
+        ] : range('a', 'd');
         $transitions = [];
-        $transitions[] = new Transition('t', 'a', 'c');
-        $transitions[] = new Transition('t', 'b', 'd');
+        $transitions[] = new Transition('t', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('c', $useEnumerations));
+        $transitions[] = new Transition('t', $this->getTypedPlaceValue('b', $useEnumerations), $this->getTypedPlaceValue('d', $useEnumerations));
         $definition = new Definition($places, $transitions);
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $marking = $workflow->apply($subject, 't');
 
-        $this->assertFalse($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
-        $this->assertTrue($marking->has('d'));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('a', $useEnumerations)));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('b', $useEnumerations)));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('c', $useEnumerations)));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('d', $useEnumerations)));
     }
 
-    public function testApplyWithSameNameTransition3()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testApplyWithSameNameTransition3(bool $useEnumerations)
     {
         $subject = new Subject();
-        $subject->setMarking(['a' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::A] : ['a' => 1]);
 
-        $places = range('a', 'd');
+        $places = $useEnumerations ? [
+            AlphabeticalEnum::A,
+            AlphabeticalEnum::B,
+            AlphabeticalEnum::C,
+            AlphabeticalEnum::D,
+        ] : range('a', 'd');
         $transitions = [];
-        $transitions[] = new Transition('t', 'a', 'b');
-        $transitions[] = new Transition('t', 'b', 'c');
-        $transitions[] = new Transition('t', 'c', 'd');
+        $transitions[] = new Transition('t', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('b', $useEnumerations));
+        $transitions[] = new Transition('t', $this->getTypedPlaceValue('b', $useEnumerations), $this->getTypedPlaceValue('c', $useEnumerations));
+        $transitions[] = new Transition('t', $this->getTypedPlaceValue('c', $useEnumerations), $this->getTypedPlaceValue('d', $useEnumerations));
         $definition = new Definition($places, $transitions);
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $marking = $workflow->apply($subject, 't');
         // We want to make sure we do not end up in "d"
-        $this->assertTrue($marking->has('b'));
-        $this->assertFalse($marking->has('d'));
+        $this->assertTrue($marking->has($this->getTypedPlaceValue('b', $useEnumerations)));
+        $this->assertFalse($marking->has($this->getTypedPlaceValue('d', $useEnumerations)));
     }
 
-    public function testApplyWithEventDispatcher()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testApplyWithEventDispatcher(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $eventDispatcher = new EventDispatcherMock();
         $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
@@ -383,24 +441,24 @@ class WorkflowTest extends TestCase
         $eventNameExpected = [
             'workflow.entered',
             'workflow.workflow_name.entered',
-            'workflow.workflow_name.entered.a',
+            'workflow.workflow_name.entered.'.$this->getPlaceEventSuffix('a', $useEnumerations),
             'workflow.guard',
             'workflow.workflow_name.guard',
             'workflow.workflow_name.guard.t1',
             'workflow.leave',
             'workflow.workflow_name.leave',
-            'workflow.workflow_name.leave.a',
+            'workflow.workflow_name.leave.'.$this->getPlaceEventSuffix('a', $useEnumerations),
             'workflow.transition',
             'workflow.workflow_name.transition',
             'workflow.workflow_name.transition.t1',
             'workflow.enter',
             'workflow.workflow_name.enter',
-            'workflow.workflow_name.enter.b',
-            'workflow.workflow_name.enter.c',
+            'workflow.workflow_name.enter.'.$this->getPlaceEventSuffix('b', $useEnumerations),
+            'workflow.workflow_name.enter.'.$this->getPlaceEventSuffix('c', $useEnumerations),
             'workflow.entered',
             'workflow.workflow_name.entered',
-            'workflow.workflow_name.entered.b',
-            'workflow.workflow_name.entered.c',
+            'workflow.workflow_name.entered.'.$this->getPlaceEventSuffix('b', $useEnumerations),
+            'workflow.workflow_name.entered.'.$this->getPlaceEventSuffix('c', $useEnumerations),
             'workflow.completed',
             'workflow.workflow_name.completed',
             'workflow.workflow_name.completed.t1',
@@ -442,11 +500,14 @@ class WorkflowTest extends TestCase
         }
     }
 
-    public function testApplyDispatchesWithDisableEventInContext()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testApplyDispatchesWithDisableEventInContext(bool $useEnumerations)
     {
-        $transitions[] = new Transition('a-b', 'a', 'b');
-        $transitions[] = new Transition('a-c', 'a', 'c');
-        $definition = new Definition(['a', 'b', 'c'], $transitions);
+        $transitions[] = new Transition('a-b', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('b', $useEnumerations));
+        $transitions[] = new Transition('a-c', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('c', $useEnumerations));
+        $definition = new Definition($useEnumerations ? AlphabeticalEnum::cases() : ['a', 'b', 'c'], $transitions);
 
         $subject = new Subject();
         $eventDispatcher = new EventDispatcherMock();
@@ -472,11 +533,14 @@ class WorkflowTest extends TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
-    public function testApplyDispatchesNoEventsWhenSpecifiedByDefinition()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testApplyDispatchesNoEventsWhenSpecifiedByDefinition(bool $useEnumerations)
     {
-        $transitions[] = new Transition('a-b', 'a', 'b');
-        $transitions[] = new Transition('a-c', 'a', 'c');
-        $definition = new Definition(['a', 'b', 'c'], $transitions);
+        $transitions[] = new Transition('a-b', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('b', $useEnumerations));
+        $transitions[] = new Transition('a-c', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('c', $useEnumerations));
+        $definition = new Definition($useEnumerations ? AlphabeticalEnum::cases() : ['a', 'b', 'c'], $transitions);
 
         $subject = new Subject();
         $eventDispatcher = new EventDispatcherMock();
@@ -493,11 +557,14 @@ class WorkflowTest extends TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
-    public function testApplyOnlyDispatchesEventsThatHaveBeenSpecifiedByDefinition()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testApplyOnlyDispatchesEventsThatHaveBeenSpecifiedByDefinition(bool $useEnumerations)
     {
-        $transitions[] = new Transition('a-b', 'a', 'b');
-        $transitions[] = new Transition('a-c', 'a', 'c');
-        $definition = new Definition(['a', 'b', 'c'], $transitions);
+        $transitions[] = new Transition('a-b', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('b', $useEnumerations));
+        $transitions[] = new Transition('a-c', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('c', $useEnumerations));
+        $definition = new Definition($useEnumerations ? AlphabeticalEnum::cases() : ['a', 'b', 'c'], $transitions);
 
         $subject = new Subject();
         $eventDispatcher = new EventDispatcherMock();
@@ -517,11 +584,14 @@ class WorkflowTest extends TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
-    public function testApplyDoesNotTriggerExtraGuardWithEventDispatcher()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testApplyDoesNotTriggerExtraGuardWithEventDispatcher(bool $useEnumerations)
     {
-        $transitions[] = new Transition('a-b', 'a', 'b');
-        $transitions[] = new Transition('a-c', 'a', 'c');
-        $definition = new Definition(['a', 'b', 'c'], $transitions);
+        $transitions[] = new Transition('a-b', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('b', $useEnumerations));
+        $transitions[] = new Transition('a-c', $this->getTypedPlaceValue('a', $useEnumerations), $this->getTypedPlaceValue('c', $useEnumerations));
+        $definition = new Definition($useEnumerations ? AlphabeticalEnum::cases() : ['a', 'b', 'c'], $transitions);
 
         $subject = new Subject();
         $eventDispatcher = new EventDispatcherMock();
@@ -530,22 +600,22 @@ class WorkflowTest extends TestCase
         $eventNameExpected = [
             'workflow.entered',
             'workflow.workflow_name.entered',
-            'workflow.workflow_name.entered.a',
+            'workflow.workflow_name.entered.'.$this->getPlaceEventSuffix('a', $useEnumerations),
             'workflow.guard',
             'workflow.workflow_name.guard',
             'workflow.workflow_name.guard.a-b',
             'workflow.leave',
             'workflow.workflow_name.leave',
-            'workflow.workflow_name.leave.a',
+            'workflow.workflow_name.leave.'.$this->getPlaceEventSuffix('a', $useEnumerations),
             'workflow.transition',
             'workflow.workflow_name.transition',
             'workflow.workflow_name.transition.a-b',
             'workflow.enter',
             'workflow.workflow_name.enter',
-            'workflow.workflow_name.enter.b',
+            'workflow.workflow_name.enter.'.$this->getPlaceEventSuffix('b', $useEnumerations),
             'workflow.entered',
             'workflow.workflow_name.entered',
-            'workflow.workflow_name.entered.b',
+            'workflow.workflow_name.entered.'.$this->getPlaceEventSuffix('b', $useEnumerations),
             'workflow.completed',
             'workflow.workflow_name.completed',
             'workflow.workflow_name.completed.a-b',
@@ -650,9 +720,12 @@ class WorkflowTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $marking->getContext());
     }
 
-    public function testEventDefaultInitialContext()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testEventDefaultInitialContext(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $dispatcher = new EventDispatcher();
         $name = 'workflow_name';
@@ -664,7 +737,7 @@ class WorkflowTest extends TestCase
         };
 
         $eventNames = [
-            'workflow.workflow_name.entered.a',
+            'workflow.workflow_name.entered.'.$this->getPlaceEventSuffix('a', $useEnumerations),
         ];
 
         foreach ($eventNames as $eventName) {
@@ -674,19 +747,42 @@ class WorkflowTest extends TestCase
         $workflow->apply($subject, 't1');
     }
 
-    public function testMarkingStateOnApplyWithEventDispatcher()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testMarkingStateOnApplyWithEventDispatcher(bool $useEnumerations)
     {
-        $definition = new Definition(range('a', 'f'), [new Transition('t', range('a', 'c'), range('d', 'f'))]);
+        $definition = new Definition($useEnumerations ? AlphabeticalEnum::cases() : range('a', 'f'),
+            [
+                new Transition('t',
+                    $useEnumerations ?
+                        [
+                            AlphabeticalEnum::A,
+                            AlphabeticalEnum::B,
+                            AlphabeticalEnum::C,
+                        ] : range('a', 'c'),
+                    $useEnumerations ?
+                        [
+                            AlphabeticalEnum::D,
+                            AlphabeticalEnum::E,
+                            AlphabeticalEnum::F,
+                        ] : range('d', 'f'),
+                ),
+            ]);
 
         $subject = new Subject();
-        $subject->setMarking(['a' => 1, 'b' => 1, 'c' => 1]);
+        $subject->setMarking($useEnumerations ? [
+            AlphabeticalEnum::A,
+            AlphabeticalEnum::B,
+            AlphabeticalEnum::C,
+        ] : ['a' => 1, 'b' => 1, 'c' => 1]);
 
         $dispatcher = new EventDispatcher();
 
         $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, 'test');
 
-        $assertInitialState = function (Event $event) {
-            $this->assertEquals(new Marking(['a' => 1, 'b' => 1, 'c' => 1]), $event->getMarking());
+        $assertInitialState = function (Event $event) use ($useEnumerations) {
+            $this->assertEquals(new Marking($useEnumerations ? [AlphabeticalEnum::A, AlphabeticalEnum::B, AlphabeticalEnum::C] : ['a' => 1, 'b' => 1, 'c' => 1]), $event->getMarking());
         };
         $assertTransitionState = function (Event $event) {
             $this->assertEquals(new Marking([]), $event->getMarking());
@@ -694,24 +790,27 @@ class WorkflowTest extends TestCase
 
         $dispatcher->addListener('workflow.leave', $assertInitialState);
         $dispatcher->addListener('workflow.test.leave', $assertInitialState);
-        $dispatcher->addListener('workflow.test.leave.a', $assertInitialState);
-        $dispatcher->addListener('workflow.test.leave.b', $assertInitialState);
-        $dispatcher->addListener('workflow.test.leave.c', $assertInitialState);
+        $dispatcher->addListener('workflow.test.leave.'.$this->getPlaceEventSuffix('a', $useEnumerations), $assertInitialState);
+        $dispatcher->addListener('workflow.test.leave.'.$this->getPlaceEventSuffix('b', $useEnumerations), $assertInitialState);
+        $dispatcher->addListener('workflow.test.leave.'.$this->getPlaceEventSuffix('c', $useEnumerations), $assertInitialState);
         $dispatcher->addListener('workflow.transition', $assertTransitionState);
         $dispatcher->addListener('workflow.test.transition', $assertTransitionState);
         $dispatcher->addListener('workflow.test.transition.t', $assertTransitionState);
         $dispatcher->addListener('workflow.enter', $assertTransitionState);
         $dispatcher->addListener('workflow.test.enter', $assertTransitionState);
-        $dispatcher->addListener('workflow.test.enter.d', $assertTransitionState);
-        $dispatcher->addListener('workflow.test.enter.e', $assertTransitionState);
-        $dispatcher->addListener('workflow.test.enter.f', $assertTransitionState);
+        $dispatcher->addListener('workflow.test.enter.'.$this->getPlaceEventSuffix('d', $useEnumerations), $assertTransitionState);
+        $dispatcher->addListener('workflow.test.enter.'.$this->getPlaceEventSuffix('e', $useEnumerations), $assertTransitionState);
+        $dispatcher->addListener('workflow.test.enter.'.$this->getPlaceEventSuffix('f', $useEnumerations), $assertTransitionState);
 
         $workflow->apply($subject, 't');
     }
 
-    public function testGetEnabledTransitions()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testGetEnabledTransitions(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
@@ -721,25 +820,28 @@ class WorkflowTest extends TestCase
 
         $this->assertEmpty($workflow->getEnabledTransitions($subject));
 
-        $subject->setMarking(['d' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::D] : ['d' => 1]);
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(2, $transitions);
         $this->assertSame('t3', $transitions[0]->getName());
         $this->assertSame('t4', $transitions[1]->getName());
 
-        $subject->setMarking(['c' => 1, 'e' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::C, AlphabeticalEnum::E] : ['c' => 1, 'e' => 1]);
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(1, $transitions);
         $this->assertSame('t5', $transitions[0]->getName());
     }
 
-    public function testGetEnabledTransition()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testGetEnabledTransition(bool $useEnumerations)
     {
-        $definition = $this->createComplexWorkflowDefinition();
+        $definition = $this->createComplexWorkflowDefinition($useEnumerations);
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
-        $subject->setMarking(['d' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::D] : ['d' => 1]);
         $transition = $workflow->getEnabledTransition($subject, 't3');
         $this->assertInstanceOf(Transition::class, $transition);
         $this->assertSame('t3', $transition->getName());
@@ -748,9 +850,12 @@ class WorkflowTest extends TestCase
         $this->assertNull($transition);
     }
 
-    public function testGetEnabledTransitionsWithSameNameTransition()
+    /**
+     * @dataProvider provideUseEnumerations
+     */
+    public function testGetEnabledTransitionsWithSameNameTransition(bool $useEnumerations)
     {
-        $definition = $this->createWorkflowWithSameNameTransition();
+        $definition = $this->createWorkflowWithSameNameTransition($useEnumerations);
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
@@ -758,12 +863,21 @@ class WorkflowTest extends TestCase
         $this->assertCount(1, $transitions);
         $this->assertSame('a_to_bc', $transitions[0]->getName());
 
-        $subject->setMarking(['b' => 1, 'c' => 1]);
+        $subject->setMarking($useEnumerations ? [AlphabeticalEnum::B, AlphabeticalEnum::C] : ['b' => 1, 'c' => 1]);
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(3, $transitions);
         $this->assertSame('b_to_c', $transitions[0]->getName());
         $this->assertSame('to_a', $transitions[1]->getName());
         $this->assertSame('to_a', $transitions[2]->getName());
+    }
+
+    public function provideUseEnumerations(): \Generator
+    {
+        yield [false];
+
+        if (\PHP_VERSION_ID >= 80100) {
+            yield [true];
+        }
     }
 }
 

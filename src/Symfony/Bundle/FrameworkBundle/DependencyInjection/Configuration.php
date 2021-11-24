@@ -396,7 +396,24 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                     ->arrayNode('initial_marking')
                                         ->beforeNormalization()->castToArray()->end()
-                                        ->defaultValue([])
+                                        ->beforeNormalization()
+                                            ->ifTrue(function ($v) {
+                                                foreach ($v as $value) {
+                                                    if (!is_scalar($value) && !$value instanceof \UnitEnum) {
+                                                        return true;
+                                                    }
+                                                }
+
+                                                return false;
+                                            })
+                                            ->thenInvalid('Initial marking must either be a scalar or an UnitEnum.')
+                                        ->end()
+                                        ->beforeNormalization()
+                                            ->always()
+                                            ->then(function ($places) {
+                                                return array_map(static fn ($element) => $element instanceof \UnitEnum ? \get_class($element).'::'.$element->name : $element, $places);
+                                            })
+                                        ->end()
                                         ->prototype('scalar')->end()
                                     ->end()
                                     ->variableNode('events_to_dispatch')
@@ -431,9 +448,9 @@ class Configuration implements ConfigurationInterface
                                             ->always()
                                             ->then(function ($places) {
                                                 // It's an indexed array of shape  ['place1', 'place2']
-                                                if (isset($places[0]) && \is_string($places[0])) {
-                                                    return array_map(function (string $place) {
-                                                        return ['name' => $place];
+                                                if (isset($places[0]) && (\is_string($places[0]) || $places[0] instanceof \UnitEnum)) {
+                                                    return array_map(function (string|\UnitEnum $place) {
+                                                        return ['name' => $place instanceof \UnitEnum ? \get_class($place).'::'.$place->name : $place];
                                                     }, $places);
                                                 }
 
@@ -505,9 +522,24 @@ class Configuration implements ConfigurationInterface
                                                     ->example('is_fully_authenticated() and is_granted(\'ROLE_JOURNALIST\') and subject.getTitle() == \'My first article\'')
                                                 ->end()
                                                 ->arrayNode('from')
+                                                    ->beforeNormalization()->castToArray()->end()
                                                     ->beforeNormalization()
-                                                        ->ifString()
-                                                        ->then(function ($v) { return [$v]; })
+                                                        ->ifTrue(function ($v) {
+                                                            foreach ($v as $value) {
+                                                                if (!is_scalar($value) && !$value instanceof \UnitEnum) {
+                                                                    return true;
+                                                                }
+                                                            }
+
+                                                            return false;
+                                                        })
+                                                        ->thenInvalid('"From" places must either be scalars or UnitEnum.')
+                                                    ->end()
+                                                    ->beforeNormalization()
+                                                        ->always()
+                                                        ->then(function ($places) {
+                                                            return array_map(static fn ($element) => $element instanceof \UnitEnum ? \get_class($element).'::'.$element->name : $element, $places);
+                                                        })
                                                     ->end()
                                                     ->requiresAtLeastOneElement()
                                                     ->prototype('scalar')
@@ -515,9 +547,24 @@ class Configuration implements ConfigurationInterface
                                                     ->end()
                                                 ->end()
                                                 ->arrayNode('to')
+                                                    ->beforeNormalization()->castToArray()->end()
                                                     ->beforeNormalization()
-                                                        ->ifString()
-                                                        ->then(function ($v) { return [$v]; })
+                                                        ->ifTrue(function ($v) {
+                                                            foreach ($v as $value) {
+                                                                if (!is_scalar($value) && !$value instanceof \UnitEnum) {
+                                                                    return true;
+                                                                }
+                                                            }
+
+                                                            return false;
+                                                        })
+                                                        ->thenInvalid('"To" places must either be scalars or UnitEnum.')
+                                                    ->end()
+                                                    ->beforeNormalization()
+                                                        ->always()
+                                                        ->then(function ($places) {
+                                                            return array_map(static fn ($element) => $element instanceof \UnitEnum ? \get_class($element).'::'.$element->name : $element, $places);
+                                                        })
                                                     ->end()
                                                     ->requiresAtLeastOneElement()
                                                     ->prototype('scalar')

@@ -14,6 +14,7 @@ namespace Symfony\Component\Workflow;
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
+use Symfony\Component\Workflow\Utils\PlaceEnumerationUtils;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -28,11 +29,11 @@ final class Definition
     private MetadataStoreInterface $metadataStore;
 
     /**
-     * @param string[]             $places
-     * @param Transition[]         $transitions
-     * @param string|string[]|null $initialPlaces
+     * @param string[]|\UnitEnum[]                       $places
+     * @param Transition[]                               $transitions
+     * @param string|string[]|\UnitEnum|\UnitEnum[]|null $initialPlaces
      */
-    public function __construct(array $places, array $transitions, string|array $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
+    public function __construct(array $places, array $transitions, string|\UnitEnum|array $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -52,7 +53,7 @@ final class Definition
      */
     public function getInitialPlaces(): array
     {
-        return $this->initialPlaces;
+        return array_map(static fn ($element) => PlaceEnumerationUtils::getTypedValue($element), $this->initialPlaces);
     }
 
     /**
@@ -76,30 +77,30 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlaces(string|array $places = null)
+    private function setInitialPlaces(string|\UnitEnum|array $places = null)
     {
         if (!$places) {
             return;
         }
 
-        $places = (array) $places;
+        $places = array_map(static fn ($element) => PlaceEnumerationUtils::getPlaceKey($element), \is_array($places) ? $places : [$places]);
 
         foreach ($places as $place) {
             if (!isset($this->places[$place])) {
-                throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
+                throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', PlaceEnumerationUtils::getPlaceKey($place)));
             }
         }
 
         $this->initialPlaces = $places;
     }
 
-    private function addPlace(string $place)
+    private function addPlace(string|\UnitEnum $place)
     {
         if (!\count($this->places)) {
-            $this->initialPlaces = [$place];
+            $this->initialPlaces = [PlaceEnumerationUtils::getPlaceKey($place)];
         }
 
-        $this->places[$place] = $place;
+        $this->places[PlaceEnumerationUtils::getPlaceKey($place)] = $place;
     }
 
     private function addTransition(Transition $transition)
@@ -107,12 +108,14 @@ final class Definition
         $name = $transition->getName();
 
         foreach ($transition->getFroms() as $from) {
+            $from = PlaceEnumerationUtils::getPlaceKey($from);
             if (!isset($this->places[$from])) {
                 throw new LogicException(sprintf('Place "%s" referenced in transition "%s" does not exist.', $from, $name));
             }
         }
 
         foreach ($transition->getTos() as $to) {
+            $to = PlaceEnumerationUtils::getPlaceKey($to);
             if (!isset($this->places[$to])) {
                 throw new LogicException(sprintf('Place "%s" referenced in transition "%s" does not exist.', $to, $name));
             }

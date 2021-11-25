@@ -342,7 +342,7 @@ class ErrorHandler
     public function traceAt(int $levels, bool $replace = false): int
     {
         $prev = $this->tracedErrors;
-        $this->tracedErrors = (int) $levels;
+        $this->tracedErrors = $levels;
         if (!$replace) {
             $this->tracedErrors |= $prev;
         }

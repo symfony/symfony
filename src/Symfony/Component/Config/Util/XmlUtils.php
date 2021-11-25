@@ -239,12 +239,12 @@ class XmlUtils
                 $raw = $value;
                 $cast = (int) $value;
 
-                return '0' == $value[0] ? octdec($value) : (((string) $raw === (string) $cast) ? $cast : $raw);
+                return '0' == $value[0] ? octdec($value) : (($raw === (string) $cast) ? $cast : $raw);
             case isset($value[1]) && '-' === $value[0] && ctype_digit(substr($value, 1)):
                 $raw = $value;
                 $cast = (int) $value;
 
-                return '0' == $value[1] ? octdec($value) : (((string) $raw === (string) $cast) ? $cast : $raw);
+                return '0' == $value[1] ? octdec($value) : (($raw === (string) $cast) ? $cast : $raw);
             case 'true' === $lowercaseValue:
                 return true;
             case 'false' === $lowercaseValue:

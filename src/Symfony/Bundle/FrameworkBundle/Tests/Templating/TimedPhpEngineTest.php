@@ -31,7 +31,7 @@ class TimedPhpEngineTest extends TestCase
         $container = $this->createMock(Container::class);
         $templateNameParser = $this->getTemplateNameParser();
         $globalVariables = $this->getGlobalVariables();
-        $loader = $this->getLoader($this->getStorage());
+        $loader = $this->getLoader(new StringStorage('foo'));
 
         $stopwatch = new Stopwatch();
 
@@ -60,17 +60,7 @@ class TimedPhpEngineTest extends TestCase
         return $this->createMock(GlobalVariables::class);
     }
 
-    private function getStorage(): StringStorage
-    {
-        return $this->getMockBuilder(StringStorage::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-    }
-
-    /**
-     * @param StringStorage $storage
-     */
-    private function getLoader($storage): Loader
+    private function getLoader(StringStorage $storage): Loader
     {
         $loader = $this->getMockForAbstractClass(Loader::class);
         $loader->expects($this->once())

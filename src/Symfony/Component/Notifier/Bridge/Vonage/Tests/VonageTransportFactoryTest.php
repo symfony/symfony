@@ -9,42 +9,39 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Nexmo\Tests;
+namespace Symfony\Component\Notifier\Bridge\Vonage\Tests;
 
-use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
+use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-/**
- * @group legacy
- */
-final class NexmoTransportFactoryTest extends TransportFactoryTestCase
+final class VonageTransportFactoryTest extends TransportFactoryTestCase
 {
     /**
-     * @return NexmoTransportFactory
+     * @return VonageTransportFactory
      */
     public function createFactory(): TransportFactoryInterface
     {
-        return new NexmoTransportFactory();
+        return new VonageTransportFactory();
     }
 
     public function createProvider(): iterable
     {
         yield [
-            'nexmo://host.test?from=0611223344',
-            'nexmo://apiKey:apiSecret@host.test?from=0611223344',
+            'vonage://host.test?from=0611223344',
+            'vonage://apiKey:apiSecret@host.test?from=0611223344',
         ];
     }
 
     public function supportsProvider(): iterable
     {
-        yield [true, 'nexmo://apiKey:apiSecret@default?from=0611223344'];
+        yield [true, 'vonage://apiKey:apiSecret@default?from=0611223344'];
         yield [false, 'somethingElse://apiKey:apiSecret@default?from=0611223344'];
     }
 
     public function missingRequiredOptionProvider(): iterable
     {
-        yield 'missing option: from' => ['nexmo://apiKey:apiSecret@default'];
+        yield 'missing option: from' => ['vonage://apiKey:apiSecret@default'];
     }
 
     public function unsupportedSchemeProvider(): iterable

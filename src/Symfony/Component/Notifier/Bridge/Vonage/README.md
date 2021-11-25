@@ -1,7 +1,19 @@
-Nexmo Notifier
-==============
+Vonage Notifier
+===============
 
-The Nexmo bridge is deprecated, use the Vonage bridge instead.
+Provides [Vonage](https://vonage.com) integration for Symfony Notifier.
+
+DSN example
+-----------
+
+```
+VONAGE_DSN=vonage://KEY:SECRET@default?from=FROM
+```
+
+where:
+ - `KEY` is your Vonage key
+ - `SECRET` is your Vonage secret
+ - `FROM` is your sender
 
 Resources
 ---------

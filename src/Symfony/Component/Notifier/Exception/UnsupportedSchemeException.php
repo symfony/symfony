@@ -184,6 +184,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',
         ],
+        'vonage' => [
+            'class' => Bridge\Vonage\VonageTransportFactory::class,
+            'package' => 'symfony/vonage-notifier',
+        ],
         'yunpian' => [
             'class' => Bridge\Yunpian\YunpianTransportFactory::class,
             'package' => 'symfony/yunpian-notifier',

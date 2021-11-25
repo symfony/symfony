@@ -803,7 +803,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function add(FormInterface|string $child, string $type = null, array $options = []): static
+    public function add(FormInterface|string|int $child, string $type = null, array $options = []): static
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot add children to a submitted form.');

@@ -254,11 +254,11 @@ class DoctrineExtractorTest extends TestCase
                 new Type(Type::BUILTIN_TYPE_INT),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
             )]],
-            ['json', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)]],
+            ['json', null],
         ];
 
         if (class_exists(Types::class)) {
-            $provider[] = ['json', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)]];
+            $provider[] = ['json', null];
         }
 
         return $provider;

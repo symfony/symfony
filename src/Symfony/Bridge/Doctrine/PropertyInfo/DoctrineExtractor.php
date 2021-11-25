@@ -70,116 +70,126 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         }
 
         if ($metadata->hasAssociation($property)) {
-            $class = $metadata->getAssociationTargetClass($property);
-
-            if ($metadata->isSingleValuedAssociation($property)) {
-                if ($metadata instanceof ClassMetadataInfo) {
-                    $associationMapping = $metadata->getAssociationMapping($property);
-
-                    $nullable = $this->isAssociationNullable($associationMapping);
-                } else {
-                    $nullable = false;
-                }
-
-                return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $class)];
-            }
-
-            $collectionKeyType = Type::BUILTIN_TYPE_INT;
-
-            if ($metadata instanceof ClassMetadataInfo) {
-                $associationMapping = $metadata->getAssociationMapping($property);
-
-                if (isset($associationMapping['indexBy'])) {
-                    /** @var ClassMetadataInfo $subMetadata */
-                    $subMetadata = $this->entityManager->getClassMetadata($associationMapping['targetEntity']);
-
-                    // Check if indexBy value is a property
-                    $fieldName = $associationMapping['indexBy'];
-                    if (null === ($typeOfField = $subMetadata->getTypeOfField($fieldName))) {
-                        $fieldName = $subMetadata->getFieldForColumn($associationMapping['indexBy']);
-                        //Not a property, maybe a column name?
-                        if (null === ($typeOfField = $subMetadata->getTypeOfField($fieldName))) {
-                            //Maybe the column name is the association join column?
-                            $associationMapping = $subMetadata->getAssociationMapping($fieldName);
-
-                            /** @var ClassMetadataInfo $subMetadata */
-                            $indexProperty = $subMetadata->getSingleAssociationReferencedJoinColumnName($fieldName);
-                            $subMetadata = $this->entityManager->getClassMetadata($associationMapping['targetEntity']);
-
-                            //Not a property, maybe a column name?
-                            if (null === ($typeOfField = $subMetadata->getTypeOfField($indexProperty))) {
-                                $fieldName = $subMetadata->getFieldForColumn($indexProperty);
-                                $typeOfField = $subMetadata->getTypeOfField($fieldName);
-                            }
-                        }
-                    }
-
-                    if (!$collectionKeyType = $this->getPhpType($typeOfField)) {
-                        return null;
-                    }
-                }
-            }
-
-            return [new Type(
-                Type::BUILTIN_TYPE_OBJECT,
-                false,
-                Collection::class,
-                true,
-                new Type($collectionKeyType),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, $class)
-            )];
+            return $this->getAssociationType($metadata, $property);
         }
 
-        if ($metadata instanceof ClassMetadataInfo && class_exists(Embedded::class) && isset($metadata->embeddedClasses[$property])) {
+        if ($metadata->hasClass($property)) {
             return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $metadata->embeddedClasses[$property]['class'])];
         }
 
         if ($metadata->hasField($property)) {
-            $typeOfField = $metadata->getTypeOfField($property);
-
-            if (!$builtinType = $this->getPhpType($typeOfField)) {
-                return null;
-            }
-
-            $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
-
-            switch ($builtinType) {
-                case Type::BUILTIN_TYPE_OBJECT:
-                    switch ($typeOfField) {
-                        case Types::DATE_MUTABLE:
-                        case Types::DATETIME_MUTABLE:
-                        case Types::DATETIMETZ_MUTABLE:
-                        case 'vardatetime':
-                        case Types::TIME_MUTABLE:
-                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
-
-                        case Types::DATE_IMMUTABLE:
-                        case Types::DATETIME_IMMUTABLE:
-                        case Types::DATETIMETZ_IMMUTABLE:
-                        case Types::TIME_IMMUTABLE:
-                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
-
-                        case Types::DATEINTERVAL:
-                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval')];
-                    }
-
-                    break;
-                case Type::BUILTIN_TYPE_ARRAY:
-                    switch ($typeOfField) {
-                        case Types::ARRAY:
-                        case 'json_array':
-                        case 'json':
-                            return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
-
-                        case Types::SIMPLE_ARRAY:
-                            return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))];
-                    }
-            }
-
-            return [new Type($builtinType, $nullable)];
+            $this->getFieldType($metadata, $property);
         }
 
         return null;
+    }
+
+    private function getFieldType(?ClassMetadata $metadata, string $property): ?array
+    {
+        $typeOfField = $metadata->getTypeOfField($property);
+
+        if (!$builtinType = $this->getPhpType($typeOfField)) {
+            return null;
+        }
+
+        $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
+
+        switch ($builtinType) {
+            case Type::BUILTIN_TYPE_OBJECT:
+                switch ($typeOfField) {
+                    case Types::DATE_MUTABLE:
+                    case Types::DATETIME_MUTABLE:
+                    case Types::DATETIMETZ_MUTABLE:
+                    case 'vardatetime':
+                    case Types::TIME_MUTABLE:
+                        return [Type::dateTime($nullable)];
+
+                    case Types::DATE_IMMUTABLE:
+                    case Types::DATETIME_IMMUTABLE:
+                    case Types::DATETIMETZ_IMMUTABLE:
+                    case Types::TIME_IMMUTABLE:
+                        return [Type::dateTimeImmutable($nullable)];
+
+                    case Types::DATEINTERVAL:
+                        return [Type::dateInterval($nullable)];
+                }
+
+                break;
+            case Type::BUILTIN_TYPE_ARRAY:
+                switch ($typeOfField) {
+                    case Types::ARRAY:
+                    case 'json_array':
+                    case 'json':
+                        return [Type::array($nullable)];
+
+                    case Types::SIMPLE_ARRAY:
+                        return [Type::array($nullable, true)];
+                }
+        }
+
+        return [new Type($builtinType, $nullable)];
+    }
+
+    private function getAssociationType(?ClassMetadata $metadata, string $property): ?array
+    {
+        $class = $metadata->getAssociationTargetClass($property);
+        $associationMapping = $metadata->getAssociationMapping($property);
+
+        if ($metadata->isSingleValuedAssociation($property)) {
+            $nullable = $metadata instanceof ClassMetadataInfo ? $this->isAssociationNullable($associationMapping) : false;
+
+            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $class)];
+        }
+
+        $collectionKeyType = Type::BUILTIN_TYPE_INT;
+        if ($metadata instanceof ClassMetadataInfo && isset($associationMapping['indexBy'])) {
+            $typeOfField = $this->checkTypeOfField($associationMapping);
+
+            if (!($collectionKeyType = $this->getPhpType($typeOfField))) {
+                return null;
+            }
+        }
+
+        return [new Type(
+            Type::BUILTIN_TYPE_OBJECT,
+            false,
+            Collection::class,
+            true,
+            new Type($collectionKeyType),
+            new Type(Type::BUILTIN_TYPE_OBJECT, false, $class)
+        )];
+    }
+
+    private function checkTypeOfField(array $associationMapping): ?string
+    {
+        /** @var ClassMetadataInfo $metadata */
+        $metadata = $this->entityManager->getClassMetadata($associationMapping['targetEntity']);
+
+        $fieldName = $associationMapping['indexBy'];
+        if (!(null === ($typeOfField = $metadata->getTypeOfField($fieldName)))) {
+            return $typeOfField;
+        }
+
+        $fieldName = $metadata->getFieldForColumn($associationMapping['indexBy']);
+        //Not a property, maybe a column name?
+        if (!(null === ($typeOfField = $metadata->getTypeOfField($fieldName)))) {
+            return $typeOfField;
+        }
+
+        //Maybe the column name is the association join column?
+        $associationMapping = $metadata->getAssociationMapping($fieldName);
+
+        /** @var ClassMetadataInfo $metadata */
+        $metadata = $this->entityManager->getClassMetadata($associationMapping['targetEntity']);
+        $indexProperty = $metadata->getSingleAssociationReferencedJoinColumnName($fieldName);
+
+        //Not a property, maybe a column name?
+        if (!(null === ($typeOfField = $metadata->getTypeOfField($indexProperty)))) {
+            return $typeOfField;
+        }
+
+        $fieldName = $metadata->getFieldForColumn($indexProperty);
+        return $metadata->getTypeOfField($fieldName);
     }
 
     /**

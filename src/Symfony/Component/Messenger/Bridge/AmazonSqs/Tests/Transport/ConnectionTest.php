@@ -77,8 +77,21 @@ class ConnectionTest extends TestCase
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
         $this->assertEquals(
-            new Connection(['queue_name' => 'queue_dsn'], new SqsClient(['region' => 'us-east-2', 'accessKeyId' => 'key_dsn', 'accessKeySecret' => 'secret_dsn'], null, $httpClient)),
+            new Connection(['queue_name' => 'queue_options'], new SqsClient(['region' => 'us-east-2', 'accessKeyId' => 'key_dsn', 'accessKeySecret' => 'secret_dsn'], null, $httpClient)),
             Connection::fromDsn('sqs://key_dsn:secret_dsn@default/queue_dsn?region=us-east-2', ['region' => 'eu-west-3', 'queue_name' => 'queue_options', 'access_key' => 'key_option', 'secret_key' => 'secret_option'], $httpClient)
+        );
+    }
+
+    public function testQueueNameDefault()
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $this->assertEquals(
+            new Connection(['queue_name' => 'messages'], new SqsClient(['region' => 'us-east-2', 'accessKeyId' => 'key_dsn', 'accessKeySecret' => 'secret_dsn'], null, $httpClient)),
+            Connection::fromDsn(
+              'sqs://key_dsn:secret_dsn@default/?region=us-east-2',
+              ['region' => 'eu-west-3', 'access_key' => 'key_option', 'secret_key' => 'secret_option'],
+              $httpClient
+          )
         );
     }
 
@@ -165,7 +178,7 @@ class ConnectionTest extends TestCase
 
         $this->assertEquals(
             new Connection(['queue_name' => 'queue'], new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
-            Connection::fromDsn('sqs://default/queue', ['queue_name' => 'queue_ignored'], $httpClient)
+            Connection::fromDsn('sqs://default/queue_ignored', ['queue_name' => 'queue'], $httpClient)
         );
     }
 
@@ -342,7 +355,8 @@ class ConnectionTest extends TestCase
 
     private function getMockedQueueUrlResponse(): MockResponse
     {
-        return new MockResponse(<<<XML
+        return new MockResponse(
+            <<<XML
 <GetQueueUrlResponse>
     <GetQueueUrlResult>
         <QueueUrl>https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue</QueueUrl>
@@ -357,7 +371,8 @@ XML
 
     private function getMockedReceiveMessageResponse(): MockResponse
     {
-        return new MockResponse(<<<XML
+        return new MockResponse(
+            <<<XML
 <ReceiveMessageResponse>
   <ReceiveMessageResult>
     <Message>

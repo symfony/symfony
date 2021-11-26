@@ -128,6 +128,11 @@ class Connection
             throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
         }
 
+        $parsedPath = explode('/', ltrim($parsedUrl['path'] ?? '/', '/'));
+        if (\count($parsedPath) > 0 && !empty($queueName = end($parsedPath)) && empty($options['queue_name'])) {
+            $options['queue_name'] = $queueName;
+        }
+
         $options = $query + $options + self::DEFAULT_OPTIONS;
         $configuration = [
             'buffer_size' => (int) $options['buffer_size'],
@@ -157,10 +162,6 @@ class Connection
             $clientConfiguration['endpoint'] = $options['endpoint'];
         }
 
-        $parsedPath = explode('/', ltrim($parsedUrl['path'] ?? '/', '/'));
-        if (\count($parsedPath) > 0 && !empty($queueName = end($parsedPath))) {
-            $configuration['queue_name'] = $queueName;
-        }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];
 
         // When the DNS looks like a QueueUrl, we can directly inject it in the connection

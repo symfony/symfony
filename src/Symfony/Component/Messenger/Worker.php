@@ -98,7 +98,7 @@ class Worker
             $envelopeHandled = false;
             $envelopeHandledStart = microtime(true);
             $receivers = $this->receivers;
-            $receivers = $options['strategy'] === self::STRATEGY_RANDOM ? shuffle($receivers) : $receivers;
+            $receivers = self::STRATEGY_RANDOM === $options['strategy'] ? shuffle($receivers) : $receivers;
             foreach ($this->receivers as $transportName => $receiver) {
                 if ($queueNames) {
                     $envelopes = $receiver->getFromQueues($queueNames);
@@ -120,7 +120,7 @@ class Worker
                 // after handling a single receiver, quit and start the loop again
                 // this should prevent multiple lower priority receivers from
                 // blocking too long before the higher priority are checked
-                if ($envelopeHandled && $options['strategy'] === self::STRATEGY_PRIORITY) {
+                if ($envelopeHandled && self::STRATEGY_PRIORITY === $options['strategy']) {
                     break;
                 }
             }

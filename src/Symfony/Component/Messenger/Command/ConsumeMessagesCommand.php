@@ -215,7 +215,7 @@ EOF
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
         $strategies = ['priority', 'ordered', 'random'];
-        if (! in_array($input->getOption('strategy'), $strategies, true)) {
+        if (!\in_array($input->getOption('strategy'), $strategies, true)) {
             throw new InvalidArgumentException(sprintf('The "%s" strategy does not exist. Available strategies are: "%s".', $input->getOption('strategy'), implode('", "', $strategies)));
         }
 

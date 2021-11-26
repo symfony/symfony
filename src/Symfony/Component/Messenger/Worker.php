@@ -38,6 +38,10 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class Worker
 {
+    private const STRATEGY_PRIORITY = 'priority';
+    private const STRATEGY_ORDERED = 'ordered';
+    private const STRATEGY_RANDOM = 'random';
+
     private array $receivers;
     private MessageBusInterface $bus;
     private ?EventDispatcherInterface $eventDispatcher;
@@ -73,6 +77,7 @@ class Worker
     {
         $options = array_merge([
             'sleep' => 1000000,
+            'strategy' => self::STRATEGY_PRIORITY,
         ], $options);
         $queueNames = $options['queues'] ?? null;
 
@@ -92,6 +97,8 @@ class Worker
         while (!$this->shouldStop) {
             $envelopeHandled = false;
             $envelopeHandledStart = microtime(true);
+            $receivers = $this->receivers;
+            $receivers = $options['strategy'] === self::STRATEGY_RANDOM ? shuffle($receivers) : $receivers;
             foreach ($this->receivers as $transportName => $receiver) {
                 if ($queueNames) {
                     $envelopes = $receiver->getFromQueues($queueNames);
@@ -113,7 +120,7 @@ class Worker
                 // after handling a single receiver, quit and start the loop again
                 // this should prevent multiple lower priority receivers from
                 // blocking too long before the higher priority are checked
-                if ($envelopeHandled) {
+                if ($envelopeHandled && $options['strategy'] === self::STRATEGY_PRIORITY) {
                     break;
                 }
             }

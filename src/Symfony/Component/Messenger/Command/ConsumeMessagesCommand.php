@@ -31,6 +31,7 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Worker;
 
@@ -79,6 +80,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
                 new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
+                new InputOption('strategy', null, InputOption::VALUE_REQUIRED, 'The strategy to use to consume from the different receivers: "priority", "ordered", "random"', 'priority'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
@@ -212,10 +214,15 @@ EOF
         }
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
+        $strategies = ['priority', 'ordered', 'random'];
+        if (! in_array($input->getOption('strategy'), $strategies, true)) {
+            throw new InvalidArgumentException(sprintf('The "%s" strategy does not exist. Available strategies are: "%s".', $input->getOption('strategy'), implode('", "', $strategies)));
+        }
 
         $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
+            'strategy' => $input->getOption('strategy'),
         ];
         if ($queues = $input->getOption('queues')) {
             $options['queues'] = $queues;

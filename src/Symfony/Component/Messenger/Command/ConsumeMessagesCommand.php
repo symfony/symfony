@@ -80,7 +80,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
                 new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
-                new InputOption('strategy', null, InputOption::VALUE_REQUIRED, 'The strategy to use to consume from the different receivers: "priority", "ordered", "random"', 'priority'),
+                new InputOption('strategy', null, InputOption::VALUE_REQUIRED, 'The strategy to use to consume from the different receivers: "priority", "ordered" or "random"', 'priority'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.

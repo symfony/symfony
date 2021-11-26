@@ -11,13 +11,18 @@
 
 namespace Symfony\Component\Messenger\Handler;
 
-use Symfony\Component\Messenger\Exception\LogicException;
-
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
 trait BatchHandlerTrait
 {
+    /**
+     * Completes the jobs in the list.
+     *
+     * @list<array{0: object, 1: Acknowledger}> $jobs A list of pairs of messages and their corresponding acknowledgers
+     */
+    abstract private function process(array $jobs): void;
+
     private array $jobs = [];
 
     /**
@@ -61,15 +66,5 @@ trait BatchHandlerTrait
     private function shouldFlush(): bool
     {
         return 10 <= \count($this->jobs);
-    }
-
-    /**
-     * Completes the jobs in the list.
-     *
-     * @list<array{0: object, 1: Acknowledger}> $jobs A list of pairs of messages and their corresponding acknowledgers
-     */
-    private function process(array $jobs): void
-    {
-        throw new LogicException(sprintf('"%s" should implement abstract method "process()".', get_debug_type($this)));
     }
 }

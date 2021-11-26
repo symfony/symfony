@@ -16,13 +16,6 @@ namespace Symfony\Component\Messenger\Handler;
  */
 trait BatchHandlerTrait
 {
-    /**
-     * Completes the jobs in the list.
-     *
-     * @list<array{0: object, 1: Acknowledger}> $jobs A list of pairs of messages and their corresponding acknowledgers
-     */
-    abstract private function process(array $jobs): void;
-
     private array $jobs = [];
 
     /**
@@ -67,4 +60,11 @@ trait BatchHandlerTrait
     {
         return 10 <= \count($this->jobs);
     }
+
+    /**
+     * Completes the jobs in the list.
+     *
+     * @list<array{0: object, 1: Acknowledger}> $jobs A list of pairs of messages and their corresponding acknowledgers
+     */
+    abstract private function process(array $jobs): void;
 }

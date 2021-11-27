@@ -1,0 +1,30 @@
+{
+    "name": "symfony/engagespot-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Engagespot Notifier Bridge",
+    "keywords": ["engagespot", "notifier", "push"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniel Gorgan",
+            "homepage": "https://github.com/danut007ro"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/http-client": "^4.3|^5.0|^6.0",
+        "symfony/notifier": "^5.4|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Engagespot\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

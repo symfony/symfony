@@ -1027,7 +1027,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private function createRequestMatcher(ContainerBuilder $container, string $path = null, string $host = null, int $port = null, array $methods = [], array $ips = null, array $attributes = []): Reference
     {
         if ($methods) {
-            $methods = array_map('strtoupper', (array) $methods);
+            $methods = array_map('strtoupper', $methods);
         }
 
         if (null !== $ips) {

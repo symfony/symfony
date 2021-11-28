@@ -1965,7 +1965,7 @@ class Request
             return '/';
         }
 
-        return (string) $pathInfo;
+        return $pathInfo;
     }
 
     /**

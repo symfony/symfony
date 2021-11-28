@@ -667,7 +667,7 @@ class Inline
             // no break
             case \in_array($scalar[0], ['+', '-', '.'], true) || is_numeric($scalar[0]):
                 if (Parser::preg_match('{^[+-]?[0-9][0-9_]*$}', $scalar)) {
-                    $scalar = str_replace('_', '', (string) $scalar);
+                    $scalar = str_replace('_', '', $scalar);
                 }
 
                 switch (true) {

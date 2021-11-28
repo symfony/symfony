@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -176,7 +177,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             $attributeContext = $this->getAttributeNormalizationContext($object, $attribute, $context);
-            $attributeValue = $this->getAttributeValue($object, $attribute, $format, $attributeContext);
+
+            try {
+                $attributeValue = $this->getAttributeValue($object, $attribute, $format, $attributeContext);
+            } catch (UninitializedPropertyException $e) {
+                continue;
+            } catch (\Error $e) {
+                if ($this->isUninitializedValueError($e)) {
+                    continue;
+                }
+                throw $e;
+            }
+
             if ($maxDepthReached) {
                 $attributeValue = $maxDepthHandler($attributeValue, $object, $attribute, $format, $attributeContext);
             }
@@ -680,5 +692,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // The context cannot be serialized, skip the cache
             return false;
         }
+    }
+
+    /**
+     * This error may occur when specific object normalizer implementation gets attribute value
+     * by accessing a public uninitialized property or by calling a method accessing such property.
+     */
+    private function isUninitializedValueError(\Error $e): bool
+    {
+        return \PHP_VERSION_ID >= 70400
+            && str_starts_with($e->getMessage(), 'Typed property')
+            && str_ends_with($e->getMessage(), 'must not be accessed before initialization');
     }
 }

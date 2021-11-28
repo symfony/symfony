@@ -370,8 +370,7 @@ XML
 
     private function getMockedReceiveMessageResponse(): MockResponse
     {
-        return new MockResponse(
-            <<<XML
+        return new MockResponse(<<<XML
 <ReceiveMessageResponse>
   <ReceiveMessageResult>
     <Message>

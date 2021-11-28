@@ -272,7 +272,7 @@ abstract class NumberFormatter
             throw new MethodArgumentNotImplementedException(__METHOD__, 'pattern');
         }
 
-        $this->style = null !== $style ? (int) $style : null;
+        $this->style = $style;
     }
 
     /**
@@ -796,8 +796,6 @@ abstract class NumberFormatter
      */
     private function convertValueDataType($value, int $type)
     {
-        $type = (int) $type;
-
         if (self::TYPE_DOUBLE === $type) {
             $value = (float) $value;
         } elseif (self::TYPE_INT32 === $type) {

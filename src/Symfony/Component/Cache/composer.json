@@ -43,7 +43,7 @@
         "symfony/var-dumper": "^4.4|^5.0"
     },
     "conflict": {
-        "doctrine/dbal": "<2.7",
+        "doctrine/dbal": "<2.7|>=4",
         "symfony/dependency-injection": "<3.4",
         "symfony/http-kernel": "<4.4|>=5.0",
         "symfony/var-dumper": "<4.4"

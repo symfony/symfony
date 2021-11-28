@@ -104,16 +104,8 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         // properties
-        $propertyValues = !method_exists($object, '__get') ? (array) $object : null;
         foreach ($reflClass->getProperties() as $reflProperty) {
-            if (null !== $propertyValues && !\array_key_exists($reflProperty->name, $propertyValues)) {
-                if ($reflProperty->isPublic()
-                    || ($reflProperty->isProtected() && !\array_key_exists("\0*\0{$reflProperty->name}", $propertyValues))
-                    || ($reflProperty->isPrivate() && !\array_key_exists("\0{$reflProperty->class}\0{$reflProperty->name}", $propertyValues))
-                ) {
-                    unset($attributes[$reflProperty->name]);
-                }
-
+            if (!$reflProperty->isPublic()) {
                 continue;
             }
 

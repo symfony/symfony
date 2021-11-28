@@ -99,7 +99,6 @@ jobs:
       - name: Run tests
         run: ./phpunit --group integration -v
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=1 # to be removed once DbalLogger is compatible with dbal 3.2+
           REDIS_HOST: localhost
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
           REDIS_SENTINEL_HOSTS: 'localhost:26379'

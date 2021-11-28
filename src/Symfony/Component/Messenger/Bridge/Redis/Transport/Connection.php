@@ -460,7 +460,7 @@ class Connection
                     throw new TransportException(json_last_error_msg());
                 }
 
-                $score = (int) ($this->getCurrentTimeInMilliseconds() + $delayInMs);
+                $score = $this->getCurrentTimeInMilliseconds() + $delayInMs;
                 $added = $this->connection->zadd($this->queue, ['NX'], $score, $message);
             } else {
                 $message = json_encode([

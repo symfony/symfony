@@ -54,7 +54,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
         // the logic here avoids redoing the same work in all iterations
 
         if (!isset($this->subPath)) {
-            $this->subPath = (string) $this->getSubPath();
+            $this->subPath = $this->getSubPath();
         }
         $subPathname = $this->subPath;
         if ('' !== $subPathname) {

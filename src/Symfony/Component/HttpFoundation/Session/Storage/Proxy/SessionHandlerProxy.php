@@ -21,7 +21,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     public function __construct(\SessionHandlerInterface $handler)
     {
         $this->handler = $handler;
-        $this->wrapper = ($handler instanceof \SessionHandler);
+        $this->wrapper = $handler instanceof \SessionHandler;
         $this->saveHandlerName = $this->wrapper ? ini_get('session.save_handler') : 'user';
     }
 
@@ -42,7 +42,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
         return $this->handler->close();
     }
 
-    public function read(string $sessionId): string
+    public function read(string $sessionId): string|false
     {
         return $this->handler->read($sessionId);
     }

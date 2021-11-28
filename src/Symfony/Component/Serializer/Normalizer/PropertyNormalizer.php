@@ -137,14 +137,14 @@ class PropertyNormalizer extends AbstractObjectNormalizer
             return $reflectionProperty->getValue($object);
         }
 
-        if (!method_exists($object, '__get')) {
+        if (!method_exists($object, '__get') && !isset($object->$attribute)) {
             $propertyValues = (array) $object;
 
             if (($reflectionProperty->isPublic() && !\array_key_exists($reflectionProperty->name, $propertyValues))
                 || ($reflectionProperty->isProtected() && !\array_key_exists("\0*\0{$reflectionProperty->name}", $propertyValues))
                 || ($reflectionProperty->isPrivate() && !\array_key_exists("\0{$reflectionProperty->class}\0{$reflectionProperty->name}", $propertyValues))
             ) {
-                throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', $reflectionProperty->class, $reflectionProperty->name));
+                throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', \get_class($object), $reflectionProperty->name));
             }
         }
 

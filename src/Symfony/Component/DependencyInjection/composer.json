@@ -42,7 +42,7 @@
         "symfony/yaml": "<5.4"
     },
     "provide": {
-        "psr/container-implementation": "1.1|2.0|3.0",
+        "psr/container-implementation": "1.1|2.0",
         "symfony/service-implementation": "1.1|2.0|3.0"
     },
     "autoload": {

@@ -75,7 +75,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      */
     public static function createChoiceName(object $choice, $key, string $value): string
     {
-        return str_replace('-', '_', (string) $value);
+        return str_replace('-', '_', $value);
     }
 
     /**

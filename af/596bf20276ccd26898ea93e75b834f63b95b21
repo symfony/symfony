@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-11-28T14:52:22Z
+
+Hey!
+
+I think @tgalopin has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-28T15:10:41Z
+
+`getWrappedConnection` is also called in Cache and HttpFoundation (in 4.4 for both also)
+Should these be updated too?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-11-28T16:21:00Z
+
+In cache, we use `getWrappedConnection()` to get the driver's connection, not the native one. This will still work reliably and unless we want to make the 4.4 branch compatible with DBAL 4, we don't need to change that.
+
+In HttpFoundation, we let DBAL bootstrap a PDO Oracle connection.This code almost certainly breaks if you run it with DBAL 3. I have no Oracle test environment, I'm afraid. Otherwise, I would gladly fix it. 🙁

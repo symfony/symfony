@@ -21,10 +21,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class VonageTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return VonageTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): VonageTransport
     {
         $scheme = $dsn->getScheme();
 

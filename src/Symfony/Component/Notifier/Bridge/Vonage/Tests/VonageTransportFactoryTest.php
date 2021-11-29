@@ -17,10 +17,7 @@ use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class VonageTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return VonageTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): VonageTransportFactory
     {
         return new VonageTransportFactory();
     }

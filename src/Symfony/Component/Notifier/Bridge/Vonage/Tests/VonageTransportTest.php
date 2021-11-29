@@ -21,10 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class VonageTransportTest extends TransportTestCase
 {
-    /**
-     * @return VonageTransport
-     */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): VonageTransport
     {
         return new VonageTransport('apiKey', 'apiSecret', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
     }

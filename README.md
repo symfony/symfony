@@ -17,11 +17,12 @@ Installation
 Sponsor
 -------
 
-Symfony 6.0 is [backed][27] by [SensioLabs][28].
+Symfony 6.1 is [backed][27] by [Basecom][28].
 
-As the creator of Symfony, SensioLabs supports companies using Symfony, with an
-offering encompassing consultancy, expertise, services, training, and technical
-assistance to ensure the success of web application development projects.
+As a professional software service provider, basecom implements customized
+solutions in the areas of e-commerce, PIM solutions and web portals. With our
+experience and certified expertise, we have been one of the most renowned
+Symfony specialists in Germany for many years.
 
 Help Symfony by [sponsoring][29] its development!
 
@@ -87,5 +88,5 @@ and supported by [Symfony contributors][19].
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
 [27]: https://symfony.com/backers
-[28]: https://sensiolabs.com/
+[28]: https://www.basecom.de/
 [29]: https://symfony.com/sponsor

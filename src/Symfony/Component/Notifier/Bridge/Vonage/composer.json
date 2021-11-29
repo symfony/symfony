@@ -1,8 +1,8 @@
 {
-    "name": "symfony/nexmo-notifier",
+    "name": "symfony/vonage-notifier",
     "type": "symfony-notifier-bridge",
-    "description": "Symfony Nexmo Notifier Bridge",
-    "keywords": ["sms", "nexmo", "notifier"],
+    "description": "Symfony Vonage Notifier Bridge",
+    "keywords": ["sms", "vonage", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -17,12 +17,11 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/deprecation-contracts": "^2.1|^3",
         "symfony/http-client": "^4.3|^5.0|^6.0",
         "symfony/notifier": "^5.3|^6.0"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Nexmo\\": "" },
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Vonage\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

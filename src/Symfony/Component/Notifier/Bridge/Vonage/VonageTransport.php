@@ -9,9 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Nexmo;
-
-trigger_deprecation('symfony/nexmo-notifier', '5.4', 'The "symfony/nexmo-notifier" package is deprecated, use "symfony/vonage-notifier" instead.');
+namespace Symfony\Component\Notifier\Bridge\Vonage;
 
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
@@ -25,11 +23,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @deprecated since Symfony 5.4, use the Vonage bridge instead.
  */
-final class NexmoTransport extends AbstractTransport
+final class VonageTransport extends AbstractTransport
 {
+    // see https://developer.vonage.com/messaging/sms/overview
     protected const HOST = 'rest.nexmo.com';
 
     private $apiKey;
@@ -47,7 +44,7 @@ final class NexmoTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('nexmo://%s?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('vonage://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -74,7 +71,7 @@ final class NexmoTransport extends AbstractTransport
         try {
             $result = $response->toArray(false);
         } catch (TransportExceptionInterface $e) {
-            throw new TransportException('Could not reach the remote Nexmo server.', $response, 0, $e);
+            throw new TransportException('Could not reach the remote Vonage server.', $response, 0, $e);
         }
 
         foreach ($result['messages'] as $msg) {

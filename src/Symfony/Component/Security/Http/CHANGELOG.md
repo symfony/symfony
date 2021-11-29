@@ -16,6 +16,7 @@ CHANGELOG
  * Deprecate `CookieClearingLogoutHandler`, `SessionLogoutHandler` and `CsrfTokenClearingLogoutHandler`.
    Use `CookieClearingLogoutListener`, `SessionLogoutListener` and `CsrfTokenClearingLogoutListener` instead
  * Deprecate `PassportInterface`, `UserPassportInterface` and `PassportTrait`, use `Passport` instead
+ * Deprecate `FirewallMapInterface::getListeners`, use `FirewallMapInterface::getFirewallListeners` and `FirewallMapInterface::getExceptionListener` instead
 
 5.3
 ---

@@ -55,7 +55,7 @@ class FirewallMapTest extends TestCase
 
         $map->add($tooLateMatcher, [function () {}]);
 
-        [$listeners, $exception] = $map->getListeners($request);
+        [$listeners, $exception] = $map->getListeners($request, false);
 
         $this->assertEquals([$theListener], $listeners);
         $this->assertEquals($theException, $exception);
@@ -90,7 +90,7 @@ class FirewallMapTest extends TestCase
 
         $map->add($tooLateMatcher, [function () {}]);
 
-        [$listeners, $exception] = $map->getListeners($request);
+        [$listeners, $exception] = $map->getListeners($request, false);
 
         $this->assertEquals([$theListener], $listeners);
         $this->assertEquals($theException, $exception);
@@ -112,7 +112,7 @@ class FirewallMapTest extends TestCase
 
         $map->add($notMatchingMatcher, [function () {}]);
 
-        [$listeners, $exception] = $map->getListeners($request);
+        [$listeners, $exception] = $map->getListeners($request, false);
 
         $this->assertEquals([], $listeners);
         $this->assertNull($exception);

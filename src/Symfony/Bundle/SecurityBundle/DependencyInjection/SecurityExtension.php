@@ -320,7 +320,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
             $configId = 'security.firewall.map.config.'.$name;
 
-            [$matcher, $listeners, $exceptionListener, $logoutListener] = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
+            [$matcher, $listeners, $exceptionListener] = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
 
             $contextId = 'security.firewall.map.context.'.$name;
             $isLazy = !$firewall['stateless'] && (!empty($firewall['anonymous']['lazy']) || $firewall['lazy']);
@@ -329,8 +329,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $context
                 ->replaceArgument(0, new IteratorArgument($listeners))
                 ->replaceArgument(1, $exceptionListener)
-                ->replaceArgument(2, $logoutListener)
-                ->replaceArgument(3, new Reference($configId))
+                ->replaceArgument(2, new Reference($configId))
             ;
 
             $contextRefs[$contextId] = new Reference($contextId);
@@ -450,6 +449,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 'csrf_token_id' => $firewall['logout']['csrf_token_id'],
                 'logout_path' => $firewall['logout']['path'],
             ]);
+            $listeners[] = new Reference($logoutListenerId);
 
             // add default logout listener
             if (isset($firewall['logout']['success_handler'])) {
@@ -599,7 +599,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $config->replaceArgument(10, $listenerKeys);
         $config->replaceArgument(11, $firewall['switch_user'] ?? null);
 
-        return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null];
+        return [$matcher, $listeners, $exceptionListener];
     }
 
     private function createContextListener(ContainerBuilder $container, string $contextKey, ?string $firewallEventDispatcherId)

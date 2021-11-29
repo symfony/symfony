@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Security;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 
 /**
@@ -33,15 +34,44 @@ class FirewallMap implements FirewallMapInterface
         $this->map = $map;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getListeners(Request $request)
     {
+        if (2 > \func_num_args() || func_get_arg(1)) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'The %s() method is deprecated, use getFirewallListeners() or "getExceptionListener()" instead.', __METHOD__);
+        }
+
         $context = $this->getFirewallContext($request);
 
         if (null === $context) {
             return [[], null, null];
         }
 
-        return [$context->getListeners(), $context->getExceptionListener(), $context->getLogoutListener()];
+        return [$context->getListeners(false), $context->getExceptionListener(), $context->getLogoutListener(false)];
+    }
+
+    public function getFirewallListeners(Request $request): iterable
+    {
+        $context = $this->getFirewallContext($request);
+
+        if (null === $context) {
+            return [];
+        }
+
+        return $context->getFirewallListeners();
+    }
+
+    public function getExceptionListener(Request $request): ?ExceptionListener
+    {
+        $context = $this->getFirewallContext($request);
+
+        if (null === $context) {
+            return null;
+        }
+
+        return $context->getExceptionListener();
     }
 
     /**

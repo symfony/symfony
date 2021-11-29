@@ -24,17 +24,22 @@ class FirewallContext
 {
     private $listeners;
     private $exceptionListener;
-    private $logoutListener;
     private $config;
+    private $logoutListener = null;
 
     /**
      * @param iterable<mixed, callable> $listeners
      */
-    public function __construct(iterable $listeners, ExceptionListener $exceptionListener = null, LogoutListener $logoutListener = null, FirewallConfig $config = null)
+    public function __construct(iterable $listeners, ExceptionListener $exceptionListener = null, /*FirewallConfig*/ $config = null)
     {
+        if ($config instanceof LogoutListener) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'Passing the LogoutListener as third argument is deprecated, add it to $listeners instead.', __METHOD__);
+            $this->logoutListener = $config;
+            $config = \func_num_args() > 3 ? func_get_arg(3) : null;
+        }
+
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
-        $this->logoutListener = $logoutListener;
         $this->config = $config;
     }
 
@@ -45,19 +50,65 @@ class FirewallContext
 
     /**
      * @return iterable<mixed, callable>
+     *
+     * @deprecated since Symfony 5.4, use "getFirewallListeners()" instead
      */
     public function getListeners(): iterable
     {
-        return $this->listeners;
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'The %s() method is deprecated, use getFirewallListeners() instead.', __METHOD__);
+        }
+
+        // Ensure LogoutListener is not included
+        foreach ($this->listeners as $listener) {
+            if (!($listener instanceof LogoutListener)) {
+                yield $listener;
+            }
+        }
     }
 
-    public function getExceptionListener()
+    /**
+     * @return iterable<mixed, callable>
+     */
+    public function getFirewallListeners(): iterable
+    {
+        $containedLogoutListener = false;
+        foreach ($this->listeners as $listener) {
+            yield $listener;
+            $containedLogoutListener |= $listener instanceof LogoutListener;
+        }
+
+        // Ensure the LogoutListener is contained
+        if (null !== $this->logoutListener && !$containedLogoutListener) {
+            yield $this->logoutListener;
+        }
+    }
+
+    public function getExceptionListener(): ?ExceptionListener
     {
         return $this->exceptionListener;
     }
 
+    /**
+     * @deprecated since Symfony 5.4, use "getFirewallListeners()" instead
+     */
     public function getLogoutListener()
     {
-        return $this->logoutListener;
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'The %s() method is deprecated, use getFirewallListeners() instead.', __METHOD__);
+        }
+
+        if (null !== $this->logoutListener) {
+            return $this->logoutListener;
+        }
+
+        // Return LogoutListener from listeners list
+        foreach ($this->listeners as $listener) {
+            if ($listener instanceof LogoutListener) {
+                return $listener;
+            }
+        }
+
+        return null;
     }
 }

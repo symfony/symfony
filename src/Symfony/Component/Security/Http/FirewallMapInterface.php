@@ -18,6 +18,9 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
 /**
  * This interface must be implemented by firewall maps.
  *
+ * @method iterable               getFirewallListeners(Request $request) returns the sorted list of firewall listeners
+ * @method ExceptionListener|null getExceptionListener(Request $request) returns the firewall's exception listener
+ *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 interface FirewallMapInterface
@@ -36,6 +39,8 @@ interface FirewallMapInterface
      * must be null.
      *
      * @return array{iterable<mixed, callable>, ExceptionListener, LogoutListener}
+     *
+     * @deprecated since Symfony 5.4, use "getFirewallListeners()" instead
      */
     public function getListeners(Request $request);
 }

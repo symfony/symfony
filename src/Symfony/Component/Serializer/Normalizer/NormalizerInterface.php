@@ -28,7 +28,7 @@ interface NormalizerInterface
      * @param string $format  Format the normalization result will be encoded as
      * @param array  $context Context options for the normalizer
      *
-     * @return array|string|int|float|bool|\ArrayObject|null \ArrayObject is used to make sure an empty object is encoded as an object not an array
+     * @return array|string|int|float|bool|\ArrayObject|NormalizedValueInterface|null \ArrayObject is used to make sure an empty object is encoded as an object not an array
      *
      * @throws InvalidArgumentException   Occurs when the object given is not a supported type for the normalizer
      * @throws CircularReferenceException Occurs when the normalizer detects a circular reference when no circular
@@ -36,7 +36,7 @@ interface NormalizerInterface
      * @throws LogicException             Occurs when the normalizer is not called in an expected context
      * @throws ExceptionInterface         Occurs for all the other cases of errors
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|NormalizedValueInterface|null;
 
     /**
      * Checks whether the given class is supported for normalization by this normalizer.

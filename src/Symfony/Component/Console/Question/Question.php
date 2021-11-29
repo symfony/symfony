@@ -121,7 +121,7 @@ class Question
      */
     public function setHiddenFallback(bool $fallback): static
     {
-        $this->hiddenFallback = (bool) $fallback;
+        $this->hiddenFallback = $fallback;
 
         return $this;
     }

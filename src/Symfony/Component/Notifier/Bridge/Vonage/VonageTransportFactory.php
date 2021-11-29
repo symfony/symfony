@@ -9,25 +9,27 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Nexmo;
+namespace Symfony\Component\Notifier\Bridge\Vonage;
 
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @deprecated since Symfony 5.4, use the Vonage bridge instead.
  */
-final class NexmoTransportFactory extends AbstractTransportFactory
+final class VonageTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): NexmoTransport
+    /**
+     * @return VonageTransport
+     */
+    public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
 
-        if ('nexmo' !== $scheme) {
-            throw new UnsupportedSchemeException($dsn, 'nexmo', $this->getSupportedSchemes());
+        if ('vonage' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'vonage', $this->getSupportedSchemes());
         }
 
         $apiKey = $this->getUser($dsn);
@@ -36,11 +38,11 @@ final class NexmoTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new NexmoTransport($apiKey, $apiSecret, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new VonageTransport($apiKey, $apiSecret, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['nexmo'];
+        return ['vonage'];
     }
 }

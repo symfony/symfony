@@ -9,28 +9,29 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Nexmo\Tests;
+namespace Symfony\Component\Notifier\Bridge\Vonage\Tests;
 
-use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransport;
+use Symfony\Component\Notifier\Bridge\Vonage\VonageTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
- * @group legacy
- */
-final class NexmoTransportTest extends TransportTestCase
+final class VonageTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null): NexmoTransport
+    /**
+     * @return VonageTransport
+     */
+    public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new NexmoTransport('apiKey', 'apiSecret', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
+        return new VonageTransport('apiKey', 'apiSecret', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
     {
-        yield ['nexmo://rest.nexmo.com?from=sender', $this->createTransport()];
+        yield ['vonage://rest.nexmo.com?from=sender', $this->createTransport()];
     }
 
     public function supportedMessagesProvider(): iterable

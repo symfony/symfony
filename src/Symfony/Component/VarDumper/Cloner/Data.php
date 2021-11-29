@@ -174,7 +174,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     public function withMaxDepth(int $maxDepth): static
     {
         $data = clone $this;
-        $data->maxDepth = (int) $maxDepth;
+        $data->maxDepth = $maxDepth;
 
         return $data;
     }
@@ -185,7 +185,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     public function withMaxItemsPerDepth(int $maxItemsPerDepth): static
     {
         $data = clone $this;
-        $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
+        $data->maxItemsPerDepth = $maxItemsPerDepth;
 
         return $data;
     }

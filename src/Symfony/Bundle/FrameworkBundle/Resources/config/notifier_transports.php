@@ -52,6 +52,7 @@ use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
@@ -81,6 +82,11 @@ return static function (ContainerConfigurator $container) {
             ->tag('chatter.transport_factory')
 
         ->set('notifier.transport_factory.nexmo', NexmoTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+            ->deprecate('symfony/framework-bundle', '5.4', 'The "%service_id% service is deprecated, use "notifier.transport_factory.vonage" instead.')
+
+        ->set('notifier.transport_factory.vonage', VonageTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 

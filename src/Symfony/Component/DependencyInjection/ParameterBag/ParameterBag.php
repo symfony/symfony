@@ -109,7 +109,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function has(string $name): bool
     {
-        return \array_key_exists((string) $name, $this->parameters);
+        return \array_key_exists($name, $this->parameters);
     }
 
     /**

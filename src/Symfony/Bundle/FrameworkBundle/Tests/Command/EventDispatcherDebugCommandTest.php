@@ -44,8 +44,8 @@ class EventDispatcherDebugCommandTest extends TestCase
         $dispatcher = new EventDispatcher();
         $otherDispatcher = new EventDispatcher();
 
-        $dispatcher->addListener('event', 'Listener');
-        $otherDispatcher->addListener('other_event', 'OtherListener');
+        $dispatcher->addListener('event', ['Listener']);
+        $otherDispatcher->addListener('other_event', ['OtherListener']);
 
         $dispatchers = new ServiceLocator([
             'event_dispatcher' => function () {

@@ -46,6 +46,7 @@ class TimezoneType extends AbstractType
             'intl' => false,
             'choice_loader' => function (Options $options) {
                 $input = $options['input'];
+                $grouping = $options['grouping'];
 
                 if ($options['intl']) {
                     if (!class_exists(Intl::class)) {
@@ -54,18 +55,19 @@ class TimezoneType extends AbstractType
 
                     $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale) {
-                        return self::getIntlTimezones($input, $choiceTranslationLocale);
+                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale, $grouping) {
+                        return self::getIntlTimezones($input, $choiceTranslationLocale, $grouping);
                     }), [$input, $choiceTranslationLocale]);
                 }
 
-                return ChoiceList::lazy($this, function () use ($input) {
-                    return self::getPhpTimezones($input);
+                return ChoiceList::lazy($this, function () use ($input, $grouping) {
+                    return self::getPhpTimezones($input, $grouping);
                 }, $input);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'input' => 'string',
+            'grouping' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true)
                     ? $previousValue
@@ -111,7 +113,7 @@ class TimezoneType extends AbstractType
         return 'timezone';
     }
 
-    private static function getPhpTimezones(string $input): array
+    private static function getPhpTimezones(string $input, bool $grouping): array
     {
         $timezones = [];
 
@@ -120,20 +122,27 @@ class TimezoneType extends AbstractType
                 continue;
             }
 
-            $timezones[str_replace(['/', '_'], [' / ', ' '], $timezone)] = $timezone;
+            if ($grouping) {
+                $timezones[strpos($timezone, '/') ? str_replace(['/', '_'], [' / ', ' '], dirname($timezone)) : 'Other'][str_replace('_', ' ', basename($timezone))] = $timezone;
+            } else {
+                $timezones[str_replace(['/', '_'], [' / ', ' '], $timezone)] = $timezone;
+            }
         }
 
         return $timezones;
     }
 
-    private static function getIntlTimezones(string $input, string $locale = null): array
+    private static function getIntlTimezones(string $input, string $locale = null, bool $grouping): array
     {
         $timezones = array_flip(Timezones::getNames($locale));
 
-        if ('intltimezone' === $input) {
+        if ('intltimezone' === $input || $grouping) {
             foreach ($timezones as $name => $timezone) {
-                if ('Etc/Unknown' === \IntlTimeZone::createTimeZone($timezone)->getID()) {
+                if ('intltimezone' === $input && 'Etc/Unknown' === \IntlTimeZone::createTimeZone($timezone)->getID()) {
                     unset($timezones[$name]);
+                } elseif ($grouping) {
+                    unset($timezones[$name]);
+                    $timezones[strpos($timezone, '/') ? str_replace(['/', '_'], [' / ', ' '], dirname($timezone)) : 'Other'][$name] = $timezone;
                 }
             }
         }

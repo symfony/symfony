@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-11-25T13:56:22Z
+
+Would love to get some kind of validation from @SecondeJK before merging.
+
+---------------------------------------------------------------------------
+
+by SecondeJK at 2021-11-25T15:00:10Z
+
+Thanks for sorting this @nicolas-grekas. The baseURL for the API is still the same (i.e. rest.nexmo.com) but if this changes in the future I can raise it or issue a PR to make things smoother.
+
+@fabpot I'm the PHP Advocate for Vonage, formerly Nexmo - the rebranding only happened recent-ishly despite the sale being quite a while back. I guess expect we'll be bothering you a lot more re: Symfony events etc. soon!

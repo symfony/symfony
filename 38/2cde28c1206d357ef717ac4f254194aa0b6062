@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-02T10:39:23Z
+
+This looks strange to me because this means that `['http://☎a']` is a valid domain name, while `['http://☎']` is invalid...
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-11-19T16:11:01Z
+
+> This looks strange to me because this means that `['http://☎a']` is a valid domain name, while `['http://☎']` is invalid...
+
+@nicolas-grekas wasn't this case fixed by https://github.com/symfony/symfony/pull/44119?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-19T16:14:35Z
+
+#44119 is on HttpClient+Mime, this one is on Validator, so I'm not sure.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-11-19T16:32:41Z
+
+Yes you are right, at the Validator level maybe we don't have to worry about the `xn--` URL format?
+If so, your concern is still legitimate
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2021-11-19T16:34:10Z
+
+@nicolas-grekas Sorry, I missed your earlier comment, will check it out later today.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-24T14:25:28Z
+
+Looks like #44252 could provide us with another test case, can you please incorporate it here also?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2021-11-29T07:51:10Z
+
+I've split the domain part into two cases:
+
+1) single-level domain, the assumption here is that since there's no TLD, it's an internal domain, allows symbols, hyphens etc..
+1) multi-level domain, has a TLD. Since I haven't been able to find any clear information on which characters are allowed in a TLD I went with hyphens allowed, but not at the end, no symbols
+
+Of course, this won't work if you have a multi-level internal domain, eg `subdomain.internal☎`. Any suggestions would be appreciated.

@@ -30,7 +30,6 @@ use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransport;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
-use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
@@ -84,7 +83,6 @@ final class Transport
         MessageMediaTransportFactory::class,
         MicrosoftTeamsTransport::class,
         MobytTransportFactory::class,
-        NexmoTransportFactory::class,
         OctopushTransportFactory::class,
         OvhCloudTransportFactory::class,
         RocketChatTransportFactory::class,

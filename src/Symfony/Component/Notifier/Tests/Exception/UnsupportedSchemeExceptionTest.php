@@ -36,7 +36,6 @@ use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
-use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
@@ -91,7 +90,6 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             MessageMediaTransportFactory::class => false,
             MicrosoftTeamsTransportFactory::class => false,
             MobytTransportFactory::class => false,
-            NexmoTransportFactory::class => false,
             OctopushTransportFactory::class => false,
             OneSignalTransportFactory::class => false,
             OvhCloudTransportFactory::class => false,
@@ -152,7 +150,6 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['messagemedia', 'symfony/message-media-notifier'];
         yield ['microsoftteams', 'symfony/microsoft-teams-notifier'];
         yield ['mobyt', 'symfony/mobyt-notifier'];
-        yield ['nexmo', 'symfony/nexmo-notifier'];
         yield ['octopush', 'symfony/octopush-notifier'];
         yield ['onesignal', 'symfony/one-signal-notifier'];
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];

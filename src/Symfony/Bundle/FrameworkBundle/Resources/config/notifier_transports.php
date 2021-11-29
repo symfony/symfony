@@ -35,7 +35,6 @@ use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
-use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
@@ -80,11 +79,6 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.transport_factory.mattermost', MattermostTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
-
-        ->set('notifier.transport_factory.nexmo', NexmoTransportFactory::class)
-            ->parent('notifier.transport_factory.abstract')
-            ->tag('texter.transport_factory')
-            ->deprecate('symfony/framework-bundle', '5.4', 'The "%service_id% service is deprecated, use "notifier.transport_factory.vonage" instead.')
 
         ->set('notifier.transport_factory.vonage', VonageTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')

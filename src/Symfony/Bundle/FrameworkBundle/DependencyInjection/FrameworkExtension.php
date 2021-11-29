@@ -135,7 +135,6 @@ use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransport;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
-use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
@@ -2419,7 +2418,6 @@ class FrameworkExtension extends Extension
             MessageMediaTransportFactory::class => 'notifier.transport_factory.message-media',
             MicrosoftTeamsTransportFactory::class => 'notifier.transport_factory.microsoft-teams',
             MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
-            NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
             OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
             OneSignalTransportFactory::class => 'notifier.transport_factory.one-signal',
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovh-cloud',

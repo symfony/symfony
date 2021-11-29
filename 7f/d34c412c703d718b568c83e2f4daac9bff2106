@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-11-10T22:53:05Z
+
+This looks like a correct change, although I'm wondering if we should apply this always (i.e. never check if authenticators support the request if there already is a token) instead of letting the authenticator decide. But I'm not sure if this would be the correct fix (happy to hear other ideas on this topic).
+
+Is it possible for you to add a test for this behavior? (e.g. in the `RemoteUserAuthenticatorTest`)
+
+---------------------------------------------------------------------------
+
+by stlrnz at 2021-11-11T08:42:14Z
+
+> Is it possible for you to add a test for this behavior? (e.g. in the `RemoteUserAuthenticatorTest`)
+
+I've done that. The test is inspired by `RememberMeAuthenticatorTest`.
+https://github.com/symfony/symfony/blob/07a891f6c57d9da513d75402f2aa2da73d897044/src/Symfony/Component/Security/Http/Tests/Authenticator/RememberMeAuthenticatorTest.php#L39
+
+> This looks like a correct change, although I'm wondering if we should apply this always (i.e. never check if authenticators support the request if there already is a token) instead of letting the authenticator decide. But I'm not sure if this would be the correct fix (happy to hear other ideas on this topic).
+
+I think this is the right question to ask. Looking at `HttpBasicAuthenticator` I assume there is the same check missing.
+https://github.com/symfony/symfony/blob/07a891f6c57d9da513d75402f2aa2da73d897044/src/Symfony/Component/Security/Http/Authenticator/HttpBasicAuthenticator.php#L57
+
+It's easy to forget that scenario when writing an Authenticator. In my opinion the Authenticator is _lying_ when returning false for the question "do you support this request?". It _can_ support/authenticate this request, but we dont _want_ it to do.
+So for me it would be a better solution to check for the token on a more centralized position. But I dont know if there is any scenario where this would be wrong. The current solution is more flexible.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-11-11T17:12:08Z
+
+Thank you for the PR issue and the reproducer. Great job!
+
+Im also hesitant that this is the correct fix. But Im not sure what else is. Im wondering what a system like kerberos would do on logout and if the user changes without logging out first. Then this fix will break applications (depending on kerberos or others behavior).
+
+Im not sure who would like to read this but one can do a workaround by creating your own RemoteUserAuthentication and override the `supports` method. See here for more info: https://symfony.com/doc/current/security/custom_authenticator.html
+
+---------------------------------------------------------------------------
+
+by stlrnz at 2021-11-15T11:30:39Z
+
+Thank you for the feedback, @Nyholm!
+
+> Im wondering what a system like kerberos would do on logout and if the user changes without logging out first.
+
+That's a really good question. In our environment, this cannot happen. But I mocked this scenario in my demo application and found a flaw in the original PR. So I pushed an updated version which checks for the user identifier before making a decision.
+Now the new firewall does the same as the old: if the user changes, the new user is logged in.
+
+But this implementation does not invalidate the session of the first user. In consequence the second user may have access to sensible data and/or the application will break anyway.
+However, I checked this scenario using the old firewall, too. The same thing is happening here. So this PR neither worsen nor improved that special case. But since this never seemed to be an issue, I dont know how critical it really is.
+
+> I'm wondering if we should apply this always (i.e. never check if authenticators support the request if there already is a token) instead of letting the authenticator decide
+
+I think this is still a really good idea, @wouterj! It may solve the problem with the session, too?
+But this would be a more dangerous change. Maybe we should separate that discussion from this PR?

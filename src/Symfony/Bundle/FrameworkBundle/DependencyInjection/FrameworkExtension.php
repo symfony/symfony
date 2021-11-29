@@ -16,6 +16,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
 use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use phpDocumentor\Reflection\Types\ContextFactory;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -1850,7 +1851,7 @@ class FrameworkExtension extends Extension
 
         if (
             ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/property-info'], true)
-            && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/property-info'], true)
+            && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', ContextFactory::class, ['symfony/framework-bundle', 'symfony/property-info'], true)
         ) {
             $definition = $container->register('property_info.phpstan_extractor', PhpStanExtractor::class);
             $definition->addTag('property_info.type_extractor', ['priority' => -1000]);

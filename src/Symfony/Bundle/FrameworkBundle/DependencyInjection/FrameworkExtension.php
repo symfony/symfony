@@ -350,6 +350,11 @@ class FrameworkExtension extends Extension
 
             $this->sessionConfigEnabled = true;
             $this->registerSessionConfiguration($config['session'], $container, $loader);
+            if (!empty($config['test'])) {
+                // test listener will replace the existing session listener
+                // as we are aliasing to avoid duplicated registered events
+                $container->setAlias('session_listener', 'test.session.listener');
+            }
         } elseif (!empty($config['test'])) {
             $container->removeDefinition('test.session.listener');
         }

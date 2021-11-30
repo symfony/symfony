@@ -122,7 +122,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             if ($config['always_authenticate_before_granting']) {
                 $authorizationChecker = $container->getDefinition('security.authorization_checker');
                 $authorizationCheckerArgs = $authorizationChecker->getArguments();
-                array_splice($authorizationCheckerArgs, 1, 0, [new Reference('security.authentication_manager')]);
+                array_splice($authorizationCheckerArgs, 1, 0, [new Reference('security.authentication.manager')]);
                 $authorizationChecker->setArguments($authorizationCheckerArgs);
             }
 

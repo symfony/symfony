@@ -2,6 +2,7 @@ imports:
     - { resource: ./legacy_base_config.yml }
 
 security:
+    always_authenticate_before_granting: true
     firewalls:
         default:
             anonymous: ~

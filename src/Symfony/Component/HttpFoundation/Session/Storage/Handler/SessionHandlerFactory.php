@@ -30,7 +30,7 @@ class SessionHandlerFactory
             throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a string or a connection object, "%s" given.', __METHOD__, get_debug_type($connection)));
         }
 
-        if ($options = parse_url($connection)) {
+        if ($options = \is_string($connection) ? parse_url($connection) : false) {
             parse_str($options['query'] ?? '', $options);
         }
 

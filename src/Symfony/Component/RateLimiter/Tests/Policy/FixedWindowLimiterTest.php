@@ -14,6 +14,7 @@ namespace Symfony\Component\RateLimiter\Tests\Policy;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
+use Symfony\Component\RateLimiter\Policy\Window;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
@@ -88,6 +89,19 @@ class FixedWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume();
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertEquals(9, $rateLimit->getRemainingTokens());
+    }
+
+    public function testWindowResilientToTimeShifting()
+    {
+        $serverOneClock = microtime(true) - 1;
+        $serverTwoClock = microtime(true) + 1;
+        $window = new Window('id', 300, 100, $serverTwoClock);
+        $this->assertSame(100, $window->getAvailableTokens($serverTwoClock));
+        $this->assertSame(100, $window->getAvailableTokens($serverOneClock));
+
+        $window = new Window('id', 300, 100, $serverOneClock);
+        $this->assertSame(100, $window->getAvailableTokens($serverTwoClock));
+        $this->assertSame(100, $window->getAvailableTokens($serverOneClock));
     }
 
     private function createLimiter(): FixedWindowLimiter

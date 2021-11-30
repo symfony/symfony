@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionHandlerFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 
@@ -34,6 +35,16 @@ class SessionHandlerFactoryTest extends TestCase
 
         $this->assertInstanceOf($expectedHandlerType, $handler);
         $this->assertEquals($expectedPath, ini_get('session.save_path'));
+    }
+
+    /**
+     * @dataProvider provideConnectionDSN
+     */
+    public function testCreateHandlerWithConnectionObject()
+    {
+        $handler = SessionHandlerFactory::createHandler($this->createMock(\Redis::class));
+
+        $this->assertInstanceOf(RedisSessionHandler::class, $handler);
     }
 
     public function provideConnectionDSN(): array

@@ -17,7 +17,7 @@ Installation
 Sponsor
 -------
 
-Symfony 6.1 is [backed][27] by [Basecom][28].
+Symfony 6.1 is [backed][27] by [basecom][28].
 
 As a professional software service provider, basecom implements customized
 solutions in the areas of e-commerce, PIM solutions and web portals. With our

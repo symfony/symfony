@@ -50,7 +50,7 @@ class RedisSessionHandler extends AbstractSessionHandler
 
         $this->redis = $redis;
         $this->prefix = $options['prefix'] ?? 'sf_s';
-        $this->ttl = $options['ttl'] ?? null;
+        $this->setTtl($options['ttl'] ?? null);
     }
 
     /**
@@ -109,5 +109,10 @@ class RedisSessionHandler extends AbstractSessionHandler
     public function updateTimestamp(string $sessionId, string $data): bool
     {
         return $this->redis->expire($this->prefix.$sessionId, (int) ($this->ttl ?? ini_get('session.gc_maxlifetime')));
+    }
+    
+    public function setTtl(?int $ttl): void
+    {
+        $this->ttl = $ttl;   
     }
 }

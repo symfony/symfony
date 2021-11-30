@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-11-30T16:29:35Z
+
+Can you please add a test?
+
+---------------------------------------------------------------------------
+
+by martinssipenko at 2021-11-30T17:17:29Z
+
+@derrabus I'd be happy to, but given this is my first contribution to Symfony and none of the other sites have tests for this case I would need some guidance.
+
+---------------------------------------------------------------------------
+
+by martinssipenko at 2021-11-30T17:22:47Z
+
+@derrabus check the last commit, perhaps that would work? If remove the `createTable()` invocation from `DoctrineDbalStore` and/or `PdoStore` the tests will fail now.

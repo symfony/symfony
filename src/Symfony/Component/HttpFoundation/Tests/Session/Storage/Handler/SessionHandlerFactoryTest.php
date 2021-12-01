@@ -72,6 +72,6 @@ class SessionHandlerFactoryTest extends TestCase
 
         $ttlProperty = $reflection->getProperty('ttl');
         $ttlProperty->setAccessible(true);
-        $this->assertSame('3600', $ttlProperty->getValue($handler));
+        $this->assertSame(3600, $ttlProperty->getValue($handler));
     }
 }

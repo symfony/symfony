@@ -52,6 +52,7 @@
     },
     "conflict": {
         "doctrine/dbal": "<2.10",
+        "doctrine/lexer": "<1.1",
         "doctrine/orm": "<2.7.3",
         "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<4.4",

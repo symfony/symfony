@@ -21,10 +21,10 @@
     },
     "require-dev": {
         "composer/composer": "^1.0.2|^2.0",
-        "symfony/console": "^4.4|^5",
+        "symfony/console": "^4.4.30|^5.3.7",
         "symfony/dotenv": "^5.1",
-        "symfony/http-foundation": "^4.4|^5",
-        "symfony/http-kernel": "^4.4|^5"
+        "symfony/http-foundation": "^4.4.30|^5.3.7",
+        "symfony/http-kernel": "^4.4.30|^5.3.7"
     },
     "conflict": {
         "symfony/dotenv": "<5.1"

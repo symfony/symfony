@@ -976,6 +976,11 @@ PHP
             ->setPublic(true)
             ->setAutoconfigured(true);
 
+        $container->register('failing_factory', \stdClass::class);
+        $container->register('ccc', TaggedService4::class)
+            ->setFactory([new Reference('failing_factory'), 'create'])
+            ->setAutoconfigured(true);
+
         $collector = new TagCollector();
         $container->addCompilerPass($collector);
 
@@ -990,6 +995,17 @@ PHP
                 ['someAttribute' => 'on param2 in constructor', 'priority' => 0, 'parameter' => 'param2'],
                 ['method' => 'fooAction'],
                 ['someAttribute' => 'on fooAction', 'priority' => 0, 'method' => 'fooAction'],
+                ['someAttribute' => 'on param1 in fooAction', 'priority' => 0, 'parameter' => 'param1'],
+                ['method' => 'barAction'],
+                ['someAttribute' => 'on barAction', 'priority' => 0, 'method' => 'barAction'],
+                ['property' => 'name'],
+                ['someAttribute' => 'on name', 'priority' => 0, 'property' => 'name'],
+            ],
+            'ccc' => [
+                ['class' => TaggedService4::class],
+                ['method' => 'fooAction'],
+                ['someAttribute' => 'on fooAction', 'priority' => 0, 'method' => 'fooAction'],
+                ['parameter' => 'param1'],
                 ['someAttribute' => 'on param1 in fooAction', 'priority' => 0, 'parameter' => 'param1'],
                 ['method' => 'barAction'],
                 ['someAttribute' => 'on barAction', 'priority' => 0, 'method' => 'barAction'],

@@ -70,7 +70,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 param('kernel.charset'),
                 abstract_arg('The "set_content_language_from_locale" config value'),
-                param('kernel.enabled_locales'),
             ])
             ->tag('kernel.event_subscriber')
 

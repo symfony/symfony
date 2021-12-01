@@ -285,6 +285,10 @@ class MockResponse implements ResponseInterface, StreamableInterface
             'http_code' => $response->info['http_code'],
         ] + $info + $response->info;
 
+        if (null !== $response->info['error']) {
+            throw new TransportException($response->info['error']);
+        }
+
         if (!isset($response->info['total_time'])) {
             $response->info['total_time'] = microtime(true) - $response->info['start_time'];
         }

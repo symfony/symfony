@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Unique Entity Validator checks if one or a set of fields contain unique values.
@@ -61,6 +62,10 @@ class UniqueEntityValidator extends ConstraintValidator
 
         if (null === $entity) {
             return;
+        }
+
+        if (!\is_object($entity)) {
+            throw new UnexpectedValueException($entity, 'object');
         }
 
         if ($constraint->em) {

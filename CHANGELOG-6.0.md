@@ -7,6 +7,20 @@ in 6.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.0.0...v6.0.1
 
+* 6.0.0 (2021-11-29)
+
+ * bug #44309 [Messenger] Leverage DBAL's getNativeConnection() method (derrabus)
+ * bug #44300 [FrameworkBundle] Fix property-info phpstan extractor discovery (1ed)
+ * feature #44271 [Notifier] add Vonage bridge to replace the Nexmo one (nicolas-grekas)
+ * bug #44187 [Translation] [Loco] Fix idempotency of LocoProvider write method (welcoMattic)
+ * bug #43992 [Security] Do not overwrite already stored tokens for REMOTE_USER authentication (stlrnz)
+ * bug #43876 [Validator] Fix validation for single level domains (HypeMC)
+ * bug #44327 [Debug][ErrorHandler] Increased the reserved memory from 10k to 32k (sakalys)
+ * bug #44261 [Process] intersect with getenv() in case-insensitive manner to get default envs (stable-staple)
+ * bug #44295 [Serializer] fix support for lazy/unset properties (nicolas-grekas)
+ * bug #44277 [Notifier] Fix AllMySms bridge body content (afiocre)
+ * bug #44269 [DoctrineBridge] Revert " add support for the JSON type" (dunglas)
+
 * 6.0.0-RC1 (2021-11-24)
 
  * security #cve-2021-41268 [SecurityBundle] Default signature_properties to the previous behavior (wouterj)

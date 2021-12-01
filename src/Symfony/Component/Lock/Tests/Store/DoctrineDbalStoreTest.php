@@ -70,7 +70,6 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
 
         try {
             $store = new DoctrineDbalStore($dsn);
-            $store->createTable();
 
             $store->save($key);
             $this->assertTrue($store->exists($key));

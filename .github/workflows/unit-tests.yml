@@ -181,12 +181,14 @@ jobs:
           fi
 
           (cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb)
+          (cd src/Symfony/Component/Lock; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb)
 
           # matrix.mode = high-deps
           echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} 'cd {} && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
 
           # get a list of the patched components (relies on .github/build-packages.php being called in the previous step)
           (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
+          (cd src/Symfony/Component/Lock; mv composer.bak composer.json)
           PATCHED_COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
           # for 5.4 LTS, checkout and test previous major with the patched components (only for patched components)
@@ -200,6 +202,7 @@ jobs:
               git checkout -m FETCH_HEAD
               PATCHED_COMPONENTS=$(echo "$PATCHED_COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort || true)
               (cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
+              (cd src/Symfony/Component/Lock; composer require --dev --no-update mongodb/mongodb)
               if [[ $PATCHED_COMPONENTS ]]; then
                 echo "::group::install phpunit"
                 ./phpunit install

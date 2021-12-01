@@ -53,6 +53,7 @@
     },
     "conflict": {
         "doctrine/dbal": "<2.13.1",
+        "doctrine/lexer": "<1.1",
         "doctrine/orm": "<2.7.3",
         "phpunit/phpunit": "<5.4.3",
         "symfony/cache": "<5.4",

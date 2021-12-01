@@ -834,7 +834,7 @@ class SecurityExtensionTest extends TestCase
 
         $args = $container->getDefinition('security.authorization_checker')->getArguments();
         $this->assertEquals('security.token_storage', (string) $args[0]);
-        $this->assertEquals('security.authentication_manager', (string) $args[1]);
+        $this->assertEquals('security.authentication.manager', (string) $args[1]);
         $this->assertEquals('security.access.decision_manager', (string) $args[2]);
         $this->assertEquals('%security.access.always_authenticate_before_granting%', (string) $args[3]);
     }

@@ -79,6 +79,9 @@ class UniqueValidator extends ConstraintValidator
     {
         $output = [];
         foreach ($fields as $field) {
+            if (!\is_string($field)) {
+                throw new UnexpectedTypeException($field, 'string');
+            }
             if (isset($element[$field])) {
                 $output[$field] = $element[$field];
             }

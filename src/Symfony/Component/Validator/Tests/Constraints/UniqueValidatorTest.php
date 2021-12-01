@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\UniqueValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -229,9 +230,29 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @dataProvider getInvalidFieldNames
+     */
+    public function testCollectionFieldNamesMustBeString(string $type, mixed $field)
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage(sprintf('Expected argument of type "string", "%s" given', $type));
+
+        $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique([$field]));
+    }
+
+    public function getInvalidFieldNames(): \Generator
+    {
+        return [
+            yield ['stdClass', new \stdClass()],
+            yield ['int', 2],
+            yield ['bool', false],
+        ];
+    }
+
+    /**
      * @dataProvider getInvalidCollectionValues
      */
-    public function testInvalidCollectionValues($value, $fields)
+    public function testInvalidCollectionValues(array $value, array $fields)
     {
         $this->validator->validate($value, new Unique($fields, [
             'message' => 'myMessage',
@@ -243,10 +264,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidCollectionValues()
+    public function getInvalidCollectionValues(): \Generator
     {
         return [
-            yield 'unique string' => [[['lang' => 'eng', 'translation' => 'hi'], ['lang' => 'eng', 'translation' => 'hi'],
+            yield 'unique string' => [[['lang' => 'eng', 'translation' => 'hi'], ['lang' => 'eng', 'translation' => 'hello'],
             ], ['lang']],
             yield 'unique floats' => [[
                 ['latitude' => 51.509865, 'longitude' => -0.118092, 'poi' => 'capital'],
@@ -254,7 +275,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 ['latitude' => 51.509865, 'longitude' => -0.118092],
             ], ['latitude', 'longitude']],
             yield 'unique int' => [[
-                ['id' => 1, 'email' => 'bar@email.com'], ['id' => 1, 'email' => 'bar@email.com'],
+                ['id' => 1, 'email' => 'bar@email.com'], ['id' => 1, 'email' => 'foo@email.com'],
             ], ['id']],
         ];
     }

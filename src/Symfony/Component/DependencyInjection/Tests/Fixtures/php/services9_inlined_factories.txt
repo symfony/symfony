@@ -552,9 +552,12 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
+if (\PHP_VERSION_ID >= 80100) {
 (require __DIR__.'/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
+}
 
 $classes = [];
+$preloaded = [];
 $classes[] = 'Bar\FooClass';
 $classes[] = 'Baz';
 $classes[] = 'ConfClass';
@@ -569,7 +572,7 @@ $classes[] = 'Some\Sidekick2';
 $classes[] = 'Request';
 $classes[] = 'Symfony\Component\DependencyInjection\ContainerInterface';
 
-$preloaded = Preloader::preload($classes);
+$preloaded = Preloader::preload($classes, $preloaded);
 
     [ProjectServiceContainer.php] => <?php
 

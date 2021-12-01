@@ -90,6 +90,7 @@ class PhpDumper extends Dumper
     private string $serviceLocatorTag;
     private array $exportedVariables = [];
     private string $baseClass;
+    private array $preloadableCache = [];
     private ProxyDumper $proxyDumper;
 
     /**
@@ -324,9 +325,12 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require $autoloadFile;
+if (\PHP_VERSION_ID >= 80100) {
 (require __DIR__.'/{$options['class']}.php')->set(\\Container{$hash}\\{$options['class']}::class, null);
 $preloadedFiles
+}
 \$classes = [];
+\$preloaded = [];
 
 EOF;
 
@@ -334,14 +338,18 @@ EOF;
                     if (!$class || str_contains($class, '$') || \in_array($class, ['int', 'float', 'string', 'bool', 'resource', 'object', 'array', 'null', 'callable', 'iterable', 'mixed', 'void'], true)) {
                         continue;
                     }
-                    if (!(class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) || (new \ReflectionClass($class))->isUserDefined()) {
+                    if ($this->isPreloadable($class)) {
                         $code[$options['class'].'.preload.php'] .= sprintf("\$classes[] = '%s';\n", $class);
                     }
                 }
 
+                foreach ($this->collectNonPreloadable($this->preload) as $class) {
+                    $code[$options['class'].'.preload.php'] .= sprintf("\$preloaded['%s'] = true;\n", $class);
+                }
+
                 $code[$options['class'].'.preload.php'] .= <<<'EOF'
 
-$preloaded = Preloader::preload($classes);
+$preloaded = Preloader::preload($classes, $preloaded);
 
 EOF;
             }
@@ -395,6 +403,111 @@ EOF;
         }
 
         return $code;
+    }
+
+    private function isPreloadable(string $class): ?bool
+    {
+        if (array_key_exists($class, $this->preloadableCache)) {
+            return $this->preloadableCache[$class];
+        }
+
+        $this->preloadableCache[$class] = true; // prevent recursion
+        if (in_array($class, ['self', 'static', 'parent'], true)) {
+            return $this->preloadableCache[$class] = null;
+        }
+
+        try {
+            if (!class_exists($class) && !interface_exists($class) && !trait_exists($class)) {
+                return $this->preloadableCache[$class] = false;
+            }
+        } catch (\Error $e) {
+            return $this->preloadableCache[$class] = false;
+        }
+
+        $r = new \ReflectionClass($class);
+        if (!$r->isUserDefined()) {
+            return $this->preloadableCache[$class] = null;
+        }
+
+        // Prior to PHP 8.1, typehinted properties have to be auto-loadable.
+        if (\PHP_VERSION_ID >= 80100) {
+            return $this->preloadableCache[$class] = true;
+        }
+
+        // Before PHP 7.4, user can not define typehinted properties
+        if (\PHP_VERSION_ID >= 70400) {
+            foreach ($r->getProperties() as $p) {
+                if (!$this->isPreloadableType($p->getType())) {
+                    // do not return to warm the preloadableCache
+                    $this->preloadableCache[$class] = false;
+                }
+            }
+        }
+
+        // code below does not prevent the class to be preloaded, but is here to warm the preloadableCache
+        foreach ($r->getMethods() as $m) {
+            foreach ($m->getParameters() as $p) {
+                if ($p->isDefaultValueAvailable() && $p->isDefaultValueConstant()) {
+                    $c = $p->getDefaultValueConstantName();
+
+                    if ($i = strpos($c, '::')) {
+                        $c = substr($c, 0, $i);
+                        if (in_array($c, ['self', 'static', 'parent'], true)) {
+                            continue;
+                        }
+                        // warm the preloadableCache
+                        $this->isPreloadable($c);
+                    }
+                }
+                $this->isPreloadableType($p->getType());
+            }
+            $this->isPreloadableType($m->getReturnType());
+        }
+
+        return $this->preloadableCache[$class];
+    }
+
+    private function isPreloadableType(?\ReflectionType $t): bool
+    {
+        if (!$t) {
+            return true;
+        }
+
+        $result = true;
+        foreach (($t instanceof \ReflectionUnionType || $t instanceof \ReflectionIntersectionType) ? $t->getTypes() : [$t] as $t) {
+            if (!$t instanceof \ReflectionNamedType || $t->isBuiltin()) {
+                continue;
+            }
+            if (false === $this->isPreloadable($t->getName())) {
+                $result = false;
+            }
+        }
+
+        return $result;
+    }
+
+    private function collectNonPreloadable(array $seed): array
+    {
+        $classes = $seed;
+        $prev = [];
+        while ($prev !== $classes) {
+            $prev = $classes;
+            foreach ($classes as $c) {
+                // warm preloadableCache
+                $this->isPreloadable($c);
+            }
+            $classes = array_merge(get_declared_classes(), get_declared_interfaces(), get_declared_traits());
+        }
+        $classes = [];
+        foreach ($this->preloadableCache as $class => $preloadable) {
+            if ($preloadable === false) {
+                if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) {
+                    $classes[] = $class;
+                }
+            }
+        }
+
+        return $classes;
     }
 
     /**

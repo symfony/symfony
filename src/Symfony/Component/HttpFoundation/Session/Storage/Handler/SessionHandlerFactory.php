@@ -23,10 +23,8 @@ class SessionHandlerFactory
 {
     public static function createHandler(object|string $connection): AbstractSessionHandler
     {
-        if (\is_string($connection) && $options = parse_url($connection)) {
+        if ($options = \is_string($connection) ? parse_url($connection) : false) {
             parse_str($options['query'] ?? '', $options);
-        } else {
-            $options = [];
         }
 
         switch (true) {
@@ -60,7 +58,7 @@ class SessionHandlerFactory
                 $handlerClass = str_starts_with($connection, 'memcached:') ? MemcachedSessionHandler::class : RedisSessionHandler::class;
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
 
-                return new $handlerClass($connection, array_intersect_key($options, ['prefix' => 1, 'ttl' => 1]));
+                return new $handlerClass($connection, array_intersect_key($options ?: [], ['prefix' => 1, 'ttl' => 1]));
 
             case str_starts_with($connection, 'pdo_oci://'):
                 if (!class_exists(DriverManager::class)) {

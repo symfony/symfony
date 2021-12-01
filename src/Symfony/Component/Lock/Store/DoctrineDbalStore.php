@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock\Store;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
@@ -88,6 +89,9 @@ class DoctrineDbalStore implements PersistingStoreInterface
                 ParameterType::STRING,
                 ParameterType::STRING,
             ]);
+        } catch (TableNotFoundException $e) {
+            $this->createTable();
+            $this->save($key);
         } catch (DBALException $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);

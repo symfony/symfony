@@ -84,7 +84,6 @@ class PdoStoreTest extends AbstractStoreTest
 
         try {
             $store = new PdoStore($dsn);
-            $store->createTable();
 
             $store->save($key);
             $this->assertTrue($store->exists($key));

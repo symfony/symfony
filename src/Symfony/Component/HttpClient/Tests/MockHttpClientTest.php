@@ -18,7 +18,6 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MockHttpClientTest extends HttpClientTestCase
 {
@@ -272,16 +271,8 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testDnsError':
-                $mock = $this->createMock(ResponseInterface::class);
-                $mock->expects($this->any())
-                    ->method('getStatusCode')
-                    ->willThrowException(new TransportException('DSN error'));
-                $mock->expects($this->any())
-                    ->method('getInfo')
-                    ->willReturn([]);
-
-                $responses[] = $mock;
-                $responses[] = $mock;
+                $responses[] = $mockResponse = new MockResponse('', ['error' => 'DNS error']);
+                $responses[] = $mockResponse;
                 break;
 
             case 'testToStream':
@@ -296,12 +287,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testTimeoutOnAccess':
-                $mock = $this->createMock(ResponseInterface::class);
-                $mock->expects($this->any())
-                    ->method('getHeaders')
-                    ->willThrowException(new TransportException('Timeout'));
-
-                $responses[] = $mock;
+                $responses[] = new MockResponse('', ['error' => 'Timeout']);
                 break;
 
             case 'testAcceptHeader':
@@ -363,16 +349,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testMaxDuration':
-                $mock = $this->createMock(ResponseInterface::class);
-                $mock->expects($this->any())
-                    ->method('getContent')
-                    ->willReturnCallback(static function (): void {
-                        usleep(100000);
-
-                        throw new TransportException('Max duration was reached.');
-                    });
-
-                $responses[] = $mock;
+                $responses[] = new MockResponse('', ['error' => 'Max duration was reached.']);
                 break;
         }
 

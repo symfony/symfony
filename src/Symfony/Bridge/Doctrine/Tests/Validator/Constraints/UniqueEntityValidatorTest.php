@@ -37,6 +37,7 @@ use Symfony\Bridge\Doctrine\Tests\TestRepositoryFactory;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -845,6 +846,32 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->validator->initialize($this->context);
 
         $this->validator->validate($entity, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValueMustBeObject()
+    {
+        $constraint = new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name'],
+            'em' => self::EM_NAME,
+        ]);
+
+        $this->expectException(UnexpectedValueException::class);
+
+        $this->validator->validate('foo', $constraint);
+    }
+
+    public function testValueCanBeNull()
+    {
+        $constraint = new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name'],
+            'em' => self::EM_NAME,
+        ]);
+
+        $this->validator->validate(null, $constraint);
 
         $this->assertNoViolation();
     }

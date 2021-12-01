@@ -1,0 +1,217 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-11-29T14:33:06Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-11-29T14:51:40Z
+
+Can you please provide a bit more context? This PR removes a lot of typehints: are they all needed to remove? And why are they required to be removed?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-11-29T15:20:27Z
+
+@stof PHP 6 -> Sf6 ?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-29T15:22:35Z
+
+@OskarStark indeed. Edited to fix it.
+
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2021-11-29T15:56:01Z
+
+I am very curious what kind of issues these added types cause because maybe they can involve other projects too? Because from the looks I only can suspect the issue with `mixed` type but thinks like returns bool doesn't really make sense to cause issues.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-11-29T15:59:33Z
+
+API Platform v2 needs this to be able to support both Symfony 4.4 and Symfony 6.
+API Platform v2 supports PHP 7.1, this means no (partial) covariance/contravariance, no union types, and no `mixed`.
+
+In API Platform 3 (to be released soon), we'll support only PHP 8.1 and Symfony 6, but having support for Symfony 6 in API Platform 2 will ease the upgrade process.
+
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2021-11-29T16:04:28Z
+
+Wouldn't it make sense to limit API Platform v2 to Symfony 5.4 only? Because I feel like this is stopping Symfony6 from going full PHP8?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-29T16:04:54Z
+
+@dunglas if you cannot bump to PHP 7.2+, the whole migration path prepared for Symfony 6 types won't work for you, due to not having the necessary prerequisite. I would suggest bumping to PHP 7.2+ as part of that effort. Not supporting partial covariance means that you will need us to revert all type additions done in Symfony for methods that you implement. That's too strong as a requirement IMO (especially as we are in progress of doing the stable release)
+Side note: this need for partial covariance to add types is the main reason why Symfony 5 requires PHP 7.2+.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-29T16:56:18Z
+
+To me, all argument types should stay, and all return types supported on PHP 7.2 should stay as well.
+Using PHP 7.2+ is a prerequisite of our approach about adding types (thanks to the partial variance rules supported in PHP 7.2) and those rules mean that argument types won't need to be added in the ApiPlatform child classes (so even union types are not an issue).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-11-29T17:02:16Z
+
+@stof As shown by our test suite, these types are the only ones preventing supporting PHP 7.1.
+We discussed this privately with @nicolas-grekas a while ago, and we agreed that having support for Symfony 6 in API Platform 2 would be nice. But we can also consider dropping support for PHP 7.1.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-29T17:21:17Z
+
+@dunglas given that 6.0 is tagged, this is too late for this PR to make it in anyway (feedback on the type migration was asked in September, and this PR was opened while the release process for the stable release was already started)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-29T17:26:33Z
+
+I'm personally still fine to consider this change for 6.0.1. It's not like we'll break a lot of code by merging this.
+
+Drupal has been asking for relaxing the return type before on `NormalizerInterface`, so it's not like we don't have any open discussion on the topic.
+
+And smoothing the migration for ApiPlatform looks worth it to me.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-11-29T17:40:10Z
+
+@stof I understand that this PR comes (too) late, but most contributors are benevolent and we do what we can with our limited workforce. We started working on this a while ago, we already made the whole codebase compatible with Symfony 5.4 back in October and we discussed the approach thoroughly (mostly off-GitHub) with @chalasr, @soyuka, and @nicolas-grekas.
+
+If we have no other option, we'll make API Platform 2 compatible only with Symfony 5.4, and API Platform only with Symfony 6, but I think that it will also have a negative impact on Symfony, as all projects using API Platform will not be able to upgrade to Symfony 6 until they upgrade to PHP 8.1 and API Platform 3 (not mentioning issues impacting Drupal).
+
+---------------------------------------------------------------------------
+
+by PierreRebeilleau at 2021-11-30T09:43:54Z
+
+> I'm sad about this step backward.
+>
+> What's about fixing that in ApiPLatform by providing 2 implementations (like we do for ages, for instance in the PhpUnitBridge)?
+>
+> ```
+> // JsonEncoder.php
+> final class JsonEncoder implements EncoderInterface, DecoderInterface
+> {
+>   use EncoderTrait;
+>
+>   private function _decode($data, $format, array $context = [])
+>  {...}
+> }
+>
+> // EncoderTrait.php
+> if (\PHP_VERSION_ID >= 70200) {
+>   trait EncoderTrait
+>   {
+>     use EncoderTrait72;
+>   }
+> } else {
+>   trait EncoderTrait
+>   {
+>     use EncoderTrait71;
+>   }
+> }
+>
+> // EncoderTrait72.php
+> trait EncoderTrait72
+> {
+>   public function decode($data, $format, array $context = []): mixed
+>   {
+>     return $this->_decode($data, $format, $context);
+>   }
+> }
+>
+> // EncoderTrait71.php
+> trait EncoderTrait71
+> {
+>   public function decode($data, $format, array $context = [])
+>   {
+>     return $this->_decode($data, $format, $context);
+>   }
+> }
+> ```
+
+I talked to kevin about it and the API Platform's core team does not agree with this solution, it would change too many things on the API Platform
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-11-30T10:16:00Z
+
+I personally very unsure about these changes. This is the most significant revert that is proposed for removing type hints.
+
+We've been quite strict about which types to revert or not, even deciding against reverting the typehint of the `NormalizerInterface` when Drupal proposed this. Question to the core team: Are the arguments made back then no longer valid? Or what circumstances have changed to not allow it 2 months ago, but allow it now?
+
+Then, and I admit that this is not technical but purely political, we've been especially early (3 - 4 months prior to the stable release) with announcing these changes and making as much noise as possible about it to gather feedback from open source communities relying on Symfony. I'm very unsure about accepting the most significant changes after the stable release.
+That is, unless we accept the policy that removing return type declarations is considered a bugfix and we will continue to revert return types if they are reported in the next 2 years. I don't think this is a great policy, as this means applications can not rely on the return type declarations - removing all type safety that strict typing offers.
+
+At last, if I read the discussion above correctly, there are changes that can fix this on APIP's side instead of on Symfony's side. The easiest solution of all removing support for PHP 7.1 in APIP 2. Another solution being using 2 implementations, which arguably is less nice. Given other communities didn't need these changes (or didn't test with Symfony 6 yet?), I feel like the changes are specific to APIP. Fixing this on APIP's side seems to be reasonable in that case.
+
+---
+
+*quick note: I'm very unsure, but I won't block this merge - which is why I left a plain PR comment. But I think it's good to not take this too lightly.*
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-11-30T11:18:28Z
+
+Looks like I’ll be the one blocking this merge for all the reasons mentioned in the comments. :-1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-11-30T15:55:39Z
+
+@jderusse we thought about that but as API Platform 2 will be EOL soon and that we already have to maintain 2 implementations in the 2.7 branch (the legacy one, and the one compatible with API Platform 3), this increases the maintenance burden. Also, we have a lot of classes implementing these interfaces.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-11-30T16:01:09Z
+
+I still fail to understand how we forced a lot of work on Drupal for the `NormalizerInterface` 2 months ago, only to revert the return type after a stable release. I feel very sorry for Drupal for all the time they had to spent to rewrite their serializer implementations.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-30T16:18:36Z
+
+> I still fail to understand how we forced a lot of work on Drupal for the NormalizerInterface 2 months ago, only to revert the return type after a stable release. I feel very sorry for Drupal for all the time they had to spent to rewrite their serializer implementations.
+
+On my side: because of the reason why. Reverting the return type for BC/FC purpose is legit. Reverting for allowing back a hack is certainly not. Aka in this PR, we know we'll be able to add the return type in sf7 because APIP will have released v3. On the Drupal case, we don't know that, quite the opposite.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-30T16:27:22Z
+
+Drupal was not asking to delay the addition of the native return type. It was asking to change the contract of the interface (because native return type are enforced and so they could not violate the contract anymore).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-11-30T16:39:21Z
+
+:ok_hand:  alright, makes sense.

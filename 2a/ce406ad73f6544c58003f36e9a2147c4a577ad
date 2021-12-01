@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by mhujer at 2021-11-30T13:49:16Z
+
+@alexander-schranz I can confirm that this patch fixes #44345 for both the empty Symfony app and my real world app. 👏 👍
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-11-30T15:28:46Z
+
+@mhujer Thank you for testing!

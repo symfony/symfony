@@ -200,6 +200,14 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('routing.expression_language_function', ['function' => 'env'])
 
+        ->set('container.get_routing_condition_service', \Closure::class)
+            ->public()
+            ->factory([\Closure::class, 'fromCallable'])
+            ->args([
+                [tagged_locator('routing.condition_service', 'alias'), 'get'],
+            ])
+            ->tag('routing.expression_language_function', ['function' => 'service'])
+
         // inherit from this service to lazily access env vars
         ->set('container.env', LazyString::class)
             ->abstract()

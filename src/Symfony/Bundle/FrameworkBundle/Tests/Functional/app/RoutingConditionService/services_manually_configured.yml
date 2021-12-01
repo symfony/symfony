@@ -1,0 +1,8 @@
+services:
+
+  _defaults:
+    autoconfigure: false
+
+  Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\RoutingConditionServiceBundle\Service\ManuallyTaggedService:
+    tags:
+      - { name: 'routing.condition_service', alias: 'manually_tagged' }

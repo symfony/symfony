@@ -49,11 +49,13 @@
     "conflict": {
         "doctrine/dbal": "<2.7",
         "doctrine/orm": "<2.6.3",
+        "doctrine/lexer": "<1.1",
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/dependency-injection": "<3.4",
         "symfony/form": "<4.4",
         "symfony/http-kernel": "<4.3.7",
         "symfony/messenger": "<4.3",
+        "symfony/proxy-manager-bridge": "<4.4.19",
         "symfony/security-core": "<4.4",
         "symfony/validator": "<4.4.2|<5.0.2,>=5.0"
     },

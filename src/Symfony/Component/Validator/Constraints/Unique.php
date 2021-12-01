@@ -25,7 +25,7 @@ class Unique extends Constraint
 {
     public const IS_NOT_UNIQUE = '7911c98d-b845-4da0-94b7-a8dac36bc55a';
 
-    public $fields = [];
+    public array|string $fields = [];
 
     protected const ERROR_NAMES = [
         self::IS_NOT_UNIQUE => 'IS_NOT_UNIQUE',
@@ -50,7 +50,7 @@ class Unique extends Constraint
         callable $normalizer = null,
         array $groups = null,
         mixed $payload = null,
-        $fields = null,
+        array|string $fields = null,
     ) {
         if (\is_array($fields) && \is_string(key($fields))) {
             $options = array_merge($fields, $options);
@@ -68,12 +68,12 @@ class Unique extends Constraint
         }
     }
 
-    public function getOptions()
+    public function getOptions(): array
     {
         return ['fields'];
     }
 
-    public function getDefaultOption()
+    public function getDefaultOption(): string
     {
         return 'fields';
     }

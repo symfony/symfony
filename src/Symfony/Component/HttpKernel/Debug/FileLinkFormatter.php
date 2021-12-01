@@ -35,8 +35,8 @@ class FileLinkFormatter
     ];
 
     private array|false $fileLinkFormat;
-    private ?RequestStack $requestStack;
-    private ?string $baseDir;
+    private ?RequestStack $requestStack = null;
+    private ?string $baseDir = null;
     private \Closure|string|null $urlFormat;
 
     /**

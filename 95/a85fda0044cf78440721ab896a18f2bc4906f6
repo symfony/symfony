@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-12-02T09:14:17Z
+
+Maybe we can turn this into an issue form rather than a markdown template, which allows us to put more visible help texts on each field (and mark some as required), instead of having HTML comments in the markdown.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-12-02T10:58:48Z
+
+@stof Done, not sure if we need to keep both the md and the yaml files.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-02T13:10:07Z
+
+@fabpot no. GitHub will ignore the md file if it has a yaml template for the same name
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-02T13:10:59Z
+
+shouldn't this be done in the 4.4 branch ? IIRC, we have managed those templates in the oldest maintained branch and merged them up until now (including the recent change done by @nicolas-grekas)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-12-02T13:33:49Z
+
+Rebased on 4.4, where the md files do not exist.
+For some reasons, they exist on 5.3, they are removed here #44420

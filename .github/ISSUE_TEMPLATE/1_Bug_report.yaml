@@ -1,5 +1,5 @@
 name: 🐛 Bug Report
-description: ⚠️ See below for security reports
+description: ⚠️ NEVER report security issues, read https://symfony.com/security instead
 labels: Bug
 
 body:

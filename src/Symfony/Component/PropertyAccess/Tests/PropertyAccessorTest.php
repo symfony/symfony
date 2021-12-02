@@ -964,7 +964,7 @@ class PropertyAccessorTest extends TestCase
         $object = new TestPublicPropertyGetterOnObject();
 
         $this->expectException(NoSuchPropertyException::class);
-        $this->expectExceptionMessageMatches('/.*Neither the property "b" nor one of the methods/');
+        $this->expectExceptionMessageMatches('/.*Can\'t get a way to read the property "b" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestPublicPropertyGetterOnObject./');
         $this->propertyAccessor->getValue($object, 'b');
     }
 
@@ -975,6 +975,15 @@ class PropertyAccessorTest extends TestCase
         $object = new TestPublicPropertyDynamicallyCreated('Bar');
 
         $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
+    }
+
+    public function testGetDynamicPublicPropertyWithMagicGetterDisallow()
+    {
+        $object = new TestPublicPropertyGetterOnObjectMagicGet();
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS);
+
+        $this->expectException(NoSuchPropertyException::class);
+        $propertyAccessor->getValue($object, 'c');
     }
 
     public function testGetDynamicPublicPropertyWithMagicGetterAllow()

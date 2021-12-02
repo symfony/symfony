@@ -170,3 +170,19 @@ Security
  * Deprecate passing the strategy as string to `AccessDecisionManager`,
    pass an instance of `AccessDecisionStrategyInterface` instead
  * Flag `AccessDecisionManager` as `@final`
+ * Deprecate passing `$credentials` to `PreAuthenticatedToken`,
+   `SwitchUserToken` and `UsernamePasswordToken`:
+
+   Before:
+   ```php
+   $token = new UsernamePasswordToken($user, $credentials, $firewallName, $roles);
+   $token = new PreAuthenticatedToken($user, $credentials, $firewallName, $roles);
+   $token = new SwitchUserToken($user, $credentials, $firewallName, $roles, $originalToken);
+   ```
+
+   After:
+   ```php
+   $token = new UsernamePasswordToken($user, $firewallName, $roles);
+   $token = new PreAuthenticatedToken($user, $firewallName, $roles);
+   $token = new SwitchUserToken($user, $firewallName, $roles, $originalToken);
+   ```

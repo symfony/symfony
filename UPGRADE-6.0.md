@@ -407,6 +407,22 @@ Security
    ```
  * `AccessDecisionManager` does not accept strings as strategy anymore,
    pass an instance of `AccessDecisionStrategyInterface` instead
+ * Removed the `$credentials` argument of `PreAuthenticatedToken`,
+   `SwitchUserToken` and `UsernamePasswordToken`:
+
+   Before:
+   ```php
+   $token = new UsernamePasswordToken($user, $credentials, $firewallName, $roles);
+   $token = new PreAuthenticatedToken($user, $credentials, $firewallName, $roles);
+   $token = new SwitchUserToken($user, $credentials, $firewallName, $roles, $originalToken);
+   ```
+
+   After:
+   ```php
+   $token = new UsernamePasswordToken($user, $firewallName, $roles);
+   $token = new PreAuthenticatedToken($user, $firewallName, $roles);
+   $token = new SwitchUserToken($user, $firewallName, $roles, $originalToken);
+   ```
 
 SecurityBundle
 --------------

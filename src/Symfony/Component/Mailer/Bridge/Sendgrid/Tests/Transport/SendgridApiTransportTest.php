@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Message;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -243,5 +244,22 @@ class SendgridApiTransportTest extends TestCase
         $this->assertSame(['category-one'], $payload['categories']);
         $this->assertSame('blue', $payload['personalizations'][0]['custom_args']['Color']);
         $this->assertSame('12345', $payload['personalizations'][0]['custom_args']['Client-ID']);
+    }
+
+    public function testEnvelopeOptions()
+    {
+        $expectedMailerSettings = ['bypass_unsubscribe_management' => ['enable' => true]];
+
+        $email = new Email();
+        $envelope = new Envelope(new Address('envelopefrom@example.com'), [new Address('envelopeto@example.com')]);
+        $envelope->setOption('mail_settings', $expectedMailerSettings);
+
+        $transport = new SendgridApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('mail_settings', $payload);
+        $this->assertSame($payload['mail_settings'], $expectedMailerSettings);
     }
 }

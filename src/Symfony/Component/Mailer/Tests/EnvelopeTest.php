@@ -144,4 +144,13 @@ class EnvelopeTest extends TestCase
 
         Envelope::create(new RawMessage('Some raw email message'));
     }
+
+    public function testSettingOptions()
+    {
+        $message = $this->getMockBuilder(Message::class)->getMock();
+        $e = Envelope::create($message);
+        $e->setOption('setting_name1', 'setting_value1');
+        $e->setOption('setting_name2', 'setting_value2');
+        $this->assertEquals(['setting_name1' => 'setting_value1', 'setting_name2' => 'setting_value2'], $e->getOptions());
+    }
 }

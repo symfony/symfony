@@ -146,9 +146,7 @@ class SendgridApiTransport extends AbstractApiTransport
         }
 
         foreach ($envelope->getOptions() as $name => $value) {
-            if ('mail_settings' === $name) {
-                $payload['mail_settings'] = $value;
-            }
+            $payload[$name] = $value;
         }
 
         $payload['personalizations'][] = $personalization;

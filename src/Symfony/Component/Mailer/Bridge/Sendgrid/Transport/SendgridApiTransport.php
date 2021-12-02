@@ -145,9 +145,9 @@ class SendgridApiTransport extends AbstractApiTransport
             $personalization['custom_args'] = $customArguments;
         }
 
-        foreach ($envelope->getTransportSettings() as $setting) {
-            if ($setting instanceof SendgridMailSetting) {
-                $payload['mail_settings'] = $setting->getValue();
+        foreach ($envelope->getOptions() as $name => $value) {
+            if ('mail_settings' === $name) {
+                $payload['mail_settings'] = $value;
             }
         }
 

@@ -13,7 +13,6 @@ namespace Symfony\Component\Mailer;
 
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
-use Symfony\Component\Mailer\Transport\TransportSettingInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
 
@@ -24,7 +23,7 @@ class Envelope
 {
     private $sender;
     private $recipients = [];
-    private $transportSettings = [];
+    private $options = [];
 
     /**
      * @param Address[] $recipients
@@ -89,18 +88,19 @@ class Envelope
     }
 
     /**
-     * @param TransportSettingInterface[] $transportSettings
+     * @param string $name
+     * @param mixed $value
      */
-    public function setTransportSettings(array $transportSettings): void
+    public function setOption(string $name, $value): void
     {
-        $this->transportSettings = $transportSettings;
+        $this->options[$name] = $value;
     }
 
     /**
-     * @return TransportSettingInterface[]
+     * @return array<string, mixed>
      */
-    public function getTransportSettings(): array
+    public function getOptions(): array
     {
-        return $this->transportSettings;
+        return $this->options;
     }
 }

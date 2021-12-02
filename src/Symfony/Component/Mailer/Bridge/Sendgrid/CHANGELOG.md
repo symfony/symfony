@@ -4,8 +4,8 @@ CHANGELOG
 6.1
 ---
 
-* Check the `Envelope` options for a "mail_settings" property and send it in
-  the payload to Sendgrid
+* Check the `Envelope` options for a "mail_settings" property and send the
+  value in the payload to Sendgrid
 
 5.4
 ---

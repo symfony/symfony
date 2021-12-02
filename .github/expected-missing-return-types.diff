@@ -1,15 +1,15 @@
 # Run these steps to update this file:
 sed -i 's/ *"\*\*\/Tests\/"//' composer.json
 composer u -o
-SYMFONY_PATCH_TYPE_DECLARATIONS='force=2' php .github/patch-types.php
+SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.0' php .github/patch-types.php
 head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
 (echo "$head" && echo && git diff -U2 composer.json src/) > .github/expected-missing-return-types.diff
 
 diff --git a/composer.json b/composer.json
-index 0ad5f625a7..f614f93465 100644
+index 1bc576b112..589ef8c260 100644
 --- a/composer.json
 +++ b/composer.json
-@@ -174,5 +174,5 @@
+@@ -175,5 +175,5 @@
          ],
          "exclude-from-classmap": [
 -            "**/Tests/"
@@ -91,7 +91,7 @@ index c479f75d34..0d16baaff7 100644
      {
          if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
 diff --git a/src/Symfony/Component/Config/Loader/Loader.php b/src/Symfony/Component/Config/Loader/Loader.php
-index faa0f58369..414f8dc63d 100644
+index e0974fb151..f698b5271b 100644
 --- a/src/Symfony/Component/Config/Loader/Loader.php
 +++ b/src/Symfony/Component/Config/Loader/Loader.php
 @@ -50,5 +50,5 @@ abstract class Loader implements LoaderInterface
@@ -144,52 +144,52 @@ index 6b1c6c5fbe..bb80ed461e 100644
 +    public function isFresh(ResourceInterface $resource, int $timestamp): bool;
  }
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index 801575e8f4..a71eadda91 100644
+index b582435f7d..3d5f064773 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
-@@ -214,5 +214,5 @@ class Application implements ResetInterface
+@@ -218,5 +218,5 @@ class Application implements ResetInterface
       * @return int 0 if everything went fine, or an error code
       */
 -    public function doRun(InputInterface $input, OutputInterface $output)
 +    public function doRun(InputInterface $input, OutputInterface $output): int
      {
          if (true === $input->hasParameterOption(['--version', '-V'], true)) {
-@@ -424,5 +424,5 @@ class Application implements ResetInterface
+@@ -445,5 +445,5 @@ class Application implements ResetInterface
       * @return string
       */
 -    public function getLongVersion()
 +    public function getLongVersion(): string
      {
          if ('UNKNOWN' !== $this->getName()) {
-@@ -467,5 +467,5 @@ class Application implements ResetInterface
+@@ -488,5 +488,5 @@ class Application implements ResetInterface
       * @return Command|null
       */
 -    public function add(Command $command)
 +    public function add(Command $command): ?Command
      {
          $this->init();
-@@ -504,5 +504,5 @@ class Application implements ResetInterface
+@@ -525,5 +525,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When given command name does not exist
       */
 -    public function get(string $name)
 +    public function get(string $name): Command
      {
          $this->init();
-@@ -611,5 +611,5 @@ class Application implements ResetInterface
+@@ -632,5 +632,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When command name is incorrect or ambiguous
       */
 -    public function find(string $name)
 +    public function find(string $name): Command
      {
          $this->init();
-@@ -721,5 +721,5 @@ class Application implements ResetInterface
+@@ -742,5 +742,5 @@ class Application implements ResetInterface
       * @return Command[]
       */
 -    public function all(string $namespace = null)
 +    public function all(string $namespace = null): array
      {
          $this->init();
-@@ -920,5 +920,5 @@ class Application implements ResetInterface
+@@ -941,5 +941,5 @@ class Application implements ResetInterface
       * @return int 0 if everything went fine, or an error code
       */
 -    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
@@ -197,17 +197,17 @@ index 801575e8f4..a71eadda91 100644
      {
          foreach ($command->getHelperSet() as $helper) {
 diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Component/Console/Command/Command.php
-index 761b31d0d2..bf4ff86dd5 100644
+index d6354b4ab1..b267917312 100644
 --- a/src/Symfony/Component/Console/Command/Command.php
 +++ b/src/Symfony/Component/Console/Command/Command.php
-@@ -169,5 +169,5 @@ class Command
+@@ -171,5 +171,5 @@ class Command
       * @return bool
       */
 -    public function isEnabled()
 +    public function isEnabled(): bool
      {
          return true;
-@@ -195,5 +195,5 @@ class Command
+@@ -197,5 +197,5 @@ class Command
       * @see setCode()
       */
 -    protected function execute(InputInterface $input, OutputInterface $output)
@@ -215,16 +215,40 @@ index 761b31d0d2..bf4ff86dd5 100644
      {
          throw new LogicException('You must override the execute() method in the concrete command class.');
 diff --git a/src/Symfony/Component/Console/Helper/HelperInterface.php b/src/Symfony/Component/Console/Helper/HelperInterface.php
-index 1d2b7bf..cb1f661 100644
+index 1d2b7bfb84..cb1f66152d 100644
 --- a/src/Symfony/Component/Console/Helper/HelperInterface.php
 +++ b/src/Symfony/Component/Console/Helper/HelperInterface.php
-@@ -33,5 +33,5 @@ interface HelperInterface
-      *
+@@ -34,4 +34,4 @@ interface HelperInterface
       * @return string
       */
 -    public function getName();
 +    public function getName(): string;
  }
+diff --git a/src/Symfony/Component/Console/Input/InputInterface.php b/src/Symfony/Component/Console/Input/InputInterface.php
+index 024da1884e..943790e875 100644
+--- a/src/Symfony/Component/Console/Input/InputInterface.php
++++ b/src/Symfony/Component/Console/Input/InputInterface.php
+@@ -54,5 +54,5 @@ interface InputInterface
+      * @return mixed
+      */
+-    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false);
++    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed;
+ 
+     /**
+@@ -84,5 +84,5 @@ interface InputInterface
+      * @throws InvalidArgumentException When argument given doesn't exist
+      */
+-    public function getArgument(string $name);
++    public function getArgument(string $name): mixed;
+ 
+     /**
+@@ -112,5 +112,5 @@ interface InputInterface
+      * @throws InvalidArgumentException When option given doesn't exist
+      */
+-    public function getOption(string $name);
++    public function getOption(string $name): mixed;
+ 
+     /**
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 index 1acec50de5..904e67a47b 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
@@ -348,7 +372,7 @@ index 479aeef880..272954c082 100644
 +    public function getFunctions(): array;
  }
 diff --git a/src/Symfony/Component/Form/AbstractExtension.php b/src/Symfony/Component/Form/AbstractExtension.php
-index 7aff58e574..45d0b16d96 100644
+index 79d61e8bc0..7f34d95d84 100644
 --- a/src/Symfony/Component/Form/AbstractExtension.php
 +++ b/src/Symfony/Component/Form/AbstractExtension.php
 @@ -114,5 +114,5 @@ abstract class AbstractExtension implements FormExtensionInterface
@@ -366,7 +390,7 @@ index 7aff58e574..45d0b16d96 100644
      {
          return null;
 diff --git a/src/Symfony/Component/Form/AbstractRendererEngine.php b/src/Symfony/Component/Form/AbstractRendererEngine.php
-index 054d0f7173..fb84f2018e 100644
+index 3dbe0a8420..b4179c785c 100644
 --- a/src/Symfony/Component/Form/AbstractRendererEngine.php
 +++ b/src/Symfony/Component/Form/AbstractRendererEngine.php
 @@ -135,5 +135,5 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
@@ -490,10 +514,10 @@ index 2f442cb536..d98909cfae 100644
 +    public function warmUp(string $cacheDir): array;
  }
 diff --git a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php b/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
-index 1c9b597872..598faeee34 100644
+index 3a3be3af49..971560c07b 100644
 --- a/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
 +++ b/src/Symfony/Component/HttpKernel/DataCollector/DataCollector.php
-@@ -62,5 +62,5 @@ abstract class DataCollector implements DataCollectorInterface
+@@ -59,5 +59,5 @@ abstract class DataCollector implements DataCollectorInterface
       * @return callable[] The casters to add to the cloner
       */
 -    protected function getCasters()
@@ -511,10 +535,10 @@ index 1cb865fd66..f6f4efe7a7 100644
 +    public function getName(): string;
  }
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-index 7d107dc2c6..5814e8681d 100644
+index 8e7b80a909..d757429d36 100644
 --- a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-@@ -446,5 +446,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
+@@ -448,5 +448,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
       * @return Response
       */
 -    protected function forward(Request $request, bool $catch = false, Response $entry = null)
@@ -522,7 +546,7 @@ index 7d107dc2c6..5814e8681d 100644
      {
          if ($this->surrogate) {
 diff --git a/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php b/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php
-index 1d277f2c15..0a4fcb13c2 100644
+index f4773eb62a..0ba648b57f 100644
 --- a/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php
 +++ b/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php
 @@ -61,5 +61,5 @@ class HttpKernelBrowser extends AbstractBrowser
@@ -558,38 +582,38 @@ index 19ff0db181..f0f4a5829f 100644
  
      /**
 diff --git a/src/Symfony/Component/OptionsResolver/OptionsResolver.php b/src/Symfony/Component/OptionsResolver/OptionsResolver.php
-index b17c3ecbbc..8bb4cb5824 100644
+index fe77644762..09dcfe166b 100644
 --- a/src/Symfony/Component/OptionsResolver/OptionsResolver.php
 +++ b/src/Symfony/Component/OptionsResolver/OptionsResolver.php
-@@ -484,5 +484,5 @@ class OptionsResolver implements Options
+@@ -486,5 +486,5 @@ class OptionsResolver implements Options
       * @throws AccessException           If called from a lazy option or normalizer
       */
 -    public function setNormalizer(string $option, \Closure $normalizer)
 +    public function setNormalizer(string $option, \Closure $normalizer): static
      {
          if ($this->locked) {
-@@ -568,5 +568,5 @@ class OptionsResolver implements Options
+@@ -570,5 +570,5 @@ class OptionsResolver implements Options
       * @throws AccessException           If called from a lazy option or normalizer
       */
 -    public function setAllowedValues(string $option, mixed $allowedValues)
 +    public function setAllowedValues(string $option, mixed $allowedValues): static
      {
          if ($this->locked) {
-@@ -608,5 +608,5 @@ class OptionsResolver implements Options
+@@ -610,5 +610,5 @@ class OptionsResolver implements Options
       * @throws AccessException           If called from a lazy option or normalizer
       */
 -    public function addAllowedValues(string $option, mixed $allowedValues)
 +    public function addAllowedValues(string $option, mixed $allowedValues): static
      {
          if ($this->locked) {
-@@ -648,5 +648,5 @@ class OptionsResolver implements Options
+@@ -650,5 +650,5 @@ class OptionsResolver implements Options
       * @throws AccessException           If called from a lazy option or normalizer
       */
 -    public function setAllowedTypes(string $option, string|array $allowedTypes)
 +    public function setAllowedTypes(string $option, string|array $allowedTypes): static
      {
          if ($this->locked) {
-@@ -682,5 +682,5 @@ class OptionsResolver implements Options
+@@ -684,5 +684,5 @@ class OptionsResolver implements Options
       * @throws AccessException           If called from a lazy option or normalizer
       */
 -    public function addAllowedTypes(string $option, string|array $allowedTypes)
@@ -597,45 +621,45 @@ index b17c3ecbbc..8bb4cb5824 100644
      {
          if ($this->locked) {
 diff --git a/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php b/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php
-index 90eab97103..332d91b4e6 100644
+index fbb37d9f94..522e0487a9 100644
 --- a/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php
 +++ b/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php
-@@ -29,5 +29,5 @@ interface PropertyPathInterface extends \Traversable
+@@ -31,5 +31,5 @@ interface PropertyPathInterface extends \Traversable
       * @return int
       */
 -    public function getLength();
 +    public function getLength(): int;
  
      /**
-@@ -41,5 +41,5 @@ interface PropertyPathInterface extends \Traversable
+@@ -43,5 +43,5 @@ interface PropertyPathInterface extends \Traversable
       * @return self|null
       */
 -    public function getParent();
 +    public function getParent(): ?\Symfony\Component\PropertyAccess\PropertyPathInterface;
  
      /**
-@@ -48,5 +48,5 @@ interface PropertyPathInterface extends \Traversable
-      * @return array
+@@ -50,5 +50,5 @@ interface PropertyPathInterface extends \Traversable
+      * @return list<string>
       */
 -    public function getElements();
 +    public function getElements(): array;
  
      /**
-@@ -59,5 +59,5 @@ interface PropertyPathInterface extends \Traversable
+@@ -61,5 +61,5 @@ interface PropertyPathInterface extends \Traversable
       * @throws Exception\OutOfBoundsException If the offset is invalid
       */
 -    public function getElement(int $index);
 +    public function getElement(int $index): string;
  
      /**
-@@ -70,5 +70,5 @@ interface PropertyPathInterface extends \Traversable
+@@ -72,5 +72,5 @@ interface PropertyPathInterface extends \Traversable
       * @throws Exception\OutOfBoundsException If the offset is invalid
       */
 -    public function isProperty(int $index);
 +    public function isProperty(int $index): bool;
  
      /**
-@@ -81,4 +81,4 @@ interface PropertyPathInterface extends \Traversable
+@@ -83,4 +83,4 @@ interface PropertyPathInterface extends \Traversable
       * @throws Exception\OutOfBoundsException If the offset is invalid
       */
 -    public function isIndex(int $index);
@@ -679,7 +703,7 @@ index 6da0bcb4c8..16e9765b1d 100644
 +    public function getTypes(string $class, string $property, array $context = []): ?array;
  }
 diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-index d7f9d5bba1..1cbb9b032f 100644
+index 2dd0e5efbf..95e01d8955 100644
 --- a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 @@ -260,5 +260,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
@@ -690,10 +714,10 @@ index d7f9d5bba1..1cbb9b032f 100644
      {
          $name = str_replace('\\', '_', $class->name).'_'.$method->name;
 diff --git a/src/Symfony/Component/Routing/Router.php b/src/Symfony/Component/Routing/Router.php
-index 8436fe7bd6..7b35b5e872 100644
+index 83c10427a1..e113d4a194 100644
 --- a/src/Symfony/Component/Routing/Router.php
 +++ b/src/Symfony/Component/Routing/Router.php
-@@ -181,5 +181,5 @@ class Router implements RouterInterface, RequestMatcherInterface
+@@ -178,5 +178,5 @@ class Router implements RouterInterface, RequestMatcherInterface
       * {@inheritdoc}
       */
 -    public function getRouteCollection()
@@ -732,10 +756,10 @@ index 7e401c3ff3..6b446ff376 100644
 +    public function vote(TokenInterface $token, mixed $subject, array $attributes): int;
  }
 diff --git a/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php b/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php
-index 606c812fad..040c641bd7 100644
+index 298bc78cd9..3ef4176dd8 100644
 --- a/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php
 +++ b/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php
-@@ -80,5 +80,5 @@ class AuthenticationException extends RuntimeException
+@@ -89,5 +89,5 @@ class AuthenticationException extends RuntimeException
       * @return string
       */
 -    public function getMessageKey()
@@ -743,17 +767,17 @@ index 606c812fad..040c641bd7 100644
      {
          return 'An authentication exception occurred.';
 diff --git a/src/Symfony/Component/Security/Core/User/UserProviderInterface.php b/src/Symfony/Component/Security/Core/User/UserProviderInterface.php
-index 33d489f6d7..7b1300b066 100644
+index ec90d413fa..9f1401aa91 100644
 --- a/src/Symfony/Component/Security/Core/User/UserProviderInterface.php
 +++ b/src/Symfony/Component/Security/Core/User/UserProviderInterface.php
-@@ -49,5 +49,5 @@ interface UserProviderInterface
+@@ -45,5 +45,5 @@ interface UserProviderInterface
       * @throws UserNotFoundException    if the user is not found
       */
 -    public function refreshUser(UserInterface $user);
 +    public function refreshUser(UserInterface $user): UserInterface;
  
      /**
-@@ -56,5 +56,5 @@ interface UserProviderInterface
+@@ -52,5 +52,5 @@ interface UserProviderInterface
       * @return bool
       */
 -    public function supportsClass(string $class);
@@ -771,10 +795,10 @@ index 91271d14a3..100c2fb549 100644
 +    public function start(Request $request, AuthenticationException $authException = null): Response;
  }
 diff --git a/src/Symfony/Component/Security/Http/Firewall.php b/src/Symfony/Component/Security/Http/Firewall.php
-index 49b2b9a0d4..27ad80e8d0 100644
+index 0c313f8f09..acfc9f4b88 100644
 --- a/src/Symfony/Component/Security/Http/Firewall.php
 +++ b/src/Symfony/Component/Security/Http/Firewall.php
-@@ -100,5 +100,5 @@ class Firewall implements EventSubscriberInterface
+@@ -106,5 +106,5 @@ class Firewall implements EventSubscriberInterface
       * {@inheritdoc}
       */
 -    public static function getSubscribedEvents()
@@ -782,14 +806,142 @@ index 49b2b9a0d4..27ad80e8d0 100644
      {
          return [
 diff --git a/src/Symfony/Component/Security/Http/FirewallMapInterface.php b/src/Symfony/Component/Security/Http/FirewallMapInterface.php
-index 6704940153..ee0f2ed470 100644
+index 480ea8ad6b..fa43d6a6e9 100644
 --- a/src/Symfony/Component/Security/Http/FirewallMapInterface.php
 +++ b/src/Symfony/Component/Security/Http/FirewallMapInterface.php
-@@ -36,4 +36,4 @@ interface FirewallMapInterface
-      * @return array of the format [[AuthenticationListener], ExceptionListener, LogoutListener]
+@@ -38,4 +38,4 @@ interface FirewallMapInterface
+      * @return array{iterable<mixed, callable>, ExceptionListener, LogoutListener}
       */
 -    public function getListeners(Request $request);
 +    public function getListeners(Request $request): array;
+ }
+diff --git a/src/Symfony/Component/Serializer/Encoder/DecoderInterface.php b/src/Symfony/Component/Serializer/Encoder/DecoderInterface.php
+index 84a84ad1f3..6f66b6d32a 100644
+--- a/src/Symfony/Component/Serializer/Encoder/DecoderInterface.php
++++ b/src/Symfony/Component/Serializer/Encoder/DecoderInterface.php
+@@ -35,5 +35,5 @@ interface DecoderInterface
+      * @throws UnexpectedValueException
+      */
+-    public function decode(string $data, string $format, array $context = []);
++    public function decode(string $data, string $format, array $context = []): mixed;
+ 
+     /**
+@@ -44,4 +44,4 @@ interface DecoderInterface
+      * @return bool
+      */
+-    public function supportsDecoding(string $format);
++    public function supportsDecoding(string $format): bool;
+ }
+diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
+index b0a1f3218b..893fe59e2f 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
++++ b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
+@@ -223,5 +223,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
+      * @return string[]|AttributeMetadataInterface[]|bool
+      */
+-    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false)
++    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
+     {
+         $allowExtraAttributes = $context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES];
+@@ -273,5 +273,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
+      * @return bool
+      */
+-    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = [])
++    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
+     {
+         $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
+@@ -324,5 +324,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
+      * @throws MissingConstructorArgumentsException
+      */
+-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
++    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
+     {
+         if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
+diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
+index a241215133..2ed1af7a02 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
++++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
+@@ -136,5 +136,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * {@inheritdoc}
+      */
+-    public function supportsNormalization(mixed $data, string $format = null)
++    public function supportsNormalization(mixed $data, string $format = null): bool
+     {
+         return \is_object($data) && !$data instanceof \Traversable;
+@@ -144,5 +144,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * {@inheritdoc}
+      */
+-    public function normalize(mixed $object, string $format = null, array $context = [])
++    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+     {
+         if (!isset($context['cache_key'])) {
+@@ -277,5 +277,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * {@inheritdoc}
+      */
+-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
++    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
+     {
+         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
+@@ -339,5 +339,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * @return string[]
+      */
+-    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
++    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
+ 
+     /**
+@@ -346,10 +346,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * @return mixed
+      */
+-    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
++    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
+ 
+     /**
+      * {@inheritdoc}
+      */
+-    public function supportsDenormalization(mixed $data, string $type, string $format = null)
++    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool
+     {
+         return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
+@@ -359,5 +359,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
+      * {@inheritdoc}
+      */
+-    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
++    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+     {
+         if (!isset($context['cache_key'])) {
+diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
+index 5e94400b80..726d89cbb1 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
++++ b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
+@@ -45,5 +45,5 @@ interface DenormalizerInterface
+      * @throws ExceptionInterface       Occurs for all the other cases of errors
+      */
+-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []);
++    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed;
+ 
+     /**
+@@ -56,4 +56,4 @@ interface DenormalizerInterface
+      * @return bool
+      */
+-    public function supportsDenormalization(mixed $data, string $type, string $format = null);
++    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool;
+ }
+diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
+index 30eeafb47b..a7a60ad2f2 100644
+--- a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
++++ b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
+@@ -37,5 +37,5 @@ interface NormalizerInterface
+      * @throws ExceptionInterface         Occurs for all the other cases of errors
+      */
+-    public function normalize(mixed $object, string $format = null, array $context = []);
++    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
+ 
+     /**
+@@ -47,4 +47,4 @@ interface NormalizerInterface
+      * @return bool
+      */
+-    public function supportsNormalization(mixed $data, string $format = null);
++    public function supportsNormalization(mixed $data, string $format = null): bool;
  }
 diff --git a/src/Symfony/Component/Templating/Helper/HelperInterface.php b/src/Symfony/Component/Templating/Helper/HelperInterface.php
 index 5dade65db5..db0d0a00ea 100644
@@ -819,201 +971,34 @@ index 4c088b94f9..86107a636d 100644
 +    abstract protected function extractFromDirectory(string|array $resource): iterable;
  }
 diff --git a/src/Symfony/Component/Validator/Constraint.php b/src/Symfony/Component/Validator/Constraint.php
-index 012a483de2..6573ad7ec5 100644
+index d6dcdf178f..0ab8d9c10e 100644
 --- a/src/Symfony/Component/Validator/Constraint.php
 +++ b/src/Symfony/Component/Validator/Constraint.php
-@@ -235,5 +235,5 @@ abstract class Constraint
+@@ -239,5 +239,5 @@ abstract class Constraint
       * @see __construct()
       */
 -    public function getDefaultOption()
 +    public function getDefaultOption(): ?string
      {
          return null;
-@@ -249,5 +249,5 @@ abstract class Constraint
+@@ -253,5 +253,5 @@ abstract class Constraint
       * @see __construct()
       */
 -    public function getRequiredOptions()
 +    public function getRequiredOptions(): array
      {
          return [];
-@@ -263,5 +263,5 @@ abstract class Constraint
+@@ -267,5 +267,5 @@ abstract class Constraint
       * @return string
       */
 -    public function validatedBy()
 +    public function validatedBy(): string
      {
          return static::class.'Validator';
-@@ -277,5 +277,5 @@ abstract class Constraint
+@@ -281,5 +281,5 @@ abstract class Constraint
       * @return string|string[] One or more constant values
       */
 -    public function getTargets()
 +    public function getTargets(): string|array
      {
          return self::PROPERTY_CONSTRAINT;
-diff --git a/src/Symfony/Component/Console/Input/InputInterface.php b/src/Symfony/Component/Console/Input/InputInterface.php
-index 024da1884e..943790e875 100644
---- a/src/Symfony/Component/Console/Input/InputInterface.php
-+++ b/src/Symfony/Component/Console/Input/InputInterface.php
-@@ -54,5 +54,5 @@ interface InputInterface
-      * @return mixed
-      */
--    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false);
-+    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed;
- 
-     /**
-@@ -84,5 +84,5 @@ interface InputInterface
-      * @throws InvalidArgumentException When argument given doesn't exist
-      */
--    public function getArgument(string $name);
-+    public function getArgument(string $name): mixed;
- 
-     /**
-@@ -112,5 +112,5 @@ interface InputInterface
-      * @throws InvalidArgumentException When option given doesn't exist
-      */
--    public function getOption(string $name);
-+    public function getOption(string $name): mixed;
- 
-     /**
-diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
-index b0a1f32..893fe59 100644
---- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
-+++ b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
-@@ -222,7 +222,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
-      *
-      * @return string[]|AttributeMetadataInterface[]|bool
-      */
--    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false)
-+    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
-     {
-         $allowExtraAttributes = $context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES];
-         if (!$this->classMetadataFactory) {
-@@ -272,7 +272,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
-      *
-      * @return bool
-      */
--    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = [])
-+    protected function isAllowedAttribute(object|string $classOrObject, string $attribute, string $format = null, array $context = []): bool
-     {
-         $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
-         if (\in_array($attribute, $ignoredAttributes)) {
-@@ -323,7 +323,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
-      * @throws RuntimeException
-      * @throws MissingConstructorArgumentsException
-      */
--    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
-+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
-     {
-         if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
-             unset($context[self::OBJECT_TO_POPULATE]);
-diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-index a241215..c6bcc63 100644
---- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-+++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-@@ -143,7 +143,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
-     /**
-      * {@inheritdoc}
-      */
--    public function normalize(mixed $object, string $format = null, array $context = [])
-+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
-     {
-         if (!isset($context['cache_key'])) {
-             $context['cache_key'] = $this->getCacheKey($format, $context);
-@@ -276,7 +276,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
-     /**
-      * {@inheritdoc}
-      */
--    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
-+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null): object
-     {
-         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
-             if (!isset($data[$mapping->getTypeProperty()])) {
-@@ -338,19 +338,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
-      *
-      * @return string[]
-      */
--    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
-+    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
- 
-     /**
-      * Gets the attribute value.
-      *
-      * @return mixed
-      */
--    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
-+    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
- 
-     /**
-      * {@inheritdoc}
-      */
--    public function supportsDenormalization(mixed $data, string $type, string $format = null)
-+    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool
-     {
-         return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
-     }
-@@ -358,7 +358,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
-     /**
-      * {@inheritdoc}
-      */
--    public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
-+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
-     {
-         if (!isset($context['cache_key'])) {
-             $context['cache_key'] = $this->getCacheKey($format, $context);
-diff --git a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
-index 5e94400..726d89c 100644
---- a/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
-+++ b/src/Symfony/Component/Serializer/Normalizer/DenormalizerInterface.php
-@@ -44,7 +44,7 @@ interface DenormalizerInterface
-      * @throws RuntimeException         Occurs if the class cannot be instantiated
-      * @throws ExceptionInterface       Occurs for all the other cases of errors
-      */
--    public function denormalize(mixed $data, string $type, string $format = null, array $context = []);
-+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed;
- 
-     /**
-      * Checks whether the given class is supported for denormalization by this normalizer.
-@@ -55,5 +55,5 @@ interface DenormalizerInterface
-      *
-      * @return bool
-      */
--    public function supportsDenormalization(mixed $data, string $type, string $format = null);
-+    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool;
- }
-diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
-index fb4bee4..00e8ad0 100644
---- a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
-+++ b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
-@@ -36,7 +36,7 @@ interface NormalizerInterface
-      * @throws LogicException             Occurs when the normalizer is not called in an expected context
-      * @throws ExceptionInterface         Occurs for all the other cases of errors
-      */
--    public function normalize(mixed $object, string $format = null, array $context = []);
-+    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
- 
-     /**
-      * Checks whether the given class is supported for normalization by this normalizer.
-diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-index c6bcc63..2ed1af7 100644
---- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-+++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-@@ -135,7 +135,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
-     /**
-      * {@inheritdoc}
-      */
--    public function supportsNormalization(mixed $data, string $format = null)
-+    public function supportsNormalization(mixed $data, string $format = null): bool
-     {
-         return \is_object($data) && !$data instanceof \Traversable;
-     }
-diff --git a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
-index d9f8df9..a7a60ad 100644
---- a/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
-+++ b/src/Symfony/Component/Serializer/Normalizer/NormalizerInterface.php
-@@ -46,5 +46,5 @@ interface NormalizerInterface
-      *
-      * @return bool
-      */
--    public function supportsNormalization(mixed $data, string $format = null);
-+    public function supportsNormalization(mixed $data, string $format = null): bool;
- }

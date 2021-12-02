@@ -21,9 +21,9 @@ use Symfony\Component\Mime\RawMessage;
  */
 class Envelope
 {
-    private $sender;
-    private $recipients = [];
-    private $options = [];
+    private Address $sender;
+    private array $recipients = [];
+    private array $options = [];
 
     /**
      * @param Address[] $recipients

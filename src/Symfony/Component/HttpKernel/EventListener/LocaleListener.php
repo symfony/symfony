@@ -70,6 +70,7 @@ class LocaleListener implements EventSubscriberInterface
             $request->setLocale($locale);
         } elseif ($this->useAcceptLanguageHeader && $this->enabledLocales && ($preferredLanguage = $request->getPreferredLanguage($this->enabledLocales))) {
             $request->setLocale($preferredLanguage);
+            $request->attributes->set('_vary_by_language', true);
         }
     }
 

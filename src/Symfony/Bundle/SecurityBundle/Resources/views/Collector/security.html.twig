@@ -392,7 +392,7 @@
                                                     {% for voter_detail in decision.voter_details %}
                                                         <tr>
                                                             <td class="font-normal">{{ profiler_dump(voter_detail['class']) }}</td>
-                                                            {% if collector.voterStrategy == constant('Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManager::STRATEGY_UNANIMOUS') %}
+                                                            {% if collector.voterStrategy == 'unanimous' %}
                                                             <td class="font-normal text-small">attribute {{ voter_detail['attributes'][0] }}</td>
                                                             {% endif %}
                                                             <td class="font-normal text-small">

@@ -88,7 +88,6 @@ class Envelope
     }
 
     /**
-     * @param string $name
      * @param mixed $value
      */
     public function setOption(string $name, $value): void

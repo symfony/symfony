@@ -1,11 +1,16 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+* Check the `Envelope` options for a "mail_settings" property and send it in
+  the payload to Sendgrid
+
 5.4
 ---
 
  * Add support for `TagHeader` and `MetadataHeader` to the Sendgrid API transport
- * Add support for setting the "mail_settings" property when using the SendgridApiTransport
 
 4.4.0
 -----

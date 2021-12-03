@@ -138,7 +138,12 @@ class AbstractControllerTest extends TestCase
     public function testGetUser()
     {
         $user = new InMemoryUser('user', 'pass');
-        $token = new UsernamePasswordToken($user, 'default', ['ROLE_USER']);
+        if (method_exists(UsernamePasswordToken::class, 'setAuthenticated')) {
+            // @deprecated since Symfony 5.4
+            $token = new UsernamePasswordToken($user, 'pass', 'default', ['ROLE_USER']);
+        } else {
+            $token = new UsernamePasswordToken($user, 'default', ['ROLE_USER']);
+        }
 
         $controller = $this->createController();
         $controller->setContainer($this->getContainerWithTokenStorage($token));
@@ -151,6 +156,11 @@ class AbstractControllerTest extends TestCase
      */
     public function testGetUserAnonymousUserConvertedToNull()
     {
+        // @deprecated since Symfony 5.4
+        if (!class_exists(AnonymousToken::class)) {
+            $this->markTestSkipped('This test requires "symfony/security-core" <6.0.');
+        }
+
         $token = new AnonymousToken('default', 'anon.');
 
         $controller = $this->createController();

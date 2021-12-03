@@ -16,8 +16,8 @@ namespace Symfony\Component\Translation\Exception;
  */
 interface ProviderExceptionInterface extends ExceptionInterface
 {
-    /*
-     * Returns debug info coming from the Symfony\Contracts\HttpClient\ResponseInterface
+    /**
+     * Returns debug info coming from the {@link \Symfony\Contracts\HttpClient\ResponseInterface::getInfo}.
      */
     public function getDebug(): string;
 }

@@ -25,9 +25,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
+use Symfony\Component\Translation\Command\TranslationTrait;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
@@ -42,6 +42,8 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 #[AsCommand(name: 'translation:extract', description: 'Extract missing translations keys from code to translation files.')]
 class TranslationUpdateCommand extends Command
 {
+    use TranslationTrait;
+
     private const ASC = 'asc';
     private const DESC = 'desc';
     private const SORT_ORDERS = [self::ASC, self::DESC];
@@ -151,7 +153,7 @@ EOF
         $format = $input->getOption('format');
         $xliffVersion = '1.2';
 
-        if (\in_array($format, array_keys(self::FORMATS), true)) {
+        if (\array_key_exists($format, self::FORMATS)) {
             [$format, $xliffVersion] = self::FORMATS[$format];
         }
 
@@ -356,39 +358,6 @@ EOF
         if ($input->mustSuggestOptionValuesFor('sort')) {
             $suggestions->suggestValues(self::SORT_ORDERS);
         }
-    }
-
-    private function filterCatalogue(MessageCatalogue $catalogue, string $domain): MessageCatalogue
-    {
-        $filteredCatalogue = new MessageCatalogue($catalogue->getLocale());
-
-        // extract intl-icu messages only
-        $intlDomain = $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
-        if ($intlMessages = $catalogue->all($intlDomain)) {
-            $filteredCatalogue->add($intlMessages, $intlDomain);
-        }
-
-        // extract all messages and subtract intl-icu messages
-        if ($messages = array_diff($catalogue->all($domain), $intlMessages)) {
-            $filteredCatalogue->add($messages, $domain);
-        }
-        foreach ($catalogue->getResources() as $resource) {
-            $filteredCatalogue->addResource($resource);
-        }
-
-        if ($metadata = $catalogue->getMetadata('', $intlDomain)) {
-            foreach ($metadata as $k => $v) {
-                $filteredCatalogue->setMetadata($k, $v, $intlDomain);
-            }
-        }
-
-        if ($metadata = $catalogue->getMetadata('', $domain)) {
-            foreach ($metadata as $k => $v) {
-                $filteredCatalogue->setMetadata($k, $v, $domain);
-            }
-        }
-
-        return $filteredCatalogue;
     }
 
     private function extractMessages(string $locale, array $transPaths, string $prefix): MessageCatalogue

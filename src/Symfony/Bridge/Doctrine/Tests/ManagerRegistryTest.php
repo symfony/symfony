@@ -95,7 +95,6 @@ class ManagerRegistryTest extends TestCase
         self::assertNotInstanceOf(ValueHolderInterface::class, $wrappedValue);
     }
 
-    /** @return void */
     private function dumpLazyServiceProjectAsFilesServiceContainer()
     {
         if (class_exists(\LazyServiceProjectAsFilesServiceContainer::class, false)) {

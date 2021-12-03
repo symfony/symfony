@@ -406,6 +406,29 @@ class PhpDocExtractorTest extends TestCase
             ['ddd', null],
         ];
     }
+
+    /**
+     * @dataProvider pseudoTypesProvider
+     */
+    public function testPseudoTypes($property, array $type)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypesDummy', $property));
+    }
+
+    public function pseudoTypesProvider(): array
+    {
+        return [
+            ['classString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['classStringGeneric', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['htmlEscapedString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['lowercaseString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['nonEmptyLowercaseString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['nonEmptyString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['numericString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['traitString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['positiveInt', [new Type(Type::BUILTIN_TYPE_INT, false, null)]],
+        ];
+    }
 }
 
 class EmptyDocBlock

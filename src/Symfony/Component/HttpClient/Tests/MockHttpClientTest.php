@@ -63,6 +63,26 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
+    public function testIdleTimeoutStopsBodyProcessing()
+    {
+        $mockHttpClient = new MockHttpClient(new MockResponse(['foo', '', 'bar']));
+        $i = 0;
+        $response = $mockHttpClient->request('GET', 'https://symfony.com', [
+            'on_progress' => static function () use (&$i): void {
+                ++$i;
+            },
+        ]);
+
+        try {
+            $response->getContent();
+            $this->fail('Expected idle timeout.');
+        } catch (TransportException $e) {
+            $this->assertSame('Idle timeout reached for "https://symfony.com/".', $e->getMessage());
+        }
+
+        $this->assertSame(4, $i); // 4 = dns resolution + headers arrival + foo + completion
+    }
+
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
         $responses = [];

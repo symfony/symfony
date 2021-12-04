@@ -87,14 +87,14 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
             throw new \LogicException('No remember-me cookie is found.');
         }
 
-        if (!is_callable([$this->rememberMeHandler, 'getRememberMeDetails'])) {
+        if (!\is_callable([$this->rememberMeHandler, 'getRememberMeDetails'])) {
             trigger_deprecation('symfony/security-http', '6.1', 'RememberMeHandlers should implement method "getRememberMeDetails()".');
             $rememberMeCookie = RememberMeDetails::fromRawCookie($rawCookie);
         } else {
             $rememberMeCookie = $this->rememberMeHandler->getRememberMeDetails($rawCookie);
         }
 
-        if (!is_callable([$this->rememberMeHandler, 'getUserIdentifierForCookie'])) {
+        if (!\is_callable([$this->rememberMeHandler, 'getUserIdentifierForCookie'])) {
             trigger_deprecation('symfony/security-http', '6.1', 'RememberMeHandlers should implement method "getUserIdentifierForCookie()".');
             $userIdentifier = $rememberMeCookie->getUserIdentifier();
         } else {

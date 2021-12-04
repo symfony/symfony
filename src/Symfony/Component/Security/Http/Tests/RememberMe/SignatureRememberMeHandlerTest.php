@@ -122,4 +122,16 @@ class SignatureRememberMeHandlerTest extends TestCase
 
         $this->handler->consumeRememberMeCookie(new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'signature'));
     }
+
+    public function testGetUserIdentifierForCookie()
+    {
+        $this->assertEquals('wouter', $this->handler->getUserIdentifierForCookie(new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'signature')));
+    }
+
+    public function testGetRememberMeDetails()
+    {
+        $details = new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'signature');
+
+        $this->assertEquals($details, $this->handler->getRememberMeDetails($details->toString()));
+    }
 }

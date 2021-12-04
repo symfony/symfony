@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * {@see AbstractRememberMeHandler} instead.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
+ * @author Patrick Elshof <tyrelcher@protonmail.com>
  */
 interface RememberMeHandlerInterface
 {
@@ -51,4 +52,25 @@ interface RememberMeHandlerInterface
      * This should set a cookie with a `null` value on the request attribute.
      */
     public function clearRememberMeCookie(): void;
+
+    /**
+     * Retrieves the User Identifier for the RememberMe cookie.
+     *
+     * If the cookie is required to contain the User Identifier {@see UserInterface::getUserIdentifier()}
+     * then it can simply be retrieved from the provided cookie details; if not, then it could be retrieved
+     * from elsewhere based on some other information provided (e.g. in a database).
+     *
+     * Cannot be added to 6.1 because of backwards compatibility.
+     */
+    //public function getUserIdentifierForCookie(RememberMeDetails $rememberMeDetails): string;
+
+    /**
+     * Retrieves the RememberMeDetails using the raw cookie.
+     *
+     * This method allows the authenticator to retrieve the cookie details without needing
+     * to care about the implementation details of the RememberMeDetails used by the RememberMeHandler.
+     *
+     * Cannot be added to 6.1 because of backwards compatibility.
+     */
+    //public function getRememberMeDetails(string $rawCookie): RememberMeDetails;
 }

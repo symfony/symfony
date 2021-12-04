@@ -38,6 +38,7 @@ use Symfony\Component\Security\Http\RememberMe\ResponseListener;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Wouter de Jong <wouter@wouterj.nl>
+ * @author Patrick Elshof <tyrelcher@protonmail.com>
  *
  * @final
  */
@@ -86,9 +87,21 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
             throw new \LogicException('No remember-me cookie is found.');
         }
 
-        $rememberMeCookie = RememberMeDetails::fromRawCookie($rawCookie);
+        if (!is_callable([$this->rememberMeHandler, 'getRememberMeDetails'])) {
+            trigger_deprecation('symfony/security-http', '6.1', 'RememberMeHandlers should implement method "getRememberMeDetails()".');
+            $rememberMeCookie = RememberMeDetails::fromRawCookie($rawCookie);
+        } else {
+            $rememberMeCookie = $this->rememberMeHandler->getRememberMeDetails($rawCookie);
+        }
 
-        return new SelfValidatingPassport(new UserBadge($rememberMeCookie->getUserIdentifier(), function () use ($rememberMeCookie) {
+        if (!is_callable([$this->rememberMeHandler, 'getUserIdentifierForCookie'])) {
+            trigger_deprecation('symfony/security-http', '6.1', 'RememberMeHandlers should implement method "getUserIdentifierForCookie()".');
+            $userIdentifier = $rememberMeCookie->getUserIdentifier();
+        } else {
+            $userIdentifier = $this->rememberMeHandler->getUserIdentifierForCookie($rememberMeCookie);
+        }
+
+        return new SelfValidatingPassport(new UserBadge($userIdentifier, function () use ($rememberMeCookie) {
             return $this->rememberMeHandler->consumeRememberMeCookie($rememberMeCookie);
         }));
     }

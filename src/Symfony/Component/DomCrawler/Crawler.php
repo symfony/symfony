@@ -1221,11 +1221,11 @@ class Crawler implements \Countable, \IteratorAggregate
         set_error_handler(function () { throw new \Exception(); });
 
         try {
-            return htmlspecialchars_decode(utf8_decode(htmlentities($htmlContent, ENT_COMPAT, $charset, false)));
+            return htmlspecialchars_decode(utf8_decode(htmlentities($htmlContent, \ENT_COMPAT, $charset, false)));
         } catch (\Exception | \ValueError $e) {
             try {
                 $htmlContent = iconv($charset, 'UTF-8', $htmlContent);
-                $htmlContent = htmlspecialchars_decode(utf8_decode(htmlentities($htmlContent, ENT_COMPAT, 'UTF-8', false)));
+                $htmlContent = htmlspecialchars_decode(utf8_decode(htmlentities($htmlContent, \ENT_COMPAT, 'UTF-8', false)));
             } catch (\Exception | \ValueError $e) {
             }
 

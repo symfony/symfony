@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add the `Security` helper class
+ * Add the `getUserIdentifierForCookie()` method to the `Symfony\Bundle\SecurityBundle\RememberMe\DecoratedRememberMeHandler`
+   and `Symfony\Bundle\SecurityBundle\RememberMe\FirewallAwareRememberMeHandler` classes
 
 6.1
 ---

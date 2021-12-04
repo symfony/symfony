@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @author Patrick Elshof <tyrelcher@protonmail.com>
  *
  * @method string            getUserIdentifierForCookie(RememberMeDetails $rememberMeDetails) Retrieves the User Identifier for the RememberMe cookie.
- * @method RememberMeDetails getRememberMeDetails(string $rawCookie) Retrieves the RememberMeDetails using the raw cookie.
+ * @method RememberMeDetails getRememberMeDetails(string $rawCookie)                          Retrieves the RememberMeDetails using the raw cookie.
  */
 interface RememberMeHandlerInterface
 {

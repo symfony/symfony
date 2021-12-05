@@ -339,7 +339,7 @@ class SecurityExtensionTest extends TestCase
             ],
         ]);
 
-        $this->expectDeprecation('Since symfony/security-bundle 5.4: Not configuring explicitly the provider for the "custom_authenticators" listener on "some_firewall" firewall is deprecated because it\'s ambiguous as there is more than one registered provider.');
+        $this->expectDeprecation('Since symfony/security-bundle 5.4: Not configuring explicitly the provider for the "some_firewall" firewall is deprecated because it\'s ambiguous as there is more than one registered provider. Set the "provider" key to one of the configured providers, even if your custom authenticators don\'t use it.');
 
         $container->compile();
     }

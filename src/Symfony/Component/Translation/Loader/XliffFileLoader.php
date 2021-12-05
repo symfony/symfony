@@ -104,6 +104,10 @@ class XliffFileLoader implements LoaderInterface
 
             $file->registerXPathNamespace('xliff', $namespace);
 
+            foreach ($file->xpath('.//xliff:prop') as $prop) {
+                $catalogue->setCatalogueMetadata($prop->attributes()['prop-type'], (string) $prop, $domain);
+            }
+
             foreach ($file->xpath('.//xliff:trans-unit') as $translation) {
                 $attributes = $translation->attributes();
 

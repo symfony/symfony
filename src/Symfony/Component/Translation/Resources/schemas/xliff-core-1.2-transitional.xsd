@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 
 May-19-2004:
@@ -1646,20 +1645,21 @@ Jan-10-2006
   </xsd:group>
   <xsd:attributeGroup name="AttrGroup_TextContent">
     <xsd:attribute name="id" type="xsd:string" use="required"/>
+    <xsd:attribute name="ts" type="xsd:string" use="optional"/>
     <xsd:attribute name="xid" type="xsd:string" use="optional"/>
     <xsd:attribute name="equiv-text" type="xsd:string" use="optional"/>
-    <xsd:anyAttribute namespace="##other" processContents="strict"/>
+    <xsd:anyAttribute namespace="##any" processContents="skip"/>
   </xsd:attributeGroup>
   <!-- XLIFF Structure -->
   <xsd:element name="xliff">
     <xsd:complexType>
       <xsd:sequence maxOccurs="unbounded">
-        <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="strict"/>
+        <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="skip"/>
         <xsd:element ref="xlf:file"/>
       </xsd:sequence>
       <xsd:attribute name="version" type="xlf:AttrType_Version" use="required"/>
       <xsd:attribute ref="xml:lang" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
   </xsd:element>
   <xsd:element name="file">
@@ -1672,14 +1672,16 @@ Jan-10-2006
       <xsd:attribute name="source-language" type="xsd:language" use="required"/>
       <xsd:attribute name="datatype" type="xlf:AttrType_datatype" use="required"/>
       <xsd:attribute name="tool-id" type="xsd:string" use="optional"/>
+      <xsd:attribute default="manual" name="tool" type="xsd:string" use="optional"/>
       <xsd:attribute name="date" type="xsd:dateTime" use="optional"/>
       <xsd:attribute ref="xml:space" use="optional"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
       <xsd:attribute name="category" type="xsd:string" use="optional"/>
       <xsd:attribute name="target-language" type="xsd:language" use="optional"/>
       <xsd:attribute name="product-name" type="xsd:string" use="optional"/>
       <xsd:attribute name="product-version" type="xsd:string" use="optional"/>
       <xsd:attribute name="build-num" type="xsd:string" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
     <xsd:unique name="U_group_id">
       <xsd:selector xpath=".//xlf:group"/>
@@ -1739,10 +1741,11 @@ Jan-10-2006
           <xsd:element name="glossary" type="xlf:ElemType_ExternalReference"/>
           <xsd:element name="reference" type="xlf:ElemType_ExternalReference"/>
           <xsd:element ref="xlf:count-group"/>
+          <xsd:element ref="xlf:prop-group"/>
           <xsd:element ref="xlf:note"/>
           <xsd:element ref="xlf:tool"/>
         </xsd:choice>
-        <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="strict"/>
+        <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="skip"/>
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
@@ -1791,6 +1794,7 @@ Jan-10-2006
       <xsd:attribute name="process-name" type="xsd:string" use="required"/>
       <xsd:attribute name="company-name" type="xsd:string" use="optional"/>
       <xsd:attribute name="tool-id" type="xsd:string" use="optional"/>
+      <xsd:attribute name="tool" type="xsd:string" use="optional"/>
       <xsd:attribute name="date" type="xsd:dateTime" use="optional"/>
       <xsd:attribute name="job-id" type="xsd:string" use="optional"/>
       <xsd:attribute name="contact-name" type="xsd:string" use="optional"/>
@@ -1838,16 +1842,34 @@ Jan-10-2006
       </xsd:simpleContent>
     </xsd:complexType>
   </xsd:element>
+  <xsd:element name="prop-group">
+    <xsd:complexType>
+      <xsd:sequence maxOccurs="unbounded">
+        <xsd:element ref="xlf:prop"/>
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="prop">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="prop-type" type="xsd:string" use="required"/>
+          <xsd:attribute ref="xml:lang" use="optional"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
   <xsd:element name="tool">
     <xsd:complexType mixed="true">
       <xsd:sequence>
-        <xsd:any namespace="##any" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:any namespace="##any" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
       <xsd:attribute name="tool-id" type="xsd:string" use="required"/>
       <xsd:attribute name="tool-name" type="xsd:string" use="required"/>
       <xsd:attribute name="tool-version" type="xsd:string" use="optional"/>
       <xsd:attribute name="tool-company" type="xsd:string" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
   </xsd:element>
   <xsd:element name="body">
@@ -1865,8 +1887,9 @@ Jan-10-2006
         <xsd:sequence>
           <xsd:element maxOccurs="unbounded" minOccurs="0" ref="xlf:context-group"/>
           <xsd:element maxOccurs="unbounded" minOccurs="0" ref="xlf:count-group"/>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" ref="xlf:prop-group"/>
           <xsd:element maxOccurs="unbounded" minOccurs="0" ref="xlf:note"/>
-          <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="strict"/>
+          <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="skip"/>
         </xsd:sequence>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element maxOccurs="unbounded" minOccurs="0" ref="xlf:group"/>
@@ -1877,6 +1900,7 @@ Jan-10-2006
       <xsd:attribute name="id" type="xsd:string" use="optional"/>
       <xsd:attribute name="datatype" type="xlf:AttrType_datatype" use="optional"/>
       <xsd:attribute default="default" ref="xml:space" use="optional"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
       <xsd:attribute name="restype" type="xlf:AttrType_restype" use="optional"/>
       <xsd:attribute name="resname" type="xsd:string" use="optional"/>
       <xsd:attribute name="extradata" type="xsd:string" use="optional"/>
@@ -1901,7 +1925,7 @@ Jan-10-2006
       <xsd:attribute name="minbytes" type="xsd:NMTOKEN" use="optional"/>
       <xsd:attribute name="charclass" type="xsd:string" use="optional"/>
       <xsd:attribute default="no" name="merged-trans" type="xlf:AttrType_YesNo" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
   </xsd:element>
   <xsd:element name="trans-unit">
@@ -1913,10 +1937,11 @@ Jan-10-2006
         <xsd:choice maxOccurs="unbounded" minOccurs="0">
           <xsd:element ref="xlf:context-group"/>
           <xsd:element ref="xlf:count-group"/>
+          <xsd:element ref="xlf:prop-group"/>
           <xsd:element ref="xlf:note"/>
           <xsd:element ref="xlf:alt-trans"/>
         </xsd:choice>
-        <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="strict"/>
+        <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="skip"/>
       </xsd:sequence>
       <xsd:attribute name="id" type="xsd:string" use="required"/>
       <xsd:attribute name="approved" type="xlf:AttrType_YesNo" use="optional"/>
@@ -1924,6 +1949,7 @@ Jan-10-2006
       <xsd:attribute default="yes" name="reformat" type="xlf:AttrType_reformat" use="optional"/>
       <xsd:attribute default="default" ref="xml:space" use="optional"/>
       <xsd:attribute name="datatype" type="xlf:AttrType_datatype" use="optional"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
       <xsd:attribute name="phase-name" type="xsd:string" use="optional"/>
       <xsd:attribute name="restype" type="xlf:AttrType_restype" use="optional"/>
       <xsd:attribute name="resname" type="xsd:string" use="optional"/>
@@ -1947,7 +1973,7 @@ Jan-10-2006
       <xsd:attribute name="minbytes" type="xsd:NMTOKEN" use="optional"/>
       <xsd:attribute name="charclass" type="xsd:string" use="optional"/>
       <xsd:attribute default="yes" name="merged-trans" type="xlf:AttrType_YesNo" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
     <xsd:unique name="U_tu_segsrc_mid">
       <xsd:selector xpath="./xlf:seg-source/xlf:mrk"/>
@@ -1962,7 +1988,8 @@ Jan-10-2006
     <xsd:complexType mixed="true">
       <xsd:group maxOccurs="unbounded" minOccurs="0" ref="xlf:ElemGroup_TextContent"/>
       <xsd:attribute ref="xml:lang" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
     <xsd:unique name="U_source_bpt_rid">
       <xsd:selector xpath=".//xlf:bpt"/>
@@ -1985,7 +2012,8 @@ Jan-10-2006
     <xsd:complexType mixed="true">
       <xsd:group maxOccurs="unbounded" minOccurs="0" ref="xlf:ElemGroup_TextContent"/>
       <xsd:attribute ref="xml:lang" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
     <xsd:unique name="U_segsrc_bpt_rid">
       <xsd:selector xpath=".//xlf:bpt"/>
@@ -2011,6 +2039,8 @@ Jan-10-2006
       <xsd:attribute name="state-qualifier" type="xlf:AttrType_state-qualifier" use="optional"/>
       <xsd:attribute name="phase-name" type="xsd:NMTOKEN" use="optional"/>
       <xsd:attribute ref="xml:lang" use="optional"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
+      <xsd:attribute name="restype" type="xlf:AttrType_restype" use="optional"/>
       <xsd:attribute name="resname" type="xsd:string" use="optional"/>
       <xsd:attribute name="coord" type="xlf:AttrType_Coordinates" use="optional"/>
       <xsd:attribute name="font" type="xsd:string" use="optional"/>
@@ -2018,7 +2048,7 @@ Jan-10-2006
       <xsd:attribute name="style" type="xsd:NMTOKEN" use="optional"/>
       <xsd:attribute name="exstyle" type="xsd:NMTOKEN" use="optional"/>
       <xsd:attribute default="yes" name="equiv-trans" type="xlf:AttrType_YesNo" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
     <xsd:unique name="U_target_bpt_rid">
       <xsd:selector xpath=".//xlf:bpt"/>
@@ -2042,18 +2072,21 @@ Jan-10-2006
       <xsd:sequence>
         <xsd:element minOccurs="0" ref="xlf:source"/>
         <xsd:element minOccurs="0" ref="xlf:seg-source"/>
-        <xsd:element maxOccurs="1" ref="xlf:target"/>
+        <xsd:element maxOccurs="unbounded" ref="xlf:target"/>
         <xsd:element maxOccurs="unbounded" minOccurs="0" ref="xlf:context-group"/>
+        <xsd:element maxOccurs="unbounded" minOccurs="0" ref="xlf:prop-group"/>
         <xsd:element maxOccurs="unbounded" minOccurs="0" ref="xlf:note"/>
-        <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="strict"/>
+        <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="skip"/>
       </xsd:sequence>
       <xsd:attribute name="match-quality" type="xsd:string" use="optional"/>
       <xsd:attribute name="tool-id" type="xsd:string" use="optional"/>
+      <xsd:attribute name="tool" type="xsd:string" use="optional"/>
       <xsd:attribute name="crc" type="xsd:NMTOKEN" use="optional"/>
       <xsd:attribute ref="xml:lang" use="optional"/>
       <xsd:attribute name="origin" type="xsd:string" use="optional"/>
       <xsd:attribute name="datatype" type="xlf:AttrType_datatype" use="optional"/>
       <xsd:attribute default="default" ref="xml:space" use="optional"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
       <xsd:attribute name="restype" type="xlf:AttrType_restype" use="optional"/>
       <xsd:attribute name="resname" type="xsd:string" use="optional"/>
       <xsd:attribute name="extradata" type="xsd:string" use="optional"/>
@@ -2070,7 +2103,7 @@ Jan-10-2006
       <xsd:attribute name="exstyle" type="xsd:NMTOKEN" use="optional"/>
       <xsd:attribute name="phase-name" type="xsd:NMTOKEN" use="optional"/>
       <xsd:attribute default="proposal" name="alttranstype" type="xlf:AttrType_alttranstype" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
     <xsd:unique name="U_at_segsrc_mid">
       <xsd:selector xpath="./xlf:seg-source/xlf:mrk"/>
@@ -2089,20 +2122,22 @@ Jan-10-2006
         <xsd:choice maxOccurs="unbounded" minOccurs="0">
           <xsd:element ref="xlf:context-group"/>
           <xsd:element ref="xlf:count-group"/>
+          <xsd:element ref="xlf:prop-group"/>
           <xsd:element ref="xlf:note"/>
           <xsd:element ref="xlf:trans-unit"/>
         </xsd:choice>
-        <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="strict"/>
+        <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="skip"/>
       </xsd:sequence>
       <xsd:attribute name="id" type="xsd:string" use="required"/>
       <xsd:attribute name="mime-type" type="xlf:mime-typeValueList" use="required"/>
       <xsd:attribute name="approved" type="xlf:AttrType_YesNo" use="optional"/>
       <xsd:attribute default="yes" name="translate" type="xlf:AttrType_YesNo" use="optional"/>
       <xsd:attribute default="yes" name="reformat" type="xlf:AttrType_reformat" use="optional"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
       <xsd:attribute name="restype" type="xlf:AttrType_restype" use="optional"/>
       <xsd:attribute name="resname" type="xsd:string" use="optional"/>
       <xsd:attribute name="phase-name" type="xsd:string" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
   </xsd:element>
   <xsd:element name="bin-source">
@@ -2111,7 +2146,8 @@ Jan-10-2006
         <xsd:element ref="xlf:internal-file"/>
         <xsd:element ref="xlf:external-file"/>
       </xsd:choice>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
   </xsd:element>
   <xsd:element name="bin-target">
@@ -2121,12 +2157,13 @@ Jan-10-2006
         <xsd:element ref="xlf:external-file"/>
       </xsd:choice>
       <xsd:attribute name="mime-type" type="xlf:mime-typeValueList" use="optional"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
       <xsd:attribute name="state" type="xlf:AttrType_state" use="optional"/>
       <xsd:attribute name="state-qualifier" type="xlf:AttrType_state-qualifier" use="optional"/>
       <xsd:attribute name="phase-name" type="xsd:NMTOKEN" use="optional"/>
       <xsd:attribute name="restype" type="xlf:AttrType_restype" use="optional"/>
       <xsd:attribute name="resname" type="xsd:string" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
   </xsd:element>
   <!-- Element for inline codes -->
@@ -2217,7 +2254,8 @@ Jan-10-2006
       <xsd:attribute name="mtype" type="xlf:AttrType_mtype" use="required"/>
       <xsd:attribute name="mid" type="xsd:NMTOKEN" use="optional"/>
       <xsd:attribute name="comment" type="xsd:string" use="optional"/>
-      <xsd:anyAttribute namespace="##other" processContents="strict"/>
+      <xsd:attribute name="ts" type="xsd:string" use="optional"/>
+      <xsd:anyAttribute namespace="##any" processContents="skip"/>
     </xsd:complexType>
   </xsd:element>
 </xsd:schema>

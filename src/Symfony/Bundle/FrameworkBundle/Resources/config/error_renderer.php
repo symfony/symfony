@@ -30,6 +30,7 @@ return static function (ContainerConfigurator $container) {
                     ->factory([HtmlErrorRenderer::class, 'getAndCleanOutputBuffer'])
                     ->args([service('request_stack')]),
                 service('logger')->nullOnInvalid(),
+                abstract_arg('Configuration per exception class'),
             ])
 
         ->alias('error_renderer.html', 'error_handler.error_renderer.html')

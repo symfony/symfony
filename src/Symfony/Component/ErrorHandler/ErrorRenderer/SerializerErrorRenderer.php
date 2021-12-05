@@ -28,13 +28,15 @@ class SerializerErrorRenderer implements ErrorRendererInterface
     private $format;
     private $fallbackErrorRenderer;
     private $debug;
+    private $exceptionsMapping;
 
     /**
-     * @param string|callable(FlattenException) $format The format as a string or a callable that should return it
-     *                                                  formats not supported by Request::getMimeTypes() should be given as mime types
-     * @param bool|callable                     $debug  The debugging mode as a boolean or a callable that should return it
+     * @param string|callable(FlattenException) $format            The format as a string or a callable that should return it
+     *                                                             formats not supported by Request::getMimeTypes() should be given as mime types
+     * @param bool|callable                     $debug             The debugging mode as a boolean or a callable that should return it
+     * @param array                             $exceptionsMapping Configuration per exception class
      */
-    public function __construct(SerializerInterface $serializer, $format, ErrorRendererInterface $fallbackErrorRenderer = null, $debug = false)
+    public function __construct(SerializerInterface $serializer, $format, ErrorRendererInterface $fallbackErrorRenderer = null, $debug = false, array $exceptionsMapping = [])
     {
         if (!\is_string($format) && !\is_callable($format)) {
             throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be a string or a callable, "%s" given.', __METHOD__, \gettype($format)));
@@ -48,6 +50,7 @@ class SerializerErrorRenderer implements ErrorRendererInterface
         $this->format = $format;
         $this->fallbackErrorRenderer = $fallbackErrorRenderer ?? new HtmlErrorRenderer();
         $this->debug = $debug;
+        $this->exceptionsMapping = $exceptionsMapping;
     }
 
     /**
@@ -62,7 +65,15 @@ class SerializerErrorRenderer implements ErrorRendererInterface
             $headers['X-Debug-Exception-File'] = rawurlencode($exception->getFile()).':'.$exception->getLine();
         }
 
-        $flattenException = FlattenException::createFromThrowable($exception, null, $headers);
+        $statusCode = 500;
+        foreach ($this->exceptionsMapping as $class => $config) {
+            if ($exception instanceof $class && $config['status_code']) {
+                $statusCode = $config['status_code'];
+                break;
+            }
+        }
+
+        $flattenException = FlattenException::createFromThrowable($exception, $statusCode, $headers);
 
         try {
             $format = \is_string($this->format) ? $this->format : ($this->format)($flattenException);

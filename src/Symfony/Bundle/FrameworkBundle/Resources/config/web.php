@@ -106,7 +106,7 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.error_controller'),
                 service('logger')->nullOnInvalid(),
                 param('kernel.debug'),
-                abstract_arg('an exceptions to log & status code mapping'),
+                abstract_arg('Configuration per exception class'),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'request'])

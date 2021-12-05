@@ -39,15 +39,17 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     private $projectDir;
     private $outputBuffer;
     private $logger;
+    private $exceptionsMapping;
 
     private static $template = 'views/error.html.php';
 
     /**
-     * @param bool|callable                 $debug          The debugging mode as a boolean or a callable that should return it
+     * @param bool|callable                 $debug             The debugging mode as a boolean or a callable that should return it
      * @param string|FileLinkFormatter|null $fileLinkFormat
-     * @param bool|callable                 $outputBuffer   The output buffer as a string or a callable that should return it
+     * @param bool|callable                 $outputBuffer      The output buffer as a string or a callable that should return it
+     * @param array                         $exceptionsMapping Configuration per exception class
      */
-    public function __construct($debug = false, string $charset = null, $fileLinkFormat = null, string $projectDir = null, $outputBuffer = '', LoggerInterface $logger = null)
+    public function __construct($debug = false, string $charset = null, $fileLinkFormat = null, string $projectDir = null, $outputBuffer = '', LoggerInterface $logger = null, array $exceptionsMapping = [])
     {
         if (!\is_bool($debug) && !\is_callable($debug)) {
             throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a boolean or a callable, "%s" given.', __METHOD__, \gettype($debug)));
@@ -63,6 +65,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         $this->projectDir = $projectDir;
         $this->outputBuffer = $outputBuffer;
         $this->logger = $logger;
+        $this->exceptionsMapping = $exceptionsMapping;
     }
 
     /**
@@ -76,7 +79,14 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             $headers['X-Debug-Exception-File'] = rawurlencode($exception->getFile()).':'.$exception->getLine();
         }
 
-        $exception = FlattenException::createFromThrowable($exception, null, $headers);
+        $statusCode = 500;
+        foreach ($this->exceptionsMapping as $class => $config) {
+            if ($exception instanceof $class && $config['status_code']) {
+                $statusCode = $config['status_code'];
+                break;
+            }
+        }
+        $exception = FlattenException::createFromThrowable($exception, $statusCode, $headers);
 
         return $exception->setAsString($this->renderException($exception));
     }
@@ -262,8 +272,6 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      * @param string $file       A file path
      * @param int    $line       The selected line number
      * @param int    $srcContext The number of displayed lines around or -1 for the whole file
-     *
-     * @return string
      */
     private function fileExcerpt(string $file, int $line, int $srcContext = 3): string
     {

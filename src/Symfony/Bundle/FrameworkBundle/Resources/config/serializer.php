@@ -208,6 +208,7 @@ return static function (ContainerConfigurator $container) {
                 inline_service()
                     ->factory([HtmlErrorRenderer::class, 'isDebug'])
                     ->args([service('request_stack'), param('kernel.debug')]),
+                abstract_arg('Configuration per exception class'),
             ])
     ;
 

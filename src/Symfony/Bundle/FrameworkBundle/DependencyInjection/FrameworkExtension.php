@@ -452,6 +452,7 @@ class FrameworkExtension extends Extension
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
 
         $container->getDefinition('exception_listener')->replaceArgument(3, $config['exceptions']);
+        $container->getDefinition('error_handler.error_renderer.html')->replaceArgument(6, $config['exceptions']);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists(\Symfony\Component\Serializer\Serializer::class)) {
@@ -459,6 +460,8 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
+
+            $container->getDefinition('error_handler.error_renderer.serializer')->replaceArgument(4, $config['exceptions']);
         }
 
         if ($propertyInfoEnabled) {

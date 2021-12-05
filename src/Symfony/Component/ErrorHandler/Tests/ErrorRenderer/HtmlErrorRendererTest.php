@@ -13,6 +13,7 @@ namespace Symfony\Component\ErrorHandler\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\HttpFoundation\Response;
 
 class HtmlErrorRendererTest extends TestCase
 {
@@ -42,6 +43,22 @@ HTML;
 %A<h2>The server returned a "500 Internal Server Error".</h2>%A
 HTML;
 
+        $expectedDebugWithStatusCode = <<<HTML
+<!-- Foo (418 I'm a teapot) -->
+<!DOCTYPE html>
+<html lang="en">
+%A<title>Foo (418 I'm a teapot)</title>
+%A<div class="trace trace-as-html" id="trace-box-1">%A
+<!-- Foo (418 I'm a teapot) -->
+HTML;
+
+        $expectedNonDebugWithStatusCode = <<<HTML
+<!DOCTYPE html>
+<html>
+%A<title>An Error Occurred: I'm a teapot</title>
+%A<h2>The server returned a "418 I'm a teapot".</h2>%A
+HTML;
+
         yield '->render() returns the HTML content WITH stack traces in debug mode' => [
             new \RuntimeException('Foo'),
             new HtmlErrorRenderer(true),
@@ -52,6 +69,28 @@ HTML;
             new \RuntimeException('Foo'),
             new HtmlErrorRenderer(false),
             $expectedNonDebug,
+        ];
+
+        yield '->render() returns the HTML content WITH stack traces in debug mode and contains the correct status code' => [
+            new \RuntimeException('Foo'),
+            new HtmlErrorRenderer(true, null, null, null, '', null, [
+                  \RuntimeException::class => [
+                        'status_code' => Response::HTTP_I_AM_A_TEAPOT,
+                        'log_level' => null,
+                  ],
+            ]),
+            $expectedDebugWithStatusCode,
+        ];
+
+        yield '->render() returns the HTML content WITHOUT stack traces in non-debug mode and contains the correct status code' => [
+            new \RuntimeException('Foo'),
+            new HtmlErrorRenderer(false, null, null, null, '', null, [
+                  \RuntimeException::class => [
+                        'status_code' => Response::HTTP_I_AM_A_TEAPOT,
+                        'log_level' => null,
+                  ],
+            ]),
+            $expectedNonDebugWithStatusCode,
         ];
     }
 }

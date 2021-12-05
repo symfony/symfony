@@ -41,12 +41,6 @@ class EventDispatcherDebugCommandTest extends TestCase
 
     private function createCommandCompletionTester(): CommandCompletionTester
     {
-        $dispatcher = new EventDispatcher();
-        $otherDispatcher = new EventDispatcher();
-
-        $dispatcher->addListener('event', ['Listener']);
-        $otherDispatcher->addListener('other_event', ['OtherListener']);
-
         $dispatchers = new ServiceLocator([
             'event_dispatcher' => function () {
                 $dispatcher = new EventDispatcher();

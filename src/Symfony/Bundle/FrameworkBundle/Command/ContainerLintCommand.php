@@ -74,7 +74,7 @@ final class ContainerLintCommand extends Command
             return 1;
         }
 
-        $io->success('The container was lint successfully: all services are injected with values that are compatible with their type declarations.');
+        $io->success('The container was linted successfully: all services are injected with values that are compatible with their type declarations.');
 
         return 0;
     }

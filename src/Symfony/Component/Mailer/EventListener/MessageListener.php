@@ -40,8 +40,11 @@ class MessageListener implements EventSubscriberInterface
             return;
         }
 
-        $this->setHeaders($message);
+        // the renderer might modify the message and add new headers
+        // so we have to render it before setting the headers
+        // @see \Symfony\Bridge\Twig\Mime\WrappedTemplatedEmail
         $this->renderMessage($message);
+        $this->setHeaders($message);
     }
 
     private function setHeaders(Message $message): void

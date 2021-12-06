@@ -20,6 +20,10 @@
         <default key="_controller">web_profiler.controller.profiler::phpinfoAction</default>
     </route>
 
+    <route id="_profiler_xdebug" path="/xdebug">
+        <default key="_controller">web_profiler.controller.profiler::xdebugAction</default>
+    </route>
+
     <route id="_profiler_search_results" path="/{token}/search/results">
         <default key="_controller">web_profiler.controller.profiler::searchResultsAction</default>
     </route>

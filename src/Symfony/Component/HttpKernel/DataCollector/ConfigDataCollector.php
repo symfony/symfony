@@ -195,11 +195,19 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     }
 
     /**
-     * Returns true if the XDebug is enabled.
+     * Returns true if the Xdebug is enabled.
      */
-    public function hasXDebug(): bool
+    public function hasXdebug(): bool
     {
         return $this->data['xdebug_enabled'];
+    }
+
+    /**
+     * Returns true if the function xdebug_info is available.
+     */
+    public function hasXdebugInfo(): bool
+    {
+        return \function_exists('xdebug_info');
     }
 
     /**

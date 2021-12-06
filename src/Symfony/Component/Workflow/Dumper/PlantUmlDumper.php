@@ -237,7 +237,7 @@ class PlantUmlDumper implements DumperInterface
     private function getTransitionColor(string $color): string
     {
         // PUML format requires that color in transition have to be prefixed with “#”.
-        if ('#' !== substr($color, 0, 1)) {
+        if (!str_starts_with($color, '#')) {
             $color = '#'.$color;
         }
 

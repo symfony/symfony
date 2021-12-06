@@ -254,7 +254,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         $text = $prefix.preg_replace('~([^\\n]{'.$width.'})\\ *~', "\$1\n", $text);
         $text = rtrim($text, "\n").($matches[1] ?? '');
 
-        if (!$currentLineLength && '' !== $current && "\n" !== substr($current, -1)) {
+        if (!$currentLineLength && '' !== $current && !str_ends_with($current, "\n")) {
             $text = "\n".$text;
         }
 

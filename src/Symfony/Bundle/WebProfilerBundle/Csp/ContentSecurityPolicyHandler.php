@@ -224,7 +224,7 @@ class ContentSecurityPolicyHandler
             if (!str_ends_with($directive, '\'')) {
                 continue;
             }
-            if ('\'nonce-' === substr($directive, 0, 7)) {
+            if (str_starts_with($directive, '\'nonce-')) {
                 return true;
             }
             if (\in_array(substr($directive, 0, 8), ['\'sha256-', '\'sha384-', '\'sha512-'], true)) {

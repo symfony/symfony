@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2021-12-02T12:44:55Z
+
+Checks failures are unrelated I think.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-02T16:43:33Z
+
+BTW, is anyone in touch with Loco, because so far they didn't answer to our ping to back the bridge.
+
+(Crowdin and Lokalise did, so you know which bridge you'd better use ;) )
+
+---------------------------------------------------------------------------
+
+by Kocal at 2021-12-02T17:19:27Z
+
+The two foreach have been merged!
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-02T17:24:00Z
+
+I suggest adding a comment in the code mentioning that the Loco API forbids concurrent requests, to explain why this provider does not take advantage of the request concurrency allowed by http-client (so that it does not get refactored in the opposite way by someone not knowing about this API limitation).
+
+---------------------------------------------------------------------------
+
+by Kern046 at 2021-12-02T17:42:09Z
+
+> BTW, is anyone in touch with Loco, because so far they didn't answer to our ping to back the bridge.
+
+They answered us quite quickly about this issue, I contacted them via their [contact form](https://localise.biz/contact) :shrug:
+
+---------------------------------------------------------------------------
+
+by Kocal at 2021-12-03T09:10:14Z
+
+A comment has been added, thanks for your reviews.

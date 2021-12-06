@@ -320,7 +320,7 @@ class DeprecationErrorHandler
                     fwrite($handle, "\n".self::colorize($deprecationGroupMessage, 'legacy' !== $group && 'indirect' !== $group)."\n");
                 }
 
-                if ('legacy' !== $group && !$configuration->verboseOutput($group) && !$isFailing) {
+                if ('legacy' !== $group && !$configuration->verboseOutput($group)) {
                     continue;
                 }
                 $notices = $this->deprecationGroups[$group]->notices();

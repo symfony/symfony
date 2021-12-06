@@ -358,6 +358,7 @@ class SessionListenerTest extends TestCase
     public function testSessionIsSavedWhenUnexpectedSessionExceptionThrown()
     {
         $session = $this->createMock(Session::class);
+        $session->expects($this->exactly(1))->method('getId')->willReturn('123456');
         $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
         $session->method('isStarted')->willReturn(true);
         $session->expects($this->once())->method('getUsageIndex')->willReturn(1);

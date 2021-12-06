@@ -58,6 +58,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected $propertyPath;
     protected $constraint;
     protected $defaultTimezone;
+    private $defaultLocale;
 
     private function doSetUp()
     {
@@ -76,6 +77,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $this->validator = $this->createValidator();
         $this->validator->initialize($this->context);
 
+        $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
 
         $this->setDefaultTimezone('UTC');
@@ -84,6 +86,8 @@ abstract class ConstraintValidatorTestCase extends TestCase
     private function doTearDown()
     {
         $this->restoreDefaultTimezone();
+
+        \Locale::setDefault($this->defaultLocale);
     }
 
     protected function setDefaultTimezone($defaultTimezone)

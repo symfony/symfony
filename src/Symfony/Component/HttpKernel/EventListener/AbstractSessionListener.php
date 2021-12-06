@@ -146,7 +146,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
             $sessionCookieHttpOnly = $this->sessionOptions['cookie_httponly'] ?? true;
             $sessionCookieSameSite = $this->sessionOptions['cookie_samesite'] ?? Cookie::SAMESITE_LAX;
 
-            SessionUtils::popSessionCookie($sessionName, $sessionCookiePath);
+            SessionUtils::popSessionCookie($sessionName, $sessionId);
 
             $request = $event->getRequest();
             $requestSessionCookieId = $request->cookies->get($sessionName);

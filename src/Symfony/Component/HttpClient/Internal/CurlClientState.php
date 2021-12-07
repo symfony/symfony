@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpClient\Internal;
 
-use Psr\Log\LoggerInterface;
 
 /**
  * Internal representation of the cURL client's state.
@@ -25,11 +24,11 @@ final class CurlClientState extends ClientState
     public \CurlMultiHandle $handle;
     /** @var PushedResponse[] */
     public array $pushedResponses = [];
-    public DnsCache $dnsCache;
+    public $dnsCache;
     /** @var float[] */
     public array $pauseExpiries = [];
     public int $execCounter = \PHP_INT_MIN;
-    public ?LoggerInterface $logger = null;
+    public $logger = null;
 
     public function __construct()
     {

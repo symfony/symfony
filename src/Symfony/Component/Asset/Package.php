@@ -23,8 +23,8 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  */
 class Package implements PackageInterface
 {
-    private VersionStrategyInterface $versionStrategy;
-    private ContextInterface $context;
+    private $versionStrategy;
+    private $context;
 
     public function __construct(VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {

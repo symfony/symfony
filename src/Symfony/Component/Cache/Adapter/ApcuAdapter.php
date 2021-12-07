@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  */
 class ApcuAdapter extends AbstractAdapter
 {
-    private ?MarshallerInterface $marshaller;
+    private $marshaller;
 
     /**
      * @throws CacheException if APCu is not enabled

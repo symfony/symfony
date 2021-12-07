@@ -31,7 +31,7 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
 {
     private const DEFAULT_API_ENDPOINT = 'https://api.pwnedpasswords.com/range/%s';
 
-    private HttpClientInterface $httpClient;
+    private $httpClient;
     private string $charset;
     private bool $enabled;
     private string $endpoint;

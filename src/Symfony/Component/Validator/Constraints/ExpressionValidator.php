@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ExpressionValidator extends ConstraintValidator
 {
-    private ?ExpressionLanguage $expressionLanguage;
+    private $expressionLanguage;
 
     public function __construct(ExpressionLanguage $expressionLanguage = null)
     {

@@ -30,9 +30,9 @@ use Symfony\Component\Security\Http\Event\LazyResponseEvent;
  */
 class AccessListener extends AbstractListener
 {
-    private TokenStorageInterface $tokenStorage;
-    private AccessDecisionManagerInterface $accessDecisionManager;
-    private AccessMapInterface $map;
+    private $tokenStorage;
+    private $accessDecisionManager;
+    private $map;
 
     public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, bool $exceptionOnNoToken = false)
     {

@@ -28,10 +28,10 @@ use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkExceptio
  */
 final class LoginLinkHandler implements LoginLinkHandlerInterface
 {
-    private UrlGeneratorInterface $urlGenerator;
-    private UserProviderInterface $userProvider;
+    private $urlGenerator;
+    private $userProvider;
     private array $options;
-    private SignatureHasher $signatureHashUtil;
+    private $signatureHashUtil;
 
     public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, SignatureHasher $signatureHashUtil, array $options)
     {

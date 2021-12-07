@@ -34,8 +34,8 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
 {
     private string $realmName;
-    private UserProviderInterface $userProvider;
-    private ?LoggerInterface $logger;
+    private $userProvider;
+    private $logger;
 
     public function __construct(string $realmName, UserProviderInterface $userProvider, LoggerInterface $logger = null)
     {

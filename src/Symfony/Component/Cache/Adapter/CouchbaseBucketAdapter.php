@@ -36,8 +36,8 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         'durabilityTimeout',
     ];
 
-    private \CouchbaseBucket $bucket;
-    private MarshallerInterface $marshaller;
+    private $bucket;
+    private $marshaller;
 
     public function __construct(\CouchbaseBucket $bucket, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {

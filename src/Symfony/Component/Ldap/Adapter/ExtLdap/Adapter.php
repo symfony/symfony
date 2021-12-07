@@ -23,8 +23,8 @@ use Symfony\Component\Ldap\Exception\LdapException;
 class Adapter implements AdapterInterface
 {
     private array $config;
-    private ConnectionInterface $connection;
-    private EntryManagerInterface $entryManager;
+    private $connection;
+    private $entryManager;
 
     public function __construct(array $config = [])
     {

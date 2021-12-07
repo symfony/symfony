@@ -17,7 +17,7 @@ namespace Symfony\Component\RateLimiter;
 final class Reservation
 {
     private float $timeToAct;
-    private RateLimit $rateLimit;
+    private $rateLimit;
 
     /**
      * @param float $timeToAct Unix timestamp in seconds when this reservation should act

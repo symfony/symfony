@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Envelope;
  */
 class StackMiddleware implements MiddlewareInterface, StackInterface
 {
-    private MiddlewareStack $stack;
+    private $stack;
     private int $offset = 0;
 
     /**

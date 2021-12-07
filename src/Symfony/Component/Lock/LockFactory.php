@@ -25,7 +25,7 @@ class LockFactory implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    private PersistingStoreInterface $store;
+    private $store;
 
     public function __construct(PersistingStoreInterface $store)
     {

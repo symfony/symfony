@@ -33,8 +33,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'secrets:set', description: 'Set a secret in the vault')]
 final class SecretsSetCommand extends Command
 {
-    private AbstractVault $vault;
-    private ?AbstractVault $localVault;
+    private $vault;
+    private $localVault;
 
     public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
     {

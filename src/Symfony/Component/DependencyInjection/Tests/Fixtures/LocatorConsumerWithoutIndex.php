@@ -18,7 +18,7 @@ final class LocatorConsumerWithoutIndex
 {
     public function __construct(
         #[TaggedLocator('foo_bar')]
-        private ContainerInterface $locator,
+        private $locator,
     ) {
     }
 

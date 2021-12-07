@@ -29,8 +29,8 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class ResolveInvalidReferencesPass implements CompilerPassInterface
 {
-    private ContainerBuilder $container;
-    private RuntimeException $signalingException;
+    private $container;
+    private $signalingException;
     private string $currentId;
 
     /**

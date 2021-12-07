@@ -20,7 +20,7 @@ use Psr\Container\ContainerInterface;
  */
 class ContainerLoader extends ObjectLoader
 {
-    private ContainerInterface $container;
+    private $container;
 
     public function __construct(ContainerInterface $container, string $env = null)
     {

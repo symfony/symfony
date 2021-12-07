@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class UniqueEntityValidator extends ConstraintValidator
 {
-    private ManagerRegistry $registry;
+    private $registry;
 
     public function __construct(ManagerRegistry $registry)
     {

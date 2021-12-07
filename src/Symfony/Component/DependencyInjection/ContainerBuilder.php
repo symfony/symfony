@@ -83,10 +83,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private array $extensionConfigs = [];
 
-    private Compiler $compiler;
+    private $compiler;
     private bool $trackResources;
-    private ?InstantiatorInterface $proxyInstantiator = null;
-    private ExpressionLanguage $expressionLanguage;
+    private $proxyInstantiator = null;
+    private $expressionLanguage;
 
     /**
      * @var ExpressionFunctionProviderInterface[]

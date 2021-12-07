@@ -23,7 +23,7 @@ namespace Symfony\Component\CssSelector\Node;
  */
 class AttributeNode extends AbstractNode
 {
-    private NodeInterface $selector;
+    private $selector;
     private ?string $namespace;
     private string $attribute;
     private string $operator;

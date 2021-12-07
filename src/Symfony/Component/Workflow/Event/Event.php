@@ -25,9 +25,9 @@ class Event extends BaseEvent
 {
     protected $context;
     private object $subject;
-    private Marking $marking;
-    private ?Transition $transition;
-    private ?WorkflowInterface $workflow;
+    private $marking;
+    private $transition;
+    private $workflow;
 
     public function __construct(object $subject, Marking $marking, Transition $transition = null, WorkflowInterface $workflow = null, array $context = [])
     {

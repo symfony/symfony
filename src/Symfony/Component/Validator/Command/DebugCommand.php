@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 #[AsCommand(name: 'debug:validator', description: 'Display validation constraints for classes')]
 class DebugCommand extends Command
 {
-    private MetadataFactoryInterface $validator;
+    private $validator;
 
     public function __construct(MetadataFactoryInterface $validator)
     {

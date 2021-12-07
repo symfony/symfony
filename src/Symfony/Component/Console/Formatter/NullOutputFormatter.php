@@ -16,7 +16,7 @@ namespace Symfony\Component\Console\Formatter;
  */
 final class NullOutputFormatter implements OutputFormatterInterface
 {
-    private NullOutputFormatterStyle $style;
+    private $style;
 
     /**
      * {@inheritdoc}

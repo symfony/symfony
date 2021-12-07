@@ -30,8 +30,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AnalyzeServiceReferencesPass extends AbstractRecursivePass
 {
-    private ServiceReferenceGraph $graph;
-    private ?Definition $currentDefinition = null;
+    private $graph;
+    private $currentDefinition = null;
     private bool $onlyConstructorArguments;
     private bool $hasProxyDumper;
     private bool $lazy;

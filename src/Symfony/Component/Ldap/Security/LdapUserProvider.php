@@ -32,7 +32,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private LdapInterface $ldap;
+    private $ldap;
     private string $baseDn;
     private ?string $searchDn;
     private ?string $searchPassword;

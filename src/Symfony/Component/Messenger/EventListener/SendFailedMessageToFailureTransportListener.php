@@ -25,8 +25,8 @@ use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
  */
 class SendFailedMessageToFailureTransportListener implements EventSubscriberInterface
 {
-    private ContainerInterface $failureSenders;
-    private ?LoggerInterface $logger;
+    private $failureSenders;
+    private $logger;
 
     public function __construct(ContainerInterface $failureSenders, LoggerInterface $logger = null)
     {

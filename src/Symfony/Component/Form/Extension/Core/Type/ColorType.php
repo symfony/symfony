@@ -26,7 +26,7 @@ class ColorType extends AbstractType
      */
     private const HTML5_PATTERN = '/^#[0-9a-f]{6}$/i';
 
-    private ?TranslatorInterface $translator;
+    private $translator;
 
     public function __construct(TranslatorInterface $translator = null)
     {

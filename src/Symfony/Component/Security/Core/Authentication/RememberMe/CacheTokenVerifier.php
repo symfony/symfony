@@ -18,7 +18,7 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CacheTokenVerifier implements TokenVerifierInterface
 {
-    private CacheItemPoolInterface $cache;
+    private $cache;
     private int $outdatedTokenTtl;
     private string $cacheKeyPrefix;
 

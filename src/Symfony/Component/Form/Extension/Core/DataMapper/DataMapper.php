@@ -25,7 +25,7 @@ use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
  */
 class DataMapper implements DataMapperInterface
 {
-    private DataAccessorInterface $dataAccessor;
+    private $dataAccessor;
 
     public function __construct(DataAccessorInterface $dataAccessor = null)
     {

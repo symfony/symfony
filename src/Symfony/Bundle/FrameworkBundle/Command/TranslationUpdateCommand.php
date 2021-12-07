@@ -50,9 +50,9 @@ class TranslationUpdateCommand extends Command
         'xlf20' => ['xlf', '2.0'],
     ];
 
-    private TranslationWriterInterface $writer;
-    private TranslationReaderInterface $reader;
-    private ExtractorInterface $extractor;
+    private $writer;
+    private $reader;
+    private $extractor;
     private string $defaultLocale;
     private ?string $defaultTransPath;
     private ?string $defaultViewsPath;

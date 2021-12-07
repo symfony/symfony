@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 #[AsCommand(name: 'cache:pool:delete', description: 'Delete an item from a cache pool')]
 final class CachePoolDeleteCommand extends Command
 {
-    private Psr6CacheClearer $poolClearer;
+    private $poolClearer;
     private ?array $poolNames;
 
     /**

@@ -21,7 +21,7 @@ use Twig\Profiler\Profile;
  */
 final class ProfilerExtension extends BaseProfilerExtension
 {
-    private ?Stopwatch $stopwatch;
+    private $stopwatch;
 
     /**
      * @var \SplObjectStorage<Profile, StopwatchEvent>

@@ -34,9 +34,9 @@ final class TranslationPullCommand extends Command
 {
     use TranslationTrait;
 
-    private TranslationProviderCollection $providerCollection;
-    private TranslationWriterInterface $writer;
-    private TranslationReaderInterface $reader;
+    private $providerCollection;
+    private $writer;
+    private $reader;
     private string $defaultLocale;
     private array $transPaths;
     private array $enabledLocales;

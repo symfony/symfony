@@ -41,7 +41,7 @@ class Connection
      * * ttr: the message time to run before it is put back in the ready queue (in seconds)
      */
     private array $configuration;
-    private PheanstalkInterface $client;
+    private $client;
     private string $tube;
     private int $timeout;
     private int $ttr;

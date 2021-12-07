@@ -14,7 +14,6 @@ namespace Symfony\Component\String\Resources;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\String\Exception\RuntimeException;
 use Symfony\Component\VarExporter\VarExporter;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @internal
@@ -22,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class WcswidthDataGenerator
 {
     private string $outDir;
-    private HttpClientInterface $client;
+    private $client;
 
     public function __construct(string $outDir)
     {

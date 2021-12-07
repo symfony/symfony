@@ -38,12 +38,12 @@ class SymfonyStyle extends OutputStyle
 {
     public const MAX_LINE_LENGTH = 120;
 
-    private InputInterface $input;
-    private OutputInterface $output;
-    private SymfonyQuestionHelper $questionHelper;
-    private ProgressBar $progressBar;
+    private $input;
+    private $output;
+    private $questionHelper;
+    private $progressBar;
     private int $lineLength;
-    private TrimmedBufferOutput $bufferedOutput;
+    private $bufferedOutput;
 
     public function __construct(InputInterface $input, OutputInterface $output)
     {

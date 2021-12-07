@@ -9,7 +9,7 @@ final class LocatorConsumerWithDefaultPriorityMethod
 {
     public function __construct(
         #[TaggedLocator(tag: 'foo_bar', defaultPriorityMethod: 'getPriority')]
-        private ContainerInterface $locator,
+        private $locator,
     ) {
     }
 

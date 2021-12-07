@@ -23,9 +23,9 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class SwitchUserEvent extends Event
 {
-    private Request $request;
-    private UserInterface $targetUser;
-    private ?TokenInterface $token;
+    private $request;
+    private $targetUser;
+    private $token;
 
     public function __construct(Request $request, UserInterface $targetUser, TokenInterface $token = null)
     {

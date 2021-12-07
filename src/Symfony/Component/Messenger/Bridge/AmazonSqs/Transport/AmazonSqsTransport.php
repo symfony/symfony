@@ -28,10 +28,10 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class AmazonSqsTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ResetInterface
 {
-    private SerializerInterface $serializer;
-    private Connection $connection;
-    private ?ReceiverInterface $receiver;
-    private ?SenderInterface $sender;
+    private $serializer;
+    private $connection;
+    private $receiver;
+    private $sender;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null, ReceiverInterface $receiver = null, SenderInterface $sender = null)
     {

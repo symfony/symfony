@@ -25,7 +25,7 @@ namespace Symfony\Component\Cache\Traits;
 class RedisClusterNodeProxy
 {
     private array $host;
-    private \RedisCluster|RedisClusterProxy $redis;
+    private $redis;
 
     public function __construct(array $host, \RedisCluster|RedisClusterProxy $redis)
     {

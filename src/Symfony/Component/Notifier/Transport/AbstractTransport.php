@@ -28,7 +28,7 @@ abstract class AbstractTransport implements TransportInterface
 {
     protected const HOST = 'localhost';
 
-    private ?EventDispatcherInterface $dispatcher;
+    private $dispatcher;
 
     protected $client;
     protected $host;

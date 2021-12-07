@@ -36,12 +36,12 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class SecurityDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private ?TokenStorageInterface $tokenStorage;
-    private ?RoleHierarchyInterface $roleHierarchy;
-    private ?LogoutUrlGenerator $logoutUrlGenerator;
-    private ?AccessDecisionManagerInterface $accessDecisionManager;
-    private ?FirewallMapInterface $firewallMap;
-    private ?TraceableFirewallListener $firewall;
+    private $tokenStorage;
+    private $roleHierarchy;
+    private $logoutUrlGenerator;
+    private $accessDecisionManager;
+    private $firewallMap;
+    private $firewall;
     private bool $hasVarDumper;
 
     public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)

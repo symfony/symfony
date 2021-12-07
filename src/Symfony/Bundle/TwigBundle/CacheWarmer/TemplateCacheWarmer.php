@@ -24,8 +24,8 @@ use Twig\Error\Error;
  */
 class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
-    private Environment $twig;
+    private $container;
+    private $twig;
     private iterable $iterator;
 
     public function __construct(ContainerInterface $container, iterable $iterator)

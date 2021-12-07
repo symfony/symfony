@@ -29,7 +29,7 @@ class UserBadge implements BadgeInterface
     private string $userIdentifier;
     /** @var callable|null */
     private $userLoader;
-    private UserInterface $user;
+    private $user;
 
     /**
      * Initializes the user badge.

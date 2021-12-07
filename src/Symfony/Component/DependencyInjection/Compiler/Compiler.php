@@ -21,9 +21,9 @@ use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
  */
 class Compiler
 {
-    private PassConfig $passConfig;
+    private $passConfig;
     private array $log = [];
-    private ServiceReferenceGraph $serviceReferenceGraph;
+    private $serviceReferenceGraph;
 
     public function __construct()
     {

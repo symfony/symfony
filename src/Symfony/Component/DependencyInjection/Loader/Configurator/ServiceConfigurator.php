@@ -41,7 +41,7 @@ class ServiceConfigurator extends AbstractServiceConfigurator
 
     public const FACTORY = 'services';
 
-    private ContainerBuilder $container;
+    private $container;
     private array $instanceof;
     private bool $allowParent;
     private ?string $path;

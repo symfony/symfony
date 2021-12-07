@@ -29,7 +29,7 @@ final class CacheItem implements ItemInterface
     protected float|int|null $expiry = null;
     protected array $metadata = [];
     protected array $newMetadata = [];
-    protected ?ItemInterface $innerItem = null;
+    protected $innerItem = null;
     protected ?string $poolHash = null;
     protected bool $isTaggable = false;
 

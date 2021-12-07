@@ -24,9 +24,9 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 class LogoutUrlGenerator
 {
-    private ?RequestStack $requestStack;
-    private ?UrlGeneratorInterface $router;
-    private ?TokenStorageInterface $tokenStorage;
+    private $requestStack;
+    private $router;
+    private $tokenStorage;
     private array $listeners = [];
     private ?string $currentFirewallName = null;
     private ?string $currentFirewallContext = null;

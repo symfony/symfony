@@ -31,7 +31,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      *
      * This property should only be accessed through queryBuilder.
      */
-    private QueryBuilder $queryBuilder;
+    private $queryBuilder;
 
     public function __construct(QueryBuilder $queryBuilder)
     {

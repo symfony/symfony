@@ -26,7 +26,7 @@ class Parser
     public const OPERATOR_LEFT = 1;
     public const OPERATOR_RIGHT = 2;
 
-    private TokenStream $stream;
+    private $stream;
     private array $unaryOperators;
     private array $binaryOperators;
     private array $functions;

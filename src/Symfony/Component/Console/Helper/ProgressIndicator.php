@@ -31,7 +31,7 @@ class ProgressIndicator
         'very_verbose_no_ansi' => ' %message% (%elapsed:6s%, %memory:6s%)',
     ];
 
-    private OutputInterface $output;
+    private $output;
     private int $startTime;
     private ?string $format = null;
     private ?string $message = null;

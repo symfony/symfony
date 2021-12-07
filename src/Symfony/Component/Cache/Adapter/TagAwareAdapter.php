@@ -34,7 +34,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     public const TAGS_PREFIX = "\0tags\0";
 
     private array $deferred = [];
-    private AdapterInterface $tags;
+    private $tags;
     private array $knownTagVersions = [];
     private float $knownTagVersionsTtl;
 

@@ -43,7 +43,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
     use LoggerAwareTrait;
 
     private array $defaultOptions = self::OPTIONS_DEFAULTS;
-    private AmpClientState $multi;
+    private $multi;
 
     /**
      * @param array    $defaultOptions     Default requests' options

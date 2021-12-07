@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
-    private Entry $entry;
+    private $entry;
     private string $username;
     private ?string $password;
     private array $roles;

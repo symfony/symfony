@@ -22,7 +22,7 @@ use Symfony\Component\Notifier\EventListener\NotificationLoggerListener;
  */
 final class NotificationDataCollector extends DataCollector
 {
-    private NotificationLoggerListener $logger;
+    private $logger;
 
     public function __construct(NotificationLoggerListener $logger)
     {

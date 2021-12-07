@@ -27,8 +27,8 @@ use Symfony\Component\Security\Http\AccessMapInterface;
  */
 class ChannelListener extends AbstractListener
 {
-    private AccessMapInterface $map;
-    private ?LoggerInterface $logger;
+    private $map;
+    private $logger;
     private int $httpPort;
     private int $httpsPort;
 

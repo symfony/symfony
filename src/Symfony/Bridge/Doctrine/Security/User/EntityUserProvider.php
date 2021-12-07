@@ -32,7 +32,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private ManagerRegistry $registry;
+    private $registry;
     private ?string $managerName;
     private string $classOrAlias;
     private string $class;

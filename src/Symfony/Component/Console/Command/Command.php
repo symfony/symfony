@@ -47,20 +47,20 @@ class Command
      */
     protected static $defaultDescription;
 
-    private ?Application $application = null;
+    private $application = null;
     private ?string $name = null;
     private ?string $processTitle = null;
     private array $aliases = [];
-    private InputDefinition $definition;
+    private $definition;
     private bool $hidden = false;
     private string $help = '';
     private string $description = '';
-    private ?InputDefinition $fullDefinition = null;
+    private $fullDefinition = null;
     private bool $ignoreValidationErrors = false;
     private ?\Closure $code = null;
     private array $synopsis = [];
     private array $usages = [];
-    private ?HelperSet $helperSet = null;
+    private $helperSet = null;
 
     public static function getDefaultName(): ?string
     {

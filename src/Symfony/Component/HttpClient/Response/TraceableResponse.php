@@ -31,10 +31,10 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class TraceableResponse implements ResponseInterface, StreamableInterface
 {
-    private HttpClientInterface $client;
-    private ResponseInterface $response;
+    private $client;
+    private $response;
     private mixed $content;
-    private ?StopwatchEvent $event;
+    private $event;
 
     public function __construct(HttpClientInterface $client, ResponseInterface $response, &$content, StopwatchEvent $event = null)
     {

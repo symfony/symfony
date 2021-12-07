@@ -21,9 +21,9 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class LogoutEvent extends Event
 {
-    private Request $request;
-    private ?Response $response = null;
-    private ?TokenInterface $token;
+    private $request;
+    private $response = null;
+    private $token;
 
     public function __construct(Request $request, ?TokenInterface $token)
     {

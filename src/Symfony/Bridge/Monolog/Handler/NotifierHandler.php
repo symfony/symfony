@@ -24,7 +24,7 @@ use Symfony\Component\Notifier\NotifierInterface;
  */
 class NotifierHandler extends AbstractHandler
 {
-    private NotifierInterface $notifier;
+    private $notifier;
 
     public function __construct(NotifierInterface $notifier, string|int $level = Logger::ERROR, bool $bubble = true)
     {

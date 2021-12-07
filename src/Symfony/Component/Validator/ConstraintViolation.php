@@ -25,7 +25,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     private mixed $root;
     private ?string $propertyPath;
     private mixed $invalidValue;
-    private ?Constraint $constraint;
+    private $constraint;
     private ?string $code;
     private mixed $cause;
 

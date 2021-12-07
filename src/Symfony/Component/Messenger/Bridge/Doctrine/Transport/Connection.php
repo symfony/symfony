@@ -60,7 +60,7 @@ class Connection implements ResetInterface
     protected $configuration = [];
     protected $driverConnection;
     protected $queueEmptiedAt;
-    private ?SchemaSynchronizer $schemaSynchronizer;
+    private $schemaSynchronizer;
     private bool $autoSetup;
 
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)

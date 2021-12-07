@@ -26,7 +26,7 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  */
 class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {
-    private \PDO $conn;
+    private $conn;
     private string $dsn;
     private string $username = '';
     private string $password = '';

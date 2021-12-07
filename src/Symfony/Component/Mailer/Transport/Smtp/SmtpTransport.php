@@ -37,7 +37,7 @@ class SmtpTransport extends AbstractTransport
     private int $restartCounter = 0;
     private int $pingThreshold = 100;
     private float $lastMessageTime = 0;
-    private AbstractStream $stream;
+    private $stream;
     private string $domain = '[127.0.0.1]';
 
     public function __construct(AbstractStream $stream = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)

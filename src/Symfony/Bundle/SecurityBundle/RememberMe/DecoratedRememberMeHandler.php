@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  */
 final class DecoratedRememberMeHandler implements RememberMeHandlerInterface
 {
-    private RememberMeHandlerInterface $handler;
+    private $handler;
 
     public function __construct(RememberMeHandlerInterface $handler)
     {

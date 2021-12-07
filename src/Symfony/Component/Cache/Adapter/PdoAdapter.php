@@ -21,8 +21,8 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 {
     protected $maxIdLength = 255;
 
-    private MarshallerInterface $marshaller;
-    private \PDO|Connection $conn;
+    private $marshaller;
+    private $conn;
     private string $dsn;
     private string $driver;
     private string $serverVersion;

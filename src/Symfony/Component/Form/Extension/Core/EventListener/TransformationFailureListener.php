@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TransformationFailureListener implements EventSubscriberInterface
 {
-    private ?TranslatorInterface $translator;
+    private $translator;
 
     public function __construct(TranslatorInterface $translator = null)
     {

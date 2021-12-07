@@ -294,7 +294,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
 
 final class ConstraintViolationAssertion
 {
-    private ExecutionContextInterface $context;
+    private $context;
 
     /**
      * @var ConstraintViolationAssertion[]
@@ -307,7 +307,7 @@ final class ConstraintViolationAssertion
     private string $propertyPath = 'property.path';
     private ?int $plural = null;
     private ?string $code = null;
-    private ?Constraint $constraint;
+    private $constraint;
     private mixed $cause = null;
 
     /**
@@ -451,7 +451,7 @@ final class ConstraintViolationAssertion
  */
 class AssertingContextualValidator implements ContextualValidatorInterface
 {
-    private ExecutionContextInterface $context;
+    private $context;
     private bool $expectNoValidate = false;
     private int $atPathCalls = -1;
     private array $expectedAtPath = [];

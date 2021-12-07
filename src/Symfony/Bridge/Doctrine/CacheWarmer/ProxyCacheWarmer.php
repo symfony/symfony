@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  */
 class ProxyCacheWarmer implements CacheWarmerInterface
 {
-    private ManagerRegistry $registry;
+    private $registry;
 
     public function __construct(ManagerRegistry $registry)
     {

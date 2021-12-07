@@ -25,8 +25,8 @@ use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
  */
 final class EmailMessage implements MessageInterface
 {
-    private RawMessage $message;
-    private ?Envelope $envelope;
+    private $message;
+    private $envelope;
 
     public function __construct(RawMessage $message, Envelope $envelope = null)
     {

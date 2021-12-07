@@ -28,7 +28,7 @@ class Security implements AuthorizationCheckerInterface
     public const LAST_USERNAME = '_security.last_username';
     public const MAX_USERNAME_LENGTH = 4096;
 
-    private ContainerInterface $container;
+    private $container;
 
     public function __construct(ContainerInterface $container)
     {

@@ -26,10 +26,10 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class DoctrineTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
-    private Connection $connection;
-    private SerializerInterface $serializer;
-    private DoctrineReceiver $receiver;
-    private DoctrineSender $sender;
+    private $connection;
+    private $serializer;
+    private $receiver;
+    private $sender;
 
     public function __construct(Connection $connection, SerializerInterface $serializer)
     {

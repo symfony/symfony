@@ -25,9 +25,9 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class DumpListener implements EventSubscriberInterface
 {
-    private ClonerInterface $cloner;
-    private DataDumperInterface $dumper;
-    private ?Connection $connection;
+    private $cloner;
+    private $dumper;
+    private $connection;
 
     public function __construct(ClonerInterface $cloner, DataDumperInterface $dumper, Connection $connection = null)
     {

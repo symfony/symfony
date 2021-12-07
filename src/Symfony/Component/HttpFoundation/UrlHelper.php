@@ -20,8 +20,8 @@ use Symfony\Component\Routing\RequestContext;
  */
 final class UrlHelper
 {
-    private RequestStack $requestStack;
-    private ?RequestContext $requestContext;
+    private $requestStack;
+    private $requestContext;
 
     public function __construct(RequestStack $requestStack, RequestContext $requestContext = null)
     {

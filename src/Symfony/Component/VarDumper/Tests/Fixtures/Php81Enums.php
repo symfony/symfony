@@ -4,8 +4,8 @@ namespace Symfony\Component\VarDumper\Tests\Fixtures;
 
 class Php81Enums
 {
-    public UnitEnumFixture $e1;
-    public BackedEnumFixture $e2;
+    public $e1;
+    public $e2;
 
     public function __construct()
     {

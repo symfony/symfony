@@ -23,7 +23,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     private array $metadata = [];
     private array $resources = [];
     private string $locale;
-    private ?MessageCatalogueInterface $fallbackCatalogue = null;
+    private $fallbackCatalogue = null;
     private ?self $parent = null;
 
     /**

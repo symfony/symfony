@@ -31,11 +31,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 abstract class ProviderFactoryTestCase extends TestCase
 {
-    protected HttpClientInterface $client;
-    protected LoggerInterface $logger;
+    protected $client;
+    protected $logger;
     protected string $defaultLocale;
-    protected LoaderInterface $loader;
-    protected XliffFileDumper $xliffFileDumper;
+    protected $loader;
+    protected $xliffFileDumper;
 
     abstract public function createFactory(): ProviderFactoryInterface;
 

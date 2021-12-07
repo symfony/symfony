@@ -10,15 +10,15 @@
  */
 
 namespace Symfony\Component\Cache\Traits;
-
 /**
+
  * @author Alessandro Chitolina <alekitto@gmail.com>
  *
  * @internal
  */
 class RedisClusterProxy
 {
-    private \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy $redis;
+    private $redis;
     private \Closure $initializer;
 
     public function __construct(\Closure $initializer)

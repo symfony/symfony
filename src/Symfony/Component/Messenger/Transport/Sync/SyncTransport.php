@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class SyncTransport implements TransportInterface
 {
-    private MessageBusInterface $messageBus;
+    private $messageBus;
 
     public function __construct(MessageBusInterface $messageBus)
     {

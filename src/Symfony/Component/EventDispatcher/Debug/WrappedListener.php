@@ -26,10 +26,10 @@ final class WrappedListener
     private string $name;
     private bool $called = false;
     private bool $stoppedPropagation = false;
-    private Stopwatch $stopwatch;
-    private ?EventDispatcherInterface $dispatcher;
+    private $stopwatch;
+    private $dispatcher;
     private string $pretty;
-    private ClassStub|string $stub;
+    private $stub;
     private ?int $priority = null;
     private static bool $hasClassStub;
 

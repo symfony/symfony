@@ -29,7 +29,7 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  */
 class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {
-    private Connection $conn;
+    private $conn;
     private static $storeRegistry = [];
 
     /**

@@ -324,6 +324,30 @@ class ProfilerController
     }
 
     /**
+     * Displays the Xdebug info.
+     *
+     * @throws NotFoundHttpException
+     */
+    public function xdebugAction(): Response
+    {
+        $this->denyAccessIfProfilerDisabled();
+
+        if (!\function_exists('xdebug_info')) {
+            throw new NotFoundHttpException('Xdebug must be installed in version 3.');
+        }
+
+        if (null !== $this->cspHandler) {
+            $this->cspHandler->disableCsp();
+        }
+
+        ob_start();
+        xdebug_info();
+        $xdebugInfo = ob_get_clean();
+
+        return new Response($xdebugInfo, 200, ['Content-Type' => 'text/html']);
+    }
+
+    /**
      * Displays the source of a file.
      *
      * @throws NotFoundHttpException

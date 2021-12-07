@@ -43,6 +43,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\AbstractStaticOption;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\HttpClient\DependencyInjection\HttpClientPass;
 use Symfony\Component\HttpFoundation\Request;
@@ -94,6 +95,15 @@ class FrameworkBundle extends Bundle
 
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();
+        }
+    }
+
+    public function shutdown()
+    {
+        parent::shutdown();
+
+        if (class_exists(AbstractStaticOption::class)) {
+            AbstractStaticOption::reset();
         }
     }
 

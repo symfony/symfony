@@ -106,6 +106,9 @@ class RememberMeAuthenticatorTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
+    /**
+     * @group legacy
+     */
     public function testAuthenticateDeprecatedCodePath()
     {
         $mock = $this->getMockBuilder(RememberMeHandlerInterface::class)
@@ -123,6 +126,9 @@ class RememberMeAuthenticatorTest extends TestCase
         $passport->getUser(); // trigger the user loader
     }
 
+    /**
+     * @group legacy
+     */
     public function testAuthenticateWithoutOldTokenDeprecatedCodePath()
     {
         $mock = $this->getMockBuilder(RememberMeHandlerInterface::class)

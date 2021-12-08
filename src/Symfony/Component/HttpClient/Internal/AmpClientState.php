@@ -76,7 +76,7 @@ final class AmpClientState extends ClientState
             foreach ($options['proxy']['no_proxy'] as $rule) {
                 $dotRule = '.'.ltrim($rule, '.');
 
-                if ('*' === $rule || $host === $rule || substr($host, -\strlen($dotRule)) === $dotRule) {
+                if ('*' === $rule || $host === $rule || str_ends_with($host, $dotRule)) {
                     $options['proxy'] = null;
                     break;
                 }

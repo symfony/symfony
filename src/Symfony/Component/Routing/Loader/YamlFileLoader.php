@@ -75,7 +75,7 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($parsedConfig as $name => $config) {
-            if (0 === strpos($name, 'when@')) {
+            if (str_starts_with($name, 'when@')) {
                 if (!$this->env || 'when@'.$this->env !== $name) {
                     continue;
                 }

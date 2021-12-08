@@ -81,7 +81,7 @@ final class FirebaseTransport extends AbstractTransport
         }
 
         $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-        $jsonContents = 0 === strpos($contentType, 'application/json') ? $response->toArray(false) : null;
+        $jsonContents = str_starts_with($contentType, 'application/json') ? $response->toArray(false) : null;
         $errorMessage = null;
 
         if ($jsonContents && isset($jsonContents['results'][0]['error'])) {

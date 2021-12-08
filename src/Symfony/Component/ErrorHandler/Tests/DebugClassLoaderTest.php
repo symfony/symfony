@@ -439,7 +439,7 @@ class ClassLoader
             eval('namespace Test\\'.__NAMESPACE__.'; class NonDeprecatedInterfaceClass implements \\'.__NAMESPACE__.'\Fixtures\NonDeprecatedInterface {}');
         } elseif ('Test\\'.Float::class === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class Float {}');
-        } elseif (0 === strpos($class, 'Test\\'.ExtendsFinalClass::class)) {
+        } elseif (str_starts_with($class, 'Test\\' . ExtendsFinalClass::class)) {
             $classShortName = substr($class, strrpos($class, '\\') + 1);
             eval('namespace Test\\'.__NAMESPACE__.'; class '.$classShortName.' extends \\'.__NAMESPACE__.'\Fixtures\\'.substr($classShortName, 7).' {}');
         } elseif ('Test\\'.ExtendsAnnotatedClass::class === $class) {

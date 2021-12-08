@@ -47,7 +47,7 @@ class Property
         $this->array = false;
         $this->type = $type;
 
-        if ('[]' === substr($type, -2)) {
+        if (str_ends_with($type, '[]')) {
             $this->array = true;
             $this->type = substr($type, 0, -2);
         }

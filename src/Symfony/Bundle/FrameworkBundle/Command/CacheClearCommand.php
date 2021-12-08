@@ -90,7 +90,7 @@ EOF
         }
 
         $useBuildDir = $realBuildDir !== $realCacheDir;
-        $oldBuildDir = substr($realBuildDir, 0, -1).('~' === substr($realBuildDir, -1) ? '+' : '~');
+        $oldBuildDir = substr($realBuildDir, 0, -1).(str_ends_with($realBuildDir, '~') ? '+' : '~');
         if ($useBuildDir) {
             $fs->remove($oldBuildDir);
 
@@ -120,7 +120,7 @@ EOF
 
         // the warmup cache dir name must have the same length as the real one
         // to avoid the many problems in serialized resources files
-        $warmupDir = substr($realBuildDir, 0, -1).('_' === substr($realBuildDir, -1) ? '-' : '_');
+        $warmupDir = substr($realBuildDir, 0, -1).(str_ends_with($realBuildDir, '_') ? '-' : '_');
 
         if ($output->isVerbose() && $fs->exists($warmupDir)) {
             $io->comment('Clearing outdated warmup directory...');
@@ -217,7 +217,7 @@ EOF
             }
         }
         foreach ($mounts as $mount) {
-            if (0 === strpos($dir, $mount)) {
+            if (str_starts_with($dir, $mount)) {
                 return true;
             }
         }

@@ -35,7 +35,7 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
                     continue;
                 }
             } catch (\TypeError $e) {
-                if (false !== strpos($e->getMessage(), 'supports(): Argument #1')) {
+                if (str_contains($e->getMessage(), 'supports(): Argument #1')) {
                     continue;
                 }
 

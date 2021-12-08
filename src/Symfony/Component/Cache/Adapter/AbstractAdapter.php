@@ -130,7 +130,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         if (str_starts_with($dsn, 'memcached:')) {
             return MemcachedAdapter::createConnection($dsn, $options);
         }
-        if (0 === strpos($dsn, 'couchbase:')) {
+        if (str_starts_with($dsn, 'couchbase:')) {
             if (CouchbaseBucketAdapter::isSupported()) {
                 return CouchbaseBucketAdapter::createConnection($dsn, $options);
             }

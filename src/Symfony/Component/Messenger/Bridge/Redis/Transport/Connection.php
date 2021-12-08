@@ -142,7 +142,7 @@ class Connection
 
     public static function fromDsn(string $dsn, array $redisOptions = [], \Redis|\RedisCluster $redis = null): self
     {
-        if (false === strpos($dsn, ',')) {
+        if (!str_contains($dsn, ',')) {
             $parsedUrl = self::parseDsn($dsn, $redisOptions);
         } else {
             $dsns = explode(',', $dsn);
@@ -254,7 +254,7 @@ class Connection
     private static function parseDsn(string $dsn, array &$redisOptions): array
     {
         $url = $dsn;
-        $scheme = 0 === strpos($dsn, 'rediss:') ? 'rediss' : 'redis';
+        $scheme = str_starts_with($dsn, 'rediss:') ? 'rediss' : 'redis';
 
         if (preg_match('#^'.$scheme.':///([^:@])+$#', $dsn)) {
             $url = str_replace($scheme.':', 'file:', $dsn);

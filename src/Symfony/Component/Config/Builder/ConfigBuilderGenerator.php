@@ -338,7 +338,7 @@ public function NAME($value): static
     private function getSingularName(PrototypedArrayNode $node): string
     {
         $name = $node->getName();
-        if ('s' !== substr($name, -1)) {
+        if (!str_ends_with($name, 's')) {
             return $name;
         }
 

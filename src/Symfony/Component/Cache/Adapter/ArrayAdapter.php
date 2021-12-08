@@ -245,7 +245,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             $now = microtime(true);
 
             foreach ($this->values as $key => $value) {
-                if (!isset($this->expiries[$key]) || $this->expiries[$key] <= $now || 0 === strpos($key, $prefix)) {
+                if (!isset($this->expiries[$key]) || $this->expiries[$key] <= $now || str_starts_with($key, $prefix)) {
                     unset($this->values[$key], $this->expiries[$key]);
                 }
             }

@@ -97,7 +97,7 @@ class ErrorHandler
     private bool $isRecursive = false;
     private bool $isRoot = false;
     private $exceptionHandler;
-    private $bootstrappingLogger = null;
+    private ?BufferingLogger $bootstrappingLogger = null;
 
     private static ?string $reservedMemory = null;
     private static array $silencedErrorCache = [];

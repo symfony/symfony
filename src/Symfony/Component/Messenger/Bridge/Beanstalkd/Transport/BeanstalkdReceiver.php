@@ -24,8 +24,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterface
 {
-    private $connection;
-    private $serializer;
+    private Connection $connection;
+    private SerializerInterface $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {

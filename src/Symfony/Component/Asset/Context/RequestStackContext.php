@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class RequestStackContext implements ContextInterface
 {
-    private $requestStack;
+    private RequestStack $requestStack;
     private string $basePath;
     private bool $secure;
 

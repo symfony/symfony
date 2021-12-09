@@ -39,9 +39,9 @@ class MemcachedAdapter extends AbstractAdapter
         \Memcached::OPT_SERIALIZER => \Memcached::SERIALIZER_PHP,
     ];
 
-    private $marshaller;
-    private $client;
-    private $lazyClient;
+    private MarshallerInterface $marshaller;
+    private \Memcached $client;
+    private \Memcached $lazyClient;
 
     /**
      * Using a MemcachedAdapter with a TagAwareAdapter for storing tags is discouraged.

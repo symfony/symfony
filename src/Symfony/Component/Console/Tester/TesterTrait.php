@@ -23,10 +23,10 @@ use Symfony\Component\Console\Tester\Constraint\CommandIsSuccessful;
  */
 trait TesterTrait
 {
-    private $output;
+    private StreamOutput $output;
     private array $inputs = [];
     private bool $captureStreamsIndependently = false;
-    private $input;
+    private InputInterface $input;
     private int $statusCode;
 
     /**

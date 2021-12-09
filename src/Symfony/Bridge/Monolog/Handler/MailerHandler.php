@@ -24,8 +24,8 @@ use Symfony\Component\Mime\Email;
  */
 class MailerHandler extends AbstractProcessingHandler
 {
-    private $mailer;
-    private $messageTemplate;
+    private MailerInterface $mailer;
+    private \Closure|Email $messageTemplate;
 
     public function __construct(MailerInterface $mailer, callable|Email $messageTemplate, string|int $level = Logger::DEBUG, bool $bubble = true)
     {

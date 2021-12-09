@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class CompiledUrlMatcherDumper extends MatcherDumper
 {
-    private $expressionLanguage;
+    private ExpressionLanguage $expressionLanguage;
     private ?\Exception $signalingException = null;
 
     /**

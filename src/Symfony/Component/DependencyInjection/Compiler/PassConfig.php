@@ -28,7 +28,7 @@ class PassConfig
     public const TYPE_OPTIMIZE = 'optimization';
     public const TYPE_REMOVE = 'removing';
 
-    private $mergePass;
+    private MergeExtensionConfigurationPass $mergePass;
     private array $afterRemovingPasses;
     private array $beforeOptimizationPasses;
     private array $beforeRemovingPasses = [];

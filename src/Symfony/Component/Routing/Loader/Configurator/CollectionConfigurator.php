@@ -23,8 +23,8 @@ class CollectionConfigurator
     use Traits\HostTrait;
     use Traits\RouteTrait;
 
-    private $parent;
-    private $parentConfigurator;
+    private RouteCollection $parent;
+    private ?CollectionConfigurator $parentConfigurator;
     private ?array $parentPrefixes;
     private string|array|null $host = null;
 

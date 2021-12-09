@@ -27,7 +27,7 @@ final class Transports implements TransportInterface
      * @var array<string, TransportInterface>
      */
     private array $transports = [];
-    private $default;
+    private TransportInterface $default;
 
     /**
      * @param iterable<string, TransportInterface> $transports

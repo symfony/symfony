@@ -109,8 +109,8 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
  */
 final class QueuedEnvelope
 {
-    private $envelope;
-    private $stack;
+    private Envelope $envelope;
+    private StackInterface $stack;
 
     public function __construct(Envelope $envelope, StackInterface $stack)
     {

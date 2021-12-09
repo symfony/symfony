@@ -33,7 +33,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberInterface
 {
-    private $container;
+    private ContainerInterface $container;
     private array $collectedParameters = [];
     private \Closure $paramFetcher;
 

@@ -38,7 +38,7 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
 #[AsCommand(name: 'security:hash-password', description: 'Hash a user password')]
 class UserPasswordHashCommand extends Command
 {
-    private $hasherFactory;
+    private PasswordHasherFactoryInterface $hasherFactory;
     private array $userClasses;
 
     public function __construct(PasswordHasherFactoryInterface $hasherFactory, array $userClasses = [])

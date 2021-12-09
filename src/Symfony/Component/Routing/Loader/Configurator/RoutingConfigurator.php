@@ -21,7 +21,7 @@ class RoutingConfigurator
 {
     use Traits\AddTrait;
 
-    private $loader;
+    private PhpFileLoader $loader;
     private string $path;
     private string $file;
     private ?string $env;

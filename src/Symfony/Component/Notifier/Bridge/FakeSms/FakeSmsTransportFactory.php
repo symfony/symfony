@@ -24,8 +24,8 @@ use Symfony\Component\Notifier\Transport\Dsn;
  */
 final class FakeSmsTransportFactory extends AbstractTransportFactory
 {
-    private $mailer;
-    private $logger;
+    private MailerInterface $mailer;
+    private LoggerInterface $logger;
 
     public function __construct(MailerInterface $mailer, LoggerInterface $logger)
     {

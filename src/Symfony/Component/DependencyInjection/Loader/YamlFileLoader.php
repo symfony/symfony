@@ -106,7 +106,7 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private $yamlParser;
+    private YamlParser $yamlParser;
 
     private int $anonymousServicesCount;
     private string $anonymousServicesSuffix;

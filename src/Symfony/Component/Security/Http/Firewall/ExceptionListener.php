@@ -47,14 +47,14 @@ class ExceptionListener
 {
     use TargetPathTrait;
 
-    private $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
     private string $firewallName;
-    private $accessDeniedHandler;
-    private $authenticationEntryPoint;
-    private $authenticationTrustResolver;
+    private ?AccessDeniedHandlerInterface $accessDeniedHandler;
+    private ?AuthenticationEntryPointInterface $authenticationEntryPoint;
+    private AuthenticationTrustResolverInterface $authenticationTrustResolver;
     private ?string $errorPage;
-    private $logger;
-    private $httpUtils;
+    private ?LoggerInterface $logger;
+    private HttpUtils $httpUtils;
     private bool $stateless;
 
     public function __construct(TokenStorageInterface $tokenStorage, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, string $firewallName, AuthenticationEntryPointInterface $authenticationEntryPoint = null, string $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null, bool $stateless = false)

@@ -24,10 +24,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class SignatureHasher
 {
-    private $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
     private array $signatureProperties;
     private string $secret;
-    private $expiredSignaturesStorage;
+    private ?ExpiredSignatureStorage $expiredSignaturesStorage;
     private ?int $maxUses;
 
     /**

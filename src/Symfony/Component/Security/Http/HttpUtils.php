@@ -27,8 +27,8 @@ use Symfony\Component\Security\Core\Security;
  */
 class HttpUtils
 {
-    private $urlGenerator;
-    private $urlMatcher;
+    private ?UrlGeneratorInterface $urlGenerator;
+    private UrlMatcherInterface|RequestMatcherInterface|null $urlMatcher;
     private ?string $domainRegexp;
     private ?string $secureDomainRegexp;
 

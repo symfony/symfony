@@ -27,7 +27,7 @@ class Route implements \Serializable
     private array $requirements = [];
     private array $options = [];
     private string $condition = '';
-    private $compiled = null;
+    private ?CompiledRoute $compiled = null;
 
     /**
      * Constructor.

@@ -32,7 +32,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     protected $currentId;
 
     private bool $processExpressions = false;
-    private $expressionLanguage;
+    private ExpressionLanguage $expressionLanguage;
     private bool $inExpression = false;
 
     /**

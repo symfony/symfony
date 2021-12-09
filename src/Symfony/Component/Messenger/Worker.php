@@ -39,11 +39,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class Worker
 {
     private array $receivers;
-    private $bus;
-    private $eventDispatcher;
-    private $logger;
+    private MessageBusInterface $bus;
+    private ?EventDispatcherInterface $eventDispatcher;
+    private ?LoggerInterface $logger;
     private bool $shouldStop = false;
-    private $metadata;
+    private WorkerMetadata $metadata;
     private array $acks = [];
     private \SplObjectStorage $unacks;
 

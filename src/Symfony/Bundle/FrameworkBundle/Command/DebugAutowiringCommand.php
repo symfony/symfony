@@ -34,7 +34,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 class DebugAutowiringCommand extends ContainerDebugCommand
 {
     private bool $supportsHref;
-    private $fileLinkFormatter;
+    private ?FileLinkFormatter $fileLinkFormatter;
 
     public function __construct(string $name = null, FileLinkFormatter $fileLinkFormatter = null)
     {

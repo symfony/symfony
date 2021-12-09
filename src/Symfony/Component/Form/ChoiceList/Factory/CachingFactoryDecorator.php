@@ -27,7 +27,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterface
 {
-    private $decoratedFactory;
+    private ChoiceListFactoryInterface $decoratedFactory;
 
     /**
      * @var ChoiceListInterface[]

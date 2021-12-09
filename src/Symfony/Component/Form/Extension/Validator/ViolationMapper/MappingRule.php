@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormInterface;
  */
 class MappingRule
 {
-    private $origin;
+    private FormInterface $origin;
     private string $propertyPath;
     private string $targetPath;
 

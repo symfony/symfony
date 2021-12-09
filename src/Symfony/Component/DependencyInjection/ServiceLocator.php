@@ -31,7 +31,7 @@ class ServiceLocator implements ServiceProviderInterface
     }
 
     private ?string $externalId = null;
-    private $container = null;
+    private ?Container $container = null;
 
     /**
      * {@inheritdoc}

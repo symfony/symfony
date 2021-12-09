@@ -15,7 +15,7 @@ use Symfony\Component\Workflow\Transition;
 
 class GuardExpression
 {
-    private $transition;
+    private Transition $transition;
     private string $expression;
 
     public function __construct(Transition $transition, string $expression)

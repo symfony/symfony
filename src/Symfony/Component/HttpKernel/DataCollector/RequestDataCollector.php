@@ -36,7 +36,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     private \SplObjectStorage $controllers;
     private array $sessionUsages = [];
-    private $requestStack;
+    private ?RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack = null)
     {

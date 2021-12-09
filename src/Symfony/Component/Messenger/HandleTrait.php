@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  */
 trait HandleTrait
 {
-    private $messageBus;
+    private MessageBusInterface $messageBus;
 
     /**
      * Dispatches the given message, expecting to be handled by a single handler

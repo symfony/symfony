@@ -24,7 +24,7 @@ class OutputFormatterStyleStack implements ResetInterface
      */
     private array $styles = [];
 
-    private $emptyStyle;
+    private OutputFormatterStyleInterface $emptyStyle;
 
     public function __construct(OutputFormatterStyleInterface $emptyStyle = null)
     {

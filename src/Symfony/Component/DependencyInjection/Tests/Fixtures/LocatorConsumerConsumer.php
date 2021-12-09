@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 final class LocatorConsumerConsumer
 {
     public function __construct(
-        private $locatorConsumer
+        private LocatorConsumer $locatorConsumer
     ) {
     }
 

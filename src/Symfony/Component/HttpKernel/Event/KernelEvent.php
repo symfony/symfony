@@ -22,8 +22,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class KernelEvent extends Event
 {
-    private $kernel;
-    private $request;
+    private HttpKernelInterface $kernel;
+    private Request $request;
     private ?int $requestType;
 
     /**

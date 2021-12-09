@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 class FirePHPHandler extends BaseFirePHPHandler
 {
     private array $headers = [];
-    private $response;
+    private Response $response;
 
     /**
      * Adds the headers to the response once it's created.

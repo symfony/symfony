@@ -31,7 +31,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  */
 class CheckCredentialsListener implements EventSubscriberInterface
 {
-    private $hasherFactory;
+    private PasswordHasherFactoryInterface $hasherFactory;
 
     public function __construct(PasswordHasherFactoryInterface $hasherFactory)
     {

@@ -28,7 +28,7 @@ final class Notifier implements NotifierInterface
 {
     private array $adminRecipients = [];
     private array|ContainerInterface $channels;
-    private $policy;
+    private ?ChannelPolicyInterface $policy;
 
     /**
      * @param ChannelInterface[]|ContainerInterface $channels

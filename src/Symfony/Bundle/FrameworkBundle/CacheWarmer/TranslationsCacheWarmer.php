@@ -24,8 +24,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
-    private $container;
-    private $translator;
+    private ContainerInterface $container;
+    private TranslatorInterface $translator;
 
     public function __construct(ContainerInterface $container)
     {

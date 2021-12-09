@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ControllerResolver implements ControllerResolverInterface
 {
-    private $logger;
+    private ?LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger = null)
     {

@@ -43,7 +43,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
      */
     private $buffer;
 
-    private $multi;
+    private NativeClientState $multi;
     private float $pauseExpiry = 0.0;
 
     /**

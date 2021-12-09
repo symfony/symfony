@@ -37,7 +37,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
 
     public const FACTORY = 'load';
 
-    private $loader;
+    private PhpFileLoader $loader;
     private string $resource;
     private ?array $excludes = null;
     private bool $allowParent;

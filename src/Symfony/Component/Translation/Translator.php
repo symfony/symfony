@@ -51,7 +51,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
     private array $resources = [];
 
-    private $formatter;
+    private MessageFormatterInterface $formatter;
 
     private ?string $cacheDir;
 
@@ -59,7 +59,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
     private array $cacheVary;
 
-    private $configCacheFactory;
+    private ?ConfigCacheFactoryInterface $configCacheFactory;
 
     private array $parentLocales;
 

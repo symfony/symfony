@@ -43,7 +43,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
 {
-    private $output;
+    private ?OutputInterface $output;
     private array $verbosityLevelMap = [
         OutputInterface::VERBOSITY_QUIET => Logger::ERROR,
         OutputInterface::VERBOSITY_NORMAL => Logger::WARNING,

@@ -37,20 +37,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ExecutionContext implements ExecutionContextInterface
 {
-    private $validator;
+    private ValidatorInterface $validator;
 
     /**
      * The root value of the validated object graph.
      */
     private mixed $root;
 
-    private $translator;
+    private TranslatorInterface $translator;
     private ?string $translationDomain;
 
     /**
      * The violations generated in the current context.
      */
-    private $violations;
+    private ConstraintViolationList $violations;
 
     /**
      * The currently validated value.
@@ -70,7 +70,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * The current validation metadata.
      */
-    private $metadata = null;
+    private ?MetadataInterface $metadata = null;
 
     /**
      * The currently validated group.
@@ -80,7 +80,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * The currently validated constraint.
      */
-    private $constraint = null;
+    private ?Constraint $constraint = null;
 
     /**
      * Stores which objects have been validated in which group.

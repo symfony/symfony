@@ -18,7 +18,7 @@ final class LocatorConsumer
 {
     public function __construct(
         #[TaggedLocator('foo_bar', indexAttribute: 'foo')]
-        private $locator,
+        private ContainerInterface $locator,
     ) {
     }
 

@@ -21,7 +21,7 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
  */
 final class PathHeader extends AbstractHeader
 {
-    private $address;
+    private Address $address;
 
     public function __construct(string $name, Address $address)
     {

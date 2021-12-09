@@ -25,7 +25,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TraceableValidator implements ValidatorInterface, ResetInterface
 {
-    private $validator;
+    private ValidatorInterface $validator;
     private array $collectedData = [];
 
     public function __construct(ValidatorInterface $validator)

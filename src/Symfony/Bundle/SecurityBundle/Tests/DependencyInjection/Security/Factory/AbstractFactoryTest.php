@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class AbstractFactoryTest extends TestCase
 {
-    private $container;
+    private ContainerBuilder $container;
 
     protected function setUp(): void
     {

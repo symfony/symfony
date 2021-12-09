@@ -82,7 +82,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     protected $defaultLocale;
 
-    private $configCacheFactory;
+    private ConfigCacheFactoryInterface $configCacheFactory;
 
     /**
      * @var ExpressionFunctionProviderInterface[]

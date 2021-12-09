@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
  */
 class FirewallMap implements FirewallMapInterface
 {
-    private $container;
+    private ContainerInterface $container;
     private iterable $map;
 
     public function __construct(ContainerInterface $container, iterable $map)

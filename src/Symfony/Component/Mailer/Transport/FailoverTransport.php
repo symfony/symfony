@@ -18,7 +18,7 @@ namespace Symfony\Component\Mailer\Transport;
  */
 class FailoverTransport extends RoundRobinTransport
 {
-    private $currentTransport = null;
+    private ?TransportInterface $currentTransport = null;
 
     protected function getNextTransport(): ?TransportInterface
     {

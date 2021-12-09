@@ -26,12 +26,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CsrfValidationListener implements EventSubscriberInterface
 {
     private string $fieldName;
-    private $tokenManager;
+    private CsrfTokenManagerInterface $tokenManager;
     private string $tokenId;
     private string $errorMessage;
-    private $translator;
+    private ?TranslatorInterface $translator;
     private ?string $translationDomain;
-    private $serverParams;
+    private ServerParams $serverParams;
 
     public static function getSubscribedEvents(): array
     {

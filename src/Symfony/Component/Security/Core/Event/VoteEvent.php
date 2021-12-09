@@ -23,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class VoteEvent extends Event
 {
-    private $voter;
+    private VoterInterface $voter;
     private mixed $subject;
     private array $attributes;
     private int $vote;

@@ -30,7 +30,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 abstract class Output implements OutputInterface
 {
     private int $verbosity;
-    private $formatter;
+    private OutputFormatterInterface $formatter;
 
     /**
      * @param int|null                      $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)

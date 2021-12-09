@@ -31,7 +31,7 @@ class GenerateUlidCommand extends Command
         'rfc4122',
     ];
 
-    private $factory;
+    private UlidFactory $factory;
 
     public function __construct(UlidFactory $factory = null)
     {

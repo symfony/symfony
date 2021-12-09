@@ -24,7 +24,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 final class TraceableAuthenticatorManagerListener extends AbstractListener
 {
-    private $authenticationManagerListener;
+    private AuthenticatorManagerListener $authenticationManagerListener;
     private array $authenticatorsInfo = [];
     private bool $hasVardumper;
 

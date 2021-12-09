@@ -25,8 +25,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class AppVariable
 {
-    private $tokenStorage;
-    private $requestStack;
+    private TokenStorageInterface $tokenStorage;
+    private RequestStack $requestStack;
     private string $environment;
     private bool $debug;
 

@@ -33,7 +33,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
 {
     private string $manifestPath;
     private array $manifestData;
-    private $httpClient;
+    private ?HttpClientInterface $httpClient;
     private bool $strictMode;
 
     /**

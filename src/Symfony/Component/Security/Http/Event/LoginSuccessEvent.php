@@ -31,11 +31,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class LoginSuccessEvent extends Event
 {
-    private $authenticator;
-    private $passport;
-    private $authenticatedToken;
-    private $request;
-    private $response;
+    private AuthenticatorInterface $authenticator;
+    private Passport $passport;
+    private TokenInterface $authenticatedToken;
+    private Request $request;
+    private ?Response $response;
     private string $firewallName;
 
     public function __construct(AuthenticatorInterface $authenticator, Passport $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName)

@@ -24,10 +24,10 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class AmqpTransport implements QueueReceiverInterface, TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
 {
-    private $serializer;
-    private $connection;
-    private $receiver;
-    private $sender;
+    private SerializerInterface $serializer;
+    private Connection $connection;
+    private AmqpReceiver $receiver;
+    private AmqpSender $sender;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {

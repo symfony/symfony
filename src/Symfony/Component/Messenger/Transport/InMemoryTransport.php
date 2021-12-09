@@ -45,7 +45,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     private array $queue = [];
 
     private int $nextId = 1;
-    private $serializer;
+    private ?SerializerInterface $serializer;
 
     public function __construct(SerializerInterface $serializer = null)
     {

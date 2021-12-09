@@ -27,7 +27,7 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
  */
 class LazyChoiceList implements ChoiceListInterface
 {
-    private $loader;
+    private ChoiceLoaderInterface $loader;
 
     /**
      * The callable creating string values for each choice.

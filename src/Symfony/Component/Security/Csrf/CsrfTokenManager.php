@@ -26,8 +26,8 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
  */
 class CsrfTokenManager implements CsrfTokenManagerInterface
 {
-    private $generator;
-    private $storage;
+    private TokenGeneratorInterface $generator;
+    private TokenStorageInterface $storage;
     private \Closure|string $namespace;
 
     /**

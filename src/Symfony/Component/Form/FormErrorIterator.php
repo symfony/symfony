@@ -40,7 +40,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      */
     public const INDENTATION = '    ';
 
-    private $form;
+    private FormInterface $form;
     private array $errors;
 
     /**

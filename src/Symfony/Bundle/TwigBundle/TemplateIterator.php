@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class TemplateIterator implements \IteratorAggregate
 {
-    private $kernel;
+    private KernelInterface $kernel;
     private \Traversable $templates;
     private array $paths;
     private ?string $defaultPath;

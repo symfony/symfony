@@ -49,7 +49,7 @@ final class AmpClientState extends ClientState
     private \Closure $clientConfigurator;
     private int $maxHostConnections;
     private int $maxPendingPushes;
-    private $logger;
+    private ?LoggerInterface $logger;
 
     public function __construct(?callable $clientConfigurator, int $maxHostConnections, int $maxPendingPushes, ?LoggerInterface &$logger)
     {

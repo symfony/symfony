@@ -35,7 +35,7 @@ class PdoStore implements PersistingStoreInterface
     use DatabaseTableTrait;
     use ExpiringStoreTrait;
 
-    private $conn;
+    private \PDO $conn;
     private string $dsn;
     private string $driver;
     private string $username = '';

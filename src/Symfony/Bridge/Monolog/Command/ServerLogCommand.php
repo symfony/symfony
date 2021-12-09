@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog\Command;
 
 use Monolog\Formatter\FormatterInterface;
+use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
@@ -32,8 +33,8 @@ class ServerLogCommand extends Command
 {
     private const BG_COLOR = ['black', 'blue', 'cyan', 'green', 'magenta', 'red', 'white', 'yellow'];
 
-    private $el;
-    private $handler;
+    private ExpressionLanguage $el;
+    private HandlerInterface $handler;
 
     public function isEnabled(): bool
     {

@@ -33,7 +33,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class FormDataCollector extends DataCollector implements FormDataCollectorInterface
 {
-    private $dataExtractor;
+    private FormDataExtractorInterface $dataExtractor;
 
     /**
      * Stores the collected data per {@link FormInterface} instance.

@@ -31,14 +31,14 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  */
 class ProfilerListener implements EventSubscriberInterface
 {
-    private $profiler;
-    private $matcher;
+    private Profiler $profiler;
+    private ?RequestMatcherInterface $matcher;
     private bool $onlyException;
     private bool $onlyMainRequests;
     private ?\Throwable $exception = null;
     /** @var \SplObjectStorage<Request, Profile> */
     private \SplObjectStorage $profiles;
-    private $requestStack;
+    private RequestStack $requestStack;
     private ?string $collectParameter;
     /** @var \SplObjectStorage<Request, Request|null> */
     private \SplObjectStorage $parents;

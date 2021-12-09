@@ -23,7 +23,7 @@ use Symfony\Component\Cache\Traits\RedisProxy;
  */
 class RedisSessionHandler extends AbstractSessionHandler
 {
-    private $redis;
+    private \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis;
 
     /**
      * Key prefix for shared environments.

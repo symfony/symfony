@@ -22,7 +22,7 @@ use Symfony\Component\DomCrawler\Field\FormField;
 class Form extends Link implements \ArrayAccess
 {
     private \DOMElement $button;
-    private $fields;
+    private FormFieldRegistry $fields;
     private ?string $baseHref;
 
     /**

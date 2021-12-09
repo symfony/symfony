@@ -30,8 +30,8 @@ class ContainerConfigurator extends AbstractConfigurator
 {
     public const FACTORY = 'container';
 
-    private $container;
-    private $loader;
+    private ContainerBuilder $container;
+    private PhpFileLoader $loader;
     private array $instanceof;
     private string $path;
     private string $file;

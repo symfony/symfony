@@ -71,15 +71,15 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
-    private $config;
-    private $parent = null;
+    private FormConfigInterface $config;
+    private ?FormInterface $parent = null;
 
     /**
      * A map of FormInterface instances.
      *
      * @var OrderedHashMap<string, FormInterface>
      */
-    private $children;
+    private OrderedHashMap $children;
 
     /**
      * @var FormError[]
@@ -91,7 +91,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * The button that was used to submit the form.
      */
-    private $clickedButton = null;
+    private FormInterface|ClickableInterface|null $clickedButton = null;
 
     private mixed $modelData = null;
     private mixed $normData = null;
@@ -105,7 +105,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * The transformation failure generated during submission, if any.
      */
-    private $transformationFailure = null;
+    private ?TransformationFailedException $transformationFailure = null;
 
     /**
      * Whether the form's data has been initialized.
@@ -131,7 +131,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      */
     private bool $inheritData;
 
-    private $propertyPath = null;
+    private ?PropertyPathInterface $propertyPath = null;
 
     /**
      * @throws LogicException if a data mapper is not provided for a compound form

@@ -23,16 +23,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResolvedFormType implements ResolvedFormTypeInterface
 {
-    private $innerType;
+    private FormTypeInterface $innerType;
 
     /**
      * @var FormTypeExtensionInterface[]
      */
     private array $typeExtensions;
 
-    private $parent;
+    private ?ResolvedFormTypeInterface $parent;
 
-    private $optionsResolver;
+    private OptionsResolver $optionsResolver;
 
     /**
      * @param FormTypeExtensionInterface[] $typeExtensions

@@ -23,7 +23,7 @@ class MockFileSessionStorageFactory implements SessionStorageFactoryInterface
 {
     private ?string $savePath;
     private string $name;
-    private $metaBag;
+    private ?MetadataBag $metaBag;
 
     /**
      * @see MockFileSessionStorage constructor.

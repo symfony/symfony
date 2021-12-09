@@ -24,7 +24,7 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
 class SendersLocator implements SendersLocatorInterface
 {
     private array $sendersMap;
-    private $sendersLocator;
+    private ContainerInterface $sendersLocator;
 
     /**
      * @param array<string, list<string>> $sendersMap     An array, keyed by "type", set to an array of sender aliases

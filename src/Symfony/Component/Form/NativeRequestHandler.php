@@ -21,7 +21,7 @@ use Symfony\Component\Form\Util\ServerParams;
  */
 class NativeRequestHandler implements RequestHandlerInterface
 {
-    private $serverParams;
+    private ServerParams $serverParams;
 
     /**
      * The allowed keys of the $_FILES array.

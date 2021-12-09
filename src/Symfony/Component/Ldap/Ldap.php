@@ -22,7 +22,7 @@ use Symfony\Component\Ldap\Exception\DriverNotFoundException;
  */
 final class Ldap implements LdapInterface
 {
-    private $adapter;
+    private AdapterInterface $adapter;
 
     public function __construct(AdapterInterface $adapter)
     {

@@ -25,7 +25,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class DataCollectorTypeExtension extends AbstractTypeExtension
 {
-    private $listener;
+    private DataCollectorListener $listener;
 
     public function __construct(FormDataCollectorInterface $dataCollector)
     {

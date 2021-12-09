@@ -22,10 +22,10 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class BeanstalkdTransport implements TransportInterface, MessageCountAwareInterface
 {
-    private $connection;
-    private $serializer;
-    private $receiver;
-    private $sender;
+    private Connection $connection;
+    private SerializerInterface $serializer;
+    private BeanstalkdReceiver $receiver;
+    private BeanstalkdSender $sender;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {

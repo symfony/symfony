@@ -41,15 +41,15 @@ class SwitchUserListener extends AbstractListener
 {
     public const EXIT_VALUE = '_exit';
 
-    private $tokenStorage;
-    private $provider;
-    private $userChecker;
+    private TokenStorageInterface $tokenStorage;
+    private UserProviderInterface $provider;
+    private UserCheckerInterface $userChecker;
     private string $firewallName;
-    private $accessDecisionManager;
+    private AccessDecisionManagerInterface $accessDecisionManager;
     private string $usernameParameter;
     private string $role;
-    private $logger;
-    private $dispatcher;
+    private ?LoggerInterface $logger;
+    private ?EventDispatcherInterface $dispatcher;
     private bool $stateless;
 
     public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $firewallName, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)

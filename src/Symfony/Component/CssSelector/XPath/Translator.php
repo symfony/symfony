@@ -30,7 +30,7 @@ use Symfony\Component\CssSelector\Parser\ParserInterface;
  */
 class Translator implements TranslatorInterface
 {
-    private $mainParser;
+    private ParserInterface $mainParser;
 
     /**
      * @var ParserInterface[]

@@ -72,20 +72,20 @@ class Application implements ResetInterface
 {
     private array $commands = [];
     private bool $wantHelps = false;
-    private $runningCommand = null;
+    private ?Command $runningCommand = null;
     private string $name;
     private string $version;
-    private $commandLoader = null;
+    private ?CommandLoaderInterface $commandLoader = null;
     private bool $catchExceptions = true;
     private bool $autoExit = true;
-    private $definition;
-    private $helperSet;
-    private $dispatcher = null;
-    private $terminal;
+    private InputDefinition $definition;
+    private HelperSet $helperSet;
+    private ?EventDispatcherInterface $dispatcher = null;
+    private Terminal $terminal;
     private string $defaultCommand;
     private bool $singleCommand = false;
     private bool $initialized = false;
-    private $signalRegistry;
+    private SignalRegistry $signalRegistry;
     private array $signalsToDispatchEvent = [];
 
     public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')

@@ -43,13 +43,13 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class ContextListener extends AbstractListener
 {
-    private $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
     private string $sessionKey;
-    private $logger;
+    private ?LoggerInterface $logger;
     private iterable $userProviders;
-    private $dispatcher;
+    private ?EventDispatcherInterface $dispatcher;
     private bool $registered = false;
-    private $trustResolver;
+    private AuthenticationTrustResolverInterface $trustResolver;
     private ?\Closure $sessionTrackerEnabler;
 
     /**

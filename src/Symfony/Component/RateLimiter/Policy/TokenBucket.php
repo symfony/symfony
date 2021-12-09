@@ -22,7 +22,7 @@ final class TokenBucket implements LimiterStateInterface
 {
     private string $stringRate;
     private string $id;
-    private $rate;
+    private Rate $rate;
     private int $tokens;
     private int $burstSize;
     private float $timer;

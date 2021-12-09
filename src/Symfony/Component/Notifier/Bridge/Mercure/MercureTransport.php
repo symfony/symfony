@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransport extends AbstractTransport
 {
-    private $hub;
+    private HubInterface $hub;
     private string $hubId;
     private string|array $topics;
 

@@ -25,7 +25,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  */
 class AmpBody implements RequestBody, InputStream
 {
-    private $body;
+    private ResourceInputStream|\Closure|string $body;
     private array $info;
     private \Closure $onProgress;
     private ?int $offset = 0;

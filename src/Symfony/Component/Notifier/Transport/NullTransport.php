@@ -23,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class NullTransport implements TransportInterface
 {
-    private $dispatcher;
+    private ?EventDispatcherInterface $dispatcher;
 
     public function __construct(EventDispatcherInterface $dispatcher = null)
     {

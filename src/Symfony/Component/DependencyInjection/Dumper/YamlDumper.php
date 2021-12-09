@@ -37,7 +37,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlDumper extends Dumper
 {
-    private $dumper;
+    private YmlDumper $dumper;
 
     /**
      * Dumps the service container as an YAML string.

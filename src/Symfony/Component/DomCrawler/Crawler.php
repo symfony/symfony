@@ -58,7 +58,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     private bool $isHtml = true;
 
-    private $html5Parser;
+    private ?HTML5 $html5Parser;
 
     /**
      * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A Node to use as the base for the crawling

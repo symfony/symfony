@@ -49,8 +49,8 @@ class MongoDbStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $collection;
-    private $client;
+    private Collection $collection;
+    private Client $client;
     private string $uri;
     private array $options;
     private float $initialTtl;

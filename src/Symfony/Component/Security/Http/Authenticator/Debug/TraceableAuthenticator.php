@@ -29,10 +29,10 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 final class TraceableAuthenticator implements AuthenticatorInterface, InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
 {
-    private $authenticator;
-    private $passport = null;
+    private AuthenticatorInterface $authenticator;
+    private ?Passport $passport = null;
     private ?float $duration = null;
-    private $stub;
+    private ClassStub|string $stub;
 
     public function __construct(AuthenticatorInterface $authenticator)
     {

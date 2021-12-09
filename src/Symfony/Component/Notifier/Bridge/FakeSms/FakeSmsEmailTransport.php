@@ -30,7 +30,7 @@ final class FakeSmsEmailTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private $mailer;
+    private MailerInterface $mailer;
     private string $to;
     private string $from;
 

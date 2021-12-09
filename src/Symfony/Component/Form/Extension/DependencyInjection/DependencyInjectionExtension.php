@@ -20,9 +20,9 @@ use Symfony\Component\Form\FormTypeInterface;
 
 class DependencyInjectionExtension implements FormExtensionInterface
 {
-    private $guesser = null;
+    private ?FormTypeGuesserChain $guesser = null;
     private bool $guesserLoaded = false;
-    private $typeContainer;
+    private ContainerInterface $typeContainer;
     private array $typeExtensionServices;
     private iterable $guesserServices;
 

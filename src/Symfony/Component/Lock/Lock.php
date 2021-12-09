@@ -29,8 +29,8 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    private $store;
-    private $key;
+    private PersistingStoreInterface $store;
+    private Key $key;
     private ?float $ttl;
     private bool $autoRelease;
     private bool $dirty = false;

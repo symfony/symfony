@@ -28,7 +28,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class DoctrineDataCollector extends DataCollector
 {
-    private $registry;
+    private ManagerRegistry $registry;
     private array $connections;
     private array $managers;
 

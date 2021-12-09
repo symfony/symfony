@@ -22,7 +22,7 @@ class PreloadedExtension implements FormExtensionInterface
 {
     private array $types = [];
     private array $typeExtensions = [];
-    private $typeGuesser;
+    private ?FormTypeGuesserInterface $typeGuesser;
 
     /**
      * Creates a new preloaded extension.

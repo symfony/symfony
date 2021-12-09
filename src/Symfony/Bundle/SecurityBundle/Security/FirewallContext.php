@@ -23,9 +23,9 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
 class FirewallContext
 {
     private iterable $listeners;
-    private $exceptionListener;
-    private $logoutListener;
-    private $config;
+    private ?ExceptionListener $exceptionListener;
+    private ?LogoutListener $logoutListener;
+    private ?FirewallConfig $config;
 
     /**
      * @param iterable<mixed, callable> $listeners

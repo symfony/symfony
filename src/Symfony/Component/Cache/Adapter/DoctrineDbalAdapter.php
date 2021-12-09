@@ -27,8 +27,8 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 {
     protected $maxIdLength = 255;
 
-    private $marshaller;
-    private $conn;
+    private MarshallerInterface $marshaller;
+    private Connection $conn;
     private string $platformName;
     private string $serverVersion;
     private string $table = 'cache_items';

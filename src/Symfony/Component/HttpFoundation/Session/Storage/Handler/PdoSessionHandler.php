@@ -65,7 +65,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      */
     public const LOCK_TRANSACTIONAL = 2;
 
-    private $pdo;
+    private \PDO $pdo;
 
     /**
      * DSN string or null for session.save_path or false when lazy connection disabled.

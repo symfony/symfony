@@ -23,7 +23,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
 {
     private bool $decorated;
     private array $styles = [];
-    private $styleStack;
+    private OutputFormatterStyleStack $styleStack;
 
     public function __clone()
     {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Mailer\DataCollector\MessageDataCollector;
+use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
 
 return static function (ContainerConfigurator $container) {
     $container->services()

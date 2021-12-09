@@ -24,9 +24,9 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class SerializerErrorRenderer implements ErrorRendererInterface
 {
-    private $serializer;
+    private SerializerInterface $serializer;
     private string|\Closure $format;
-    private $fallbackErrorRenderer;
+    private ErrorRendererInterface $fallbackErrorRenderer;
     private bool|\Closure $debug;
 
     /**

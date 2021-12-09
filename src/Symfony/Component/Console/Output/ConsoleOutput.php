@@ -29,7 +29,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {
-    private $stderr;
+    private OutputInterface $stderr;
     private array $consoleSectionOutputs = [];
 
     /**

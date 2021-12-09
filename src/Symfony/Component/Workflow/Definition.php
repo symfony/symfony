@@ -25,7 +25,7 @@ final class Definition
     private array $places = [];
     private array $transitions = [];
     private array $initialPlaces = [];
-    private $metadataStore;
+    private MetadataStoreInterface $metadataStore;
 
     /**
      * @param string[]             $places

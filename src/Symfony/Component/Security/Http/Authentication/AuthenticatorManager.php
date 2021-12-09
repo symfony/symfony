@@ -46,10 +46,10 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {
     private iterable $authenticators;
-    private $tokenStorage;
-    private $eventDispatcher;
+    private TokenStorageInterface $tokenStorage;
+    private EventDispatcherInterface $eventDispatcher;
     private bool $eraseCredentials;
-    private $logger;
+    private ?LoggerInterface $logger;
     private string $firewallName;
     private bool $hideUserNotFoundExceptions;
     private array $requiredBadges;

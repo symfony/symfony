@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 class HandlerFailedException extends RuntimeException
 {
     private array $exceptions;
-    private $envelope;
+    private Envelope $envelope;
 
     /**
      * @param \Throwable[] $exceptions

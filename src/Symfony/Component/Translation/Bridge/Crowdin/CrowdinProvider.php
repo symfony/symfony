@@ -31,10 +31,10 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class CrowdinProvider implements ProviderInterface
 {
-    private $client;
-    private $loader;
-    private $logger;
-    private $xliffFileDumper;
+    private HttpClientInterface $client;
+    private LoaderInterface $loader;
+    private LoggerInterface $logger;
+    private XliffFileDumper $xliffFileDumper;
     private string $defaultLocale;
     private string $endpoint;
 

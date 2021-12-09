@@ -42,10 +42,10 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  */
 class RouterListener implements EventSubscriberInterface
 {
-    private $matcher;
-    private $context;
-    private $logger;
-    private $requestStack;
+    private RequestMatcherInterface|UrlMatcherInterface $matcher;
+    private RequestContext $context;
+    private ?LoggerInterface $logger;
+    private RequestStack $requestStack;
     private ?string $projectDir;
     private bool $debug;
 

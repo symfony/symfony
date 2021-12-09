@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\OneSignal;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Tomas Norkūnas <norkunas.tom@gmail.com>

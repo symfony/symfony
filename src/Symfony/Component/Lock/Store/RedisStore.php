@@ -31,7 +31,7 @@ class RedisStore implements SharedLockStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $redis;
+    private \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis;
     private float $initialTtl;
     private bool $supportTime;
 

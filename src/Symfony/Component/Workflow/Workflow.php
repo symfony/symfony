@@ -52,9 +52,9 @@ class Workflow implements WorkflowInterface
         WorkflowEvents::ANNOUNCE => self::DISABLE_ANNOUNCE_EVENT,
     ];
 
-    private $definition;
-    private $markingStore;
-    private $dispatcher;
+    private Definition $definition;
+    private MarkingStoreInterface $markingStore;
+    private ?EventDispatcherInterface $dispatcher;
     private string $name;
 
     /**

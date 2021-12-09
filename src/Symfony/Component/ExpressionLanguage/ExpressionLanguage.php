@@ -24,10 +24,10 @@ class_exists(ParsedExpression::class);
  */
 class ExpressionLanguage
 {
-    private $cache;
-    private $lexer;
-    private $parser;
-    private $compiler;
+    private CacheItemPoolInterface $cache;
+    private Lexer $lexer;
+    private Parser $parser;
+    private Compiler $compiler;
 
     protected array $functions = [];
 

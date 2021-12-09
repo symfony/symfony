@@ -42,14 +42,14 @@ class ConsoleFormatter implements FormatterInterface
     ];
 
     private array $options;
-    private $cloner;
+    private VarCloner $cloner;
 
     /**
      * @var resource|null
      */
     private $outputBuffer;
 
-    private $dumper;
+    private CliDumper $dumper;
 
     /**
      * Available options:

@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpFoundation\Session;
  */
 final class SessionBagProxy implements SessionBagInterface
 {
-    private $bag;
+    private SessionBagInterface $bag;
     private array $data;
     private ?int $usageIndex;
     private ?\Closure $usageReporter;

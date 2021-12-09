@@ -29,7 +29,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     protected $locked = false;
 
     private bool $disabled = false;
-    private $type;
+    private ResolvedFormTypeInterface $type;
     private string $name;
     private array $attributes = [];
     private array $options;

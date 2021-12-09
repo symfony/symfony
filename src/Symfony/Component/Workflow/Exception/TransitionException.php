@@ -21,7 +21,7 @@ class TransitionException extends LogicException
 {
     private object $subject;
     private string $transitionName;
-    private $workflow;
+    private WorkflowInterface $workflow;
     private array $context;
 
     public function __construct(object $subject, string $transitionName, WorkflowInterface $workflow, string $message, array $context = [])

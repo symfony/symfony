@@ -33,8 +33,8 @@ class FormRegistry implements FormRegistryInterface
      */
     private array $types = [];
 
-    private $guesser = false;
-    private $resolvedTypeFactory;
+    private FormTypeGuesserInterface|null|false $guesser = false;
+    private ResolvedFormTypeFactoryInterface $resolvedTypeFactory;
     private array $checkedTypes = [];
 
     /**

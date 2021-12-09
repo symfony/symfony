@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Security;
  */
 class AuthenticationUtils
 {
-    private $requestStack;
+    private RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack)
     {

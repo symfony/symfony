@@ -23,7 +23,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class MessageLoggerListener implements EventSubscriberInterface, ResetInterface
 {
-    private $events;
+    private MessageEvents $events;
 
     public function __construct()
     {

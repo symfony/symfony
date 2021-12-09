@@ -22,10 +22,10 @@ use Symfony\Component\Form\Exception\LogicException;
  */
 class DoctrineChoiceLoader extends AbstractChoiceLoader
 {
-    private $manager;
+    private ObjectManager $manager;
     private string $class;
-    private $idReader;
-    private $objectLoader;
+    private ?IdReader $idReader;
+    private ?EntityLoaderInterface $objectLoader;
 
     /**
      * Creates a new choice loader.

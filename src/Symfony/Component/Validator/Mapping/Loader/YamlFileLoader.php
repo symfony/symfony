@@ -34,7 +34,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Caches the used YAML parser.
      */
-    private $yamlParser;
+    private YamlParser $yamlParser;
 
     /**
      * {@inheritdoc}

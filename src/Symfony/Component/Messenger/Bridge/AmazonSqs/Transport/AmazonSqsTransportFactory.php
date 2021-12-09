@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class AmazonSqsTransportFactory implements TransportFactoryInterface
 {
-    private $logger;
+    private ?LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger = null)
     {

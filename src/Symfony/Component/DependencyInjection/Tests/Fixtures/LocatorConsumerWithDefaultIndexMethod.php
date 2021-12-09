@@ -9,7 +9,7 @@ final class LocatorConsumerWithDefaultIndexMethod
 {
     public function __construct(
         #[TaggedLocator(tag: 'foo_bar', defaultIndexMethod: 'getDefaultFooName')]
-        private $locator,
+        private ContainerInterface $locator,
     ) {
     }
 

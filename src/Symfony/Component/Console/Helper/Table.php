@@ -43,8 +43,8 @@ class Table
     private bool $horizontal = false;
     private array $effectiveColumnWidths = [];
     private int $numberOfColumns;
-    private $output;
-    private $style;
+    private OutputInterface $output;
+    private TableStyle $style;
     private array $columnStyles = [];
     private array $columnWidths = [];
     private array $columnMaxWidths = [];

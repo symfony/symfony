@@ -24,7 +24,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 class NullOutput implements OutputInterface
 {
-    private $formatter;
+    private NullOutputFormatter $formatter;
 
     /**
      * {@inheritdoc}

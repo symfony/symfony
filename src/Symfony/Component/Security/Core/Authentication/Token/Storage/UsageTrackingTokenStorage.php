@@ -24,8 +24,8 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceSubscriberInterface
 {
-    private $storage;
-    private $container;
+    private TokenStorageInterface $storage;
+    private ContainerInterface $container;
     private bool $enableUsageTracking = false;
 
     public function __construct(TokenStorageInterface $storage, ContainerInterface $container)

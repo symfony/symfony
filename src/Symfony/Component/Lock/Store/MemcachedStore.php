@@ -26,7 +26,7 @@ class MemcachedStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $memcached;
+    private \Memcached $memcached;
     private int $initialTtl;
     private bool $useExtendedReturn;
 

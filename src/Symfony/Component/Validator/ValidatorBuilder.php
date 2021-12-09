@@ -48,12 +48,12 @@ class ValidatorBuilder
     private array $xmlMappings = [];
     private array $yamlMappings = [];
     private array $methodMappings = [];
-    private $annotationReader = null;
+    private ?Reader $annotationReader = null;
     private bool $enableAnnotationMapping = false;
-    private $metadataFactory = null;
-    private $validatorFactory;
-    private $mappingCache = null;
-    private $translator = null;
+    private ?MetadataFactoryInterface $metadataFactory = null;
+    private ConstraintValidatorFactoryInterface $validatorFactory;
+    private ?CacheItemPoolInterface $mappingCache = null;
+    private ?TranslatorInterface $translator = null;
     private ?string $translationDomain = null;
 
     /**

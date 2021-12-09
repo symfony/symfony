@@ -38,8 +38,8 @@ use Symfony\Component\Mime\RawMessage;
 class SendmailTransport extends AbstractTransport
 {
     private string $command = '/usr/sbin/sendmail -bs';
-    private $stream;
-    private $transport = null;
+    private ProcessStream $stream;
+    private ?SmtpTransport $transport = null;
 
     /**
      * Constructor.

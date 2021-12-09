@@ -22,8 +22,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class MessageEvent extends Event
 {
-    private $message;
-    private $envelope;
+    private RawMessage $message;
+    private Envelope $envelope;
     private string $transport;
     private bool $queued;
 

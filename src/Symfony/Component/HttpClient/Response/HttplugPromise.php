@@ -23,7 +23,7 @@ use Psr\Http\Message\ResponseInterface as Psr7ResponseInterface;
  */
 final class HttplugPromise implements HttplugPromiseInterface
 {
-    private $promise;
+    private GuzzlePromiseInterface $promise;
 
     public function __construct(GuzzlePromiseInterface $promise)
     {

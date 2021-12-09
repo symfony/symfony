@@ -22,9 +22,9 @@ use Twig\Environment;
  */
 final class BodyRenderer implements BodyRendererInterface
 {
-    private $twig;
+    private Environment $twig;
     private array $context;
-    private $converter;
+    private HtmlConverter $converter;
 
     public function __construct(Environment $twig, array $context = [])
     {

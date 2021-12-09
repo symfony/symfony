@@ -22,7 +22,7 @@ abstract class AbstractChoiceLoader implements ChoiceLoaderInterface
     /**
      * The loaded choice list.
      */
-    private $choiceList;
+    private ArrayChoiceList $choiceList;
 
     /**
      * @final

@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Sms77;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author André Matthies <matthiez@gmail.com>

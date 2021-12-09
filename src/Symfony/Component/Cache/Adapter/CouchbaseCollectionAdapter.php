@@ -29,8 +29,8 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
 {
     private const MAX_KEY_LENGTH = 250;
 
-    private $connection;
-    private $marshaller;
+    private Collection $connection;
+    private MarshallerInterface $marshaller;
 
     public function __construct(Collection $connection, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {

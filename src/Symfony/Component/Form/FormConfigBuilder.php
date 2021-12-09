@@ -34,17 +34,17 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /** @var bool */
     protected $locked = false;
 
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
     private string $name;
-    private $propertyPath = null;
+    private ?PropertyPathInterface $propertyPath = null;
     private bool $mapped = true;
     private bool $byReference = true;
     private bool $inheritData = false;
     private bool $compound = false;
-    private $type;
+    private ResolvedFormTypeInterface $type;
     private array $viewTransformers = [];
     private array $modelTransformers = [];
-    private $dataMapper = null;
+    private ?DataMapperInterface $dataMapper = null;
     private bool $required = true;
     private bool $disabled = false;
     private bool $errorBubbling = false;
@@ -53,10 +53,10 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private mixed $data = null;
     private ?string $dataClass;
     private bool $dataLocked = false;
-    private $formFactory;
+    private FormFactoryInterface $formFactory;
     private string $action = '';
     private string $method = 'POST';
-    private $requestHandler;
+    private RequestHandlerInterface $requestHandler;
     private bool $autoInitialize = false;
     private array $options;
     private ?\Closure $isEmptyCallback = null;

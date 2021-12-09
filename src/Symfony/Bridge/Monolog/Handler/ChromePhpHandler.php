@@ -59,7 +59,7 @@ class ChromePhpHandler extends BaseChromePhpHandler
             return;
         }
 
-        if ($this->response) {
+        if (isset($this->response)) {
             $this->response->headers->set($header, $content);
         } else {
             $this->headers[$header] = $content;

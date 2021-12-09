@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
-use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides basic functionality for services mapped by the firewall name
@@ -24,9 +22,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 trait FirewallAwareTrait
 {
-    private ContainerInterface $locator;
-    private RequestStack $requestStack;
-    private FirewallMap $firewallMap;
+    private $locator;
+    private $requestStack;
+    private $firewallMap;
 
     private function getForFirewall(): object
     {

@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Container;
  */
 class ContainerBag extends FrozenParameterBag implements ContainerBagInterface
 {
-    private Container $container;
+    private $container;
 
     public function __construct(Container $container)
     {

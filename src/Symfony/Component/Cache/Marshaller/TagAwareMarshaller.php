@@ -18,7 +18,7 @@ namespace Symfony\Component\Cache\Marshaller;
  */
 class TagAwareMarshaller implements MarshallerInterface
 {
-    private MarshallerInterface $marshaller;
+    private $marshaller;
 
     public function __construct(MarshallerInterface $marshaller = null)
     {

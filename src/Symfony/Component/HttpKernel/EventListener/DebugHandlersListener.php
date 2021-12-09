@@ -33,8 +33,8 @@ class DebugHandlersListener implements EventSubscriberInterface
 {
     private string|object|null $earlyHandler;
     private ?\Closure $exceptionHandler;
-    private ?LoggerInterface $logger;
-    private ?LoggerInterface $deprecationLogger;
+    private $logger;
+    private $deprecationLogger;
     private array|int|null $levels;
     private ?int $throwAt;
     private bool $scream;

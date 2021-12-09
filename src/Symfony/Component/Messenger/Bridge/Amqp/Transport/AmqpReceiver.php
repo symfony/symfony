@@ -27,8 +27,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 {
-    private SerializerInterface $serializer;
-    private Connection $connection;
+    private $serializer;
+    private $connection;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {

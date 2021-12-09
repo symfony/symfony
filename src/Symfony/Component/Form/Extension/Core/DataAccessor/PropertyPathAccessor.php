@@ -28,7 +28,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class PropertyPathAccessor implements DataAccessorInterface
 {
-    private PropertyAccessorInterface $propertyAccessor;
+    private $propertyAccessor;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {

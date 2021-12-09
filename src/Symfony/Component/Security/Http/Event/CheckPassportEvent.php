@@ -26,8 +26,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class CheckPassportEvent extends Event
 {
-    private AuthenticatorInterface $authenticator;
-    private Passport $passport;
+    private $authenticator;
+    private $passport;
 
     public function __construct(AuthenticatorInterface $authenticator, Passport $passport)
     {

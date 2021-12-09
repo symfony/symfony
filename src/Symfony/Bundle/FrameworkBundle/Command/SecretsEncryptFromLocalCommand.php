@@ -27,8 +27,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'secrets:encrypt-from-local', description: 'Encrypt all local secrets to the vault')]
 final class SecretsEncryptFromLocalCommand extends Command
 {
-    private AbstractVault $vault;
-    private ?AbstractVault $localVault;
+    private $vault;
+    private $localVault;
 
     public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
     {

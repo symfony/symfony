@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class HttpFoundationRequestHandler implements RequestHandlerInterface
 {
-    private ServerParams $serverParams;
+    private $serverParams;
 
     public function __construct(ServerParams $serverParams = null)
     {

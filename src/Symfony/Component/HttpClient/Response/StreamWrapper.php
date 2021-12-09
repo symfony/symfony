@@ -25,9 +25,9 @@ class StreamWrapper
     /** @var resource|string|null */
     public $context;
 
-    private HttpClientInterface|ResponseInterface $client;
+    private $client;
 
-    private ResponseInterface $response;
+    private $response;
 
     /** @var resource|null */
     private $content;

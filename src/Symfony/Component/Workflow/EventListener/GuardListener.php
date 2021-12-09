@@ -25,12 +25,12 @@ use Symfony\Component\Workflow\TransitionBlocker;
 class GuardListener
 {
     private array $configuration;
-    private ExpressionLanguage $expressionLanguage;
-    private TokenStorageInterface $tokenStorage;
-    private AuthorizationCheckerInterface $authorizationChecker;
-    private AuthenticationTrustResolverInterface $trustResolver;
-    private ?RoleHierarchyInterface $roleHierarchy;
-    private ?ValidatorInterface $validator;
+    private $expressionLanguage;
+    private $tokenStorage;
+    private $authorizationChecker;
+    private $trustResolver;
+    private $roleHierarchy;
+    private $validator;
 
     public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
     {

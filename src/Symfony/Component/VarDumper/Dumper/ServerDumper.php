@@ -22,8 +22,8 @@ use Symfony\Component\VarDumper\Server\Connection;
  */
 class ServerDumper implements DataDumperInterface
 {
-    private Connection $connection;
-    private ?DataDumperInterface $wrappedDumper;
+    private $connection;
+    private $wrappedDumper;
 
     /**
      * @param string                     $host             The server host

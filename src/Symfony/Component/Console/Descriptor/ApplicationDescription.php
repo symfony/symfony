@@ -24,7 +24,7 @@ class ApplicationDescription
 {
     public const GLOBAL_NAMESPACE = '_global';
 
-    private Application $application;
+    private $application;
     private ?string $namespace;
     private bool $showHidden;
     private array $namespaces;

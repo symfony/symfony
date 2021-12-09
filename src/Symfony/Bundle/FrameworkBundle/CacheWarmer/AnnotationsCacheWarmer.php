@@ -25,7 +25,7 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
  */
 class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
 {
-    private Reader $annotationReader;
+    private $annotationReader;
     private ?string $excludeRegexp;
     private bool $debug;
 

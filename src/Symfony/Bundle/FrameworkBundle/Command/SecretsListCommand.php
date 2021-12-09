@@ -31,8 +31,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'secrets:list', description: 'List all secrets')]
 final class SecretsListCommand extends Command
 {
-    private AbstractVault $vault;
-    private ?AbstractVault $localVault;
+    private $vault;
+    private $localVault;
 
     public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
     {

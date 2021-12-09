@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  */
 class CsrfProtectionListener implements EventSubscriberInterface
 {
-    private CsrfTokenManagerInterface $csrfTokenManager;
+    private $csrfTokenManager;
 
     public function __construct(CsrfTokenManagerInterface $csrfTokenManager)
     {

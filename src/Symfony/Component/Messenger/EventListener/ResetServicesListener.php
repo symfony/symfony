@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
  */
 class ResetServicesListener implements EventSubscriberInterface
 {
-    private ServicesResetter $servicesResetter;
+    private $servicesResetter;
 
     public function __construct(ServicesResetter $servicesResetter)
     {

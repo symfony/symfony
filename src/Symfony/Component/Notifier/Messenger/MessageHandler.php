@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class MessageHandler
 {
-    private TransportInterface $transport;
+    private $transport;
 
     public function __construct(TransportInterface $transport)
     {

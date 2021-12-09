@@ -24,7 +24,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 class ConfigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private KernelInterface $kernel;
+    private $kernel;
 
     /**
      * Sets the Kernel associated with this Request.

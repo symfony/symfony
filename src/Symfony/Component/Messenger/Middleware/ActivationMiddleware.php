@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Envelope;
  */
 class ActivationMiddleware implements MiddlewareInterface
 {
-    private MiddlewareInterface $inner;
+    private $inner;
     private \Closure|bool $activated;
 
     public function __construct(MiddlewareInterface $inner, bool|callable $activated)

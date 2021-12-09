@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Worker;
  */
 final class WorkerRunningEvent
 {
-    private Worker $worker;
+    private $worker;
     private bool $isWorkerIdle;
 
     public function __construct(Worker $worker, bool $isWorkerIdle)

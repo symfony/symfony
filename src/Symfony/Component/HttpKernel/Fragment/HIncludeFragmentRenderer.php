@@ -25,8 +25,8 @@ use Twig\Environment;
 class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 {
     private ?string $globalDefaultTemplate;
-    private ?UriSigner $signer;
-    private ?Environment $twig;
+    private $signer;
+    private $twig;
     private string $charset;
 
     /**

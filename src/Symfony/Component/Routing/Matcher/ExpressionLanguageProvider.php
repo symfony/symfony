@@ -22,7 +22,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
-    private ServiceProviderInterface $functions;
+    private $functions;
 
     public function __construct(ServiceProviderInterface $functions)
     {

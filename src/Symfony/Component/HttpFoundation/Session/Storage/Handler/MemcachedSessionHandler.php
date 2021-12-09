@@ -21,7 +21,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class MemcachedSessionHandler extends AbstractSessionHandler
 {
-    private \Memcached $memcached;
+    private $memcached;
 
     /**
      * Time to live in seconds.

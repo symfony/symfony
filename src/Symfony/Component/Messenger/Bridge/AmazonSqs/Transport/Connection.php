@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
 use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use AsyncAws\Sqs\Enum\QueueAttributeName;
-use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\MessageAttributeValue;
 use AsyncAws\Sqs\ValueObject\MessageSystemAttributeValue;
@@ -50,8 +49,8 @@ class Connection
     ];
 
     private array $configuration;
-    private SqsClient $client;
-    private ?ReceiveMessageResult $currentResponse = null;
+    private $client;
+    private $currentResponse = null;
     /** @var array[] */
     private array $buffer = [];
     private ?string $queueUrl;

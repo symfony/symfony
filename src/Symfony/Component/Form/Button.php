@@ -25,8 +25,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class Button implements \IteratorAggregate, FormInterface
 {
-    private ?FormInterface $parent = null;
-    private FormConfigInterface $config;
+    private $parent = null;
+    private $config;
     private bool $submitted = false;
 
     /**

@@ -69,7 +69,7 @@ class PhpDumper extends Dumper
     private ?\SplObjectStorage $inlinedDefinitions = null;
     private ?array $serviceCalls = null;
     private array $reservedVariables = ['instance', 'class', 'this', 'container'];
-    private ExpressionLanguage $expressionLanguage;
+    private $expressionLanguage;
     private ?string $targetDirRegex = null;
     private int $targetDirMaxMatches;
     private string $docStar;
@@ -90,7 +90,7 @@ class PhpDumper extends Dumper
     private string $serviceLocatorTag;
     private array $exportedVariables = [];
     private string $baseClass;
-    private ProxyDumper $proxyDumper;
+    private $proxyDumper;
 
     /**
      * {@inheritdoc}

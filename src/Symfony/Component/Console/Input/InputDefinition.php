@@ -30,8 +30,8 @@ class InputDefinition
 {
     private array $arguments = [];
     private int $requiredCount = 0;
-    private ?InputArgument $lastArrayArgument = null;
-    private ?InputArgument $lastOptionalArgument = null;
+    private $lastArrayArgument = null;
+    private $lastOptionalArgument = null;
     private array $options = [];
     private array $negations = [];
     private array $shortcuts = [];

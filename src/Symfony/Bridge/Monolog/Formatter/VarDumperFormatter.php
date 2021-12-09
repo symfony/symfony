@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
  */
 class VarDumperFormatter implements FormatterInterface
 {
-    private VarCloner $cloner;
+    private $cloner;
 
     public function __construct(VarCloner $cloner = null)
     {

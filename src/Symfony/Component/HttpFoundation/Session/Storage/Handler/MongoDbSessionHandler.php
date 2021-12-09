@@ -26,8 +26,8 @@ use MongoDB\Collection;
  */
 class MongoDbSessionHandler extends AbstractSessionHandler
 {
-    private Client $mongo;
-    private Collection $collection;
+    private $mongo;
+    private $collection;
     private array $options;
 
     /**

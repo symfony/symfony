@@ -29,7 +29,7 @@ class_exists(HttpHeaderSerializer::class);
  */
 class AddLinkHeaderListener implements EventSubscriberInterface
 {
-    private HttpHeaderSerializer $serializer;
+    private $serializer;
 
     public function __construct()
     {

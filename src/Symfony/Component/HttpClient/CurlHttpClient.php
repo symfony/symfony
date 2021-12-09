@@ -48,7 +48,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     /**
      * An internal object to share state between the client and its responses.
      */
-    private CurlClientState $multi;
+    private $multi;
 
     private static array $curlVersion;
 

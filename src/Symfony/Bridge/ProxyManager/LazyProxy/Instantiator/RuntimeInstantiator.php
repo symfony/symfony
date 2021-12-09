@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
  */
 class RuntimeInstantiator implements InstantiatorInterface
 {
-    private LazyLoadingValueHolderFactory $factory;
+    private $factory;
 
     public function __construct()
     {

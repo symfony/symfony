@@ -25,8 +25,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class DoctrineSender implements SenderInterface
 {
-    private Connection $connection;
-    private SerializerInterface $serializer;
+    private $connection;
+    private $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {

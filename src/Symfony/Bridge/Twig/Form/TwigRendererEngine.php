@@ -21,8 +21,8 @@ use Twig\Template;
  */
 class TwigRendererEngine extends AbstractRendererEngine
 {
-    private Environment $environment;
-    private Template $template;
+    private $environment;
+    private $template;
 
     public function __construct(array $defaultThemes, Environment $environment)
     {

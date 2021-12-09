@@ -20,7 +20,7 @@ use Symfony\Component\Console\Color;
  */
 class OutputFormatterStyle implements OutputFormatterStyleInterface
 {
-    private Color $color;
+    private $color;
     private string $foreground;
     private string $background;
     private array $options;

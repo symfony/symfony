@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class Application extends BaseApplication
 {
-    private KernelInterface $kernel;
+    private $kernel;
     private bool $commandsRegistered = false;
     private array $registrationErrors = [];
 

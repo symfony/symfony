@@ -30,7 +30,7 @@ class FormError
     /**
      * The form that spawned this error.
      */
-    private ?FormInterface $origin = null;
+    private $origin = null;
 
     /**
      * Any array key in $messageParameters will be used as a placeholder in

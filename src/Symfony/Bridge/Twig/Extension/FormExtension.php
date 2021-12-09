@@ -30,7 +30,7 @@ use Twig\TwigTest;
  */
 final class FormExtension extends AbstractExtension
 {
-    private ?TranslatorInterface $translator;
+    private $translator;
 
     public function __construct(TranslatorInterface $translator = null)
     {

@@ -23,7 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ExecutionContextFactory implements ExecutionContextFactoryInterface
 {
-    private TranslatorInterface $translator;
+    private $translator;
     private ?string $translationDomain;
 
     public function __construct(TranslatorInterface $translator, string $translationDomain = null)

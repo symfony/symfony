@@ -49,8 +49,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChoiceType extends AbstractType
 {
-    private ChoiceListFactoryInterface $choiceListFactory;
-    private ?TranslatorInterface $translator;
+    private $choiceListFactory;
+    private $translator;
 
     public function __construct(ChoiceListFactoryInterface $choiceListFactory = null, TranslatorInterface $translator = null)
     {

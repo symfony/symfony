@@ -32,9 +32,9 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
 {
     use AsyncDecoratorTrait;
 
-    private RetryStrategyInterface $strategy;
+    private $strategy;
     private int $maxRetries;
-    private LoggerInterface $logger;
+    private $logger;
 
     /**
      * @param int $maxRetries The maximum number of times to retry

@@ -4,7 +4,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 class FooClassWithEnumAttribute
 {
-    private FooUnitEnum $bar;
+    private $bar;
 
     public function __construct(FooUnitEnum $bar)
     {

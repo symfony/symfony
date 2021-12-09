@@ -26,7 +26,7 @@ use Symfony\Component\Uid\Uuid;
 #[AsCommand(name: 'uuid:generate', description: 'Generate a UUID')]
 class GenerateUuidCommand extends Command
 {
-    private UuidFactory $factory;
+    private $factory;
 
     public function __construct(UuidFactory $factory = null)
     {

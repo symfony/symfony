@@ -39,7 +39,7 @@ use Twig\Source;
 #[AsCommand(name: 'lint:twig', description: 'Lint a Twig template and outputs encountered errors')]
 class LintCommand extends Command
 {
-    private Environment $twig;
+    private $twig;
     private string $format;
 
     public function __construct(Environment $twig)

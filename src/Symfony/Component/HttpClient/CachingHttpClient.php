@@ -35,8 +35,8 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
 {
     use HttpClientTrait;
 
-    private HttpClientInterface $client;
-    private HttpCache $cache;
+    private $client;
+    private $cache;
     private array $defaultOptions = self::OPTIONS_DEFAULTS;
 
     public function __construct(HttpClientInterface $client, StoreInterface $store, array $defaultOptions = [])

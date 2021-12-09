@@ -50,9 +50,9 @@ class TranslationDebugCommand extends Command
     public const MESSAGE_UNUSED = 1;
     public const MESSAGE_EQUALS_FALLBACK = 2;
 
-    private TranslatorInterface $translator;
-    private TranslationReaderInterface $reader;
-    private ExtractorInterface $extractor;
+    private $translator;
+    private $reader;
+    private $extractor;
     private ?string $defaultTransPath;
     private ?string $defaultViewsPath;
     private array $transPaths;

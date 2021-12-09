@@ -23,7 +23,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 final class GuardEvent extends Event
 {
-    private TransitionBlockerList $transitionBlockerList;
+    private $transitionBlockerList;
 
     /**
      * {@inheritdoc}

@@ -37,7 +37,7 @@ class TokenStream
     private array $used = [];
 
     private int $cursor = 0;
-    private ?Token $peeked;
+    private $peeked;
     private bool $peeking = false;
 
     /**

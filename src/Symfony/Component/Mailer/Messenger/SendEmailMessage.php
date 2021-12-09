@@ -19,8 +19,8 @@ use Symfony\Component\Mime\RawMessage;
  */
 class SendEmailMessage
 {
-    private RawMessage $message;
-    private ?Envelope $envelope;
+    private $message;
+    private $envelope;
 
     public function __construct(RawMessage $message, Envelope $envelope = null)
     {

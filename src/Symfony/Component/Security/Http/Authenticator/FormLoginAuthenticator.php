@@ -41,12 +41,12 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  */
 class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 {
-    private HttpUtils $httpUtils;
-    private UserProviderInterface $userProvider;
-    private AuthenticationSuccessHandlerInterface $successHandler;
-    private AuthenticationFailureHandlerInterface $failureHandler;
+    private $httpUtils;
+    private $userProvider;
+    private $successHandler;
+    private $failureHandler;
     private array $options;
-    private HttpKernelInterface $httpKernel;
+    private $httpKernel;
 
     public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options)
     {

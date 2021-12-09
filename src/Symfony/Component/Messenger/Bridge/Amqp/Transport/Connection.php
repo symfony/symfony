@@ -77,18 +77,18 @@ class Connection
     private array $connectionOptions;
     private array $exchangeOptions;
     private array $queuesOptions;
-    private AmqpFactory $amqpFactory;
+    private $amqpFactory;
     private mixed $autoSetupExchange;
     private mixed $autoSetupDelayExchange;
-    private \AMQPChannel $amqpChannel;
-    private \AMQPExchange $amqpExchange;
+    private $amqpChannel;
+    private $amqpExchange;
 
     /**
      * @var \AMQPQueue[]
      */
     private array $amqpQueues = [];
 
-    private \AMQPExchange $amqpDelayExchange;
+    private $amqpDelayExchange;
 
     public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, AmqpFactory $amqpFactory = null)
     {

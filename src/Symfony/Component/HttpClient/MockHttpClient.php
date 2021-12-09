@@ -28,7 +28,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
 {
     use HttpClientTrait;
 
-    private ResponseInterface|\Closure|iterable|null $responseFactory;
+    private $responseFactory;
     private int $requestsCount = 0;
     private array $defaultOptions = [];
 

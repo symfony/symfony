@@ -43,7 +43,7 @@ class Connection
         'serializer' => \Redis::SERIALIZER_PHP,
     ];
 
-    private \Redis|\RedisCluster|RedisProxy|RedisClusterProxy $connection;
+    private $connection;
     private string $stream;
     private string $queue;
     private string $group;

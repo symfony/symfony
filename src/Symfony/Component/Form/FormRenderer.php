@@ -25,8 +25,8 @@ class FormRenderer implements FormRendererInterface
 {
     public const CACHE_KEY_VAR = 'unique_block_prefix';
 
-    private FormRendererEngineInterface $engine;
-    private ?CsrfTokenManagerInterface $csrfTokenManager;
+    private $engine;
+    private $csrfTokenManager;
     private array $blockNameHierarchyMap = [];
     private array $hierarchyLevelMap = [];
     private array $variableStack = [];

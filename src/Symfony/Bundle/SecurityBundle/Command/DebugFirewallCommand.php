@@ -33,8 +33,8 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 final class DebugFirewallCommand extends Command
 {
     private array $firewallNames;
-    private ContainerInterface $contexts;
-    private ContainerInterface $eventDispatchers;
+    private $contexts;
+    private $eventDispatchers;
     private array $authenticators;
 
     /**

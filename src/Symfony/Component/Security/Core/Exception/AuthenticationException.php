@@ -24,7 +24,7 @@ class AuthenticationException extends RuntimeException
     /** @internal */
     protected $serialized;
 
-    private ?TokenInterface $token = null;
+    private $token = null;
 
     public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
     {

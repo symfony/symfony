@@ -35,7 +35,7 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
     private iterable $voters;
     private array $votersCacheAttributes = [];
     private array $votersCacheObject = [];
-    private AccessDecisionStrategyInterface $strategy;
+    private $strategy;
 
     /**
      * @param iterable<mixed, VoterInterface> $voters An array or an iterator of VoterInterface instances

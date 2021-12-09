@@ -30,7 +30,7 @@ final class DkimSigner
     public const ALGO_SHA256 = 'rsa-sha256';
     public const ALGO_ED25519 = 'ed25519-sha256'; // RFC 8463
 
-    private \OpenSSLAsymmetricKey $key;
+    private $key;
     private string $domainName;
     private string $selector;
     private array $defaultOptions;

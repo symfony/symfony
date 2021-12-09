@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class HttpBrowser extends AbstractBrowser
 {
-    private HttpClientInterface $client;
+    private $client;
 
     public function __construct(HttpClientInterface $client = null, History $history = null, CookieJar $cookieJar = null)
     {

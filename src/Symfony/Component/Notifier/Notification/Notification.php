@@ -40,7 +40,7 @@ class Notification
     private string $subject = '';
     private string $content = '';
     private string $emoji = '';
-    private ?FlattenException $exception = null;
+    private $exception = null;
     private string $exceptionAsString = '';
     private string $importance = self::IMPORTANCE_HIGH;
 

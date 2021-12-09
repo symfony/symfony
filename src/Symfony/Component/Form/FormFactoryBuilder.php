@@ -22,7 +22,7 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 {
     private bool $forceCoreExtension;
 
-    private ResolvedFormTypeFactoryInterface $resolvedTypeFactory;
+    private $resolvedTypeFactory;
 
     /**
      * @var FormExtensionInterface[]

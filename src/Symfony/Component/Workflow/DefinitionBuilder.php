@@ -25,7 +25,7 @@ class DefinitionBuilder
     private array $places = [];
     private array $transitions = [];
     private string|array|null $initialPlaces = null;
-    private ?MetadataStoreInterface $metadataStore = null;
+    private $metadataStore = null;
 
     /**
      * @param string[]     $places

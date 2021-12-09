@@ -45,7 +45,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         '::/128',
     ];
 
-    private HttpClientInterface $client;
+    private $client;
     private string|array|null $subnets;
 
     /**

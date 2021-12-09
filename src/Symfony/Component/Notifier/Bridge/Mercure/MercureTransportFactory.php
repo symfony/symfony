@@ -23,7 +23,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
  */
 final class MercureTransportFactory extends AbstractTransportFactory
 {
-    private HubRegistry $registry;
+    private $registry;
 
     public function __construct(HubRegistry $registry)
     {

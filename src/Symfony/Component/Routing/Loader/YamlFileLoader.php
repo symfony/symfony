@@ -36,7 +36,7 @@ class YamlFileLoader extends FileLoader
     private const AVAILABLE_KEYS = [
         'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless',
     ];
-    private YamlParser $yamlParser;
+    private $yamlParser;
 
     /**
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid

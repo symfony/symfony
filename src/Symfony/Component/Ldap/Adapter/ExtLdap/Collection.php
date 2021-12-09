@@ -20,8 +20,8 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class Collection implements CollectionInterface
 {
-    private Connection $connection;
-    private Query $search;
+    private $connection;
+    private $search;
     /** @var list<Entry> */
     private array $entries;
 

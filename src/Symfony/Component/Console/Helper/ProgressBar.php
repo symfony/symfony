@@ -47,7 +47,7 @@ final class ProgressBar
     private float $lastWriteTime = 0;
     private float $minSecondsBetweenRedraws = 0;
     private float $maxSecondsBetweenRedraws = 1;
-    private OutputInterface $output;
+    private $output;
     private int $step = 0;
     private ?int $max = null;
     private int $startTime;
@@ -56,9 +56,9 @@ final class ProgressBar
     private int $formatLineCount;
     private array $messages = [];
     private bool $overwrite = true;
-    private Terminal $terminal;
+    private $terminal;
     private ?string $previousMessage = null;
-    private Cursor $cursor;
+    private $cursor;
 
     private static array $formatters;
     private static array $formats;

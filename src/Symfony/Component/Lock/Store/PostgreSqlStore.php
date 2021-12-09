@@ -143,7 +143,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
     public function putOffExpiration(Key $key, float $ttl)
     {
         if (isset($this->dbalStore)) {
-            $this->dbalStore->putOffExpiration($key);
+            $this->dbalStore->putOffExpiration($key, $ttl);
 
             return;
         }

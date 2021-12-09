@@ -437,7 +437,7 @@ class Connection
         }
     }
 
-    public function add(string $body, array $headers, int $delayInMs = 0): void
+    public function add(string $body, array $headers, int $delayInMs = 0): string
     {
         if ($this->autoSetup) {
             $this->setup();
@@ -445,11 +445,12 @@ class Connection
 
         try {
             if ($delayInMs > 0) { // the delay is <= 0 for queued messages
+                $id = uniqid('', true);
                 $message = json_encode([
                     'body' => $body,
                     'headers' => $headers,
                     // Entry need to be unique in the sorted set else it would only be added once to the delayed messages queue
-                    'uniqid' => uniqid('', true),
+                    'uniqid' => $id,
                 ]);
 
                 if (false === $message) {
@@ -483,6 +484,8 @@ class Connection
                 } else {
                     $added = $this->connection->xadd($this->stream, '*', ['message' => $message]);
                 }
+
+                $id = $added;
             }
         } catch (\RedisException $e) {
             if ($error = $this->connection->getLastError() ?: null) {
@@ -497,6 +500,8 @@ class Connection
             }
             throw new TransportException($error ?? 'Could not add a message to the redis stream.');
         }
+
+        return $id;
     }
 
     public function setup(): void

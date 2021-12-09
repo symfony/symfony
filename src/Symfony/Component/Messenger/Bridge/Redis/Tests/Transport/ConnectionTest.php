@@ -359,4 +359,26 @@ class ConnectionTest extends TestCase
 
         $this->assertSame('xack error', $e->getMessage());
     }
+
+    /**
+     * @dataProvider provideIdPatterns
+     */
+    public function testAddReturnId(string $expected, \Redis $redis, int $delay = 0)
+    {
+        $id = Connection::fromDsn(dsn: 'redis://localhost/queue', redis: $redis)->add('body', [], $delay);
+
+        $this->assertMatchesRegularExpression($expected, $id);
+    }
+
+    public function provideIdPatterns(): \Generator
+    {
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->atLeastOnce())->method('xadd')->willReturn('THE_MESSAGE_ID');
+
+        yield 'No delay' => ['/^THE_MESSAGE_ID$/', $redis];
+
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->atLeastOnce())->method('rawCommand')->willReturn('1');
+        yield '100ms delay' => ['/^\w+\.\d+$/', $redis, 100];
+    }
 }

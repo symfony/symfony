@@ -24,7 +24,7 @@ class ConsoleSectionOutput extends StreamOutput
     private array $content = [];
     private int $lines = 0;
     private array $sections;
-    private Terminal $terminal;
+    private $terminal;
 
     /**
      * @param resource               $stream

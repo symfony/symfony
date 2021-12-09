@@ -28,9 +28,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CoreExtension extends AbstractExtension
 {
-    private PropertyAccessorInterface $propertyAccessor;
-    private ChoiceListFactoryInterface $choiceListFactory;
-    private ?TranslatorInterface $translator;
+    private $propertyAccessor;
+    private $choiceListFactory;
+    private $translator;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null, TranslatorInterface $translator = null)
     {

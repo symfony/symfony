@@ -48,7 +48,7 @@ class BicValidator extends ConstraintValidator
         'VG' => 'GB', // British Virgin Islands
     ];
 
-    private ?PropertyAccessor $propertyAccessor;
+    private $propertyAccessor;
 
     public function __construct(PropertyAccessor $propertyAccessor = null)
     {

@@ -19,9 +19,9 @@ use Symfony\Component\Mime\RawMessage;
  */
 class SentMessage
 {
-    private RawMessage $original;
-    private RawMessage $raw;
-    private Envelope $envelope;
+    private $original;
+    private $raw;
+    private $envelope;
     private string $messageId;
     private string $debug = '';
 

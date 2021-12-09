@@ -31,9 +31,9 @@ final class PropertyInfoLoader implements LoaderInterface
 {
     use AutoMappingTrait;
 
-    private PropertyListExtractorInterface $listExtractor;
-    private PropertyTypeExtractorInterface $typeExtractor;
-    private PropertyAccessExtractorInterface $accessExtractor;
+    private $listExtractor;
+    private $typeExtractor;
+    private $accessExtractor;
     private ?string $classValidatorRegexp;
 
     public function __construct(PropertyListExtractorInterface $listExtractor, PropertyTypeExtractorInterface $typeExtractor, PropertyAccessExtractorInterface $accessExtractor, string $classValidatorRegexp = null)

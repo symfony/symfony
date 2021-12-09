@@ -20,7 +20,7 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
  */
 class RedisClusterProxy
 {
-    private ?\RedisCluster $redis;
+    private $redis;
     private \Closure $initializer;
     private bool $ready = false;
 

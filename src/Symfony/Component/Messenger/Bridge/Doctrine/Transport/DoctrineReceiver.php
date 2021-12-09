@@ -31,8 +31,8 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface,
 {
     private const MAX_RETRIES = 3;
     private int $retryingSafetyCounter = 0;
-    private Connection $connection;
-    private SerializerInterface $serializer;
+    private $connection;
+    private $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {

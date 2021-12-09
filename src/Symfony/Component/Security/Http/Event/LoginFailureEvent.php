@@ -28,12 +28,12 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class LoginFailureEvent extends Event
 {
-    private AuthenticationException $exception;
-    private AuthenticatorInterface $authenticator;
-    private Request $request;
-    private ?Response $response;
+    private $exception;
+    private $authenticator;
+    private $request;
+    private $response;
     private string $firewallName;
-    private ?Passport $passport;
+    private $passport;
 
     public function __construct(AuthenticationException $exception, AuthenticatorInterface $authenticator, Request $request, ?Response $response, string $firewallName, Passport $passport = null)
     {

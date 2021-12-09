@@ -27,7 +27,7 @@ class ZookeeperStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private \Zookeeper $zookeeper;
+    private $zookeeper;
 
     public function __construct(\Zookeeper $zookeeper)
     {

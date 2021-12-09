@@ -16,7 +16,7 @@ namespace Symfony\Component\Notifier\Message;
  */
 final class SentMessage
 {
-    private MessageInterface $original;
+    private $original;
     private string $transport;
     private ?string $messageId = null;
 

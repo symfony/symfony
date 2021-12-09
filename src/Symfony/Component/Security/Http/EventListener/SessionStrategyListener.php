@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  */
 class SessionStrategyListener implements EventSubscriberInterface
 {
-    private SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy;
+    private $sessionAuthenticationStrategy;
 
     public function __construct(SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy)
     {

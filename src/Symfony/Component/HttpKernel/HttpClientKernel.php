@@ -31,7 +31,7 @@ class_exists(ResponseHeaderBag::class);
  */
 final class HttpClientKernel implements HttpKernelInterface
 {
-    private HttpClientInterface $client;
+    private $client;
 
     public function __construct(HttpClientInterface $client = null)
     {

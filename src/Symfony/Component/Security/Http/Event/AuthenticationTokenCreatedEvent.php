@@ -22,8 +22,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class AuthenticationTokenCreatedEvent extends Event
 {
-    private TokenInterface $authenticatedToken;
-    private Passport $passport;
+    private $authenticatedToken;
+    private $passport;
 
     public function __construct(TokenInterface $token, Passport $passport)
     {

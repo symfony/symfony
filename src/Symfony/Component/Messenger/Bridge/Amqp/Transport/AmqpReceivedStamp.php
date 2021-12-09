@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class AmqpReceivedStamp implements NonSendableStampInterface
 {
-    private \AMQPEnvelope $amqpEnvelope;
+    private $amqpEnvelope;
     private string $queueName;
 
     public function __construct(\AMQPEnvelope $amqpEnvelope, string $queueName)

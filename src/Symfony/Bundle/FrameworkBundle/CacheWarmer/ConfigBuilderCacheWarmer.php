@@ -28,8 +28,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ConfigBuilderCacheWarmer implements CacheWarmerInterface
 {
-    private KernelInterface $kernel;
-    private ?LoggerInterface $logger;
+    private $kernel;
+    private $logger;
 
     public function __construct(KernelInterface $kernel, LoggerInterface $logger = null)
     {

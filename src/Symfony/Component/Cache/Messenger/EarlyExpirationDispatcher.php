@@ -23,8 +23,8 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  */
 class EarlyExpirationDispatcher
 {
-    private MessageBusInterface $bus;
-    private ReverseContainer $reverseContainer;
+    private $bus;
+    private $reverseContainer;
     private ?\Closure $callbackWrapper;
 
     public function __construct(MessageBusInterface $bus, ReverseContainer $reverseContainer, callable $callbackWrapper = null)

@@ -23,8 +23,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ValidationListener implements EventSubscriberInterface
 {
-    private ValidatorInterface $validator;
-    private ViolationMapperInterface $violationMapper;
+    private $validator;
+    private $violationMapper;
 
     /**
      * {@inheritdoc}

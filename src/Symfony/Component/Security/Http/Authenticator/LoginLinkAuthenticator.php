@@ -31,10 +31,10 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
  */
 final class LoginLinkAuthenticator extends AbstractAuthenticator implements InteractiveAuthenticatorInterface
 {
-    private LoginLinkHandlerInterface $loginLinkHandler;
-    private HttpUtils $httpUtils;
-    private AuthenticationSuccessHandlerInterface $successHandler;
-    private AuthenticationFailureHandlerInterface $failureHandler;
+    private $loginLinkHandler;
+    private $httpUtils;
+    private $successHandler;
+    private $failureHandler;
     private array $options;
 
     public function __construct(LoginLinkHandlerInterface $loginLinkHandler, HttpUtils $httpUtils, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options)

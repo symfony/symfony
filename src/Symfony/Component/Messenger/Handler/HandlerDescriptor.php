@@ -20,7 +20,7 @@ final class HandlerDescriptor
 {
     private \Closure $handler;
     private string $name;
-    private ?BatchHandlerInterface $batchHandler = null;
+    private $batchHandler = null;
     private array $options;
 
     public function __construct(callable $handler, array $options = [])

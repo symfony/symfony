@@ -22,8 +22,8 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
  */
 final class RequestContextProvider implements ContextProviderInterface
 {
-    private RequestStack $requestStack;
-    private VarCloner $cloner;
+    private $requestStack;
+    private $cloner;
 
     public function __construct(RequestStack $requestStack)
     {

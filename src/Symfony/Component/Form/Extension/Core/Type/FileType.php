@@ -33,7 +33,7 @@ class FileType extends AbstractType
         self::MIB_BYTES => 'MiB',
     ];
 
-    private ?TranslatorInterface $translator;
+    private $translator;
 
     public function __construct(TranslatorInterface $translator = null)
     {

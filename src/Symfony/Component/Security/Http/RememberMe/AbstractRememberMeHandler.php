@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
 {
-    private UserProviderInterface $userProvider;
+    private $userProvider;
     protected $requestStack;
     protected $options;
     protected $logger;

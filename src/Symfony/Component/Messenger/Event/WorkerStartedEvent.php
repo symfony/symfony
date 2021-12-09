@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Worker;
  */
 final class WorkerStartedEvent
 {
-    private Worker $worker;
+    private $worker;
 
     public function __construct(Worker $worker)
     {

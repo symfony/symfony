@@ -47,7 +47,7 @@ class ElasticsearchLogstashHandler extends AbstractHandler
 
     private string $endpoint;
     private string $index;
-    private HttpClientInterface $client;
+    private $client;
 
     /**
      * @var \SplObjectStorage<ResponseInterface, null>

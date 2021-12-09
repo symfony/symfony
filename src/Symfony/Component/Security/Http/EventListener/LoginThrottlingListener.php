@@ -25,8 +25,8 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
  */
 final class LoginThrottlingListener implements EventSubscriberInterface
 {
-    private RequestStack $requestStack;
-    private RequestRateLimiterInterface $limiter;
+    private $requestStack;
+    private $limiter;
 
     public function __construct(RequestStack $requestStack, RequestRateLimiterInterface $limiter)
     {

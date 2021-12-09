@@ -18,7 +18,7 @@ use Symfony\Component\Uid\Ulid;
 
 final class UlidGenerator extends AbstractIdGenerator
 {
-    private ?UlidFactory $factory;
+    private $factory;
 
     public function __construct(UlidFactory $factory = null)
     {

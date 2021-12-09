@@ -23,7 +23,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 trait DecoratorTrait
 {
-    private HttpClientInterface $client;
+    private $client;
 
     public function __construct(HttpClientInterface $client = null)
     {

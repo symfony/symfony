@@ -33,7 +33,7 @@ class Serializer implements SerializerInterface
     public const MESSENGER_SERIALIZATION_CONTEXT = 'messenger_serialization';
     private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
 
-    private SymfonySerializerInterface $serializer;
+    private $serializer;
     private string $format;
     private array $context;
 

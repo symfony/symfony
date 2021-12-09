@@ -27,7 +27,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class HelpCommand extends Command
 {
-    private Command $command;
+    private $command;
 
     /**
      * {@inheritdoc}

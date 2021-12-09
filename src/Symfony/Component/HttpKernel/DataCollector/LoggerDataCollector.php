@@ -24,10 +24,10 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  */
 class LoggerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private DebugLoggerInterface $logger;
+    private $logger;
     private ?string $containerPathPrefix;
-    private ?Request $currentRequest = null;
-    private ?RequestStack $requestStack;
+    private $currentRequest = null;
+    private $requestStack;
     private ?array $processedLogs = null;
 
     public function __construct(object $logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null)

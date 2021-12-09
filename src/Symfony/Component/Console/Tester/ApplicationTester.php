@@ -28,7 +28,7 @@ class ApplicationTester
 {
     use TesterTrait;
 
-    private Application $application;
+    private $application;
 
     public function __construct(Application $application)
     {

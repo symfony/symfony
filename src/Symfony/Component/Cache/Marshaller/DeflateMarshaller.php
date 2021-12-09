@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Exception\CacheException;
  */
 class DeflateMarshaller implements MarshallerInterface
 {
-    private MarshallerInterface $marshaller;
+    private $marshaller;
 
     public function __construct(MarshallerInterface $marshaller)
     {

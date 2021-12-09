@@ -24,9 +24,9 @@ use Symfony\Component\HttpKernel\UriSigner;
  */
 abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRenderer
 {
-    private ?SurrogateInterface $surrogate;
-    private FragmentRendererInterface $inlineStrategy;
-    private ?UriSigner $signer;
+    private $surrogate;
+    private $inlineStrategy;
+    private $signer;
 
     /**
      * The "fallback" strategy when surrogate is not available should always be an

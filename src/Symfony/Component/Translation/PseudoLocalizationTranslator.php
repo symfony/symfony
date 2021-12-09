@@ -20,7 +20,7 @@ final class PseudoLocalizationTranslator implements TranslatorInterface
 {
     private const EXPANSION_CHARACTER = '~';
 
-    private TranslatorInterface $translator;
+    private $translator;
     private bool $accents;
     private float $expansionFactor;
     private bool $brackets;

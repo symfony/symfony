@@ -21,8 +21,8 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
  */
 class ExpressionRequestMatcher extends RequestMatcher
 {
-    private ExpressionLanguage $language;
-    private Expression|string $expression;
+    private $language;
+    private $expression;
 
     public function setExpression(ExpressionLanguage $language, Expression|string $expression)
     {

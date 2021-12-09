@@ -23,7 +23,7 @@ use Symfony\Component\Notifier\Notifier;
  */
 class SendFailedMessageToNotifierListener implements EventSubscriberInterface
 {
-    private Notifier $notifier;
+    private $notifier;
 
     public function __construct(Notifier $notifier)
     {

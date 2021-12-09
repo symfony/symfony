@@ -23,7 +23,7 @@ use Symfony\Component\Mime\Message;
  */
 class EnvelopeListener implements EventSubscriberInterface
 {
-    private ?Address $sender = null;
+    private $sender = null;
 
     /**
      * @var Address[]|null

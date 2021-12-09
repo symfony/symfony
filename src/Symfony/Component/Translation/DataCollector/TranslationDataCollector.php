@@ -25,7 +25,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class TranslationDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private DataCollectorTranslator $translator;
+    private $translator;
 
     public function __construct(DataCollectorTranslator $translator)
     {

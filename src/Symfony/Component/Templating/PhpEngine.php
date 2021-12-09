@@ -41,7 +41,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected $globals = [];
     protected $parser;
 
-    private Storage $evalTemplate;
+    private $evalTemplate;
     private array $evalParameters;
 
     /**

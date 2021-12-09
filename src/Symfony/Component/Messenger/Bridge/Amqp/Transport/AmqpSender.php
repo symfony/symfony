@@ -26,8 +26,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class AmqpSender implements SenderInterface
 {
-    private SerializerInterface $serializer;
-    private Connection $connection;
+    private $serializer;
+    private $connection;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {

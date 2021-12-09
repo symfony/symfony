@@ -22,7 +22,7 @@ use Symfony\Component\Asset\Exception\LogicException;
  */
 class Packages
 {
-    private ?PackageInterface $defaultPackage;
+    private $defaultPackage;
     private array $packages = [];
 
     /**

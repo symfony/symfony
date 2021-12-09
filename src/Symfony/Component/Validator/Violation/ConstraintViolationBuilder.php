@@ -26,16 +26,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
 {
-    private ConstraintViolationList $violations;
+    private $violations;
     private string|\Stringable $message;
     private array $parameters;
     private mixed $root;
     private mixed $invalidValue;
     private string $propertyPath;
-    private TranslatorInterface $translator;
+    private $translator;
     private ?string $translationDomain;
     private ?int $plural = null;
-    private ?Constraint $constraint;
+    private $constraint;
     private ?string $code = null;
     private mixed $cause = null;
 

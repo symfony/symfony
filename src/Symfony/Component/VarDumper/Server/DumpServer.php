@@ -25,7 +25,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 class DumpServer
 {
     private string $host;
-    private ?LoggerInterface $logger;
+    private $logger;
 
     /**
      * @var resource|null

@@ -29,7 +29,7 @@ final class FakeChatEmailTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private MailerInterface $mailer;
+    private $mailer;
     private string $to;
     private string $from;
 

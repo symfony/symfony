@@ -22,7 +22,7 @@ class ImportConfigurator
     use Traits\PrefixTrait;
     use Traits\RouteTrait;
 
-    private RouteCollection $parent;
+    private $parent;
 
     public function __construct(RouteCollection $parent, RouteCollection $route)
     {

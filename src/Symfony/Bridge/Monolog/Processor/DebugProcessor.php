@@ -21,7 +21,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
 {
     private array $records = [];
     private array $errorCount = [];
-    private ?RequestStack $requestStack;
+    private $requestStack;
 
     public function __construct(RequestStack $requestStack = null)
     {

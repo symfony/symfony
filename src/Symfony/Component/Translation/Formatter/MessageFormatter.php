@@ -22,8 +22,8 @@ class_exists(IntlFormatter::class);
  */
 class MessageFormatter implements MessageFormatterInterface, IntlFormatterInterface
 {
-    private TranslatorInterface $translator;
-    private IntlFormatterInterface $intlFormatter;
+    private $translator;
+    private $intlFormatter;
 
     /**
      * @param TranslatorInterface|null $translator An identity translator to use as selector for pluralization

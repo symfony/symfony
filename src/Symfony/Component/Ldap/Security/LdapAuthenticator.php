@@ -34,7 +34,7 @@ use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointExceptio
  */
 class LdapAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {
-    private AuthenticatorInterface $authenticator;
+    private $authenticator;
     private string $ldapServiceId;
     private string $dnString;
     private string $searchDn;

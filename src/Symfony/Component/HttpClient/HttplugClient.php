@@ -58,16 +58,16 @@ if (!interface_exists(RequestFactory::class)) {
  */
 final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestFactory, StreamFactory, UriFactory, ResetInterface
 {
-    private HttpClientInterface $client;
-    private ResponseFactoryInterface $responseFactory;
-    private StreamFactoryInterface $streamFactory;
+    private $client;
+    private $responseFactory;
+    private $streamFactory;
 
     /**
      * @var \SplObjectStorage<ResponseInterface, array{RequestInterface, Promise}>|null
      */
     private ?\SplObjectStorage $promisePool;
 
-    private HttplugWaitLoop $waitLoop;
+    private $waitLoop;
 
     public function __construct(HttpClientInterface $client = null, ResponseFactoryInterface $responseFactory = null, StreamFactoryInterface $streamFactory = null)
     {

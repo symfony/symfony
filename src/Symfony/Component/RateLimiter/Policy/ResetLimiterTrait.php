@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
-use Symfony\Component\Lock\LockInterface;
-use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 trait ResetLimiterTrait
 {
-    private LockInterface $lock;
-    private StorageInterface $storage;
+    private $lock;
+    private $storage;
     private string $id;
 
     /**

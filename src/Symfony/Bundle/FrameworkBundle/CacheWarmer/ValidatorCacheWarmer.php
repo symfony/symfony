@@ -28,7 +28,7 @@ use Symfony\Component\Validator\ValidatorBuilder;
  */
 class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
 {
-    private ValidatorBuilder $validatorBuilder;
+    private $validatorBuilder;
 
     /**
      * @param string $phpArrayFile The PHP file where metadata are cached

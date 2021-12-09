@@ -20,8 +20,8 @@ final class ChatMessage implements MessageInterface
 {
     private ?string $transport = null;
     private string $subject;
-    private ?MessageOptionsInterface $options;
-    private ?Notification $notification = null;
+    private $options;
+    private $notification = null;
 
     public function __construct(string $subject, MessageOptionsInterface $options = null)
     {

@@ -30,8 +30,8 @@ class HttpCache extends BaseHttpCache
     protected $cacheDir;
     protected $kernel;
 
-    private ?StoreInterface $store = null;
-    private ?SurrogateInterface $surrogate;
+    private $store = null;
+    private $surrogate;
     private array $options;
 
     /**

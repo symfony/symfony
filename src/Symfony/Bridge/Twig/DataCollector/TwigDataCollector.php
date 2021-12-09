@@ -28,8 +28,8 @@ use Twig\Profiler\Profile;
  */
 class TwigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private Profile $profile;
-    private ?Environment $twig;
+    private $profile;
+    private $twig;
     private array $computed;
 
     public function __construct(Profile $profile, Environment $twig = null)

@@ -52,9 +52,9 @@ if (!interface_exists(ClientInterface::class)) {
  */
 final class Psr18Client implements ClientInterface, RequestFactoryInterface, StreamFactoryInterface, UriFactoryInterface, ResetInterface
 {
-    private HttpClientInterface $client;
-    private ResponseFactoryInterface $responseFactory;
-    private StreamFactoryInterface $streamFactory;
+    private $client;
+    private $responseFactory;
+    private $streamFactory;
 
     public function __construct(HttpClientInterface $client = null, ResponseFactoryInterface $responseFactory = null, StreamFactoryInterface $streamFactory = null)
     {
@@ -205,7 +205,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
  */
 class Psr18NetworkException extends \RuntimeException implements NetworkExceptionInterface
 {
-    private RequestInterface $request;
+    private $request;
 
     public function __construct(TransportExceptionInterface $e, RequestInterface $request)
     {
@@ -224,7 +224,7 @@ class Psr18NetworkException extends \RuntimeException implements NetworkExceptio
  */
 class Psr18RequestException extends \InvalidArgumentException implements RequestExceptionInterface
 {
-    private RequestInterface $request;
+    private $request;
 
     public function __construct(TransportExceptionInterface $e, RequestInterface $request)
     {

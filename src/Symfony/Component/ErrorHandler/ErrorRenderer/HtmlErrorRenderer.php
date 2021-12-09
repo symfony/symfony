@@ -38,7 +38,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     private string|array|FileLinkFormatter|false $fileLinkFormat;
     private ?string $projectDir;
     private string|\Closure $outputBuffer;
-    private ?LoggerInterface $logger;
+    private $logger;
 
     private static string $template = 'views/error.html.php';
 

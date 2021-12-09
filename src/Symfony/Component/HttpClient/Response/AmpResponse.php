@@ -45,9 +45,9 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
     private static string $nextId = 'a';
 
-    private AmpClientState $multi;
+    private $multi;
     private ?array $options;
-    private CancellationTokenSource $canceller;
+    private $canceller;
     private \Closure $onProgress;
 
     private static ?string $delay = null;

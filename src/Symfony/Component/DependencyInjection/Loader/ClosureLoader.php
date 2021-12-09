@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ClosureLoader extends Loader
 {
-    private ContainerBuilder $container;
+    private $container;
 
     public function __construct(ContainerBuilder $container, string $env = null)
     {

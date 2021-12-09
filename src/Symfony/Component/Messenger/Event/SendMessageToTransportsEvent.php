@@ -26,7 +26,7 @@ use Symfony\Component\Messenger\Envelope;
  */
 final class SendMessageToTransportsEvent
 {
-    private Envelope $envelope;
+    private $envelope;
 
     public function __construct(Envelope $envelope)
     {

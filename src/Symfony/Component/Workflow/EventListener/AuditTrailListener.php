@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Event\Event;
  */
 class AuditTrailListener implements EventSubscriberInterface
 {
-    private LoggerInterface $logger;
+    private $logger;
 
     public function __construct(LoggerInterface $logger)
     {

@@ -23,10 +23,10 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class RedisTransport implements TransportInterface, SetupableTransportInterface
 {
-    private SerializerInterface $serializer;
-    private Connection $connection;
-    private RedisReceiver $receiver;
-    private RedisSender $sender;
+    private $serializer;
+    private $connection;
+    private $receiver;
+    private $sender;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {

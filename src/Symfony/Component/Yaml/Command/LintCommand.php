@@ -36,7 +36,7 @@ use Symfony\Component\Yaml\Yaml;
 #[AsCommand(name: 'lint:yaml', description: 'Lint a YAML file and outputs encountered errors')]
 class LintCommand extends Command
 {
-    private Parser $parser;
+    private $parser;
     private ?string $format = null;
     private bool $displayCorrectFiles;
     private ?\Closure $directoryIteratorProvider;

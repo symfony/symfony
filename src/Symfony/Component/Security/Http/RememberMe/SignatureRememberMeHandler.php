@@ -32,7 +32,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 final class SignatureRememberMeHandler extends AbstractRememberMeHandler
 {
-    private SignatureHasher $signatureHasher;
+    private $signatureHasher;
 
     public function __construct(SignatureHasher $signatureHasher, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null)
     {

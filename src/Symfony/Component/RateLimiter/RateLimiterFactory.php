@@ -28,8 +28,8 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 final class RateLimiterFactory
 {
     private array $config;
-    private StorageInterface $storage;
-    private ?LockFactory $lockFactory;
+    private $storage;
+    private $lockFactory;
 
     public function __construct(array $config, StorageInterface $storage, LockFactory $lockFactory = null)
     {

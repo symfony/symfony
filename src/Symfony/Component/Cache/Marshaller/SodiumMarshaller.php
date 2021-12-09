@@ -21,7 +21,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 class SodiumMarshaller implements MarshallerInterface
 {
-    private MarshallerInterface $marshaller;
+    private $marshaller;
     private array $decryptionKeys;
 
     /**

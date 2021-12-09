@@ -19,7 +19,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class SentMessageEvent extends Event
 {
-    private SentMessage $message;
+    private $message;
 
     public function __construct(SentMessage $message)
     {

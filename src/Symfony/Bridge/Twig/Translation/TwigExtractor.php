@@ -37,7 +37,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
      */
     private string $prefix = '';
 
-    private Environment $twig;
+    private $twig;
 
     public function __construct(Environment $twig)
     {

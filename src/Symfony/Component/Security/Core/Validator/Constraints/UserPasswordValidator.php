@@ -22,8 +22,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class UserPasswordValidator extends ConstraintValidator
 {
-    private TokenStorageInterface $tokenStorage;
-    private PasswordHasherFactoryInterface $hasherFactory;
+    private $tokenStorage;
+    private $hasherFactory;
 
     public function __construct(TokenStorageInterface $tokenStorage, PasswordHasherFactoryInterface $hasherFactory)
     {

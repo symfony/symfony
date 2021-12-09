@@ -62,7 +62,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     private bool $autoload;
     private array $skippedIds;
 
-    private ExpressionLanguage $expressionLanguage;
+    private $expressionLanguage;
 
     /**
      * @param bool  $autoload   Whether services who's class in not loaded should be checked or not.

@@ -20,8 +20,8 @@ namespace Symfony\Component\DependencyInjection\Compiler;
  */
 class ServiceReferenceGraphEdge
 {
-    private ServiceReferenceGraphNode $sourceNode;
-    private ServiceReferenceGraphNode $destNode;
+    private $sourceNode;
+    private $destNode;
     private mixed $value;
     private bool $lazy;
     private bool $weak;

@@ -24,13 +24,13 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class InlineServiceDefinitionsPass extends AbstractRecursivePass
 {
-    private ?AnalyzeServiceReferencesPass $analyzingPass;
+    private $analyzingPass;
     private array $cloningIds = [];
     private array $connectedIds = [];
     private array $notInlinedIds = [];
     private array $inlinedIds = [];
     private array $notInlinableIds = [];
-    private ?ServiceReferenceGraph $graph = null;
+    private $graph = null;
 
     public function __construct(AnalyzeServiceReferencesPass $analyzingPass = null)
     {

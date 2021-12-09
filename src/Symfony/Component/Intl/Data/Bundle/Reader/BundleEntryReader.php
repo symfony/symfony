@@ -28,7 +28,7 @@ use Symfony\Component\Intl\Locale;
  */
 class BundleEntryReader implements BundleEntryReaderInterface
 {
-    private BundleReaderInterface $reader;
+    private $reader;
 
     /**
      * A mapping of locale aliases to locales.

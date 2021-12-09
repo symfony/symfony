@@ -28,7 +28,7 @@ use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 #[AsCommand(name: 'messenger:setup-transports', description: 'Prepare the required infrastructure for the transport')]
 class SetupTransportsCommand extends Command
 {
-    private ContainerInterface $transportLocator;
+    private $transportLocator;
     private array $transportNames;
 
     public function __construct(ContainerInterface $transportLocator, array $transportNames = [])

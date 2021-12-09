@@ -23,9 +23,9 @@ use Symfony\Component\Mime\RawMessage;
  */
 final class Mailer implements MailerInterface
 {
-    private TransportInterface $transport;
-    private ?MessageBusInterface $bus;
-    private ?EventDispatcherInterface $dispatcher;
+    private $transport;
+    private $bus;
+    private $dispatcher;
 
     public function __construct(TransportInterface $transport, MessageBusInterface $bus = null, EventDispatcherInterface $dispatcher = null)
     {

@@ -27,8 +27,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResolvedTypeDataCollectorProxy implements ResolvedFormTypeInterface
 {
-    private ResolvedFormTypeInterface $proxiedType;
-    private FormDataCollectorInterface $dataCollector;
+    private $proxiedType;
+    private $dataCollector;
 
     public function __construct(ResolvedFormTypeInterface $proxiedType, FormDataCollectorInterface $dataCollector)
     {

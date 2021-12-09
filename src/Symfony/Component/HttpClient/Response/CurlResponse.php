@@ -33,7 +33,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     use TransportResponseTrait;
 
     private static bool $performing = false;
-    private CurlClientState $multi;
+    private $multi;
 
     /**
      * @var resource

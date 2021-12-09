@@ -18,8 +18,8 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  */
 class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {
-    private AbstractSessionHandler $handler;
-    private MarshallerInterface $marshaller;
+    private $handler;
+    private $marshaller;
 
     public function __construct(AbstractSessionHandler $handler, MarshallerInterface $marshaller)
     {

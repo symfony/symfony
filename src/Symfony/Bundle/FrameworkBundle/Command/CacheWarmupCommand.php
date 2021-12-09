@@ -30,7 +30,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
 #[AsCommand(name: 'cache:warmup', description: 'Warm up an empty cache')]
 class CacheWarmupCommand extends Command
 {
-    private CacheWarmerAggregate $cacheWarmer;
+    private $cacheWarmer;
 
     public function __construct(CacheWarmerAggregate $cacheWarmer)
     {

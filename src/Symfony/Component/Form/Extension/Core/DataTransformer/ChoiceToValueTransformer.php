@@ -20,7 +20,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ChoiceToValueTransformer implements DataTransformerInterface
 {
-    private ChoiceListInterface $choiceList;
+    private $choiceList;
 
     public function __construct(ChoiceListInterface $choiceList)
     {

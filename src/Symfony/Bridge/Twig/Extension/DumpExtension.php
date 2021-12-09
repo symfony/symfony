@@ -26,8 +26,8 @@ use Twig\TwigFunction;
  */
 final class DumpExtension extends AbstractExtension
 {
-    private ClonerInterface $cloner;
-    private ?HtmlDumper $dumper;
+    private $cloner;
+    private $dumper;
 
     public function __construct(ClonerInterface $cloner, HtmlDumper $dumper = null)
     {

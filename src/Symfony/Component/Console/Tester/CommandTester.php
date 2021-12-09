@@ -24,7 +24,7 @@ class CommandTester
 {
     use TesterTrait;
 
-    private Command $command;
+    private $command;
 
     public function __construct(Command $command)
     {

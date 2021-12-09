@@ -26,9 +26,9 @@ class ServicesConfigurator extends AbstractConfigurator
 {
     public const FACTORY = 'services';
 
-    private Definition $defaults;
-    private ContainerBuilder $container;
-    private PhpFileLoader $loader;
+    private $defaults;
+    private $container;
+    private $loader;
     private array $instanceof;
     private ?string $path;
     private string $anonymousHash;

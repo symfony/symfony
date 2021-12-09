@@ -19,7 +19,7 @@
         "php": ">=7.2.5",
         "symfony/deprecation-contracts": "^2.1|^3",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php73": "^1.8",
+        "symfony/polyfill-php73": "^1.9",
         "symfony/polyfill-php80": "^1.16",
         "symfony/service-contracts": "^1.1|^2|^3",
         "symfony/string": "^5.1|^6.0"

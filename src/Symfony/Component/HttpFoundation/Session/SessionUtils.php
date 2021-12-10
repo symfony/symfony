@@ -29,7 +29,7 @@ final class SessionUtils
     {
         $sessionCookie = null;
         $sessionCookiePrefix = sprintf(' %s=', urlencode($sessionName));
-        $sessionCookieWithId = sprintf('%s%s;', $sessionCookiePrefix, urlencode($sessionId));
+        $sessionCookieWithId = sprintf(' %s%s;', $sessionCookiePrefix, urlencode($sessionId));
         $otherCookies = [];
         foreach (headers_list() as $h) {
             if (0 !== stripos($h, 'Set-Cookie:')) {

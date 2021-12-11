@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-12-03T11:39:13Z
+
+Failure is related, I need to investigate.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-12-03T12:58:20Z
+
+@nicolas-grekas The failure is related to the PHP version. It seems that the destructor of `ErrorChunk` is not triggered in the same way on 7.2 and above, I don't really know what should I do here. Keep the current behavior (direct throw) on 7.2? Modify the test so that it doesn't rely on the destructor? Something else?

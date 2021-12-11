@@ -26,6 +26,11 @@ class NativeHttpClientTest extends HttpClientTestCase
         $this->markTestSkipped('NativeHttpClient doesn\'t support informational status codes.');
     }
 
+    public function testTimeoutOnInitialize()
+    {
+        $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
+    }
+
     public function testTimeoutOnDestruct()
     {
         $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');

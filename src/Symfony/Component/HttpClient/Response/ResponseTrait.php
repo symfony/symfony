@@ -233,15 +233,15 @@ trait ResponseTrait
      */
     abstract protected static function select(ClientState $multi, float $timeout): int;
 
-    private static function initialize(self $response, float $timeout = null): void
+    private static function initialize(self $response): void
     {
         if (null !== $response->info['error']) {
             throw new TransportException($response->info['error']);
         }
 
         try {
-            if (($response->initializer)($response, $timeout)) {
-                foreach (self::stream([$response], $timeout) as $chunk) {
+            if (($response->initializer)($response, -0.0)) {
+                foreach (self::stream([$response], -0.0) as $chunk) {
                     if ($chunk->isFirst()) {
                         break;
                     }
@@ -304,7 +304,7 @@ trait ResponseTrait
         $this->shouldBuffer = true;
 
         if ($this->initializer && null === $this->info['error']) {
-            self::initialize($this, -0.0);
+            self::initialize($this);
             $this->checkStatusCode();
         }
     }

@@ -76,8 +76,10 @@ class LokaliseProviderTest extends ProviderTestCase
 
         $getKeysIdsForMessagesDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedQuery = [
-                'filter_keys' => 'young_dog',
+                'filter_keys' => '',
                 'filter_filenames' => 'messages.xliff',
+                'limit' => 5000,
+                'page' => 1,
             ];
 
             $this->assertSame('GET', $method);
@@ -89,8 +91,10 @@ class LokaliseProviderTest extends ProviderTestCase
 
         $getKeysIdsForValidatorsDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedQuery = [
-                'filter_keys' => 'post.num_comments',
+                'filter_keys' => '',
                 'filter_filenames' => 'validators.xliff',
+                'limit' => 5000,
+                'page' => 1,
             ];
 
             $this->assertSame('GET', $method);
@@ -337,6 +341,8 @@ class LokaliseProviderTest extends ProviderTestCase
             $expectedQuery = [
                 'filter_keys' => 'a',
                 'filter_filenames' => 'messages.xliff',
+                'limit' => 5000,
+                'page' => 1,
             ];
 
             $this->assertSame('GET', $method);
@@ -355,6 +361,8 @@ class LokaliseProviderTest extends ProviderTestCase
             $expectedQuery = [
                 'filter_keys' => 'post.num_comments',
                 'filter_filenames' => 'validators.xliff',
+                'limit' => 5000,
+                'page' => 1,
             ];
 
             $this->assertSame('GET', $method);

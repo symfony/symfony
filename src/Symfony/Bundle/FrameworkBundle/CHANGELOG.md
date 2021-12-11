@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Environment variable `SYMFONY_IDE` is read by default when `framework.ide` config is not set.
+
 6.0
 ---
 

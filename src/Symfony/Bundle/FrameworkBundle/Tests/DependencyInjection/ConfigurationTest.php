@@ -368,7 +368,7 @@ class ConfigurationTest extends TestCase
     {
         return [
             'http_method_override' => true,
-            'ide' => null,
+            'ide' => '%env(default::SYMFONY_IDE)%',
             'default_locale' => 'en',
             'enabled_locales' => [],
             'set_locale_from_accept_language' => false,

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-12-08T14:23:51Z
+
+Seems good. CI errors are not related to your changes.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-12-08T14:42:21Z
+
+FYI: The `package/verify` will almost always be red when modifying the contracts. You can ignore that CI job for this PR.

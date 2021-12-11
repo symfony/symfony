@@ -159,7 +159,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
      */
     protected static function schedule(self $response, array &$runningResponses): void
     {
-        if (!$response->id) {
+        if (!isset($response->id)) {
             throw new InvalidArgumentException('MockResponse instances must be issued by MockHttpClient before processing.');
         }
 

@@ -12,7 +12,6 @@ jobs:
 
   tests:
     name: Tests
-    runs-on: Ubuntu-20.04
 
     env:
       extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis-5.3.4
@@ -21,13 +20,21 @@ jobs:
       matrix:
         include:
           - php: '8.1'
+            os: ubuntu-20.04
+          - php: '8.0'
+            os: macos-11
           - php: '8.0'
             mode: high-deps
+            os: ubuntu-20.04
           - php: '8.1'
             mode: low-deps
+            os: ubuntu-20.04
           - php: '8.2'
             mode: experimental
+            os: ubuntu-20.04
       fail-fast: false
+
+    runs-on: "${{ matrix.os }}"
 
     steps:
       - name: Checkout
@@ -49,6 +56,11 @@ jobs:
           extensions: "${{ env.extensions }}"
           tools: flex
 
+      - name: Install Homebrew packages
+        if: "matrix.os == 'macos-11'"
+        run: |
+          brew install parallel
+
       - name: Configure environment
         run: |
           git config --global user.email ""
@@ -60,11 +72,11 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
           echo COLUMNS=120 >> $GITHUB_ENV
-          echo PHPUNIT="$(readlink -f ./phpunit) --exclude-group tty,benchmark,intl-data" >> $GITHUB_ENV
+          echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data" >> $GITHUB_ENV
           echo COMPOSER_UP='composer update --no-progress --ansi' >> $GITHUB_ENV
 
           SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
-          SYMFONY_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+')
+          SYMFONY_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | cut -d "'" -f2 | cut -d '.' -f 1-2)
           SYMFONY_FEATURE_BRANCH=$(curl -s https://raw.githubusercontent.com/symfony/recipes/flex/main/index.json | jq -r '.versions."dev-name"')
 
           # Install the phpunit-bridge from a PR if required
@@ -110,9 +122,9 @@ jobs:
 
           # Skip the phpunit-bridge on bugfix-branches when not in *-deps mode
           if [[ ! "${{ matrix.mode }}" = *-deps && $SYMFONY_VERSION != $SYMFONY_FEATURE_BRANCH ]]; then
-            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h ') >> $GITHUB_ENV
+            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' | xargs -I{} dirname {}) >> $GITHUB_ENV
           else
-            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h ') >> $GITHUB_ENV
+            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist | xargs -I{} dirname {}) >> $GITHUB_ENV
           fi
 
           # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
@@ -134,7 +146,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Patch return types
-        if: "matrix.php == '8.1' && ! matrix.mode"
+        if: "matrix.php == '8.1' && ! matrix.mode && matrix.os == 'ubuntu-20.04'"
         run: |
           patch -sp1 < .github/expected-missing-return-types.diff
           git add .

@@ -157,6 +157,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 $this->markTestSkipped('Real transport required');
                 break;
 
+            case 'testTimeoutOnInitialize':
             case 'testTimeoutOnDestruct':
                 $this->markTestSkipped('Real transport required');
                 break;

@@ -116,7 +116,7 @@ class ResponseHeaderBagTest extends TestCase
 
         $bag->clearCookie('foo');
 
-        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; Max-Age=0; path=/; httponly', $bag);
+        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d M Y H:i:s T', time() - 31536001).'; Max-Age=0; path=/; httponly', $bag);
     }
 
     public function testClearCookieSecureNotHttpOnly()
@@ -125,7 +125,7 @@ class ResponseHeaderBagTest extends TestCase
 
         $bag->clearCookie('foo', '/', null, true, false);
 
-        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; Max-Age=0; path=/; secure', $bag);
+        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d M Y H:i:s T', time() - 31536001).'; Max-Age=0; path=/; secure', $bag);
     }
 
     public function testClearCookieSamesite()
@@ -133,7 +133,7 @@ class ResponseHeaderBagTest extends TestCase
         $bag = new ResponseHeaderBag([]);
 
         $bag->clearCookie('foo', '/', null, true, false, 'none');
-        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; Max-Age=0; path=/; secure; samesite=none', $bag);
+        $this->assertSetCookieHeader('foo=deleted; expires='.gmdate('D, d M Y H:i:s T', time() - 31536001).'; Max-Age=0; path=/; secure; samesite=none', $bag);
     }
 
     public function testReplace()

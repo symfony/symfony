@@ -196,6 +196,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         }
 
         $host = parse_url($this->info['redirect_url'] ?? $this->url, \PHP_URL_HOST);
+        $this->multi->lastTimeout = null;
         $this->multi->openHandles[$this->id] = [&$this->pauseExpiry, $h, $this->buffer, $this->onProgress, &$this->remaining, &$this->info, $host];
         $this->multi->hosts[$host] = 1 + ($this->multi->hosts[$host] ?? 0);
     }

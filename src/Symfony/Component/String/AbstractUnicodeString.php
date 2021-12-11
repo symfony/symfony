@@ -49,6 +49,8 @@ abstract class AbstractUnicodeString extends AbstractString
     private const TRANSLIT_TO = ['AE', 'D', 'O', 'TH', 'ss', 'ae', 'd', 'o', 'th', 'D', 'd', 'H', 'h', 'i', 'q', 'L', 'l', 'L', 'l', '\'n', 'N', 'n', 'OE', 'oe', 'T', 't', 'b', 'B', 'B', 'b', 'C', 'c', 'D', 'D', 'D', 'd', 'E', 'F', 'f', 'G', 'hv', 'I', 'I', 'K', 'k', 'l', 'N', 'n', 'OI', 'oi', 'P', 'p', 't', 'T', 't', 'T', 'V', 'Y', 'y', 'Z', 'z', 'DZ', 'Dz', 'dz', 'G', 'g', 'd', 'Z', 'z', 'l', 'n', 't', 'j', 'db', 'qp', 'A', 'C', 'c', 'L', 'T', 's', 'z', 'B', 'U', 'E', 'e', 'J', 'j', 'R', 'r', 'Y', 'y', 'b', 'c', 'd', 'd', 'e', 'j', 'g', 'g', 'G', 'h', 'h', 'i', 'I', 'l', 'l', 'l', 'm', 'n', 'n', 'N', 'OE', 'r', 'r', 'r', 'R', 's', 't', 'u', 'v', 'Y', 'z', 'z', 'B', 'G', 'H', 'j', 'L', 'q', 'dz', 'dz', 'ts', 'ls', 'lz', 'A', 'AE', 'B', 'C', 'D', 'D', 'E', 'J', 'K', 'L', 'M', 'O', 'P', 'T', 'U', 'V', 'W', 'Z', 'ue', 'b', 'd', 'f', 'm', 'n', 'p', 'r', 'r', 's', 't', 'z', 'th', 'I', 'p', 'U', 'b', 'd', 'f', 'g', 'k', 'l', 'm', 'n', 'p', 'r', 's', 'v', 'x', 'z', 'a', 'd', 'e', 'e', 'i', 'u', 'a', 's', 's', 'SS', 'LL', 'll', 'V', 'v', 'Y', 'y', '(C)', '(R)', 'CE', 'Cr', 'Fr.', 'L.', 'Pts', 'TL', 'Rs', 'x', 'Rx', 'm/s', 'rad/s', 'C/kg', 'pH', 'V/m', 'A/m', ' 1/4', ' 1/2', ' 3/4', ' 1/3', ' 2/3', ' 1/5', ' 2/5', ' 3/5', ' 4/5', ' 1/6', ' 5/6', ' 1/8', ' 3/8', ' 5/8', ' 7/8', ' 1/', '0', '\'', '\'', ',', '\'', '"', '"', ',,', '"', '\'', '"', '"', '"', '<<', '>>', '<', '>', '-', '-', '-', '-', '-', '-', '-', '-', '-', '||', '/', '[', ']', '*', ',', '.', '<', '>', '<<', '>>', '[', ']', '[', ']', '[', ']', ',', '.', '[', ']', '<<', '>>', '<', '>', ',', '[', ']', '((', '))', '.', ',', '*', '/', '-', '/', '\\', '|', '||', '<<', '>>', '((', '))'];
 
     private static $transliterators = [];
+    private static $tableZero;
+    private static $tableWide;
 
     public static function fromCodePoints(int ...$codes): static
     {
@@ -553,19 +555,18 @@ abstract class AbstractUnicodeString extends AbstractString
                 return -1;
             }
 
-            static $tableZero;
-            if (null === $tableZero) {
-                $tableZero = require __DIR__.'/Resources/data/wcswidth_table_zero.php';
+            if (null === self::$tableZero) {
+                self::$tableZero = require __DIR__.'/Resources/data/wcswidth_table_zero.php';
             }
 
-            if ($codePoint >= $tableZero[0][0] && $codePoint <= $tableZero[$ubound = \count($tableZero) - 1][1]) {
+            if ($codePoint >= self::$tableZero[0][0] && $codePoint <= self::$tableZero[$ubound = \count(self::$tableZero) - 1][1]) {
                 $lbound = 0;
                 while ($ubound >= $lbound) {
                     $mid = floor(($lbound + $ubound) / 2);
 
-                    if ($codePoint > $tableZero[$mid][1]) {
+                    if ($codePoint > self::$tableZero[$mid][1]) {
                         $lbound = $mid + 1;
-                    } elseif ($codePoint < $tableZero[$mid][0]) {
+                    } elseif ($codePoint < self::$tableZero[$mid][0]) {
                         $ubound = $mid - 1;
                     } else {
                         continue 2;
@@ -573,19 +574,18 @@ abstract class AbstractUnicodeString extends AbstractString
                 }
             }
 
-            static $tableWide;
-            if (null === $tableWide) {
-                $tableWide = require __DIR__.'/Resources/data/wcswidth_table_wide.php';
+            if (null === self::$tableWide) {
+                self::$tableWide = require __DIR__.'/Resources/data/wcswidth_table_wide.php';
             }
 
-            if ($codePoint >= $tableWide[0][0] && $codePoint <= $tableWide[$ubound = \count($tableWide) - 1][1]) {
+            if ($codePoint >= self::$tableWide[0][0] && $codePoint <= self::$tableWide[$ubound = \count(self::$tableWide) - 1][1]) {
                 $lbound = 0;
                 while ($ubound >= $lbound) {
                     $mid = floor(($lbound + $ubound) / 2);
 
-                    if ($codePoint > $tableWide[$mid][1]) {
+                    if ($codePoint > self::$tableWide[$mid][1]) {
                         $lbound = $mid + 1;
-                    } elseif ($codePoint < $tableWide[$mid][0]) {
+                    } elseif ($codePoint < self::$tableWide[$mid][0]) {
                         $ubound = $mid - 1;
                     } else {
                         $width += 2;

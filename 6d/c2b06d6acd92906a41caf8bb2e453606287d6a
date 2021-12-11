@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by starred-gijs at 2021-12-09T15:12:36Z
+
+Hi @kbond, you implemented the original version for Mailgun TagHeader support, are you the right person to ask for a review/feedback?
+
+---------------------------------------------------------------------------
+
+by starred-gijs at 2021-12-10T08:48:01Z
+
+Thanks for your reply! Any change I can convince you to handle this as a bug? 😄
+Main reason is that multiple `TagHeader` does work with the `MailgunHttpTransport` and this PR fixes it for `MailgunApiTransport`.
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-12-10T12:57:47Z
+
+I admit this feels like a bit of a grey area personally and I know the frustration of having to wait a few versions for a fix like this. I'm falling back on the established Symfony process and this would be considered a feature. The code isn't currently broken, it just doesn't allow a specific feature provided by Mailgun.
+
+---------------------------------------------------------------------------
+
+by starred-gijs at 2021-12-10T13:01:47Z
+
+Oke fair enough, it was worth a try. I will rebase and target 6.1 :)
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-12-10T13:02:40Z
+
+Awesome, and thanks for understanding :)

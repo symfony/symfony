@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-09-24T13:30:54Z
+
+Failures looks related but it's working on my local and I don't see how the changes could have broken them, I'm going to need some help :confused:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-09-24T13:40:45Z
+
+perhaps more easy to tell config builder about extra methods? maintaining consistency in keys while doing so.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-09-27T08:41:39Z
+
+Should we split `adapter` and `adapters` entries instead? Is that possible?
+Then the rule would be more clear: adapters XOR adapter+provider
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-12-07T16:52:04Z
+
+CI is green, so the failures were not related I guess :-)
+
+@nicolas-grekas Splitting the entries couldn't be considered as a bug fix isn'it? I studied the split a bit and it would be more complicated than the current patch.
+
+Is my proposed change too risky for 4.4? I'd really like to fix this issue to get rid of the last yaml config file in my apps :sweat_smile:

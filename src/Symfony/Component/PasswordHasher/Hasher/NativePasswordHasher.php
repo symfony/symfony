@@ -77,7 +77,7 @@ final class NativePasswordHasher implements PasswordHasherInterface
             throw new InvalidPasswordException();
         }
 
-        if (\PASSWORD_BCRYPT === $this->algorithm && (72 < \strlen($plainPassword) || false !== strpos($plainPassword, "\0"))) {
+        if (\PASSWORD_BCRYPT === $this->algorithm && (72 < \strlen($plainPassword) || str_contains($plainPassword, "\0"))) {
             $plainPassword = base64_encode(hash('sha512', $plainPassword, true));
         }
 
@@ -90,9 +90,9 @@ final class NativePasswordHasher implements PasswordHasherInterface
             return false;
         }
 
-        if (0 !== strpos($hashedPassword, '$argon')) {
+        if (!str_starts_with($hashedPassword, '$argon')) {
             // Bcrypt cuts on NUL chars and after 72 bytes
-            if (0 === strpos($hashedPassword, '$2') && (72 < \strlen($plainPassword) || false !== strpos($plainPassword, "\0"))) {
+            if (str_starts_with($hashedPassword, '$2') && (72 < \strlen($plainPassword) || str_contains($plainPassword, "\0"))) {
                 $plainPassword = base64_encode(hash('sha512', $plainPassword, true));
             }
 

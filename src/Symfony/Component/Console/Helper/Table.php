@@ -490,11 +490,11 @@ class Table
                     $cellFormat = '<'.$tag.'>%s</>';
                 }
 
-                if (strstr($content, '</>')) {
+                if (str_contains($content, '</>')) {
                     $content = str_replace('</>', '', $content);
                     $width -= 3;
                 }
-                if (strstr($content, '<fg=default;bg=default>')) {
+                if (str_contains($content, '<fg=default;bg=default>')) {
                     $content = str_replace('<fg=default;bg=default>', '', $content);
                     $width -= \strlen('<fg=default;bg=default>');
                 }
@@ -538,7 +538,7 @@ class Table
                 if (isset($this->columnMaxWidths[$column]) && Helper::width(Helper::removeDecoration($formatter, $cell)) > $this->columnMaxWidths[$column]) {
                     $cell = $formatter->formatAndWrap($cell, $this->columnMaxWidths[$column] * $colspan);
                 }
-                if (!strstr($cell ?? '', "\n")) {
+                if (!str_contains($cell ?? '', "\n")) {
                     continue;
                 }
                 $escaped = implode("\n", array_map([OutputFormatter::class, 'escapeTrailingBackslash'], explode("\n", $cell)));
@@ -603,7 +603,7 @@ class Table
             if ($cell instanceof TableCell && $cell->getRowspan() > 1) {
                 $nbLines = $cell->getRowspan() - 1;
                 $lines = [$cell];
-                if (strstr($cell, "\n")) {
+                if (str_contains($cell, "\n")) {
                     $lines = explode("\n", str_replace("\n", "<fg=default;bg=default>\n</>", $cell));
                     $nbLines = \count($lines) > $nbLines ? substr_count($cell, "\n") : $nbLines;
 

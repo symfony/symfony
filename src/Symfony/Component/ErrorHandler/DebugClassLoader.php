@@ -482,7 +482,7 @@ class DebugClassLoader
                     }
                     $returnType = implode('|', $returnType);
 
-                    self::$returnTypes[$class] += [$method => [$returnType, 0 === strpos($returnType, '?') ? substr($returnType, 1).'|null' : $returnType, $use, '']];
+                    self::$returnTypes[$class] += [$method => [$returnType, str_starts_with($returnType, '?') ? substr($returnType, 1).'|null' : $returnType, $use, '']];
                 }
             }
         }
@@ -699,7 +699,7 @@ class DebugClassLoader
 
         $dirFiles = self::$darwinCache[$kDir][1];
 
-        if (!isset($dirFiles[$file]) && ') : eval()\'d code' === substr($file, -17)) {
+        if (!isset($dirFiles[$file]) && str_ends_with($file, ') : eval()\'d code')) {
             // Get the file name from "file_name.php(123) : eval()'d code"
             $file = substr($file, 0, strrpos($file, '(', -17));
         }
@@ -757,14 +757,14 @@ class DebugClassLoader
             return;
         }
 
-        if ($nullable = 0 === strpos($types, 'null|')) {
+        if ($nullable = str_starts_with($types, 'null|')) {
             $types = substr($types, 5);
-        } elseif ($nullable = '|null' === substr($types, -5)) {
+        } elseif ($nullable = str_ends_with($types, '|null')) {
             $types = substr($types, 0, -5);
         }
         $arrayType = ['array' => 'array'];
         $typesMap = [];
-        $glue = false !== strpos($types, '&') ? '&' : '|';
+        $glue = str_contains($types, '&') ? '&' : '|';
         foreach (explode($glue, $types) as $t) {
             $t = self::SPECIAL_RETURN_TYPES[strtolower($t)] ?? $t;
             $typesMap[$this->normalizeType($t, $class, $parent, $returnType)][$t] = $t;
@@ -858,7 +858,7 @@ class DebugClassLoader
         // We could resolve "use" statements to return the FQDN
         // but this would be too expensive for a runtime checker
 
-        if ('[]' !== substr($type, -2)) {
+        if (!str_ends_with($type, '[]')) {
             return $type;
         }
 
@@ -916,10 +916,10 @@ class DebugClassLoader
         $patchedMethods[$file][$startLine] = true;
         $fileOffset = self::$fileOffsets[$file] ?? 0;
         $startLine += $fileOffset - 2;
-        if ($nullable = '|null' === substr($returnType, -5)) {
+        if ($nullable = str_ends_with($returnType, '|null')) {
             $returnType = substr($returnType, 0, -5);
         }
-        $glue = false !== strpos($returnType, '&') ? '&' : '|';
+        $glue = str_contains($returnType, '&') ? '&' : '|';
         $returnType = explode($glue, $returnType);
         $code = file($file);
 
@@ -976,7 +976,7 @@ class DebugClassLoader
         if ('docblock' === $this->patchTypes['force'] || ('object' === $normalizedType && '7.1' === $this->patchTypes['php'])) {
             $returnType = implode($glue, $returnType).($nullable ? '|null' : '');
 
-            if (false !== strpos($code[$startLine], '#[')) {
+            if (str_contains($code[$startLine], '#[')) {
                 --$startLine;
             }
 
@@ -1054,11 +1054,11 @@ EOTXT;
                 return;
             }
 
-            if ('8.0' > $this->patchTypes['php'] && (false !== strpos($returnType, '|') || \in_array($returnType, ['mixed', 'static'], true))) {
+            if ('8.0' > $this->patchTypes['php'] && (str_contains($returnType, '|') || \in_array($returnType, ['mixed', 'static'], true))) {
                 return;
             }
 
-            if ('8.1' > $this->patchTypes['php'] && false !== strpos($returnType, '&')) {
+            if ('8.1' > $this->patchTypes['php'] && str_contains($returnType, '&')) {
                 return;
             }
         }

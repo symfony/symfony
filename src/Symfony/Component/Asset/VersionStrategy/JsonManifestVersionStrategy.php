@@ -46,7 +46,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
         $this->httpClient = $httpClient;
         $this->strictMode = $strictMode;
 
-        if (null === $this->httpClient && ($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
+        if (null === $this->httpClient && ($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && str_starts_with($scheme, 'http')) {
             throw new LogicException(sprintf('The "%s" class needs an HTTP client to use a remote manifest. Try running "composer require symfony/http-client".', self::class));
         }
     }
@@ -69,7 +69,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
     private function getManifestPath(string $path): ?string
     {
         if (!isset($this->manifestData)) {
-            if (null !== $this->httpClient && ($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
+            if (null !== $this->httpClient && ($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && str_starts_with($scheme, 'http')) {
                 try {
                     $this->manifestData = $this->httpClient->request('GET', $this->manifestPath, [
                         'headers' => ['accept' => 'application/json'],

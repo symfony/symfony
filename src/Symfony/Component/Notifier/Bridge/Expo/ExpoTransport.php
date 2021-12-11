@@ -83,7 +83,7 @@ final class ExpoTransport extends AbstractTransport
         }
 
         $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-        $jsonContents = 0 === strpos($contentType, 'application/json') ? $response->toArray(false) : null;
+        $jsonContents = str_starts_with($contentType, 'application/json') ? $response->toArray(false) : null;
 
         if (200 !== $statusCode) {
             $errorMessage = $jsonContents['error']['message'] ?? $response->getContent(false);

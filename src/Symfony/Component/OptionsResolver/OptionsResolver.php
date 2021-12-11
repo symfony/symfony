@@ -1134,7 +1134,7 @@ class OptionsResolver implements Options
 
     private function verifyTypes(string $type, mixed $value, array &$invalidTypes, int $level = 0): bool
     {
-        if (\is_array($value) && '[]' === substr($type, -2)) {
+        if (\is_array($value) && str_ends_with($type, '[]')) {
             $type = substr($type, 0, -2);
             $valid = true;
 

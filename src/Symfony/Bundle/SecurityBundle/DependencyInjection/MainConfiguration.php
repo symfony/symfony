@@ -255,7 +255,7 @@ class MainConfiguration implements ConfigurationInterface
                                 return $requiredBadge;
                             }
 
-                            if (false === strpos($requiredBadge, '\\')) {
+                            if (!str_contains($requiredBadge, '\\')) {
                                 $fqcn = 'Symfony\Component\Security\Http\Authenticator\Passport\Badge\\'.$requiredBadge;
                                 if (class_exists($fqcn)) {
                                     return $fqcn;

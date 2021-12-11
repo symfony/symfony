@@ -102,7 +102,7 @@ class ParseException extends RuntimeException
         $this->message = $this->rawMessage;
 
         $dot = false;
-        if ('.' === substr($this->message, -1)) {
+        if (str_ends_with($this->message, '.')) {
             $this->message = substr($this->message, 0, -1);
             $dot = true;
         }

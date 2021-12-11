@@ -277,6 +277,9 @@ final class CurlResponse implements ResponseInterface
             while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active));
 
             while ($info = curl_multi_info_read($multi->handle)) {
+                if (\CURLMSG_DONE !== $info['msg']) {
+                    continue;
+                }
                 $result = $info['result'];
                 $id = (int) $ch = $info['handle'];
                 $waitFor = @curl_getinfo($ch, \CURLINFO_PRIVATE) ?: '_0';

@@ -470,7 +470,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                         throw $e;
                     }
                 } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
-                    if ($access[self::ACCESS_REF] && !isset($object->$name) && !\array_key_exists($name, (array) $object) && (\PHP_VERSION_ID < 70400 || !(new \ReflectionProperty($class, $name))->hasType())) {
+                    if ($access->canBeReference() && !isset($object->$name) && !\array_key_exists($name, (array) $object) && (\PHP_VERSION_ID < 70400 || !(new \ReflectionProperty($class, $name))->hasType())) {
                         throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', $class, $name));
                     }
 
@@ -491,7 +491,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 throw $e;
             }
-        } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
+        } elseif (property_exists($object, $property) && \array_key_exists($property, (array) $object)) {
             $result[self::VALUE] = $object->$property;
             if (isset($zval[self::REF])) {
                 $result[self::REF] = &$object->$property;

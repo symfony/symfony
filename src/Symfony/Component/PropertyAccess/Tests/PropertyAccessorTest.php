@@ -29,6 +29,9 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyDynamicallyCreated;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyGetterOnObject;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyGetterOnObjectMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestSingularAndPluralProps;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
@@ -848,5 +851,40 @@ class PropertyAccessorTest extends TestCase
         $this->expectExceptionMessageMatches('/.*The method "setFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestClassSetValue" was found but does not have public access./');
         $object = new TestClassSetValue(0);
         $this->propertyAccessor->setValue($object, 'foo', 1);
+    }
+
+    public function testGetPublicProperty()
+    {
+        $value = 'A';
+        $path = 'a';
+        $object = new TestPublicPropertyGetterOnObject();
+
+        $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
+    }
+
+    public function testGetPrivateProperty()
+    {
+        $object = new TestPublicPropertyGetterOnObject();
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessageMatches('/.*Neither the property "b" nor one of the methods/');
+        $this->propertyAccessor->getValue($object, 'b');
+    }
+
+    public function testGetDynamicPublicProperty()
+    {
+        $value = 'Bar';
+        $path = 'foo';
+        $object = new TestPublicPropertyDynamicallyCreated('Bar');
+
+        $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
+    }
+
+    public function testGetDynamicPublicPropertyWithMagicGetterAllow()
+    {
+        $value = 'B';
+        $path = 'b';
+        $object = new TestPublicPropertyGetterOnObjectMagicGet();
+        $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
     }
 }

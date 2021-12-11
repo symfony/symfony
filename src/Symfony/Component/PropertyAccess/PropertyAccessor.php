@@ -408,7 +408,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 }
             } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
                 $name = $access[self::ACCESS_NAME];
-                if (!method_exists($object, '__get') && !isset($object->$name) && !\array_key_exists($name, (array) $object) && (\PHP_VERSION_ID < 70400 || !(new \ReflectionProperty($class, $name))->hasType())) {
+                if ($access[self::ACCESS_REF] && !isset($object->$name) && !\array_key_exists($name, (array) $object) && (\PHP_VERSION_ID < 70400 || !(new \ReflectionProperty($class, $name))->hasType())) {
                     throw new AccessException(sprintf('The property "%s::$%s" is not initialized.', $class, $name));
                 }
 

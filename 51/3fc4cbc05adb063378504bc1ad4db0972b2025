@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by divinity76 at 2021-12-07T05:10:22Z
+
++1 from me, btw wonder if a E_USER_WARNING about an unknown-ignored message would be appropriate (probably means you're running an old version of symfony)
+
+another thing, the code above seems faulty, the loop above should be changed from
+```
+while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active));
+```
+to something like
+```
+do{
+    $err = curl_multi_exec($multi->handle, $active);
+} while($err === \CURLM_CALL_MULTI_PERFORM);
+if($err !== CURLM_OK){
+ // handle error somehow
+}
+```
+while exactly how to handle the error may be up for debate, just ignoring the error (as the current code does) is not the right approach. i've done it like
+```php
+            do {
+                $err = curl_multi_exec($mh, $still_running);
+            } while ($err === CURLM_CALL_MULTI_PERFORM);
+            if ($err !== CURLM_OK) {
+                $errinfo = [
+                    "multi_exec_return" => $err,
+                    "curl_multi_errno" => curl_multi_errno($mh),
+                    "curl_multi_strerror" => curl_multi_strerror($err)
+                ];
+                $errstr = "curl_multi_exec error: " . var_export($errinfo, true);
+                throw new \RuntimeException($errstr);
+            }
+```
+in the past, but didn't really give it much thought as to how it should really be handled. possible return values include
+```
+CURLM_CALL_MULTI_PERFORM
+CURLM_OK
+CURLM_BAD_HANDLE
+CURLM_BAD_EASY_HANDLE
+CURLM_OUT_OF_MEMORY
+CURLM_INTERNAL_ERROR
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-12-07T13:44:20Z
+
+> btw wonder if a E_USER_WARNING about an unknown-ignored message would be appropriate (probably means you're running an old version of symfony)
+
+Im not sure what you mean. Are you suggesting we should trigger a `E_USER_WARNING` if libcurl adds another value for `$info['msg']`?
+
+--------
+
+Your other comments seams interesting. Feel free to open an new PR or issue about those. They are a bit unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by divinity76 at 2021-12-07T14:25:32Z
+
+> Are you suggesting we should trigger a E_USER_WARNING if libcurl adds another value for $info['msg']?
+
+maybe, after all, it means that this version Symfony received a message from libcurl that this version of Symfony doesn't understand, and because the message wasn't understood, Symfony opted to completely ignore the message. does that warrant a warning? i don't know tbh. i don't have strong feelings on it either way, just ignoring unknown messages is probably fine.
+
+>Your other comments seams interesting. Feel free to open an new PR or issue about those. They are a bit unrelated to this PR.
+
+yeah maybe i'll do that ^^

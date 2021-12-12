@@ -227,6 +227,6 @@ class XliffFileLoader implements LoaderInterface
 
     private function isXmlString(string $resource): bool
     {
-        return 0 === strpos($resource, '<?xml');
+        return str_starts_with($resource, '<?xml');
     }
 }

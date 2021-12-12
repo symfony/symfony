@@ -92,7 +92,7 @@ final class Address
             return $address;
         }
 
-        if (false === strpos($address, '<')) {
+        if (!str_contains($address, '<')) {
             return new self($address);
         }
 

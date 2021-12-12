@@ -215,7 +215,7 @@ class Crawler implements \Countable, \IteratorAggregate
     public function addXmlContent(string $content, string $charset = 'UTF-8', int $options = \LIBXML_NONET)
     {
         // remove the default namespace if it's the only namespace to make XPath expressions simpler
-        if (!preg_match('/xmlns:/', $content)) {
+        if (!str_contains($content, 'xmlns:')) {
             $content = str_replace('xmlns', 'ns', $content);
         }
 

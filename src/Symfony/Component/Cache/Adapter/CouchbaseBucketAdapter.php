@@ -77,7 +77,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
             $password = $options['password'];
 
             foreach ($servers as $dsn) {
-                if (0 !== strpos($dsn, 'couchbase:')) {
+                if (!str_starts_with($dsn, 'couchbase:')) {
                     throw new InvalidArgumentException(sprintf('Invalid Couchbase DSN: "%s" does not start with "couchbase:".', $dsn));
                 }
 

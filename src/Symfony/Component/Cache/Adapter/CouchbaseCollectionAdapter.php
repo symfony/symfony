@@ -70,7 +70,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
             $password = $options['password'] ?? '';
 
             foreach ($dsn as $server) {
-                if (0 !== strpos($server, 'couchbase:')) {
+                if (!str_starts_with($server, 'couchbase:')) {
                     throw new InvalidArgumentException(sprintf('Invalid Couchbase DSN: "%s" does not start with "couchbase:".', $server));
                 }
 

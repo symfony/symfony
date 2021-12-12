@@ -2123,10 +2123,10 @@ EOF;
             $export = var_export($value, true);
         }
         if ($this->asFiles) {
-            if (false !== strpos($export, '$this')) {
+            if (str_contains($export, '$this')) {
                 $export = str_replace('$this', "$'.'this", $export);
             }
-            if (false !== strpos($export, 'function () {')) {
+            if (str_contains($export, 'function () {')) {
                 $export = str_replace('function () {', "function ('.') {", $export);
             }
         }

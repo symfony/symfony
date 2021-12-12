@@ -71,7 +71,7 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
 
     public function verify(string $hashedPassword, string $plainPassword, string $salt = null): bool
     {
-        if (\strlen($hashedPassword) !== $this->hashLength || false !== strpos($hashedPassword, '$')) {
+        if (\strlen($hashedPassword) !== $this->hashLength || str_contains($hashedPassword, '$')) {
             return false;
         }
 

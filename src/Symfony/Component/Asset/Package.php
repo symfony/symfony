@@ -64,6 +64,6 @@ class Package implements PackageInterface
 
     protected function isAbsoluteUrl(string $url): bool
     {
-        return str_contains($url, '://') || '//' === substr($url, 0, 2);
+        return str_contains($url, '://') || str_starts_with($url, '//');
     }
 }

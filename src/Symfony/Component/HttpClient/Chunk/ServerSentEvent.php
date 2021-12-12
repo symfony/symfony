@@ -29,7 +29,7 @@ final class ServerSentEvent extends DataChunk implements ChunkInterface
         parent::__construct(-1, $content);
 
         // remove BOM
-        if (0 === strpos($content, "\xEF\xBB\xBF")) {
+        if (str_starts_with($content, "\xEF\xBB\xBF")) {
             $content = substr($content, 3);
         }
 

@@ -64,6 +64,6 @@ class HostnameValidator extends ConstraintValidator
 
     private function hasValidTld(string $domain): bool
     {
-        return false !== strpos($domain, '.') && !\in_array(substr($domain, strrpos($domain, '.') + 1), self::RESERVED_TLDS, true);
+        return str_contains($domain, '.') && !\in_array(substr($domain, strrpos($domain, '.') + 1), self::RESERVED_TLDS, true);
     }
 }

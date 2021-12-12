@@ -165,7 +165,7 @@ class Connection
             $parsedUrl = [];
         }
 
-        $useAmqps = 0 === strpos($dsn, 'amqps://');
+        $useAmqps = str_starts_with($dsn, 'amqps://');
         $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : [];
         $exchangeName = $pathParts[1] ?? 'messages';
         parse_str($parsedUrl['query'] ?? '', $parsedQuery);

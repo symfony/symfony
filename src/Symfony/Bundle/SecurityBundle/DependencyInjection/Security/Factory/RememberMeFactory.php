@@ -112,7 +112,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
 
         foreach ($container->findTaggedServiceIds('security.remember_me_aware') as $serviceId => $attributes) {
             // register ContextListener
-            if ('security.context_listener' === substr($serviceId, 0, 25)) {
+            if (str_starts_with($serviceId, 'security.context_listener')) {
                 continue;
             }
 

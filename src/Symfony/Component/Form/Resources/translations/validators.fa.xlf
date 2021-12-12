@@ -24,7 +24,7 @@
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
-                <target>گزینه‌ انتخاب‌شده نامعتبر است.</target>
+                <target>گزینه‌ انتخاب‌ شده نامعتبر است.</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>The collection is invalid.</source>

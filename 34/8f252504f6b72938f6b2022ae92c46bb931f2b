@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-11T16:09:33Z
+
+I missed your comment @wouterj :)
+But since not setting/setting to false this option is deprecated in 5.3, I think this should have been part of the cleanup doe in 6.0. `false` yields an exception already in 6.0. Defaulting to something that throws looks odd to me.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-12-11T16:21:55Z
+
+Alright, I'm OK with having this in 6.0😉

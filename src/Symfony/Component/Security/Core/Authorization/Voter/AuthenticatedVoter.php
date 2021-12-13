@@ -12,8 +12,10 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\OfflineTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 
 /**
  * AuthenticatedVoter votes if an attribute like IS_AUTHENTICATED_FULLY,
@@ -44,6 +46,10 @@ class AuthenticatedVoter implements CacheableVoterInterface
     {
         if ($attributes === [self::PUBLIC_ACCESS]) {
             return VoterInterface::ACCESS_GRANTED;
+        }
+
+        if ($token instanceof OfflineTokenInterface) {
+            throw new InvalidArgumentException('Cannot decide on authentication attributes when an offline token is used.');
         }
 
         $result = VoterInterface::ACCESS_ABSTAIN;

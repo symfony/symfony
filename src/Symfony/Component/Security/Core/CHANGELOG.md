@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.1
+---
+
+ * Add `UserAuthorizationChecker::userIsGranted()` to test user authorization without relying on the session.
+   For example, users not currently logged in, or while processing a message from a message queue.
+ * Add `OfflineTokenInterface` to mark tokens that do not represent the currently logged-in user
 
 7.0
 ---

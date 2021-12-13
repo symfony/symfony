@@ -17,8 +17,10 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
+use Symfony\Component\Security\Core\Authentication\Token\UserAuthorizationCheckerToken;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class AuthenticatedVoterTest extends TestCase
@@ -85,6 +87,29 @@ class AuthenticatedVoterTest extends TestCase
         $this->assertTrue($voter->supportsType(get_debug_type(new \stdClass())));
     }
 
+    /**
+     * @dataProvider unsupportedOfflineAttributeProvider
+     */
+    public function testOfflineToken(string $attribute)
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $voter->vote($this->getToken('offline'), null, [$attribute]);
+    }
+
+    public static function unsupportedOfflineAttributeProvider(): array
+    {
+        return [
+            [AuthenticatedVoter::IS_AUTHENTICATED_FULLY],
+            [AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED],
+            [AuthenticatedVoter::IS_AUTHENTICATED],
+            [AuthenticatedVoter::IS_IMPERSONATOR],
+            [AuthenticatedVoter::IS_REMEMBERED],
+        ];
+    }
+
     protected function getToken($authenticated)
     {
         $user = new InMemoryUser('wouter', '', ['ROLE_USER']);
@@ -106,6 +131,10 @@ class AuthenticatedVoterTest extends TestCase
 
         if ('impersonated' === $authenticated) {
             return $this->getMockBuilder(SwitchUserToken::class)->disableOriginalConstructor()->getMock();
+        }
+
+        if ('offline' === $authenticated) {
+            return new UserAuthorizationCheckerToken($user);
         }
 
         return new NullToken();

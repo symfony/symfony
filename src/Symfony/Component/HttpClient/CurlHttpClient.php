@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpClient;
 
 use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
@@ -35,7 +35,6 @@ use Symfony\Contracts\Service\ResetInterface;
 final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {
     use HttpClientTrait;
-    use LoggerAwareTrait;
 
     private $defaultOptions = self::OPTIONS_DEFAULTS + [
         'auth_ntlm' => null, // array|string - an array containing the username as first value, and optionally the
@@ -46,13 +45,16 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     ];
 
     /**
+     * @var LoggerInterface|null
+     */
+    private $logger;
+
+    /**
      * An internal object to share state between the client and its responses.
      *
      * @var CurlClientState
      */
     private $multi;
-
-    private static $curlVersion;
 
     /**
      * @param array $defaultOptions     Default request's options
@@ -73,33 +75,12 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);
         }
 
-        $this->multi = new CurlClientState();
-        self::$curlVersion = self::$curlVersion ?? curl_version();
+        $this->multi = new CurlClientState($maxHostConnections, $maxPendingPushes);
+    }
 
-        // Don't enable HTTP/1.1 pipelining: it forces responses to be sent in order
-        if (\defined('CURLPIPE_MULTIPLEX')) {
-            curl_multi_setopt($this->multi->handle, \CURLMOPT_PIPELINING, \CURLPIPE_MULTIPLEX);
-        }
-        if (\defined('CURLMOPT_MAX_HOST_CONNECTIONS')) {
-            $maxHostConnections = curl_multi_setopt($this->multi->handle, \CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : \PHP_INT_MAX) ? 0 : $maxHostConnections;
-        }
-        if (\defined('CURLMOPT_MAXCONNECTS') && 0 < $maxHostConnections) {
-            curl_multi_setopt($this->multi->handle, \CURLMOPT_MAXCONNECTS, $maxHostConnections);
-        }
-
-        // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/77535
-        if (0 >= $maxPendingPushes || \PHP_VERSION_ID < 70217 || (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304)) {
-            return;
-        }
-
-        // HTTP/2 push crashes before curl 7.61
-        if (!\defined('CURLMOPT_PUSHFUNCTION') || 0x073D00 > self::$curlVersion['version_number'] || !(\CURL_VERSION_HTTP2 & self::$curlVersion['features'])) {
-            return;
-        }
-
-        curl_multi_setopt($this->multi->handle, \CURLMOPT_PUSHFUNCTION, function ($parent, $pushed, array $requestHeaders) use ($maxPendingPushes) {
-            return $this->handlePush($parent, $pushed, $requestHeaders, $maxPendingPushes);
-        });
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $this->multi->logger = $logger;
     }
 
     /**
@@ -145,7 +126,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_0;
         } elseif (1.1 === (float) $options['http_version']) {
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_1;
-        } elseif (\defined('CURL_VERSION_HTTP2') && (\CURL_VERSION_HTTP2 & self::$curlVersion['features']) && ('https:' === $scheme || 2.0 === (float) $options['http_version'])) {
+        } elseif (\defined('CURL_VERSION_HTTP2') && (\CURL_VERSION_HTTP2 & CurlClientState::$curlVersion['features']) && ('https:' === $scheme || 2.0 === (float) $options['http_version'])) {
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_2_0;
         }
 
@@ -188,11 +169,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $this->multi->dnsCache->evictions = [];
             $port = parse_url($authority, \PHP_URL_PORT) ?: ('http:' === $scheme ? 80 : 443);
 
-            if ($resolve && 0x072A00 > self::$curlVersion['version_number']) {
+            if ($resolve && 0x072A00 > CurlClientState::$curlVersion['version_number']) {
                 // DNS cache removals require curl 7.42 or higher
                 // On lower versions, we have to create a new multi handle
-                curl_multi_close($this->multi->handle);
-                $this->multi->handle = (new self())->multi->handle;
+                $this->multi->reset();
             }
 
             foreach ($options['resolve'] as $host => $ip) {
@@ -317,7 +297,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $host), self::$curlVersion['version_number']);
+        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $host), CurlClientState::$curlVersion['version_number']);
     }
 
     /**
@@ -333,7 +313,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
         if (\is_resource($this->multi->handle) || $this->multi->handle instanceof \CurlMultiHandle) {
             $active = 0;
-            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
+            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active)) {
+            }
         }
 
         return new ResponseStream(CurlResponse::stream($responses, $timeout));
@@ -341,68 +322,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
     public function reset()
     {
-        $this->multi->logger = $this->logger;
         $this->multi->reset();
-    }
-
-    /**
-     * @return array
-     */
-    public function __sleep()
-    {
-        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
-    }
-
-    public function __wakeup()
-    {
-        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-    }
-
-    public function __destruct()
-    {
-        $this->multi->logger = $this->logger;
-    }
-
-    private function handlePush($parent, $pushed, array $requestHeaders, int $maxPendingPushes): int
-    {
-        $headers = [];
-        $origin = curl_getinfo($parent, \CURLINFO_EFFECTIVE_URL);
-
-        foreach ($requestHeaders as $h) {
-            if (false !== $i = strpos($h, ':', 1)) {
-                $headers[substr($h, 0, $i)][] = substr($h, 1 + $i);
-            }
-        }
-
-        if (!isset($headers[':method']) || !isset($headers[':scheme']) || !isset($headers[':authority']) || !isset($headers[':path'])) {
-            $this->logger && $this->logger->debug(sprintf('Rejecting pushed response from "%s": pushed headers are invalid', $origin));
-
-            return \CURL_PUSH_DENY;
-        }
-
-        $url = $headers[':scheme'][0].'://'.$headers[':authority'][0];
-
-        // curl before 7.65 doesn't validate the pushed ":authority" header,
-        // but this is a MUST in the HTTP/2 RFC; let's restrict pushes to the original host,
-        // ignoring domains mentioned as alt-name in the certificate for now (same as curl).
-        if (!str_starts_with($origin, $url.'/')) {
-            $this->logger && $this->logger->debug(sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
-
-            return \CURL_PUSH_DENY;
-        }
-
-        if ($maxPendingPushes <= \count($this->multi->pushedResponses)) {
-            $fifoUrl = key($this->multi->pushedResponses);
-            unset($this->multi->pushedResponses[$fifoUrl]);
-            $this->logger && $this->logger->debug(sprintf('Evicting oldest pushed response: "%s"', $fifoUrl));
-        }
-
-        $url .= $headers[':path'][0];
-        $this->logger && $this->logger->debug(sprintf('Queueing pushed response: "%s"', $url));
-
-        $this->multi->pushedResponses[$url] = new PushedResponse(new CurlResponse($this->multi, $pushed), $headers, $this->multi->openHandles[(int) $parent][1] ?? [], $pushed);
-
-        return \CURL_PUSH_OK;
     }
 
     /**

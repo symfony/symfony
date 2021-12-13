@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add `SerializedMessageStamp` to avoid serializing a message when a retry occurs.
+
 6.0
 ---
 

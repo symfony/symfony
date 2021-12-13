@@ -80,7 +80,7 @@ class Configuration implements ConfigurationInterface
                     ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests. Note: When using the HttpCache, you need to call the method in your front controller instead")
                     ->defaultTrue()
                 ->end()
-                ->scalarNode('ide')->defaultNull()->end()
+                ->scalarNode('ide')->defaultValue('%env(default::SYMFONY_IDE)%')->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
                 ->booleanNode('set_locale_from_accept_language')

@@ -38,7 +38,7 @@ class AbstractRecursivePassTest extends TestCase
         $pass = new class() extends AbstractRecursivePass {
             public $actual;
 
-            protected function processValue($value, $isRoot = false)
+            protected function processValue($value, $isRoot = false): mixed
             {
                 if ($value instanceof Definition && 'foo' === $this->currentId) {
                     $this->actual = $this->getConstructor($value, true);
@@ -64,7 +64,7 @@ class AbstractRecursivePassTest extends TestCase
         $pass = new class() extends AbstractRecursivePass {
             public $actual;
 
-            protected function processValue($value, $isRoot = false)
+            protected function processValue($value, $isRoot = false): mixed
             {
                 if ($value instanceof Definition && 'foo' === $this->currentId) {
                     $this->actual = $this->getConstructor($value, true);
@@ -90,7 +90,7 @@ class AbstractRecursivePassTest extends TestCase
         $pass = new class() extends AbstractRecursivePass {
             public $actual;
 
-            protected function processValue($value, $isRoot = false)
+            protected function processValue($value, $isRoot = false): mixed
             {
                 if ($value instanceof Definition && 'foo' === $this->currentId) {
                     $this->actual = $this->getReflectionMethod($value, 'create');
@@ -114,7 +114,7 @@ class AbstractRecursivePassTest extends TestCase
         $container->register('foo');
 
         (new class() extends AbstractRecursivePass {
-            protected function processValue($value, $isRoot = false)
+            protected function processValue($value, $isRoot = false): mixed
             {
                 if ($value instanceof Definition && 'foo' === $this->currentId) {
                     $this->getConstructor($value, true);

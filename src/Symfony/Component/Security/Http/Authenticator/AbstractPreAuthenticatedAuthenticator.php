@@ -64,17 +64,13 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
         } catch (BadCredentialsException $e) {
             $this->clearToken($e);
 
-            if (null !== $this->logger) {
-                $this->logger->debug('Skipping pre-authenticated authenticator as a BadCredentialsException is thrown.', ['exception' => $e, 'authenticator' => static::class]);
-            }
+            $this->logger?->debug('Skipping pre-authenticated authenticator as a BadCredentialsException is thrown.', ['exception' => $e, 'authenticator' => static::class]);
 
             return false;
         }
 
         if (null === $username) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Skipping pre-authenticated authenticator no username could be extracted.', ['authenticator' => static::class]);
-            }
+            $this->logger?->debug('Skipping pre-authenticated authenticator no username could be extracted.', ['authenticator' => static::class]);
 
             return false;
         }
@@ -83,9 +79,7 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
         $token = $this->tokenStorage->getToken();
 
         if ($token instanceof PreAuthenticatedToken && $this->firewallName === $token->getFirewallName() && $token->getUserIdentifier() === $username) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Skipping pre-authenticated authenticator as the user already has an existing session.', ['authenticator' => static::class]);
-            }
+            $this->logger?->debug('Skipping pre-authenticated authenticator as the user already has an existing session.', ['authenticator' => static::class]);
 
             return false;
         }
@@ -131,9 +125,7 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
         if ($token instanceof PreAuthenticatedToken && $this->firewallName === $token->getFirewallName()) {
             $this->tokenStorage->setToken(null);
 
-            if (null !== $this->logger) {
-                $this->logger->info('Cleared pre-authenticated token due to an exception.', ['exception' => $exception]);
-            }
+            $this->logger?->info('Cleared pre-authenticated token due to an exception.', ['exception' => $exception]);
         }
     }
 }

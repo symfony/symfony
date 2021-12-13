@@ -173,9 +173,7 @@ class SwitchUserListener extends AbstractListener
             throw $exception;
         }
 
-        if (null !== $this->logger) {
-            $this->logger->info('Attempting to switch to user.', ['username' => $username]);
-        }
+        $this->logger?->info('Attempting to switch to user.', ['username' => $username]);
 
         $this->userChecker->checkPostAuth($user);
 

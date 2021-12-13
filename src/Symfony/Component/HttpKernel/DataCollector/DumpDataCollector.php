@@ -69,9 +69,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function dump(Data $data)
     {
-        if ($this->stopwatch) {
-            $this->stopwatch->start('dump');
-        }
+        $this->stopwatch?->start('dump');
 
         ['name' => $name, 'file' => $file, 'line' => $line, 'file_excerpt' => $fileExcerpt] = $this->sourceContextProvider->getContext();
 
@@ -91,9 +89,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->data[] = compact('data', 'name', 'file', 'line', 'fileExcerpt');
         ++$this->dataCount;
 
-        if ($this->stopwatch) {
-            $this->stopwatch->stop('dump');
-        }
+        $this->stopwatch?->stop('dump');
     }
 
     public function collect(Request $request, Response $response, \Throwable $exception = null)
@@ -133,9 +129,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function reset()
     {
-        if ($this->stopwatch) {
-            $this->stopwatch->reset();
-        }
+        $this->stopwatch?->reset();
         $this->data = [];
         $this->dataCount = 0;
         $this->isCollected = true;

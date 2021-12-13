@@ -169,7 +169,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $stack = [];
         $attributes = $this->getAttributes($object, $format, $context);
         $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
-        $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
+        $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($class)->getAttributesMetadata();
         if (isset($context[self::MAX_DEPTH_HANDLER])) {
             $maxDepthHandler = $context[self::MAX_DEPTH_HANDLER];
             if (!\is_callable($maxDepthHandler)) {

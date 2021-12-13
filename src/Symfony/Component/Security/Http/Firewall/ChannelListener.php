@@ -62,9 +62,7 @@ class ChannelListener extends AbstractListener
         }
 
         if ('http' === $channel && $request->isSecure()) {
-            if (null !== $this->logger) {
-                $this->logger->info('Redirecting to HTTP.');
-            }
+            $this->logger?->info('Redirecting to HTTP.');
 
             return true;
         }

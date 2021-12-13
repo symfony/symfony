@@ -59,9 +59,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     {
         $this->data = [];
 
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->reset();
-        }
+        $this->stopwatch?->reset();
     }
 
     /**

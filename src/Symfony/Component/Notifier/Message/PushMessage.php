@@ -41,7 +41,7 @@ final class PushMessage implements MessageInterface
 
     public function getRecipientId(): ?string
     {
-        return $this->options ? $this->options->getRecipientId() : null;
+        return $this->options?->getRecipientId();
     }
 
     public function subject(string $subject): self

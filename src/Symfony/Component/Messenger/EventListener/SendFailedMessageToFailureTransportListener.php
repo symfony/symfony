@@ -59,12 +59,10 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
             new RedeliveryStamp(0)
         );
 
-        if (null !== $this->logger) {
-            $this->logger->info('Rejected message {class} will be sent to the failure transport {transport}.', [
-                'class' => \get_class($envelope->getMessage()),
-                'transport' => \get_class($failureSender),
-            ]);
-        }
+        $this->logger?->info('Rejected message {class} will be sent to the failure transport {transport}.', [
+            'class' => \get_class($envelope->getMessage()),
+            'transport' => \get_class($failureSender),
+        ]);
 
         $failureSender->send($envelope);
     }

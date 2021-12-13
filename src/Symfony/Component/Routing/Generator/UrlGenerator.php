@@ -192,9 +192,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                             throw new InvalidParameterException(strtr($message, ['{parameter}' => $varName, '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$varName]]));
                         }
 
-                        if ($this->logger) {
-                            $this->logger->error($message, ['parameter' => $varName, 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$varName]]);
-                        }
+                        $this->logger?->error($message, ['parameter' => $varName, 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$varName]]);
 
                         return '';
                     }
@@ -247,9 +245,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                             throw new InvalidParameterException(strtr($message, ['{parameter}' => $token[3], '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$token[3]]]));
                         }
 
-                        if ($this->logger) {
-                            $this->logger->error($message, ['parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]]);
-                        }
+                        $this->logger?->error($message, ['parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]]);
 
                         return '';
                     }

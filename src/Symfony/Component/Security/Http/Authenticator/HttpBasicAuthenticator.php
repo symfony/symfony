@@ -86,9 +86,7 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        if (null !== $this->logger) {
-            $this->logger->info('Basic authentication failed for user.', ['username' => $request->headers->get('PHP_AUTH_USER'), 'exception' => $exception]);
-        }
+        $this->logger?->info('Basic authentication failed for user.', ['username' => $request->headers->get('PHP_AUTH_USER'), 'exception' => $exception]);
 
         return $this->start($request, $exception);
     }

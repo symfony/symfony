@@ -189,9 +189,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         try {
             $allListeners = $this->getListeners();
         } catch (\Exception $e) {
-            if (null !== $this->logger) {
-                $this->logger->info('An exception was thrown while getting the uncalled listeners.', ['exception' => $e]);
-            }
+            $this->logger?->info('An exception was thrown while getting the uncalled listeners.', ['exception' => $e]);
 
             // unable to retrieve the uncalled listeners
             return [];
@@ -308,9 +306,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
             }
 
             if ($listener->wasCalled()) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('Notified event "{event}" to listener "{listener}".', $context);
-                }
+                $this->logger?->debug('Notified event "{event}" to listener "{listener}".', $context);
             } else {
                 $this->callStack->detach($listener);
             }
@@ -320,9 +316,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
             }
 
             if ($listener->stoppedPropagation()) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('Listener "{listener}" stopped propagation of the event "{event}".', $context);
-                }
+                $this->logger?->debug('Listener "{listener}" stopped propagation of the event "{event}".', $context);
 
                 $skipped = true;
             }

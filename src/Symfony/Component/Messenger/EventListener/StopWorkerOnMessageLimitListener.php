@@ -42,9 +42,7 @@ class StopWorkerOnMessageLimitListener implements EventSubscriberInterface
             $this->receivedMessages = 0;
             $event->getWorker()->stop();
 
-            if (null !== $this->logger) {
-                $this->logger->info('Worker stopped due to maximum count of {count} messages processed', ['count' => $this->maximumNumberOfMessages]);
-            }
+            $this->logger?->info('Worker stopped due to maximum count of {count} messages processed', ['count' => $this->maximumNumberOfMessages]);
         }
     }
 

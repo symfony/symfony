@@ -133,7 +133,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             $this->discriminatorCache[$cacheKey] = null;
             if (null !== $this->classDiscriminatorResolver) {
                 $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object);
-                $this->discriminatorCache[$cacheKey] = null === $mapping ? null : $mapping->getTypeProperty();
+                $this->discriminatorCache[$cacheKey] = $mapping?->getTypeProperty();
             }
         }
 

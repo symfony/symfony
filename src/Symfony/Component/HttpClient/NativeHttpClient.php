@@ -176,7 +176,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $this->multi->dnsCache = $options['resolve'] + $this->multi->dnsCache;
         }
 
-        $this->logger && $this->logger->info(sprintf('Request: "%s %s"', $method, implode('', $url)));
+        $this->logger?->info(sprintf('Request: "%s %s"', $method, implode('', $url)));
 
         if (!isset($options['normalized_headers']['user-agent'])) {
             $options['headers'][] = 'User-Agent: Symfony HttpClient/Native';

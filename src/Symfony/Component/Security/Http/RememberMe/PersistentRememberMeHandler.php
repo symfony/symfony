@@ -91,9 +91,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         if ($persistentToken->getLastUsed()->getTimestamp() + 60 < time()) {
             $tokenValue = $this->generateHash(base64_encode(random_bytes(64)));
             $tokenLastUsed = new \DateTime();
-            if ($this->tokenVerifier) {
-                $this->tokenVerifier->updateExistingToken($persistentToken, $tokenValue, $tokenLastUsed);
-            }
+            $this->tokenVerifier?->updateExistingToken($persistentToken, $tokenValue, $tokenLastUsed);
             $this->tokenProvider->updateToken($series, $tokenValue, $tokenLastUsed);
         }
 

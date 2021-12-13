@@ -86,7 +86,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
             throw new NoSuchMetadataException(sprintf('The class or interface "%s" does not exist.', $class));
         }
 
-        $cacheItem = null === $this->cache ? null : $this->cache->getItem($this->escapeClassName($class));
+        $cacheItem = $this->cache?->getItem($this->escapeClassName($class));
         if ($cacheItem && $cacheItem->isHit()) {
             $metadata = $cacheItem->get();
 
@@ -98,9 +98,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
 
         $metadata = new ClassMetadata($class);
 
-        if (null !== $this->loader) {
-            $this->loader->loadClassMetadata($metadata);
-        }
+        $this->loader?->loadClassMetadata($metadata);
 
         if (null !== $cacheItem) {
             $this->cache->save($cacheItem->set($metadata));

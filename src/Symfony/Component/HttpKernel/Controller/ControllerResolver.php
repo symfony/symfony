@@ -36,9 +36,7 @@ class ControllerResolver implements ControllerResolverInterface
     public function getController(Request $request): callable|false
     {
         if (!$controller = $request->attributes->get('_controller')) {
-            if (null !== $this->logger) {
-                $this->logger->warning('Unable to look for the controller as the "_controller" parameter is missing.');
-            }
+            $this->logger?->warning('Unable to look for the controller as the "_controller" parameter is missing.');
 
             return false;
         }

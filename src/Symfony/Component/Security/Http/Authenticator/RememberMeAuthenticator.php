@@ -73,9 +73,7 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
             return false;
         }
 
-        if (null !== $this->logger) {
-            $this->logger->debug('Remember-me cookie detected.');
-        }
+        $this->logger?->debug('Remember-me cookie detected.');
 
         // the `null` return value indicates that this authenticator supports lazy firewalls
         return null;

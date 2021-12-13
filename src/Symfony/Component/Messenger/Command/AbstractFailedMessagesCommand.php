@@ -65,7 +65,7 @@ abstract class AbstractFailedMessagesCommand extends Command
         /** @var TransportMessageIdStamp $stamp */
         $stamp = $envelope->last(TransportMessageIdStamp::class);
 
-        return null !== $stamp ? $stamp->getId() : null;
+        return $stamp?->getId();
     }
 
     protected function displaySingleMessage(Envelope $envelope, SymfonyStyle $io)
@@ -129,10 +129,7 @@ abstract class AbstractFailedMessagesCommand extends Command
             $dump = new Dumper($io, null, $this->createCloner());
             $io->writeln($dump($envelope->getMessage()));
             $io->title('Exception:');
-            $flattenException = null;
-            if (null !== $lastErrorDetailsStamp) {
-                $flattenException = $lastErrorDetailsStamp->getFlattenException();
-            }
+            $flattenException = $lastErrorDetailsStamp?->getFlattenException();
             $io->writeln(null === $flattenException ? '(no data)' : $dump($flattenException));
         } else {
             $io->writeln(' Re-run command with <info>-vv</info> to see more message & error details.');

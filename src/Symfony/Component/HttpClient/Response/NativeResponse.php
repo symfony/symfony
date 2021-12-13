@@ -126,7 +126,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                 throw new TransportException($msg);
             }
 
-            $this->logger && $this->logger->info(sprintf('%s for "%s".', $msg, $url ?? $this->url));
+            $this->logger?->info(sprintf('%s for "%s".', $msg, $url ?? $this->url));
         });
 
         try {
@@ -162,7 +162,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                     break;
                 }
 
-                $this->logger && $this->logger->info(sprintf('Redirecting: "%s %s"', $this->info['http_code'], $url ?? $this->url));
+                $this->logger?->info(sprintf('Redirecting: "%s %s"', $this->info['http_code'], $url ?? $this->url));
             }
         } catch (\Throwable $e) {
             $this->close();

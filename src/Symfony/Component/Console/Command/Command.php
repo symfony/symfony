@@ -421,9 +421,7 @@ class Command
     public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null): static
     {
         $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
-        if (null !== $this->fullDefinition) {
-            $this->fullDefinition->addArgument(new InputArgument($name, $mode, $description, $default));
-        }
+        $this->fullDefinition?->addArgument(new InputArgument($name, $mode, $description, $default));
 
         return $this;
     }
@@ -442,9 +440,7 @@ class Command
     public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null): static
     {
         $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
-        if (null !== $this->fullDefinition) {
-            $this->fullDefinition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
-        }
+        $this->fullDefinition?->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
 
         return $this;
     }

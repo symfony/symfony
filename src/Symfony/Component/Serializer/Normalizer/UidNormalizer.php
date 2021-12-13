@@ -14,7 +14,6 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Uid\AbstractUid;
-use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
 final class UidNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
@@ -70,9 +69,15 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         try {
-            return Ulid::class === $type ? Ulid::fromString($data) : Uuid::fromString($data);
+            return AbstractUid::class !== $type ? $type::fromString($data) : Uuid::fromString($data);
         } catch (\InvalidArgumentException $exception) {
             throw new NotNormalizableValueException(sprintf('The data is not a valid "%s" string representation.', $type));
+        } catch (\Error $e) {
+            if (str_starts_with($e->getMessage(), 'Cannot instantiate abstract class')) {
+                return $this->denormalize($data, AbstractUid::class, $format, $context);
+            }
+
+            throw $e;
         }
     }
 

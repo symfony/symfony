@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-13T08:49:29Z
+
+> if you install with `--prefer-lowest` for `symfony/symfony` package, it will install a wrong version of psr container.
+
+But… you don't depend on `symfony/symfony` in your projects, are you? 🙃
+
+Anyway, this change looks correct.
+
+---------------------------------------------------------------------------
+
+by Nek- at 2021-12-13T08:55:05Z
+
+@derrabus it can be convenient for testing.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-13T08:58:34Z
+
+No, trust me on this. Please don't.

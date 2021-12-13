@@ -15,6 +15,7 @@ use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Output\BashCompletionOutput;
 use Symfony\Component\Console\Completion\Output\CompletionOutputInterface;
+use Symfony\Component\Console\Completion\Output\FishCompletionOutput;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,7 +42,10 @@ final class CompleteCommand extends Command
     public function __construct(array $completionOutputs = [])
     {
         // must be set before the parent constructor, as the property value is used in configure()
-        $this->completionOutputs = $completionOutputs + ['bash' => BashCompletionOutput::class];
+        $this->completionOutputs = $completionOutputs + [
+            'bash' => BashCompletionOutput::class,
+            'fish' => FishCompletionOutput::class,
+        ];
 
         parent::__construct();
     }

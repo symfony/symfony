@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-12-13T17:19:38Z
+
+I think we should avoid doing that for existing code for now, to avoid merge conflicts when merging between branches.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-12-13T18:43:26Z
+
+@stof I think we stopped worrying about this a while ago.
+@derrabus Is there any PHP CS Fixer rule that we can enable for this (probably not easy to implement)?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-13T20:47:49Z
+
+> I think we should avoid doing that for existing code for now, to avoid merge conflicts when merging between branches.
+
+The thing is, since we decided not to merge this kind of change into the oldest stable brach anymore, we would basically never be able to perform this kind of modernization if we didn't do it on the feature branch. I think that the conflicts are managable in this case.
+
+> Is there any PHP CS Fixer rule that we can enable for this (probably not easy to implement)?
+
+Not that I'm aware of, but I could try to implement rules for the cases I've found here.

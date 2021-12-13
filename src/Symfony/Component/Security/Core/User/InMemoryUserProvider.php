@@ -56,7 +56,7 @@ class InMemoryUserProvider implements UserProviderInterface
     {
         $userIdentifier = strtolower($user->getUserIdentifier());
         if (isset($this->users[$userIdentifier])) {
-            throw new \LogicException('Another user with the same username already exists.');
+            throw new \LogicException('Another user with the same identifier already exists.');
         }
 
         $this->users[$userIdentifier] = $user;

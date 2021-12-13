@@ -125,6 +125,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             }
         };
 
+        $multi->lastTimeout = null;
         $multi->openHandles[$id] = $id;
         ++$multi->responseCount;
 

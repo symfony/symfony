@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-12-13T17:22:30Z
+
+is it possible to have tests to prevent such regressions or is it too tricky to trigger ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-13T17:26:43Z
+
+It's too tricky, PHP engine closing in unpredictable order...

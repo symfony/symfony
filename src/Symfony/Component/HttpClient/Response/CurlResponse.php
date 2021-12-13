@@ -172,6 +172,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         };
 
         // Schedule the request in a non-blocking way
+        $multi->lastTimeout = null;
         $multi->openHandles[$id] = [$ch, $options];
         curl_multi_add_handle($multi->handle, $ch);
 

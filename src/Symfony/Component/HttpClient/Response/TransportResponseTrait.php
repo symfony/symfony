@@ -140,7 +140,7 @@ trait TransportResponseTrait
         $this->shouldBuffer = true;
 
         if ($this->initializer && null === $this->info['error']) {
-            self::initialize($this, -0.0);
+            self::initialize($this);
             $this->checkStatusCode();
         }
     }

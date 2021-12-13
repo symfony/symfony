@@ -70,7 +70,7 @@ EOF
         }
 
         $secrets = $this->vault->list($reveal);
-        $localSecrets = null !== $this->localVault ? $this->localVault->list($reveal) : null;
+        $localSecrets = $this->localVault?->list($reveal);
 
         $rows = [];
 

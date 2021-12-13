@@ -55,9 +55,7 @@ class HttpCacheTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        if ($this->cache) {
-            $this->cache->getStore()->cleanup();
-        }
+        $this->cache?->getStore()->cleanup();
         $this->kernel = null;
         $this->cache = null;
         $this->caches = null;

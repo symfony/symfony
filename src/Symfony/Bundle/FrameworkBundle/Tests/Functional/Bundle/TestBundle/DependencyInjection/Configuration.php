@@ -27,9 +27,7 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('test');
 
-        if ($this->customConfig) {
-            $this->customConfig->addConfiguration($treeBuilder->getRootNode());
-        }
+        $this->customConfig?->addConfiguration($treeBuilder->getRootNode());
 
         return $treeBuilder;
     }

@@ -1546,9 +1546,7 @@ class ProcessTest extends TestCase
             $process = new Process($commandline, $cwd, $env, $input, $timeout);
         }
 
-        if (self::$process) {
-            self::$process->stop(0);
-        }
+        self::$process?->stop(0);
 
         return self::$process = $process;
     }

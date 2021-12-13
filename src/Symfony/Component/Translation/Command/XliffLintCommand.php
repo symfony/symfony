@@ -184,9 +184,7 @@ EOF
                     // general document errors have a '-1' line number
                     $line = -1 === $error['line'] ? null : $error['line'];
 
-                    if ($githubReporter) {
-                        $githubReporter->error($error['message'], $info['file'], $line, null !== $line ? $error['column'] : null);
-                    }
+                    $githubReporter?->error($error['message'], $info['file'], $line, null !== $line ? $error['column'] : null);
 
                     return null === $line ? $error['message'] : sprintf('Line %d, Column %d: %s', $line, $error['column'], $error['message']);
                 }, $info['messages']));

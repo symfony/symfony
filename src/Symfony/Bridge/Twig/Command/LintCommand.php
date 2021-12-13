@@ -230,9 +230,7 @@ EOF
     {
         $line = $exception->getTemplateLine();
 
-        if ($githubReporter) {
-            $githubReporter->error($exception->getRawMessage(), $file, $line <= 0 ? null : $line);
-        }
+        $githubReporter?->error($exception->getRawMessage(), $file, $line <= 0 ? null : $line);
 
         if ($file) {
             $output->text(sprintf('<error> ERROR </error> in %s (line %s)', $file, $line));

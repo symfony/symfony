@@ -47,9 +47,7 @@ class StopWorkerOnFailureLimitListener implements EventSubscriberInterface
             $this->failedMessages = 0;
             $event->getWorker()->stop();
 
-            if (null !== $this->logger) {
-                $this->logger->info('Worker stopped due to limit of {count} failed message(s) is reached', ['count' => $this->maximumNumberOfFailures]);
-            }
+            $this->logger?->info('Worker stopped due to limit of {count} failed message(s) is reached', ['count' => $this->maximumNumberOfFailures]);
         }
     }
 

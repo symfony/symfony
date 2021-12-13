@@ -50,9 +50,7 @@ final class Texter implements TexterInterface
             return $this->transport->send($message);
         }
 
-        if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(new MessageEvent($message, true));
-        }
+        $this->dispatcher?->dispatch(new MessageEvent($message, true));
 
         $this->bus->dispatch($message);
 

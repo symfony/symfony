@@ -39,9 +39,7 @@ class StopWorkerOnMemoryLimitListener implements EventSubscriberInterface
         $usedMemory = $memoryResolver();
         if ($usedMemory > $this->memoryLimit) {
             $event->getWorker()->stop();
-            if (null !== $this->logger) {
-                $this->logger->info('Worker stopped due to memory limit of {limit} bytes exceeded ({memory} bytes used)', ['limit' => $this->memoryLimit, 'memory' => $usedMemory]);
-            }
+            $this->logger?->info('Worker stopped due to memory limit of {limit} bytes exceeded ({memory} bytes used)', ['limit' => $this->memoryLimit, 'memory' => $usedMemory]);
         }
     }
 

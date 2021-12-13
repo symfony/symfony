@@ -43,9 +43,7 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
     {
         if ($this->shouldRestart()) {
             $event->getWorker()->stop();
-            if (null !== $this->logger) {
-                $this->logger->info('Worker stopped because a restart was requested.');
-            }
+            $this->logger?->info('Worker stopped because a restart was requested.');
         }
     }
 

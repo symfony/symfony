@@ -78,7 +78,7 @@ class Profile
      */
     public function getParentToken(): ?string
     {
-        return $this->parent ? $this->parent->getToken() : null;
+        return $this->parent?->getToken();
     }
 
     /**

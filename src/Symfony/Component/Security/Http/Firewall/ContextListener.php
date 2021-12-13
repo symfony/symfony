@@ -120,30 +120,22 @@ class ContextListener extends AbstractListener
 
         $token = $this->safelyUnserialize($token);
 
-        if (null !== $this->logger) {
-            $this->logger->debug('Read existing security token from the session.', [
-                'key' => $this->sessionKey,
-                'token_class' => \is_object($token) ? \get_class($token) : null,
-            ]);
-        }
+        $this->logger?->debug('Read existing security token from the session.', [
+            'key' => $this->sessionKey,
+            'token_class' => \is_object($token) ? \get_class($token) : null,
+        ]);
 
         if ($token instanceof TokenInterface) {
             $originalToken = $token;
             $token = $this->refreshUser($token);
 
             if (!$token) {
-                if ($this->logger) {
-                    $this->logger->debug('Token was deauthenticated after trying to refresh it.');
-                }
+                $this->logger?->debug('Token was deauthenticated after trying to refresh it.');
 
-                if ($this->dispatcher) {
-                    $this->dispatcher->dispatch(new TokenDeauthenticatedEvent($originalToken, $request));
-                }
+                $this->dispatcher?->dispatch(new TokenDeauthenticatedEvent($originalToken, $request));
             }
         } elseif (null !== $token) {
-            if (null !== $this->logger) {
-                $this->logger->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => $token]);
-            }
+            $this->logger?->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => $token]);
 
             $token = null;
         }
@@ -170,9 +162,7 @@ class ContextListener extends AbstractListener
             return;
         }
 
-        if ($this->dispatcher) {
-            $this->dispatcher->removeListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
-        }
+        $this->dispatcher?->removeListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
         $this->registered = false;
         $session = $request->getSession();
         $sessionId = $session->getId();
@@ -186,9 +176,7 @@ class ContextListener extends AbstractListener
         } else {
             $session->set($this->sessionKey, serialize($token));
 
-            if (null !== $this->logger) {
-                $this->logger->debug('Stored the security token in the session.', ['key' => $this->sessionKey]);
-            }
+            $this->logger?->debug('Stored the security token in the session.', ['key' => $this->sessionKey]);
         }
 
         if ($this->sessionTrackerEnabler && $session->getId() === $sessionId) {
@@ -227,9 +215,7 @@ class ContextListener extends AbstractListener
                 if ($token instanceof AbstractToken && $this->hasUserChanged($user, $newToken)) {
                     $userDeauthenticated = true;
 
-                    if (null !== $this->logger) {
-                        $this->logger->debug('Cannot refresh token because user has changed.', ['username' => $refreshedUser->getUserIdentifier(), 'provider' => \get_class($provider)]);
-                    }
+                    $this->logger?->debug('Cannot refresh token because user has changed.', ['username' => $refreshedUser->getUserIdentifier(), 'provider' => \get_class($provider)]);
 
                     continue;
                 }
@@ -251,9 +237,7 @@ class ContextListener extends AbstractListener
             } catch (UnsupportedUserException $e) {
                 // let's try the next user provider
             } catch (UserNotFoundException $e) {
-                if (null !== $this->logger) {
-                    $this->logger->warning('Username could not be found in the selected user provider.', ['username' => $e->getUserIdentifier(), 'provider' => \get_class($provider)]);
-                }
+                $this->logger?->warning('Username could not be found in the selected user provider.', ['username' => $e->getUserIdentifier(), 'provider' => \get_class($provider)]);
 
                 $userNotFoundByProvider = true;
             }
@@ -288,9 +272,7 @@ class ContextListener extends AbstractListener
             if (0x37313BC !== $e->getCode()) {
                 throw $e;
             }
-            if ($this->logger) {
-                $this->logger->warning('Failed to unserialize the security token from the session.', ['key' => $this->sessionKey, 'received' => $serializedToken, 'exception' => $e]);
-            }
+            $this->logger?->warning('Failed to unserialize the security token from the session.', ['key' => $this->sessionKey, 'received' => $serializedToken, 'exception' => $e]);
         } finally {
             restore_error_handler();
             ini_set('unserialize_callback_func', $prevUnserializeHandler);

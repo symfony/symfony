@@ -56,9 +56,7 @@ class AmazonSqsSender implements SenderInterface
 
         /** @var AmazonSqsXrayTraceHeaderStamp|null $amazonSqsXrayTraceHeaderStamp */
         $amazonSqsXrayTraceHeaderStamp = $envelope->last(AmazonSqsXrayTraceHeaderStamp::class);
-        if (null !== $amazonSqsXrayTraceHeaderStamp) {
-            $xrayTraceId = $amazonSqsXrayTraceHeaderStamp->getTraceId();
-        }
+        $xrayTraceId = $amazonSqsXrayTraceHeaderStamp?->getTraceId();
 
         try {
             $this->connection->send(

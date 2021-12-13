@@ -158,7 +158,7 @@ class TraceableUrlMatcher extends UrlMatcher
             'log' => $log,
             'name' => $name,
             'level' => $level,
-            'path' => null !== $route ? $route->getPath() : null,
+            'path' => $route?->getPath(),
         ];
     }
 }

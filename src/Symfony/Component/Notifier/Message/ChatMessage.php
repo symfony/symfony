@@ -54,7 +54,7 @@ final class ChatMessage implements MessageInterface
 
     public function getRecipientId(): ?string
     {
-        return $this->options ? $this->options->getRecipientId() : null;
+        return $this->options?->getRecipientId();
     }
 
     /**

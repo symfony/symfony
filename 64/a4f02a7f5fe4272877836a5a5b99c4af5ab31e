@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by guillaume-a at 2021-10-21T21:24:40Z
+
+I just saw test errors. I'll fix it tomorrow.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-10-22T17:17:18Z
+
+Hey!
+
+I think @GromNaN has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2021-10-22T19:30:39Z
+
+Does this handle properly values containing backslashes or spaces ? see #43664 for the bash completion
+
+---------------------------------------------------------------------------
+
+by guillaume-a at 2021-10-22T20:44:53Z
+
+@stof otb I don't think. i'll take a look soon. Thanks for the feedback.
+
+---------------------------------------------------------------------------
+
+by guillaume-a at 2021-10-29T13:36:57Z
+
+> @fabpot fabpot added this to the 6.1 milestone 14 minutes ago
+
+Does this mean i have to change my rebase branch for this PR ?
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2021-12-03T18:02:56Z
+
+If it can help, there was a fish plugin for Symfony 2: https://github.com/mojoLyon/fish-sf
+
+---------------------------------------------------------------------------
+
+by guillaume-a at 2021-12-09T19:28:39Z
+
+Rebased onto 6.1, and seams to work. At least "on my machine" ;)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-12-09T20:08:47Z
+
+Does it work with the following features:
+- aliased command  #44461
+- backslash in typed and completed values (for class names) #43664
+
+---------------------------------------------------------------------------
+
+by guillaume-a at 2021-12-09T20:56:24Z
+
+#44461 it seems to work OTB with fish.
+![image](https://user-images.githubusercontent.com/917449/145473932-36398212-7c58-42d3-b8a5-f4599873ed17.png)
+
+#43664 : And this too
+![image](https://user-images.githubusercontent.com/917449/145474297-807d91a1-6be3-45b0-9f9d-932bb11e3c8b.png)

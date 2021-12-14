@@ -69,7 +69,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      */
     public function supports(mixed $resource, string $type = null): bool
     {
-        if ('annotation' === $type) {
+        if (\in_array($type, ['annotation', 'attribute'], true)) {
             return true;
         }
 

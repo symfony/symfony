@@ -243,7 +243,7 @@ class EnglishInflectorTest extends TestCase
             ['life', 'lives'],
             ['louse', 'lice'],
             ['man', 'men'],
-            ['matrix', ['matricies', 'matrixes']],
+            ['matrix', ['matrices', 'matrixes']],
             ['mouse', 'mice'],
             ['move', 'moves'],
             ['movie', 'movies'],

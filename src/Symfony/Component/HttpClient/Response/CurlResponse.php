@@ -275,7 +275,8 @@ final class CurlResponse implements ResponseInterface
         try {
             self::$performing = true;
             $active = 0;
-            while (\CURLM_CALL_MULTI_PERFORM === ($err = curl_multi_exec($multi->handle, $active)));
+            while (\CURLM_CALL_MULTI_PERFORM === ($err = curl_multi_exec($multi->handle, $active))) {
+            }
 
             if (\CURLM_OK !== $err) {
                 throw new TransportException(curl_multi_strerror($err));

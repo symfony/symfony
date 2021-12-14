@@ -89,6 +89,7 @@ final class CurlClientState extends ClientState
                 curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, null);
             }
 
+            curl_multi_close($this->handle);
             $this->__construct($this->maxHostConnections, $this->maxPendingPushes);
         }
     }

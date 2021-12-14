@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Workflow\Event;
 
+/**
+ * @template TSubject of object
+ * @extends Event<TSubject>
+ */
 final class CompletedEvent extends Event
 {
 }

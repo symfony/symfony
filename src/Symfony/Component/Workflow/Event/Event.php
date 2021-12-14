@@ -17,6 +17,8 @@ use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
 
 /**
+ * @template TSubject of object
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Carlos Pereira De Amorim <carlos@shauri.fr>
@@ -24,11 +26,17 @@ use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
 class Event extends BaseEvent
 {
     protected $context;
+    /**
+     * @var TSubject
+     */
     private $subject;
     private $marking;
     private $transition;
     private $workflow;
 
+    /**
+     * @param TSubject $subject
+     */
     public function __construct(object $subject, Marking $marking, Transition $transition = null, WorkflowInterface $workflow = null, array $context = [])
     {
         $this->subject = $subject;
@@ -43,6 +51,9 @@ class Event extends BaseEvent
         return $this->marking;
     }
 
+    /**
+     * @return TSubject
+     */
     public function getSubject()
     {
         return $this->subject;
@@ -63,6 +74,9 @@ class Event extends BaseEvent
         return $this->workflow->getName();
     }
 
+    /**
+     * @param TSubject $subject
+     */
     public function getMetadata(string $key, $subject)
     {
         return $this->workflow->getMetadataStore()->getMetadata($key, $subject);

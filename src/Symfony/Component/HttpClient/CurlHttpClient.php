@@ -306,9 +306,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of CurlResponse objects, "%s" given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
         }
 
-        if (\is_resource($this->multi->handle) || $this->multi->handle instanceof \CurlMultiHandle) {
+        if (\is_resource($mh = $this->multi->handles[0] ?? null) || $mh instanceof \CurlMultiHandle) {
             $active = 0;
-            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active)) {
+            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($mh, $active)) {
             }
         }
 

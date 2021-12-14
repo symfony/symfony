@@ -109,7 +109,7 @@ trait TransportResponseTrait
     private static function addResponseHeaders(array $responseHeaders, array &$info, array &$headers, string &$debug = ''): void
     {
         foreach ($responseHeaders as $h) {
-            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([1-9]\d\d)(?: |$)#', $h, $m)) {
+            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? (\d\d\d)(?: |$)#', $h, $m)) {
                 if ($headers) {
                     $debug .= "< \r\n";
                     $headers = [];
@@ -124,10 +124,6 @@ trait TransportResponseTrait
         }
 
         $debug .= "< \r\n";
-
-        if (!$info['http_code']) {
-            throw new TransportException(sprintf('Invalid or missing HTTP status line for "%s".', implode('', $info['url'])));
-        }
     }
 
     /**

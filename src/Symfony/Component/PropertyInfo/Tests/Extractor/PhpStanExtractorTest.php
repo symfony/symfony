@@ -370,6 +370,14 @@ class PhpStanExtractorTest extends TestCase
             ['e', [new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class, true, [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING)])], [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [new Type(Type::BUILTIN_TYPE_INT)], [new Type(Type::BUILTIN_TYPE_STRING, false, null, true, [], [new Type(Type::BUILTIN_TYPE_OBJECT, false, DefaultValue::class)])])]), new Type(Type::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
         ];
     }
+
+    public function testDummyNamespace()
+    {
+        $this->assertEquals(
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')],
+            $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace', 'dummy')
+        );
+    }
 }
 
 class PhpStanOmittedParamTagTypeDocBlock

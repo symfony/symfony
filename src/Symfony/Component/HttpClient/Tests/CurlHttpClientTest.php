@@ -62,9 +62,20 @@ class CurlHttpClientTest extends HttpClientTestCase
         $r = new \ReflectionProperty($httpClient, 'multi');
         $r->setAccessible(true);
         $clientState = $r->getValue($httpClient);
-        $initialHandleId = (int) $clientState->handle;
+        $initialHandleId = (int) $clientState->handles[0];
         $httpClient->reset();
-        self::assertNotSame($initialHandleId, (int) $clientState->handle);
+        self::assertNotSame($initialHandleId, (int) $clientState->handles[0]);
+    }
+
+    public function testProcessAfterReset()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://127.0.0.1:8057/json');
+
+        $client->reset();
+
+        $this->assertSame(['application/json'], $response->getHeaders()['content-type']);
     }
 
     public function testOverridingRefererUsingCurlOptions()

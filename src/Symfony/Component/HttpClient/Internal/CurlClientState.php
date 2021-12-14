@@ -23,8 +23,8 @@ use Symfony\Component\HttpClient\Response\CurlResponse;
  */
 final class CurlClientState extends ClientState
 {
-    /** @var \CurlMultiHandle|resource */
-    public $handle;
+    /** @var array<\CurlMultiHandle|resource> */
+    public $handles = [];
     /** @var PushedResponse[] */
     public $pushedResponses = [];
     /** @var DnsCache */
@@ -44,20 +44,20 @@ final class CurlClientState extends ClientState
     {
         self::$curlVersion = self::$curlVersion ?? curl_version();
 
-        $this->handle = curl_multi_init();
+        array_unshift($this->handles, $mh = curl_multi_init());
         $this->dnsCache = new DnsCache();
         $this->maxHostConnections = $maxHostConnections;
         $this->maxPendingPushes = $maxPendingPushes;
 
         // Don't enable HTTP/1.1 pipelining: it forces responses to be sent in order
         if (\defined('CURLPIPE_MULTIPLEX')) {
-            curl_multi_setopt($this->handle, \CURLMOPT_PIPELINING, \CURLPIPE_MULTIPLEX);
+            curl_multi_setopt($mh, \CURLMOPT_PIPELINING, \CURLPIPE_MULTIPLEX);
         }
         if (\defined('CURLMOPT_MAX_HOST_CONNECTIONS')) {
-            $maxHostConnections = curl_multi_setopt($this->handle, \CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : \PHP_INT_MAX) ? 0 : $maxHostConnections;
+            $maxHostConnections = curl_multi_setopt($mh, \CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : \PHP_INT_MAX) ? 0 : $maxHostConnections;
         }
         if (\defined('CURLMOPT_MAXCONNECTS') && 0 < $maxHostConnections) {
-            curl_multi_setopt($this->handle, \CURLMOPT_MAXCONNECTS, $maxHostConnections);
+            curl_multi_setopt($mh, \CURLMOPT_MAXCONNECTS, $maxHostConnections);
         }
 
         // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/77535
@@ -70,44 +70,40 @@ final class CurlClientState extends ClientState
             return;
         }
 
-        curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, function ($parent, $pushed, array $requestHeaders) use ($maxPendingPushes) {
-            return $this->handlePush($parent, $pushed, $requestHeaders, $maxPendingPushes);
+        // Clone to prevent a circular reference
+        $multi = clone $this;
+        $multi->handles = [$mh];
+        $multi->pushedResponses = &$this->pushedResponses;
+        $multi->logger = &$this->logger;
+        $multi->handlesActivity = &$this->handlesActivity;
+        $multi->openHandles = &$this->openHandles;
+        $multi->lastTimeout = &$this->lastTimeout;
+
+        curl_multi_setopt($mh, \CURLMOPT_PUSHFUNCTION, static function ($parent, $pushed, array $requestHeaders) use ($multi, $maxPendingPushes) {
+            return $multi->handlePush($parent, $pushed, $requestHeaders, $maxPendingPushes);
         });
     }
 
     public function reset()
     {
-        if ($this->logger) {
-            foreach ($this->pushedResponses as $url => $response) {
-                $this->logger->debug(sprintf('Unused pushed response: "%s"', $url));
+        foreach ($this->pushedResponses as $url => $response) {
+            $this->logger && $this->logger->debug(sprintf('Unused pushed response: "%s"', $url));
+
+            foreach ($this->handles as $mh) {
+                curl_multi_remove_handle($mh, $response->handle);
             }
+            curl_close($response->handle);
         }
 
         $this->pushedResponses = [];
         $this->dnsCache->evictions = $this->dnsCache->evictions ?: $this->dnsCache->removals;
         $this->dnsCache->removals = $this->dnsCache->hostnames = [];
 
-        if (\is_resource($this->handle) || $this->handle instanceof \CurlMultiHandle) {
-            if (\defined('CURLMOPT_PUSHFUNCTION')) {
-                curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, null);
-            }
-
-            $this->__construct($this->maxHostConnections, $this->maxPendingPushes);
+        if (\defined('CURLMOPT_PUSHFUNCTION')) {
+            curl_multi_setopt($this->handles[0], \CURLMOPT_PUSHFUNCTION, null);
         }
-    }
 
-    public function __wakeup()
-    {
-        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-    }
-
-    public function __destruct()
-    {
-        foreach ($this->openHandles as [$ch]) {
-            if (\is_resource($ch) || $ch instanceof \CurlHandle) {
-                curl_setopt($ch, \CURLOPT_VERBOSE, false);
-            }
-        }
+        $this->__construct($this->maxHostConnections, $this->maxPendingPushes);
     }
 
     private function handlePush($parent, $pushed, array $requestHeaders, int $maxPendingPushes): int

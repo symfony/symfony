@@ -340,15 +340,8 @@ final class CurlResponse implements ResponseInterface
         }
 
         if ('' !== $data) {
-            try {
-                // Regular header line: add it to the list
-                self::addResponseHeaders([$data], $info, $headers);
-            } catch (TransportException $e) {
-                $multi->handlesActivity[$id][] = null;
-                $multi->handlesActivity[$id][] = $e;
-
-                return \strlen($data);
-            }
+            // Regular header line: add it to the list
+            self::addResponseHeaders([$data], $info, $headers);
 
             if (!str_starts_with($data, 'HTTP/')) {
                 if (0 === stripos($data, 'Location:')) {

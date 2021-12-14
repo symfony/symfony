@@ -237,7 +237,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         try {
             /* @var Response $response */
             if (null === $response = yield from self::getPushedResponse($request, $multi, $info, $headers, $options, $logger)) {
-                $logger && $logger->info(sprintf('Request: "%s %s"', $info['http_method'], $info['url']));
+                $logger?->info(sprintf('Request: "%s %s"', $info['http_method'], $info['url']));
 
                 $response = yield from self::followRedirects($request, $multi, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause);
             }
@@ -321,7 +321,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 return $response;
             }
 
-            $logger && $logger->info(sprintf('Redirecting: "%s %s"', $status, $info['url']));
+            $logger?->info(sprintf('Redirecting: "%s %s"', $status, $info['url']));
 
             try {
                 // Discard body of redirects
@@ -429,14 +429,14 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             foreach ($response->getHeaderArray('vary') as $vary) {
                 foreach (preg_split('/\s*+,\s*+/', $vary) as $v) {
                     if ('*' === $v || ($pushedRequest->getHeaderArray($v) !== $request->getHeaderArray($v) && 'accept-encoding' !== strtolower($v))) {
-                        $logger && $logger->debug(sprintf('Skipping pushed response: "%s"', $info['url']));
+                        $logger?->debug(sprintf('Skipping pushed response: "%s"', $info['url']));
                         continue 3;
                     }
                 }
             }
 
             $pushDeferred->resolve();
-            $logger && $logger->debug(sprintf('Accepting pushed response: "%s %s"', $info['http_method'], $info['url']));
+            $logger?->debug(sprintf('Accepting pushed response: "%s %s"', $info['http_method'], $info['url']));
             self::addResponseHeaders($response, $info, $headers);
             unset($multi->pushedResponses[$authority][$i]);
 

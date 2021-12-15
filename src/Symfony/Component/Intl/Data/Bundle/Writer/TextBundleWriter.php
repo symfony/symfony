@@ -78,10 +78,8 @@ class TextBundleWriter implements BundleWriterInterface
         if (\is_array($value)) {
             $intValues = \count($value) === \count(array_filter($value, 'is_int'));
 
-            $keys = array_keys($value);
-
             // check that the keys are 0-indexed and ascending
-            $intKeys = $keys === range(0, \count($keys) - 1);
+            $intKeys = array_is_list($value);
 
             if ($intValues && $intKeys) {
                 $this->writeIntVector($file, $value, $indentation);

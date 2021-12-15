@@ -116,8 +116,8 @@ class UidNormalizerTest extends TestCase
             ['4126dbc1-488e-4f6e-aadd-775dcbac482e', UuidV4::class],
             ['18cdf3d3-ea1b-5b23-a9c5-40abd0e2df22', UuidV5::class],
             ['1ea6ecef-eb9a-66fe-b62b-957b45f17e43', UuidV6::class],
-            ['1ea6ecef-eb9a-66fe-b62b-957b45f17e43', AbstractUid::class],
             ['01E4BYF64YZ97MDV6RH0HAMN6X', Ulid::class],
+            ['01FPT3YXZXJ1J437FES7CR5BCB', TestCustomUid::class],
         ];
     }
 
@@ -134,16 +134,32 @@ class UidNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsDenormalization('foo', \stdClass::class));
     }
 
+    public function testSupportOurAbstractUid()
+    {
+        $this->assertTrue($this->normalizer->supportsDenormalization('1ea6ecef-eb9a-66fe-b62b-957b45f17e43', AbstractUid::class));
+    }
+
+    public function testSupportCustomAbstractUid()
+    {
+        $this->assertTrue($this->normalizer->supportsDenormalization('ccc', TestAbstractCustomUid::class));
+    }
+
     /**
      * @dataProvider dataProvider
      */
     public function testDenormalize($uuidString, $class)
     {
-        if (Ulid::class === $class) {
-            $this->assertEquals(new Ulid($uuidString), $this->normalizer->denormalize($uuidString, $class));
-        } else {
-            $this->assertEquals(Uuid::fromString($uuidString), $this->normalizer->denormalize($uuidString, $class));
-        }
+        $this->assertEquals($class::fromString($uuidString), $this->normalizer->denormalize($uuidString, $class));
+    }
+
+    public function testDenormalizeOurAbstractUid()
+    {
+        $this->assertEquals(Uuid::fromString($uuidString = '1ea6ecef-eb9a-66fe-b62b-957b45f17e43'), $this->normalizer->denormalize($uuidString, AbstractUid::class));
+    }
+
+    public function testDenormalizeCustomAbstractUid()
+    {
+        $this->assertEquals(Uuid::fromString($uuidString = '1ea6ecef-eb9a-66fe-b62b-957b45f17e43'), $this->normalizer->denormalize($uuidString, TestAbstractCustomUid::class));
     }
 
     public function testNormalizeWithNormalizationFormatPassedInConstructor()
@@ -168,4 +184,12 @@ class UidNormalizerTest extends TestCase
             'uid_normalization_format' => 'ccc',
         ]);
     }
+}
+
+class TestCustomUid extends Ulid
+{
+}
+
+abstract class TestAbstractCustomUid extends Ulid
+{
 }

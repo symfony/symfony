@@ -19,6 +19,9 @@ use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
  * @Symfony\Component\Validator\Tests\Fixtures\ConstraintA
  * @Assert\GroupSequence({"Foo", "Entity"})
  * @Assert\Callback({"Symfony\Component\Validator\Tests\Fixtures\CallbackClass", "callback"})
+ * @Assert\Sequentially({
+ *     @Assert\Expression("this.getFirstName() != null")
+ * })
  */
 class Entity extends EntityParent implements EntityInterfaceB
 {

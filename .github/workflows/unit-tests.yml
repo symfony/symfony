@@ -146,7 +146,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Patch return types
-        if: "matrix.php == '8.1' && ! matrix.mode && matrix.os == 'ubuntu-20.04'"
+        if: "matrix.php == '8.1' && ! matrix.mode && matrix.os != 'macos-11'"
         run: |
           patch -sp1 < .github/expected-missing-return-types.diff
           git add .
@@ -224,7 +224,7 @@ jobs:
           [[ ! $X ]] || (exit 1)
 
       - name: Run tests with SIGCHLD enabled PHP
-        if: "matrix.php == '8.0' && ! matrix.mode"
+        if: "matrix.php == '8.0' && ! matrix.mode && matrix.os != 'macos-11'"
         run: |
           mkdir build
           cd build

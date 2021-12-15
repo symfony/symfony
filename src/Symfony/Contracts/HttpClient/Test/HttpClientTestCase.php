@@ -838,16 +838,16 @@ abstract class HttpClientTestCase extends TestCase
     public function testTimeoutOnInitialize()
     {
         $p1 = TestHttpServer::start(8067);
-        $p2 = TestHttpServer::start(8077);
+        $p2 = TestHttpServer::start(8078);
 
         $client = $this->getHttpClient(__FUNCTION__);
         $start = microtime(true);
         $responses = [];
 
         $responses[] = $client->request('GET', 'http://localhost:8067/timeout-header', ['timeout' => 0.25]);
-        $responses[] = $client->request('GET', 'http://localhost:8077/timeout-header', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:8078/timeout-header', ['timeout' => 0.25]);
         $responses[] = $client->request('GET', 'http://localhost:8067/timeout-header', ['timeout' => 0.25]);
-        $responses[] = $client->request('GET', 'http://localhost:8077/timeout-header', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:8078/timeout-header', ['timeout' => 0.25]);
 
         try {
             foreach ($responses as $response) {
@@ -871,16 +871,16 @@ abstract class HttpClientTestCase extends TestCase
     public function testTimeoutOnDestruct()
     {
         $p1 = TestHttpServer::start(8067);
-        $p2 = TestHttpServer::start(8077);
+        $p2 = TestHttpServer::start(8078);
 
         $client = $this->getHttpClient(__FUNCTION__);
         $start = microtime(true);
         $responses = [];
 
         $responses[] = $client->request('GET', 'http://localhost:8067/timeout-header', ['timeout' => 0.25]);
-        $responses[] = $client->request('GET', 'http://localhost:8077/timeout-header', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:8078/timeout-header', ['timeout' => 0.25]);
         $responses[] = $client->request('GET', 'http://localhost:8067/timeout-header', ['timeout' => 0.25]);
-        $responses[] = $client->request('GET', 'http://localhost:8077/timeout-header', ['timeout' => 0.25]);
+        $responses[] = $client->request('GET', 'http://localhost:8078/timeout-header', ['timeout' => 0.25]);
 
         try {
             while ($response = array_shift($responses)) {

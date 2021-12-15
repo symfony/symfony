@@ -114,6 +114,20 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertEquals(9, $rateLimit->getRemainingTokens());
     }
 
+    public function testBucketResilientToTimeShifting()
+    {
+        $serverOneClock = microtime(true) - 1;
+        $serverTwoClock = microtime(true) + 1;
+
+        $bucket = new TokenBucket('id', 100, new Rate(\DateInterval::createFromDateString('5 minutes'), 10), $serverTwoClock);
+        $this->assertSame(100, $bucket->getAvailableTokens($serverTwoClock));
+        $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
+
+        $bucket = new TokenBucket('id', 100, new Rate(\DateInterval::createFromDateString('5 minutes'), 10), $serverOneClock);
+        $this->assertSame(100, $bucket->getAvailableTokens($serverTwoClock));
+        $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
+    }
+
     private function createLimiter($initialTokens = 10, Rate $rate = null)
     {
         return new TokenBucketLimiter('test', $initialTokens, $rate ?? Rate::perSecond(10), $this->storage);

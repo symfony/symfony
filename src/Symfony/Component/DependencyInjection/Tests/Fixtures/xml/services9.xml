@@ -10,6 +10,7 @@
     <service id="foo" class="Bar\FooClass" public="true">
       <tag name="foo" foo="foo"/>
       <tag name="foo" bar="bar" baz="baz"/>
+      <tag name="nullable" bar="bar" baz=""/>
       <argument>foo</argument>
       <argument type="service" id="foo.baz"/>
       <argument type="collection">

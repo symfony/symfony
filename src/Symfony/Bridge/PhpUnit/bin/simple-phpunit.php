@@ -182,27 +182,6 @@ if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER')) {
     putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 }
 
-$COMPOSER = ($COMPOSER = getenv('COMPOSER_BINARY'))
-    || file_exists($COMPOSER = $oldPwd.'/composer.phar')
-    || ($COMPOSER = rtrim((string) ('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', shell_exec('where.exe composer.phar 2> NUL')) : shell_exec('which composer.phar 2> /dev/null'))))
-    || ($COMPOSER = rtrim((string) ('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', shell_exec('where.exe composer 2> NUL')) : shell_exec('which composer 2> /dev/null'))))
-    || file_exists($COMPOSER = rtrim((string) ('\\' === \DIRECTORY_SEPARATOR ? shell_exec('git rev-parse --show-toplevel 2> NUL') : shell_exec('git rev-parse --show-toplevel 2> /dev/null'))).\DIRECTORY_SEPARATOR.'composer.phar')
-    ? ('#!/usr/bin/env php' === file_get_contents($COMPOSER, false, null, 0, 18) ? $PHP : '').' '.escapeshellarg($COMPOSER) // detect shell wrappers by looking at the shebang
-    : 'composer';
-
-$prevCacheDir = getenv('COMPOSER_CACHE_DIR');
-if ($prevCacheDir) {
-    if (false === $absoluteCacheDir = realpath($prevCacheDir)) {
-        @mkdir($prevCacheDir, 0777, true);
-        $absoluteCacheDir = realpath($prevCacheDir);
-    }
-    if ($absoluteCacheDir) {
-        putenv("COMPOSER_CACHE_DIR=$absoluteCacheDir");
-    } else {
-        $prevCacheDir = false;
-    }
-}
-
 if ($buildRequired) {
     // Build a standalone phpunit without symfony/yaml nor prophecy by default
 
@@ -214,28 +193,36 @@ if ($buildRequired) {
         passthru(sprintf('\\' === \DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s 2> NUL' : 'rm -rf %s', escapeshellarg("$PHPUNIT_VERSION_DIR.old")));
     }
 
-    $info = [];
-    foreach (explode("\n", `$COMPOSER info --no-ansi -a -n phpunit/phpunit "$PHPUNIT_VERSION.*"`) as $line) {
-        $line = rtrim($line);
-
-        if (!$info && preg_match('/^versions +: /', $line)) {
-            $info['versions'] = explode(', ', ltrim(substr($line, 9), ': '));
-        } elseif (isset($info['requires'])) {
-            if ('' === $line) {
-                break;
-            }
-
-            $line = explode(' ', $line, 2);
-            $info['requires'][$line[0]] = $line[1];
-        } elseif ($info && 'requires' === $line) {
-            $info['requires'] = [];
-        }
-    }
+    $COMPOSER = ($COMPOSER = getenv('COMPOSER_BINARY'))
+        || file_exists($COMPOSER = $oldPwd.'/composer.phar')
+        || ($COMPOSER = rtrim((string) ('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', shell_exec('where.exe composer.phar 2> NUL')) : shell_exec('which composer.phar 2> /dev/null'))))
+        || ($COMPOSER = rtrim((string) ('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', shell_exec('where.exe composer 2> NUL')) : shell_exec('which composer 2> /dev/null'))))
+        || file_exists($COMPOSER = rtrim((string) ('\\' === \DIRECTORY_SEPARATOR ? shell_exec('git rev-parse --show-toplevel 2> NUL') : shell_exec('git rev-parse --show-toplevel 2> /dev/null'))).\DIRECTORY_SEPARATOR.'composer.phar')
+        ? ('#!/usr/bin/env php' === file_get_contents($COMPOSER, false, null, 0, 18) ? $PHP : '').' '.escapeshellarg($COMPOSER) // detect shell wrappers by looking at the shebang
+        : 'composer';
 
     if (in_array('--colors=never', $argv, true) || (isset($argv[$i = array_search('never', $argv, true) - 1]) && '--colors' === $argv[$i])) {
         $COMPOSER .= ' --no-ansi';
     } else {
         $COMPOSER .= ' --ansi';
+    }
+
+    $prevCacheDir = getenv('COMPOSER_CACHE_DIR');
+    if ($prevCacheDir) {
+        if (false === $absoluteCacheDir = realpath($prevCacheDir)) {
+            @mkdir($prevCacheDir, 0777, true);
+            $absoluteCacheDir = realpath($prevCacheDir);
+        }
+        if ($absoluteCacheDir) {
+            putenv("COMPOSER_CACHE_DIR=$absoluteCacheDir");
+        } else {
+            $prevCacheDir = false;
+        }
+    }
+
+    $jsonInfo = `$COMPOSER show -a -n -f json phpunit/phpunit "$PHPUNIT_VERSION.*"`;
+    if (!$jsonInfo || null === ($info = json_decode($jsonInfo, true))) {
+        $info = [];
     }
 
     $info += [
@@ -363,9 +350,8 @@ if ($PHPUNIT_VERSION < 8.0) {
     ++$argc;
 }
 
-$components = [];
-$cmd = array_map('escapeshellarg', $argv);
 $exit = 0;
+$components = [];
 
 if (isset($argv[1]) && 'symfony' === $argv[1] && !file_exists('symfony') && file_exists('src/Symfony')) {
     $argv[1] = 'src/Symfony';
@@ -382,23 +368,15 @@ if (isset($argv[1]) && is_dir($argv[1]) && !file_exists($argv[1].'/phpunit.xml.d
             $components[] = dirname($fileInfo->getPathname());
         }
     }
-    if ($components) {
-        array_shift($cmd);
-    }
-}
-
-$cmd[0] = sprintf('%s %s --colors=always', $PHP, escapeshellarg("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit"));
-$cmd = str_replace('%', '%%', implode(' ', $cmd)).' %1$s';
-
-if ('\\' === \DIRECTORY_SEPARATOR) {
-    $cmd = 'cmd /v:on /d /c "('.$cmd.')%2$s"';
-} else {
-    $cmd .= '%2$s';
 }
 
 if ($components) {
     $skippedTests = $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] ?? false;
     $runningProcs = [];
+
+    $phpUnitCmd = $PHP.' '.escapeshellarg("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit").' --colors=always';
+    $arguments = implode(' ', array_map('escapeshellarg', array_slice($argv, 1)));
+    $quote = '\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 80000;
 
     foreach ($components as $component) {
         // Run phpunit tests in parallel
@@ -408,8 +386,9 @@ if ($components) {
         }
 
         $c = escapeshellarg($component);
+        $cmd = "$phpUnitCmd $c $arguments > $c/phpunit.stdout 2> $c/phpunit.stderr";
 
-        if ($proc = proc_open(sprintf($cmd, $c, " > $c/phpunit.stdout 2> $c/phpunit.stderr"), [], $pipes)) {
+        if ($proc = proc_open($quote ? '"'.$cmd.'"' : $cmd, [], $pipes)) {
             $runningProcs[$component] = $proc;
         } else {
             $exit = 1;

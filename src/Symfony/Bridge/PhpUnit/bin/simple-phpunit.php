@@ -18,8 +18,13 @@ global $argv, $argc;
 $argv = $_SERVER['argv'] ?? [];
 $argc = $_SERVER['argc'] ?? 0;
 $getEnvVar = function ($name, $default = false) use ($argv) {
+    $defaultSet = 2 === func_num_args();
+    $getValue = function ($value) use ($defaultSet, $default) {
+        return '' === $value && $defaultSet ? $default : $value;
+    };
+
     if (false !== $value = getenv($name)) {
-        return $value;
+        return $getValue($value);
     }
 
     static $phpunitConfig = null;
@@ -73,12 +78,12 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
         }
     }
     if (false !== $phpunitConfig) {
-        $var = new DOMXPath($phpunitConfig);
-        foreach ($var->query('//php/server[@name="'.$name.'"]') as $var) {
-            return $var->getAttribute('value');
-        }
-        foreach ($var->query('//php/env[@name="'.$name.'"]') as $var) {
-            return $var->getAttribute('value');
+        $xpath = new DOMXPath($phpunitConfig);
+        foreach (['server', 'env'] as $element) {
+            $list = $xpath->query('//php/'.$element.'[@name="'.$name.'"]');
+            if (false !== $list && 0 !== $list->length) {
+                return $getValue($list[0]->getAttribute('value'));
+            }
         }
     }
 
@@ -124,12 +129,12 @@ while (!file_exists($root.'/'.$composerJson) || file_exists($root.'/DeprecationE
 
 if (\PHP_VERSION_ID >= 80000) {
     // PHP 8 requires PHPUnit 9.3+, PHP 8.1 requires PHPUnit 9.5+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '9.5') ?: '9.5';
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '9.5');
 } elseif (\PHP_VERSION_ID >= 70200) {
     // PHPUnit 8 requires PHP 7.2+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.5') ?: '8.5';
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.5');
 } else {
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.5') ?: '7.5';
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.5');
 }
 
 $MAX_PHPUNIT_VERSION = $getEnvVar('SYMFONY_MAX_PHPUNIT_VERSION', false);

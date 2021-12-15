@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-12-15T12:13:55Z
+
+It should target 6.0 isn'it? The return type is on 6.0.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-15T12:37:10Z
+
+But it's not a bugfix.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-15T13:09:02Z
+
+I think this is a cleanup that can go on 6.0. This is a leftover really.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-12-15T13:11:14Z
+
+I think we can include "logicfix" in the lowest possible branch since it's 100% safe.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-15T13:49:51Z
+
+Rebased!

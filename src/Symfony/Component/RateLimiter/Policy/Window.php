@@ -63,11 +63,6 @@ final class Window implements LimiterStateInterface
 
     public function getAvailableTokens(float $now)
     {
-        // if timer is in future, there are no tokens available anymore
-        if ($this->timer > $now) {
-            return 0;
-        }
-
         // if now is more than the window interval in the past, all tokens are available
         if (($now - $this->timer) > $this->intervalInSeconds) {
             return $this->maxSize;

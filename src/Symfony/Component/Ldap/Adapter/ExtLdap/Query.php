@@ -24,8 +24,7 @@ use Symfony\Component\Ldap\Exception\NotBoundException;
  */
 class Query extends AbstractQuery
 {
-    // As of PHP 7.2, we can use LDAP_CONTROL_PAGEDRESULTS instead of this
-    public const PAGINATION_OID = '1.2.840.113556.1.4.319';
+    public const PAGINATION_OID = \LDAP_CONTROL_PAGEDRESULTS;
 
     /** @var Connection */
     protected $connection;

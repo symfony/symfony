@@ -149,8 +149,7 @@ class AdapterTest extends LdapTestCase
             $this->assertEquals(\count($paged_query->getResources()), 5);
 
             // This last query is to ensure that we haven't botched the state of our connection
-            // by not resetting pagination properly. extldap <= PHP 7.1 do not implement the necessary
-            // bits to work around an implementation flaw, so we simply can't guarantee this to work there.
+            // by not resetting pagination properly.
             $final_query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
                 'scope' => Query::SCOPE_ONE,
             ]);

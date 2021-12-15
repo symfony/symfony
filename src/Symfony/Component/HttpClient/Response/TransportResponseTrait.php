@@ -27,6 +27,7 @@ use Symfony\Component\HttpClient\Internal\ClientState;
  */
 trait TransportResponseTrait
 {
+    private $canary;
     private $headers = [];
     private $info = [
         'response_headers' => [],
@@ -41,7 +42,6 @@ trait TransportResponseTrait
     private $timeout = 0;
     private $inflate;
     private $finalInfo;
-    private $canary;
     private $logger;
 
     /**
@@ -176,12 +176,11 @@ trait TransportResponseTrait
                 foreach ($responses as $j => $response) {
                     $timeoutMax = $timeout ?? max($timeoutMax, $response->timeout);
                     $timeoutMin = min($timeoutMin, $response->timeout, 1);
+                    $chunk = false;
 
                     if ($fromLastTimeout && null !== $multi->lastTimeout) {
                         $elapsedTimeout = microtime(true) - $multi->lastTimeout;
                     }
-
-                    $chunk = false;
 
                     if (isset($multi->handlesActivity[$j])) {
                         $multi->lastTimeout = null;

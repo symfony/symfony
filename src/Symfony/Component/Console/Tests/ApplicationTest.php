@@ -894,6 +894,9 @@ class ApplicationTest extends TestCase
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_linebreaks.txt', $tester->getDisplay(true), '->renderException() keep multiple line breaks');
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testRenderAnonymousException()
     {
         $application = new Application();
@@ -917,6 +920,9 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Dummy type "class@anonymous" is invalid.', $tester->getDisplay(true));
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testRenderExceptionStackTraceContainsRootException()
     {
         $application = new Application();

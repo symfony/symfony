@@ -164,4 +164,3 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         );
     }
 }
-

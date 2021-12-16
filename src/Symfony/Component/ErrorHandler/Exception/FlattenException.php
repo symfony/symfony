@@ -298,7 +298,6 @@ class FlattenException
     }
 
     /**
-     *
      * @return $this
      */
     public function setTrace(array $trace, ?string $file, ?int $line): self

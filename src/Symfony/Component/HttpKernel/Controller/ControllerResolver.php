@@ -45,7 +45,7 @@ class ControllerResolver implements ControllerResolverInterface
             if (isset($controller[0]) && \is_string($controller[0]) && isset($controller[1])) {
                 try {
                     $controller[0] = $this->instantiateController($controller[0]);
-                } catch (\Error | \LogicException $e) {
+                } catch (\Error|\LogicException $e) {
                     if (\is_callable($controller)) {
                         return $controller;
                     }
@@ -107,7 +107,7 @@ class ControllerResolver implements ControllerResolverInterface
 
         try {
             $controller = [$this->instantiateController($class), $method];
-        } catch (\Error | \LogicException $e) {
+        } catch (\Error|\LogicException $e) {
             try {
                 if ((new \ReflectionMethod($class, $method))->isStatic()) {
                     return $class.'::'.$method;

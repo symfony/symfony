@@ -141,8 +141,6 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
 
     /**
      * Returns the reflection instance for accessing the member's value.
-     *
-     * @return \ReflectionMethod|\ReflectionProperty
      */
     public function getReflectionMember(object|string $objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {

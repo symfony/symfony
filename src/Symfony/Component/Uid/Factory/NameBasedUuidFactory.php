@@ -26,9 +26,6 @@ class NameBasedUuidFactory
         $this->namespace = $namespace;
     }
 
-    /**
-     * @return UuidV5|UuidV3
-     */
     public function create(string $name): UuidV5|UuidV3
     {
         switch ($class = $this->class) {

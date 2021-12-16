@@ -40,7 +40,7 @@ class TentativeTypes
 
 EOPHP;
 
-while (false !== $file = fgets(STDIN)) {
+while (false !== $file = fgets(\STDIN)) {
     $code = file_get_contents(substr($file, 0, -1));
 
     if (!str_contains($code, '@tentative-return-type')) {

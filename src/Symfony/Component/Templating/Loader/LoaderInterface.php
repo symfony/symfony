@@ -23,8 +23,6 @@ interface LoaderInterface
 {
     /**
      * Loads a template.
-     *
-     * @return Storage|false
      */
     public function load(TemplateReferenceInterface $template): Storage|false;
 

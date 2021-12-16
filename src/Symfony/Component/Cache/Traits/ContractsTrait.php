@@ -41,12 +41,20 @@ trait ContractsTrait
      */
     public function setCallbackWrapper(?callable $callbackWrapper): callable
     {
-        $previousWrapper = $this->callbackWrapper ??= \Closure::fromCallable([LockRegistry::class, 'compute']);
+        if (!isset($this->callbackWrapper)) {
+            $this->callbackWrapper = \Closure::fromCallable([LockRegistry::class, 'compute']);
+
+            if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+                $this->setCallbackWrapper(null);
+            }
+        }
+
         if (null !== $callbackWrapper && !$callbackWrapper instanceof \Closure) {
             $callbackWrapper = \Closure::fromCallable($callbackWrapper);
         }
 
-        $this->callbackWrapper = $callbackWrapper ?? function (callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger) {
+        $previousWrapper = $this->callbackWrapper;
+        $this->callbackWrapper = $callbackWrapper ?? static function (callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger) {
             return $callback($item, $save);
         };
 
@@ -87,6 +95,10 @@ trait ContractsTrait
 
             $this->computing[$key] = $key;
             $startTime = microtime(true);
+
+            if (!isset($this->callbackWrapper)) {
+                $this->setCallbackWrapper($this->setCallbackWrapper(null));
+            }
 
             try {
                 $value = ($this->callbackWrapper)($callback, $item, $save, $pool, function (CacheItem $item) use ($setMetadata, $startTime, &$metadata) {

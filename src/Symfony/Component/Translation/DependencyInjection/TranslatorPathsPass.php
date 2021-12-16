@@ -85,7 +85,7 @@ class TranslatorPathsPass extends AbstractRecursivePass
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof Reference) {
-            if ((string) $value === 'translator') {
+            if ('translator' === (string) $value) {
                 for ($i = $this->level - 1; $i >= 0; --$i) {
                     $class = $this->definitions[$i]->getClass();
 

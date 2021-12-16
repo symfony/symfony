@@ -134,8 +134,6 @@ abstract class AbstractDoctrineExtension extends Extension
      * If this is a bundle controlled mapping all the missing information can be autodetected by this method.
      *
      * Returns false when autodetection failed, an array of the completed information otherwise.
-     *
-     * @return array|false
      */
     protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container, string $bundleDir = null): array|false
     {

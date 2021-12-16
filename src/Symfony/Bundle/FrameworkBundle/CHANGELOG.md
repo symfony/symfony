@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Environment variable `SYMFONY_IDE` is read by default when `framework.ide` config is not set.
+ * Add `cache.adapter.filesystem_tag_aware` pre-configured adapter
 
 6.0
 ---

@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
@@ -105,6 +106,18 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('cache.pool', ['clearer' => 'cache.default_clearer', 'reset' => 'reset'])
             ->tag('monolog.logger', ['channel' => 'cache'])
+
+        ->set('cache.adapter.filesystem_tag_aware', FilesystemTagAwareAdapter::class)
+        ->abstract()
+        ->args([
+            '', // namespace
+            0, // default lifetime
+            sprintf('%s/pools/app', param('kernel.cache_dir')),
+            service('cache.default_marshaller')->ignoreOnInvalid(),
+        ])
+        ->call('setLogger', [service('logger')->ignoreOnInvalid()])
+        ->tag('cache.pool', ['clearer' => 'cache.default_clearer', 'reset' => 'reset'])
+        ->tag('monolog.logger', ['channel' => 'cache'])
 
         ->set('cache.adapter.psr6', ProxyAdapter::class)
             ->abstract()

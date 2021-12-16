@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by sbelyshkin at 2021-12-12T14:16:25Z
+
+Looks like UnitTest fails because Redis cannot connect to `getenv('REDIS_HOST')` while other tests work well with this variable. How can I rewrite the test?
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-12-13T08:57:21Z
+
+Hey!
+
+I think @ajcerezo has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot

@@ -412,7 +412,7 @@ trait PdoTrait
             if (null === $driver && !(\is_object($result) ? $result->rowCount() : $stmt->rowCount())) {
                 try {
                     $insertStmt->execute();
-                } catch (DBALException | Exception $e) {
+                } catch (DBALException|Exception $e) {
                 } catch (\PDOException $e) {
                     // A concurrent write won, let it be
                 }

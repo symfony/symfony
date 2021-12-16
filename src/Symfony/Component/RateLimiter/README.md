@@ -4,11 +4,6 @@ Rate Limiter Component
 The Rate Limiter component provides a Token Bucket implementation to
 rate limit input and output in your application.
 
-**This Component is experimental**.
-[Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
-are not covered by Symfony's
-[Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
-
 Getting Started
 ---------------
 

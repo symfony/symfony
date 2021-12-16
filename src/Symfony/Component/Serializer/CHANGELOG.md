@@ -6,7 +6,9 @@ CHANGELOG
 
  * Add support of PHP backed enumerations
  * Add support for serializing empty array as object
- * Deprecate support for returning empty, iterable, countable, raw object when normalizing
+ * Return empty collections as `ArrayObject` from `Serializer::normalize()` when `PRESERVE_EMPTY_OBJECTS` is set
+ * Add support for collecting type errors during denormalization
+ * Add missing arguments in `MissingConstructorArgumentsException`
 
 5.3
 ---

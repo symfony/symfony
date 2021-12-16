@@ -156,4 +156,22 @@ class TraceableMessageBusTest extends TestCase
             ],
         ], $actualTracedMessage);
     }
+
+    public function testItTracesExceptionsWhenMessageBusIsFiredFromArrayCallback()
+    {
+        $message = new DummyMessage('Hello');
+        $exception = new \RuntimeException();
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->with($message)
+            ->willThrowException($exception);
+
+        $traceableBus = new TraceableMessageBus($bus);
+
+        $this->expectExceptionObject($exception);
+
+        array_map([$traceableBus, 'dispatch'], [$message]);
+    }
 }

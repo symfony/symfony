@@ -31,13 +31,14 @@ class SubRequestHandler
 
         // remove untrusted values
         $remoteAddr = $request->server->get('REMOTE_ADDR');
-        if (!IpUtils::checkIp($remoteAddr, $trustedProxies)) {
+        if (!$remoteAddr || !IpUtils::checkIp($remoteAddr, $trustedProxies)) {
             $trustedHeaders = [
                 'FORWARDED' => $trustedHeaderSet & Request::HEADER_FORWARDED,
                 'X_FORWARDED_FOR' => $trustedHeaderSet & Request::HEADER_X_FORWARDED_FOR,
                 'X_FORWARDED_HOST' => $trustedHeaderSet & Request::HEADER_X_FORWARDED_HOST,
                 'X_FORWARDED_PROTO' => $trustedHeaderSet & Request::HEADER_X_FORWARDED_PROTO,
                 'X_FORWARDED_PORT' => $trustedHeaderSet & Request::HEADER_X_FORWARDED_PORT,
+                'X_FORWARDED_PREFIX' => $trustedHeaderSet & Request::HEADER_X_FORWARDED_PREFIX,
             ];
             foreach (array_filter($trustedHeaders) as $name => $key) {
                 $request->headers->remove($name);

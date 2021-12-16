@@ -249,7 +249,8 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $this->assertSame(['foo::barAction', 'foo::fooAction'], array_keys($locator));
+
+        $this->assertEqualsCanonicalizing(['foo::barAction', 'foo::fooAction'], array_keys($locator));
     }
 
     public function testArgumentWithNoTypeHintIsOk()
@@ -396,7 +397,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $this->assertSame([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
+        $this->assertEqualsCanonicalizing([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
     }
 
     /**

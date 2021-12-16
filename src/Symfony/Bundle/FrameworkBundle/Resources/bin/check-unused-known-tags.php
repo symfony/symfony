@@ -15,5 +15,5 @@ use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\UnusedTags
 
 $target = dirname(__DIR__, 2).'/DependencyInjection/Compiler/UnusedTagsPass.php';
 $contents = file_get_contents($target);
-$contents = preg_replace('{private \$knownTags = \[(.+?)\];}sm', "private \$knownTags = [\n        '".implode("',\n        '", UnusedTagsPassUtils::getDefinedTags())."',\n    ];", $contents);
+$contents = preg_replace('{private const KNOWN_TAGS = \[(.+?)\];}sm', "private const KNOWN_TAGS = [\n        '".implode("',\n        '", UnusedTagsPassUtils::getDefinedTags())."',\n    ];", $contents);
 file_put_contents($target, $contents);

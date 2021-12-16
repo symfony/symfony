@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+use Composer\InstalledVersions;
 use Symfony\Bridge\Twig\Extension\LogoutUrlExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
@@ -38,12 +39,17 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
+use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
+use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
+use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
@@ -57,9 +63,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private $requestMatchers = [];
     private $expressions = [];
     private $contextListeners = [];
-    /** @var array<array{0: int, 1: AuthenticatorFactoryInterface|SecurityFactoryInterface}> */
+    /** @var list<array{int, AuthenticatorFactoryInterface|SecurityFactoryInterface}> */
     private $factories = [];
-    /** @var (AuthenticatorFactoryInterface|SecurityFactoryInterface)[] */
+    /** @var list<AuthenticatorFactoryInterface|SecurityFactoryInterface> */
     private $sortedFactories = [];
     private $userProviderFactories = [];
     private $statelessFirewallKeys = [];
@@ -77,6 +83,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
     public function load(array $configs, ContainerBuilder $container)
     {
+        if (!class_exists(InstalledVersions::class)) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'Configuring Symfony without the Composer Runtime API is deprecated. Consider upgrading to Composer 2.1 or later.');
+        }
+
         if (!array_filter($configs)) {
             return;
         }
@@ -112,14 +122,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             if ($config['always_authenticate_before_granting']) {
                 $authorizationChecker = $container->getDefinition('security.authorization_checker');
                 $authorizationCheckerArgs = $authorizationChecker->getArguments();
-                array_splice($authorizationCheckerArgs, 1, 0, [new Reference('security.authentication_manager')]);
+                array_splice($authorizationCheckerArgs, 1, 0, [new Reference('security.authentication.manager')]);
                 $authorizationChecker->setArguments($authorizationCheckerArgs);
             }
 
             $loader->load('security_legacy.php');
         }
 
-        if ($container::willBeAvailable('symfony/twig-bridge', LogoutUrlExtension::class, ['symfony/security-bundle'])) {
+        if ($container::willBeAvailable('symfony/twig-bridge', LogoutUrlExtension::class, ['symfony/security-bundle'], true)) {
             $loader->load('templating_twig.php');
         }
 
@@ -132,7 +142,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $loader->load('security_debug.php');
         }
 
-        if (!$container::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/security-bundle'])) {
+        if (!$container::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/security-bundle'], true)) {
             $container->removeDefinition('security.expression_language');
             $container->removeDefinition('security.access.expression_voter');
         }
@@ -144,12 +154,18 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         if (isset($config['access_decision_manager']['service'])) {
             $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service']);
+        } elseif (isset($config['access_decision_manager']['strategy_service'])) {
+            $container
+                ->getDefinition('security.access.decision_manager')
+                ->addArgument(new Reference($config['access_decision_manager']['strategy_service']));
         } else {
             $container
                 ->getDefinition('security.access.decision_manager')
-                ->addArgument($config['access_decision_manager']['strategy'])
-                ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
-                ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied']);
+                ->addArgument($this->createStrategyDefinition(
+                    $config['access_decision_manager']['strategy'] ?? MainConfiguration::STRATEGY_AFFIRMATIVE,
+                    $config['access_decision_manager']['allow_if_all_abstain'],
+                    $config['access_decision_manager']['allow_if_equal_granted_denied']
+                ));
         }
 
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
@@ -188,6 +204,25 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $container->registerForAutoconfiguration(VoterInterface::class)
             ->addTag('security.voter');
+    }
+
+    /**
+     * @throws \InvalidArgumentException if the $strategy is invalid
+     */
+    private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition
+    {
+        switch ($strategy) {
+            case MainConfiguration::STRATEGY_AFFIRMATIVE:
+                return new Definition(AffirmativeStrategy::class, [$allowIfAllAbstainDecisions]);
+            case MainConfiguration::STRATEGY_CONSENSUS:
+                return new Definition(ConsensusStrategy::class, [$allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions]);
+            case MainConfiguration::STRATEGY_UNANIMOUS:
+                return new Definition(UnanimousStrategy::class, [$allowIfAllAbstainDecisions]);
+            case MainConfiguration::STRATEGY_PRIORITY:
+                return new Definition(PriorityStrategy::class, [$allowIfAllAbstainDecisions]);
+        }
+
+        throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
     }
 
     private function createRoleHierarchy(array $config, ContainerBuilder $container)
@@ -504,6 +539,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->replaceArgument(0, new Reference($managerId))
             ;
 
+            if ($container->hasDefinition('debug.security.firewall') && $this->authenticatorManagerEnabled) {
+                $container
+                    ->register('debug.security.firewall.authenticator.'.$id, TraceableAuthenticatorManagerListener::class)
+                    ->setDecoratedService('security.firewall.authenticator.'.$id)
+                    ->setArguments([new Reference('debug.security.firewall.authenticator.'.$id.'.inner')])
+                ;
+            }
+
             // user checker listener
             $container
                 ->setDefinition('security.listener.user_checker.'.$id, new ChildDefinition('security.listener.user_checker'))
@@ -542,8 +585,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         foreach ($this->getSortedFactories() as $factory) {
             $key = str_replace('-', '_', $factory->getKey());
-            if (\array_key_exists($key, $firewall)) {
+            if ('custom_authenticators' !== $key && \array_key_exists($key, $firewall)) {
                 $listenerKeys[] = $key;
+            }
+        }
+
+        if ($firewall['custom_authenticators'] ?? false) {
+            foreach ($firewall['custom_authenticators'] as $customAuthenticatorId) {
+                $listenerKeys[] = $customAuthenticatorId;
             }
         }
 
@@ -654,10 +703,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey || 'custom_authenticators' === $factoryKey) {
+            if ('custom_authenticators' === $factoryKey) {
+                trigger_deprecation('symfony/security-bundle', '5.4', 'Not configuring explicitly the provider for the "%s" firewall is deprecated because it\'s ambiguous as there is more than one registered provider. Set the "provider" key to one of the configured providers, even if your custom authenticators don\'t use it.', $id);
+            }
+
             return 'security.user_providers';
         }
 
-        throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $factoryKey, $id));
+        throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" %s on "%s" firewall is ambiguous as there is more than one registered provider.', $factoryKey, $this->authenticatorManagerEnabled ? 'authenticator' : 'listener', $id));
     }
 
     private function createEncoders(array $encoders, ContainerBuilder $container)
@@ -990,7 +1043,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return $this->expressions[$id];
         }
 
-        if (!$container::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/security-bundle'])) {
+        if (!$container::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/security-bundle'], true)) {
             throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
         }
 
@@ -1006,7 +1059,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private function createRequestMatcher(ContainerBuilder $container, string $path = null, string $host = null, int $port = null, array $methods = [], array $ips = null, array $attributes = []): Reference
     {
         if ($methods) {
-            $methods = array_map('strtoupper', (array) $methods);
+            $methods = array_map('strtoupper', $methods);
         }
 
         if (null !== $ips) {
@@ -1135,7 +1188,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * @return (AuthenticatorFactoryInterface|SecurityFactoryInterface)[]
+     * @return array<int, SecurityFactoryInterface|AuthenticatorFactoryInterface>
      */
     private function getSortedFactories(): array
     {

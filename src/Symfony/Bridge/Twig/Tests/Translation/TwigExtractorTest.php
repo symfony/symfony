@@ -66,6 +66,7 @@ class TwigExtractorTest extends TestCase
             ['{% set foo = "new key" | trans %}', ['new key' => 'messages']],
             ['{{ 1 ? "new key" | trans : "another key" | trans }}', ['new key' => 'messages', 'another key' => 'messages']],
             ['{{ t("new key") | trans() }}', ['new key' => 'messages']],
+            ['{% set foo = t("new key") %}', ['new key' => 'messages']],
             ['{{ t("new key", {}, "domain") | trans() }}', ['new key' => 'domain']],
             ['{{ 1 ? t("new key") | trans : t("another key") | trans }}', ['new key' => 'messages', 'another key' => 'messages']],
 
@@ -81,7 +82,7 @@ class TwigExtractorTest extends TestCase
             ['{{ ("another " ~ "new " ~ "key") | trans() }}', ['another new key' => 'messages']],
             ['{{ ("new" ~ " key") | trans(domain="domain") }}', ['new key' => 'domain']],
             ['{{ ("another " ~ "new " ~ "key") | trans(domain="domain") }}', ['another new key' => 'domain']],
-            // if it has a variable or other expression, we can not extract it
+            // if it has a variable or other expression, we cannot extract it
             ['{% set foo = "new" %} {{ ("new " ~ foo ~ "key") | trans() }}', []],
             ['{{ ("foo " ~ "new"|trans ~ "key") | trans() }}', ['new' => 'messages']],
         ];

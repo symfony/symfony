@@ -12,6 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -90,22 +93,10 @@ EOF
         }
 
         $extension = $this->findExtension($name);
+        $extensionAlias = $extension->getAlias();
         $container = $this->compileContainer();
 
-        $extensionAlias = $extension->getAlias();
-        $extensionConfig = [];
-        foreach ($container->getCompilerPassConfig()->getPasses() as $pass) {
-            if ($pass instanceof ValidateEnvPlaceholdersPass) {
-                $extensionConfig = $pass->getExtensionConfig();
-                break;
-            }
-        }
-
-        if (!isset($extensionConfig[$extensionAlias])) {
-            throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
-        }
-
-        $config = $container->resolveEnvPlaceholders($extensionConfig[$extensionAlias]);
+        $config = $this->getConfig($extension, $container);
 
         if (null === $path = $input->getArgument('path')) {
             $io->title(
@@ -165,5 +156,85 @@ EOF
         }
 
         return $config;
+    }
+
+    private function getConfigForExtension(ExtensionInterface $extension, ContainerBuilder $container): array
+    {
+        $extensionAlias = $extension->getAlias();
+
+        $extensionConfig = [];
+        foreach ($container->getCompilerPassConfig()->getPasses() as $pass) {
+            if ($pass instanceof ValidateEnvPlaceholdersPass) {
+                $extensionConfig = $pass->getExtensionConfig();
+                break;
+            }
+        }
+
+        if (isset($extensionConfig[$extensionAlias])) {
+            return $extensionConfig[$extensionAlias];
+        }
+
+        // Fall back to default config if the extension has one
+
+        if (!$extension instanceof ConfigurationExtensionInterface) {
+            throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
+        }
+
+        $configs = $container->getExtensionConfig($extensionAlias);
+        $configuration = $extension->getConfiguration($configs, $container);
+        $this->validateConfiguration($extension, $configuration);
+
+        return (new Processor())->processConfiguration($configuration, $configs);
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('name')) {
+            $suggestions->suggestValues($this->getAvailableBundles(!preg_match('/^[A-Z]/', $input->getCompletionValue())));
+
+            return;
+        }
+
+        if ($input->mustSuggestArgumentValuesFor('path') && null !== $name = $input->getArgument('name')) {
+            try {
+                $config = $this->getConfig($this->findExtension($name), $this->compileContainer());
+                $paths = array_keys(self::buildPathsCompletion($config));
+                $suggestions->suggestValues($paths);
+            } catch (LogicException $e) {
+            }
+        }
+    }
+
+    private function getAvailableBundles(bool $alias): array
+    {
+        $availableBundles = [];
+        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
+            $availableBundles[] = $alias ? $bundle->getContainerExtension()->getAlias() : $bundle->getName();
+        }
+
+        return $availableBundles;
+    }
+
+    private function getConfig(ExtensionInterface $extension, ContainerBuilder $container)
+    {
+        return $container->resolveEnvPlaceholders(
+            $container->getParameterBag()->resolveValue(
+                $this->getConfigForExtension($extension, $container)
+            )
+        );
+    }
+
+    private static function buildPathsCompletion(array $paths, string $prefix = ''): array
+    {
+        $completionPaths = [];
+        foreach ($paths as $key => $values) {
+            if (\is_array($values)) {
+                $completionPaths = $completionPaths + self::buildPathsCompletion($values, $prefix.$key.'.');
+            } else {
+                $completionPaths[$prefix.$key] = null;
+            }
+        }
+
+        return $completionPaths;
     }
 }

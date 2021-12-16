@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExpressionVoter implements VoterInterface
+class ExpressionVoter implements CacheableVoterInterface
 {
     private $expressionLanguage;
     private $trustResolver;
@@ -37,6 +37,16 @@ class ExpressionVoter implements VoterInterface
         $this->trustResolver = $trustResolver;
         $this->authChecker = $authChecker;
         $this->roleHierarchy = $roleHierarchy;
+    }
+
+    public function supportsAttribute(string $attribute): bool
+    {
+        return false;
+    }
+
+    public function supportsType(string $subjectType): bool
+    {
+        return true;
     }
 
     /**

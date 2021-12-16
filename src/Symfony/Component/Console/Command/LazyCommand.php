@@ -12,6 +12,8 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -67,6 +69,11 @@ final class LazyCommand extends Command
     public function run(InputInterface $input, OutputInterface $output): int
     {
         return $this->getCommand()->run($input, $output);
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        $this->getCommand()->complete($input, $suggestions);
     }
 
     /**

@@ -4,19 +4,19 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>ค่านี้ควรจะเป็น false</target>
+                <target>ค่านี้ควรเป็น false</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
-                <target>ค่านี้ควรจะเป็น true</target>
+                <target>ค่านี้ควรเป็น true</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
-                <target>ค่านี้ควรจะเป็นชนิด {{ type }}</target>
+                <target>ค่านี้ควรเป็น {{ type }}</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank.</source>
-                <target>ควรจะเป็นค่าว่าง</target>
+                <target>ควรเป็นค่าว่าง</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
@@ -36,11 +36,11 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>ฟิลด์นี้ที่ไม่ได้คาดหวัง</target>
+                <target>ไม่ควรมีฟิลด์นี้</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>ฟิลด์นี้จะหายไป</target>
+                <target>ฟิลด์นี้หายไป</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -164,7 +164,7 @@
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>ความกว้างของภาพไม่ได้ขนาด ({{ width }}px) อนุญาตให้สั้นที่สุด {{ min_width }}px</target>
+                <target>ความกว้างของภาพต่ำเกินไป ({{ width }}px) อนุญาตให้ความกว้างไม่ต่ำกว่า {{ min_width }}px</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
@@ -172,7 +172,7 @@
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>ความสูงของภาพไม่ได้ขนาด ({{ height }}px) อนุญาตให้สูงอย่างน้อยที่สุด {{ min_height }}px</target>
+                <target>ความสูงของภาพเล็กเกินไป ({{ height }}px) อนุญาตให้ความสูงไม่ควรต่ำกว่า {{ min_height }}px</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
@@ -192,15 +192,15 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>ไม่พบไฟล์ temp ควรจะกำหนดใน php.ini</target>
+                <target>ไม่พบการตั้งค่าโฟลเดอร์ชั่วคราว (temporary folder) ใน php.ini</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
-                <target>ไม่สามารถเขียน temp ไฟล์ลงดิสก์ได้</target>
+                <target>ไม่สามารถเขียนไฟล์ชั่วคราว (temporary file) ลงดิสก์ได้</target>
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
-                <target>PHP extension เกี่ยวกับการอัปโหลดมีปัญหา</target>
+                <target>PHP extension ทำให้การอัปโหลดมีปัญหา</target>
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
@@ -212,7 +212,7 @@
             </trans-unit>
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
-                <target>คอเล็กชั่นนี้ควรจะมีสมาชิก {{ limit }} เท่านั้น</target>
+                <target>คอเล็กชั่นนี้ควรจะมี {{ limit }} สมาชิกเท่านั้น</target>
             </trans-unit>
             <trans-unit id="57">
                 <source>Invalid card number.</source>
@@ -224,31 +224,31 @@
             </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>นี่ไม่ถูกต้องตาม International Bank Account Number (IBAN)</target>
+                <target>ค่านี้ไม่ใช่ International Bank Account Number (IBAN) ที่ถูกต้อง</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
-                <target>ค่านี้ไม่ถูกต้องตาม ISBN-10</target>
+                <target>ค่านี้ไม่ใช่ ISBN-10 ที่ถูกต้อง</target>
             </trans-unit>
             <trans-unit id="61">
                 <source>This value is not a valid ISBN-13.</source>
-                <target>ค่านี้ไม่ถูกต้องตาม ISBN-13</target>
+                <target>ค่านี้ไม่ใช่ ISBN-13 ที่ถูกต้อง</target>
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>ค่านี้ไม่ถูกต้องตามทั้ง ISBN-10 และ ISBN-13</target>
+                <target>ค่านี้ไม่ใช่ ISBN-10 หรือ ISBN-13 ที่ถูกต้อง</target>
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>
-                <target>ค่านี้ไม่ถุกต้องตาม ISSN</target>
+                <target>ค่านี้ไม่ใช่ ISSN ที่ถูกต้อง</target>
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>ค่านี้ไม่ถูกต้องตามสกุลเงิน</target>
+                <target>ค่านี้ไม่ใช่สกุลเงินที่ถูกต้อง</target>
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
-                <target>ค่านี้ไม่ตรงกับ {{ compared_value }}</target>
+                <target>ค่านี้ควรตรงกับ {{ compared_value }}</target>
             </trans-unit>
             <trans-unit id="66">
                 <source>This value should be greater than {{ compared_value }}.</source>
@@ -280,11 +280,11 @@
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>สัดส่วนของภาพใหญ่เกิน ({{ ratio }}) สามารถมีขนาดใหญ่ที่สุดได้ {{ max_ratio }}</target>
+                <target>สัดส่วนของภาพใหญ่เกิน ({{ ratio }}) สัดส่วนใหญ่ที่สุดที่ใช้ได้คือ {{ max_ratio }}</target>
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>สัดส่วนของภาพเล็กเกิน ({{ ratio }}) สามารถมีขนาดเล็กที่สุดได้ {{ min_ratio }}</target>
+                <target>สัดส่วนของภาพเล็กเกิน ({{ ratio }}) สัดส่วนเล็กที่สุดที่ใช้ได้คือ {{ min_ratio }}</target>
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
@@ -380,11 +380,27 @@
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
-                <target>สมากชิกแต่ละตัวในคอเล็กชั่นควรเป็นไปตามเซ็ตข้อจำกัดของคอเล็กชั่น</target>
+                <target>สมาชิกแต่ละตัวในคอเล็กชั่นควรเป็นไปตามข้อจำกัดของคอเล็กชั่นนั้นๆ</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>ค่า​รหัสหลักทรัพย์สากล (ISIN) ไม่ถูกต้อง</target>
+                <target>ค่ารหัสหลักทรัพย์สากล (ISIN) ไม่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>ค่านี้ควรเป็นนิพจน์ที่ถูกต้อง</target>
+            </trans-unit>
+           <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>ค่านี้ไม่ใช่สี CSS ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>ค่านี้ไม่ใช่รูปแบบ CIDR ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>ค่าของ netmask ควรมีค่าระหว่าง {{ min }} ถึง {{ max }}</target>
             </trans-unit>
         </body>
     </file>

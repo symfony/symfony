@@ -147,9 +147,13 @@ trait RedisTrait
         }
 
         if (isset($params['host']) || isset($params['path'])) {
-            if (!isset($params['dbindex']) && isset($params['path']) && preg_match('#/(\d+)$#', $params['path'], $m)) {
-                $params['dbindex'] = $m[1];
-                $params['path'] = substr($params['path'], 0, -\strlen($m[0]));
+            if (!isset($params['dbindex']) && isset($params['path'])) {
+                if (preg_match('#/(\d+)$#', $params['path'], $m)) {
+                    $params['dbindex'] = $m[1];
+                    $params['path'] = substr($params['path'], 0, -\strlen($m[0]));
+                } elseif (isset($params['host'])) {
+                    throw new InvalidArgumentException(sprintf('Invalid Redis DSN: "%s", the "dbindex" parameter must be a number.', $dsn));
+                }
             }
 
             if (isset($params['host'])) {
@@ -205,8 +209,11 @@ trait RedisTrait
                     @$redis->{$connect}($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...\defined('Redis::SCAN_PREFIX') ? [['stream' => $params['ssl'] ?? null]] : []);
 
                     set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
-                    $isConnected = $redis->isConnected();
-                    restore_error_handler();
+                    try {
+                        $isConnected = $redis->isConnected();
+                    } finally {
+                        restore_error_handler();
+                    }
                     if (!$isConnected) {
                         $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error, $error) ? sprintf(' (%s)', $error[1]) : '';
                         throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$error.'.');

@@ -32,6 +32,15 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
     private static $vulcainStarted = false;
 
+    public function testTimeoutOnDestruct()
+    {
+        if (!method_exists(parent::class, 'testTimeoutOnDestruct')) {
+            $this->markTestSkipped('BaseHttpClientTestCase doesn\'t have testTimeoutOnDestruct().');
+        }
+
+        parent::testTimeoutOnDestruct();
+    }
+
     public function testAcceptHeader()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -351,5 +360,17 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             $this->assertCount(0, $clientState->handlesActivity);
             $this->assertCount(0, $clientState->openHandles);
         }
+    }
+
+    public function testDebugInfoOnDestruct()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $traceInfo = [];
+        $client->request('GET', 'http://localhost:8057', ['on_progress' => function (int $dlNow, int $dlSize, array $info) use (&$traceInfo) {
+            $traceInfo = $info;
+        }]);
+
+        $this->assertNotEmpty($traceInfo['debug']);
     }
 }

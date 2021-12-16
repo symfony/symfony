@@ -87,7 +87,6 @@ class MemcachedAdapterTest extends AdapterTestCase
     public function provideBadOptions(): array
     {
         return [
-            ['foo', 'bar'],
             ['hash', 'zyx'],
             ['serializer', 'zyx'],
             ['distribution', 'zyx'],

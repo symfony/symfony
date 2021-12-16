@@ -58,7 +58,7 @@ class_exists(ConfigCache::class);
 abstract class Kernel implements KernelInterface, RebootableInterface, TerminableInterface
 {
     /**
-     * @var BundleInterface[]
+     * @var array<string, BundleInterface>
      */
     protected $bundles = [];
 
@@ -73,13 +73,16 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     private $requestStackSize = 0;
     private $resetServices = false;
 
+    /**
+     * @var array<string, bool>
+     */
     private static $freshCache = [];
 
-    public const VERSION = '5.4.0-DEV';
-    public const VERSION_ID = 50400;
+    public const VERSION = '5.4.2-DEV';
+    public const VERSION_ID = 50402;
     public const MAJOR_VERSION = 5;
     public const MINOR_VERSION = 4;
-    public const RELEASE_VERSION = 0;
+    public const RELEASE_VERSION = 2;
     public const EXTRA_VERSION = 'DEV';
 
     public const END_OF_MAINTENANCE = '11/2024';

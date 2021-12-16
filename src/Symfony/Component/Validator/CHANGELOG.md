@@ -4,7 +4,10 @@ CHANGELOG
 5.4
 ---
 
+ * Add a `Cidr` constraint to validate CIDR notations
+ * Add a `CssColor` constraint to validate CSS colors
  * Add support for `ConstraintViolationList::createFromMessage()`
+ * Add error's uid to `Count` and `Length` constraints with "exactly" option enabled
 
 5.3
 ---
@@ -169,7 +172,7 @@ CHANGELOG
 3.2.0
 -----
 
- * deprecated `Tests\Constraints\AbstractContraintValidatorTest` in favor of `Test\ConstraintValidatorTestCase`
+ * deprecated `Tests\Constraints\AbstractConstraintValidatorTest` in favor of `Test\ConstraintValidatorTestCase`
  * added support for PHP constants in YAML configuration files
 
 3.1.0

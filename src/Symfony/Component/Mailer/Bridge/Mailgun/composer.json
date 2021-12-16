@@ -1,6 +1,6 @@
 {
     "name": "symfony/mailgun-mailer",
-    "type": "symfony-bridge",
+    "type": "symfony-mailer-bridge",
     "description": "Symfony Mailgun Mailer Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",

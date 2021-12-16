@@ -34,9 +34,8 @@ use Symfony\Component\ErrorHandler\Internal\TentativeTypes;
  * which is a url-encoded array with the follow parameters:
  *  - "force": any value enables deprecation notices - can be any of:
  *      - "phpdoc" to patch only docblock annotations
- *      - "object" to turn union types to the "object" type when possible (not recommended)
- *      - "1" to add all possible return types including magic methods
- *      - "0" to add possible return types excluding magic methods
+ *      - "2" to add all possible return types
+ *      - "1" to add return types but only to tests/final/internal/private methods
  *  - "php": the target version of PHP - e.g. "7.1" doesn't generate "object" types
  *  - "deprecations": "1" to trigger a deprecation notice when a child class misses a
  *                    return type while the parent declares an "@return" annotation
@@ -73,6 +72,7 @@ class DebugClassLoader
         'mixed' => 'mixed',
         'static' => 'static',
         '$this' => 'static',
+        'list' => 'array',
     ];
 
     private const BUILTIN_RETURN_TYPES = [
@@ -127,7 +127,7 @@ class DebugClassLoader
         $this->patchTypes += [
             'force' => null,
             'php' => \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION,
-            'deprecations' => false,
+            'deprecations' => \PHP_VERSION_ID >= 70400,
         ];
 
         if ('phpdoc' === $this->patchTypes['force']) {
@@ -534,7 +534,8 @@ class DebugClassLoader
                     $this->patchTypes['force'] = $forcePatchTypes ?: 'docblock';
                 }
 
-                $canAddReturnType = false !== stripos($method->getFileName(), \DIRECTORY_SEPARATOR.'Tests'.\DIRECTORY_SEPARATOR)
+                $canAddReturnType = 2 === (int) $forcePatchTypes
+                    || false !== stripos($method->getFileName(), \DIRECTORY_SEPARATOR.'Tests'.\DIRECTORY_SEPARATOR)
                     || $refl->isFinal()
                     || $method->isFinal()
                     || $method->isPrivate()
@@ -559,7 +560,7 @@ class DebugClassLoader
                     if ('docblock' === $this->patchTypes['force']) {
                         $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                     } elseif ('' !== $declaringClass && $this->patchTypes['deprecations']) {
-                        $deprecations[] = sprintf('Method "%s::%s()" will return "%s" as of its next major version. Doing the same in %s "%s" will be required when upgrading.', $declaringClass, $method->name, $normalizedType, interface_exists($declaringClass) ? 'implementation' : 'child class', $className);
+                        $deprecations[] = sprintf('Method "%s::%s()" might add "%s" as a native return type declaration in the future. Do the same in %s "%s" now to avoid errors or add an explicit @return annotation to suppress this message.', $declaringClass, $method->name, $normalizedType, interface_exists($declaringClass) ? 'implementation' : 'child class', $className);
                     }
                 }
             }
@@ -749,6 +750,10 @@ class DebugClassLoader
 
     private function setReturnType(string $types, string $class, string $method, string $filename, ?string $parent, \ReflectionType $returnType = null): void
     {
+        if ('__construct' === $method) {
+            return;
+        }
+
         if ($nullable = 0 === strpos($types, 'null|')) {
             $types = substr($types, 5);
         } elseif ($nullable = '|null' === substr($types, -5)) {
@@ -795,7 +800,7 @@ class DebugClassLoader
                 continue;
             }
 
-            $docTypes = array_merge($docTypes, $t);
+            $docTypes[] = $t;
 
             if ('mixed' === $n || 'void' === $n) {
                 $nullable = false;
@@ -812,6 +817,7 @@ class DebugClassLoader
                 $phpTypes[] = $n;
             }
         }
+        $docTypes = array_merge([], ...$docTypes);
 
         if (!$phpTypes) {
             return;
@@ -1174,11 +1180,8 @@ EOTXT;
             if (false === $i = strpos($param, '$')) {
                 continue;
             }
-            if (false !== $j = strpos($param, ' $') ?: strpos($param, '&$')) {
-                $i = 1 + $j;
-            }
 
-            $type = 0 === $i ? '' : rtrim(substr($param, 0, $i - 1));
+            $type = 0 === $i ? '' : rtrim(substr($param, 0, $i), ' &');
             $param = substr($param, 1 + $i, (strpos($param, ' ', $i) ?: (1 + $i + \strlen($param))) - $i - 1);
 
             $tags['param'][$param] = $type;

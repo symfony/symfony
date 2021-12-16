@@ -357,7 +357,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('null_config.yml');
         $container->compile();
 
-        $this->assertSame([null], $container->getParameter('project.configs'));
+        $this->assertSame([[]], $container->getParameter('project.configs'));
     }
 
     public function testSupports()

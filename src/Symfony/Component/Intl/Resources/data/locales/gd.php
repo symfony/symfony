@@ -505,6 +505,8 @@ return [
         'rw_RW' => 'Kinyarwanda (Rubhanda)',
         'sa' => 'Sanskrit',
         'sa_IN' => 'Sanskrit (Na h-Innseachan)',
+        'sc' => 'Sàrdais',
+        'sc_IT' => 'Sàrdais (An Eadailt)',
         'sd' => 'Sindhi',
         'sd_Arab' => 'Sindhi (Arabais)',
         'sd_Arab_PK' => 'Sindhi (Arabais, Pagastàn)',

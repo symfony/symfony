@@ -26,6 +26,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 class AmpBody implements RequestBody, InputStream
 {
     private $body;
+    private $info;
     private $onProgress;
     private $offset = 0;
     private $length = -1;

@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
+ *
+ * @implements \IteratorAggregate<int, string>
  */
 class TemplateIterator implements \IteratorAggregate
 {
@@ -45,7 +47,7 @@ class TemplateIterator implements \IteratorAggregate
             return $this->templates;
         }
 
-        $templates = null !== $this->defaultPath ? $this->findTemplatesInDirectory($this->defaultPath, null, ['bundles']) : [];
+        $templates = null !== $this->defaultPath ? [$this->findTemplatesInDirectory($this->defaultPath, null, ['bundles'])] : [];
 
         foreach ($this->kernel->getBundles() as $bundle) {
             $name = $bundle->getName();
@@ -55,18 +57,17 @@ class TemplateIterator implements \IteratorAggregate
 
             $bundleTemplatesDir = is_dir($bundle->getPath().'/Resources/views') ? $bundle->getPath().'/Resources/views' : $bundle->getPath().'/templates';
 
-            $templates = array_merge(
-                $templates,
-                $this->findTemplatesInDirectory($bundleTemplatesDir, $name),
-                null !== $this->defaultPath ? $this->findTemplatesInDirectory($this->defaultPath.'/bundles/'.$bundle->getName(), $name) : []
-            );
+            $templates[] = $this->findTemplatesInDirectory($bundleTemplatesDir, $name);
+            if (null !== $this->defaultPath) {
+                $templates[] = $this->findTemplatesInDirectory($this->defaultPath.'/bundles/'.$bundle->getName(), $name);
+            }
         }
 
         foreach ($this->paths as $dir => $namespace) {
-            $templates = array_merge($templates, $this->findTemplatesInDirectory($dir, $namespace));
+            $templates[] = $this->findTemplatesInDirectory($dir, $namespace);
         }
 
-        return $this->templates = new \ArrayIterator(array_unique($templates));
+        return $this->templates = new \ArrayIterator(array_unique(array_merge([], ...$templates)));
     }
 
     /**

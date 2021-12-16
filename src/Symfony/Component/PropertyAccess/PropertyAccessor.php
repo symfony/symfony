@@ -313,10 +313,8 @@ class PropertyAccessor implements PropertyAccessorInterface
                     if (!$zval[self::VALUE] instanceof \ArrayAccess && !\is_array($zval[self::VALUE])) {
                         return false;
                     }
-                } else {
-                    if (!$this->isPropertyWritable($zval[self::VALUE], $propertyPath->getElement($i))) {
-                        return false;
-                    }
+                } elseif (!\is_object($zval[self::VALUE]) || !$this->isPropertyWritable($zval[self::VALUE], $propertyPath->getElement($i))) {
+                    return false;
                 }
 
                 if (\is_object($zval[self::VALUE])) {
@@ -472,6 +470,10 @@ class PropertyAccessor implements PropertyAccessorInterface
                         throw $e;
                     }
                 } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
+                    if ($access->canBeReference() && !isset($object->$name) && !\array_key_exists($name, (array) $object) && (\PHP_VERSION_ID < 70400 || !(new \ReflectionProperty($class, $name))->hasType())) {
+                        throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', $class, $name));
+                    }
+
                     $result[self::VALUE] = $object->$name;
 
                     if (isset($zval[self::REF]) && $access->canBeReference()) {
@@ -489,7 +491,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 throw $e;
             }
-        } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
+        } elseif (property_exists($object, $property) && \array_key_exists($property, (array) $object)) {
             $result[self::VALUE] = $object->$property;
             if (isset($zval[self::REF])) {
                 $result[self::REF] = &$object->$property;
@@ -663,10 +665,6 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function isPropertyWritable(object $object, string $property): bool
     {
-        if (!\is_object($object)) {
-            return false;
-        }
-
         $mutatorForArray = $this->getWriteInfo(\get_class($object), $property, []);
 
         if (PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType() || ($object instanceof \stdClass && property_exists($object, $property))) {

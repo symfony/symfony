@@ -304,7 +304,7 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>The host could not be resolved.</target>
+                <target>Palvelimeen ei saatu yhteyttä.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
@@ -385,6 +385,22 @@
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Tämä arvo ei ole kelvollinen ISIN-koodi (International Securities Identification Number).</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Tämän arvon on oltava kelvollinen lauseke.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Tämä arvo ei ole kelvollinen CSS-värimääritys.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Tämä arvo ei ole kelvollinen CIDR-merkintä.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Verkkomaskille annetun arvon tulisi olla {{ min }} ja {{ max }} välillä.</target>
             </trans-unit>
         </body>
     </file>

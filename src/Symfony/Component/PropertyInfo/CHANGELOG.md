@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add PhpStanExtractor
+
 5.3
 ---
 
@@ -10,7 +15,7 @@ CHANGELOG
 5.2.0
 -----
 
- * deprecated the `enable_magic_call_extraction` context option in `ReflectionExtractor::getWriteInfo()` and `ReflectionExtractor::getReadInfo()`. in favor of `enable_magic_methods_extraction`
+ * deprecated the `enable_magic_call_extraction` context option in `ReflectionExtractor::getWriteInfo()` and `ReflectionExtractor::getReadInfo()` in favor of `enable_magic_methods_extraction`
 
 5.1.0
 -----

@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
@@ -86,5 +87,22 @@ class SetupTransportsCommandTest extends TestCase
         $command = new SetupTransportsCommand($serviceLocator, ['amqp', 'other_transport']);
         $tester = new CommandTester($command);
         $tester->execute(['transport' => 'not_found']);
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $command = new SetupTransportsCommand($serviceLocator, ['amqp', 'other_transport']);
+        $tester = new CommandCompletionTester($command);
+        $suggestions = $tester->complete($input);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'transport' => [[''], ['amqp', 'other_transport']];
     }
 }

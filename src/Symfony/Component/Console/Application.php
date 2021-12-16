@@ -12,11 +12,15 @@
 namespace Symfony\Component\Console;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CompleteCommand;
+use Symfony\Component\Console\Command\DumpCompletionCommand;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleSignalEvent;
@@ -351,6 +355,29 @@ class Application implements ResetInterface
     }
 
     /**
+     * Adds suggestions to $suggestions for the current completion input (e.g. option or argument).
+     */
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if (
+            CompletionInput::TYPE_ARGUMENT_VALUE === $input->getCompletionType()
+            && 'command' === $input->getCompletionName()
+        ) {
+            $suggestions->suggestValues(array_filter(array_map(function (Command $command) {
+                return $command->isHidden() ? null : $command->getName();
+            }, $this->all())));
+
+            return;
+        }
+
+        if (CompletionInput::TYPE_OPTION_NAME === $input->getCompletionType()) {
+            $suggestions->suggestOptions($this->getDefinition()->getOptions());
+
+            return;
+        }
+    }
+
+    /**
      * Gets the help message.
      *
      * @return string
@@ -573,14 +600,14 @@ class Application implements ResetInterface
                 continue;
             }
 
-            $namespaces = array_merge($namespaces, $this->extractAllNamespaces($command->getName()));
+            $namespaces[] = $this->extractAllNamespaces($command->getName());
 
             foreach ($command->getAliases() as $alias) {
-                $namespaces = array_merge($namespaces, $this->extractAllNamespaces($alias));
+                $namespaces[] = $this->extractAllNamespaces($alias);
             }
         }
 
-        return array_values(array_unique(array_filter($namespaces)));
+        return array_values(array_unique(array_filter(array_merge([], ...$namespaces))));
     }
 
     /**
@@ -1040,7 +1067,7 @@ class Application implements ResetInterface
             new InputOption('--quiet', '-q', InputOption::VALUE_NONE, 'Do not output any message'),
             new InputOption('--verbose', '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug'),
             new InputOption('--version', '-V', InputOption::VALUE_NONE, 'Display this application version'),
-            new InputOption('--ansi', '', InputOption::VALUE_NEGATABLE, 'Force (or disable --no-ansi) ANSI output', false),
+            new InputOption('--ansi', '', InputOption::VALUE_NEGATABLE, 'Force (or disable --no-ansi) ANSI output', null),
             new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE, 'Do not ask any interactive question'),
         ]);
     }
@@ -1052,7 +1079,7 @@ class Application implements ResetInterface
      */
     protected function getDefaultCommands()
     {
-        return [new HelpCommand(), new ListCommand()];
+        return [new HelpCommand(), new ListCommand(), new CompleteCommand(), new DumpCompletionCommand()];
     }
 
     /**
@@ -1143,7 +1170,7 @@ class Application implements ResetInterface
     /**
      * Sets the default Command name.
      *
-     * @return self
+     * @return $this
      */
     public function setDefaultCommand(string $commandName, bool $isSingleCommand = false)
     {

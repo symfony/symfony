@@ -62,6 +62,9 @@ class YamlFileLoaderTest extends TestCase
             ['nonesense_resource_plus_path.yml'],
             ['nonesense_type_without_resource.yml'],
             ['bad_format.yml'],
+            ['alias/invalid-alias.yaml'],
+            ['alias/invalid-deprecated-no-package.yaml'],
+            ['alias/invalid-deprecated-no-version.yaml'],
         ];
     }
 
@@ -444,5 +447,15 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame(['b', 'a'], array_keys($routes->all()));
         $this->assertSame('/b', $routes->get('b')->getPath());
         $this->assertSame('/a1', $routes->get('a')->getPath());
+    }
+
+    public function testImportingAliases()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
+        $routes = $loader->load('alias.yaml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
+
+        $this->assertEquals($expectedRoutes('yaml'), $routes);
     }
 }

@@ -87,7 +87,7 @@ class Deprecation
                     $this->getOriginalFilesStack();
                     array_splice($this->originalFilesStack, 0, $j, [$this->triggeringFile]);
 
-                    if (preg_match('/(?|"([^"]++)" that is deprecated|should implement method "(?:static )?([^:]++))/', $message, $m) || preg_match('/^(?:The|Method) "([^":]++)/', $message, $m)) {
+                    if (preg_match('/(?|"([^"]++)" that is deprecated|should implement method "(?:static )?([^:]++))/', $message, $m) || (false === strpos($message, '()" will return') && false === strpos($message, 'native return type declaration') && preg_match('/^(?:The|Method) "([^":]++)/', $message, $m))) {
                         $this->triggeringFile = (new \ReflectionClass($m[1]))->getFileName();
                         array_unshift($this->originalFilesStack, $this->triggeringFile);
                     }
@@ -102,8 +102,11 @@ class Deprecation
         }
 
         set_error_handler(function () {});
-        $parsedMsg = unserialize($this->message);
-        restore_error_handler();
+        try {
+            $parsedMsg = unserialize($this->message);
+        } finally {
+            restore_error_handler();
+        }
         if ($parsedMsg && isset($parsedMsg['deprecation'])) {
             $this->message = $parsedMsg['deprecation'];
             $this->originClass = $parsedMsg['class'];

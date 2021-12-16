@@ -386,6 +386,18 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Această valoare nu este un număr internațional de identificare (ISIN) valabil.</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Această valoare ar trebui să fie o expresie validă.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Această valoare nu este o notație CIDR validă.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Valoarea netmask-ului trebuie sa fie intre {{ min }} si {{ max }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

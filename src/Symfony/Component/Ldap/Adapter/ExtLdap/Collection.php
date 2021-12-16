@@ -22,6 +22,7 @@ class Collection implements CollectionInterface
 {
     private $connection;
     private $search;
+    /** @var list<Entry>|null */
     private $entries;
 
     public function __construct(Connection $connection, Query $search)
@@ -63,7 +64,7 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @return \Traversable
+     * @return \Traversable<int, Entry>
      */
     #[\ReturnTypeWillChange]
     public function getIterator()
@@ -101,7 +102,7 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @return mixed
+     * @return Entry|null
      */
     #[\ReturnTypeWillChange]
     public function offsetGet($offset)

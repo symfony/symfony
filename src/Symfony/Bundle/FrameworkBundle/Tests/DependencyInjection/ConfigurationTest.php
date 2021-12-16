@@ -370,6 +370,9 @@ class ConfigurationTest extends TestCase
             'http_method_override' => true,
             'ide' => null,
             'default_locale' => 'en',
+            'enabled_locales' => [],
+            'set_locale_from_accept_language' => false,
+            'set_content_language_from_locale' => false,
             'secret' => 's3cr3t',
             'trusted_hosts' => [],
             'trusted_headers' => [
@@ -402,6 +405,7 @@ class ConfigurationTest extends TestCase
                 'only_main_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
+                'collect_parameter' => null,
             ],
             'translator' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -443,6 +447,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ],
             'serializer' => [
+                'default_context' => [],
                 'enabled' => !class_exists(FullStack::class),
                 'enable_annotations' => !class_exists(FullStack::class),
                 'mapping' => ['paths' => []],
@@ -499,6 +504,7 @@ class ConfigurationTest extends TestCase
                 'directory' => '%kernel.cache_dir%/pools/app',
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
+                'default_doctrine_dbal_provider' => 'database_connection',
                 'default_pdo_provider' => ContainerBuilder::willBeAvailable('doctrine/dbal', Connection::class, ['symfony/framework-bundle']) ? 'database_connection' : null,
                 'prefix_seed' => '_%kernel.project_dir%.%kernel.container_class%',
             ],
@@ -535,6 +541,7 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
+                'reset_on_message' => null,
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [
@@ -578,6 +585,7 @@ class ConfigurationTest extends TestCase
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 6,
             ],
+            'exceptions' => [],
         ];
     }
 }

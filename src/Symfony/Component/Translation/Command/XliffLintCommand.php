@@ -13,6 +13,8 @@ namespace Symfony\Component\Translation\Command;
 
 use Symfony\Component\Console\CI\GithubActionReporter;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -84,12 +86,8 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $filenames = (array) $input->getArgument('filename');
-        $this->format = $input->getOption('format');
+        $this->format = $input->getOption('format') ?? (GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt');
         $this->displayCorrectFiles = $output->isVerbose();
-
-        if (null === $this->format) {
-            $this->format = GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt';
-        }
 
         if (['-'] === $filenames) {
             return $this->display($io, [$this->validate(file_get_contents('php://stdin'))]);
@@ -277,5 +275,12 @@ EOF
         }
 
         return null;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues(['txt', 'json', 'github']);
+        }
     }
 }

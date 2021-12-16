@@ -15,18 +15,17 @@ use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 
 class SerializerCacheWarmerTest extends TestCase
 {
-    public function testWarmUp()
+    /**
+     * @dataProvider loaderProvider
+     */
+    public function testWarmUp(array $loaders)
     {
-        $loaders = [
-            new XmlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/person.xml'),
-            new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/author.yml'),
-        ];
-
         $file = sys_get_temp_dir().'/cache-serializer.php';
         @unlink($file);
 
@@ -39,6 +38,26 @@ class SerializerCacheWarmerTest extends TestCase
 
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
+    }
+
+    public function loaderProvider()
+    {
+        return [
+            [
+                [
+                    new LoaderChain([
+                        new XmlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/person.xml'),
+                        new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/author.yml'),
+                    ]),
+                ],
+            ],
+            [
+                [
+                    new XmlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/person.xml'),
+                    new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/author.yml'),
+                ],
+            ],
+        ];
     }
 
     public function testWarmUpWithoutLoader()

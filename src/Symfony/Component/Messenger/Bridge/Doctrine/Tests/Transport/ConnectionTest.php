@@ -12,11 +12,11 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Abstraction\Result as AbstractionResult;
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection as DBALConnection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Driver\ResultStatement;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySQL57Platform;
 use Doctrine\DBAL\Platforms\SQLServer2012Platform;
@@ -25,7 +25,9 @@ use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
+use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\DBAL\Statement;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
@@ -97,12 +99,7 @@ class ConnectionTest extends TestCase
     {
         $this->expectException(TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
-
-        if (class_exists(Exception::class)) {
-            $driverConnection->method('delete')->willThrowException(new Exception());
-        } else {
-            $driverConnection->method('delete')->willThrowException(new DBALException());
-        }
+        $driverConnection->method('delete')->willThrowException(new DBALException());
 
         $connection = new Connection([], $driverConnection);
         $connection->ack('dummy_id');
@@ -112,12 +109,7 @@ class ConnectionTest extends TestCase
     {
         $this->expectException(TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
-
-        if (class_exists(Exception::class)) {
-            $driverConnection->method('delete')->willThrowException(new Exception());
-        } else {
-            $driverConnection->method('delete')->willThrowException(new DBALException());
-        }
+        $driverConnection->method('delete')->willThrowException(new DBALException());
 
         $connection = new Connection([], $driverConnection);
         $connection->reject('dummy_id');
@@ -137,7 +129,11 @@ class ConnectionTest extends TestCase
         $schemaConfig->method('getMaxIdentifierLength')->willReturn(63);
         $schemaConfig->method('getDefaultTableOptions')->willReturn([]);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
-        $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        if (method_exists(DBALConnection::class, 'createSchemaManager')) {
+            $driverConnection->method('createSchemaManager')->willReturn($schemaManager);
+        } else {
+            $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        }
 
         return $driverConnection;
     }
@@ -403,6 +399,60 @@ class ConnectionTest extends TestCase
         yield 'SQL Server' => [
             new SQLServer2012Platform(),
             'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK) WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+        ];
+    }
+
+    /**
+     * @dataProvider setupIndicesProvider
+     */
+    public function testSetupIndices(string $platformClass, array $expectedIndices)
+    {
+        $driverConnection = $this->createMock(DBALConnection::class);
+        $driverConnection->method('getConfiguration')->willReturn(new Configuration());
+
+        $schemaManager = $this->createMock(AbstractSchemaManager::class);
+        $schema = new Schema();
+        $expectedTable = $schema->createTable('messenger_messages');
+        $expectedTable->addColumn('id', Types::BIGINT);
+        $expectedTable->setPrimaryKey(['id']);
+        // Make sure columns for indices exists so addIndex() will not throw
+        foreach (array_unique(array_merge(...$expectedIndices)) as $columnName) {
+            $expectedTable->addColumn($columnName, Types::STRING);
+        }
+        foreach ($expectedIndices as $indexColumns) {
+            $expectedTable->addIndex($indexColumns);
+        }
+        $schemaManager->method('createSchema')->willReturn($schema);
+        if (method_exists(DBALConnection::class, 'createSchemaManager')) {
+            $driverConnection->method('createSchemaManager')->willReturn($schemaManager);
+        } else {
+            $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        }
+
+        $platformMock = $this->createMock($platformClass);
+        $platformMock
+            ->expects(self::once())
+            ->method('getAlterTableSQL')
+            ->with(self::callback(static function (TableDiff $tableDiff): bool {
+                return 0 === \count($tableDiff->addedIndexes) && 0 === \count($tableDiff->changedIndexes) && 0 === \count($tableDiff->removedIndexes);
+            }))
+            ->willReturn([]);
+        $driverConnection->method('getDatabasePlatform')->willReturn($platformMock);
+
+        $connection = new Connection([], $driverConnection);
+        $connection->setup();
+    }
+
+    public function setupIndicesProvider(): iterable
+    {
+        yield 'MySQL' => [
+            MySQL57Platform::class,
+            [['delivered_at']],
+        ];
+
+        yield 'Other platforms' => [
+            AbstractPlatform::class,
+            [['queue_name'], ['available_at'], ['delivered_at']],
         ];
     }
 

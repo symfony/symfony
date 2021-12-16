@@ -27,6 +27,8 @@ use Symfony\Component\Process\Pipes\WindowsPipes;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Romain Neutron <imprec@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, string>
  */
 class Process implements \IteratorAggregate
 {
@@ -305,10 +307,10 @@ class Process implements \IteratorAggregate
         $descriptors = $this->getDescriptors();
 
         if ($this->env) {
-            $env += $this->env;
+            $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->env, $env, 'strcasecmp') : $this->env;
         }
 
-        $env += $this->getDefaultEnv();
+        $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->getDefaultEnv(), $env, 'strcasecmp') : $this->getDefaultEnv();
 
         if (\is_array($commandline = $this->commandline)) {
             $commandline = implode(' ', array_map([$this, 'escapeArgument'], $commandline));
@@ -338,7 +340,7 @@ class Process implements \IteratorAggregate
 
         $envPairs = [];
         foreach ($env as $k => $v) {
-            if (false !== $v) {
+            if (false !== $v && false === \in_array($k, ['argc', 'argv', 'ARGC', 'ARGV'], true)) {
                 $envPairs[] = $k.'='.$v;
             }
         }
@@ -530,7 +532,7 @@ class Process implements \IteratorAggregate
             throw new RuntimeException('Disabling output while the process is running is not possible.');
         }
         if (null !== $this->idleTimeout) {
-            throw new LogicException('Output can not be disabled while an idle timeout is set.');
+            throw new LogicException('Output cannot be disabled while an idle timeout is set.');
         }
 
         $this->outputDisabled = true;
@@ -618,7 +620,7 @@ class Process implements \IteratorAggregate
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
      *
-     * @return \Generator
+     * @return \Generator<string, string>
      */
     #[\ReturnTypeWillChange]
     public function getIterator(int $flags = 0)
@@ -814,7 +816,7 @@ class Process implements \IteratorAggregate
         $this->requireProcessIsTerminated(__FUNCTION__);
 
         if ($this->isSigchildEnabled() && -1 === $this->processInformation['termsig']) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.');
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal cannot be retrieved.');
         }
 
         return $this->processInformation['termsig'];
@@ -971,8 +973,6 @@ class Process implements \IteratorAggregate
 
     /**
      * Gets the last output time in seconds.
-     *
-     * @return float|null
      */
     public function getLastOutputTime(): ?float
     {
@@ -1038,7 +1038,7 @@ class Process implements \IteratorAggregate
     public function setIdleTimeout(?float $timeout)
     {
         if (null !== $timeout && $this->outputDisabled) {
-            throw new LogicException('Idle timeout can not be set while the output is disabled.');
+            throw new LogicException('Idle timeout cannot be set while the output is disabled.');
         }
 
         $this->idleTimeout = $this->validateTimeout($timeout);
@@ -1141,25 +1141,12 @@ class Process implements \IteratorAggregate
     /**
      * Sets the environment variables.
      *
-     * Each environment variable value should be a string.
-     * If it is an array, the variable is ignored.
-     * If it is false or null, it will be removed when
-     * env vars are otherwise inherited.
-     *
-     * That happens in PHP when 'argv' is registered into
-     * the $_ENV array for instance.
-     *
-     * @param array $env The new environment variables
+     * @param array<string|\Stringable> $env The new environment variables
      *
      * @return $this
      */
     public function setEnv(array $env)
     {
-        // Process can not handle env values that are arrays
-        $env = array_filter($env, function ($value) {
-            return !\is_array($value);
-        });
-
         $this->env = $env;
 
         return $this;
@@ -1189,7 +1176,7 @@ class Process implements \IteratorAggregate
     public function setInput($input)
     {
         if ($this->isRunning()) {
-            throw new LogicException('Input can not be set while the process is running.');
+            throw new LogicException('Input cannot be set while the process is running.');
         }
 
         $this->input = ProcessUtils::validateInput(__METHOD__, $input);
@@ -1504,8 +1491,6 @@ class Process implements \IteratorAggregate
      * @param int  $signal         A valid POSIX signal (see https://php.net/pcntl.constants)
      * @param bool $throwException Whether to throw exception in case signal failed
      *
-     * @return bool
-     *
      * @throws LogicException   In case the process is not running
      * @throws RuntimeException In case --enable-sigchild is activated and the process can't be killed
      * @throws RuntimeException In case of failure
@@ -1514,7 +1499,7 @@ class Process implements \IteratorAggregate
     {
         if (null === $pid = $this->getPid()) {
             if ($throwException) {
-                throw new LogicException('Can not send signal on a non running process.');
+                throw new LogicException('Cannot send signal on a non running process.');
             }
 
             return false;
@@ -1659,20 +1644,9 @@ class Process implements \IteratorAggregate
 
     private function getDefaultEnv(): array
     {
-        $env = [];
+        $env = getenv();
+        $env = ('\\' === \DIRECTORY_SEPARATOR ? array_intersect_ukey($env, $_SERVER, 'strcasecmp') : array_intersect_key($env, $_SERVER)) ?: $env;
 
-        foreach ($_SERVER as $k => $v) {
-            if (\is_string($v) && false !== $v = getenv($k)) {
-                $env[$k] = $v;
-            }
-        }
-
-        foreach ($_ENV as $k => $v) {
-            if (\is_string($v)) {
-                $env[$k] = $v;
-            }
-        }
-
-        return $env;
+        return $_ENV + ('\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($env, $_ENV, 'strcasecmp') : $env);
     }
 }

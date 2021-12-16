@@ -76,6 +76,8 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
 
     /**
      * @param string $path The hook path (anything after https://outlook.office.com)
+     *
+     * @return $this
      */
     public function recipient(string $path): self
     {
@@ -90,6 +92,8 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
 
     /**
      * @param string $summary Markdown string
+     *
+     * @return $this
      */
     public function summary(string $summary): self
     {
@@ -98,6 +102,9 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function title(string $title): self
     {
         $this->options['title'] = $title;
@@ -105,6 +112,9 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function text(string $text): self
     {
         $this->options['text'] = $text;
@@ -112,6 +122,9 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function themeColor(string $themeColor): self
     {
         $this->validateThemeColor($themeColor);
@@ -121,6 +134,9 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function section(SectionInterface $section): self
     {
         $this->options['sections'][] = $section->toArray();
@@ -128,6 +144,9 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function action(ActionInterface $action): self
     {
         $this->validateNumberOfActions();
@@ -137,6 +156,9 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function expectedActor(string $actor): self
     {
         $this->options['expectedActors'][] = $actor;

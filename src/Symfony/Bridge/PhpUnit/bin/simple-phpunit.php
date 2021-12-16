@@ -94,8 +94,8 @@ $passthruOrFail = function ($command) {
 };
 
 if (\PHP_VERSION_ID >= 80000) {
-    // PHP 8 requires PHPUnit 9.3+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '9.4') ?: '9.4';
+    // PHP 8 requires PHPUnit 9.3+, PHP 8.1 requires PHPUnit 9.5+
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '9.5') ?: '9.5';
 } elseif (\PHP_VERSION_ID >= 70200) {
     // PHPUnit 8 requires PHP 7.2+
     $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.5') ?: '8.5';
@@ -122,7 +122,7 @@ while (!file_exists($root.'/'.$COMPOSER_JSON) || file_exists($root.'/Deprecation
 }
 
 $oldPwd = getcwd();
-$PHPUNIT_DIR = $getEnvVar('SYMFONY_PHPUNIT_DIR', $root.'/vendor/bin/.phpunit');
+$PHPUNIT_DIR = rtrim($getEnvVar('SYMFONY_PHPUNIT_DIR', $root.'/vendor/bin/.phpunit'), '/'.\DIRECTORY_SEPARATOR);
 $PHP = defined('PHP_BINARY') ? \PHP_BINARY : 'php';
 $PHP = escapeshellarg($PHP);
 if ('phpdbg' === \PHP_SAPI) {
@@ -224,10 +224,10 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     @copy("$PHPUNIT_VERSION_DIR/phpunit.xsd", 'phpunit.xsd');
     chdir("$PHPUNIT_VERSION_DIR");
     if ($SYMFONY_PHPUNIT_REMOVE) {
-        $passthruOrFail("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
+        $passthruOrFail("$COMPOSER remove --no-update --no-interaction ".$SYMFONY_PHPUNIT_REMOVE);
     }
     if ($SYMFONY_PHPUNIT_REQUIRE) {
-        $passthruOrFail("$COMPOSER require --no-update ".$SYMFONY_PHPUNIT_REQUIRE);
+        $passthruOrFail("$COMPOSER require --no-update --no-interaction ".$SYMFONY_PHPUNIT_REQUIRE);
     }
     if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
         $passthruOrFail("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
@@ -239,6 +239,13 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         $passthruOrFail("$COMPOSER config --unset platform.php");
     }
     if (file_exists($path = $root.'/vendor/symfony/phpunit-bridge')) {
+        $haystack = "$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR";
+        $rootLen = strlen($root);
+
+        $p = ($rootLen <= strlen($haystack) ? str_repeat('../', substr_count($haystack, '/', $rootLen)) : '').'vendor/symfony/phpunit-bridge';
+        if (realpath($p) === realpath($path)) {
+            $path = $p;
+        }
         $passthruOrFail("$COMPOSER require --no-update symfony/phpunit-bridge \"*@dev\"");
         $passthruOrFail("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', \DIRECTORY_SEPARATOR, $path)));
         if ('\\' === \DIRECTORY_SEPARATOR) {

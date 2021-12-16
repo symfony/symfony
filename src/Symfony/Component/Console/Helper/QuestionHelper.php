@@ -33,8 +33,11 @@ use function Symfony\Component\String\s;
  */
 class QuestionHelper extends Helper
 {
+    /**
+     * @var resource|null
+     */
     private $inputStream;
-    private static $shell;
+
     private static $stty = true;
     private static $stdinIsInteractive;
 
@@ -205,7 +208,7 @@ class QuestionHelper extends Helper
     {
         $messages = [];
 
-        $maxWidth = max(array_map('self::width', array_keys($choices = $question->getChoices())));
+        $maxWidth = max(array_map([__CLASS__, 'width'], array_keys($choices = $question->getChoices())));
 
         foreach ($choices as $key => $value) {
             $padding = str_repeat(' ', $maxWidth - self::width($key));

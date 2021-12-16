@@ -298,6 +298,7 @@ class InlineTest extends TestCase
             ['12_', 12],
             ['"quoted string"', 'quoted string'],
             ["'quoted string'", 'quoted string'],
+            ['1234.0', 1234.0],
             ['12.30e+02', 12.30e+02],
             ['123.45_67', 123.4567],
             ['0x4D2', 0x4D2],
@@ -461,7 +462,8 @@ class InlineTest extends TestCase
             ['_12', '_12'],
             ["'12_'", '12_'],
             ["'quoted string'", 'quoted string'],
-            ['!!float 1230', 12.30e+02],
+            ['1230.0', 12.30e+02],
+            ['1.23E+45', 12.30e+44],
             ['1234', 0x4D2],
             ['1243', 02333],
             ["'0x_4_D_2_'", '0x_4_D_2_'],
@@ -942,5 +944,33 @@ class InlineTest extends TestCase
             ["'\u{3000}'", '　'],
             ["'a　b'", 'a　b'],
         ];
+    }
+
+    public function testParseSingleQuotedTaggedString()
+    {
+        $this->assertSame('foo', Inline::parse("!!str 'foo'"));
+    }
+
+    public function testParseDoubleQuotedTaggedString()
+    {
+        $this->assertSame('foo', Inline::parse('!!str "foo"'));
+    }
+
+    public function testParseQuotedReferenceLikeStringsInMapping()
+    {
+        $yaml = <<<YAML
+{foo: '&foo', bar: "&bar", baz: !!str '&baz'}
+YAML;
+
+        $this->assertSame(['foo' => '&foo', 'bar' => '&bar', 'baz' => '&baz'], Inline::parse($yaml));
+    }
+
+    public function testParseQuotedReferenceLikeStringsInSequence()
+    {
+        $yaml = <<<YAML
+['&foo', "&bar", !!str '&baz']
+YAML;
+
+        $this->assertSame(['&foo', '&bar', '&baz'], Inline::parse($yaml));
     }
 }

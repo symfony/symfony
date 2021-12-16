@@ -43,6 +43,9 @@ final class ZulipOptions implements MessageOptionsInterface
         return $this->recipient;
     }
 
+    /**
+     * @return $this
+     */
     public function topic(string $topic): self
     {
         $this->topic = $topic;

@@ -73,8 +73,6 @@ final class Response
 
     /**
      * Gets the response headers.
-     *
-     * @return array
      */
     public function getHeaders(): array
     {

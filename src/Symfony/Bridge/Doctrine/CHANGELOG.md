@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `DoctrineOpenTransactionLoggerMiddleware` to log when a transaction has been left open
+ * Deprecate `PdoCacheAdapterDoctrineSchemaSubscriber` and add `DoctrineDbalCacheAdapterSchemaSubscriber` instead
+ * `UniqueEntity` constraint retrieves a maximum of two entities if the default repository method is used.
+ * Add support for the newer bundle structure to `AbstractDoctrineExtension::loadMappingInformation()`
+ * Add argument `$bundleDir` to `AbstractDoctrineExtension::getMappingDriverBundleConfigDefaults()`
+ * Add argument `$bundleDir` to `AbstractDoctrineExtension::getMappingResourceConfigDirectory()`
+
 5.3
 ---
 

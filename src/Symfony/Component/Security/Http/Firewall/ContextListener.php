@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -57,7 +58,7 @@ class ContextListener extends AbstractListener
     private $sessionTrackerEnabler;
 
     /**
-     * @param iterable|UserProviderInterface[] $userProviders
+     * @param iterable<mixed, UserProviderInterface> $userProviders
      */
     public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null, callable $sessionTrackerEnabler = null)
     {
@@ -237,7 +238,7 @@ class ContextListener extends AbstractListener
                 $newToken->setUser($refreshedUser, false);
 
                 // tokens can be deauthenticated if the user has been changed.
-                if ($this->hasUserChanged($user, $newToken)) {
+                if ($token instanceof AbstractToken && $this->hasUserChanged($user, $newToken)) {
                     $userDeauthenticated = true;
                     // @deprecated since Symfony 5.4
                     if (method_exists($newToken, 'setAuthenticated')) {
@@ -259,8 +260,9 @@ class ContextListener extends AbstractListener
                     $context = ['provider' => \get_class($provider), 'username' => method_exists($refreshedUser, 'getUserIdentifier') ? $refreshedUser->getUserIdentifier() : $refreshedUser->getUsername()];
 
                     if ($token instanceof SwitchUserToken) {
-                        // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
-                        $context['impersonator_username'] = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getOriginalToken()->getUsername();
+                        $originalToken = $token->getOriginalToken();
+                        // @deprecated since Symfony 5.3, change to $originalToken->getUserIdentifier() in 6.0
+                        $context['impersonator_username'] = method_exists($originalToken, 'getUserIdentifier') ? $originalToken->getUserIdentifier() : $originalToken->getUsername();
                     }
 
                     $this->logger->debug('User was reloaded from a user provider.', $context);
@@ -296,11 +298,11 @@ class ContextListener extends AbstractListener
 
     private function safelyUnserialize(string $serializedToken)
     {
-        $e = $token = null;
+        $token = null;
         $prevUnserializeHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
         $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler) {
             if (__FILE__ === $file) {
-                throw new \ErrorException($msg, 0x37313bc, $type, $file, $line);
+                throw new \ErrorException($msg, 0x37313BC, $type, $file, $line);
             }
 
             return $prevErrorHandler ? $prevErrorHandler($type, $msg, $file, $line, $context) : false;
@@ -308,17 +310,16 @@ class ContextListener extends AbstractListener
 
         try {
             $token = unserialize($serializedToken);
-        } catch (\Throwable $e) {
-        }
-        restore_error_handler();
-        ini_set('unserialize_callback_func', $prevUnserializeHandler);
-        if ($e) {
-            if (!$e instanceof \ErrorException || 0x37313bc !== $e->getCode()) {
+        } catch (\ErrorException $e) {
+            if (0x37313BC !== $e->getCode()) {
                 throw $e;
             }
             if ($this->logger) {
                 $this->logger->warning('Failed to unserialize the security token from the session.', ['key' => $this->sessionKey, 'received' => $serializedToken, 'exception' => $e]);
             }
+        } finally {
+            restore_error_handler();
+            ini_set('unserialize_callback_func', $prevUnserializeHandler);
         }
 
         return $token;
@@ -386,7 +387,7 @@ class ContextListener extends AbstractListener
      */
     public static function handleUnserializeCallback(string $class)
     {
-        throw new \ErrorException('Class not found: '.$class, 0x37313bc);
+        throw new \ErrorException('Class not found: '.$class, 0x37313BC);
     }
 
     /**

@@ -14,7 +14,9 @@ namespace Symfony\Component\Yaml\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\CI\GithubActionReporter;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Yaml\Command\LintCommand;
 
@@ -163,6 +165,25 @@ YAML;
         $tester->execute(['filename' => $filename], ['decorated' => false]);
     }
 
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        if (!class_exists(CommandCompletionTester::class)) {
+            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+        }
+
+        $tester = new CommandCompletionTester($this->createCommand());
+
+        $this->assertSame($expectedSuggestions, $tester->complete($input));
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
+    }
+
     private function createFile($content): string
     {
         $filename = tempnam(sys_get_temp_dir().'/framework-yml-lint-test', 'sf-');
@@ -173,13 +194,17 @@ YAML;
         return $filename;
     }
 
-    protected function createCommandTester(): CommandTester
+    protected function createCommand(): Command
     {
         $application = new Application();
         $application->add(new LintCommand());
-        $command = $application->find('lint:yaml');
 
-        return new CommandTester($command);
+        return $application->find('lint:yaml');
+    }
+
+    protected function createCommandTester(): CommandTester
+    {
+        return new CommandTester($this->createCommand());
     }
 
     protected function setUp(): void

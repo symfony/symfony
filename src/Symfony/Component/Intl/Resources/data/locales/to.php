@@ -492,6 +492,8 @@ return [
         'rw_RW' => 'lea fakakiniāuanita (Luanitā)',
         'sa' => 'lea fakasanisukuliti',
         'sa_IN' => 'lea fakasanisukuliti (ʻInitia)',
+        'sc' => 'lea fakasaletīnia',
+        'sc_IT' => 'lea fakasaletīnia (ʻĪtali)',
         'sd' => 'lea fakasīniti',
         'sd_Arab' => 'lea fakasīniti (tohinima fakaʻalepea)',
         'sd_Arab_PK' => 'lea fakasīniti (tohinima fakaʻalepea, Pākisitani)',

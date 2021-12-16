@@ -78,7 +78,7 @@ class ConnectionTest extends TestCase
         $redis->expects($this->once())
             ->method('connect')
             ->with('tls://127.0.0.1', 6379)
-            ->willReturn(null);
+            ->willReturn(true);
 
         Connection::fromDsn('redis://127.0.0.1?tls=1', [], $redis);
     }
@@ -92,7 +92,7 @@ class ConnectionTest extends TestCase
         $redis->expects($this->once())
             ->method('connect')
             ->with('tls://127.0.0.1', 6379)
-            ->willReturn(null);
+            ->willReturn(true);
 
         Connection::fromDsn('redis://127.0.0.1', ['tls' => true], $redis);
     }
@@ -103,7 +103,7 @@ class ConnectionTest extends TestCase
         $redis->expects($this->once())
             ->method('connect')
             ->with('tls://127.0.0.1', 6379)
-            ->willReturn(null);
+            ->willReturn(true);
 
         Connection::fromDsn('rediss://127.0.0.1?delete_after_ack=true', [], $redis);
     }
@@ -155,7 +155,7 @@ class ConnectionTest extends TestCase
 
         $redis->expects($this->exactly(3))->method('xreadgroup')
             ->with('symfony', 'consumer', ['queue' => 0], 1, null)
-            ->willReturn(['queue' => [['message' => '{"body":"Test","headers":[]}']]]);
+            ->willReturn(['queue' => [['message' => json_encode(['body' => 'Test', 'headers' => []])]]]);
 
         $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
         $this->assertNotNull($connection->get());
@@ -163,15 +163,29 @@ class ConnectionTest extends TestCase
         $this->assertNotNull($connection->get());
     }
 
-    public function testAuth()
+    /**
+     * @param string|array $expected
+     *
+     * @dataProvider provideAuthDsn
+     */
+    public function testAuth($expected, string $dsn)
     {
         $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('auth')
-            ->with('password')
+            ->with($expected)
             ->willReturn(true);
 
-        Connection::fromDsn('redis://password@localhost/queue', ['delete_after_ack' => true], $redis);
+        Connection::fromDsn($dsn, ['delete_after_ack' => true], $redis);
+    }
+
+    public function provideAuthDsn(): \Generator
+    {
+        yield 'Password only' => ['password', 'redis://password@localhost/queue'];
+        yield 'User and password' => [['user', 'password'], 'redis://user:password@localhost/queue'];
+        yield 'User and colon' => ['user', 'redis://user:@localhost/queue'];
+        yield 'Colon and password' => ['password', 'redis://:password@localhost/queue'];
+        yield 'Colon and falsy password' => ['0', 'redis://:0@localhost/queue'];
     }
 
     public function testAuthFromOptions()
@@ -240,7 +254,17 @@ class ConnectionTest extends TestCase
             ->willReturn(['queue' => [['message' => '{"body":"1","headers":[]}']]]);
 
         $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
-        $connection->get();
+        $message = $connection->get();
+
+        $this->assertSame([
+            'id' => 0,
+            'data' => [
+                'message' => json_encode([
+                    'body' => '1',
+                    'headers' => [],
+                ]),
+            ],
+        ], $message);
     }
 
     public function testClaimAbandonedMessageWithRaceCondition()
@@ -315,7 +339,7 @@ class ConnectionTest extends TestCase
 
         $redis->expects($this->exactly(1))->method('xadd')
             ->with('queue', '*', ['message' => '{"body":"1","headers":[]}'], 20000, true)
-            ->willReturn(1);
+            ->willReturn('1');
 
         $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000', ['delete_after_ack' => true], $redis);
         $connection->add('1', []);
@@ -365,7 +389,7 @@ class ConnectionTest extends TestCase
     {
         $redis = $this->createMock(\Redis::class);
 
-        $redis->expects($this->once())->method('xadd')->willReturn(0);
+        $redis->expects($this->once())->method('xadd')->willReturn('0');
         $redis->expects($this->once())->method('xack')->willReturn(0);
 
         $redis->method('getLastError')->willReturnOnConsecutiveCalls('xadd error', 'xack error');

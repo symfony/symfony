@@ -538,6 +538,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'rw_RW',
         'sa',
         'sa_IN',
+        'sc',
+        'sc_IT',
         'sd',
         'sd_Arab',
         'sd_Arab_PK',

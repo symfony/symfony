@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\XmlReferenceDumper;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -156,5 +158,33 @@ EOF
         $io->writeln(null === $path ? $dumper->dump($configuration, $extension->getNamespace()) : $dumper->dumpAtPath($configuration, $path));
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('name')) {
+            $suggestions->suggestValues($this->getAvailableBundles());
+        }
+
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues($this->getAvailableFormatOptions());
+        }
+    }
+
+    private function getAvailableBundles(): array
+    {
+        $bundles = [];
+
+        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
+            $bundles[] = $bundle->getName();
+            $bundles[] = $bundle->getContainerExtension()->getAlias();
+        }
+
+        return $bundles;
+    }
+
+    private function getAvailableFormatOptions(): array
+    {
+        return ['yaml', 'xml'];
     }
 }

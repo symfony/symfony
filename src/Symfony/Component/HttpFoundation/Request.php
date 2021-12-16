@@ -186,7 +186,7 @@ class Request
     protected $format;
 
     /**
-     * @var SessionInterface|callable
+     * @var SessionInterface|callable(): SessionInterface
      */
     protected $session;
 
@@ -761,11 +761,15 @@ class Request
      * like whether the session is started or not. It is just a way to check if this Request
      * is associated with a Session instance.
      *
+     * @param bool $skipIfUninitialized When true, ignores factories injected by `setSessionFactory`
+     *
      * @return bool
      */
-    public function hasSession()
+    public function hasSession(/* bool $skipIfUninitialized = false */)
     {
-        return null !== $this->session;
+        $skipIfUninitialized = \func_num_args() > 0 ? func_get_arg(0) : false;
+
+        return null !== $this->session && (!$skipIfUninitialized || $this->session instanceof SessionInterface);
     }
 
     public function setSession(SessionInterface $session)
@@ -775,6 +779,8 @@ class Request
 
     /**
      * @internal
+     *
+     * @param callable(): SessionInterface $factory
      */
     public function setSessionFactory(callable $factory)
     {
@@ -987,7 +993,7 @@ class Request
     /**
      * Gets the user info.
      *
-     * @return string A user name and, optionally, scheme-specific information about how to gain authorization to access the server
+     * @return string|null A user name if any and, optionally, scheme-specific information about how to gain authorization to access the server
      */
     public function getUserInfo()
     {
@@ -1509,7 +1515,7 @@ class Request
     public function getProtocolVersion()
     {
         if ($this->isFromTrustedProxy()) {
-            preg_match('~^(HTTP/)?([1-9]\.[0-9]) ~', $this->headers->get('Via'), $matches);
+            preg_match('~^(HTTP/)?([1-9]\.[0-9]) ~', $this->headers->get('Via') ?? '', $matches);
 
             if ($matches) {
                 return 'HTTP/'.$matches[2];
@@ -1601,7 +1607,7 @@ class Request
      */
     public function getETags()
     {
-        return preg_split('/\s*,\s*/', $this->headers->get('if_none_match', ''), -1, \PREG_SPLIT_NO_EMPTY);
+        return preg_split('/\s*,\s*/', $this->headers->get('If-None-Match', ''), -1, \PREG_SPLIT_NO_EMPTY);
     }
 
     /**
@@ -1780,14 +1786,10 @@ class Request
 
         if (!$this->isSecure()) {
             // see https://tools.ietf.org/html/rfc8674#section-3
-            $this->isSafeContentPreferred = false;
-
-            return $this->isSafeContentPreferred;
+            return $this->isSafeContentPreferred = false;
         }
 
-        $this->isSafeContentPreferred = AcceptHeader::fromString($this->headers->get('Prefer'))->has('safe');
-
-        return $this->isSafeContentPreferred;
+        return $this->isSafeContentPreferred = AcceptHeader::fromString($this->headers->get('Prefer'))->has('safe');
     }
 
     /*
@@ -1967,7 +1969,7 @@ class Request
             return '/';
         }
 
-        return (string) $pathInfo;
+        return $pathInfo;
     }
 
     /**
@@ -1986,7 +1988,7 @@ class Request
             'rdf' => ['application/rdf+xml'],
             'atom' => ['application/atom+xml'],
             'rss' => ['application/rss+xml'],
-            'form' => ['application/x-www-form-urlencoded'],
+            'form' => ['application/x-www-form-urlencoded', 'multipart/form-data'],
         ];
     }
 

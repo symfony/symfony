@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,12 +31,17 @@ final class CachePoolDeleteCommand extends Command
     protected static $defaultDescription = 'Delete an item from a cache pool';
 
     private $poolClearer;
+    private $poolNames;
 
-    public function __construct(Psr6CacheClearer $poolClearer)
+    /**
+     * @param string[]|null $poolNames
+     */
+    public function __construct(Psr6CacheClearer $poolClearer, array $poolNames = null)
     {
         parent::__construct();
 
         $this->poolClearer = $poolClearer;
+        $this->poolNames = $poolNames;
     }
 
     /**
@@ -80,5 +87,12 @@ EOF
         $io->success(sprintf('Cache item "%s" was successfully deleted.', $key));
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if (\is_array($this->poolNames) && $input->mustSuggestArgumentValuesFor('pool')) {
+            $suggestions->suggestValues($this->poolNames);
+        }
     }
 }

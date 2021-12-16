@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Nexmo;
 
+trigger_deprecation('symfony/nexmo-notifier', '5.4', 'The "symfony/nexmo-notifier" package is deprecated, use "symfony/vonage-notifier" instead.');
+
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -23,6 +25,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.4, use the Vonage bridge instead.
  */
 final class NexmoTransport extends AbstractTransport
 {

@@ -1,6 +1,6 @@
 {
     "name": "symfony/amazon-sns-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Provides Amazon SNS integration for Symfony Notifier.",
     "keywords": ["amazon", "sns", "notifier", "chat", "sms"],
     "homepage": "https://symfony.com",
@@ -17,8 +17,8 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/http-client": "^4.4|^5.2",
-        "symfony/notifier": "^5.4",
+        "symfony/http-client": "^4.4|^5.2|^6.0",
+        "symfony/notifier": "^5.4|^6.0",
         "async-aws/sns": "^1.0"
     },
     "autoload": {

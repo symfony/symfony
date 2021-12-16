@@ -17,7 +17,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.0'
-          extensions: "json,memcached,mongodb,redis,xsl,ldap,dom"
+          extensions: "json,couchbase,memcached,mongodb,redis,xsl,ldap,dom"
           ini-values: "memory_limit=-1"
           coverage: none
 
@@ -52,5 +52,4 @@ jobs:
 
       - name: Psalm
         run: |
-          ./vendor/bin/psalm.phar --no-progress
-          ./vendor/bin/psalm.phar --output-format=github --no-progress
+          ./vendor/bin/psalm.phar --no-progress || ./vendor/bin/psalm.phar --output-format=github --no-progress

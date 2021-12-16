@@ -559,10 +559,10 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', [], 120000);
     }
 
-    public function testObfuscatePasswordInDsn()
+    public function testNoCredentialLeakageWhenConnectionFails()
     {
         $this->expectException(\AMQPException::class);
-        $this->expectExceptionMessage('Could not connect to the AMQP server. Please verify the provided DSN. ({"host":"localhost","port":5672,"vhost":"/","login":"user","password":"********"})');
+        $this->expectExceptionMessage('Could not connect to the AMQP server. Please verify the provided DSN.');
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createMock(\AMQPConnection::class),
             $amqpChannel = $this->createMock(\AMQPChannel::class),

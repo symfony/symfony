@@ -17,8 +17,6 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  * Data object representing the fill rate of a token bucket.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 final class Rate
 {
@@ -49,6 +47,16 @@ final class Rate
     public static function perDay(int $rate = 1): self
     {
         return new static(new \DateInterval('P1D'), $rate);
+    }
+
+    public static function perMonth(int $rate = 1): self
+    {
+        return new static(new \DateInterval('P1M'), $rate);
+    }
+
+    public static function perYear(int $rate = 1): self
+    {
+        return new static(new \DateInterval('P1Y'), $rate);
     }
 
     /**
@@ -93,6 +101,6 @@ final class Rate
 
     public function __toString(): string
     {
-        return $this->refillTime->format('P%dDT%HH%iM%sS').'-'.$this->refillAmount;
+        return $this->refillTime->format('P%y%m%dDT%HH%iM%sS').'-'.$this->refillAmount;
     }
 }

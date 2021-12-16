@@ -4,6 +4,7 @@ CHANGELOG
 5.4
 ---
 
+ * Add a `CacheableVoterInterface` for voters that vote only on identified attributes and subjects
  * Deprecate `AuthenticationEvents::AUTHENTICATION_FAILURE`, use the `LoginFailureEvent` instead
  * Deprecate `AnonymousToken`, as the related authenticator was deprecated in 5.3
  * Deprecate `Token::getCredentials()`, tokens should no longer contain credentials (as they represent authenticated sessions)
@@ -18,6 +19,11 @@ CHANGELOG
    `$exceptionOnNoToken` argument to `false` of `AuthorizationChecker`
  * Deprecate methods `TokenInterface::isAuthenticated()` and `setAuthenticated`,
    return null from "getUser()" instead when a token is not authenticated
+ * Add `AccessDecisionStrategyInterface` to allow custom access decision strategies
+ * Add access decision strategies `AffirmativeStrategy`, `ConsensusStrategy`, `PriorityStrategy`, `UnanimousStrategy`
+ * Deprecate passing the strategy as string to `AccessDecisionManager`,
+   pass an instance of `AccessDecisionStrategyInterface` instead
+ * Flag `AccessDecisionManager` as `@final`
 
 5.3
 ---

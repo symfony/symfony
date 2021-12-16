@@ -39,6 +39,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\AttributesTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
@@ -49,6 +50,9 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectToPopulateTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipNullValuesTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipUninitializedValuesTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObjectWithGetters;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
 
 /**
@@ -57,6 +61,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTr
 class ObjectNormalizerTest extends TestCase
 {
     use AttributesTestTrait;
+    use CacheableObjectAttributesTestTrait;
     use CallbacksTestTrait;
     use CircularReferenceTestTrait;
     use ConstructorArgumentsTestTrait;
@@ -66,6 +71,7 @@ class ObjectNormalizerTest extends TestCase
     use MaxDepthTestTrait;
     use ObjectToPopulateTestTrait;
     use SkipNullValuesTestTrait;
+    use SkipUninitializedValuesTestTrait;
     use TypeEnforcementTestTrait;
 
     /**
@@ -131,6 +137,26 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testNormalizeObjectWithUnsetProperties()
+    {
+        $obj = new ObjectInner();
+        unset($obj->foo);
+        $this->assertEquals(
+            ['bar' => null],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
+    public function testNormalizeObjectWithLazyProperties()
+    {
+        $obj = new LazyObjectInner();
+        unset($obj->foo);
+        $this->assertEquals(
+            ['foo' => 123, 'bar' => null],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     /**
      * @requires PHP 7.4
      */
@@ -162,6 +188,19 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->bar);
         $this->assertTrue($obj->isBaz());
+    }
+
+    public function testDenormalizeEmptyXmlArray()
+    {
+        $normalizer = $this->getDenormalizerForObjectToPopulate();
+        $obj = $normalizer->denormalize(
+            ['bar' => ''],
+            ObjectDummy::class,
+            'xml'
+        );
+
+        $this->assertIsArray($obj->bar);
+        $this->assertEmpty($obj->bar);
     }
 
     public function testDenormalizeWithObject()
@@ -530,6 +569,42 @@ class ObjectNormalizerTest extends TestCase
     // skip null
 
     protected function getNormalizerForSkipNullValues(): ObjectNormalizer
+    {
+        return new ObjectNormalizer();
+    }
+
+    // skip uninitialized
+
+    protected function getNormalizerForSkipUninitializedValues(): ObjectNormalizer
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        return new ObjectNormalizer($classMetadataFactory);
+    }
+
+    protected function getObjectCollectionWithExpectedArray(): array
+    {
+        $typedPropsObject = new TypedPropertiesObject();
+        $typedPropsObject->unInitialized = 'value2';
+
+        $collection = [
+            new TypedPropertiesObject(),
+            $typedPropsObject,
+            new TypedPropertiesObjectWithGetters(),
+            (new TypedPropertiesObjectWithGetters())->setUninitialized('value2'),
+        ];
+
+        $expectedArrays = [
+            ['initialized' => 'value', 'initialized2' => 'value'],
+            ['unInitialized' => 'value2', 'initialized' => 'value', 'initialized2' => 'value'],
+            ['initialized' => 'value', 'initialized2' => 'value'],
+            ['unInitialized' => 'value2', 'initialized' => 'value', 'initialized2' => 'value'],
+        ];
+
+        return [$collection, $expectedArrays];
+    }
+
+    protected function getNormalizerForCacheableObjectAttributesTest(): ObjectNormalizer
     {
         return new ObjectNormalizer();
     }
@@ -915,6 +990,16 @@ class ObjectInner
 {
     public $foo;
     public $bar;
+}
+
+class LazyObjectInner extends ObjectInner
+{
+    public function __get($name)
+    {
+        if ('foo' === $name) {
+            return $this->foo = 123;
+        }
+    }
 }
 
 class FormatAndContextAwareNormalizer extends ObjectNormalizer

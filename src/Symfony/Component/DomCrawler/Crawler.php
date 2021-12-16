@@ -18,6 +18,8 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
  * Crawler eases navigation of a list of \DOMNode objects.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @implements \IteratorAggregate<int, \DOMNode>
  */
 class Crawler implements \Countable, \IteratorAggregate
 {
@@ -60,7 +62,7 @@ class Crawler implements \Countable, \IteratorAggregate
     private $document;
 
     /**
-     * @var \DOMNode[]
+     * @var list<\DOMNode>
      */
     private $nodes = [];
 
@@ -635,6 +637,14 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Returns only the inner text that is the direct descendent of the current node, excluding any child nodes.
+     */
+    public function innerText(): string
+    {
+        return $this->filterXPath('.//text()')->text();
+    }
+
+    /**
      * Returns the first node of the list as HTML.
      *
      * @param string|null $default When not null: the value to return when the current node is empty
@@ -1121,7 +1131,7 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @return \ArrayIterator|\DOMNode[]
+     * @return \ArrayIterator<int, \DOMNode>
      */
     #[\ReturnTypeWillChange]
     public function getIterator()

@@ -31,7 +31,6 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
     public function getAcceptData()
     {
         $foo = [
-            '.gitignore',
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -54,7 +53,6 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
         ];
 
         $fo = [
-            '.gitignore',
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -79,7 +77,6 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
         ];
 
         $toto = [
-            '.gitignore',
             '.bar',
             '.foo',
             '.foo/.bar',

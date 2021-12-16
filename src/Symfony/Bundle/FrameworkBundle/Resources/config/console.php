@@ -39,6 +39,7 @@ use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Component\Console\EventListener\ErrorListener;
+use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
@@ -129,6 +130,13 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('console.command')
 
+        ->set('console.command.dotenv_debug', DotenvDebugCommand::class)
+            ->args([
+                param('kernel.environment'),
+                param('kernel.project_dir'),
+            ])
+            ->tag('console.command')
+
         ->set('console.command.event_dispatcher_debug', EventDispatcherDebugCommand::class)
             ->args([
                 tagged_locator('event_dispatcher.dispatcher', 'name'),
@@ -142,6 +150,8 @@ return static function (ContainerConfigurator $container) {
                 service('event_dispatcher'),
                 service('logger')->nullOnInvalid(),
                 [], // Receiver names
+                service('messenger.listener.reset_services')->nullOnInvalid(),
+                [], // Bus names
             ])
             ->tag('console.command')
             ->tag('monolog.logger', ['channel' => 'messenger'])
@@ -212,10 +222,11 @@ return static function (ContainerConfigurator $container) {
                 null, // twig.default_path
                 [], // Translator paths
                 [], // Twig paths
+                param('kernel.enabled_locales'),
             ])
             ->tag('console.command')
 
-        ->set('console.command.translation_update', TranslationUpdateCommand::class)
+        ->set('console.command.translation_extract', TranslationUpdateCommand::class)
             ->args([
                 service('translation.writer'),
                 service('translation.reader'),
@@ -225,6 +236,7 @@ return static function (ContainerConfigurator $container) {
                 null, // twig.default_path
                 [], // Translator paths
                 [], // Twig paths
+                param('kernel.enabled_locales'),
             ])
             ->tag('console.command')
 
@@ -298,7 +310,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.secrets_list', SecretsListCommand::class)
             ->args([
                 service('secrets.vault'),
-                service('secrets.local_vault'),
+                service('secrets.local_vault')->ignoreOnInvalid(),
             ])
             ->tag('console.command')
 
@@ -312,7 +324,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.secrets_encrypt_from_local', SecretsEncryptFromLocalCommand::class)
             ->args([
                 service('secrets.vault'),
-                service('secrets.local_vault'),
+                service('secrets.local_vault')->ignoreOnInvalid(),
             ])
             ->tag('console.command')
     ;

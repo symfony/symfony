@@ -30,7 +30,7 @@ final class CachePoolPruneCommand extends Command
     private $pools;
 
     /**
-     * @param iterable|PruneableInterface[] $pools
+     * @param iterable<mixed, PruneableInterface> $pools
      */
     public function __construct(iterable $pools)
     {

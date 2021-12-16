@@ -540,7 +540,7 @@ return [
         ],
         'LSL' => [
             0 => 'LSL',
-            1 => 'lesoški loti',
+            1 => 'lesotski loti',
         ],
         'LTL' => [
             0 => 'LTL',

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Authenticator\Passport\Badge;
 
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\EventListener\UserProviderListener;

@@ -22,7 +22,7 @@ class UnsupportedSchemeException extends LogicException
     private const SCHEME_TO_PACKAGE_MAP = [
         'allmysms' => [
             'class' => Bridge\AllMySms\AllMySmsTransportFactory::class,
-            'package' => 'symfony/allmysms-notifier',
+            'package' => 'symfony/all-my-sms-notifier',
         ],
         'clickatell' => [
             'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
@@ -35,6 +35,10 @@ class UnsupportedSchemeException extends LogicException
         'esendex' => [
             'class' => Bridge\Esendex\EsendexTransportFactory::class,
             'package' => 'symfony/esendex-notifier',
+        ],
+        'expo' => [
+            'class' => Bridge\Expo\ExpoTransportFactory::class,
+            'package' => 'symfony/expo-notifier',
         ],
         'fakechat' => [
             'class' => Bridge\FakeChat\FakeChatTransportFactory::class,
@@ -54,7 +58,7 @@ class UnsupportedSchemeException extends LogicException
         ],
         'gatewayapi' => [
             'class' => Bridge\GatewayApi\GatewayApiTransportFactory::class,
-            'package' => 'symfony/gatewayapi-notifier',
+            'package' => 'symfony/gateway-api-notifier',
         ],
         'gitter' => [
             'class' => Bridge\Gitter\GitterTransportFactory::class,
@@ -116,6 +120,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Octopush\OctopushTransportFactory::class,
             'package' => 'symfony/octopush-notifier',
         ],
+        'onesignal' => [
+            'class' => Bridge\OneSignal\OneSignalTransportFactory::class,
+            'package' => 'symfony/one-signal-notifier',
+        ],
         'ovhcloud' => [
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovh-cloud-notifier',
@@ -135,6 +143,10 @@ class UnsupportedSchemeException extends LogicException
         'slack' => [
             'class' => Bridge\Slack\SlackTransportFactory::class,
             'package' => 'symfony/slack-notifier',
+        ],
+        'sms77' => [
+            'class' => Bridge\Sms77\Sms77TransportFactory::class,
+            'package' => 'symfony/sms77-notifier',
         ],
         'smsapi' => [
             'class' => Bridge\Smsapi\SmsapiTransportFactory::class,
@@ -171,6 +183,10 @@ class UnsupportedSchemeException extends LogicException
         'twilio' => [
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',
+        ],
+        'vonage' => [
+            'class' => Bridge\Vonage\VonageTransportFactory::class,
+            'package' => 'symfony/vonage-notifier',
         ],
         'yunpian' => [
             'class' => Bridge\Yunpian\YunpianTransportFactory::class,

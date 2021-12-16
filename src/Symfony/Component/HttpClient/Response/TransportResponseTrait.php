@@ -27,6 +27,7 @@ use Symfony\Component\HttpClient\Internal\ClientState;
  */
 trait TransportResponseTrait
 {
+    private $canary;
     private $headers = [];
     private $info = [
         'response_headers' => [],
@@ -41,7 +42,6 @@ trait TransportResponseTrait
     private $timeout = 0;
     private $inflate;
     private $finalInfo;
-    private $canary;
     private $logger;
 
     /**
@@ -109,7 +109,7 @@ trait TransportResponseTrait
     private static function addResponseHeaders(array $responseHeaders, array &$info, array &$headers, string &$debug = ''): void
     {
         foreach ($responseHeaders as $h) {
-            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([1-9]\d\d)(?: |$)#', $h, $m)) {
+            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? (\d\d\d)(?: |$)#', $h, $m)) {
                 if ($headers) {
                     $debug .= "< \r\n";
                     $headers = [];
@@ -124,10 +124,6 @@ trait TransportResponseTrait
         }
 
         $debug .= "< \r\n";
-
-        if (!$info['http_code']) {
-            throw new TransportException(sprintf('Invalid or missing HTTP status line for "%s".', implode('', $info['url'])));
-        }
     }
 
     /**
@@ -146,6 +142,8 @@ trait TransportResponseTrait
     /**
      * Implements an event loop based on a buffer activity queue.
      *
+     * @param iterable<array-key, self> $responses
+     *
      * @internal
      */
     public static function stream(iterable $responses, float $timeout = null): \Generator
@@ -158,6 +156,12 @@ trait TransportResponseTrait
 
         $lastActivity = microtime(true);
         $elapsedTimeout = 0;
+
+        if ($fromLastTimeout = 0.0 === $timeout && '-0' === (string) $timeout) {
+            $timeout = null;
+        } elseif ($fromLastTimeout = 0 > $timeout) {
+            $timeout = -$timeout;
+        }
 
         while (true) {
             $hasActivity = false;
@@ -174,13 +178,18 @@ trait TransportResponseTrait
                     $timeoutMin = min($timeoutMin, $response->timeout, 1);
                     $chunk = false;
 
+                    if ($fromLastTimeout && null !== $multi->lastTimeout) {
+                        $elapsedTimeout = microtime(true) - $multi->lastTimeout;
+                    }
+
                     if (isset($multi->handlesActivity[$j])) {
-                        // no-op
+                        $multi->lastTimeout = null;
                     } elseif (!isset($multi->openHandles[$j])) {
                         unset($responses[$j]);
                         continue;
                     } elseif ($elapsedTimeout >= $timeoutMax) {
                         $multi->handlesActivity[$j] = [new ErrorChunk($response->offset, sprintf('Idle timeout reached for "%s".', $response->getInfo('url')))];
+                        $multi->lastTimeout ?? $multi->lastTimeout = $lastActivity;
                     } else {
                         continue;
                     }

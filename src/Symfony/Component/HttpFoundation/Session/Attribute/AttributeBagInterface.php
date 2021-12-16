@@ -46,7 +46,7 @@ interface AttributeBagInterface extends SessionBagInterface
     /**
      * Returns attributes.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function all();
 

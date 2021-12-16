@@ -12,7 +12,7 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface
     {
-        return new GmailTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new GmailTransportFactory($this->getDispatcher(), null, $this->getLogger());
     }
 
     public function supportsProvider(): iterable

@@ -743,7 +743,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a YAML file.
      *
-     * @return array
+     * @return array|null
      *
      * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
      */

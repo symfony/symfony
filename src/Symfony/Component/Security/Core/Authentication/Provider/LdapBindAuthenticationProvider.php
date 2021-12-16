@@ -67,7 +67,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
     protected function retrieveUser(string $userIdentifier, UsernamePasswordToken $token)
     {
         if (AuthenticationProviderInterface::USERNAME_NONE_PROVIDED === $userIdentifier) {
-            throw new UserNotFoundException('User identifier can not be null.');
+            throw new UserNotFoundException('User identifier cannot be null.');
         }
 
         // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0

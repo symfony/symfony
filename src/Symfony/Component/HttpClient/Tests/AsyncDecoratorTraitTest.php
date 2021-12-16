@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\AsyncDecoratorTrait;
 use Symfony\Component\HttpClient\DecoratorTrait;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Contracts\HttpClient\ChunkInterface;
@@ -27,6 +28,10 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
     {
         if ('testHandleIsRemovedOnException' === $testCase) {
             $this->markTestSkipped("AsyncDecoratorTrait doesn't cache handles");
+        }
+
+        if ('testTimeoutOnDestruct' === $testCase) {
+            return HttpClient::create();
         }
 
         $chunkFilter = $chunkFilter ?? static function (ChunkInterface $chunk, AsyncContext $context) { yield $chunk; };
@@ -47,6 +52,15 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
                 return new AsyncResponse($this->client, $method, $url, $options, $this->chunkFilter);
             }
         };
+    }
+
+    public function testTimeoutOnDestruct()
+    {
+        if (HttpClient::create() instanceof NativeHttpClient) {
+            $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
+        }
+
+        HttpClientTestCase::testTimeoutOnDestruct();
     }
 
     public function testRetry404()

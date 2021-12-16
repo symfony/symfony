@@ -14,6 +14,8 @@ namespace Symfony\Component\Messenger\Command;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,6 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
@@ -40,17 +43,21 @@ class ConsumeMessagesCommand extends Command
 
     private $routableBus;
     private $receiverLocator;
+    private $eventDispatcher;
     private $logger;
     private $receiverNames;
-    private $eventDispatcher;
+    private $resetServicesListener;
+    private $busIds;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [])
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [])
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
+        $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->resetServicesListener = $resetServicesListener;
+        $this->busIds = $busIds;
 
         parent::__construct();
     }
@@ -72,6 +79,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
+                new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
             ])
             ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
@@ -109,6 +117,10 @@ messages didn't originate from Messenger:
 Use the --queues option to limit a receiver to only certain queues (only supported by some receivers):
 
     <info>php %command.full_name% <receiver-name> --queues=fasttrack</info>
+
+Use the --no-reset option to prevent services resetting after each message (may lead to leaking services' state between messages):
+
+    <info>php %command.full_name% <receiver-name> --no-reset</info>
 EOF
             )
         ;
@@ -157,6 +169,10 @@ EOF
             }
 
             $receivers[$receiverName] = $this->receiverLocator->get($receiverName);
+        }
+
+        if (null !== $this->resetServicesListener && !$input->getOption('no-reset')) {
+            $this->eventDispatcher->addSubscriber($this->resetServicesListener);
         }
 
         $stopsWhen = [];
@@ -209,6 +225,19 @@ EOF
         $worker->run($options);
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('receivers')) {
+            $suggestions->suggestValues(array_diff($this->receiverNames, array_diff($input->getArgument('receivers'), [$input->getCompletionValue()])));
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('bus')) {
+            $suggestions->suggestValues($this->busIds);
+        }
     }
 
     private function convertToBytes(string $memoryLimit): int

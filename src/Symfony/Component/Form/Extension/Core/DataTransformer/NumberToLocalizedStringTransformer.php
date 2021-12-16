@@ -81,7 +81,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * @return string
      *
      * @throws TransformationFailedException if the given value is not numeric
-     *                                       or if the value can not be transformed
+     *                                       or if the value cannot be transformed
      */
     public function transform($value)
     {
@@ -114,7 +114,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * @return int|float|null
      *
      * @throws TransformationFailedException if the given value is not a string
-     *                                       or if the value can not be transformed
+     *                                       or if the value cannot be transformed
      */
     public function reverseTransform($value)
     {

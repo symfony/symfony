@@ -15,6 +15,9 @@ use Symfony\Component\Notifier\Bridge\Firebase\FirebaseOptions;
 
 final class IOSNotification extends FirebaseOptions
 {
+    /**
+     * @return $this
+     */
     public function sound(string $sound): self
     {
         $this->options['sound'] = $sound;
@@ -22,6 +25,9 @@ final class IOSNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function badge(string $badge): self
     {
         $this->options['badge'] = $badge;
@@ -29,6 +35,9 @@ final class IOSNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function clickAction(string $clickAction): self
     {
         $this->options['click_action'] = $clickAction;
@@ -36,6 +45,9 @@ final class IOSNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function subtitle(string $subtitle): self
     {
         $this->options['subtitle'] = $subtitle;
@@ -43,6 +55,9 @@ final class IOSNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function bodyLocKey(string $bodyLocKey): self
     {
         $this->options['body_loc_key'] = $bodyLocKey;
@@ -52,6 +67,8 @@ final class IOSNotification extends FirebaseOptions
 
     /**
      * @param string[] $bodyLocArgs
+     *
+     * @return $this
      */
     public function bodyLocArgs(array $bodyLocArgs): self
     {
@@ -60,6 +77,9 @@ final class IOSNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function titleLocKey(string $titleLocKey): self
     {
         $this->options['title_loc_key'] = $titleLocKey;
@@ -69,6 +89,8 @@ final class IOSNotification extends FirebaseOptions
 
     /**
      * @param string[] $titleLocArgs
+     *
+     * @return $this
      */
     public function titleLocArgs(array $titleLocArgs): self
     {

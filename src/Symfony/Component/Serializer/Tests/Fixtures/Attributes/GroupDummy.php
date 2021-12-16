@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Tests\Fixtures\ChildOfGroupsAnnotationDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummyInterface;
 
 /**
@@ -23,6 +24,8 @@ class GroupDummy extends GroupDummyParent implements GroupDummyInterface
     private $foo;
     #[Groups(['b', 'c', 'name_converter'])]
     protected $bar;
+    #[ChildOfGroupsAnnotationDummy]
+    protected $quux;
     private $fooBar;
     private $symfony;
 
@@ -67,5 +70,15 @@ class GroupDummy extends GroupDummyParent implements GroupDummyInterface
     public function getSymfony()
     {
         return $this->symfony;
+    }
+
+    public function getQuux()
+    {
+        return $this->quux;
+    }
+
+    public function setQuux($quux): void
+    {
+        $this->quux = $quux;
     }
 }

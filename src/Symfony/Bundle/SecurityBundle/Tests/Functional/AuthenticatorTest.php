@@ -14,9 +14,11 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 class AuthenticatorTest extends AbstractWebTestCase
 {
     /**
+     * @group legacy
+     *
      * @dataProvider provideEmails
      */
-    public function testGlobalUserProvider($email)
+    public function testLegacyGlobalUserProvider($email)
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'implicit_user_provider.yml']);
 

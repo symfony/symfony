@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
+use Psr\Log\LogLevel;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -76,6 +77,7 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+            ->fixXmlConfig('enabled_locale')
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
@@ -85,6 +87,18 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
+                ->booleanNode('set_locale_from_accept_language')
+                    ->info('Whether to use the Accept-Language HTTP header to set the Request locale (only when the "_locale" request attribute is not passed).')
+                    ->defaultFalse()
+                ->end()
+                ->booleanNode('set_content_language_from_locale')
+                    ->info('Whether to set the Content-Language HTTP header on the Response using the Request locale.')
+                    ->defaultFalse()
+                ->end()
+                ->arrayNode('enabled_locales')
+                    ->info('Defines the possible locales for the application. This list is used for generating translations files, but also to restrict which locales are allowed when it is set from Accept-Language header (using "set_locale_from_accept_language").')
+                    ->prototype('scalar')->end()
+                ->end()
                 ->arrayNode('trusted_hosts')
                     ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
                     ->prototype('scalar')->end()
@@ -112,7 +126,7 @@ class Configuration implements ConfigurationInterface
             $parentPackages = (array) $parentPackage;
             $parentPackages[] = 'symfony/framework-bundle';
 
-            return ContainerBuilder::willBeAvailable($package, $class, $parentPackages);
+            return ContainerBuilder::willBeAvailable($package, $class, $parentPackages, true);
         };
 
         $enableIfStandalone = static function (string $package, string $class) use ($willBeAvailable) {
@@ -139,6 +153,7 @@ class Configuration implements ConfigurationInterface
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
         $this->addCacheSection($rootNode, $willBeAvailable);
         $this->addPhpErrorsSection($rootNode);
+        $this->addExceptionsSection($rootNode);
         $this->addWebLinkSection($rootNode, $enableIfStandalone);
         $this->addLockSection($rootNode, $enableIfStandalone);
         $this->addMessengerSection($rootNode, $enableIfStandalone);
@@ -300,6 +315,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeEnabled()
                     ->children()
                         ->booleanNode('collect')->defaultTrue()->end()
+                        ->scalarNode('collect_parameter')->defaultNull()->info('The name of the parameter to use to enable or disable collection on a per request basis')->end()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_main_requests')->defaultFalse()->end()
                         ->booleanNode('only_master_requests')->setDeprecated('symfony/framework-bundle', '5.3', 'Option "%node%" at "%path%" is deprecated, use "only_main_requests" instead.')->defaultFalse()->end()
@@ -327,7 +343,7 @@ class Configuration implements ConfigurationInterface
                                     $workflows = [];
                                 }
 
-                                if (1 === \count($workflows) && isset($workflows['workflows']) && array_keys($workflows['workflows']) !== range(0, \count($workflows) - 1) && !empty(array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_marking', 'places', 'transitions']))) {
+                                if (1 === \count($workflows) && isset($workflows['workflows']) && !array_is_list($workflows['workflows']) && !empty(array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_marking', 'places', 'transitions']))) {
                                     $workflows = $workflows['workflows'];
                                 }
 
@@ -812,6 +828,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                         ->arrayNode('enabled_locales')
+                            ->setDeprecated('symfony/framework-bundle', '5.3', 'Option "%node%" at "%path%" is deprecated, set the "framework.enabled_locales" option instead.')
                             ->prototype('scalar')->end()
                             ->defaultValue([])
                         ->end()
@@ -846,7 +863,7 @@ class Configuration implements ConfigurationInterface
                                     ->arrayNode('locales')
                                         ->prototype('scalar')->end()
                                         ->defaultValue([])
-                                        ->info('If not set, all locales listed under framework.translator.enabled_locales are used.')
+                                        ->info('If not set, all locales listed under framework.enabled_locales are used.')
                                     ->end()
                                 ->end()
                             ->end()
@@ -867,7 +884,7 @@ class Configuration implements ConfigurationInterface
                     ->{$enableIfStandalone('symfony/validator', Validation::class)}()
                     ->children()
                         ->scalarNode('cache')->end()
-                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && $willBeAvailable('doctrine/annotations', Annotation::class, 'symfony/validator') ? 'defaultTrue' : 'defaultFalse'}()->end()
+                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && (\PHP_VERSION_ID >= 80000 || $willBeAvailable('doctrine/annotations', Annotation::class, 'symfony/validator')) ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->arrayNode('static_method')
                             ->defaultValue(['loadValidatorMetadata'])
                             ->prototype('scalar')->end()
@@ -950,8 +967,8 @@ class Configuration implements ConfigurationInterface
 
     private function addAnnotationsSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable)
     {
-        $doctrineCache = $willBeAvailable('doctrine/cache', Cache::class, 'doctrine/annotation');
-        $psr6Cache = $willBeAvailable('symfony/cache', PsrCachedReader::class, 'doctrine/annotation');
+        $doctrineCache = $willBeAvailable('doctrine/cache', Cache::class, 'doctrine/annotations');
+        $psr6Cache = $willBeAvailable('symfony/cache', PsrCachedReader::class, 'doctrine/annotations');
 
         $rootNode
             ->children()
@@ -976,7 +993,7 @@ class Configuration implements ConfigurationInterface
                     ->info('serializer configuration')
                     ->{$enableIfStandalone('symfony/serializer', Serializer::class)}()
                     ->children()
-                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && $willBeAvailable('doctrine/annotations', Annotation::class, 'symfony/serializer') ? 'defaultTrue' : 'defaultFalse'}()->end()
+                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && (\PHP_VERSION_ID >= 80000 || $willBeAvailable('doctrine/annotations', Annotation::class, 'symfony/serializer')) ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->scalarNode('name_converter')->end()
                         ->scalarNode('circular_reference_handler')->end()
                         ->scalarNode('max_depth_handler')->end()
@@ -988,6 +1005,12 @@ class Configuration implements ConfigurationInterface
                                     ->prototype('scalar')->end()
                                 ->end()
                             ->end()
+                        ->end()
+                        ->arrayNode('default_context')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('name')
+                            ->defaultValue([])
+                            ->prototype('variable')->end()
                         ->end()
                     ->end()
                 ->end()
@@ -1054,19 +1077,21 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
                         ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
+                        ->scalarNode('default_doctrine_dbal_provider')->defaultValue('database_connection')->end()
                         ->scalarNode('default_pdo_provider')->defaultValue($willBeAvailable('doctrine/dbal', Connection::class) ? 'database_connection' : null)->end()
                         ->arrayNode('pools')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->fixXmlConfig('adapter')
                                 ->beforeNormalization()
-                                    ->ifTrue(function ($v) { return (isset($v['adapters']) || \is_array($v['adapter'] ?? null)) && isset($v['provider']); })
-                                    ->thenInvalid('Pool cannot have a "provider" while "adapter" is set to a map')
+                                    ->ifTrue(function ($v) { return isset($v['provider']) && \is_array($v['adapters'] ?? $v['adapter'] ?? null) && 1 < \count($v['adapters'] ?? $v['adapter']); })
+                                    ->thenInvalid('Pool cannot have a "provider" while more than one adapter is defined')
                                 ->end()
                                 ->children()
                                     ->arrayNode('adapters')
                                         ->performNoDeepMerging()
                                         ->info('One or more adapters to chain for creating the pool, defaults to "cache.app".')
+                                        ->beforeNormalization()->castToArray()->end()
                                         ->beforeNormalization()
                                             ->always()->then(function ($values) {
                                                 if ([0] === array_keys($values) && \is_array($values[0])) {
@@ -1163,6 +1188,64 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    private function addExceptionsSection(ArrayNodeDefinition $rootNode)
+    {
+        $logLevels = (new \ReflectionClass(LogLevel::class))->getConstants();
+
+        $rootNode
+            ->children()
+                ->arrayNode('exceptions')
+                    ->info('Exception handling configuration')
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(function (array $v): array {
+                            if (!\array_key_exists('exception', $v)) {
+                                return $v;
+                            }
+
+                            // Fix XML normalization
+                            $data = isset($v['exception'][0]) ? $v['exception'] : [$v['exception']];
+                            $exceptions = [];
+                            foreach ($data as $exception) {
+                                $config = [];
+                                if (\array_key_exists('log-level', $exception)) {
+                                    $config['log_level'] = $exception['log-level'];
+                                }
+                                if (\array_key_exists('status-code', $exception)) {
+                                    $config['status_code'] = $exception['status-code'];
+                                }
+                                $exceptions[$exception['name']] = $config;
+                            }
+
+                            return $exceptions;
+                        })
+                    ->end()
+                    ->prototype('array')
+                        ->fixXmlConfig('exception')
+                        ->children()
+                            ->scalarNode('log_level')
+                                ->info('The level of log message. Null to let Symfony decide.')
+                                ->validate()
+                                    ->ifTrue(function ($v) use ($logLevels) { return !\in_array($v, $logLevels); })
+                                    ->thenInvalid(sprintf('The log level is not valid. Pick one among "%s".', implode('", "', $logLevels)))
+                                ->end()
+                                ->defaultNull()
+                            ->end()
+                            ->scalarNode('status_code')
+                                ->info('The status code of the response. Null to let Symfony decide.')
+                                ->validate()
+                                    ->ifTrue(function ($v) { return $v < 100 || $v > 599; })
+                                    ->thenInvalid('The log level is not valid. Pick a value between 100 and 599.')
+                                ->end()
+                                ->defaultNull()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addLockSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
@@ -1198,19 +1281,17 @@ class Configuration implements ConfigurationInterface
                                 ->ifString()->then(function ($v) { return ['default' => $v]; })
                             ->end()
                             ->beforeNormalization()
-                                ->ifTrue(function ($v) { return \is_array($v) && array_keys($v) === range(0, \count($v) - 1); })
+                                ->ifTrue(function ($v) { return \is_array($v) && array_is_list($v); })
                                 ->then(function ($v) {
                                     $resources = [];
                                     foreach ($v as $resource) {
-                                        $resources = array_merge_recursive(
-                                            $resources,
-                                            \is_array($resource) && isset($resource['name'])
-                                                ? [$resource['name'] => $resource['value']]
-                                                : ['default' => $resource]
-                                        );
+                                        $resources[] = \is_array($resource) && isset($resource['name'])
+                                            ? [$resource['name'] => $resource['value']]
+                                            : ['default' => $resource]
+                                        ;
                                     }
 
-                                    return $resources;
+                                    return array_merge_recursive([], ...$resources);
                                 })
                             ->end()
                             ->prototype('array')
@@ -1369,6 +1450,10 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('failure_transport')
                             ->defaultNull()
                             ->info('Transport name to send failed messages to (after all retries have failed).')
+                        ->end()
+                        ->booleanNode('reset_on_message')
+                            ->defaultNull()
+                            ->info('Reset container services after each message.')
                         ->end()
                         ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')

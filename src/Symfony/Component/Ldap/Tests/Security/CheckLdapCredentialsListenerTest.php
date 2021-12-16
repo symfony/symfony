@@ -229,7 +229,7 @@ if (interface_exists(AuthenticatorInterface::class)) {
         {
         }
 
-        public function authenticate(Request $request): PassportInterface
+        public function authenticate(Request $request): Passport
         {
         }
 

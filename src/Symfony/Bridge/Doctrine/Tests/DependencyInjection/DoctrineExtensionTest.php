@@ -49,6 +49,10 @@ class DoctrineExtensionTest extends TestCase
             ->willReturnCallback(function ($name) {
                 return 'doctrine.orm.'.$name;
             });
+
+        $this->extension
+            ->method('getMappingObjectDefaultName')
+            ->willReturn('Entity');
     }
 
     public function testFixManagersAutoMappingsWithTwoAutomappings()
@@ -169,6 +173,23 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals($newEmConfigs['em2'], array_merge([
             'auto_mapping' => false,
         ], $expectedEm2));
+    }
+
+    public function testMappingTypeDetection()
+    {
+        $container = $this->createContainer();
+
+        $reflection = new \ReflectionClass(\get_class($this->extension));
+        $method = $reflection->getMethod('detectMappingType');
+        $method->setAccessible(true);
+
+        // The ordinary fixtures contain annotation
+        $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures', $container);
+        $this->assertSame($mappingType, 'annotation');
+
+        // In the attribute folder, attributes are used
+        $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures/Attribute', $container);
+        $this->assertSame($mappingType, \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute');
     }
 
     public function providerBasicDrivers()

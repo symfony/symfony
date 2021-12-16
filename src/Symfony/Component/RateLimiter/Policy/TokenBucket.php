@@ -17,10 +17,10 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @internal
- * @experimental in 5.3
  */
 final class TokenBucket implements LimiterStateInterface
 {
+    private $stringRate;
     private $id;
     private $rate;
 
@@ -47,6 +47,8 @@ final class TokenBucket implements LimiterStateInterface
      */
     public function __construct(string $id, int $initialTokens, Rate $rate, float $timer = null)
     {
+        unset($this->stringRate);
+
         if ($initialTokens < 1) {
             throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
         }
@@ -79,7 +81,7 @@ final class TokenBucket implements LimiterStateInterface
 
     public function getAvailableTokens(float $now): int
     {
-        $elapsed = $now - $this->timer;
+        $elapsed = max(0, $now - $this->timer);
 
         return min($this->burstSize, $this->tokens + $this->rate->calculateNewTokensDuringInterval($elapsed));
     }

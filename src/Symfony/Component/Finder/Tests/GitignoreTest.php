@@ -442,4 +442,429 @@ class GitignoreTest extends TestCase
 
         return $cases;
     }
+
+    /**
+     * @dataProvider provideNegatedPatternsCases
+     */
+    public function testToRegexMatchingNegatedPatterns(array $gitignoreLines, array $matchingCases, array $nonMatchingCases)
+    {
+        $patterns = implode("\n", $gitignoreLines);
+
+        $regex = Gitignore::toRegexMatchingNegatedPatterns($patterns);
+        $this->assertSame($regex, Gitignore::toRegexMatchingNegatedPatterns(implode("\r\n", $gitignoreLines)));
+        $this->assertSame($regex, Gitignore::toRegexMatchingNegatedPatterns(implode("\r", $gitignoreLines)));
+
+        foreach ($matchingCases as $matchingCase) {
+            $this->assertMatchesRegularExpression(
+                $regex,
+                $matchingCase,
+                sprintf(
+                    "Failed asserting path:\n%s\nmatches gitignore negated patterns:\n%s",
+                    preg_replace('~^~m', '    ', $matchingCase),
+                    preg_replace('~^~m', '    ', $patterns)
+                )
+            );
+        }
+
+        foreach ($nonMatchingCases as $nonMatchingCase) {
+            $this->assertDoesNotMatchRegularExpression(
+                $regex,
+                $nonMatchingCase,
+                sprintf("Failed asserting path:\n%s\nNOT matching gitignore negated patterns:\n%s",
+                    preg_replace('~^~m', '    ', $nonMatchingCase),
+                    preg_replace('~^~m', '    ', $patterns)
+                )
+            );
+        }
+    }
+
+    public function provideNegatedPatternsCases(): iterable
+    {
+        yield [
+            [''],
+            [],
+            ['a', 'a/b', 'a/b/c', 'aa', 'm.txt', '.txt'],
+        ];
+
+        yield [
+            ['!a', '!X'],
+            ['a', 'a/b', 'a/b/c', 'X', 'b/a', 'b/c/a', 'a/X', 'a/X/y', 'b/a/X/y'],
+            ['A', 'x', 'aa', 'm.txt', '.txt', 'aa/b', 'b/aa'],
+        ];
+
+        yield [
+            ['!/a', '!x', '!d/'],
+            ['a', 'a/b', 'a/b/c', 'x', 'a/x', 'a/x/y', 'b/a/x/y', 'd/', 'd/u', 'e/d/', 'e/d/u'],
+            ['b/a', 'b/c/a', 'aa', 'm.txt', '.txt', 'aa/b', 'b/aa', 'e/d'],
+        ];
+
+        yield [
+            ['!a/', '!x'],
+            ['a/b', 'a/b/c', 'x', 'a/x', 'a/x/y', 'b/a/x/y'],
+            ['a', 'b/a', 'b/c/a', 'aa', 'm.txt', '.txt', 'aa/b', 'b/aa'],
+        ];
+
+        yield [
+            ['!*'],
+            ['a', 'a/b', 'a/b/c', 'aa', 'm.txt', '.txt'],
+            [],
+        ];
+
+        yield [
+            ['!/*'],
+            ['a', 'a/b', 'a/b/c', 'aa', 'm.txt', '.txt'],
+            [],
+        ];
+
+        yield [
+            ['!/a', '!m/*', '!o/**', '!p/**/', '!x**y'],
+            ['a', 'a/b', 'a/b/c', 'm/', 'o/', 'p/', 'xy', 'xuy', 'x/y', 'x/u/y', 'xu/y', 'x/uy', 'xu/uy'],
+            ['aa', 'm', 'b/m', 'b/m/', 'o', 'b/o', 'b/o/', 'p', 'b/p', 'b/p/'],
+        ];
+
+        yield [
+            ['!a', 'x'],
+            ['a', 'a/b', 'a/b/c', 'b/a', 'b/c/a'],
+            ['x', 'aa', 'm.txt', '.txt', 'aa/b', 'b/aa'],
+        ];
+
+        yield [
+            ['!a', 'a/', '!b', 'b/b'],
+            ['a', 'a/x', 'x/a', 'x/a/x', 'b', 'b'],
+            ['a/', 'x/a/', 'bb', 'b/b', 'bb'],
+        ];
+
+        yield [
+            ['![a-c]', '!x[C-E][][o]', '!g-h'],
+            ['a', 'b', 'c', 'xDo', 'g-h'],
+            ['A', 'xdo', 'u', 'g', 'h'],
+        ];
+
+        yield [
+            ['!a?', '!*/??b?'],
+            ['ax', 'x/xxbx'],
+            ['a', 'axy', 'xxax', 'x/xxax', 'x/y/xxax'],
+        ];
+
+        yield [
+            ['! ', '! \ ', '!  \  ', '!/a ', '!/b/c \ '],
+            ['  ', '   ', 'x/  ', 'x/   ', 'a', 'a/x', 'b/c  '],
+            [' ', '    ', 'x/ ', 'x/    ', 'a ', 'b/c   '],
+        ];
+
+        yield [
+            ['!\#', '! #', '!/ #', '!  #', '!/  #', '!  \ #', '!   \  #', '!a #', '!a  #', '!a  \ #', '!a   \  #'],
+            ['   ', '    ', 'a', 'a   ', 'a    '],
+            [' ', '  ', 'a ', 'a  '],
+        ];
+
+        yield [
+            ["!\t", "!\t\\\t", "! \t\\\t ", "!\t#", "!a\t#", "!a\t\t#", "!a \t#", "!a\t\t\\\t#", "!a \t\t\\\t\t#"],
+            ["\t\t", " \t\t", 'a', "a\t\t\t", "a \t\t\t"],
+            ["\t", "\t\t ", " \t\t ", "a\t", 'a ', "a \t", "a\t\t"],
+        ];
+
+        yield [
+            ['! a', '!b ', '!\ ', '!c\ '],
+            [' a', 'b', ' ', 'c '],
+            ['a', 'b ', 'c'],
+        ];
+
+        yield [
+            ['!\#a', '!\#b', '!\#/'],
+            ['#a', '#b', '#/'],
+            ['a', 'b'],
+        ];
+
+        yield [
+            ['*', '!!', '!!*x', '\!!b'],
+            ['!', '!x', '!xx'],
+            ['a', '!!', '!!b'],
+        ];
+
+        yield [
+            [
+                '*',
+                '!/bin',
+                '!/bin/bash',
+            ],
+            ['bin/bash', 'bin/cat'],
+            ['abc/bin/cat'],
+        ];
+
+        yield [
+            ['!fi#le.txt'],
+            [],
+            ['#file.txt'],
+        ];
+
+        yield [
+            [
+                '/bin/',
+                '/usr/local/',
+                '!/bin/bash',
+                '!/usr/local/bin/bash',
+            ],
+            ['bin/bash'],
+            ['bin/cat'],
+        ];
+
+        yield [
+            ['!*.py[co]'],
+            ['file.pyc', 'file.pyc'],
+            ['filexpyc', 'file.pycx', 'file.py'],
+        ];
+
+        yield [
+            ['!dir1/**/dir2/'],
+            ['dir1/dir2/', 'dir1/dirA/dir2/', 'dir1/dirA/dirB/dir2/'],
+            ['dir1dir2/', 'dir1xdir2/', 'dir1/xdir2/', 'dir1x/dir2/'],
+        ];
+
+        yield [
+            ['!dir1/*/dir2/'],
+            ['dir1/dirA/dir2/'],
+            ['dir1/dirA/dirB/dir2/'],
+        ];
+
+        yield [
+            ['!/*.php'],
+            ['file.php'],
+            ['app/file.php'],
+        ];
+
+        yield [
+            ['!\#file.txt'],
+            ['#file.txt'],
+            [],
+        ];
+
+        yield [
+            ['!*.php'],
+            ['app/file.php', 'file.php'],
+            ['file.phps', 'file.phps', 'filephps'],
+        ];
+
+        yield [
+            ['!app/cache/'],
+            ['app/cache/file.txt', 'app/cache/dir1/dir2/file.txt'],
+            ['a/app/cache/file.txt'],
+        ];
+
+        yield [
+            ['#IamComment', '!/app/cache/'],
+            ['app/cache/file.txt', 'app/cache/subdir/ile.txt'],
+            ['a/app/cache/file.txt', '#IamComment', 'IamComment'],
+        ];
+
+        yield [
+            ['!/app/cache/', '#LastLineIsComment'],
+            ['app/cache/file.txt', 'app/cache/subdir/ile.txt'],
+            ['a/app/cache/file.txt', '#LastLineIsComment', 'LastLineIsComment'],
+        ];
+
+        yield [
+            ['!/app/cache/', '!\#file.txt', '#LastLineIsComment'],
+            ['app/cache/file.txt', 'app/cache/subdir/ile.txt', '#file.txt'],
+            ['a/app/cache/file.txt', '#LastLineIsComment', 'LastLineIsComment'],
+        ];
+
+        yield [
+            ['!/app/cache/', '!\#file.txt', '#IamComment', '!another_file.txt'],
+            ['app/cache/file.txt', 'app/cache/subdir/ile.txt', '#file.txt', 'another_file.txt'],
+            ['a/app/cache/file.txt', 'IamComment', '#IamComment'],
+        ];
+
+        yield [
+            [
+                '/app/**',
+                '!/app/bin',
+                '!/app/bin/test',
+            ],
+            ['app/bin/file', 'app/bin/test'],
+            ['app/test/file'],
+        ];
+
+        yield [
+            [
+                '/app/*/img',
+                '!/app/*/img/src',
+            ],
+            ['app/a/img/src', 'app/a/img/src/', 'app/a/img/src/x'],
+            ['app/a/img', 'app/a/img/x'],
+        ];
+
+        yield [
+            [
+                'app/**/img',
+                '!/app/**/img/src',
+            ],
+            ['app/a/img/src', 'app/a/b/img/src', 'app/a/c/b/img/src', 'app/a/img/src/x', 'app/a/b/img/src/x'],
+            ['app/a/img', 'app/a/img/x', 'app/a/b/img', 'app/a/b/img/x', 'app/a/b/c/img'],
+        ];
+
+        yield [
+            [
+                '/*',
+                '!/foo',
+                '/foo/*',
+                '!/foo/bar',
+            ],
+            ['foo', 'foo/bar'],
+            ['bar', 'foo/ba', 'foo/barx', 'x/foo/bar'],
+        ];
+
+        yield [
+            [
+                '/example/**',
+                '!/example/example.txt',
+                '!/example/packages',
+            ],
+            ['example/example.txt', 'example/packages', 'example/packages/', 'example/packages/foo.yaml'],
+            ['example/test', 'example/example.txt2'],
+        ];
+
+        // based on https://www.atlassian.com/git/tutorials/saving-changes/gitignore
+        yield [
+            ['!**/logs'],
+            ['logs/debug.log', 'logs/monday/foo.bar'],
+            [],
+        ];
+
+        yield [
+            ['!**/logs/debug.log'],
+            ['logs/debug.log', 'build/logs/debug.log'],
+            ['logs/build/debug.log'],
+        ];
+
+        yield [
+            ['!*.log'],
+            ['debug.log', 'foo.log', '.log', 'logs/debug.log'],
+            [],
+        ];
+
+        yield [
+            [
+                '*.log',
+                '!important.log',
+            ],
+            ['important.log', 'logs/important.log'],
+            ['debug.log', 'trace.log'],
+        ];
+
+        yield [
+            [
+                '*.log',
+                '!important/*.log',
+                'trace.*',
+            ],
+            ['important/debug.log'],
+            ['debug.log', 'important/trace.log'],
+        ];
+
+        yield [
+            ['!/debug.log'],
+            ['debug.log'],
+            ['logs/debug.log'],
+        ];
+
+        yield [
+            ['!debug.log'],
+            ['debug.log', 'logs/debug.log'],
+            [],
+        ];
+
+        yield [
+            ['!debug?.log'],
+            ['debug0.log', 'debugg.log'],
+            ['debug10.log'],
+        ];
+
+        yield [
+            ['!debug[0-9].log'],
+            ['debug0.log', 'debug1.log'],
+            ['debug10.log'],
+        ];
+
+        yield [
+            ['!debug[01].log'],
+            ['debug0.log', 'debug1.log'],
+            ['debug2.log', 'debug01.log'],
+        ];
+
+        yield [
+            ['!debug[!01].log'],
+            ['debug2.log'],
+            ['debug0.log', 'debug1.log', 'debug01.log'],
+        ];
+
+        yield [
+            ['!debug[a-z].log'],
+            ['debuga.log', 'debugb.log'],
+            ['debug1.log'],
+        ];
+
+        yield [
+            ['!logs'],
+            ['logs', 'logs/debug.log', 'logs/latest/foo.bar', 'build/logs', 'build/logs/debug.log'],
+            [],
+        ];
+
+        yield [
+            ['!logs/'],
+            ['logs/debug.log', 'logs/latest/foo.bar', 'build/logs/foo.bar', 'build/logs/latest/debug.log'],
+            [],
+        ];
+
+        yield [
+            [
+                'logs/',
+                '!logs/important.log',
+            ],
+            [],
+            ['logs/debug.log'/* must be pruned on traversal 'logs/important.log'*/],
+        ];
+
+        yield [
+            ['!logs/**/debug.log'],
+            ['logs/debug.log', 'logs/monday/debug.log', 'logs/monday/pm/debug.log'],
+            [],
+        ];
+
+        yield [
+            ['!logs/*day/debug.log'],
+            ['logs/monday/debug.log', 'logs/tuesday/debug.log'],
+            ['logs/latest/debug.log'],
+        ];
+
+        yield [
+            ['!logs/debug.log'],
+            ['logs/debug.log'],
+            ['debug.log', 'build/logs/debug.log'],
+        ];
+
+        yield [
+            ['!*/vendor/*'],
+            ['a/vendor/', 'a/vendor/b', 'a/vendor/b/c'],
+            ['a', 'vendor', 'vendor/', 'a/vendor', 'a/b/vendor', 'a/b/vendor/c'],
+        ];
+
+        yield [
+            ['!**/vendor/**'],
+            ['vendor/', 'vendor/a', 'vendor/a/b', 'a/b/vendor/c/d'],
+            ['a', 'vendor', 'a/vendor', 'a/b/vendor'],
+        ];
+
+        yield [
+            ['!***/***/vendor/*****/*****'],
+            ['vendor/', 'vendor/a', 'vendor/a/b', 'a/b/vendor/c/d'],
+            ['a', 'vendor', 'a/vendor', 'a/b/vendor'],
+        ];
+
+        yield [
+            ['!**vendor**'],
+            ['vendor', 'vendor/', 'vendor/a', 'vendor/a/b', 'a/vendor', 'a/b/vendor', 'a/b/vendor/c/d'],
+            ['a'],
+        ];
+    }
 }

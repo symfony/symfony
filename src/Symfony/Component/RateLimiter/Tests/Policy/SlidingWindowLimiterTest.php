@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
+use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
 /**
@@ -29,6 +30,7 @@ class SlidingWindowLimiterTest extends TestCase
         $this->storage = new InMemoryStorage();
 
         ClockMock::register(InMemoryStorage::class);
+        ClockMock::register(RateLimit::class);
     }
 
     public function testConsume()
@@ -51,6 +53,20 @@ class SlidingWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(10);
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertSame(10, $rateLimit->getLimit());
+    }
+
+    public function testWaitIntervalOnConsumeOverLimit()
+    {
+        $limiter = $this->createLimiter();
+
+        // initial consume
+        $limiter->consume(8);
+        // consumer over the limit
+        $rateLimit = $limiter->consume(4);
+
+        $start = microtime(true);
+        $rateLimit->wait(); // wait 12 seconds
+        $this->assertEqualsWithDelta($start + 12, microtime(true), 1);
     }
 
     public function testReserve()

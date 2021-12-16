@@ -29,6 +29,8 @@ abstract class AbstractCloner implements ClonerInterface
         'Symfony\Component\VarDumper\Caster\ConstStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castStub'],
         'Symfony\Component\VarDumper\Caster\EnumStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castEnum'],
 
+        'Fiber' => ['Symfony\Component\VarDumper\Caster\FiberCaster', 'castFiber'],
+
         'Closure' => ['Symfony\Component\VarDumper\Caster\ReflectionCaster', 'castClosure'],
         'Generator' => ['Symfony\Component\VarDumper\Caster\ReflectionCaster', 'castGenerator'],
         'ReflectionType' => ['Symfony\Component\VarDumper\Caster\ReflectionCaster', 'castType'],
@@ -194,8 +196,16 @@ abstract class AbstractCloner implements ClonerInterface
     protected $maxString = -1;
     protected $minDepth = 1;
 
+    /**
+     * @var array<string, list<callable>>
+     */
     private $casters = [];
+
+    /**
+     * @var callable|null
+     */
     private $prevErrorHandler;
+
     private $classInfo = [];
     private $filter = 0;
 

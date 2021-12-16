@@ -92,7 +92,7 @@ class ApplicationTest extends TestCase
     /**
      * Replaces the dynamic placeholders of the command help text with a static version.
      * The placeholder %command.full_name% includes the script path that is not predictable
-     * and can not be tested against.
+     * and cannot be tested against.
      */
     protected function ensureStaticCommandHelp(Application $application)
     {
@@ -106,7 +106,7 @@ class ApplicationTest extends TestCase
         $application = new Application('foo', 'bar');
         $this->assertEquals('foo', $application->getName(), '__construct() takes the application name as its first argument');
         $this->assertEquals('bar', $application->getVersion(), '__construct() takes the application version as its second argument');
-        $this->assertEquals(['help', 'list'], array_keys($application->all()), '__construct() registered the help and list commands by default');
+        $this->assertEquals(['help', 'list', '_complete', 'completion'], array_keys($application->all()), '__construct() registered the help and list commands by default');
     }
 
     public function testSetGetName()
@@ -883,6 +883,9 @@ class ApplicationTest extends TestCase
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_linebreaks.txt', $tester->getDisplay(true), '->renderException() keep multiple line breaks');
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testRenderAnonymousException()
     {
         $application = new Application();
@@ -906,6 +909,9 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Dummy type "class@anonymous" is invalid.', $tester->getDisplay(true));
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testRenderExceptionStackTraceContainsRootException()
     {
         $application = new Application();

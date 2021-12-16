@@ -909,7 +909,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'b', 'b' => 'BBB'], $matcher->match('/en-en/BBB'));
     }
 
-    public function testTrailingRequirementWithDefault_A()
+    public function testTrailingRequirementWithDefaultA()
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/fr-fr/{a}', ['a' => 'aaa'], ['a' => '.+']));
@@ -920,7 +920,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/fr-fr/');
     }
 
-    public function testTrailingRequirementWithDefault_B()
+    public function testTrailingRequirementWithDefaultB()
     {
         $coll = new RouteCollection();
         $coll->add('b', new Route('/en-en/{b}', ['b' => 'bbb'], ['b' => '.*']));

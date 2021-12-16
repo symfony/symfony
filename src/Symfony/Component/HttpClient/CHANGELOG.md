@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `MockHttpClient::setResponseFactory()` method to be able to set response factory after client creating
+
 5.3
 ---
 

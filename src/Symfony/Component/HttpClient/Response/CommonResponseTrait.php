@@ -149,8 +149,8 @@ trait CommonResponseTrait
         }
 
         try {
-            if (($response->initializer)($response)) {
-                foreach (self::stream([$response]) as $chunk) {
+            if (($response->initializer)($response, -0.0)) {
+                foreach (self::stream([$response], -0.0) as $chunk) {
                     if ($chunk->isFirst()) {
                         break;
                     }

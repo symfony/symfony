@@ -39,8 +39,12 @@ class RedisTransportTest extends TestCase
 
         $redisEnvelope = [
             'id' => '5',
-            'body' => 'body',
-            'headers' => ['my' => 'header'],
+            'data' => [
+                'message' => json_encode([
+                    'body' => 'body',
+                    'headers' => ['my' => 'header'],
+                ]),
+            ],
         ];
 
         $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));

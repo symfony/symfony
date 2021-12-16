@@ -22,7 +22,7 @@ class StackMiddleware implements MiddlewareInterface, StackInterface
     private $offset = 0;
 
     /**
-     * @param iterable|MiddlewareInterface[]|MiddlewareInterface|null $middlewareIterator
+     * @param iterable<mixed, MiddlewareInterface>|MiddlewareInterface|null $middlewareIterator
      */
     public function __construct($middlewareIterator = null)
     {
@@ -67,6 +67,7 @@ class StackMiddleware implements MiddlewareInterface, StackInterface
  */
 class MiddlewareStack
 {
+    /** @var \Iterator<mixed, MiddlewareInterface> */
     public $iterator;
     public $stack = [];
 

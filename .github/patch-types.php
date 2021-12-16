@@ -15,7 +15,6 @@ foreach ($loader->getClassMap() as $class => $file) {
     switch (true) {
         case false !== strpos($file = realpath($file), '/vendor/'):
         case false !== strpos($file, '/src/Symfony/Bridge/PhpUnit/'):
-        case false !== strpos($file, '/Attribute/'):
         case false !== strpos($file, '/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Validation/Article.php'):
         case false !== strpos($file, '/src/Symfony/Component/Cache/Tests/Fixtures/DriverWrapper.php'):
         case false !== strpos($file, '/src/Symfony/Component/Config/Tests/Fixtures/BadFileName.php'):
@@ -31,6 +30,9 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/Prototype/BadClasses/MissingParent.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/'):
         case false !== strpos($file, '/src/Symfony/Component/ErrorHandler/Tests/Fixtures/'):
+        case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Answer.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Number.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Suit.php'):
         case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/Php81Dummy.php'):
         case false !== strpos($file, '/src/Symfony/Component/Runtime/Internal/ComposerPlugin.php'):

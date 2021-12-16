@@ -147,6 +147,27 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertInstanceOf(BoundArgument::class, $locator->getBindings()['foo']);
     }
 
+    public function testTaggedServices()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', TestDefinition1::class)->addTag('test_tag');
+        $container->register('baz', TestDefinition2::class)->addTag('test_tag');
+
+        $container->register('foo', ServiceLocator::class)
+            ->setArguments([new TaggedIteratorArgument('test_tag', null, null, true)])
+            ->addTag('container.service_locator')
+        ;
+
+        (new ServiceLocatorTagPass())->process($container);
+
+        /** @var ServiceLocator $locator */
+        $locator = $container->get('foo');
+
+        $this->assertSame(TestDefinition1::class, \get_class($locator('bar')));
+        $this->assertSame(TestDefinition2::class, \get_class($locator('baz')));
+    }
+
     public function testIndexedByServiceIdWithDecoration()
     {
         $container = new ContainerBuilder();
@@ -176,6 +197,22 @@ class ServiceLocatorTagPassTest extends TestCase
         static::assertTrue($locator->has(Service::class));
         static::assertFalse($locator->has(Decorated::class));
         static::assertInstanceOf(Decorated::class, $locator->get(Service::class));
+    }
+
+    public function testDefinitionOrderIsTheSame()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service-1');
+        $container->register('service-2');
+
+        $locator = ServiceLocatorTagPass::register($container, [
+            'service-2' => new Reference('service-2'),
+            'service-1' => new Reference('service-1'),
+        ]);
+        $locator = $container->getDefinition($locator);
+        $factories = $locator->getArguments()[0];
+
+        static::assertSame(['service-2', 'service-1'], array_keys($factories));
     }
 }
 

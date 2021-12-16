@@ -121,6 +121,8 @@ final class AsyncContext
 
     /**
      * Attaches an info to the response.
+     *
+     * @return $this
      */
     public function setInfo(string $type, $value): self
     {

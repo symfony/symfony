@@ -29,7 +29,7 @@ interface LockInterface
      * @return bool
      *
      * @throws LockConflictedException If the lock is acquired by someone else in blocking mode
-     * @throws LockAcquiringException  If the lock can not be acquired
+     * @throws LockAcquiringException  If the lock cannot be acquired
      */
     public function acquire(bool $blocking = false);
 
@@ -39,7 +39,7 @@ interface LockInterface
      * @param float|null $ttl Maximum expected lock duration in seconds
      *
      * @throws LockConflictedException If the lock is acquired by someone else
-     * @throws LockAcquiringException  If the lock can not be refreshed
+     * @throws LockAcquiringException  If the lock cannot be refreshed
      */
     public function refresh(float $ttl = null);
 
@@ -53,7 +53,7 @@ interface LockInterface
     /**
      * Release the lock.
      *
-     * @throws LockReleasingException If the lock can not be released
+     * @throws LockReleasingException If the lock cannot be released
      */
     public function release();
 

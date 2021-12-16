@@ -52,7 +52,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                 // Detect wrapped values that encode for their expiry and creation duration
                 // For compactness, these values are packed in the key of an array using
                 // magic numbers in the form 9D-..-..-..-..-00-..-..-..-5F
-                if (\is_array($v) && 1 === \count($v) && 10 === \strlen($k = (string) key($v)) && "\x9D" === $k[0] && "\0" === $k[5] && "\x5F" === $k[9]) {
+                if (\is_array($v) && 1 === \count($v) && 10 === \strlen($k = (string) array_key_first($v)) && "\x9D" === $k[0] && "\0" === $k[5] && "\x5F" === $k[9]) {
                     $item->value = $v[$k];
                     $v = unpack('Ve/Nc', substr($k, 1, -1));
                     $item->metadata[CacheItem::METADATA_EXPIRY] = $v['e'] + CacheItem::METADATA_EXPIRY_OFFSET;
@@ -116,7 +116,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             return $opcache;
         }
 
-        $apcu = new ApcuAdapter($namespace, (int) $defaultLifetime / 5, $version);
+        $apcu = new ApcuAdapter($namespace, intdiv($defaultLifetime, 5), $version);
         if (null !== $logger) {
             $apcu->setLogger($logger);
         }
@@ -133,7 +133,11 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             return MemcachedAdapter::createConnection($dsn, $options);
         }
         if (0 === strpos($dsn, 'couchbase:')) {
-            return CouchbaseBucketAdapter::createConnection($dsn, $options);
+            if (CouchbaseBucketAdapter::isSupported()) {
+                return CouchbaseBucketAdapter::createConnection($dsn, $options);
+            }
+
+            return CouchbaseCollectionAdapter::createConnection($dsn, $options);
         }
 
         throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));

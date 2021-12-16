@@ -24,7 +24,7 @@
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
-                <target>گزینه‌ی انتخاب‌شده نامعتبر است</target>
+                <target>گزینه‌ انتخاب‌ شده نامعتبر است.</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>The collection is invalid.</source>
@@ -40,11 +40,11 @@
             </trans-unit>
             <trans-unit id="105">
                 <source>Please select a valid currency.</source>
-                <target>لطفاً یک واحد پولی معتبر انتخاب کنید.</target>
+                <target>لطفاً یک واحد پول معتبر انتخاب کنید.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>Please choose a valid date interval.</source>
-                <target>لطفاً یک بازه‌ی زمانی معتبر انتخاب کنید.</target>
+                <target>لطفاً یک بازه‌ زمانی معتبر انتخاب کنید.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Please enter a valid date and time.</source>
@@ -72,7 +72,7 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>Please select a valid locale.</source>
-                <target>لطفاً یک جغرافیای (locale) معتبر انتخاب کنید.</target>
+                <target>لطفاً یک منطقه‌جغرافیایی (locale) معتبر انتخاب کنید.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>Please enter a valid money amount.</source>
@@ -116,23 +116,23 @@
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
-                <target>کادر انتخاب (checkbox)  دارای مقداری نامعتبر است.</target>
+                <target>کادر انتخاب (checkbox) دارای مقداری نامعتبر است.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>Please enter a valid email address.</source>
-                <target>لطفاً یک آدرس رایانامه‌ی معتبر وارد کنید.</target>
+                <target>لطفاً یک آدرس رایانامه (ایمیل) معتبر وارد کنید.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>Please select a valid option.</source>
-                <target>لطفاً یک گزینه‌ی معتبر انتخاب کنید.</target>
+                <target>لطفاً یک گزینه‌ معتبر انتخاب کنید.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>Please select a valid range.</source>
-                <target>لطفاً یک محدوده‌ی معتبر انتخاب کنید.</target>
+                <target>لطفاً یک محدوده‌ معتبر انتخاب کنید.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>Please enter a valid week.</source>
-                <target>لطفاً یک هفته‌ی معتبر وارد کنید.</target>
+                <target>لطفاً یک هفته‌ معتبر وارد کنید.</target>
             </trans-unit>
         </body>
     </file>

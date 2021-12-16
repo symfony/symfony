@@ -22,6 +22,8 @@ use Symfony\Component\Finder\Glob;
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @final
+ *
+ * @implements \IteratorAggregate<string, \SplFileInfo>
  */
 class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 {
@@ -119,7 +121,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         }
 
         if (null !== $paths) {
-            sort($paths);
+            natsort($paths);
             foreach ($paths as $path) {
                 if ($this->excludedPrefixes) {
                     $normalizedPath = str_replace('\\', '/', $path);
@@ -152,7 +154,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
                     ),
                     \RecursiveIteratorIterator::LEAVES_ONLY
                 ));
-                uasort($files, 'strnatcmp');
+                uksort($files, 'strnatcmp');
 
                 foreach ($files as $path => $info) {
                     if ($info->isFile()) {

@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportF
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
+use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnCustomStopExceptionListener;
@@ -192,10 +193,18 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('messenger.listener.stop_worker_on_sigterm_signal_listener', StopWorkerOnSigtermSignalListener::class)
+            ->args([
+                service('logger')->ignoreOnInvalid(),
+            ])
             ->tag('kernel.event_subscriber')
 
         ->set('messenger.listener.stop_worker_on_stop_exception_listener', StopWorkerOnCustomStopExceptionListener::class)
             ->tag('kernel.event_subscriber')
+
+        ->set('messenger.listener.reset_services', ResetServicesListener::class)
+            ->args([
+                service('services_resetter'),
+            ])
 
         ->set('messenger.routable_message_bus', RoutableMessageBus::class)
             ->args([

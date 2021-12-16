@@ -28,7 +28,7 @@ interface SharedLockInterface extends LockInterface
      * @return bool
      *
      * @throws LockConflictedException If the lock is acquired by someone else in blocking mode
-     * @throws LockAcquiringException  If the lock can not be acquired
+     * @throws LockAcquiringException  If the lock cannot be acquired
      */
     public function acquireRead(bool $blocking = false);
 }

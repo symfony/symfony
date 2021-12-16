@@ -4,12 +4,19 @@ UPGRADE FROM 5.3 to 5.4
 Cache
 -----
 
- * Deprecate `DoctrineProvider` because this class has been added to the `doctrine/cache` package`
+ * Deprecate `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
+ * Deprecate usage of `PdoAdapter` with a `Doctrine\DBAL\Connection` or a DBAL URL. Use the new `DoctrineDbalAdapter` instead
 
 Console
 -------
 
  * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
+
+DoctrineBridge
+--------------
+
+ * Add argument `$bundleDir` to `AbstractDoctrineExtension::getMappingDriverBundleConfigDefaults()`
+ * Add argument `$bundleDir` to `AbstractDoctrineExtension::getMappingResourceConfigDirectory()`
 
 Finder
 ------
@@ -25,9 +32,13 @@ Form
 FrameworkBundle
 ---------------
 
+ * Deprecate the `framework.translator.enabled_locales` config option, use `framework.enabled_locales` instead
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private
  * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
+ * Deprecate the `cache.adapter.doctrine` service: The Doctrine Cache library is deprecated. Either switch to Symfony Cache or use the PSR-6 adapters provided by Doctrine Cache.
+ * In `framework.cache` configuration, using `cache.adapter.pdo` adapter with a Doctrine DBAL connection is deprecated, use `cache.adapter.doctrine_dbal` instead.
+ * Deprecate not setting the `framework.messenger.reset_on_message` config option, its default value will change to `true` in 6.0
 
 HttpKernel
 ----------
@@ -37,7 +48,15 @@ HttpKernel
 HttpFoundation
 --------------
 
+ * Deprecate passing `null` as `$requestIp` to `IpUtils::checkIp()`, `IpUtils::checkIp4()` or `IpUtils::checkIp6()`, pass an empty string instead.
  * Mark `Request::get()` internal, use explicit input sources instead
+ * Deprecate `upload_progress.*` and `url_rewriter.tags` session options
+
+Lock
+----
+
+ * Deprecate usage of `PdoStore` with a `Doctrine\DBAL\Connection` or a DBAL url, use the new `DoctrineDbalStore` instead
+ * Deprecate usage of `PostgreSqlStore` with a `Doctrine\DBAL\Connection` or a DBAL url, use the new `DoctrineDbalPostgreSqlStore` instead
 
 Messenger
 ---------
@@ -45,9 +64,16 @@ Messenger
  * Deprecate not setting the `delete_after_ack` config option (or DSN parameter) using the Redis transport,
    its default value will change to `true` in 6.0
 
+Monolog
+-------
+
+ * Deprecate `ResetLoggersWorkerSubscriber` to reset buffered logs in messenger
+   workers, use `framework.messenger.reset_on_message` option in FrameworkBundle messenger configuration instead.
+
 SecurityBundle
 --------------
 
+ * Deprecate `FirewallConfig::getListeners()`, use `FirewallConfig::getAuthenticators()` instead
  * Deprecate `security.authentication.basic_entry_point` and `security.authentication.retry_entry_point` services, the logic is moved into the
    `HttpBasicAuthenticator` and `ChannelListener` respectively
  * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`
@@ -120,6 +146,7 @@ Security
  * Deprecate `AuthenticatorInterface::createAuthenticatedToken()`, use `AuthenticatorInterface::createToken()` instead
  * Deprecate `PassportInterface`, `UserPassportInterface` and `PassportTrait`, use `Passport` instead.
    As such, the return type declaration of `AuthenticatorInterface::authenticate()` will change to `Passport` in 6.0
+ * Deprecate not configuring explicitly a provider for custom_authenticators when there is more than one registered provider
 
    Before:
    ```php
@@ -139,4 +166,23 @@ Security
        {
        }
    }
+   ```
+ * Deprecate passing the strategy as string to `AccessDecisionManager`,
+   pass an instance of `AccessDecisionStrategyInterface` instead
+ * Flag `AccessDecisionManager` as `@final`
+ * Deprecate passing `$credentials` to `PreAuthenticatedToken`,
+   `SwitchUserToken` and `UsernamePasswordToken`:
+
+   Before:
+   ```php
+   $token = new UsernamePasswordToken($user, $credentials, $firewallName, $roles);
+   $token = new PreAuthenticatedToken($user, $credentials, $firewallName, $roles);
+   $token = new SwitchUserToken($user, $credentials, $firewallName, $roles, $originalToken);
+   ```
+
+   After:
+   ```php
+   $token = new UsernamePasswordToken($user, $firewallName, $roles);
+   $token = new PreAuthenticatedToken($user, $firewallName, $roles);
+   $token = new SwitchUserToken($user, $firewallName, $roles, $originalToken);
    ```

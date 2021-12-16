@@ -262,11 +262,17 @@ class TranslatorTest extends TestCase
         $translator->addResource('array', ['foo' => 'foofoo'], 'en_GB_scouse');
         $translator->addResource('array', ['bar' => 'foobar'], 'en_GB');
         $translator->addResource('array', ['baz' => 'foobaz'], 'en_001');
-        $translator->addResource('array', ['qux' => 'fooqux'], 'en');
+        $translator->addResource('array', ['bar' => 'en', 'qux' => 'fooqux'], 'en');
+        $translator->addResource('array', ['bar' => 'nl_NL', 'fallback' => 'nl_NL'], 'nl_NL');
+        $translator->addResource('array', ['bar' => 'nl', 'fallback' => 'nl'], 'nl');
+
+        $translator->setFallbackLocales(['nl_NL', 'nl']);
+
         $this->assertSame('foofoo', $translator->trans('foo'));
         $this->assertSame('foobar', $translator->trans('bar'));
         $this->assertSame('foobaz', $translator->trans('baz'));
         $this->assertSame('fooqux', $translator->trans('qux'));
+        $this->assertSame('nl_NL', $translator->trans('fallback'));
     }
 
     public function testTransWithIcuRootFallbackLocale()
@@ -316,7 +322,7 @@ class TranslatorTest extends TestCase
         $translator = new Translator('fr_FR');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', ['foo' => 'foo (en_US)'], 'en_US');
-        $translator->addResource('array', ['bar' => 'bar (en)'], 'en');
+        $translator->addResource('array', ['foo' => 'foo (en)', 'bar' => 'bar (en)'], 'en');
 
         $translator->setFallbackLocales(['en_US', 'en']);
 

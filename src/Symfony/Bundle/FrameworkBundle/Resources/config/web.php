@@ -69,6 +69,7 @@ return static function (ContainerConfigurator $container) {
         ->set('response_listener', ResponseListener::class)
             ->args([
                 param('kernel.charset'),
+                abstract_arg('The "set_content_language_from_locale" config value'),
             ])
             ->tag('kernel.event_subscriber')
 
@@ -80,6 +81,8 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 param('kernel.default_locale'),
                 service('router')->ignoreOnInvalid(),
+                abstract_arg('The "set_locale_from_accept_language" config value'),
+                param('kernel.enabled_locales'),
             ])
             ->tag('kernel.event_subscriber')
 
@@ -102,6 +105,7 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.error_controller'),
                 service('logger')->nullOnInvalid(),
                 param('kernel.debug'),
+                abstract_arg('an exceptions to log & status code mapping'),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'request'])

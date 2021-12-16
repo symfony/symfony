@@ -27,7 +27,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     private $providers;
 
     /**
-     * @param iterable|UserProviderInterface[] $providers
+     * @param iterable<array-key, UserProviderInterface> $providers
      */
     public function __construct(iterable $providers)
     {
@@ -35,7 +35,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     }
 
     /**
-     * @return array
+     * @return UserProviderInterface[]
      */
     public function getProviders()
     {
@@ -136,7 +136,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
             trigger_deprecation('symfony/security-core', '5.3', 'The "%s::upgradePassword()" method expects an instance of "%s" as first argument, the "%s" class should implement it.', PasswordUpgraderInterface::class, PasswordAuthenticatedUserInterface::class, get_debug_type($user));
 
             if (!$user instanceof UserInterface) {
-                throw new \TypeError(sprintf('The "%s::upgradePassword()" method expects an instance of "%s" as first argument, "%s" given.', PasswordAuthenticatedUserInterface::class, get_debug_type($user)));
+                throw new \TypeError(sprintf('The "%s::upgradePassword()" method expects an instance of "%s" as first argument, "%s" given.', static::class, PasswordAuthenticatedUserInterface::class, get_debug_type($user)));
             }
         }
 

@@ -59,8 +59,7 @@ class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
 public function NAME(): string
 {
     return \'ALIAS\';
-}
-        ', ['ALIAS' => $rootNode->getPath()]);
+}', ['ALIAS' => $rootNode->getPath()]);
 
             $this->writeClasses();
         }
@@ -90,6 +89,7 @@ public function NAME(): string
         foreach ($this->classes as $class) {
             $this->buildConstructor($class);
             $this->buildToArray($class);
+            $this->buildSetExtraKey($class);
 
             file_put_contents($this->getFullPath($class), $class->build());
         }
@@ -126,6 +126,7 @@ public function NAME(): string
     private function handleArrayNode(ArrayNode $node, ClassBuilder $class, string $namespace): void
     {
         $childClass = new ClassBuilder($namespace, $node->getName());
+        $childClass->setAllowExtraKeys($node->shouldIgnoreExtraKeys());
         $class->addRequire($childClass);
         $this->classes[] = $childClass;
 
@@ -163,7 +164,7 @@ public function NAME($valueDEFAULT): self
 
     return $this;
 }';
-        $class->addMethod($node->getName(), $body, ['PROPERTY' => $property->getName(),  'COMMENT' => $comment, 'DEFAULT' => $node->hasDefaultValue() ? ' = '.var_export($node->getDefaultValue(), true) : '']);
+        $class->addMethod($node->getName(), $body, ['PROPERTY' => $property->getName(), 'COMMENT' => $comment, 'DEFAULT' => $node->hasDefaultValue() ? ' = '.var_export($node->getDefaultValue(), true) : '']);
     }
 
     private function handlePrototypedArrayNode(PrototypedArrayNode $node, ClassBuilder $class, string $namespace): void
@@ -211,6 +212,9 @@ public function NAME(string $VAR, $VALUE): self
         }
 
         $childClass = new ClassBuilder($namespace, $name);
+        if ($prototype instanceof ArrayNode) {
+            $childClass->setAllowExtraKeys($prototype->shouldIgnoreExtraKeys());
+        }
         $class->addRequire($childClass);
         $this->classes[] = $childClass;
         $property = $class->addProperty($node->getName(), $childClass->getFqcn().'[]');
@@ -297,31 +301,31 @@ public function NAME($value): self
     {
         $comment = '';
         if ('' !== $info = (string) $node->getInfo()) {
-            $comment .= ' * '.$info.\PHP_EOL;
+            $comment .= ' * '.$info."\n";
         }
 
         foreach ((array) ($node->getExample() ?? []) as $example) {
-            $comment .= ' * @example '.$example.\PHP_EOL;
+            $comment .= ' * @example '.$example."\n";
         }
 
         if ('' !== $default = $node->getDefaultValue()) {
-            $comment .= ' * @default '.(null === $default ? 'null' : var_export($default, true)).\PHP_EOL;
+            $comment .= ' * @default '.(null === $default ? 'null' : var_export($default, true))."\n";
         }
 
         if ($node instanceof EnumNode) {
             $comment .= sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_map(function ($a) {
                 return var_export($a, true);
-            }, $node->getValues()))).\PHP_EOL;
+            }, $node->getValues())))."\n";
         } else {
             $parameterType = $this->getParameterType($node);
             if (null === $parameterType || '' === $parameterType) {
                 $parameterType = 'mixed';
             }
-            $comment .= ' * @param ParamConfigurator|'.$parameterType.' $value'.\PHP_EOL;
+            $comment .= ' * @param ParamConfigurator|'.$parameterType.' $value'."\n";
         }
 
         if ($node->isDeprecated()) {
-            $comment .= ' * @deprecated '.$node->getDeprecation($node->getName(), $node->getParent()->getName())['message'].\PHP_EOL;
+            $comment .= ' * @deprecated '.$node->getDeprecation($node->getName(), $node->getParent()->getName())['message']."\n";
         }
 
         return $comment;
@@ -368,14 +372,15 @@ public function NAME($value): self
     }', ['PROPERTY' => $p->getName(), 'ORG_NAME' => $p->getOriginalName()]);
         }
 
+        $extraKeys = $class->shouldAllowExtraKeys() ? ' + $this->_extraKeys' : '';
+
         $class->addMethod('toArray', '
 public function NAME(): array
 {
     '.$body.'
 
-    return $output;
-}
-');
+    return $output'.$extraKeys.';
+}');
     }
 
     private function buildConstructor(ClassBuilder $class): void
@@ -399,18 +404,51 @@ public function NAME(): array
 ', ['PROPERTY' => $p->getName(), 'ORG_NAME' => $p->getOriginalName()]);
         }
 
-        $body .= '
+        if ($class->shouldAllowExtraKeys()) {
+            $body .= '
+    $this->_extraKeys = $value;
+';
+        } else {
+            $body .= '
     if ([] !== $value) {
         throw new InvalidConfigurationException(sprintf(\'The following keys are not supported by "%s": \', __CLASS__).implode(\', \', array_keys($value)));
     }';
 
-        $class->addUse(InvalidConfigurationException::class);
+            $class->addUse(InvalidConfigurationException::class);
+        }
+
         $class->addMethod('__construct', '
 public function __construct(array $value = [])
 {
 '.$body.'
-}
-');
+}');
+    }
+
+    private function buildSetExtraKey(ClassBuilder $class): void
+    {
+        if (!$class->shouldAllowExtraKeys()) {
+            return;
+        }
+
+        $class->addUse(ParamConfigurator::class);
+
+        $class->addProperty('_extraKeys');
+
+        $class->addMethod('set', '
+/**
+ * @param ParamConfigurator|mixed $value
+ * @return $this
+ */
+public function NAME(string $key, $value): self
+{
+    if (null === $value) {
+        unset($this->_extraKeys[$key]);
+    } else {
+        $this->_extraKeys[$key] = $value;
+    }
+
+    return $this;
+}');
     }
 
     private function getSubNamespace(ClassBuilder $rootClass): string

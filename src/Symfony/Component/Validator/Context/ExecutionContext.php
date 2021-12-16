@@ -128,6 +128,10 @@ class ExecutionContext implements ExecutionContextInterface
      * @var bool[]
      */
     private $initializedObjects;
+
+    /**
+     * @var \SplObjectStorage<object, string>
+     */
     private $cachedObjectsRefs;
 
     /**

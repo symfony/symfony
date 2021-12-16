@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
@@ -35,7 +36,6 @@ use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AuthenticatorInterface as GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
@@ -44,6 +44,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
 class SecurityExtensionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testInvalidCheckPath()
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -222,7 +224,7 @@ class SecurityExtensionTest extends TestCase
     public function testMissingProviderForListener()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Not configuring explicitly the provider for the "http_basic" listener on "ambiguous" firewall is ambiguous as there is more than one registered provider.');
+        $this->expectExceptionMessage('Not configuring explicitly the provider for the "http_basic" authenticator on "ambiguous" firewall is ambiguous as there is more than one registered provider.');
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
             'enable_authenticator_manager' => true,
@@ -371,6 +373,33 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->has(UserProviderInterface::class));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testFirewallWithNoUserProviderTriggerDeprecation()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+
+            'providers' => [
+                'first' => ['id' => 'foo'],
+                'second' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'some_firewall' => [
+                    'custom_authenticator' => 'my_authenticator',
+                ],
+            ],
+        ]);
+
+        $this->expectDeprecation('Since symfony/security-bundle 5.4: Not configuring explicitly the provider for the "some_firewall" firewall is deprecated because it\'s ambiguous as there is more than one registered provider. Set the "provider" key to one of the configured providers, even if your custom authenticators don\'t use it.');
+
+        $container->compile();
     }
 
     /**
@@ -805,7 +834,7 @@ class SecurityExtensionTest extends TestCase
 
         $args = $container->getDefinition('security.authorization_checker')->getArguments();
         $this->assertEquals('security.token_storage', (string) $args[0]);
-        $this->assertEquals('security.authentication_manager', (string) $args[1]);
+        $this->assertEquals('security.authentication.manager', (string) $args[1]);
         $this->assertEquals('security.access.decision_manager', (string) $args[2]);
         $this->assertEquals('%security.access.always_authenticate_before_granting%', (string) $args[3]);
     }
@@ -860,45 +889,6 @@ class TestAuthenticator implements AuthenticatorInterface
     }
 
     public function createToken(Passport $passport, string $firewallName): TokenInterface
-    {
-    }
-}
-
-class NullAuthenticator implements GuardAuthenticatorInterface
-{
-    public function start(Request $request, AuthenticationException $authException = null): Response
-    {
-    }
-
-    public function supports(Request $request): bool
-    {
-    }
-
-    public function getCredentials(Request $request)
-    {
-    }
-
-    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
-    {
-    }
-
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-    }
-
-    public function createAuthenticatedToken(UserInterface $user, string $providerKey): GuardTokenInterface
-    {
-    }
-
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
-    }
-
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
-    {
-    }
-
-    public function supportsRememberMe(): bool
     {
     }
 }

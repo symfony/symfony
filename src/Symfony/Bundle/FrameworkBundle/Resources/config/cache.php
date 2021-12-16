@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
+use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
@@ -108,6 +109,7 @@ return static function (ContainerConfigurator $container) {
                 'reset' => 'reset',
             ])
             ->tag('monolog.logger', ['channel' => 'cache'])
+            ->deprecate('symfony/framework-bundle', '5.4', 'The "%service_id%" service inherits from "cache.adapter.doctrine" which is deprecated.')
 
         ->set('cache.adapter.filesystem', FilesystemAdapter::class)
             ->abstract()
@@ -182,6 +184,23 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('monolog.logger', ['channel' => 'cache'])
 
+        ->set('cache.adapter.doctrine_dbal', DoctrineDbalAdapter::class)
+            ->abstract()
+            ->args([
+                abstract_arg('DBAL connection service'),
+                '', // namespace
+                0, // default lifetime
+                [], // table options
+                service('cache.default_marshaller')->ignoreOnInvalid(),
+            ])
+            ->call('setLogger', [service('logger')->ignoreOnInvalid()])
+            ->tag('cache.pool', [
+                'provider' => 'cache.default_doctrine_dbal_provider',
+                'clearer' => 'cache.default_clearer',
+                'reset' => 'reset',
+            ])
+            ->tag('monolog.logger', ['channel' => 'cache'])
+
         ->set('cache.adapter.pdo', PdoAdapter::class)
             ->abstract()
             ->args([
@@ -211,6 +230,7 @@ return static function (ContainerConfigurator $container) {
         ->set('cache.default_marshaller', DefaultMarshaller::class)
             ->args([
                 null, // use igbinary_serialize() when available
+                '%kernel.debug%',
             ])
 
         ->set('cache.early_expiration_handler', EarlyExpirationHandler::class)
@@ -238,7 +258,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(CacheItemPoolInterface::class, 'cache.app')
 
         ->alias(AdapterInterface::class, 'cache.app')
-            ->deprecate('symfony/framework-bundle', '5.4', 'The "%alias_id%" alias is deprecated, use "%s" instead.', CacheItemPoolInterface::class)
+            ->deprecate('symfony/framework-bundle', '5.4', sprintf('The "%%alias_id%%" alias is deprecated, use "%s" instead.', CacheItemPoolInterface::class))
 
         ->alias(CacheInterface::class, 'cache.app')
 

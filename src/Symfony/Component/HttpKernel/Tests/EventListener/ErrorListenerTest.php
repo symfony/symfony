@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -231,6 +232,11 @@ class TestKernel implements HttpKernelInterface
 {
     public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
+        $e = $request->attributes->get('exception');
+        if ($e instanceof HttpExceptionInterface) {
+            return new Response('foo', $e->getStatusCode(), $e->getHeaders());
+        }
+
         return new Response('foo');
     }
 }

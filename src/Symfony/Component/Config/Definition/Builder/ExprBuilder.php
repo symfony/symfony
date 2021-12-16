@@ -204,8 +204,6 @@ class ExprBuilder
     /**
      * Returns the related node.
      *
-     * @return NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
-     *
      * @throws \RuntimeException
      */
     public function end(): NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition

@@ -112,8 +112,6 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * Gets the save handler instance.
-     *
-     * @return AbstractProxy|\SessionHandlerInterface
      */
     public function getSaveHandler(): AbstractProxy|\SessionHandlerInterface
     {

@@ -187,7 +187,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     'authenticators' => $firewallConfig->getAuthenticators(),
                 ];
 
-
                 // generate exit impersonation path from current request
                 if ($this->data['impersonated'] && null !== $switchUserConfig = $firewallConfig->getSwitchUser()) {
                     $exitPath = $request->getRequestUri();

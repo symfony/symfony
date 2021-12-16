@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
-
 /**
  * Provides basic functionality for services mapped by the firewall name
  * in a container locator.

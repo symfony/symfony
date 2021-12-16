@@ -26,9 +26,6 @@ class TimeBasedUuidFactory
         $this->node = $node;
     }
 
-    /**
-     * @return UuidV6|UuidV1
-     */
     public function create(\DateTimeInterface $time = null): UuidV6|UuidV1
     {
         $class = $this->class;

@@ -727,8 +727,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * Returns the button that was used to submit the form.
-     *
-     * @return FormInterface|ClickableInterface|null
      */
     public function getClickedButton(): FormInterface|ClickableInterface|null
     {

@@ -18,8 +18,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\PasswordHasher\Tests\Fixtures\TestLegacyPasswordAuthenticatedUser;
 use Symfony\Component\PasswordHasher\Tests\Fixtures\TestPasswordAuthenticatedUser;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\User;
 
 class UserPasswordHasherTest extends TestCase
 {

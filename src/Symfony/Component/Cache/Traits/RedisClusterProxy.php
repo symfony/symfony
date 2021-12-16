@@ -10,8 +10,8 @@
  */
 
 namespace Symfony\Component\Cache\Traits;
-/**
 
+/**
  * @author Alessandro Chitolina <alekitto@gmail.com>
  *
  * @internal

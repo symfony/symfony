@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
-
 trait ResetLimiterTrait
 {
     private $lock;

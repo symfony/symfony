@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Yaml\Command;
 
-use Symfony\Component\Console\CI\GithubActionReporter;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\CI\GithubActionReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;

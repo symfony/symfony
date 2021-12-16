@@ -59,7 +59,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * Formats a message as a block of text.
      */
-    public function block(string|array $messages, ?string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
+    public function block(string|array $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
     {
         $messages = \is_array($messages) ? array_values($messages) : [$messages];
 

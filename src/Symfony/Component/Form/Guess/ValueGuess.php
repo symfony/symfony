@@ -32,8 +32,6 @@ class ValueGuess extends Guess
 
     /**
      * Returns the guessed value.
-     *
-     * @return string|int|bool|null
      */
     public function getValue(): string|int|bool|null
     {

@@ -43,8 +43,6 @@ interface ParameterBagInterface
     /**
      * Gets a service container parameter.
      *
-     * @return array|bool|string|int|float|null
-     *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
     public function get(string $name): array|bool|string|int|float|null;

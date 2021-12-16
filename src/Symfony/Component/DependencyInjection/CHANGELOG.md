@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Allow BackedEnum as result of `defaultIndexMethod` in tagged services
+
 6.0
 ---
 

@@ -1085,11 +1085,11 @@ class Crawler implements \Countable, \IteratorAggregate
 
         try {
             return mb_convert_encoding($htmlContent, 'HTML-ENTITIES', $charset);
-        } catch (\Exception | \ValueError $e) {
+        } catch (\Exception|\ValueError $e) {
             try {
                 $htmlContent = iconv($charset, 'UTF-8', $htmlContent);
                 $htmlContent = mb_convert_encoding($htmlContent, 'HTML-ENTITIES', 'UTF-8');
-            } catch (\Exception | \ValueError $e) {
+            } catch (\Exception|\ValueError $e) {
             }
 
             return $htmlContent;

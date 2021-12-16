@@ -27,7 +27,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 final class LockRegistry
 {
     private static $openedFiles = [];
-    private static $lockedKeys;
+    private static $lockedFiles;
 
     /**
      * The number of items in this list controls the max number of concurrent processes.
@@ -76,25 +76,21 @@ final class LockRegistry
                 fclose($file);
             }
         }
-        self::$openedFiles = self::$lockedKeys = [];
+        self::$openedFiles = self::$lockedFiles = [];
 
         return $previousFiles;
     }
 
     public static function compute(callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata = null, LoggerInterface $logger = null)
     {
-        if ('\\' === \DIRECTORY_SEPARATOR && null === self::$lockedKeys) {
+        if ('\\' === \DIRECTORY_SEPARATOR && null === self::$lockedFiles) {
             // disable locking on Windows by default
-            self::$files = self::$lockedKeys = [];
+            self::$files = self::$lockedFiles = [];
         }
 
-        $key = unpack('i', md5($item->getKey(), true))[1];
+        $key = self::$files ? abs(crc32($item->getKey())) % \count(self::$files) : -1;
 
-        if (!\function_exists('sem_get')) {
-            $key = self::$files ? abs($key) % \count(self::$files) : null;
-        }
-
-        if (null === $key || (self::$lockedKeys[$key] ?? false) || !$lock = self::open($key)) {
+        if ($key < 0 || (self::$lockedFiles[$key] ?? false) || !$lock = self::open($key)) {
             return $callback($item, $save);
         }
 
@@ -102,15 +98,11 @@ final class LockRegistry
             try {
                 $locked = false;
                 // race to get the lock in non-blocking mode
-                if ($wouldBlock = \function_exists('sem_get')) {
-                    $locked = @sem_acquire($lock, true);
-                } else {
-                    $locked = flock($lock, \LOCK_EX | \LOCK_NB, $wouldBlock);
-                }
+                $locked = flock($lock, \LOCK_EX | \LOCK_NB, $wouldBlock);
 
                 if ($locked || !$wouldBlock) {
                     $logger && $logger->info(sprintf('Lock %s, now computing item "{key}"', $locked ? 'acquired' : 'not supported'), ['key' => $item->getKey()]);
-                    self::$lockedKeys[$key] = true;
+                    self::$lockedFiles[$key] = true;
 
                     $value = $callback($item, $save);
 
@@ -125,25 +117,12 @@ final class LockRegistry
 
                     return $value;
                 }
-
                 // if we failed the race, retry locking in blocking mode to wait for the winner
                 $logger && $logger->info('Item "{key}" is locked, waiting for it to be released', ['key' => $item->getKey()]);
-
-                if (\function_exists('sem_get')) {
-                    $lock = sem_get($key);
-                    @sem_acquire($lock);
-                } else {
-                    flock($lock, \LOCK_SH);
-                }
+                flock($lock, \LOCK_SH);
             } finally {
-                if ($locked) {
-                    if (\function_exists('sem_get')) {
-                        sem_remove($lock);
-                    } else {
-                        flock($lock, \LOCK_UN);
-                    }
-                }
-                unset(self::$lockedKeys[$key]);
+                flock($lock, \LOCK_UN);
+                unset(self::$lockedFiles[$key]);
             }
             static $signalingException, $signalingCallback;
             $signalingException = $signalingException ?? unserialize("O:9:\"Exception\":1:{s:16:\"\0Exception\0trace\";a:0:{}}");
@@ -168,10 +147,6 @@ final class LockRegistry
 
     private static function open(int $key)
     {
-        if (\function_exists('sem_get')) {
-            return sem_get($key);
-        }
-
         if (null !== $h = self::$openedFiles[$key] ?? null) {
             return $h;
         }

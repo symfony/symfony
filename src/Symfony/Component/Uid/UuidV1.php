@@ -54,7 +54,7 @@ class UuidV1 extends Uuid
                 $seq = substr($uuid, 19, 4);
 
                 while (null === self::$clockSeq || $seq === self::$clockSeq) {
-                    self::$clockSeq = sprintf('%04x', random_int(0, 0x3fff) | 0x8000);
+                    self::$clockSeq = sprintf('%04x', random_int(0, 0x3FFF) | 0x8000);
                 }
 
                 $seq = self::$clockSeq;

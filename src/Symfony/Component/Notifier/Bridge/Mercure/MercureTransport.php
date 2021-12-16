@@ -87,7 +87,7 @@ final class MercureTransport extends AbstractTransport
             $sentMessage->setMessageId($messageId);
 
             return $sentMessage;
-        } catch (MercureRuntimeException | InvalidArgumentException $e) {
+        } catch (MercureRuntimeException|InvalidArgumentException $e) {
             throw new RuntimeException('Unable to post the Mercure message: '.$e->getMessage(), $e->getCode(), $e);
         }
     }

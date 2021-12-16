@@ -204,11 +204,6 @@ class Query extends AbstractQuery
 
     /**
      * Sets LDAP pagination controls.
-<<<<<<< HEAD
-=======
-     *
-     * @param resource|LDAPConnection $con
->>>>>>> 5.4
      */
     private function controlPagedResult(int $pageSize, bool $critical, string $cookie): bool
     {

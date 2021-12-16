@@ -158,6 +158,10 @@ class PriorityTaggedServiceUtil
             return $default;
         }
 
+        if (\PHP_VERSION_ID >= 80100 && $default instanceof \BackedEnum) {
+            $default = $default->value;
+        }
+
         if (\is_int($default)) {
             $default = (string) $default;
         }

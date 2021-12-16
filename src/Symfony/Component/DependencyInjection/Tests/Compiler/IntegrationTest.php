@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooEnumeratedTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAnyAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAutoconfiguration;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomMethodAttribute;
@@ -621,6 +622,32 @@ class IntegrationTest extends TestCase
         self::assertSame(['foo_tag_class', 'bar_tag_class'], array_keys($factories->getValue($locator)));
         self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tag_class'));
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttributeAndEnumeratedKeys()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooEnumeratedTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+
+        $container->register(LocatorConsumerWithDefaultIndexMethod::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumerWithDefaultIndexMethod $s */
+        $s = $container->get(LocatorConsumerWithDefaultIndexMethod::class);
+
+        $locator = $s->getLocator();
+
+        self::assertSame($container->get(FooEnumeratedTagClass::class), $locator->get('bar'));
     }
 
     /**

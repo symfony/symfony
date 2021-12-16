@@ -196,7 +196,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
         $parent = $this->parent;
 
-        while ($parent && $parent->getConfig()->getInheritData()) {
+        while ($parent?->getConfig()->getInheritData()) {
             $parent = $parent->getParent();
         }
 

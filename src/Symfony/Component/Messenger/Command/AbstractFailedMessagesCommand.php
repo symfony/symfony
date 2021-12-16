@@ -149,7 +149,7 @@ abstract class AbstractFailedMessagesCommand extends Command
 
     protected function getReceiver(string $name = null): ReceiverInterface
     {
-        if (null === $name = $name ?? $this->globalFailureReceiverName) {
+        if (null === $name ??= $this->globalFailureReceiverName) {
             throw new InvalidArgumentException(sprintf('No default failure transport is defined. Available transports are: "%s".', implode('", "', array_keys($this->failureTransports->getProvidedServices()))));
         }
 

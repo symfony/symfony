@@ -137,7 +137,7 @@ class GuardListenerTest extends TestCase
     private function createEvent(Transition $transition = null)
     {
         $subject = new Subject();
-        $transition = $transition ?? new Transition('name', 'from', 'to');
+        $transition ??= new Transition('name', 'from', 'to');
 
         $workflow = $this->createMock(WorkflowInterface::class);
 

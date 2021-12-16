@@ -200,7 +200,7 @@ class PlantUmlDumper implements DumperInterface
 
         $output = "state $placeEscaped".
             (\in_array($place, $definition->getInitialPlaces(), true) ? ' '.self::INITIAL : '').
-            ($marking && $marking->has($place) ? ' '.self::MARKED : '');
+            ($marking?->has($place) ? ' '.self::MARKED : '');
 
         $backgroundColor = $workflowMetadata->getMetadata('bg_color', $place);
         if (null !== $backgroundColor) {

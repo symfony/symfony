@@ -454,7 +454,7 @@ class PdoSessionHandler extends AbstractSessionHandler
             // If "unix_socket" is not in the query, we continue with the same process as pgsql
             // no break
             case 'pgsql':
-                $dsn ?? $dsn = 'pgsql:';
+                $dsn ??= 'pgsql:';
 
                 if (isset($params['host']) && '' !== $params['host']) {
                     $dsn .= 'host='.$params['host'].';';

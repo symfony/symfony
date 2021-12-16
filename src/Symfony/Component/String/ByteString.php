@@ -48,7 +48,7 @@ class ByteString extends AbstractString
             throw new InvalidArgumentException(sprintf('A strictly positive length is expected, "%d" given.', $length));
         }
 
-        $alphabet = $alphabet ?? self::ALPHABET_ALPHANUMERIC;
+        $alphabet ??= self::ALPHABET_ALPHANUMERIC;
         $alphabetSize = \strlen($alphabet);
         $bits = (int) ceil(log($alphabetSize, 2.0));
         if ($bits <= 0 || $bits > 56) {
@@ -363,7 +363,7 @@ class ByteString extends AbstractString
 
     public function split(string $delimiter, int $limit = null, int $flags = null): array
     {
-        if (1 > $limit = $limit ?? \PHP_INT_MAX) {
+        if (1 > $limit ??= \PHP_INT_MAX) {
             throw new InvalidArgumentException('Split limit must be a positive integer.');
         }
 

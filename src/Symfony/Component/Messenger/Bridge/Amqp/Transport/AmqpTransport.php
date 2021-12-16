@@ -40,7 +40,7 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
      */
     public function get(): iterable
     {
-        return ($this->receiver ?? $this->getReceiver())->get();
+        return $this->getReceiver()->get();
     }
 
     /**
@@ -48,7 +48,7 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
      */
     public function getFromQueues(array $queueNames): iterable
     {
-        return ($this->receiver ?? $this->getReceiver())->getFromQueues($queueNames);
+        return $this->getReceiver()->getFromQueues($queueNames);
     }
 
     /**
@@ -56,7 +56,7 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
      */
     public function ack(Envelope $envelope): void
     {
-        ($this->receiver ?? $this->getReceiver())->ack($envelope);
+        $this->getReceiver()->ack($envelope);
     }
 
     /**
@@ -64,7 +64,7 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
      */
     public function reject(Envelope $envelope): void
     {
-        ($this->receiver ?? $this->getReceiver())->reject($envelope);
+        $this->getReceiver()->reject($envelope);
     }
 
     /**
@@ -72,7 +72,7 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
      */
     public function send(Envelope $envelope): Envelope
     {
-        return ($this->sender ?? $this->getSender())->send($envelope);
+        return $this->getSender()->send($envelope);
     }
 
     /**
@@ -88,17 +88,17 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
      */
     public function getMessageCount(): int
     {
-        return ($this->receiver ?? $this->getReceiver())->getMessageCount();
+        return $this->getReceiver()->getMessageCount();
     }
 
     private function getReceiver(): AmqpReceiver
     {
-        return $this->receiver = new AmqpReceiver($this->connection, $this->serializer);
+        return $this->receiver ??= new AmqpReceiver($this->connection, $this->serializer);
     }
 
     private function getSender(): AmqpSender
     {
-        return $this->sender = new AmqpSender($this->connection, $this->serializer);
+        return $this->sender ??= new AmqpSender($this->connection, $this->serializer);
     }
 }
 

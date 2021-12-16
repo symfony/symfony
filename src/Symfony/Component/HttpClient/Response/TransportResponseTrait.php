@@ -191,7 +191,7 @@ trait TransportResponseTrait
                         continue;
                     } elseif ($elapsedTimeout >= $timeoutMax) {
                         $multi->handlesActivity[$j] = [new ErrorChunk($response->offset, sprintf('Idle timeout reached for "%s".', $response->getInfo('url')))];
-                        $multi->lastTimeout ?? $multi->lastTimeout = $lastActivity;
+                        $multi->lastTimeout ??= $lastActivity;
                     } else {
                         continue;
                     }

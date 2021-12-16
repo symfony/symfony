@@ -553,7 +553,7 @@ class DebugClassLoader
                 $this->patchReturnTypeWillChange($method);
             }
 
-            if (null !== ($returnType ?? $returnType = self::MAGIC_METHODS[$method->name] ?? null) && !$method->hasReturnType() && !isset($doc['return'])) {
+            if (null !== ($returnType ??= self::MAGIC_METHODS[$method->name] ?? null) && !$method->hasReturnType() && !isset($doc['return'])) {
                 [$normalizedType, $returnType, $declaringClass, $declaringFile] = \is_string($returnType) ? [$returnType, $returnType, '', ''] : $returnType;
 
                 if ($canAddReturnType && 'docblock' !== $this->patchTypes['force']) {
@@ -935,10 +935,10 @@ class DebugClassLoader
                 continue;
             }
 
-            [$namespace, $useOffset, $useMap] = $useStatements[$file] ?? $useStatements[$file] = self::getUseStatements($file);
+            [$namespace, $useOffset, $useMap] = $useStatements[$file] ??= self::getUseStatements($file);
 
             if ('\\' !== $type[0]) {
-                [$declaringNamespace, , $declaringUseMap] = $useStatements[$declaringFile] ?? $useStatements[$declaringFile] = self::getUseStatements($declaringFile);
+                [$declaringNamespace, , $declaringUseMap] = $useStatements[$declaringFile] ??= self::getUseStatements($declaringFile);
 
                 $p = strpos($type, '\\', 1);
                 $alias = $p ? substr($type, 0, $p) : $type;

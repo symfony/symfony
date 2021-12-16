@@ -46,7 +46,7 @@ final class Window implements LimiterStateInterface
 
     public function add(int $hits = 1, float $now = null)
     {
-        $now = $now ?? microtime(true);
+        $now ??= microtime(true);
         if (($now - $this->timer) > $this->intervalInSeconds) {
             // reset window
             $this->timer = $now;

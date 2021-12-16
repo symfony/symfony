@@ -304,7 +304,7 @@ final class Dotenv
             throw $this->createFormatException('Whitespace are not supported before the value');
         }
 
-        $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? ($_ENV['SYMFONY_DOTENV_VARS'] ?? '')));
+        $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
         unset($loadedVars['']);
         $v = '';
 

@@ -87,7 +87,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
         }
 
         $cacheItem = $this->cache?->getItem($this->escapeClassName($class));
-        if ($cacheItem && $cacheItem->isHit()) {
+        if ($cacheItem?->isHit()) {
             $metadata = $cacheItem->get();
 
             // Include constraints from the parent class

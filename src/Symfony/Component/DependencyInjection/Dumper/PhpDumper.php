@@ -221,7 +221,7 @@ class PhpDumper extends Dumper
             $this->addDefaultParametersMethod()
         ;
 
-        $proxyClasses = $proxyClasses ?? $this->generateProxyClasses();
+        $proxyClasses ??= $this->generateProxyClasses();
 
         if ($this->addGetService) {
             $code = preg_replace(
@@ -1802,7 +1802,7 @@ EOF;
             if ($value->hasErrors() && $e = $value->getErrors()) {
                 return sprintf('throw new RuntimeException(%s)', $this->export(reset($e)));
             }
-            if (null !== $this->definitionVariables && $this->definitionVariables->contains($value)) {
+            if ($this->definitionVariables?->contains($value)) {
                 return $this->dumpValue($this->definitionVariables[$value], $interpolate);
             }
             if ($value->getMethodCalls()) {

@@ -87,7 +87,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
                     $lazyCommandMap[$tag['command']] = $id;
                 }
 
-                $description = $description ?? $tag['description'] ?? null;
+                $description ??= $tag['description'] ?? null;
             }
 
             $definition->addMethodCall('setName', [$commandName]);

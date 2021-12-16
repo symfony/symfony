@@ -128,9 +128,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
     {
         $route = null;
-        $locale = $parameters['_locale']
-            ?? $this->context->getParameter('_locale')
-            ?: $this->defaultLocale;
+        $locale = $parameters['_locale'] ?? $this->context->getParameter('_locale') ?: $this->defaultLocale;
 
         if (null !== $locale) {
             do {
@@ -140,7 +138,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             } while (false !== $locale = strstr($locale, '_', true));
         }
 
-        if (null === $route = $route ?? $this->routes->get($name)) {
+        if (null === $route ??= $this->routes->get($name)) {
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
         }
 

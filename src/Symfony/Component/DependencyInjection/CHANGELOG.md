@@ -4,6 +4,7 @@ CHANGELOG
 6.1
 ---
 
+ * Allow BackedEnum as result of `defaultIndexMethod` in tagged services
  * Add `$exclude` to `TaggedIterator` and `TaggedLocator` attributes
  * Add `$exclude` to `tagged_iterator` and `tagged_locator` configurator
 

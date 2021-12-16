@@ -144,7 +144,7 @@ class PdoStore implements PersistingStoreInterface
                 $this->createTable();
             }
             $stmt->execute();
-        } catch (DBALException | Exception $e) {
+        } catch (DBALException|Exception $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         } catch (\PDOException $e) {

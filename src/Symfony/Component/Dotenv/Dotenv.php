@@ -81,8 +81,8 @@ final class Dotenv
     /**
      * Loads one or several .env files.
      *
-     * @param string    $path       A file to load
-     * @param ...string $extraPaths A list of additional files to load
+     * @param string   $path          A file to load
+     * @param string[] ...$extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
@@ -167,8 +167,8 @@ final class Dotenv
     /**
      * Loads one or several .env files and enables override existing vars.
      *
-     * @param string    $path       A file to load
-     * @param ...string $extraPaths A list of additional files to load
+     * @param string   $path          A file to load
+     * @param string[] ...$extraPaths A list of additional files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable

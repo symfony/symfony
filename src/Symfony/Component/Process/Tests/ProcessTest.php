@@ -772,7 +772,8 @@ class ProcessTest extends TestCase
         $start = microtime(true);
         try {
             $process->start();
-            foreach ($process as $buffer);
+            foreach ($process as $buffer) {
+            }
             $this->fail('A RuntimeException should have been raised');
         } catch (RuntimeException $e) {
         }

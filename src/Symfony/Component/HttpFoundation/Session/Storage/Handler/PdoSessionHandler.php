@@ -646,7 +646,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         $selectStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
         $insertStmt = null;
 
-        do {
+        while (true) {
             $selectStmt->execute();
             $sessionRows = $selectStmt->fetchAll(\PDO::FETCH_NUM);
 
@@ -695,7 +695,7 @@ class PdoSessionHandler extends AbstractSessionHandler
             }
 
             return '';
-        } while (true);
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Environment variable `SYMFONY_IDE` is read by default when `framework.ide` config is not set.
+ * When `cache.app` is `cache.adapter.redis_tag_aware`, set `cache.app.taggable` as an alias.
 
 6.0
 ---

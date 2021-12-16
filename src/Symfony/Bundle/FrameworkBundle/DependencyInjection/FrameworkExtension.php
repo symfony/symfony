@@ -2103,6 +2103,15 @@ class FrameworkExtension extends Extension
                 'tags' => false,
             ];
         }
+
+        if ('cache.adapter.redis_tag_aware' === $config['app']) {
+            $container->setAlias('cache.app.taggable', 'cache.app');
+        } else {
+            $container->register('cache.app.taggable', TagAwareAdapter::class)
+                ->addArgument(new Reference('cache.app'))
+            ;
+        }
+
         foreach ($config['pools'] as $name => $pool) {
             $pool['adapters'] = $pool['adapters'] ?: ['cache.app'];
 

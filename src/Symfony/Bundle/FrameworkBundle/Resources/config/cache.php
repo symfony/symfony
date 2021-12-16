@@ -23,7 +23,6 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
-use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Messenger\EarlyExpirationHandler;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
@@ -36,9 +35,6 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.adapter.filesystem')
             ->public()
             ->tag('cache.pool', ['clearer' => 'cache.app_clearer'])
-
-        ->set('cache.app.taggable', TagAwareAdapter::class)
-            ->args([service('cache.app')])
 
         ->set('cache.system')
             ->parent('cache.adapter.system')

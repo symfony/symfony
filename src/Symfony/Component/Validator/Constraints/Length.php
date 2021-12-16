@@ -65,7 +65,7 @@ class Length extends Constraint
         }
 
         $min ??= $options['min'] ?? null;
-        $max ??=  $options['max'] ?? null;
+        $max ??= $options['max'] ?? null;
 
         unset($options['value'], $options['min'], $options['max']);
 

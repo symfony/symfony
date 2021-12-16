@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Sms77\Tests;
 
 use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class Sms77TransportFactoryTest extends TransportFactoryTestCase
 {

@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Vonage\Tests;
 
 use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class VonageTransportFactoryTest extends TransportFactoryTestCase
 {

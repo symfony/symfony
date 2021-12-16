@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-12-16T17:26:07Z
+
+The issue was talking about problems happening in Apache, so I doubt that disabling it only on CLI will fix it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-16T17:29:47Z
+
+It was about apache calling commands in a subprocess, isn't it?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-16T17:36:24Z
+
+https://github.com/symfony/symfony/issues/41130#issuecomment-948603479 should be checked, as it talks about nested caching in parallell requests
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-16T17:47:39Z
+
+Calling `LockRegistry::setFiles([])` will work for these cases.

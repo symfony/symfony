@@ -57,7 +57,7 @@ class XliffFileLoader implements LoaderInterface
             } else {
                 $dom = XmlUtils::loadFile($resource);
             }
-        } catch (\InvalidArgumentException | XmlParsingException | InvalidXmlException $e) {
+        } catch (\InvalidArgumentException|XmlParsingException|InvalidXmlException $e) {
             throw new InvalidResourceException(sprintf('Unable to load "%s": ', $resource).$e->getMessage(), $e->getCode(), $e);
         }
 

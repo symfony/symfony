@@ -190,14 +190,14 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
         $now = microtime(true);
 
-        if (0 === $expiry) {
-            $expiry = \PHP_INT_MAX;
-        }
+        if (null !== $expiry) {
+            if (!$expiry) {
+                $expiry = \PHP_INT_MAX;
+            } elseif ($expiry <= $now) {
+                $this->deleteItem($key);
 
-        if (null !== $expiry && $expiry <= $now) {
-            $this->deleteItem($key);
-
-            return true;
+                return true;
+            }
         }
         if ($this->storeSerialized && null === $value = $this->freeze($value, $key)) {
             return false;

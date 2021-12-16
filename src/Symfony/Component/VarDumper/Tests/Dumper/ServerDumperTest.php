@@ -37,6 +37,9 @@ class ServerDumperTest extends TestCase
         $dumper->dump($data);
     }
 
+    /**
+     * @group transient-on-macos
+     */
     public function testDump()
     {
         $wrappedDumper = $this->createMock(DataDumperInterface::class);

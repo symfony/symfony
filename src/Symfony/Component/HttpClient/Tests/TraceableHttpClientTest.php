@@ -218,4 +218,18 @@ class TraceableHttpClientTest extends TestCase
         $this->assertCount(1, $events['GET http://localhost:8057']->getPeriods());
         $this->assertGreaterThan(0.0, $events['GET http://localhost:8057']->getDuration());
     }
+
+    public function testWithOptions()
+    {
+        $sut = new TraceableHttpClient(new NativeHttpClient());
+
+        $sut2 = $sut->withOptions(['base_uri' => 'http://localhost:8057']);
+
+        $response = $sut2->request('GET', '/');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
+
+        $this->assertCount(1, $sut->getTracedRequests());
+    }
 }

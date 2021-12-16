@@ -163,7 +163,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
     /**
      * @dataProvider postOnlyDataProvider
      */
-    public function testHandleNonStringUsernameWith__toString(bool $postOnly)
+    public function testHandleNonStringUsernameWithToString(bool $postOnly)
     {
         $usernameClass = $this->createMock(DummyUserClass::class);
         $usernameClass

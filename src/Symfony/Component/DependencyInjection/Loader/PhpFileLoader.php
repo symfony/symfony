@@ -137,7 +137,7 @@ class PhpFileLoader extends FileLoader
                 default:
                     try {
                         $configBuilder = $this->configBuilder($type);
-                    } catch (InvalidArgumentException | \LogicException $e) {
+                    } catch (InvalidArgumentException|\LogicException $e) {
                         throw new \InvalidArgumentException(sprintf('Could not resolve argument "%s" for "%s".', $type.' $'.$parameter->getName(), $path), 0, $e);
                     }
                     $configBuilders[] = $configBuilder;

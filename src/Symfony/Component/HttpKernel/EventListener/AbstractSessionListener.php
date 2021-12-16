@@ -151,7 +151,8 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
             $request = $event->getRequest();
             $requestSessionCookieId = $request->cookies->get($sessionName);
 
-            if ($requestSessionCookieId && $session->isEmpty()) {
+            $isSessionEmpty = $session->isEmpty();
+            if ($requestSessionCookieId && $isSessionEmpty) {
                 $response->headers->clearCookie(
                     $sessionName,
                     $sessionCookiePath,
@@ -160,7 +161,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
                     $sessionCookieHttpOnly,
                     $sessionCookieSameSite
                 );
-            } elseif ($sessionId !== $requestSessionCookieId) {
+            } elseif ($sessionId !== $requestSessionCookieId && !$isSessionEmpty) {
                 $expire = 0;
                 $lifetime = $this->sessionOptions['cookie_lifetime'] ?? null;
                 if ($lifetime) {

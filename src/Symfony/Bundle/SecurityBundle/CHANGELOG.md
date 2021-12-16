@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+6.1
+---
+* The `security.access_control` now accepts a `RequestMatcherInterface` under the `request_matcher` option as scope configuration
+
 6.0
 ---
 

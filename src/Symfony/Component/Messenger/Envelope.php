@@ -95,7 +95,7 @@ final class Envelope
 
     public function last(string $stampFqcn): ?StampInterface
     {
-        return isset($this->stamps[$stampFqcn = $stampFqcn]) ? end($this->stamps[$stampFqcn]) : null;
+        return isset($this->stamps[$stampFqcn]) ? end($this->stamps[$stampFqcn]) : null;
     }
 
     /**

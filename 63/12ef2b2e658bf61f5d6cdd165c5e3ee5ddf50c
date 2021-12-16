@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-16T19:12:17Z
+
+On 5.4, there is some class alias resolution in place here as part of a BC layer that had been removed on 6.0. This line seems to be a leftover of that removal.

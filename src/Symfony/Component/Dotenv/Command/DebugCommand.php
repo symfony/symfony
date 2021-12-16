@@ -91,7 +91,7 @@ final class DebugCommand extends Command
             $realValue = $_SERVER[$var];
             $varDetails = [$var, $realValue];
             foreach ($envFiles as $envFile) {
-                $values = $fileValues[$envFile] ?? $fileValues[$envFile] = $this->loadValues($envFile);
+                $values = $fileValues[$envFile] ??= $this->loadValues($envFile);
 
                 $varString = $values[$var] ?? '<fg=yellow>n/a</>';
                 $shortenedVar = $this->getHelper('formatter')->truncate($varString, 30);

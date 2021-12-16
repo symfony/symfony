@@ -51,7 +51,7 @@ final class Validation
             $validator = null;
         }
 
-        $validator = $validator ?? self::createValidator();
+        $validator ??= self::createValidator();
 
         return static function (mixed $value, ConstraintViolationListInterface &$violations = null) use ($constraints, $validator): bool {
             $violations = $validator->validate($value, $constraints);

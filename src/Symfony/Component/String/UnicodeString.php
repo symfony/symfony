@@ -280,7 +280,7 @@ class UnicodeString extends AbstractUnicodeString
 
     public function split(string $delimiter, int $limit = null, int $flags = null): array
     {
-        if (1 > $limit = $limit ?? 2147483647) {
+        if (1 > $limit ??= 2147483647) {
             throw new InvalidArgumentException('Split limit must be a positive integer.');
         }
 

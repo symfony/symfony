@@ -160,7 +160,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
      */
     private function checkType(Definition $checkedDefinition, mixed $value, \ReflectionParameter $parameter, ?string $envPlaceholderUniquePrefix, \ReflectionType $reflectionType = null): void
     {
-        $reflectionType = $reflectionType ?? $parameter->getType();
+        $reflectionType ??= $parameter->getType();
 
         if ($reflectionType instanceof \ReflectionUnionType) {
             foreach ($reflectionType->getTypes() as $t) {

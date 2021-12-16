@@ -364,7 +364,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                 continue;
             }
 
-            if ($pauseExpiry && ($now ?? $now = microtime(true)) < $pauseExpiry) {
+            if ($pauseExpiry && ($now ??= microtime(true)) < $pauseExpiry) {
                 $timeout = min($timeout, $pauseExpiry - $now);
                 continue;
             }

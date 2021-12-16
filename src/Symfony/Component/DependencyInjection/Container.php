@@ -380,7 +380,7 @@ class Container implements ContainerInterface, ResetInterface
             return false !== $registry ? $this->{$registry}[$id] ?? null : null;
         }
         if (false !== $registry) {
-            return $this->{$registry}[$id] ?? $this->{$registry}[$id] = $load ? $this->load($method) : $this->{$method}();
+            return $this->{$registry}[$id] ??= $load ? $this->load($method) : $this->{$method}();
         }
         if (!$load) {
             return $this->{$method}();

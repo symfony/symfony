@@ -58,7 +58,7 @@ class UuidFactory
 
     public function timeBased(Uuid|string $node = null): TimeBasedUuidFactory
     {
-        $node ?? $node = $this->timeBasedNode;
+        $node ??= $this->timeBasedNode;
 
         if (null !== $node && !$node instanceof Uuid) {
             $node = Uuid::fromString($node);
@@ -69,7 +69,7 @@ class UuidFactory
 
     public function nameBased(Uuid|string $namespace = null): NameBasedUuidFactory
     {
-        $namespace ?? $namespace = $this->nameBasedNamespace;
+        $namespace ??= $this->nameBasedNamespace;
 
         if (null === $namespace) {
             throw new \LogicException(sprintf('A namespace should be defined when using "%s()".', __METHOD__));

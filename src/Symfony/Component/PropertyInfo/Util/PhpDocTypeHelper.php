@@ -93,7 +93,7 @@ final class PhpDocTypeHelper
      */
     private function createType(DocType $type, bool $nullable, string $docType = null): ?Type
     {
-        $docType = $docType ?? (string) $type;
+        $docType ??= (string) $type;
 
         if ($type instanceof Collection) {
             $fqsen = $type->getFqsen();

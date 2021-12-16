@@ -271,7 +271,7 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function isDisabled(): bool
     {
-        if ($this->parent && $this->parent->isDisabled()) {
+        if ($this->parent?->isDisabled()) {
             return true;
         }
 

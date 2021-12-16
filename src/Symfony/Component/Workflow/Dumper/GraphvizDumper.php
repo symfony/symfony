@@ -73,7 +73,7 @@ class GraphvizDumper implements DumperInterface
             if (\in_array($place, $definition->getInitialPlaces(), true)) {
                 $attributes['style'] = 'filled';
             }
-            if ($marking && $marking->has($place)) {
+            if ($marking?->has($place)) {
                 $attributes['color'] = '#FF0000';
                 $attributes['shape'] = 'doublecircle';
             }

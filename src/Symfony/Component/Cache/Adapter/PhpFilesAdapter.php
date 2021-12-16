@@ -135,7 +135,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 
             foreach ($missingIds as $k => $id) {
                 try {
-                    $file = $this->files[$id] ?? $this->files[$id] = $this->getFile($id);
+                    $file = $this->files[$id] ??= $this->getFile($id);
 
                     if (isset(self::$valuesCache[$file])) {
                         [$expiresAt, $this->values[$id]] = self::$valuesCache[$file];
@@ -176,7 +176,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 
         set_error_handler($this->includeHandler);
         try {
-            $file = $this->files[$id] ?? $this->files[$id] = $this->getFile($id);
+            $file = $this->files[$id] ??= $this->getFile($id);
             $getExpiry = true;
 
             if (isset(self::$valuesCache[$file])) {

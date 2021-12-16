@@ -309,7 +309,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             };
 
             try {
-                $previousUrl = $previousUrl ?? $urlResolver::parseUrl($info['url']);
+                $previousUrl ??= $urlResolver::parseUrl($info['url']);
                 $location = $urlResolver::parseUrl($location);
                 $location = $urlResolver::resolveUrl($location, $previousUrl);
                 $info['redirect_url'] = implode('', $location);

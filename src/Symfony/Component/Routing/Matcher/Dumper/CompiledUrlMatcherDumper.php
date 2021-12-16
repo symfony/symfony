@@ -427,7 +427,7 @@ EOF;
 
         if ($condition = $route->getCondition()) {
             $condition = $this->getExpressionLanguage()->compile($condition, ['context', 'request']);
-            $condition = $conditions[$condition] ?? $conditions[$condition] = (str_contains($condition, '$request') ? 1 : -1) * \count($conditions);
+            $condition = $conditions[$condition] ??= (str_contains($condition, '$request') ? 1 : -1) * \count($conditions);
         } else {
             $condition = null;
         }

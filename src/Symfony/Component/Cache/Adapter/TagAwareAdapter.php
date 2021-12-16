@@ -48,7 +48,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         $this->pool = $itemsPool;
         $this->tags = $tagsPool ?? $itemsPool;
         $this->knownTagVersionsTtl = $knownTagVersionsTtl;
-        self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
+        self::$createCacheItem ??= \Closure::bind(
             static function ($key, $value, CacheItem $protoItem) {
                 $item = new CacheItem();
                 $item->key = $key;
@@ -61,7 +61,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             null,
             CacheItem::class
         );
-        self::$setCacheItemTags ?? self::$setCacheItemTags = \Closure::bind(
+        self::$setCacheItemTags ??= \Closure::bind(
             static function (CacheItem $item, $key, array &$itemTags) {
                 $item->isTaggable = true;
                 if (!$item->isHit) {
@@ -82,7 +82,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             null,
             CacheItem::class
         );
-        self::$getTagsByKey ?? self::$getTagsByKey = \Closure::bind(
+        self::$getTagsByKey ??= \Closure::bind(
             static function ($deferred) {
                 $tagsByKey = [];
                 foreach ($deferred as $key => $item) {
@@ -95,7 +95,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             null,
             CacheItem::class
         );
-        self::$saveTags ?? self::$saveTags = \Closure::bind(
+        self::$saveTags ??= \Closure::bind(
             static function (AdapterInterface $tagsAdapter, array $tags) {
                 ksort($tags);
 
@@ -394,7 +394,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         $newVersion = null;
         foreach ($this->tags->getItems(array_keys($tags)) as $tag => $version) {
             if (!$version->isHit()) {
-                $newTags[$tag] = $version->set($newVersion ?? $newVersion = random_int(\PHP_INT_MIN, \PHP_INT_MAX));
+                $newTags[$tag] = $version->set($newVersion ??= random_int(\PHP_INT_MIN, \PHP_INT_MAX));
             }
             $tagVersions[$tag = $tags[$tag]] = $version->get();
             $this->knownTagVersions[$tag] = [$now, $tagVersions[$tag]];

@@ -95,7 +95,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
         $nonces = [];
         if ($this->cspHandler) {
-            if ($this->dumpDataCollector && $this->dumpDataCollector->getDumpsCount() > 0) {
+            if ($this->dumpDataCollector?->getDumpsCount() > 0) {
                 $this->cspHandler->disableCsp();
             }
 

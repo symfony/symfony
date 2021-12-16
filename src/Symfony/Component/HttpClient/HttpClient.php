@@ -41,7 +41,7 @@ final class HttpClient
             }
 
             static $curlVersion = null;
-            $curlVersion = $curlVersion ?? curl_version();
+            $curlVersion ??= curl_version();
 
             // HTTP/2 push crashes before curl 7.61
             if (0x073D00 > $curlVersion['version_number'] || !(\CURL_VERSION_HTTP2 & $curlVersion['features'])) {

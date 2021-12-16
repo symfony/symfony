@@ -45,7 +45,7 @@ trait TraceableListenerTrait
         return [
             'response' => $this->response,
             'time' => $this->time,
-            'stub' => $this->stub ?? $this->stub = ClassStub::wrapCallable($this->listener instanceof TraceableAuthenticatorManagerListener ? $this->listener->getAuthenticatorManagerListener() : $this->listener),
+            'stub' => $this->stub ??= ClassStub::wrapCallable($this->listener instanceof TraceableAuthenticatorManagerListener ? $this->listener->getAuthenticatorManagerListener() : $this->listener),
         ];
     }
 }

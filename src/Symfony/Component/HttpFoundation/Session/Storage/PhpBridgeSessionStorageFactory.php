@@ -36,7 +36,7 @@ class PhpBridgeSessionStorageFactory implements SessionStorageFactoryInterface
     public function createStorage(?Request $request): SessionStorageInterface
     {
         $storage = new PhpBridgeSessionStorage($this->handler, $this->metaBag);
-        if ($this->secure && $request && $request->isSecure()) {
+        if ($this->secure && $request?->isSecure()) {
             $storage->setOptions(['cookie_secure' => true]);
         }
 

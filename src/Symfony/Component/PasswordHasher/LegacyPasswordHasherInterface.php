@@ -25,8 +25,6 @@ interface LegacyPasswordHasherInterface extends PasswordHasherInterface
     /**
      * Hashes a plain password.
      *
-     * @return string
-     *
      * @throws InvalidPasswordException If the plain password is invalid, e.g. excessively long
      */
     public function hash(string $plainPassword, string $salt = null): string;

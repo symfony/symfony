@@ -17,7 +17,6 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
 class MainConfigurationTest extends TestCase
 {

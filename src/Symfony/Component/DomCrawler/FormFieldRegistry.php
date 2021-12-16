@@ -87,8 +87,6 @@ class FormFieldRegistry
 
     /**
      * Tests whether the form has the given field based on the fully qualified name.
-     *
-     * @return bool
      */
     public function has(string $name): bool
     {

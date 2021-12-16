@@ -36,7 +36,8 @@ class WorkflowDumpCommand extends Command
     protected static $defaultName = 'workflow:dump';
     protected static $defaultDescription = 'Dump a workflow';
     /**
-     * string is the service id
+     * string is the service id.
+     *
      * @var array<string, Definition>
      */
     private $workflows = [];

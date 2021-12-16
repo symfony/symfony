@@ -49,8 +49,6 @@ interface DataAccessorInterface
      *
      * @param object|array  $viewData The view data of the compound form
      * @param FormInterface $form     The {@link FormInterface()} instance to check
-     *
-     * @return bool
      */
     public function isReadable($viewData, FormInterface $form): bool;
 
@@ -62,8 +60,6 @@ interface DataAccessorInterface
      *
      * @param object|array  $viewData The view data of the compound form
      * @param FormInterface $form     The {@link FormInterface()} instance to check
-     *
-     * @return bool
      */
     public function isWritable($viewData, FormInterface $form): bool;
 }

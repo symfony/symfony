@@ -151,8 +151,6 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
      * Invalidates cached items using tags.
      *
      * @param string[] $tagIds An array of tags to invalidate, key is tag and value is tag id
-     *
-     * @return bool
      */
     abstract protected function doInvalidate(array $tagIds): bool;
 

@@ -27,6 +27,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'auto_alias',
         'cache.pool',
         'cache.pool.clearer',
+        'cache.taggable',
         'chatter.transport_factory',
         'config_cache.resource_checker',
         'console.command',

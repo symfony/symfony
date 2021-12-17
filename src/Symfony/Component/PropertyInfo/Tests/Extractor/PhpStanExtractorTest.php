@@ -371,6 +371,39 @@ class PhpStanExtractorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider pseudoTypesProvider
+     */
+    public function testPseudoTypes($property, array $type)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\PhpStanPseudoTypesDummy', $property));
+    }
+
+    public function pseudoTypesProvider(): array
+    {
+        return [
+            ['classString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['classStringGeneric', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['htmlEscapedString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['lowercaseString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['nonEmptyLowercaseString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['nonEmptyString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['numericString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['traitString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['interfaceString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['literalString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
+            ['positiveInt', [new Type(Type::BUILTIN_TYPE_INT, false, null)]],
+            ['negativeInt', [new Type(Type::BUILTIN_TYPE_INT, false, null)]],
+            ['nonEmptyArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
+            ['nonEmptyList', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT))]],
+            ['scalar', [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT), new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_BOOL)]],
+            ['number', [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT)]],
+            ['numeric', [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT), new Type(Type::BUILTIN_TYPE_STRING)]],
+            ['arrayKey', [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)]],
+            ['double', [new Type(Type::BUILTIN_TYPE_FLOAT)]],
+        ];
+    }
+
     public function testDummyNamespace()
     {
         $this->assertEquals(

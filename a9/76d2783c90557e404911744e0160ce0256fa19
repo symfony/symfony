@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by fractalzombie at 2021-12-14T08:57:51Z
+
+Maybe someone can review?)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-15T17:19:38Z
+
+Let's target 6.1 please.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-16T18:14:07Z
+
+Can you please rebase onto 6.1? I think Psalm is confused by the 5.4 compat layer that should be gone on the 6.1 branch.
+
+---------------------------------------------------------------------------
+
+by fractalzombie at 2021-12-16T18:36:15Z
+
+> Can you please rebase onto 6.1? I think Psalm is confused by the 5.4 compat layer that should be gone on the 6.1 branch.
+
+Done
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-16T18:51:01Z
+
+Okay, that didn't help. But nevermind, I think we can ignore the Psalm error as a false positive. Psalm apparently does not fully understand the stamps array and I think that's okay.
+
+---------------------------------------------------------------------------
+
+by fractalzombie at 2021-12-16T22:10:08Z
+
+> Okay, that didn't help. But nevermind, I think we can ignore the Psalm error as a false positive. Psalm apparently does not fully understand the stamps array and I think that's okay.
+
+Yep, I think this is false positive.

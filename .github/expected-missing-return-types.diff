@@ -582,10 +582,16 @@ index 19ff0db181..f0f4a5829f 100644
  
      /**
 diff --git a/src/Symfony/Component/Messenger/Envelope.php b/src/Symfony/Component/Messenger/Envelope.php
-index bb1194ad1b..27731b9cb0 100644
+index bb1194ad1b..bd7fc440ff 100644
 --- a/src/Symfony/Component/Messenger/Envelope.php
 +++ b/src/Symfony/Component/Messenger/Envelope.php
-@@ -101,5 +101,5 @@ final class Envelope
+@@ -13,4 +13,5 @@ namespace Symfony\Component\Messenger;
+ 
+ use Symfony\Component\Messenger\Stamp\StampInterface;
++use Symfony\Component\Messenger\Stamp\StampInterface as TStamp;
+ 
+ /**
+@@ -101,5 +102,5 @@ final class Envelope
       * @return TStamp|null
       */
 -    public function last(string $stampFqcn): ?StampInterface

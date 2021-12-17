@@ -138,7 +138,7 @@ class XmlDumper extends Dumper
                 $tag = $this->document->createElement('tag');
                 $tag->setAttribute('name', $name);
                 foreach ($attributes as $key => $value) {
-                    $tag->setAttribute($key, $value);
+                    $tag->setAttribute($key, $value ?? '');
                 }
                 $service->appendChild($tag);
             }

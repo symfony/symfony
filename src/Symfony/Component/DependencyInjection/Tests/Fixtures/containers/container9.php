@@ -17,6 +17,7 @@ $container
     ->register('foo', FooClass::class)
     ->addTag('foo', ['foo' => 'foo'])
     ->addTag('foo', ['bar' => 'bar', 'baz' => 'baz'])
+    ->addTag('nullable', ['bar' => 'bar', 'baz' => null])
     ->setFactory(['Bar\\FooClass', 'getInstance'])
     ->setArguments(['foo', new Reference('foo.baz'), ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%'], true, new Reference('service_container')])
     ->setProperties(['foo' => 'bar', 'moo' => new Reference('foo.baz'), 'qux' => ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%']])

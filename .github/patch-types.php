@@ -35,6 +35,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case str_contains($file, '/src/Symfony/Component/Form/Tests/Fixtures/Answer.php'):
         case str_contains($file, '/src/Symfony/Component/Form/Tests/Fixtures/Number.php'):
         case str_contains($file, '/src/Symfony/Component/Form/Tests/Fixtures/Suit.php'):
+        case str_contains($file, '/src/Symfony/Component/Messenger/Envelope.php'):
         case str_contains($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/'):
         case str_contains($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/Php81Dummy.php'):
         case str_contains($file, '/src/Symfony/Component/Runtime/Internal/ComposerPlugin.php'):

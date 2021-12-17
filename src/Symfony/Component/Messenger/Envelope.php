@@ -93,6 +93,13 @@ final class Envelope
         return $cloned;
     }
 
+    /**
+     * @template TStamp of StampInterface
+     *
+     * @param class-string<TStamp> $stampFqcn
+     *
+     * @return TStamp|null
+     */
     public function last(string $stampFqcn): ?StampInterface
     {
         return isset($this->stamps[$stampFqcn]) ? end($this->stamps[$stampFqcn]) : null;

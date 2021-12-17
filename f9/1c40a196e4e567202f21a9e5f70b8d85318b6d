@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-12-06T15:46:29Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-12-06T16:07:41Z
+
+I think it's a bug and you should target 4.4. You can take inspiration from https://github.com/symfony/symfony/pull/40932/files. Also, I'm not sure we need protected methods for that.
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2021-12-06T16:17:45Z
+
+> I think it's a bug and you should target 4.4. You can take inspiration from https://github.com/symfony/symfony/pull/40932/files. Also, I'm not sure we need protected methods for that.
+
+Happy to rebase if that's needed, let me know. I added the protected methods to follow the same pattern as used to manage the timezone, can change that if it's overkill though.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-12-13T12:51:00Z
+
+I agree with @fancyweb about this being a bugfix.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-13T14:13:28Z
+
+Let's merge to 4.4. 👍🏻
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2021-12-15T23:11:22Z
+
+Rebased on 4.4, with [suggested updates](https://github.com/symfony/symfony/pull/44473#issuecomment-986918904).

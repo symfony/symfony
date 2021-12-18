@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
+ * @template TException of \Throwable
+ *
  * Allows to create a response for a thrown exception.
  *
  * Call setResponse() to set the response that will be returned for the
@@ -29,9 +31,15 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 final class ExceptionEvent extends RequestEvent
 {
+    /**
+     * @var TException
+     */
     private \Throwable $throwable;
     private bool $allowCustomResponseCode = false;
 
+    /**
+     * @param TException $e
+     */
     public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, \Throwable $e)
     {
         parent::__construct($kernel, $request, $requestType);
@@ -39,12 +47,17 @@ final class ExceptionEvent extends RequestEvent
         $this->setThrowable($e);
     }
 
+    /**
+     * @return TException
+     */
     public function getThrowable(): \Throwable
     {
         return $this->throwable;
     }
 
     /**
+     * @param TException $exception
+     *
      * Replaces the thrown exception.
      *
      * This exception will be thrown if no response is set in the event.

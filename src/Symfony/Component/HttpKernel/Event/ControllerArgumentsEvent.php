@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
+ * @template TController of object
+ *
  * Allows filtering of controller arguments.
  *
  * You can call getController() to retrieve the controller and getArguments
@@ -28,9 +30,15 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 final class ControllerArgumentsEvent extends KernelEvent
 {
+    /**
+     * @var TController
+     */
     private $controller;
     private array $arguments;
 
+    /**
+     * @param TController $controller
+     */
     public function __construct(HttpKernelInterface $kernel, callable $controller, array $arguments, Request $request, ?int $requestType)
     {
         parent::__construct($kernel, $request, $requestType);
@@ -39,11 +47,17 @@ final class ControllerArgumentsEvent extends KernelEvent
         $this->arguments = $arguments;
     }
 
+    /**
+     * @return TController
+     */
     public function getController(): callable
     {
         return $this->controller;
     }
 
+    /**
+     * @param TController $controller
+     */
     public function setController(callable $controller)
     {
         $this->controller = $controller;

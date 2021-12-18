@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
+ * @template TController of object
+ *
  * Allows filtering of a controller callable.
  *
  * You can call getController() to retrieve the current controller. With
@@ -27,8 +29,14 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 final class ControllerEvent extends KernelEvent
 {
+    /**
+     * @var TController
+     */
     private string|array|object $controller;
 
+    /**
+     * @param TController $controller
+     */
     public function __construct(HttpKernelInterface $kernel, callable $controller, Request $request, ?int $requestType)
     {
         parent::__construct($kernel, $request, $requestType);
@@ -36,11 +44,17 @@ final class ControllerEvent extends KernelEvent
         $this->setController($controller);
     }
 
+    /**
+     * @return TController
+     */
     public function getController(): callable
     {
         return $this->controller;
     }
 
+    /**
+     * @param TController $controller
+     */
     public function setController(callable $controller): void
     {
         $this->controller = $controller;

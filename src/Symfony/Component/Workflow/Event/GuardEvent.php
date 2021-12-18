@@ -18,6 +18,9 @@ use Symfony\Component\Workflow\TransitionBlockerList;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
+ * @template TSubject of object
+ * @extends Event<TSubject>
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
@@ -27,6 +30,8 @@ final class GuardEvent extends Event
 
     /**
      * {@inheritdoc}
+     *
+     * @param TSubject $subject
      */
     public function __construct(object $subject, Marking $marking, Transition $transition, WorkflowInterface $workflow = null)
     {

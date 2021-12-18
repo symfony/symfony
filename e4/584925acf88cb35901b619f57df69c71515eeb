@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-17T17:40:16Z
+
+That's a BC break, but we can do it by using `@return` instead. And that's an improvement as you said, so 6.1 :)
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-12-18T09:26:12Z
+
+Damn I was sure this class was internal :sweat_smile: I tested with `@return` and it works too so it's fine for me :smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-18T09:42:26Z
+
+One test to fix and good to me.

@@ -16,6 +16,17 @@ index 1750d55ee2..c18494167a 100644
 +
          ]
      },
+diff --git a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php b/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
+index d68ae4c8b3..8e980a9e70 100644
+--- a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
++++ b/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
+@@ -88,5 +88,5 @@ abstract class KernelTestCase extends TestCase
+      * @return TestContainer
+      */
+-    protected static function getContainer(): ContainerInterface
++    protected static function getContainer(): TestContainer
+     {
+         if (!static::$booted) {
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 index 697e34cb77..9a1e4c5618 100644
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
@@ -1019,3 +1030,35 @@ index d6dcdf178f..0ab8d9c10e 100644
 +    public function getTargets(): string|array
      {
          return self::PROPERTY_CONSTRAINT;
+diff --git a/src/Symfony/Component/Workflow/Event/Event.php b/src/Symfony/Component/Workflow/Event/Event.php
+index cd7fab7896..b340eba38e 100644
+--- a/src/Symfony/Component/Workflow/Event/Event.php
++++ b/src/Symfony/Component/Workflow/Event/Event.php
+@@ -42,5 +42,5 @@ class Event extends BaseEvent
+      * @return Marking
+      */
+-    public function getMarking()
++    public function getMarking(): Marking
+     {
+         return $this->marking;
+@@ -50,5 +50,5 @@ class Event extends BaseEvent
+      * @return object
+      */
+-    public function getSubject()
++    public function getSubject(): object
+     {
+         return $this->subject;
+@@ -58,5 +58,5 @@ class Event extends BaseEvent
+      * @return Transition|null
+      */
+-    public function getTransition()
++    public function getTransition(): ?Transition
+     {
+         return $this->transition;
+@@ -71,5 +71,5 @@ class Event extends BaseEvent
+      * @return string
+      */
+-    public function getWorkflowName()
++    public function getWorkflowName(): string
+     {
+         return $this->workflow->getName();

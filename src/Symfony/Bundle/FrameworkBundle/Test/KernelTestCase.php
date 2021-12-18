@@ -84,6 +84,8 @@ abstract class KernelTestCase extends TestCase
      * used by other services.
      *
      * Using this method is the best way to get a container from your test code.
+     *
+     * @return TestContainer
      */
     protected static function getContainer(): ContainerInterface
     {

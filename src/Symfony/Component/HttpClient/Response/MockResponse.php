@@ -39,9 +39,9 @@ class MockResponse implements ResponseInterface, StreamableInterface
     private static int $idSequence = 0;
 
     /**
-     * @param string|string[]|iterable $body The response body as a string or an iterable of strings,
-     *                                       yielding an empty string simulates an idle timeout,
-     *                                       throwing an exception yields an ErrorChunk
+     * @param string|iterable<string|\Throwable> $body The response body as a string or an iterable of strings,
+     *                                                 yielding an empty string simulates an idle timeout,
+     *                                                 throwing or yielding an exception yields an ErrorChunk
      *
      * @see ResponseInterface::getInfo() for possible info, e.g. "response_headers"
      */
@@ -305,6 +305,10 @@ class MockResponse implements ResponseInterface, StreamableInterface
         if (!\is_string($body)) {
             try {
                 foreach ($body as $chunk) {
+                    if ($chunk instanceof \Throwable) {
+                        throw $chunk;
+                    }
+
                     if ('' === $chunk = (string) $chunk) {
                         // simulate an idle timeout
                         $response->body[] = new ErrorChunk($offset, sprintf('Idle timeout reached for "%s".', $response->info['url']));

@@ -9,6 +9,9 @@
 Replace this notice by a short README for your feature/bugfix.
 This will help reviewers and should be a good start for the documentation.
 
+For features please please update src/**/CHANGELOG.md files.
+For bugfixes please update UPGRADE-*.md and src/**/CHANGELOG.md files.
+
 Additionally (see https://symfony.com/releases):
  - Always add tests and ensure they pass.
  - Bug fixes must be submitted against the lowest maintained branch where they apply

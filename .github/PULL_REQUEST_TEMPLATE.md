@@ -1,9 +1,9 @@
 | Q             | A
 | ------------- | ---
 | Branch?       | 6.1 for features / 4.4, 5.3, 5.4 or 6.0 for bug fixes <!-- see below -->
-| Bug fix?      | yes/no
-| New feature?  | yes/no <!-- please update src/**/CHANGELOG.md files -->
-| Deprecations? | yes/no <!-- please update UPGRADE-*.md and src/**/CHANGELOG.md files -->
+| Bug fix?      | <li>- [ ] yes</li>
+| New feature?  | <li>- [ ] yes</li> <!-- please update src/**/CHANGELOG.md files -->
+| Deprecations? | <li>- [ ] yes</li> <!-- please update UPGRADE-*.md and src/**/CHANGELOG.md files -->
 | Tickets       | Fix #... <!-- prefix each issue number with "Fix #", no need to create an issue if none exist, explain below instead -->
 | License       | MIT
 | Doc PR        | symfony/symfony-docs#... <!-- required for new features -->

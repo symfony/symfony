@@ -96,6 +96,9 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(\PHP_BINARY, $result);
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testFindWithOpenBaseDir()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -114,6 +117,9 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(\PHP_BINARY, $result);
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testFindProcessInOpenBasedir()
     {
         if (ini_get('open_basedir')) {

@@ -1,0 +1,187 @@
+---------------------------------------------------------------------------
+
+by simonchrz at 2021-12-09T08:50:24Z
+
+@alexander-schranz maybe you could review this please ?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-12-09T13:01:52Z
+
+@simonchrz sorry for the noice. Overall I think we should need to duplicate here some thing from the `NativeSessionStorage` to solve this problem correctly.
+
+I would go with the following in the `__construct` method so we are sure the value inside `$this->sessionOptions` is always the correct one:
+
+```php
+$this->sessionOptions = [];
+foreach (session_get_cookie_params() as $key => $value) {
+    $this->sessionOptions['cookie_' . $key] => $value;
+}
+
+foreach ($sessionOptions as $key => $value) {
+    // do the same logic as in the NativeSessionStorage
+    // @see https://github.com/symfony/symfony/blob/v5.4.0/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php#L392-L394
+    if (isset($validOptions[$key])) {
+        if ('cookie_secure' === $key && 'auto' === $value) {
+            continue;
+        }
+        $this->sessionOptions[$key] = $value;
+   }
+}
+```
+
+We need to check if symfony is forcing some specific values in https://github.com/symfony/symfony/blob/v5.4.0/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php specially if samesite work correctly still for lower PHP Versions.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-13T09:27:10Z
+
+@simonchrz Are you able to write a test for your change? I really want to make sure, we don't break this behavior again.
+
+---------------------------------------------------------------------------
+
+by simonchrz at 2021-12-14T09:14:43Z
+
+@alexander-schranz i've followed your suggestion, please double check. 👍
+@derrabus added a test, too.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-12-14T23:35:20Z
+
+@simonchrz as I see there is also issue about `cookie_secure: auto` not correctly working. And this PR also seems to fix this. Can you add an additional test case where `cookie_secure: auto` is set by symfony and php has it set to false/off, before it seems to be always true in auto mode.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2021-12-15T00:26:05Z
+
+@simonchrz @alexander-schranz I don't think this completely fixes the problem with the `auto` setting. The `mergePhpSessionOptions` thing gets called too early for that.
+
+In a normal Symfony request lifecycle the session listener is one of the first things that gets called on the `kernel.request` event which means it's one of the first listeners that gets constructed. The `onKernelRequest` method sets the session factory callback which gets triggered the first time somebody tries to access the session. That callback will then eventually call `\Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface::createStorage` whose implementations then set `cookie_secure` option to `true` if the framework configuration value was `auto` or `true` and the request is secure -> https://github.com/symfony/symfony/blob/v5.4.1/src/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorageFactory.php#L44
+
+Since the `mergePhpSessionOptions` method was already called in the constructor it did not take into consideration the PHP ini settings change that the session storage factory (potentially) made so by the time `$sessionCookieSecure = $this->sessionOptions['cookie_secure'] ?? false;` executes on the `kernel.response` event `$this->sessionOptions['cookie_secure']` will be `false` instead of `true` (in the case when the request was secure, when PHP has it set to `false` and `auto` was specified in the framework configuration).
+
+The fix for this would probably be to not call `mergePhpSessionOptions` in the constructor and instead of accessing `$this->sessionOptions` directly in the `onKernelResponse` a getter can be called which would trigger the `mergePhpSessionOptions` logic. That way we ensure that that logic is called at the last possible moment and with that we ensure that `session_get_cookie_params()` returns the correct/expected values (as those values can be changed between the constructor and the `kernel.response` event handling, as described above).
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-12-15T00:42:01Z
+
+@X-Coder264 Thank you for the detailed response and testing this out. Was not aware of it that it was currently possible to change the Storage Options from outside. Then it definitly make sense that we move the call of `mergePhpSessionOptions` from `__construct` where `$this->sessionOptions` is currently use by doing:
+
+```php
+$sessionOptions = $this->getMergedPhpSessionOptions();
+
+$sessionCookiePath = $sessionOptions['cookie_path'] ?? '/';
+// ...
+```
+
+Would be interesting how we could create a functional test case for this. To avoid this errors in the future.
+
+@simonchrz sorry for the circumstances. And really thank you for working on this.
+
+---------------------------------------------------------------------------
+
+by simonchrz at 2021-12-15T11:34:06Z
+
+> Changes looks good. Thank you 👍 . Still a test for symfony using cookie_secure `auto` with native secure disabled should be added, or did I miss that one?
+
+nope, i'm actually struggling with adding this one... maybe you could jump in writing this test ? :-)
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-12-15T11:39:08Z
+
+@simonchrz Thx, no problem. Will try to have a look at the evening at it.
+
+---------------------------------------------------------------------------
+
+by Jelle-S at 2021-12-15T12:45:35Z
+
+I can confirm this fixes #44541
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-12-16T00:06:46Z
+
+@simonchrz This two additonal test cases cover the `cookie_secure` `auto` behaviour:
+
+```php
+
+            'set_cookiesecure_auto_by_symfony_false_by_php' => [
+                'phpSessionOptions' => ['secure' => false],
+                'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => 'auto', 'cookie_secure' => 'auto', 'cookie_samesite' => Cookie::SAMESITE_LAX],
+                'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => false, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            ],
+            'set_cookiesecure_auto_by_symfony_true_by_php' => [
+                'phpSessionOptions' => ['secure' => true],
+                'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => 'auto', 'cookie_secure' => 'auto', 'cookie_samesite' => Cookie::SAMESITE_LAX],
+                'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            ],
+```
+
+---------------------------------------------------------------------------
+
+by simonchrz at 2021-12-16T08:13:01Z
+
+@alexander-schranz thanks for the hint == i've just added them to the provider
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-12-17T09:29:05Z
+
+Looks good from my side. /cc @derrabus
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-17T18:43:10Z
+
+Why isn't 5.3 affected?
+
+---------------------------------------------------------------------------
+
+by arcanisgk at 2021-12-18T04:37:30Z
+
+I am on version 5.4.1 and I guess. that I am affected by the Invalid CSRF problems, I have had to put in all my options csrf_ * => false to force the operation, any idea when I can update simfony with composer to return to normality?
+
+---------------------------------------------------------------------------
+
+by simonchrz at 2021-12-18T07:40:27Z
+
+> Why isn't 5.3 affected?
+
+issue comes from refactoring on https://github.com/symfony/symfony/pull/41390 which isn't backmerged to 5.3 for some reason...
+
+---------------------------------------------------------------------------
+
+by simonchrz at 2021-12-18T07:41:13Z
+
+> I am on version 5.4.1 and I guess. that I am affected by the Invalid CSRF problems, I have had to put in all my options csrf_ * => false to force the operation, any idea when I can update simfony with composer to return to normality?
+
+i guess with 5.4.2 ? ;)
+
+---------------------------------------------------------------------------
+
+by sxsws at 2021-12-18T11:21:10Z
+
+I think the real question is why wasn't this problem caught on such a mature project?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-18T11:28:24Z
+
+🤷
+
+---------------------------------------------------------------------------
+
+by simonchrz at 2021-12-18T13:24:02Z
+
+@nicolas-grekas any idea how to fix thos 8.0, macos-11 test of messenger component ? they seem to have some kind of disk I/O issues ? https://github.com/symfony/symfony/runs/4569511187?check_suite_focus=true#step:9:2464
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-18T16:40:21Z
+
+> any idea how to fix thos 8.0, macos-11 test of messenger component ?
+
+That test is not related to these changes, is it? You don't need to bother then. The macOS test suite is relatively new and we still have some flaky tests there.

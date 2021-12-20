@@ -1321,6 +1321,31 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
+    public function testSubmitSingleExpandedFilteredObjectChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'multiple' => false,
+            'expanded' => true,
+            'choices' => $this->objectChoices,
+            'choice_label' => 'name',
+            'choice_value' => 'id',
+            'choice_filter' => function ($choice) { return null === $choice || $choice->id < 4; },
+        ]);
+
+        $form->submit('2');
+
+        $this->assertSame($this->objectChoices[1], $form->getData());
+        $this->assertTrue($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertTrue($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse(isset($form[3]));
+        $this->assertNull($form[0]->getViewData());
+        $this->assertSame('2', $form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
+    }
+
     public function testSubmitSingleExpandedClearMissingFalse()
     {
         $form = $this->factory->create(self::TESTED_TYPE, 'foo', [
@@ -1508,6 +1533,31 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[2]->getViewData());
         $this->assertNull($form[3]->getViewData());
         $this->assertNull($form[4]->getViewData());
+    }
+
+    public function testSubmitMultipleExpandedFilteredObjectChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'multiple' => true,
+            'expanded' => true,
+            'choices' => $this->objectChoices,
+            'choice_label' => 'name',
+            'choice_value' => 'id',
+            'choice_filter' => function ($choice) { return null === $choice || $choice->id < 4; },
+        ]);
+
+        $form->submit(['1', '2']);
+
+        $this->assertSame([$this->objectChoices[0], $this->objectChoices[1]], $form->getData());
+        $this->assertTrue($form->isSynchronized());
+
+        $this->assertTrue($form[0]->getData());
+        $this->assertTrue($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse(isset($form[3]));
+        $this->assertSame('1', $form[0]->getViewData());
+        $this->assertSame('2', $form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
     }
 
     public function testSubmitMultipleChoicesInts()

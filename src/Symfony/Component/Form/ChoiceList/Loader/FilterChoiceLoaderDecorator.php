@@ -50,7 +50,7 @@ class FilterChoiceLoaderDecorator extends AbstractChoiceLoader
      */
     public function loadChoicesForValues(array $values, callable $value = null): array
     {
-        return array_filter($this->decoratedLoader->loadChoicesForValues($values, $value), $this->filter);
+        return array_filter(parent::loadChoicesForValues($values, $value), $this->filter);
     }
 
     /**
@@ -58,6 +58,6 @@ class FilterChoiceLoaderDecorator extends AbstractChoiceLoader
      */
     public function loadValuesForChoices(array $choices, callable $value = null): array
     {
-        return $this->decoratedLoader->loadValuesForChoices(array_filter($choices, $this->filter), $value);
+        return parent::loadValuesForChoices(array_filter($choices, $this->filter), $value);
     }
 }

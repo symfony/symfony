@@ -884,7 +884,7 @@ class SerializerTest extends TestCase
                 ],
                 'path' => 'uuid',
                 'useMessageForUser' => true,
-                'message' => 'The data is not a valid UUID string representation.',
+                'message' => 'The data is not a valid "Symfony\Component\Uid\Uuid" string representation.',
             ],
             [
                 'currentType' => 'null',

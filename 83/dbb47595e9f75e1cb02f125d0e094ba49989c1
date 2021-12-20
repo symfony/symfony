@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by martinssipenko at 2021-12-01T10:33:34Z
+
+@jderusse I've updated code to use Platform now, but I don't quite understand why tests on 7.2 are failing.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-12-01T22:07:05Z
+
+> I don't quite understand why tests on 7.2 are failing.
+
+Tests are falling because the class `PostgreSQLPlatform`, does not exist in a version compatible with PHP 7.2. That's why `getCurrentTimestampStatement` used platform instead of driver.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-02T01:09:52Z
+
+> Tests are falling because the class `PostgreSQLPlatform`, does not exist in a version compatible with PHP 7.2.
+
+It does, but with different casing. Add this to the top of the test file, to trigger the autoloader with the old class name as well:
+
+```php
+class_exists('Doctrine\DBAL\Platforms\PostgreSqlPlatform');
+```
+
+---------------------------------------------------------------------------
+
+by martinssipenko at 2021-12-02T06:48:50Z
+
+Alright, CI is finally green. @jderusse @derrabus could you take a look at it?
+
+---------------------------------------------------------------------------
+
+by martinssipenko at 2021-12-08T08:34:16Z
+
+@jderusse @derrabus any updates on this?
+
+---------------------------------------------------------------------------
+
+by martinssipenko at 2021-12-14T07:34:11Z
+
+@jderusse Any updates here? CI just keeps failing randomly, not sure what can/should I do about it.

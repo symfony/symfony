@@ -76,10 +76,16 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         try {
-            return AbstractUid::class !== $type ? $type::fromString($data) : Uuid::fromString($data);
+            if (AbstractUid::class === $type) {
+                trigger_deprecation('symfony/serializer', '6.1', 'Denormalizing to an abstract class in "%s" is deprecated.', __CLASS__);
+
+                return Uuid::fromString($data);
+            }
+
+            return $type::fromString($data);
         } catch (\InvalidArgumentException|\TypeError $exception) {
             throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The data is not a valid "%s" string representation.', $type), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
-        } catch (\Error $e) {
+        } catch (\Error $e) { // @deprecated remove this catch block in 7.0
             if (str_starts_with($e->getMessage(), 'Cannot instantiate abstract class')) {
                 return $this->denormalize($data, AbstractUid::class, $format, $context);
             }
@@ -93,7 +99,13 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
-        return is_a($type, AbstractUid::class, true);
+        if (AbstractUid::class === $type) {
+            trigger_deprecation('symfony/serializer', '6.1', 'Supporting denormalization for the "%s" type in "%s" is deprecated, use one of "%s" child class instead.', AbstractUid::class, __CLASS__, AbstractUid::class);
+
+            return true;
+        }
+
+        return is_subclass_of($type, AbstractUid::class, true);
     }
 
     /**

@@ -592,8 +592,26 @@ index 19ff0db181..f0f4a5829f 100644
 +    public function countErrors(Request $request = null): int;
  
      /**
+diff --git a/src/Symfony/Component/Lock/LockFactory.php b/src/Symfony/Component/Lock/LockFactory.php
+index 125b6eae50..ac327e8981 100644
+--- a/src/Symfony/Component/Lock/LockFactory.php
++++ b/src/Symfony/Component/Lock/LockFactory.php
+@@ -44,5 +44,5 @@ class LockFactory implements LoggerAwareInterface
+      * @return SharedLockInterface
+      */
+-    public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
++    public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): SharedLockInterface
+     {
+         return $this->createLockFromKey(new Key($resource), $ttl, $autoRelease);
+@@ -58,5 +58,5 @@ class LockFactory implements LoggerAwareInterface
+      * @return SharedLockInterface
+      */
+-    public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
++    public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true): SharedLockInterface
+     {
+         $lock = new Lock($key, $this->store, $ttl, $autoRelease);
 diff --git a/src/Symfony/Component/Messenger/Envelope.php b/src/Symfony/Component/Messenger/Envelope.php
-index bb1194ad1b..bd7fc440ff 100644
+index bb1194ad1b..27731b9cb0 100644
 --- a/src/Symfony/Component/Messenger/Envelope.php
 +++ b/src/Symfony/Component/Messenger/Envelope.php
 @@ -13,4 +13,5 @@ namespace Symfony\Component\Messenger;

@@ -243,4 +243,18 @@ class HeadersTest extends TestCase
             "Foo: =?utf-8?Q?aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?=\r\n =?utf-8?Q?aaaa?=",
         ], $headers->toArray());
     }
+
+    public function testInReplyToAcceptsNonIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addHeader('In-Reply-To', 'foobar');
+        $this->assertEquals('foobar', $headers->get('In-Reply-To')->getBody());
+    }
+
+    public function testReferencesAcceptsNonIdentifierValues()
+    {
+        $headers = new Headers();
+        $headers->addHeader('References' , 'foobar');
+        $this->assertEquals('foobar', $headers->get('References')->getBody());
+    }
 }

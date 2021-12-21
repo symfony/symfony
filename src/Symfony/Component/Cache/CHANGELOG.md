@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+___
+
+* Add `NullTagAwareAdapter`
+
 6.0
 ---
 

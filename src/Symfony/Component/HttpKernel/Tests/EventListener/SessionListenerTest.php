@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +32,97 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class SessionListenerTest extends TestCase
 {
+    /**
+     * @dataProvider provideSessionOptions
+     * @runInSeparateProcess
+     */
+    public function testSessionCookieOptions(array $phpSessionOptions, array $sessionOptions, array $expectedSessionOptions)
+    {
+        $session = $this->createMock(Session::class);
+        $session->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->method('getId')->willReturn('123456');
+        $session->method('getName')->willReturn('PHPSESSID');
+        $session->method('save');
+        $session->method('isStarted')->willReturn(true);
+
+        if (isset($phpSessionOptions['samesite'])) {
+            ini_set('session.cookie_samesite', $phpSessionOptions['samesite']);
+        }
+        session_set_cookie_params(0, $phpSessionOptions['path'] ?? null, $phpSessionOptions['domain'] ?? null, $phpSessionOptions['secure'] ?? null, $phpSessionOptions['httponly'] ?? null);
+
+        $listener = new SessionListener(new Container(), false, $sessionOptions);
+        $kernel = $this->createMock(HttpKernelInterface::class);
+
+        $request = new Request();
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $request->setSession($session);
+        $response = new Response();
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+        $cookies = $response->headers->getCookies();
+        $this->assertSame('PHPSESSID', $cookies[0]->getName());
+        $this->assertSame('123456', $cookies[0]->getValue());
+        $this->assertSame($expectedSessionOptions['cookie_path'], $cookies[0]->getPath());
+        $this->assertSame($expectedSessionOptions['cookie_domain'], $cookies[0]->getDomain());
+        $this->assertSame($expectedSessionOptions['cookie_secure'], $cookies[0]->isSecure());
+        $this->assertSame($expectedSessionOptions['cookie_httponly'], $cookies[0]->isHttpOnly());
+        $this->assertSame($expectedSessionOptions['cookie_samesite'], $cookies[0]->getSameSite());
+    }
+
+    public function provideSessionOptions(): \Generator
+    {
+        if (\PHP_VERSION_ID > 70300) {
+            yield 'set_samesite_by_php' => [
+                'phpSessionOptions' => ['samesite' => Cookie::SAMESITE_STRICT],
+                'sessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true],
+                'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_STRICT],
+            ];
+        }
+
+        yield 'set_cookie_path_by_php' => [
+            'phpSessionOptions' => ['path' => '/prod/'],
+            'sessionOptions' => ['cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            'expectedSessionOptions' => ['cookie_path' => '/prod/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+        ];
+
+        yield 'set_cookie_secure_by_php' => [
+            'phpSessionOptions' => ['secure' => true],
+            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+        ];
+
+        yield 'set_cookiesecure_auto_by_symfony_false_by_php' => [
+            'phpSessionOptions' => ['secure' => false],
+            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => 'auto', 'cookie_secure' => 'auto', 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => false, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+        ];
+
+        yield 'set_cookiesecure_auto_by_symfony_true_by_php' => [
+            'phpSessionOptions' => ['secure' => true],
+            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => 'auto', 'cookie_secure' => 'auto', 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+        ];
+
+        yield 'set_cookie_httponly_by_php' => [
+            'phpSessionOptions' => ['httponly' => true],
+            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+        ];
+
+        yield 'set_cookie_domain_by_php' => [
+            'phpSessionOptions' => ['domain' => 'test.symfony'],
+            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => true, 'cookie_secure' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => 'test.symfony', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+        ];
+
+        yield 'set_samesite_by_symfony' => [
+            'phpSessionOptions' => ['samesite' => Cookie::SAMESITE_STRICT],
+            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => true, 'cookie_secure' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+            'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
+        ];
+    }
+
     public function testOnlyTriggeredOnMainRequest()
     {
         $listener = $this->getMockForAbstractClass(AbstractSessionListener::class);

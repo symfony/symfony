@@ -71,7 +71,7 @@ set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$dep
 
 $exclude = getenv('SYMFONY_PATCH_TYPE_EXCLUDE') ?: null;
 foreach ($loader->getClassMap() as $class => $file) {
-    if (false !== strpos($file = realpath($file), '/vendor/')) {
+    if (false !== strpos($file = realpath($file), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
         continue;
     }
 

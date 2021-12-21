@@ -177,14 +177,14 @@ EOF
 
             $this->displaySingleMessage($envelope, $io);
 
-            $shouldHandle = $shouldForce || $io->confirm('Do you want to retry (yes) or delete this message (no)?');
+            $shouldHandle = $shouldForce || $io->confirm('Do you want to retry this message?');
 
             if ($shouldHandle) {
                 return;
             }
 
-            $messageReceivedEvent->shouldHandle(false);
-            $receiver->reject($envelope);
+            //$messageReceivedEvent->shouldHandle(false);
+            //$receiver->reject($envelope);
         };
         $this->eventDispatcher->addListener(WorkerMessageReceivedEvent::class, $listener);
 

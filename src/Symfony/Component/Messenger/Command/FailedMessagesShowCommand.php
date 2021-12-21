@@ -141,7 +141,7 @@ EOF
         $io->writeln([
             '',
             sprintf(' Run <comment>messenger:failed:retry %s --transport=%s</comment> to retry this message.', $id, $failedTransportName),
-            sprintf(' Run <comment>messenger:failed:remove %s --transport=%s</comment> to delete it.', $id, $failedTransportName),
+            sprintf(' Run <comment>messenger:failed:remove %s --transport=%s</comment> to remove it.', $id, $failedTransportName),
         ]);
     }
 }

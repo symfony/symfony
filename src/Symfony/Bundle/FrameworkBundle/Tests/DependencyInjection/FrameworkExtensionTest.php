@@ -1588,11 +1588,11 @@ abstract class FrameworkExtensionTest extends TestCase
     }
 
     /**
-     * @dataProvider testAppRedisTagAwareConfigProvider
+     * @dataProvider appRedisTagAwareConfigProvider
      */
-    public function testAppRedisTagAwareAdapter()
+    public function testAppRedisTagAwareAdapter(string $configFile)
     {
-        $container = $this->createContainerFromFile('cache_app_redis_tag_aware');
+        $container = $this->createContainerFromFile($configFile);
 
         foreach ([TagAwareCacheInterface::class, CacheInterface::class, CacheItemPoolInterface::class] as $alias) {
             $def = $container->findDefinition($alias);
@@ -1605,7 +1605,7 @@ abstract class FrameworkExtensionTest extends TestCase
         }
     }
 
-    public function testAppRedisTagAwareConfigProvider(): array
+    public function appRedisTagAwareConfigProvider(): array
     {
         return [
             ['cache_app_redis_tag_aware'],

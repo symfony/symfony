@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-12-20T16:52:05Z
+
+would be great to add a test to prevent regressions
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2021-12-20T17:27:08Z
+
+Hm, since the header type is passed as string...
+```php
+$header = new UnstructuredHeader('Subject', 'Test');
+```
+...how can a regression be tested?
+Create a new test for the entries in `private const HEADER_CLASS_MAP`?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-20T17:30:18Z
+
+@ThomasLandauer create an Email with a `In-Reply-To` header (or a `References` header for the other test to add) being a value that does not respect the `msg-id` spec, i.e. exactly what fails with the current code of the component.
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2021-12-20T18:16:15Z
+
+OK, thanks - like this?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-21T09:02:20Z
+
+@nicolas-grekas @fabpot based on the issue being solved, I suggest we consider this as a bugfix.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-21T09:09:26Z
+
+Works for me

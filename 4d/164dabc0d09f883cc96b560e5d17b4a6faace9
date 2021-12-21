@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-12-20T16:28:10Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by kubawerlos at 2021-12-20T16:39:54Z
+
+No dear bot @carsonbot, this one is a GitHub issue: https://github.com/github/feedback/discussions/5634
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-20T17:00:14Z
+
+oh, I was not aware of the fact that this feature was not available for forks belonging to an organization. Maybe carsonbot could detect that case.
+
+---------------------------------------------------------------------------
+
+by kubawerlos at 2021-12-20T18:19:27Z
+
+@stof or GitHub will fix this, I didn't know about this as well, until carsonbot's message, doesn't look like a feature.

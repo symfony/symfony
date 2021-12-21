@@ -143,7 +143,7 @@ class XmlDumper extends Dumper
                     $tag->appendChild($this->document->createTextNode($name));
                 }
                 foreach ($attributes as $key => $value) {
-                    $tag->setAttribute($key, $value);
+                    $tag->setAttribute($key, $value ?? '');
                 }
                 $service->appendChild($tag);
             }

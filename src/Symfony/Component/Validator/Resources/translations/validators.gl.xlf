@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>Ningunha carpeta temporal foi configurada en php.ini.</target>
+                <target>Ningunha carpeta temporal foi configurada en php.ini, ou a carpeta non existe.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -364,7 +364,7 @@
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-                <target>Este valor debe estar comprendido entre {{min}} e {{max}}.</target>
+                <target>Este valor debe estar comprendido entre {{ min }} e {{ max }}.</target>
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
@@ -393,6 +393,14 @@
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
                 <target>Este valor non é unha cor CSS válida.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Este valor non ten unha notación CIDR válida.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>O valor da máscara de rede debería estar entre {{ min }} e {{ max }}.</target>
             </trans-unit>
         </body>
     </file>

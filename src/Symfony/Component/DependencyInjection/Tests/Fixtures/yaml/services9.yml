@@ -14,6 +14,7 @@ services:
             - foo: { foo: foo }
             - foo: { bar: bar, baz: baz }
             - foo: { name: bar, baz: baz }
+            - nullable: { bar: bar, baz: ~ }
         arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
         properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
         calls:

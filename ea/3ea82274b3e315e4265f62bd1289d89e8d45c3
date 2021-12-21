@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by kbond at 2021-12-21T20:31:58Z
+
+When enabling this data provider, I found an issue: `cache.app` using a pool that inherits another pool using `cache.adapter.redis_tag_aware` doesn't trigger the alias to be set.
+
+Example:
+
+```yaml
+framework:
+    cache:
+        app: cache.redis_tag_aware.bar # cache.app.taggable is not an alias
+        pools:
+            cache.redis_tag_aware.foo:
+                adapter: cache.adapter.redis_tag_aware
+            cache.redis_tag_aware.bar:
+                adapter: cache.redis_tag_aware.foo
+```
+
+I'm still investigating how to fix. In the meantime, I've modified the tests in this PR to just prove `cache.app` is aliases when using a pool that is `cache.adapter.redis_tag_aware`.

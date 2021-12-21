@@ -7,9 +7,8 @@
 
     <framework:config>
         <framework:cache>
-            <framework:app>cache.redis_tag_aware.bar</framework:app>
+            <framework:app>cache.redis_tag_aware.foo</framework:app>
             <framework:pool name="cache.redis_tag_aware.foo" adapter="cache.adapter.redis_tag_aware" />
-            <framework:pool name="cache.redis_tag_aware.bar" adapter="cache.redis_tag_aware.foo" />
         </framework:cache>
     </framework:config>
 </container>

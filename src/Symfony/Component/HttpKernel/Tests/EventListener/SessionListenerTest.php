@@ -40,29 +40,27 @@ class SessionListenerTest extends TestCase
      */
     public function testSessionCookieOptions(array $phpSessionOptions, array $sessionOptions, array $expectedSessionOptions)
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
-        $session->expects($this->exactly(1))->method('getId')->willReturn('123456');
-        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
-        $session->expects($this->exactly(1))->method('save');
-        $session->expects($this->exactly(1))->method('isStarted')->willReturn(true);
+        $session = $this->createMock(Session::class);
+        $session->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->method('getId')->willReturn('123456');
+        $session->method('getName')->willReturn('PHPSESSID');
+        $session->method('save');
+        $session->method('isStarted')->willReturn(true);
 
         if (isset($phpSessionOptions['samesite'])) {
             ini_set('session.cookie_samesite', $phpSessionOptions['samesite']);
         }
         session_set_cookie_params(0, $phpSessionOptions['path'] ?? null, $phpSessionOptions['domain'] ?? null, $phpSessionOptions['secure'] ?? null, $phpSessionOptions['httponly'] ?? null);
 
-        $container = new Container();
-        $container->set('initialized_session', $session);
-
-        $listener = new SessionListener($container, false, $sessionOptions);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $listener = new SessionListener(new Container(), false, $sessionOptions);
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
+        $request->setSession($session);
         $response = new Response();
-        $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         $cookies = $response->headers->getCookies();
         $this->assertSame('PHPSESSID', $cookies[0]->getName());

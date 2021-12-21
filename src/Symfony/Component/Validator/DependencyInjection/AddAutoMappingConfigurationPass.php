@@ -30,6 +30,8 @@ class AddAutoMappingConfigurationPass implements CompilerPassInterface
         $config = $container->hasParameter('validator.auto_mapping') ? $container->getParameter('validator.auto_mapping') : null;
 
         if (!$config || !$container->hasDefinition('validator.builder')) {
+            $container->getParameterBag()->remove('validator.auto_mapping');
+            
             return;
         }
 

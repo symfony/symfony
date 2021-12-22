@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-12-21T11:02:16Z
+
+@derrabus quoted from https://www.php.net/manual/en/curl.requirements.php:
+
+> PHP requires libcurl version 7.10.5 or later.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-21T11:03:25Z
+
+based on https://github.com/php/php-src/blob/0b5d371a9c2652c9775d807d29658b59a71848e5/ext/curl/sync-constants.php#L15, that doc seems outdated though. the min version seems to be 7.15.5 now. But that's still very old.
+
+Edit: fixed the doc in https://github.com/php/doc-en/pull/1221
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-21T11:11:02Z
+
+Yeah, I know. But still. 🙈

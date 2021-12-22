@@ -128,6 +128,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * Returns an iterator for attributes.
+     *
+     * @return \ArrayIterator<string, mixed>
      */
     public function getIterator(): \ArrayIterator
     {

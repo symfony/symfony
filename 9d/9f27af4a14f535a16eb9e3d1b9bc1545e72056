@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-22T16:14:35Z
+
+Same in the root package isn't it?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-22T16:27:39Z
+
+No. the root package only has it as a require-dev, and this should be removed only after removing the dev requirement in doctrine-bridge (which won't be done in 4.4).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-22T18:18:32Z
+
+Can't we remove the package from require-dev also? Maybe by bumping the min version of some deps, if they remain compatible with PHP 7.1?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-22T18:19:21Z
+
+Maybe not on 4.4, but 5.3+? 6.0+?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-22T18:22:33Z
+
+@nicolas-grekas doing that in 5.x (either 5.3 or 5.4) is indeed the plan (see my comment on the RFC issue)

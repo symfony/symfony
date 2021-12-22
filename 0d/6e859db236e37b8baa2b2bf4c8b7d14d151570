@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by kbond at 2021-11-27T20:10:21Z
+
+Some details on `X-Unsent` header client support:
+- Virtually all versions of Outlook (desktop clients at least) support
+- [Appears some versions of Apple Mail support](https://stackoverflow.com/questions/11330628/os-x-mail-open-eml-files-in-compose-mode) with the `X-Uniform-Type-Identifier: com.apple.mail-draft` header (maybe worth adding). For versions that don't, it looks like there is [an option](https://stackoverflow.com/questions/11330628/os-x-mail-open-eml-files-in-compose-mode#comment116935146_33224913) to switch viewing a .eml to draft
+- Looks like Thunderbird 91+ supports natively and there is an addon for [previous versions](https://addons.thunderbird.net/en-us/thunderbird/addon/x-unsent-support/)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-12-20T15:49:55Z
+
+@kbond Can you rebase on 6.1? Is it ready?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-20T15:55:50Z
+
+the point brought by @kbond in https://github.com/symfony/symfony/pull/44311#discussion_r757890316 is not resolved yet: how should the mailer component behave if being asked to send a DraftEmail object ?
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-12-20T16:34:28Z
+
+Rebased. Two remaining things:
+- [x] https://github.com/symfony/symfony/pull/44311#discussion_r757813415
+- [ ] https://github.com/symfony/symfony/pull/44311#issuecomment-980794489 (adding `X-Uniform-Type-Identifier: com.apple.mail-draft` for Apple Mail)
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-12-20T17:16:09Z
+
+To @GromNaN's original question. My _personal_ use-case for setting `X-Unsent` in an email is removed once `DraftEmail` exists. Should I remove the check for this header in `Email` and `Mailer`? Then in `Mailer`, we'd throw an exception if `$message instanceof DraftEmail`.
+
+> Otherwise having code in the parent class for the behavior of a child class sounds a bad design.
+
+I agree completely if we were calling a method on the child from the parent. This is a "generic" header that can be added to any `Message`. (I don't feel strongly one way or the other)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2021-12-20T20:48:35Z
+
+`X-Unsent` is actually recognized by [Thunderbird](https://bugzilla.mozilla.org/show_bug.cgi?id=166541) and [Outlook](https://docs.microsoft.com/en-us/previous-versions/office/developer/exchange-server-2003/ms875199(v=exchg.65)). Therefore that's legit to support it in the base `Email` class.
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-12-22T01:02:21Z
+
+ad833aaaedf474b570d6c43b5ded28adbcf41cce refactors this to have `ensureValidity()` throw the exception. I agree that having the exception thrown here makes the most sense.

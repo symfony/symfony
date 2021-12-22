@@ -128,6 +128,32 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
     }
 
+    public function testBucketRefilledWithStrictFrequency()
+    {
+        $limiter = $this->createLimiter(1000, new Rate(\DateInterval::createFromDateString('15 seconds'), 100));
+        $rateLimit = $limiter->consume(300);
+
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(700, $rateLimit->getRemainingTokens());
+
+        $expected = 699;
+
+        for ($i = 1; $i <= 20; ++$i) {
+            $rateLimit = $limiter->consume();
+            $this->assertTrue($rateLimit->isAccepted());
+            $this->assertEquals($expected, $rateLimit->getRemainingTokens());
+
+            sleep(4);
+            --$expected;
+
+            if (\in_array($i, [4, 8, 12], true)) {
+                $expected += 100;
+            } elseif (\in_array($i, [15, 19], true)) {
+                $expected = 999;
+            }
+        }
+    }
+
     private function createLimiter($initialTokens = 10, Rate $rate = null)
     {
         return new TokenBucketLimiter('test', $initialTokens, $rate ?? Rate::perSecond(10), $this->storage);

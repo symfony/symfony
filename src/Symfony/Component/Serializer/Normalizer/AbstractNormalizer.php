@@ -409,6 +409,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 }
             }
 
+            if (isset($context['not_normalizable_value_exceptions']) && \count($context['not_normalizable_value_exceptions']) > 0) {
+                return $reflectionClass->newInstanceWithoutConstructor();
+            }
+
             if ($constructor->isConstructor()) {
                 return $reflectionClass->newInstanceArgs($params);
             } else {

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by solverat at 2021-12-16T09:18:59Z
+
+Yes! Just tested it! I'm struggling with this since I've updated to 5.4. It's a quite rare situation, but in my case I'm having a very early RedirectResponse which crashes with a `Session has not been set`. So +1 from my side!
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-12-22T11:10:28Z
+
+@shyim could you have a look to the failing test please?
+
+---------------------------------------------------------------------------
+
+by shyim at 2021-12-22T21:03:12Z
+
+I can look tomorrow into it
+
+---------------------------------------------------------------------------
+
+by shyim at 2021-12-23T07:42:00Z
+
+@jderusse Rebased more jobs are green. MacOS failure doesn't seems to be from my side

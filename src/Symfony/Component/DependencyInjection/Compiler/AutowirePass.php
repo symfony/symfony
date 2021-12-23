@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Parameter;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -254,6 +255,12 @@ class AutowirePass extends AbstractRecursivePass
                     if (TaggedLocator::class === $attribute->getName()) {
                         $attribute = $attribute->newInstance();
                         $arguments[$index] = new ServiceLocatorArgument(new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute, $attribute->defaultIndexMethod, true, $attribute->defaultPriorityMethod));
+                        break;
+                    }
+
+                    if (Parameter::class === $attribute->getName()) {
+                        $attribute = $attribute->newInstance();
+                        $arguments[$index] = $this->container->getParameter($attribute->name);
                         break;
                     }
                 }

@@ -38,6 +38,27 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
  */
 class AutowirePassTest extends TestCase
 {
+    /**
+     * @requires PHP 8.0
+     */
+    public function testParameterBindingsSuccess()
+    {
+        $container = new ContainerBuilder();
+
+        $testDefinition = $container->register(AutowiredParameterTest::class);
+        $testDefinition->setAutowired(true);
+
+        $container->setParameter('parameter.test', 'hello world');
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
+        $definition = $container->getDefinition(AutowiredParameterTest::class);
+
+        $this->assertCount(1, $definition->getArguments());
+        $this->assertEquals('hello world', $definition->getArgument(0));
+        $this->assertEquals('hello world', $container->get(AutowiredParameterTest::class)->testParam);
+    }
+
     public function testProcess()
     {
         $container = new ContainerBuilder();

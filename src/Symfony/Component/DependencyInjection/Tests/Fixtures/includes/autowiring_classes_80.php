@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use Symfony\Component\DependencyInjection\Attribute\Parameter;
 use Symfony\Contracts\Service\Attribute\Required;
 
 class AutowireSetter
@@ -25,4 +26,11 @@ class AutowireProperty
 {
     #[Required]
     public Foo $foo;
+}
+
+class AutowiredParameterTest
+{
+    public function __construct(#[Parameter("parameter.test")] public string $testParam)
+    {
+    }
 }

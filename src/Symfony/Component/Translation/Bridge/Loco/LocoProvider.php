@@ -73,8 +73,15 @@ final class LocoProvider implements ProviderInterface
             }
 
             foreach ($catalogue->all() as $domain => $messages) {
-                $ids = $this->getAssetsIds($domain);
-                $this->translateAssets(array_combine($ids, array_values($messages)), $locale);
+                $keysIdsMap = [];
+
+                foreach ($this->getAssetsIds($domain) as $id) {
+                    $keysIdsMap[$this->retrieveKeyFromId($id, $domain)] = $id;
+                }
+
+                $ids = array_intersect_key($keysIdsMap, $messages);
+
+                $this->translateAssets(array_combine(array_values($ids), array_values($messages)), $locale);
             }
         }
     }
@@ -83,51 +90,37 @@ final class LocoProvider implements ProviderInterface
     {
         $domains = $domains ?: ['*'];
         $translatorBag = new TranslatorBag();
-        $responses = [];
 
         foreach ($locales as $locale) {
             foreach ($domains as $domain) {
-                $responses[] = [
-                    'response' => $this->client->request('GET', sprintf('export/locale/%s.xlf', rawurlencode($locale)), [
-                        'query' => [
-                            'filter' => $domain,
-                            'status' => 'translated',
-                        ],
-                    ]),
-                    'locale' => $locale,
-                    'domain' => $domain,
-                ];
-            }
-        }
+                // Loco forbids concurrent requests, so the requests must be synchronous in order to prevent "429 Too Many Requests" errors.
+                $response = $this->client->request('GET', sprintf('export/locale/%s.xlf', rawurlencode($locale)), [
+                    'query' => [
+                        'filter' => $domain,
+                        'status' => 'translated,blank-translation',
+                    ],
+                ]);
 
-        foreach ($responses as $response) {
-            $locale = $response['locale'];
-            $domain = $response['domain'];
-            $response = $response['response'];
-
-            if (404 === $response->getStatusCode()) {
-                $this->logger->warning(sprintf('Locale "%s" for domain "%s" does not exist in Loco.', $locale, $domain));
-                continue;
-            }
-
-            $responseContent = $response->getContent(false);
-
-            if (200 !== $response->getStatusCode()) {
-                throw new ProviderException('Unable to read the Loco response: '.$responseContent, $response);
-            }
-
-            $locoCatalogue = $this->loader->load($responseContent, $locale, $domain);
-            $catalogue = new MessageCatalogue($locale);
-
-            foreach ($locoCatalogue->all($domain) as $key => $message) {
-                if (str_starts_with($key, $domain.'__')) {
-                    $key = substr($key, \strlen($domain) + 2);
+                if (404 === $response->getStatusCode()) {
+                    $this->logger->warning(sprintf('Locale "%s" for domain "%s" does not exist in Loco.', $locale, $domain));
+                    continue;
                 }
 
-                $catalogue->set($key, $message, $domain);
-            }
+                $responseContent = $response->getContent(false);
 
-            $translatorBag->addCatalogue($catalogue);
+                if (200 !== $response->getStatusCode()) {
+                    throw new ProviderException('Unable to read the Loco response: '.$responseContent, $response);
+                }
+
+                $locoCatalogue = $this->loader->load($responseContent, $locale, $domain);
+                $catalogue = new MessageCatalogue($locale);
+
+                foreach ($locoCatalogue->all($domain) as $key => $message) {
+                    $catalogue->set($this->retrieveKeyFromId($key, $domain), $message, $domain);
+                }
+
+                $translatorBag->addCatalogue($catalogue);
+            }
         }
 
         return $translatorBag;
@@ -286,5 +279,14 @@ final class LocoProvider implements ProviderInterface
 
             return $carry;
         }, []);
+    }
+
+    private function retrieveKeyFromId(string $id, string $domain): string
+    {
+        if (str_starts_with($id, $domain.'__')) {
+            return substr($id, \strlen($domain) + 2);
+        }
+
+        return $id;
     }
 }

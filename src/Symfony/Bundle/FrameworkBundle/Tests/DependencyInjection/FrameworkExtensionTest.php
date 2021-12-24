@@ -1688,6 +1688,32 @@ abstract class FrameworkExtensionTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider appRedisTagAwareConfigProvider
+     */
+    public function testAppRedisTagAwareAdapter(string $configFile)
+    {
+        $container = $this->createContainerFromFile($configFile);
+
+        foreach ([TagAwareCacheInterface::class, CacheInterface::class, CacheItemPoolInterface::class] as $alias) {
+            $def = $container->findDefinition($alias);
+
+            while ($def instanceof ChildDefinition) {
+                $def = $container->getDefinition($def->getParent());
+            }
+
+            $this->assertSame(RedisTagAwareAdapter::class, $def->getClass());
+        }
+    }
+
+    public function appRedisTagAwareConfigProvider(): array
+    {
+        return [
+            ['cache_app_redis_tag_aware'],
+            ['cache_app_redis_tag_aware_pool'],
+        ];
+    }
+
     public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()
     {
         $container = $this->createContainer(['kernel.debug' => true]);

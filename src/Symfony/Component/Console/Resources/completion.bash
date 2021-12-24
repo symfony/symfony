@@ -9,6 +9,12 @@ _sf_{{ COMMAND_NAME }}() {
     # Use newline as only separator to allow space in completion values
     IFS=$'\n'
     local sf_cmd="${COMP_WORDS[0]}"
+
+    # for an alias, get the real script behind it
+    if [[ $(type -t $sf_cmd) == "alias" ]]; then
+        sf_cmd=$(alias $sf_cmd | sed -E "s/alias $sf_cmd='(.*)'/\1/")
+    fi
+
     if [ ! -f "$sf_cmd" ]; then
         return 1
     fi

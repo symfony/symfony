@@ -311,8 +311,6 @@ class Cookie
 
     /**
      * Gets the samesite attribute of the cookie.
-     *
-     * @return string|null
      */
     public function getSameSite(): ?string
     {

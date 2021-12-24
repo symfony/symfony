@@ -36,7 +36,6 @@ use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -397,7 +396,7 @@ class SecurityExtensionTest extends TestCase
             ],
         ]);
 
-        $this->expectDeprecation('Since symfony/security-bundle 5.4: Not configuring explicitly the provider for the "custom_authenticators" listener on "some_firewall" firewall is deprecated because it\'s ambiguous as there is more than one registered provider.');
+        $this->expectDeprecation('Since symfony/security-bundle 5.4: Not configuring explicitly the provider for the "some_firewall" firewall is deprecated because it\'s ambiguous as there is more than one registered provider. Set the "provider" key to one of the configured providers, even if your custom authenticators don\'t use it.');
 
         $container->compile();
     }
@@ -834,7 +833,7 @@ class SecurityExtensionTest extends TestCase
 
         $args = $container->getDefinition('security.authorization_checker')->getArguments();
         $this->assertEquals('security.token_storage', (string) $args[0]);
-        $this->assertEquals('security.authentication_manager', (string) $args[1]);
+        $this->assertEquals('security.authentication.manager', (string) $args[1]);
         $this->assertEquals('security.access.decision_manager', (string) $args[2]);
         $this->assertEquals('%security.access.always_authenticate_before_granting%', (string) $args[3]);
     }

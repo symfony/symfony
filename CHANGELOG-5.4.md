@@ -7,6 +7,44 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.1 (2021-12-09)
+
+ * bug #44490 [DependencyInjection][Messenger] Add auto-registration for BatchHandlerInterface (GaryPEGEOT)
+ * bug #44523 [Console] Fix polyfill-php73 requirement (Seldaek)
+ * bug #44502 [HttpFoundation] do not call preg_match() on null (xabbuh)
+ * bug #44475 [Console] Handle alias in completion script (GromNaN)
+ * bug #44481 [FrameworkBundle] Fix loginUser() causing deprecation (wouterj)
+ * bug #44416 [Translation] Make http requests synchronous when reading the Loco API (Kocal)
+ * bug #44437 [HttpKernel] Fix wrong usage of SessionUtils::popSessionCookie (simonchrz)
+ * bug #44350 [Translation] Fix TranslationTrait (Tomasz Kusy)
+ * bug #44460 [SecurityBundle] Fix ambiguous deprecation message on missing provider (chalasr)
+ * bug #44467 [Console] Fix parameter types for `ProcessHelper::mustRun()` (derrabus)
+ * bug #44427 [FrameworkBundle] Fix compatibility with symfony/security-core 6.x (deps=high tests) (wouterj)
+ * bug #44424 [SecurityBundle] Don't rely on deprecated strategy constants (derrabus)
+ * bug #44399 Prevent infinite nesting of lazy `ObjectManager` instances when `ObjectManager` is reset (Ocramius)
+ * bug #44395 [HttpKernel] fix sending Vary: Accept-Language when appropriate (nicolas-grekas)
+ * bug #44385 [DependencyInjection] Skip parameter attribute configurators in AttributeAutoconfigurationPass if we can't get the constructor reflector (fancyweb)
+ * bug #44359 Avoid duplicated session listener registration in tests (alexander-schranz)
+ * bug #44375 [DoctrineBridge] fix calling get_class on non-object (kbond)
+ * bug #44378 [HttpFoundation] fix SessionHandlerFactory using connections (dmaicher)
+ * bug #44365 [SecurityBundle]  Fix invalid reference with `always_authenticate_before_granting` (chalasr)
+ * bug #44361 [HttpClient] Fix handling error info in MockResponse (fancyweb)
+ * bug #44370 [Lock] create lock table if it does not exist (martinssipenko)
+
+* 5.4.0 (2021-11-29)
+
+ * bug #44309 [Messenger] Leverage DBAL's getNativeConnection() method (derrabus)
+ * bug #44300 [FrameworkBundle] Fix property-info phpstan extractor discovery (1ed)
+ * feature #44271 [Notifier] add Vonage bridge to replace the Nexmo one (nicolas-grekas)
+ * bug #44187 [Translation] [Loco] Fix idempotency of LocoProvider write method (welcoMattic)
+ * bug #43992 [Security] Do not overwrite already stored tokens for REMOTE_USER authentication (stlrnz)
+ * bug #43876 [Validator] Fix validation for single level domains (HypeMC)
+ * bug #44327 [Debug][ErrorHandler] Increased the reserved memory from 10k to 32k (sakalys)
+ * bug #44261 [Process] intersect with getenv() in case-insensitive manner to get default envs (stable-staple)
+ * bug #44295 [Serializer] fix support for lazy/unset properties (nicolas-grekas)
+ * bug #44277 [Notifier] Fix AllMySms bridge body content (afiocre)
+ * bug #44269 [DoctrineBridge] Revert " add support for the JSON type" (dunglas)
+
 * 5.4.0-RC1 (2021-11-24)
 
  * security #cve-2021-41268 [SecurityBundle] Default signature_properties to the previous behavior (wouterj)

@@ -70,9 +70,13 @@ final class PostgreSqlConnection extends Connection
             $this->listening = true;
         }
 
-        $wrappedConnection = $this->driverConnection->getWrappedConnection();
-        if (!$wrappedConnection instanceof \PDO && $wrappedConnection instanceof DoctrinePdoConnection) {
-            $wrappedConnection = $wrappedConnection->getWrappedConnection();
+        if (method_exists($this->driverConnection, 'getNativeConnection')) {
+            $wrappedConnection = $this->driverConnection->getNativeConnection();
+        } else {
+            $wrappedConnection = $this->driverConnection->getWrappedConnection();
+            if (!$wrappedConnection instanceof \PDO && $wrappedConnection instanceof DoctrinePdoConnection) {
+                $wrappedConnection = $wrappedConnection->getWrappedConnection();
+            }
         }
 
         $notification = $wrappedConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);

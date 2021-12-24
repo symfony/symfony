@@ -122,7 +122,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             if ($config['always_authenticate_before_granting']) {
                 $authorizationChecker = $container->getDefinition('security.authorization_checker');
                 $authorizationCheckerArgs = $authorizationChecker->getArguments();
-                array_splice($authorizationCheckerArgs, 1, 0, [new Reference('security.authentication_manager')]);
+                array_splice($authorizationCheckerArgs, 1, 0, [new Reference('security.authentication.manager')]);
                 $authorizationChecker->setArguments($authorizationCheckerArgs);
             }
 
@@ -704,7 +704,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey || 'custom_authenticators' === $factoryKey) {
             if ('custom_authenticators' === $factoryKey) {
-                trigger_deprecation('symfony/security-bundle', '5.4', 'Not configuring explicitly the provider for the "%s" listener on "%s" firewall is deprecated because it\'s ambiguous as there is more than one registered provider.', $factoryKey, $id);
+                trigger_deprecation('symfony/security-bundle', '5.4', 'Not configuring explicitly the provider for the "%s" firewall is deprecated because it\'s ambiguous as there is more than one registered provider. Set the "provider" key to one of the configured providers, even if your custom authenticators don\'t use it.', $id);
             }
 
             return 'security.user_providers';
@@ -1059,7 +1059,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private function createRequestMatcher(ContainerBuilder $container, string $path = null, string $host = null, int $port = null, array $methods = [], array $ips = null, array $attributes = []): Reference
     {
         if ($methods) {
-            $methods = array_map('strtoupper', (array) $methods);
+            $methods = array_map('strtoupper', $methods);
         }
 
         if (null !== $ips) {

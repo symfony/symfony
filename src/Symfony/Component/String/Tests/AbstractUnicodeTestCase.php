@@ -37,9 +37,9 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
             ['*', [42]],
             ['AZ', [65, 90]],
             ['€', [8364]],
-            ['€', [0x20ac]],
+            ['€', [0x20AC]],
             ['Ʃ', [425]],
-            ['Ʃ', [0x1a9]],
+            ['Ʃ', [0x1A9]],
             ['☢☎❄', [0x2622, 0x260E, 0x2744]],
         ];
     }

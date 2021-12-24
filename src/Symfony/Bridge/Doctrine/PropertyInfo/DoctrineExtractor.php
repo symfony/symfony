@@ -293,7 +293,6 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             case Types::ARRAY:
             case Types::SIMPLE_ARRAY:
             case 'json_array':
-            case 'json':
                 return Type::BUILTIN_TYPE_ARRAY;
         }
 

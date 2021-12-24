@@ -985,4 +985,22 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
+
+    public function testCallableClass()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register('foo', CallableClass::class);
+        $definition->addMethodCall('callMethod', [123]);
+
+        (new CheckTypeDeclarationsPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+}
+
+class CallableClass
+{
+    public function __call($name, $arguments)
+    {
+    }
 }

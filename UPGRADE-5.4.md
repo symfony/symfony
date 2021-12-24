@@ -38,6 +38,7 @@ FrameworkBundle
  * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
  * Deprecate the `cache.adapter.doctrine` service: The Doctrine Cache library is deprecated. Either switch to Symfony Cache or use the PSR-6 adapters provided by Doctrine Cache.
  * In `framework.cache` configuration, using `cache.adapter.pdo` adapter with a Doctrine DBAL connection is deprecated, use `cache.adapter.doctrine_dbal` instead.
+ * Deprecate not setting the `framework.messenger.reset_on_message` config option, its default value will change to `true` in 6.0
 
 HttpKernel
 ----------
@@ -62,13 +63,12 @@ Messenger
 
  * Deprecate not setting the `delete_after_ack` config option (or DSN parameter) using the Redis transport,
    its default value will change to `true` in 6.0
- * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
 
 Monolog
 -------
 
  * Deprecate `ResetLoggersWorkerSubscriber` to reset buffered logs in messenger
-   workers, use "reset_on_message" option in messenger configuration instead.
+   workers, use `framework.messenger.reset_on_message` option in FrameworkBundle messenger configuration instead.
 
 SecurityBundle
 --------------
@@ -170,3 +170,19 @@ Security
  * Deprecate passing the strategy as string to `AccessDecisionManager`,
    pass an instance of `AccessDecisionStrategyInterface` instead
  * Flag `AccessDecisionManager` as `@final`
+ * Deprecate passing `$credentials` to `PreAuthenticatedToken`,
+   `SwitchUserToken` and `UsernamePasswordToken`:
+
+   Before:
+   ```php
+   $token = new UsernamePasswordToken($user, $credentials, $firewallName, $roles);
+   $token = new PreAuthenticatedToken($user, $credentials, $firewallName, $roles);
+   $token = new SwitchUserToken($user, $credentials, $firewallName, $roles, $originalToken);
+   ```
+
+   After:
+   ```php
+   $token = new UsernamePasswordToken($user, $firewallName, $roles);
+   $token = new PreAuthenticatedToken($user, $firewallName, $roles);
+   $token = new SwitchUserToken($user, $firewallName, $roles, $originalToken);
+   ```

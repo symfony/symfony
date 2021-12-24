@@ -124,7 +124,6 @@ HttpFoundation
  * Removed the `Request::HEADER_X_FORWARDED_ALL` constant, use either `Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO` or `Request::HEADER_X_FORWARDED_AWS_ELB` or `Request::HEADER_X_FORWARDED_TRAEFIK`constants instead
  * Rename `RequestStack::getMasterRequest()` to `getMainRequest()`
  * Not passing `FILTER_REQUIRE_ARRAY` or `FILTER_FORCE_ARRAY` flags to `InputBag::filter()` when filtering an array will throw `BadRequestException`
- * Removed the `Request::HEADER_X_FORWARDED_ALL` constant
  * Retrieving non-scalar values using `InputBag::get()` will throw `BadRequestException` (use `InputBad::all()` instead to retrieve an array)
  * Passing non-scalar default value as the second argument `InputBag::get()` will throw `\InvalidArgumentException`
  * Passing non-scalar, non-array value as the second argument `InputBag::set()` will throw `\InvalidArgumentException`
@@ -173,7 +172,6 @@ Messenger
  * Removed the `prefetch_count` parameter in the AMQP bridge.
  * Removed the use of TLS option for Redis Bridge, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
  * The `delete_after_ack` config option of the Redis transport now defaults to `true`
- * The `reset_on_message` config option now defaults to `true`
 
 Mime
 ----
@@ -408,6 +406,22 @@ Security
    ```
  * `AccessDecisionManager` does not accept strings as strategy anymore,
    pass an instance of `AccessDecisionStrategyInterface` instead
+ * Removed the `$credentials` argument of `PreAuthenticatedToken`,
+   `SwitchUserToken` and `UsernamePasswordToken`:
+
+   Before:
+   ```php
+   $token = new UsernamePasswordToken($user, $credentials, $firewallName, $roles);
+   $token = new PreAuthenticatedToken($user, $credentials, $firewallName, $roles);
+   $token = new SwitchUserToken($user, $credentials, $firewallName, $roles, $originalToken);
+   ```
+
+   After:
+   ```php
+   $token = new UsernamePasswordToken($user, $firewallName, $roles);
+   $token = new PreAuthenticatedToken($user, $firewallName, $roles);
+   $token = new SwitchUserToken($user, $firewallName, $roles, $originalToken);
+   ```
 
 SecurityBundle
 --------------

@@ -86,7 +86,7 @@ class AuthenticatedVoter implements CacheableVoterInterface
                 && ($this->authenticationTrustResolver->isAnonymous($token)
                     || $this->authenticationTrustResolver->isRememberMe($token)
                     || $this->authenticationTrustResolver->isFullFledged($token))) {
-                trigger_deprecation('symfony/security-core', '5.4', 'The "IS_AUTHENTICATED_ANONYMOUSLY" security attribute is deprecated, use "IS_AUTHENTICATED" or "IS_AUTHENTICATED_FULLY" instead if you want to check if the request is (fully) authenticated.');
+                trigger_deprecation('symfony/security-core', '5.4', 'The "IS_AUTHENTICATED_ANONYMOUSLY" security attribute is deprecated, use "PUBLIC_ACCESS" for public resources, otherwise use "IS_AUTHENTICATED" or "IS_AUTHENTICATED_FULLY" instead if you want to check if the request is (fully) authenticated.');
 
                 return VoterInterface::ACCESS_GRANTED;
             }

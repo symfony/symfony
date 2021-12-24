@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * @author Alexander M. Turek <me@derrabus.de>
@@ -99,11 +100,19 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
             }
         }
 
-        if ($this->parameterAttributeConfigurators && $constructorReflector = $this->getConstructor($value, false)) {
-            foreach ($constructorReflector->getParameters() as $parameterReflector) {
-                foreach ($parameterReflector->getAttributes() as $attribute) {
-                    if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
-                        $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
+        if ($this->parameterAttributeConfigurators) {
+            try {
+                $constructorReflector = $this->getConstructor($value, false);
+            } catch (RuntimeException $e) {
+                $constructorReflector = null;
+            }
+
+            if ($constructorReflector) {
+                foreach ($constructorReflector->getParameters() as $parameterReflector) {
+                    foreach ($parameterReflector->getAttributes() as $attribute) {
+                        if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
+                            $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
+                        }
                     }
                 }
             }

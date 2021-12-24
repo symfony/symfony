@@ -16,6 +16,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
 use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use phpDocumentor\Reflection\Types\ContextFactory;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -106,6 +107,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFac
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
+use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -157,6 +159,7 @@ use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransport;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Notifier;
@@ -348,6 +351,11 @@ class FrameworkExtension extends Extension
 
             $this->sessionConfigEnabled = true;
             $this->registerSessionConfiguration($config['session'], $container, $loader);
+            if (!empty($config['test'])) {
+                // test listener will replace the existing session listener
+                // as we are aliasing to avoid duplicated registered events
+                $container->setAlias('session_listener', 'test.session.listener');
+            }
         } elseif (!empty($config['test'])) {
             $container->removeDefinition('test.session.listener');
         }
@@ -574,6 +582,8 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
             ->addTag('validator.initializer');
         $container->registerForAutoconfiguration(MessageHandlerInterface::class)
+            ->addTag('messenger.message_handler');
+        $container->registerForAutoconfiguration(BatchHandlerInterface::class)
             ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(TransportFactoryInterface::class)
             ->addTag('messenger.transport_factory');
@@ -1849,7 +1859,7 @@ class FrameworkExtension extends Extension
 
         if (
             ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/property-info'], true)
-            && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/property-info'], true)
+            && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', ContextFactory::class, ['symfony/framework-bundle', 'symfony/property-info'], true)
         ) {
             $definition = $container->register('property_info.phpstan_extractor', PhpStanExtractor::class);
             $definition->addTag('property_info.type_extractor', ['priority' => -1000]);
@@ -2219,7 +2229,9 @@ class FrameworkExtension extends Extension
                 $pool['reset'] = 'reset';
             }
 
-            if ($isRedisTagAware) {
+            if ($isRedisTagAware && 'cache.app' === $name) {
+                $container->setAlias('cache.app.taggable', $name);
+            } elseif ($isRedisTagAware) {
                 $tagAwareId = $name;
                 $container->setAlias('.'.$name.'.inner', $name);
             } elseif ($pool['tags']) {
@@ -2540,6 +2552,7 @@ class FrameworkExtension extends Extension
             TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',
             TurboSmsTransport::class => 'notifier.transport_factory.turbo-sms',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
+            VonageTransportFactory::class => 'notifier.transport_factory.vonage',
             YunpianTransportFactory::class => 'notifier.transport_factory.yunpian',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
         ];

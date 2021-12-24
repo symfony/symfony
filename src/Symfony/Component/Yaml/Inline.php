@@ -112,8 +112,6 @@ class Inline
      * @param mixed $value The PHP variable to convert
      * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      *
-     * @return string
-     *
      * @throws DumpException When trying to dump PHP resource
      */
     public static function dump($value, int $flags = 0): string
@@ -206,8 +204,6 @@ class Inline
      * Check if given array is hash or just normal indexed array.
      *
      * @param array|\ArrayObject|\stdClass $value The PHP array or array-like object to check
-     *
-     * @return bool
      */
     public static function isHash($value): bool
     {
@@ -231,8 +227,6 @@ class Inline
      *
      * @param array $value The PHP array to dump
      * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
-     *
-     * @return string
      */
     private static function dumpArray(array $value, int $flags): string
     {
@@ -669,7 +663,7 @@ class Inline
             // no break
             case \in_array($scalar[0], ['+', '-', '.'], true) || is_numeric($scalar[0]):
                 if (Parser::preg_match('{^[+-]?[0-9][0-9_]*$}', $scalar)) {
-                    $scalar = str_replace('_', '', (string) $scalar);
+                    $scalar = str_replace('_', '', $scalar);
                 }
 
                 switch (true) {
@@ -790,8 +784,6 @@ class Inline
 
     /**
      * Gets a regex that matches a YAML date.
-     *
-     * @return string
      *
      * @see http://www.yaml.org/spec/1.2/spec.html#id2761573
      */

@@ -53,6 +53,7 @@
     },
     "conflict": {
         "doctrine/dbal": "<2.13.1",
+        "doctrine/lexer": "<1.1",
         "doctrine/orm": "<2.7.3",
         "phpunit/phpunit": "<5.4.3",
         "symfony/cache": "<5.4",
@@ -61,6 +62,7 @@
         "symfony/http-kernel": "<5",
         "symfony/messenger": "<4.4",
         "symfony/property-info": "<5",
+        "symfony/proxy-manager-bridge": "<4.4.19",
         "symfony/security-bundle": "<5",
         "symfony/security-core": "<5.3",
         "symfony/validator": "<5.2"

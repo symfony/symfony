@@ -50,7 +50,7 @@ class PdoDbalStoreTest extends AbstractStoreTest
      */
     protected function getClockDelay()
     {
-        return 1000000;
+        return 1500000;
     }
 
     /**

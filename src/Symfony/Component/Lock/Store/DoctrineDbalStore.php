@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock\Store;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
@@ -90,6 +91,22 @@ class DoctrineDbalStore implements PersistingStoreInterface
                 ParameterType::STRING,
                 ParameterType::STRING,
             ]);
+        } catch (TableNotFoundException $e) {
+            if (!$this->conn->isTransactionActive() || $this->platformSupportsTableCreationInTransaction()) {
+                $this->createTable();
+            }
+
+            try {
+                $this->conn->executeStatement($sql, [
+                    $this->getHashedKey($key),
+                    $this->getUniqueToken($key),
+                ], [
+                    ParameterType::STRING,
+                    ParameterType::STRING,
+                ]);
+            } catch (DBALException $e) {
+                $this->putOffExpiration($key, $this->initialTtl);
+            }
         } catch (DBALException $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
@@ -229,6 +246,25 @@ class DoctrineDbalStore implements PersistingStoreInterface
 
             default:
                 return (string) time();
+        }
+    }
+
+    /**
+     * Checks wether current platform supports table creation within transaction.
+     */
+    private function platformSupportsTableCreationInTransaction(): bool
+    {
+        $platform = $this->conn->getDatabasePlatform();
+
+        switch (true) {
+            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform:
+            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform:
+            case $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform:
+            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform:
+            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform:
+                return true;
+            default:
+                return false;
         }
     }
 }

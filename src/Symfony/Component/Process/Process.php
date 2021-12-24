@@ -307,10 +307,10 @@ class Process implements \IteratorAggregate
         $descriptors = $this->getDescriptors();
 
         if ($this->env) {
-            $env += $this->env;
+            $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->env, $env, 'strcasecmp') : $this->env;
         }
 
-        $env += $this->getDefaultEnv();
+        $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->getDefaultEnv(), $env, 'strcasecmp') : $this->getDefaultEnv();
 
         if (\is_array($commandline = $this->commandline)) {
             $commandline = implode(' ', array_map([$this, 'escapeArgument'], $commandline));
@@ -340,7 +340,7 @@ class Process implements \IteratorAggregate
 
         $envPairs = [];
         foreach ($env as $k => $v) {
-            if (false !== $v && 'argc' !== $k && 'argv' !== $k) {
+            if (false !== $v && false === \in_array($k, ['argc', 'argv', 'ARGC', 'ARGV'], true)) {
                 $envPairs[] = $k.'='.$v;
             }
         }
@@ -973,8 +973,6 @@ class Process implements \IteratorAggregate
 
     /**
      * Gets the last output time in seconds.
-     *
-     * @return float|null
      */
     public function getLastOutputTime(): ?float
     {
@@ -1493,8 +1491,6 @@ class Process implements \IteratorAggregate
      * @param int  $signal         A valid POSIX signal (see https://php.net/pcntl.constants)
      * @param bool $throwException Whether to throw exception in case signal failed
      *
-     * @return bool
-     *
      * @throws LogicException   In case the process is not running
      * @throws RuntimeException In case --enable-sigchild is activated and the process can't be killed
      * @throws RuntimeException In case of failure
@@ -1649,8 +1645,8 @@ class Process implements \IteratorAggregate
     private function getDefaultEnv(): array
     {
         $env = getenv();
-        $env = array_intersect_key($env, $_SERVER) ?: $env;
+        $env = ('\\' === \DIRECTORY_SEPARATOR ? array_intersect_ukey($env, $_SERVER, 'strcasecmp') : array_intersect_key($env, $_SERVER)) ?: $env;
 
-        return $_ENV + $env;
+        return $_ENV + ('\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($env, $_ENV, 'strcasecmp') : $env);
     }
 }

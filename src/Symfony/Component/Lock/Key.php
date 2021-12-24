@@ -79,8 +79,6 @@ final class Key
 
     /**
      * Returns the remaining lifetime in seconds.
-     *
-     * @return float|null
      */
     public function getRemainingLifetime(): ?float
     {

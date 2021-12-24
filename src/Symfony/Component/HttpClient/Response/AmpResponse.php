@@ -125,6 +125,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             }
         };
 
+        $multi->lastTimeout = null;
         $multi->openHandles[$id] = $id;
         ++$multi->responseCount;
 
@@ -326,7 +327,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 // Discard body of redirects
                 while (null !== yield $response->getBody()->read()) {
                 }
-            } catch (HttpException | StreamException $e) {
+            } catch (HttpException|StreamException $e) {
                 // Ignore streaming errors on previous responses
             }
 

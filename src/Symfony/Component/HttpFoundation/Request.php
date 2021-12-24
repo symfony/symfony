@@ -91,7 +91,7 @@ class Request
     /**
      * Request body parameters ($_POST).
      *
-     * @var InputBag
+     * @var InputBag|ParameterBag
      */
     public $request;
 

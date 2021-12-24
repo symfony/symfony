@@ -162,6 +162,16 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Returns the parameter value converted to string.
+     *
+     * @return string
+     */
+    public function getString(string $key, string $default = '')
+    {
+        return (string) $this->get($key, $default);
+    }
+
+    /**
      * Returns the parameter value converted to boolean.
      *
      * @return bool

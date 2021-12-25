@@ -26,7 +26,6 @@
         "symfony/service-contracts": "^1.1|^2"
     },
     "require-dev": {
-        "composer/package-versions-deprecated": "^1.8",
         "symfony/stopwatch": "^4.4|^5.0",
         "symfony/cache": "^5.1",
         "symfony/config": "^4.4|^5.0",
@@ -48,12 +47,12 @@
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "^2.10|^3.0",
-        "doctrine/orm": "^2.7.3"
+        "doctrine/orm": "^2.7.4"
     },
     "conflict": {
         "doctrine/dbal": "<2.10",
         "doctrine/lexer": "<1.1",
-        "doctrine/orm": "<2.7.3",
+        "doctrine/orm": "<2.7.4",
         "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<4.4",
         "symfony/form": "<5.1",

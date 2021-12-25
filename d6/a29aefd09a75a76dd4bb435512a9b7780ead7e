@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by staabm at 2021-12-12T15:43:44Z
+
+Looking at the phpstan helper makes me think it also misses
+- negative-int
+- positive-int
+- int<1, -0> like IntegerRanges
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2021-12-13T09:27:12Z
+
+I guess we could define the scope of this PR better. My goal wasn't to fix all PhpstanExtractor issues in existence here, but the ones that affected my closed-source project. Rest of the issues could be fixed in separate PR. Or, I could also fix them here, but I want to avoid someone coming here finding even more issues and hence extending the scope of this PR again and again.
+
+---------------------------------------------------------------------------
+
+by EmilMassey at 2021-12-14T16:28:05Z
+
+There is #44451 to introduce support for simple pseudo-types - `non-empty-array`, `positive-int`, `negative-int` etc.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-14T17:51:18Z
+
+> This PR fixes 2 issues.
+
+I was not aware that either syntax was actively supported in 5.3. What types did the extractor detect for those cases and how does the "crash" look like?
+
+Sorry for being overly carefule here. I'd like to keep the changes as minimal as posssible and only restore the 5.3 behavior for your cases. This PR has the potential of sneaking in new functionality which is something we should not do in a bugfix.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2021-12-14T22:54:31Z
+
+In Symfony 5.3, because PhpStanExtractor doesn't exist, it falls back to ReflectionExtractor which will extract info correctly throught reflection thanks to specified type declarations.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-14T23:53:29Z
+
+And can we make this fallback work again?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2021-12-15T22:12:10Z
+
+It does work, but only if PhpStanExtractor fails to detect the type completely. That's what I did in this PR for consttypes: Make consttypes return empty array, so that it falls back to another extractor.

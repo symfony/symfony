@@ -276,7 +276,7 @@ return [
         271 => 'Asia/Qyzylorda',
         272 => 'Asia/Rangoon',
         273 => 'Asia/Riyadh',
-        274 => 'Asia/Saigon',
+        274 => 'Asia/Ho_Chi_Minh',
         275 => 'Asia/Sakhalin',
         276 => 'Asia/Samarkand',
         277 => 'Asia/Seoul',
@@ -678,6 +678,7 @@ return [
         'Asia/Famagusta' => 'CY',
         'Asia/Gaza' => 'PS',
         'Asia/Hebron' => 'PS',
+        'Asia/Ho_Chi_Minh' => 'VN',
         'Asia/Hong_Kong' => 'HK',
         'Asia/Hovd' => 'MN',
         'Asia/Irkutsk' => 'RU',
@@ -711,7 +712,6 @@ return [
         'Asia/Qyzylorda' => 'KZ',
         'Asia/Rangoon' => 'MM',
         'Asia/Riyadh' => 'SA',
-        'Asia/Saigon' => 'VN',
         'Asia/Sakhalin' => 'RU',
         'Asia/Samarkand' => 'UZ',
         'Asia/Seoul' => 'KR',
@@ -1762,7 +1762,7 @@ return [
             0 => 'America/St_Thomas',
         ],
         'VN' => [
-            0 => 'Asia/Saigon',
+            0 => 'Asia/Ho_Chi_Minh',
         ],
         'VU' => [
             0 => 'Pacific/Efate',

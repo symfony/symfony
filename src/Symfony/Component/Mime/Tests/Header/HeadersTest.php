@@ -283,14 +283,14 @@ class HeadersTest extends TestCase
     public function testInReplyToAcceptsNonIdentifierValues()
     {
         $headers = new Headers();
-        $headers->addHeader('In-Reply-To', 'foobar');
+        $headers->addTextHeader('In-Reply-To', 'foobar');
         $this->assertEquals('foobar', $headers->get('In-Reply-To')->getBody());
     }
 
     public function testReferencesAcceptsNonIdentifierValues()
     {
         $headers = new Headers();
-        $headers->addHeader('References' , 'foobar');
+        $headers->addTextHeader('References' , 'foobar');
         $this->assertEquals('foobar', $headers->get('References')->getBody());
     }
 

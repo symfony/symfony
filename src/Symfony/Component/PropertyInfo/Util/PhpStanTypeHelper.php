@@ -19,6 +19,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
@@ -102,6 +103,10 @@ final class PhpStanTypeHelper
         if ($node instanceof UnionTypeNode) {
             $types = [];
             foreach ($node->types as $type) {
+                if ($type instanceof ConstTypeNode) {
+                    // It's safer to fall back to other extractors here, as resolving const types correctly is not easy at the moment
+                    return [];
+                }
                 foreach ($this->extractTypes($type, $nameScope) as $subType) {
                     $types[] = $subType;
                 }
@@ -160,7 +165,10 @@ final class PhpStanTypeHelper
                 case 'integer':
                     return [new Type(Type::BUILTIN_TYPE_INT)];
                 case 'list':
+                case 'non-empty-list':
                     return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT))];
+                case 'non-empty-array':
+                    return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)];
                 case 'mixed':
                     return []; // mixed seems to be ignored in all other extractors
                 case 'parent':

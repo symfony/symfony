@@ -19,6 +19,9 @@ use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCa
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
+    /**
+     * @group transient-on-macos
+     */
     public function testTimeoutOnDestruct()
     {
         if (!method_exists(parent::class, 'testTimeoutOnDestruct')) {

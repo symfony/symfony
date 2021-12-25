@@ -19,6 +19,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
@@ -102,6 +103,10 @@ final class PhpStanTypeHelper
         if ($node instanceof UnionTypeNode) {
             $types = [];
             foreach ($node->types as $type) {
+                if ($type instanceof ConstTypeNode) {
+                    // It's safer to fall back to other extractors here, as resolving const types correctly is not easy at the moment
+                    return [];
+                }
                 foreach ($this->extractTypes($type, $nameScope) as $subType) {
                     $types[] = $subType;
                 }

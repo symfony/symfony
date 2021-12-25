@@ -32,6 +32,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
     private static $vulcainStarted = false;
 
+    /**
+     * @group transient-on-macos
+     */
     public function testTimeoutOnDestruct()
     {
         if (!method_exists(parent::class, 'testTimeoutOnDestruct')) {

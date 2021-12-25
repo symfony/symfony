@@ -17,7 +17,6 @@
     ],
     "require": {
         "php": ">=8.0.2",
-        "composer/package-versions-deprecated": "^1.8",
         "friendsofphp/proxy-manager-lts": "^1.0.2",
         "symfony/dependency-injection": "^5.4|^6.0"
     },

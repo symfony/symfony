@@ -432,8 +432,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_INFILESIZE => 'body',
             \CURLOPT_POSTFIELDS => 'body',
             \CURLOPT_UPLOAD => 'body',
-            \CURLOPT_PINNEDPUBLICKEY => 'peer_fingerprint',
-            \CURLOPT_UNIX_SOCKET_PATH => 'bindto',
             \CURLOPT_INTERFACE => 'bindto',
             \CURLOPT_TIMEOUT_MS => 'max_duration',
             \CURLOPT_TIMEOUT => 'max_duration',
@@ -455,6 +453,14 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_NOPROGRESS => 'on_progress',
             \CURLOPT_PROGRESSFUNCTION => 'on_progress',
         ];
+
+        if (\defined('CURLOPT_UNIX_SOCKET_PATH')) {
+            $curloptsToConfig[\CURLOPT_UNIX_SOCKET_PATH] = 'bindto';
+        }
+
+        if (\defined('CURLOPT_PINNEDPUBLICKEY')) {
+            $curloptsToConfig[\CURLOPT_PINNEDPUBLICKEY] = 'peer_fingerprint';
+        }
 
         $curloptsToCheck = [
             \CURLOPT_PRIVATE,

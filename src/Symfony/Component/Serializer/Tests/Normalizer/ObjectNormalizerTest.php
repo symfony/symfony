@@ -12,8 +12,10 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -713,6 +715,22 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'json')->number);
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'jsonld')->number);
+    }
+
+    public function testDoesntHaveIssuesWithUnionConstTypes()
+    {
+        if (!class_exists(PhpStanExtractor::class) || !class_exists(PhpDocParser::class)) {
+            $this->markTestSkipped('phpstan/phpdoc-parser required for this test');
+        }
+
+        $extractor = new PropertyInfoExtractor([], [new PhpStanExtractor(), new PhpDocExtractor(), new ReflectionExtractor()]);
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+
+        $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], \get_class(new class() {
+            /** @var self::*|null */
+            public $foo;
+        }))->foo);
     }
 
     public function testExtractAttributesRespectsFormat()

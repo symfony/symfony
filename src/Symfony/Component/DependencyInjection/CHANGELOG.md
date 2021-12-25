@@ -1,6 +1,9 @@
 CHANGELOG
 =========
 
+6.1
+ * Add method `getString` to `ParameterBag`
+ 
 5.4
 ---
  * Add `$defaultIndexMethod` and `$defaultPriorityMethod` to `TaggedIterator` and `TaggedLocator` attributes
@@ -8,7 +11,6 @@ CHANGELOG
  * Add support for autoconfigurable attributes on methods, properties and parameters
  * Make auto-aliases private by default
  * Add support for autowiring union and intersection types
- * Add method `getString` to `ParameterBag`
 
 5.3
 ---

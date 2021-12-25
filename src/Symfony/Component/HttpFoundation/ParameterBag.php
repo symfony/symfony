@@ -166,7 +166,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return string
      */
-    public function getString(string $key, string $default = '')
+    public function getString(string $key, string $default = ''): string
     {
         return (string) $this->get($key, $default);
     }

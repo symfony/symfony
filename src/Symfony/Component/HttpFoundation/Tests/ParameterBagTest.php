@@ -148,9 +148,9 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['first' => 'shtikov', 'second' => 123]);
 
-        $this->assertEquals('shtikov', $bag->getString('first'), '->getString() gets a value of parameter as string');
-        $this->assertEquals('123', $bag->getString('second'), '->getString() gets a value of parameter as string');
-        $this->assertEquals('', $bag->getString('unknown'), '->getString() returns empty string if a parameter is not defined');
+        $this->assertSame('shtikov', $bag->getString('first'), '->getString() gets a value of parameter as string');
+        $this->assertSame('123', $bag->getString('second'), '->getString() gets a value of parameter as string');
+        $this->assertSame('', $bag->getString('unknown'), '->getString() returns empty string if a parameter is not defined');
     }
 
     public function testFilter()

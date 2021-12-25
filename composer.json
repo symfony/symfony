@@ -161,6 +161,12 @@
         "ocramius/proxy-manager": "<2.1",
         "phpunit/phpunit": "<5.4.3"
     },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "symfony/runtime": true
+        }
+    },
     "autoload": {
         "psr-4": {
             "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",

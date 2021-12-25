@@ -1,14 +1,5 @@
 Array
 (
-    [Container%s/removed-ids.php] => <?php
-
-namespace Container%s;
-
-return [
-    'Psr\\Container\\ContainerInterface' => true,
-    'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-];
-
     [Container%s/proxy-classes.php] => <?php
 
 namespace Container%s;
@@ -74,11 +65,6 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
-    public function getRemovedIds(): array
-    {
-        return require $this->containerDir.\DIRECTORY_SEPARATOR.'removed-ids.php';
-    }
-
     protected function createProxy($class, \Closure $factory)
     {
         return $factory();
@@ -108,10 +94,7 @@ class ProjectServiceContainer extends Container
         return new \Bar\FooClass(new \Bar\FooLazyClass());
     }
 
-    /**
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|string|int|float|bool|null
     {
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];

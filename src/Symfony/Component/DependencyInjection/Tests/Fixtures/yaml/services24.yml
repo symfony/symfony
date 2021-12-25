@@ -8,15 +8,3 @@ services:
         class: Foo
         public: true
         autowire: true
-    Psr\Container\ContainerInterface:
-        alias: service_container
-        deprecated:
-            package: symfony/dependency-injection
-            version: 5.1
-            message: The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.
-    Symfony\Component\DependencyInjection\ContainerInterface:
-        alias: service_container
-        deprecated:
-            package: symfony/dependency-injection
-            version: 5.1
-            message: The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.

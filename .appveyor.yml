@@ -1,6 +1,7 @@
 build: false
 clone_depth: 2
 clone_folder: c:\projects\symfony
+image: Visual Studio 2019
 
 cache:
     - composer.phar
@@ -12,16 +13,15 @@ init:
     - SET SYMFONY_DEPRECATIONS_HELPER=strict
     - SET ANSICON=121x90 (121x90)
     - SET SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE=1
-    - SET SYMFONY_DEPRECATIONS_HELPER=max[direct]=1
     - REG ADD "HKEY_CURRENT_USER\Software\Microsoft\Command Processor" /v DelayedExpansion /t REG_DWORD /d 1 /f
 
 install:
     - mkdir c:\php && cd c:\php
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.2.5-Win32-VC15-x86.zip
-    - 7z x php-7.2.5-Win32-VC15-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.0.2-Win32-vs16-x86.zip
+    - 7z x php-8.0.2-Win32-vs16-x86.zip -y >nul
     - cd ext
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.19-7.2-ts-vc15-x86.zip
-    - 7z x php_apcu-5.1.19-7.2-ts-vc15-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.21-8.0-ts-vs16-x86.zip
+    - 7z x php_apcu-5.1.21-8.0-ts-vs16-x86.zip -y >nul
     - cd ..
     - copy /Y php.ini-development php.ini-min
     - echo memory_limit=-1 >> php.ini-min
@@ -62,9 +62,9 @@ test_script:
     - copy /Y c:\php\php.ini-min c:\php\php.ini
     - IF %APPVEYOR_REPO_BRANCH:~-2% neq .x (rm -Rf src\Symfony\Bridge\PhpUnit)
     - mv src\Symfony\Component\HttpClient\phpunit.xml.dist src\Symfony\Component\HttpClient\phpunit.xml
-    - php phpunit src\Symfony --exclude-group tty,benchmark,intl-data || SET X=!errorlevel!
+    - php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || SET X=!errorlevel!
     - php phpunit src\Symfony\Component\HttpClient || SET X=!errorlevel!
     - copy /Y c:\php\php.ini-max c:\php\php.ini
-    - php phpunit src\Symfony --exclude-group tty,benchmark,intl-data || SET X=!errorlevel!
+    - php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || SET X=!errorlevel!
     - php phpunit src\Symfony\Component\HttpClient || SET X=!errorlevel!
     - exit %X%

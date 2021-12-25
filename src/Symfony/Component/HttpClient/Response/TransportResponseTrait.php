@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\HttpClient\Response;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Chunk\LastChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\Canary;
 use Symfony\Component\HttpClient\Internal\ClientState;
 
 /**
@@ -27,8 +29,9 @@ use Symfony\Component\HttpClient\Internal\ClientState;
  */
 trait TransportResponseTrait
 {
-    private $headers = [];
-    private $info = [
+    private Canary $canary;
+    private array $headers = [];
+    private array $info = [
         'response_headers' => [],
         'http_code' => 0,
         'error' => null,
@@ -37,12 +40,11 @@ trait TransportResponseTrait
 
     /** @var object|resource */
     private $handle;
-    private $id;
-    private $timeout = 0;
-    private $inflate;
-    private $finalInfo;
-    private $canary;
-    private $logger;
+    private int|string $id;
+    private ?float $timeout = 0;
+    private \InflateContext|bool|null $inflate = null;
+    private ?array $finalInfo = null;
+    private ?LoggerInterface $logger = null;
 
     /**
      * {@inheritdoc}
@@ -109,7 +111,7 @@ trait TransportResponseTrait
     private static function addResponseHeaders(array $responseHeaders, array &$info, array &$headers, string &$debug = ''): void
     {
         foreach ($responseHeaders as $h) {
-            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([1-9]\d\d)(?: |$)#', $h, $m)) {
+            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? (\d\d\d)(?: |$)#', $h, $m)) {
                 if ($headers) {
                     $debug .= "< \r\n";
                     $headers = [];
@@ -124,10 +126,6 @@ trait TransportResponseTrait
         }
 
         $debug .= "< \r\n";
-
-        if (!$info['http_code']) {
-            throw new TransportException(sprintf('Invalid or missing HTTP status line for "%s".', implode('', $info['url'])));
-        }
     }
 
     /**
@@ -138,7 +136,7 @@ trait TransportResponseTrait
         $this->shouldBuffer = true;
 
         if ($this->initializer && null === $this->info['error']) {
-            self::initialize($this, -0.0);
+            self::initialize($this);
             $this->checkStatusCode();
         }
     }
@@ -180,12 +178,11 @@ trait TransportResponseTrait
                 foreach ($responses as $j => $response) {
                     $timeoutMax = $timeout ?? max($timeoutMax, $response->timeout);
                     $timeoutMin = min($timeoutMin, $response->timeout, 1);
+                    $chunk = false;
 
                     if ($fromLastTimeout && null !== $multi->lastTimeout) {
                         $elapsedTimeout = microtime(true) - $multi->lastTimeout;
                     }
-
-                    $chunk = false;
 
                     if (isset($multi->handlesActivity[$j])) {
                         $multi->lastTimeout = null;
@@ -194,7 +191,7 @@ trait TransportResponseTrait
                         continue;
                     } elseif ($elapsedTimeout >= $timeoutMax) {
                         $multi->handlesActivity[$j] = [new ErrorChunk($response->offset, sprintf('Idle timeout reached for "%s".', $response->getInfo('url')))];
-                        $multi->lastTimeout ?? $multi->lastTimeout = $lastActivity;
+                        $multi->lastTimeout ??= $lastActivity;
                     } else {
                         continue;
                     }

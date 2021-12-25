@@ -18,9 +18,6 @@ use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPas
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
-/**
- * @requires PHP 8
- */
 class AttributeAutoconfigurationPassTest extends TestCase
 {
     public function testProcessAddsNoEmptyInstanceofConditionals()

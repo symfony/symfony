@@ -30,15 +30,13 @@ class ServiceLocator implements ServiceProviderInterface
         get as private doGet;
     }
 
-    private $externalId;
-    private $container;
+    private ?string $externalId = null;
+    private ?Container $container = null;
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function get(string $id)
+    public function get(string $id): mixed
     {
         if (!$this->externalId) {
             return $this->doGet($id);
@@ -69,10 +67,8 @@ class ServiceLocator implements ServiceProviderInterface
 
     /**
      * @internal
-     *
-     * @return static
      */
-    public function withContext(string $externalId, Container $container): self
+    public function withContext(string $externalId, Container $container): static
     {
         $locator = clone $this;
         $locator->externalId = $externalId;

@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\MessageMedia\Tests;
 
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class MessageMediaTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return MessageMediaTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): MessageMediaTransportFactory
     {
         return new MessageMediaTransportFactory();
     }

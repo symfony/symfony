@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `PropertyPathMaper`
+ * Remove `Symfony\Component\Form\Extension\Validator\Util\ServerParams`
+ * Remove `FormPass` configuration
+ * Remove the `NumberToLocalizedStringTransformer::ROUND_*` constants, use `\NumberFormatter::ROUND_*` instead
+ * The `rounding_mode` option of the `PercentType` defaults to `\NumberFormatter::ROUND_HALFUP`
+ * The rounding mode argument of the constructor of `PercentToLocalizedStringTransformer` defaults to `\NumberFormatter::ROUND_HALFUP`
+ * Add `FormConfigInterface::getIsEmptyCallback()` and `FormConfigBuilderInterface::setIsEmptyCallback()`
+ * Change `$forms` parameter type of the `DataMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$forms` parameter type of the `DataMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+ * Change `$checkboxes` parameter type of the `CheckboxListMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$checkboxes` parameter type of the `CheckboxListMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+ * Change `$radios` parameter type of the `RadioListMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$radios` parameter type of the `RadioListMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+
 5.4
 ---
 

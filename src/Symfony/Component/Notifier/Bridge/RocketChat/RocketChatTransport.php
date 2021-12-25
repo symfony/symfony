@@ -29,8 +29,8 @@ final class RocketChatTransport extends AbstractTransport
 {
     protected const HOST = 'rocketchat.com';
 
-    private $accessToken;
-    private $chatChannel;
+    private string $accessToken;
+    private ?string $chatChannel;
 
     public function __construct(string $accessToken, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

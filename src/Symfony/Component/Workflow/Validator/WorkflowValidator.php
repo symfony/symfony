@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
  */
 class WorkflowValidator implements DefinitionValidatorInterface
 {
-    private $singlePlace;
+    private bool $singlePlace;
 
     public function __construct(bool $singlePlace = false)
     {

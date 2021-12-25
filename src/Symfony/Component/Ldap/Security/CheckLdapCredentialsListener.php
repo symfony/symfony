@@ -17,9 +17,7 @@ use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\LogicException;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
-use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
@@ -30,7 +28,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  */
 class CheckLdapCredentialsListener implements EventSubscriberInterface
 {
-    private $ldapLocator;
+    private ContainerInterface $ldapLocator;
 
     public function __construct(ContainerInterface $ldapLocator)
     {
@@ -50,8 +48,8 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$passport instanceof UserPassportInterface || !$passport->hasBadge(PasswordCredentials::class)) {
-            throw new \LogicException(sprintf('LDAP authentication requires a passport containing a user and password credentials, authenticator "%s" does not fulfill these requirements.', \get_class($event->getAuthenticator())));
+        if (!$passport->hasBadge(PasswordCredentials::class)) {
+            throw new \LogicException(sprintf('LDAP authentication requires a passport containing password credentials, authenticator "%s" does not fulfill these requirements.', \get_class($event->getAuthenticator())));
         }
 
         /** @var PasswordCredentials $passwordCredentials */
@@ -70,9 +68,6 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
         }
 
         $user = $passport->getUser();
-        if (!$user instanceof PasswordAuthenticatedUserInterface) {
-            trigger_deprecation('symfony/ldap', '5.3', 'Not implementing the "%s" interface in class "%s" while using password-based authenticators is deprecated.', PasswordAuthenticatedUserInterface::class, get_debug_type($user));
-        }
 
         /** @var LdapInterface $ldap */
         $ldap = $this->ldapLocator->get($ldapBadge->getLdapServiceId());
@@ -83,8 +78,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
                 } else {
                     throw new LogicException('Using the "query_string" config without using a "search_dn" and a "search_password" is not supported.');
                 }
-                // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
-                $username = $ldap->escape(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), '', LdapInterface::ESCAPE_FILTER);
+                $username = $ldap->escape($user->getUserIdentifier(), '', LdapInterface::ESCAPE_FILTER);
                 $query = str_replace('{username}', $username, $ldapBadge->getQueryString());
                 $result = $ldap->query($ldapBadge->getDnString(), $query)->execute();
                 if (1 !== $result->count()) {
@@ -93,8 +87,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
 
                 $dn = $result[0]->getDn();
             } else {
-                // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
-                $username = $ldap->escape(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), '', LdapInterface::ESCAPE_DN);
+                $username = $ldap->escape($user->getUserIdentifier(), '', LdapInterface::ESCAPE_DN);
                 $dn = str_replace('{username}', $username, $ldapBadge->getDnString());
             }
 

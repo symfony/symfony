@@ -12,17 +12,13 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
 class MainConfigurationTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * The minimal, required config needed to not have any required validation
      * issues.
@@ -144,20 +140,6 @@ class MainConfigurationTest extends TestCase
         $factory->method('getKey')->willReturn('key');
 
         $configuration = new MainConfiguration(['stub' => $factory], []);
-        $configuration->getConfigTreeBuilder();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFirewalls()
-    {
-        $factory = $this->createMock(AuthenticatorFactoryInterface::class);
-        $factory->expects($this->once())->method('addConfiguration');
-
-        $this->expectDeprecation('Since symfony/security-bundle 5.4: Passing an array of arrays as 1st argument to "Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration::__construct" is deprecated, pass a sorted array of factories instead.');
-
-        $configuration = new MainConfiguration(['http_basic' => ['stub' => $factory]], []);
         $configuration->getConfigTreeBuilder();
     }
 }

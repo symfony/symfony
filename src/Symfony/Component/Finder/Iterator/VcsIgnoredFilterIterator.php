@@ -107,7 +107,7 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
 
             $parentDirectory = $newParentDirectory;
 
-            if (0 !== strpos($parentDirectory, $this->baseDir)) {
+            if (!str_starts_with($parentDirectory, $this->baseDir)) {
                 break;
             }
 

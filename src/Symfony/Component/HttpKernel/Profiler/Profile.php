@@ -20,28 +20,24 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  */
 class Profile
 {
-    private $token;
+    private string $token;
 
     /**
      * @var DataCollectorInterface[]
      */
-    private $collectors = [];
+    private array $collectors = [];
 
-    private $ip;
-    private $method;
-    private $url;
-    private $time;
-    private $statusCode;
-
-    /**
-     * @var Profile
-     */
-    private $parent;
+    private ?string $ip = null;
+    private ?string $method = null;
+    private ?string $url = null;
+    private ?int $time = null;
+    private ?int $statusCode = null;
+    private ?self $parent = null;
 
     /**
      * @var Profile[]
      */
-    private $children = [];
+    private array $children = [];
 
     public function __construct(string $token)
     {
@@ -55,10 +51,8 @@ class Profile
 
     /**
      * Gets the token.
-     *
-     * @return string
      */
-    public function getToken()
+    public function getToken(): string
     {
         return $this->token;
     }
@@ -73,30 +67,24 @@ class Profile
 
     /**
      * Returns the parent profile.
-     *
-     * @return self|null
      */
-    public function getParent()
+    public function getParent(): ?self
     {
         return $this->parent;
     }
 
     /**
      * Returns the parent token.
-     *
-     * @return string|null
      */
-    public function getParentToken()
+    public function getParentToken(): ?string
     {
-        return $this->parent ? $this->parent->getToken() : null;
+        return $this->parent?->getToken();
     }
 
     /**
      * Returns the IP.
-     *
-     * @return string|null
      */
-    public function getIp()
+    public function getIp(): ?string
     {
         return $this->ip;
     }
@@ -108,10 +96,8 @@ class Profile
 
     /**
      * Returns the request method.
-     *
-     * @return string|null
      */
-    public function getMethod()
+    public function getMethod(): ?string
     {
         return $this->method;
     }
@@ -123,10 +109,8 @@ class Profile
 
     /**
      * Returns the URL.
-     *
-     * @return string|null
      */
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -136,10 +120,7 @@ class Profile
         $this->url = $url;
     }
 
-    /**
-     * @return int
-     */
-    public function getTime()
+    public function getTime(): int
     {
         return $this->time ?? 0;
     }
@@ -154,10 +135,7 @@ class Profile
         $this->statusCode = $statusCode;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getStatusCode()
+    public function getStatusCode(): ?int
     {
         return $this->statusCode;
     }
@@ -167,7 +145,7 @@ class Profile
      *
      * @return self[]
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }
@@ -208,11 +186,9 @@ class Profile
     /**
      * Gets a Collector by name.
      *
-     * @return DataCollectorInterface
-     *
      * @throws \InvalidArgumentException if the collector does not exist
      */
-    public function getCollector(string $name)
+    public function getCollector(string $name): DataCollectorInterface
     {
         if (!isset($this->collectors[$name])) {
             throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
@@ -226,7 +202,7 @@ class Profile
      *
      * @return DataCollectorInterface[]
      */
-    public function getCollectors()
+    public function getCollectors(): array
     {
         return $this->collectors;
     }
@@ -252,18 +228,12 @@ class Profile
         $this->collectors[$collector->getName()] = $collector;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasCollector(string $name)
+    public function hasCollector(string $name): bool
     {
         return isset($this->collectors[$name]);
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'statusCode'];
     }

@@ -3,7 +3,7 @@ digraph sc {
   node [fontsize="11" fontname="Arial" shape="record"];
   edge [fontsize="9" fontname="Arial" color="grey" arrowhead="open" arrowsize="0.5"];
 
-  node_service_container [label="service_container (Psr\Container\ContainerInterface, Symfony\Component\DependencyInjection\ContainerInterface)\nSymfony\\Component\\DependencyInjection\\ContainerInterface\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_service_container [label="service_container\nSymfony\\Component\\DependencyInjection\\ContainerInterface\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo [label="foo (alias_for_foo)\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo_baz [label="foo.baz\nBazClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_bar [label="bar\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];

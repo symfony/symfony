@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add method `__toString()` to `InputInterface`
+
+6.0
+---
+
+ * `Command::setHidden()` has a default value (`true`) for `$hidden` parameter and is final
+ * Remove `Helper::strlen()`, use `Helper::width()` instead
+ * Remove `Helper::strlenWithoutDecoration()`, use `Helper::removeDecoration()` instead
+ * `AddConsoleCommandPass` can not be configured anymore
+ * Remove `HelperSet::setCommand()` and `getCommand()` without replacement
+
 5.4
 ---
 

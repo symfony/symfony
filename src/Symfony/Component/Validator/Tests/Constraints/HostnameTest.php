@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\Hostname;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class HostnameTest extends TestCase
 {
     public function testAttributes()
@@ -46,7 +43,7 @@ class HostnameDummy
     #[Hostname]
     private $a;
 
-    #[Hostname(message: "myMessage", requireTld: false)]
+    #[Hostname(message: 'myMessage', requireTld: false)]
     private $b;
 
     #[Hostname(groups: ['my_group'], payload: 'some attached data')]

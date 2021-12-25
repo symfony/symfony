@@ -28,8 +28,8 @@ final class MessageBirdTransport extends AbstractTransport
 {
     protected const HOST = 'rest.messagebird.com';
 
-    private $token;
-    private $from;
+    private string $token;
+    private string $from;
 
     public function __construct(string $token, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

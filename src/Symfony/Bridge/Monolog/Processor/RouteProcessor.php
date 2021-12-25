@@ -26,8 +26,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class RouteProcessor implements EventSubscriberInterface, ResetInterface
 {
-    private $routeData;
-    private $includeParams;
+    private array $routeData = [];
+    private bool $includeParams;
 
     public function __construct(bool $includeParams = true)
     {

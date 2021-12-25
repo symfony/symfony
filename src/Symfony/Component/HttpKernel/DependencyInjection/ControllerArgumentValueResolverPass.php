@@ -28,40 +28,25 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    private $argumentResolverService;
-    private $argumentValueResolverTag;
-    private $traceableResolverStopwatch;
-
-    public function __construct(string $argumentResolverService = 'argument_resolver', string $argumentValueResolverTag = 'controller.argument_value_resolver', string $traceableResolverStopwatch = 'debug.stopwatch')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/http-kernel', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->argumentResolverService = $argumentResolverService;
-        $this->argumentValueResolverTag = $argumentValueResolverTag;
-        $this->traceableResolverStopwatch = $traceableResolverStopwatch;
-    }
-
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->argumentResolverService)) {
+        if (!$container->hasDefinition('argument_resolver')) {
             return;
         }
 
-        $resolvers = $this->findAndSortTaggedServices($this->argumentValueResolverTag, $container);
+        $resolvers = $this->findAndSortTaggedServices('controller.argument_value_resolver', $container);
 
-        if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class) && $container->has($this->traceableResolverStopwatch)) {
+        if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class) && $container->has('debug.stopwatch')) {
             foreach ($resolvers as $resolverReference) {
                 $id = (string) $resolverReference;
                 $container->register("debug.$id", TraceableValueResolver::class)
                     ->setDecoratedService($id)
-                    ->setArguments([new Reference("debug.$id.inner"), new Reference($this->traceableResolverStopwatch)]);
+                    ->setArguments([new Reference("debug.$id.inner"), new Reference('debug.stopwatch')]);
             }
         }
 
         $container
-            ->getDefinition($this->argumentResolverService)
+            ->getDefinition('argument_resolver')
             ->replaceArgument(1, new IteratorArgument($resolvers))
         ;
     }

@@ -18,11 +18,11 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
  */
 final class PersistentToken implements PersistentTokenInterface
 {
-    private $class;
-    private $userIdentifier;
-    private $series;
-    private $tokenValue;
-    private $lastUsed;
+    private string $class;
+    private string $userIdentifier;
+    private string $series;
+    private string $tokenValue;
+    private \DateTime $lastUsed;
 
     public function __construct(string $class, string $userIdentifier, string $series, string $tokenValue, \DateTime $lastUsed)
     {
@@ -52,16 +52,6 @@ final class PersistentToken implements PersistentTokenInterface
     public function getClass(): string
     {
         return $this->class;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUsername(): string
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
-
-        return $this->userIdentifier;
     }
 
     public function getUserIdentifier(): string

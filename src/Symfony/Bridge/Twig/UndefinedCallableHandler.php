@@ -68,10 +68,7 @@ class UndefinedCallableHandler
         'workflow' => 'enable "framework.workflows"',
     ];
 
-    /**
-     * @return TwigFilter|false
-     */
-    public static function onUndefinedFilter(string $name)
+    public static function onUndefinedFilter(string $name): TwigFilter|false
     {
         if (!isset(self::FILTER_COMPONENTS[$name])) {
             return false;
@@ -80,10 +77,7 @@ class UndefinedCallableHandler
         throw new SyntaxError(self::onUndefined($name, 'filter', self::FILTER_COMPONENTS[$name]));
     }
 
-    /**
-     * @return TwigFunction|false
-     */
-    public static function onUndefinedFunction(string $name)
+    public static function onUndefinedFunction(string $name): TwigFunction|false
     {
         if (!isset(self::FUNCTION_COMPONENTS[$name])) {
             return false;

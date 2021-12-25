@@ -30,8 +30,8 @@ final class SlackTransport extends AbstractTransport
 {
     protected const HOST = 'slack.com';
 
-    private $accessToken;
-    private $chatChannel;
+    private string $accessToken;
+    private ?string $chatChannel;
 
     public function __construct(string $accessToken, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

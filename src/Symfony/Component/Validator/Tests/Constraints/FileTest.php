@@ -141,9 +141,6 @@ class FileTest extends TestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(FileDummy::class);

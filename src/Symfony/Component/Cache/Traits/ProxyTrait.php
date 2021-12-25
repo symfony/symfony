@@ -21,12 +21,12 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 trait ProxyTrait
 {
-    private $pool;
+    private object $pool;
 
     /**
      * {@inheritdoc}
      */
-    public function prune()
+    public function prune(): bool
     {
         return $this->pool instanceof PruneableInterface && $this->pool->prune();
     }

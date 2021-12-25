@@ -16,9 +16,9 @@ namespace Symfony\Component\BrowserKit;
  */
 final class Response
 {
-    private $content;
-    private $status;
-    private $headers;
+    private string $content;
+    private int $status;
+    private array $headers;
 
     /**
      * The headers array is a set of key/value pairs. If a header is present multiple times
@@ -37,8 +37,6 @@ final class Response
 
     /**
      * Converts the response object to string containing all headers and the response content.
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -56,11 +54,6 @@ final class Response
         return $headers."\n".$this->content;
     }
 
-    /**
-     * Gets the response content.
-     *
-     * @return string
-     */
     public function getContent(): string
     {
         return $this->content;
@@ -71,20 +64,15 @@ final class Response
         return $this->status;
     }
 
-    /**
-     * Gets the response headers.
-     */
     public function getHeaders(): array
     {
         return $this->headers;
     }
 
     /**
-     * Gets a response header.
-     *
      * @return string|array|null The first header value if $first is true, an array of values otherwise
      */
-    public function getHeader(string $header, bool $first = true)
+    public function getHeader(string $header, bool $first = true): string|array|null
     {
         $normalizedHeader = str_replace('-', '_', strtolower($header));
         foreach ($this->headers as $key => $value) {

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -23,8 +22,6 @@ use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
  */
 class LengthTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testNormalizerCanBeSet()
     {
         $length = new Length(['min' => 0, 'max' => 10, 'normalizer' => 'trim']);
@@ -46,25 +43,6 @@ class LengthTest extends TestCase
         new Length(['min' => 0, 'max' => 10, 'normalizer' => new \stdClass()]);
     }
 
-    /**
-     * @group legacy
-     * @dataProvider allowEmptyStringOptionData
-     */
-    public function testDeprecatedAllowEmptyStringOption(bool $value)
-    {
-        $this->expectDeprecation('Since symfony/validator 5.2: The "allowEmptyString" option of the "Symfony\Component\Validator\Constraints\Length" constraint is deprecated.');
-
-        new Length(['allowEmptyString' => $value, 'max' => 5]);
-    }
-
-    public function allowEmptyStringOptionData()
-    {
-        return [
-            [true],
-            [false],
-        ];
-    }
-
     public function testConstraintDefaultOption()
     {
         $constraint = new Length(5);
@@ -82,9 +60,6 @@ class LengthTest extends TestCase
         self::assertEquals('message', $constraint->exactMessage);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(LengthDummy::class);

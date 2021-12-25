@@ -13,15 +13,12 @@ namespace Symfony\Component\Routing\Tests\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\FooController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\FooController as FooAttributesController;
 
 class RouteTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private function getMethodAnnotation(string $method, bool $attributes): Route
     {
         $class = $attributes ? FooAttributesController::class : FooController::class;
@@ -42,36 +39,7 @@ class RouteTest extends TestCase
         return $route;
     }
 
-    public function provideDeprecationArrayAsFirstArgument()
-    {
-        return [
-            ['requirements', ['locale' => 'en'], 'getRequirements'],
-            ['options', ['compiler_class' => 'RouteCompiler'], 'getOptions'],
-            ['name', 'blog_index', 'getName'],
-            ['defaults', ['_controller' => 'MyBlogBundle:Blog:index'], 'getDefaults'],
-            ['schemes', ['https'], 'getSchemes'],
-            ['methods', ['GET', 'POST'], 'getMethods'],
-            ['host', '{locale}.example.com', 'getHost'],
-            ['condition', 'context.getMethod() == "GET"', 'getCondition'],
-            ['value', '/Blog', 'getPath'],
-            ['value', ['nl' => '/hier', 'en' => '/here'], 'getLocalizedPaths'],
-        ];
-    }
-
     /**
-     * @group legacy
-     * @dataProvider provideDeprecationArrayAsFirstArgument
-     */
-    public function testDeprecationArrayAsFirstArgument(string $parameter, $value, string $getter)
-    {
-        $this->expectDeprecation('Since symfony/routing 5.3: Passing an array as first argument to "Symfony\Component\Routing\Annotation\Route::__construct" is deprecated. Use named arguments instead.');
-
-        $route = new Route([$parameter => $value]);
-        $this->assertEquals($route->$getter(), $value);
-    }
-
-    /**
-     * @requires PHP 8
      * @dataProvider getValidParameters
      */
     public function testLoadFromAttribute(string $methodName, string $getter, $expectedReturn)

@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Exception\CacheException;
  */
 class DeflateMarshaller implements MarshallerInterface
 {
-    private $marshaller;
+    private MarshallerInterface $marshaller;
 
     public function __construct(MarshallerInterface $marshaller)
     {
@@ -42,7 +42,7 @@ class DeflateMarshaller implements MarshallerInterface
     /**
      * {@inheritdoc}
      */
-    public function unmarshall(string $value)
+    public function unmarshall(string $value): mixed
     {
         if (false !== $inflatedValue = @gzinflate($value)) {
             $value = $inflatedValue;

@@ -21,11 +21,9 @@ class Lexer
     /**
      * Tokenizes an expression.
      *
-     * @return TokenStream
-     *
      * @throws SyntaxError
      */
-    public function tokenize(string $expression)
+    public function tokenize(string $expression): TokenStream
     {
         $expression = str_replace(["\r", "\n", "\t", "\v", "\f"], ' ', $expression);
         $cursor = 0;
@@ -48,13 +46,13 @@ class Lexer
                 }
                 $tokens[] = new Token(Token::NUMBER_TYPE, $number, $cursor + 1);
                 $cursor += \strlen($match[0]);
-            } elseif (false !== strpos('([{', $expression[$cursor])) {
+            } elseif (str_contains('([{', $expression[$cursor])) {
                 // opening bracket
                 $brackets[] = [$expression[$cursor], $cursor];
 
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
                 ++$cursor;
-            } elseif (false !== strpos(')]}', $expression[$cursor])) {
+            } elseif (str_contains(')]}', $expression[$cursor])) {
                 // closing bracket
                 if (empty($brackets)) {
                     throw new SyntaxError(sprintf('Unexpected "%s".', $expression[$cursor]), $cursor, $expression);
@@ -75,7 +73,7 @@ class Lexer
                 // operators
                 $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
                 $cursor += \strlen($match[0]);
-            } elseif (false !== strpos('.,?:', $expression[$cursor])) {
+            } elseif (str_contains('.,?:', $expression[$cursor])) {
                 // punctuation
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
                 ++$cursor;

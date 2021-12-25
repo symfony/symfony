@@ -23,7 +23,7 @@ class DumpCompletionCommandTest extends TestCase
     {
         yield 'shell' => [
             [''],
-            ['bash'],
+            ['bash', 'fish'],
         ];
     }
 }

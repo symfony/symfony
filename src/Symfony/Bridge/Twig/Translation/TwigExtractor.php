@@ -29,19 +29,15 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
 {
     /**
      * Default domain for found messages.
-     *
-     * @var string
      */
-    private $defaultDomain = 'messages';
+    private string $defaultDomain = 'messages';
 
     /**
      * Prefix for found message.
-     *
-     * @var string
      */
-    private $prefix = '';
+    private string $prefix = '';
 
-    private $twig;
+    private Environment $twig;
 
     public function __construct(Environment $twig)
     {
@@ -84,10 +80,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
         $visitor->disable();
     }
 
-    /**
-     * @return bool
-     */
-    protected function canBeExtracted(string $file)
+    protected function canBeExtracted(string $file): bool
     {
         return $this->isFile($file) && 'twig' === pathinfo($file, \PATHINFO_EXTENSION);
     }
@@ -95,7 +88,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * {@inheritdoc}
      */
-    protected function extractFromDirectory($directory)
+    protected function extractFromDirectory($directory): iterable
     {
         $finder = new Finder();
 

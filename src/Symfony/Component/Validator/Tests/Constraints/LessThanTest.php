@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class LessThanTest extends TestCase
 {
     public function testAttributes()

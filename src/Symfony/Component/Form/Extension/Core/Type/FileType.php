@@ -33,7 +33,7 @@ class FileType extends AbstractType
         self::MIB_BYTES => 'MiB',
     ];
 
-    private $translator;
+    private ?TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator = null)
     {
@@ -130,18 +130,14 @@ class FileType extends AbstractType
             'empty_data' => $emptyData,
             'multiple' => false,
             'allow_file_upload' => true,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid file.';
-            },
+            'invalid_message' => 'Please select a valid file.',
         ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'file';
     }
@@ -176,10 +172,8 @@ class FileType extends AbstractType
      * Returns the maximum size of an uploaded file as configured in php.ini.
      *
      * This method should be kept in sync with Symfony\Component\HttpFoundation\File\UploadedFile::getMaxFilesize().
-     *
-     * @return int|float The maximum size of an uploaded file in bytes (returns float if size > PHP_INT_MAX)
      */
-    private static function getMaxFilesize()
+    private static function getMaxFilesize(): int|float
     {
         $iniMax = strtolower(ini_get('upload_max_filesize'));
 
@@ -214,10 +208,8 @@ class FileType extends AbstractType
      * (i.e. try "MB", then "kB", then "bytes").
      *
      * This method should be kept in sync with Symfony\Component\Validator\Constraints\FileValidator::factorizeSizes().
-     *
-     * @param int|float $limit
      */
-    private function factorizeSizes(int $size, $limit)
+    private function factorizeSizes(int $size, int|float $limit)
     {
         $coef = self::MIB_BYTES;
         $coefFactor = self::KIB_BYTES;

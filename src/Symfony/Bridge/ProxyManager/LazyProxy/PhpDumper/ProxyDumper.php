@@ -25,9 +25,9 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
  */
 class ProxyDumper implements DumperInterface
 {
-    private $salt;
-    private $proxyGenerator;
-    private $classGenerator;
+    private string $salt;
+    private LazyLoadingValueHolderGenerator $proxyGenerator;
+    private BaseGeneratorStrategy $classGenerator;
 
     public function __construct(string $salt = '')
     {

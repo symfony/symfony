@@ -31,7 +31,7 @@ abstract class Loader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResolver()
+    public function getResolver(): LoaderResolverInterface
     {
         return $this->resolver;
     }
@@ -47,12 +47,9 @@ abstract class Loader implements LoaderInterface
     /**
      * Imports a resource.
      *
-     * @param mixed       $resource A resource
-     * @param string|null $type     The resource type or null if unknown
-     *
      * @return mixed
      */
-    public function import($resource, string $type = null)
+    public function import(mixed $resource, string $type = null)
     {
         return $this->resolve($resource, $type)->load($resource, $type);
     }
@@ -60,14 +57,9 @@ abstract class Loader implements LoaderInterface
     /**
      * Finds a loader able to load an imported resource.
      *
-     * @param mixed       $resource A resource
-     * @param string|null $type     The resource type or null if unknown
-     *
-     * @return LoaderInterface
-     *
      * @throws LoaderLoadException If no loader is found
      */
-    public function resolve($resource, string $type = null)
+    public function resolve(mixed $resource, string $type = null): LoaderInterface
     {
         if ($this->supports($resource, $type)) {
             return $this;

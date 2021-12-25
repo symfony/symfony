@@ -25,8 +25,6 @@ trait CacheableObjectAttributesTestTrait
      * The same normalizer instance normalizes two objects of the same class in a row:
      *  1. an object having some uninitialized properties
      *  2. an object with all properties being initialized.
-     *
-     * @requires PHP 7.4
      */
     public function testObjectCollectionNormalization()
     {
@@ -38,8 +36,6 @@ trait CacheableObjectAttributesTestTrait
      * The same normalizer instance normalizes two objects of the same class in a row:
      *  1. an object with all properties being initialized
      *  2. an object having some uninitialized properties.
-     *
-     * @requires PHP 7.4
      */
     public function testReversedObjectCollectionNormalization()
     {

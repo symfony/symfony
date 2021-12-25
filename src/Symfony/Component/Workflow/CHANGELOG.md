@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `InvalidTokenConfigurationException`
+
 5.4
 ---
 

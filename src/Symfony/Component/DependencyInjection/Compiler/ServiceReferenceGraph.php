@@ -29,7 +29,7 @@ class ServiceReferenceGraph
     /**
      * @var ServiceReferenceGraphNode[]
      */
-    private $nodes = [];
+    private array $nodes = [];
 
     public function hasNode(string $id): bool
     {
@@ -74,7 +74,7 @@ class ServiceReferenceGraph
     /**
      * Connects 2 nodes together in the Graph.
      */
-    public function connect(?string $sourceId, $sourceValue, ?string $destId, $destValue = null, Reference $reference = null, bool $lazy = false, bool $weak = false, bool $byConstructor = false)
+    public function connect(?string $sourceId, mixed $sourceValue, ?string $destId, mixed $destValue = null, Reference $reference = null, bool $lazy = false, bool $weak = false, bool $byConstructor = false)
     {
         if (null === $sourceId || null === $destId) {
             return;
@@ -88,7 +88,7 @@ class ServiceReferenceGraph
         $destNode->addInEdge($edge);
     }
 
-    private function createNode(string $id, $value): ServiceReferenceGraphNode
+    private function createNode(string $id, mixed $value): ServiceReferenceGraphNode
     {
         if (isset($this->nodes[$id]) && $this->nodes[$id]->getValue() === $value) {
             return $this->nodes[$id];

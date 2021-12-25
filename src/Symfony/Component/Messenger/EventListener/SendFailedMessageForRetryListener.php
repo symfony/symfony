@@ -32,11 +32,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class SendFailedMessageForRetryListener implements EventSubscriberInterface
 {
-    private $sendersLocator;
-    private $retryStrategyLocator;
-    private $logger;
-    private $eventDispatcher;
-    private $historySize;
+    private ContainerInterface $sendersLocator;
+    private ContainerInterface $retryStrategyLocator;
+    private ?LoggerInterface $logger;
+    private ?EventDispatcherInterface $eventDispatcher;
+    private int $historySize;
 
     public function __construct(ContainerInterface $sendersLocator, ContainerInterface $retryStrategyLocator, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, int $historySize = 10)
     {
@@ -69,9 +69,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
 
             $delay = $retryStrategy->getWaitingTime($envelope, $throwable);
 
-            if (null !== $this->logger) {
-                $this->logger->warning('Error thrown while handling message {class}. Sending for retry #{retryCount} using {delay} ms delay. Error: "{error}"', $context + ['retryCount' => $retryCount, 'delay' => $delay, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
-            }
+            $this->logger?->warning('Error thrown while handling message {class}. Sending for retry #{retryCount} using {delay} ms delay. Error: "{error}"', $context + ['retryCount' => $retryCount, 'delay' => $delay, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
 
             // add the delay and retry stamp info
             $retryEnvelope = $this->withLimitedHistory($envelope, new DelayStamp($delay), new RedeliveryStamp($retryCount));
@@ -79,13 +77,9 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             // re-send the message for retry
             $this->getSenderForTransport($event->getReceiverName())->send($retryEnvelope);
 
-            if (null !== $this->eventDispatcher) {
-                $this->eventDispatcher->dispatch(new WorkerMessageRetriedEvent($retryEnvelope, $event->getReceiverName()));
-            }
+            $this->eventDispatcher?->dispatch(new WorkerMessageRetriedEvent($retryEnvelope, $event->getReceiverName()));
         } else {
-            if (null !== $this->logger) {
-                $this->logger->critical('Error thrown while handling message {class}. Removing from transport after {retryCount} retries. Error: "{error}"', $context + ['retryCount' => $retryCount, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
-            }
+            $this->logger?->critical('Error thrown while handling message {class}. Removing from transport after {retryCount} retries. Error: "{error}"', $context + ['retryCount' => $retryCount, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
         }
     }
 
@@ -113,7 +107,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
         return $envelope;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // must have higher priority than SendFailedMessageToFailureTransportListener

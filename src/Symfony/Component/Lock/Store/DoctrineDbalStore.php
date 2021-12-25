@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock\Store;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
@@ -40,7 +41,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     use DatabaseTableTrait;
     use ExpiringStoreTrait;
 
-    private $conn;
+    private Connection $conn;
 
     /**
      * List of available options:
@@ -57,19 +58,17 @@ class DoctrineDbalStore implements PersistingStoreInterface
      * @throws InvalidArgumentException When namespace contains invalid characters
      * @throws InvalidArgumentException When the initial ttl is not valid
      */
-    public function __construct($connOrUrl, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
+    public function __construct(Connection|string $connOrUrl, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
     {
         $this->init($options, $gcProbability, $initialTtl);
 
         if ($connOrUrl instanceof Connection) {
             $this->conn = $connOrUrl;
-        } elseif (\is_string($connOrUrl)) {
+        } else {
             if (!class_exists(DriverManager::class)) {
                 throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $connOrUrl));
             }
             $this->conn = DriverManager::getConnection(['url' => $connOrUrl]);
-        } else {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be "%s" or string, "%s" given.', Connection::class, __METHOD__, get_debug_type($connOrUrl)));
         }
     }
 
@@ -90,6 +89,22 @@ class DoctrineDbalStore implements PersistingStoreInterface
                 ParameterType::STRING,
                 ParameterType::STRING,
             ]);
+        } catch (TableNotFoundException $e) {
+            if (!$this->conn->isTransactionActive() || $this->platformSupportsTableCreationInTransaction()) {
+                $this->createTable();
+            }
+
+            try {
+                $this->conn->executeStatement($sql, [
+                    $this->getHashedKey($key),
+                    $this->getUniqueToken($key),
+                ], [
+                    ParameterType::STRING,
+                    ParameterType::STRING,
+                ]);
+            } catch (DBALException $e) {
+                $this->putOffExpiration($key, $this->initialTtl);
+            }
         } catch (DBALException $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
@@ -147,7 +162,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = ? AND $this->tokenCol = ? AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
         $result = $this->conn->fetchOne($sql, [
@@ -229,6 +244,25 @@ class DoctrineDbalStore implements PersistingStoreInterface
 
             default:
                 return (string) time();
+        }
+    }
+
+    /**
+     * Checks wether current platform supports table creation within transaction.
+     */
+    private function platformSupportsTableCreationInTransaction(): bool
+    {
+        $platform = $this->conn->getDatabasePlatform();
+
+        switch (true) {
+            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform:
+            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform:
+            case $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform:
+            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform:
+            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform:
+                return true;
+            default:
+                return false;
         }
     }
 }

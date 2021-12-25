@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Command;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -36,18 +37,16 @@ use Symfony\Component\Messenger\Worker;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
+#[AsCommand(name: 'messenger:consume', description: 'Consume messages')]
 class ConsumeMessagesCommand extends Command
 {
-    protected static $defaultName = 'messenger:consume';
-    protected static $defaultDescription = 'Consume messages';
-
-    private $routableBus;
-    private $receiverLocator;
-    private $eventDispatcher;
-    private $logger;
-    private $receiverNames;
-    private $resetServicesListener;
-    private $busIds;
+    private RoutableMessageBus $routableBus;
+    private ContainerInterface $receiverLocator;
+    private EventDispatcherInterface $eventDispatcher;
+    private ?LoggerInterface $logger;
+    private array $receiverNames;
+    private ?ResetServicesListener $resetServicesListener;
+    private array $busIds;
 
     public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [])
     {
@@ -81,7 +80,6 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
                 new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
 
@@ -155,7 +153,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $receivers = [];
         foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {

@@ -21,10 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 final class Target
 {
-    /**
-     * @var string
-     */
-    public $name;
+    public string $name;
 
     public function __construct(string $name)
     {
@@ -33,7 +30,7 @@ final class Target
 
     public static function parseName(\ReflectionParameter $parameter): string
     {
-        if (80000 > \PHP_VERSION_ID || !$target = $parameter->getAttributes(self::class)[0] ?? null) {
+        if (!$target = $parameter->getAttributes(self::class)[0] ?? null) {
             return $parameter->name;
         }
 

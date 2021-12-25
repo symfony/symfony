@@ -421,24 +421,6 @@ class PhpDumperTest extends TestCase
         $this->assertSame($foo, $container->get('alias_for_alias'));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testAliasesDeprecation()
-    {
-        $this->expectDeprecation('The "alias_for_foo_deprecated" service alias is deprecated. You should stop using it, as it will be removed in the future.');
-        $container = include self::$fixturesPath.'/containers/container_alias_deprecation.php';
-        $container->compile();
-        $dumper = new PhpDumper($container);
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_alias_deprecation.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Aliases_Deprecation']));
-
-        require self::$fixturesPath.'/php/container_alias_deprecation.php';
-        $container = new \Symfony_DI_PhpDumper_Test_Aliases_Deprecation();
-        $container->get('alias_for_foo_non_deprecated');
-        $container->get('alias_for_foo_deprecated');
-    }
-
     public function testFrozenContainerWithoutAliases()
     {
         $container = new ContainerBuilder();
@@ -1283,31 +1265,6 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_adawson.php', $dumper->dump());
     }
 
-    /**
-     * This test checks the trigger of a deprecation note and should not be removed in major releases.
-     *
-     * @group legacy
-     */
-    public function testPrivateServiceTriggersDeprecation()
-    {
-        $this->expectDeprecation('The "foo" service is deprecated. You should stop using it, as it will be removed in the future.');
-        $container = new ContainerBuilder();
-        $container->register('foo', 'stdClass')
-            ->setDeprecated(true);
-        $container->register('bar', 'stdClass')
-            ->setPublic(true)
-            ->setProperty('foo', new Reference('foo'));
-
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Private_Service_Triggers_Deprecation']));
-
-        $container = new \Symfony_DI_PhpDumper_Test_Private_Service_Triggers_Deprecation();
-
-        $container->get('bar');
-    }
-
     public function testParameterWithMixedCase()
     {
         $container = new ContainerBuilder(new ParameterBag(['Foo' => 'bar', 'BAR' => 'foo']));
@@ -1436,9 +1393,6 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testWitherWithStaticReturnType()
     {
         $container = new ContainerBuilder();
@@ -1459,30 +1413,6 @@ class PhpDumperTest extends TestCase
 
         $wither = $container->get('wither');
         $this->assertInstanceOf(Foo::class, $wither->foo);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testMultipleDeprecatedAliasesWorking()
-    {
-        $this->expectDeprecation('The "deprecated1" service alias is deprecated. You should stop using it, as it will be removed in the future.');
-        $this->expectDeprecation('The "deprecated2" service alias is deprecated. You should stop using it, as it will be removed in the future.');
-        $container = new ContainerBuilder();
-        $container->setDefinition('bar', new Definition('stdClass'))->setPublic(true);
-        $container->setAlias('deprecated1', 'bar')->setPublic(true)->setDeprecated('%alias_id% is deprecated');
-        $container->setAlias('deprecated2', 'bar')->setPublic(true)->setDeprecated('%alias_id% is deprecated');
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-        $dump = $dumper->dump(['class' => $class = __FUNCTION__]);
-
-        eval('?>'.$dump);
-        $container = new $class();
-
-        $this->assertInstanceOf(\stdClass::class, $container->get('bar'));
-        $this->assertInstanceOf(\stdClass::class, $container->get('deprecated1'));
-        $this->assertInstanceOf(\stdClass::class, $container->get('deprecated2'));
     }
 
     public function testDumpServiceWithAbstractArgument()
@@ -1554,7 +1484,7 @@ class PhpDumperTest extends TestCase
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface
 {
-    public function getEnv(string $prefix, string $name, \Closure $getEnv)
+    public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
     {
         return str_rot13($getEnv($name));
     }

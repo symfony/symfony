@@ -24,7 +24,7 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
     /**
      * {@inheritdoc}
      */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         // abstain vote by default in case none of the attributes are supported
         $vote = self::ACCESS_ABSTAIN;
@@ -35,12 +35,7 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
                     continue;
                 }
             } catch (\TypeError $e) {
-                if (\PHP_VERSION_ID < 80000) {
-                    if (0 === strpos($e->getMessage(), 'Argument 1 passed to')
-                        && false !== strpos($e->getMessage(), '::supports() must be of the type string')) {
-                        continue;
-                    }
-                } elseif (false !== strpos($e->getMessage(), 'supports(): Argument #1')) {
+                if (str_contains($e->getMessage(), 'supports(): Argument #1')) {
                     continue;
                 }
 
@@ -82,20 +77,13 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
     /**
      * Determines if the attribute and subject are supported by this voter.
      *
-     * @param string $attribute An attribute
-     * @param mixed  $subject   The subject to secure, e.g. an object the user wants to access or any other PHP type
-     *
-     * @return bool
+     * @param $subject The subject to secure, e.g. an object the user wants to access or any other PHP type
      */
-    abstract protected function supports(string $attribute, $subject);
+    abstract protected function supports(string $attribute, mixed $subject): bool;
 
     /**
      * Perform a single access check operation on a given attribute, subject and token.
      * It is safe to assume that $attribute and $subject already passed the "supports()" method check.
-     *
-     * @param mixed $subject
-     *
-     * @return bool
      */
-    abstract protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token);
+    abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool;
 }

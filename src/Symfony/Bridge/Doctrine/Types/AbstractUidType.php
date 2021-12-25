@@ -40,7 +40,7 @@ abstract class AbstractUidType extends Type
      *
      * @throws ConversionException
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform): ?AbstractUid
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?AbstractUid
     {
         if ($value instanceof AbstractUid || null === $value) {
             return $value;

@@ -31,19 +31,14 @@ class Email extends Constraint
 
     public const INVALID_FORMAT_ERROR = 'bd79c0ab-ddba-46cc-a703-a7a4b08de310';
 
-    protected static $errorNames = [
-        self::INVALID_FORMAT_ERROR => 'STRICT_CHECK_FAILED_ERROR',
-    ];
-
-    /**
-     * @var string[]
-     *
-     * @internal
-     */
-    public static $validationModes = [
+    public const VALIDATION_MODES = [
         self::VALIDATION_MODE_HTML5,
         self::VALIDATION_MODE_STRICT,
         self::VALIDATION_MODE_LOOSE,
+    ];
+
+    protected static $errorNames = [
+        self::INVALID_FORMAT_ERROR => 'STRICT_CHECK_FAILED_ERROR',
     ];
 
     public $message = 'This value is not a valid email address.';
@@ -56,9 +51,9 @@ class Email extends Constraint
         string $mode = null,
         callable $normalizer = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null
     ) {
-        if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::$validationModes, true)) {
+        if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::VALIDATION_MODES, true)) {
             throw new InvalidArgumentException('The "mode" parameter value is not valid.');
         }
 

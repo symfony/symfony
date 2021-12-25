@@ -30,7 +30,7 @@ use Twig\TwigTest;
  */
 final class FormExtension extends AbstractExtension
 {
-    private $translator;
+    private ?TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator = null)
     {
@@ -103,10 +103,7 @@ final class FormExtension extends AbstractExtension
         return $view->vars['full_name'];
     }
 
-    /**
-     * @return string|array
-     */
-    public function getFieldValue(FormView $view)
+    public function getFieldValue(FormView $view): string|array
     {
         return $view->vars['value'];
     }
@@ -158,7 +155,7 @@ final class FormExtension extends AbstractExtension
         yield from $this->createFieldChoicesList($view->vars['choices'], $view->vars['choice_translation_domain']);
     }
 
-    private function createFieldChoicesList(iterable $choices, $translationDomain): iterable
+    private function createFieldChoicesList(iterable $choices, string|false|null $translationDomain): iterable
     {
         foreach ($choices as $choice) {
             $translatableLabel = $this->createFieldTranslation($choice->label, [], $translationDomain);
@@ -174,7 +171,7 @@ final class FormExtension extends AbstractExtension
         }
     }
 
-    private function createFieldTranslation(?string $value, array $parameters, $domain): ?string
+    private function createFieldTranslation(?string $value, array $parameters, string|false|null $domain): ?string
     {
         if (!$this->translator || !$value || false === $domain) {
             return $value;
@@ -189,11 +186,9 @@ final class FormExtension extends AbstractExtension
  *
  * This is a function and not callable due to performance reasons.
  *
- * @param string|array $selectedValue The selected value to compare
- *
  * @see ChoiceView::isSelected()
  */
-function twig_is_selected_choice(ChoiceView $choice, $selectedValue): bool
+function twig_is_selected_choice(ChoiceView $choice, string|array $selectedValue): bool
 {
     if (\is_array($selectedValue)) {
         return \in_array($choice->value, $selectedValue, true);

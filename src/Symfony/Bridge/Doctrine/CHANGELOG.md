@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `DoctrineTestHelper` and `TestRepositoryFactory`
+
 5.4
 ---
 

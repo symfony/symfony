@@ -18,8 +18,8 @@ use Symfony\Component\Notifier\Message\MessageInterface;
  */
 class NotificationEvents
 {
-    private $events = [];
-    private $transports = [];
+    private array $events = [];
+    private array $transports = [];
 
     public function add(MessageEvent $event): void
     {

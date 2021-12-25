@@ -75,7 +75,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
 
 class SimpleProcessor implements EnvVarProcessorInterface
 {
-    public function getEnv(string $prefix, string $name, \Closure $getEnv)
+    public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
     {
         return $getEnv($name);
     }

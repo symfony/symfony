@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
 {
-    private $serviceLocatorContextIds = [];
+    private array $serviceLocatorContextIds = [];
 
     /**
      * {@inheritdoc}
@@ -43,7 +43,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         }
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Reference) {
             return parent::processValue($value, $isRoot);
@@ -95,7 +95,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
             }
 
             $lev = levenshtein($id, $knownId);
-            if ($lev <= \strlen($id) / 3 || false !== strpos($knownId, $id)) {
+            if ($lev <= \strlen($id) / 3 || str_contains($knownId, $id)) {
                 $alternatives[] = $knownId;
             }
         }

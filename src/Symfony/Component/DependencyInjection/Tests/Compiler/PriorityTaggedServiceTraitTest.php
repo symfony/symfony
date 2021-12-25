@@ -192,9 +192,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         yield ['getMethodShouldBePublicInsteadPrivate', 'foo', sprintf('Either method "%s::getMethodShouldBePublicInsteadPrivate()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedItemAttributes()
     {
         $container = new ContainerBuilder();

@@ -112,10 +112,6 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mobyt\MobytTransportFactory::class,
             'package' => 'symfony/mobyt-notifier',
         ],
-        'nexmo' => [
-            'class' => Bridge\Nexmo\NexmoTransportFactory::class,
-            'package' => 'symfony/nexmo-notifier',
-        ],
         'octopush' => [
             'class' => Bridge\Octopush\OctopushTransportFactory::class,
             'package' => 'symfony/octopush-notifier',
@@ -183,6 +179,10 @@ class UnsupportedSchemeException extends LogicException
         'twilio' => [
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',
+        ],
+        'vonage' => [
+            'class' => Bridge\Vonage\VonageTransportFactory::class,
+            'package' => 'symfony/vonage-notifier',
         ],
         'yunpian' => [
             'class' => Bridge\Yunpian\YunpianTransportFactory::class,

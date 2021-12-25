@@ -27,5 +27,5 @@ interface ResourceInterface
      * resource; and it should be unlikely to collide with that of other, unrelated
      * resource instances.
      */
-    public function __toString();
+    public function __toString(): string;
 }

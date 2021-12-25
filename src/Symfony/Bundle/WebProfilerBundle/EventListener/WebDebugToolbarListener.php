@@ -40,13 +40,13 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     public const DISABLED = 1;
     public const ENABLED = 2;
 
-    protected $twig;
-    protected $urlGenerator;
-    protected $interceptRedirects;
-    protected $mode;
-    protected $excludedAjaxPaths;
-    private $cspHandler;
-    private $dumpDataCollector;
+    private Environment $twig;
+    private ?UrlGeneratorInterface $urlGenerator;
+    private bool $interceptRedirects;
+    private int $mode;
+    private string $excludedAjaxPaths;
+    private ?ContentSecurityPolicyHandler $cspHandler;
+    private ?DumpDataCollector $dumpDataCollector;
 
     public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null, DumpDataCollector $dumpDataCollector = null)
     {
@@ -95,7 +95,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
         $nonces = [];
         if ($this->cspHandler) {
-            if ($this->dumpDataCollector && $this->dumpDataCollector->getDumpsCount() > 0) {
+            if ($this->dumpDataCollector?->getDumpsCount() > 0) {
                 $this->cspHandler->disableCsp();
             }
 

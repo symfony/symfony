@@ -42,8 +42,6 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'bar_%env(BAR)%' => true,
             'baz_%env(BAR)%' => true,
         ];
@@ -69,10 +67,7 @@ class ProjectServiceContainer extends Container
         return $this->services['foo'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ?? ($this->privates['bar_%env(BAR)%'] = new \stdClass())), ['baz_'.$this->getEnv('string:BAR') => new \stdClass()]);
     }
 
-    /**
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|string|int|float|bool|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));

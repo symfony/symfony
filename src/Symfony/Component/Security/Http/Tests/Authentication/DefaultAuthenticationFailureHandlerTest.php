@@ -30,12 +30,17 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     private $httpUtils;
     private $logger;
     private $request;
+    private $response;
     private $session;
     private $exception;
 
     protected function setUp(): void
     {
+        $this->response = new Response();
         $this->httpKernel = $this->createMock(HttpKernelInterface::class);
+        $this->httpKernel->expects($this->any())
+            ->method('handle')->willReturn($this->response);
+
         $this->httpUtils = $this->createMock(HttpUtils::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -56,15 +61,10 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
             ->method('createRequest')->with($this->request, '/login')
             ->willReturn($subRequest);
 
-        $response = new Response();
-        $this->httpKernel->expects($this->once())
-            ->method('handle')->with($subRequest, HttpKernelInterface::SUB_REQUEST)
-            ->willReturn($response);
-
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
 
-        $this->assertSame($response, $result);
+        $this->assertSame($this->response, $result);
     }
 
     public function testRedirect()

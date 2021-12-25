@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove deprecated classes `Symfony/Component/Messenger/Transport/AmqpExt`, `Symfony/Component/Messenger/Transport/Doctrine` and `Symfony/Component/Messenger/Transport/Redis`.
+ * Class `MessengerPass` cannot be configured with constructor arguments
+ * Remove constructor arguments and getters for `RedeliveryStamp`'s properties `exceptionMessage` and `flattenException`
+
 5.4
 ---
 

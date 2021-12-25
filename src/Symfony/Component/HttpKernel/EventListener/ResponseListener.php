@@ -24,8 +24,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class ResponseListener implements EventSubscriberInterface
 {
-    private $charset;
-    private $addContentLanguageHeader;
+    private string $charset;
+    private bool $addContentLanguageHeader;
 
     public function __construct(string $charset, bool $addContentLanguageHeader = false)
     {
@@ -50,6 +50,9 @@ class ResponseListener implements EventSubscriberInterface
 
         if ($this->addContentLanguageHeader && !$response->isInformational() && !$response->isEmpty() && !$response->headers->has('Content-Language')) {
             $response->headers->set('Content-Language', $event->getRequest()->getLocale());
+        }
+
+        if ($event->getRequest()->attributes->get('_vary_by_language')) {
             $response->setVary('Accept-Language', false);
         }
 

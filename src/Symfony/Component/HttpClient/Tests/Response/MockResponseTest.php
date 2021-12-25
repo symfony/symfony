@@ -3,7 +3,9 @@
 namespace Symfony\Component\HttpClient\Tests\Response;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\JsonException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
@@ -95,5 +97,23 @@ class MockResponseTest extends TestCase
             'responseHeaders' => [],
             'message' => 'JSON content was expected to decode to an array, "int" returned for "https://example.com/file.json".',
         ];
+    }
+
+    public function testErrorIsTakenIntoAccountInInitialization()
+    {
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('ccc error');
+
+        MockResponse::fromRequest('GET', 'https://symfony.com', [], new MockResponse('', [
+            'error' => 'ccc error',
+        ]))->getStatusCode();
+    }
+
+    public function testMustBeIssuedByMockHttpClient()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('MockResponse instances must be issued by MockHttpClient before processing.');
+
+        (new MockResponse())->getContent();
     }
 }

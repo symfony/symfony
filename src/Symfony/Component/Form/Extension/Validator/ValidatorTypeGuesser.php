@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {
-    private $metadataFactory;
+    private MetadataFactoryInterface $metadataFactory;
 
     public function __construct(MetadataFactoryInterface $metadataFactory)
     {
@@ -31,7 +31,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessType(string $class, string $property)
+    public function guessType(string $class, string $property): ?TypeGuess
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessTypeForConstraint($constraint);
@@ -41,7 +41,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessRequired(string $class, string $property)
+    public function guessRequired(string $class, string $property): ?ValueGuess
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessRequiredForConstraint($constraint);
@@ -53,7 +53,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessMaxLength(string $class, string $property)
+    public function guessMaxLength(string $class, string $property): ?ValueGuess
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessMaxLengthForConstraint($constraint);
@@ -63,7 +63,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessPattern(string $class, string $property)
+    public function guessPattern(string $class, string $property): ?ValueGuess
     {
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessPatternForConstraint($constraint);
@@ -72,10 +72,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * Guesses a field class name for a given constraint.
-     *
-     * @return TypeGuess|null
      */
-    public function guessTypeForConstraint(Constraint $constraint)
+    public function guessTypeForConstraint(Constraint $constraint): ?TypeGuess
     {
         switch (\get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Type':
@@ -165,10 +163,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * Guesses whether a field is required based on the given constraint.
-     *
-     * @return ValueGuess|null
      */
-    public function guessRequiredForConstraint(Constraint $constraint)
+    public function guessRequiredForConstraint(Constraint $constraint): ?ValueGuess
     {
         switch (\get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\NotNull':
@@ -182,10 +178,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * Guesses a field's maximum length based on the given constraint.
-     *
-     * @return ValueGuess|null
      */
-    public function guessMaxLengthForConstraint(Constraint $constraint)
+    public function guessMaxLengthForConstraint(Constraint $constraint): ?ValueGuess
     {
         switch (\get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Length':
@@ -212,10 +206,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * Guesses a field's pattern based on the given constraint.
-     *
-     * @return ValueGuess|null
      */
-    public function guessPatternForConstraint(Constraint $constraint)
+    public function guessPatternForConstraint(Constraint $constraint): ?ValueGuess
     {
         switch (\get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Length':
@@ -256,10 +248,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *                               for a given constraint
      * @param mixed    $defaultValue The default value assumed if no other value
      *                               can be guessed
-     *
-     * @return Guess|null
      */
-    protected function guess(string $class, string $property, \Closure $closure, $defaultValue = null)
+    protected function guess(string $class, string $property, \Closure $closure, mixed $defaultValue = null): ?Guess
     {
         $guesses = [];
         $classMetadata = $this->metadataFactory->getMetadataFor($class);

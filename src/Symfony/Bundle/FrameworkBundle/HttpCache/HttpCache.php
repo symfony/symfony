@@ -30,14 +30,14 @@ class HttpCache extends BaseHttpCache
     protected $cacheDir;
     protected $kernel;
 
-    private $store;
-    private $surrogate;
-    private $options;
+    private ?StoreInterface $store = null;
+    private ?SurrogateInterface $surrogate;
+    private array $options;
 
     /**
-     * @param string|StoreInterface $cache The cache directory (default used if null) or the storage instance
+     * @param $cache The cache directory (default used if null) or the storage instance
      */
-    public function __construct(KernelInterface $kernel, $cache = null, SurrogateInterface $surrogate = null, array $options = null)
+    public function __construct(KernelInterface $kernel, string|StoreInterface $cache = null, SurrogateInterface $surrogate = null, array $options = null)
     {
         $this->kernel = $kernel;
         $this->surrogate = $surrogate;
@@ -45,8 +45,6 @@ class HttpCache extends BaseHttpCache
 
         if ($cache instanceof StoreInterface) {
             $this->store = $cache;
-        } elseif (null !== $cache && !\is_string($cache)) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be a string or a SurrogateInterface, "%s" given.', __METHOD__, get_debug_type($cache)));
         } else {
             $this->cacheDir = $cache;
         }
@@ -65,7 +63,7 @@ class HttpCache extends BaseHttpCache
     /**
      * {@inheritdoc}
      */
-    protected function forward(Request $request, bool $catch = false, Response $entry = null)
+    protected function forward(Request $request, bool $catch = false, Response $entry = null): Response
     {
         $this->getKernel()->boot();
         $this->getKernel()->getContainer()->set('cache', $this);
@@ -75,26 +73,18 @@ class HttpCache extends BaseHttpCache
 
     /**
      * Returns an array of options to customize the Cache configuration.
-     *
-     * @return array
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         return [];
     }
 
-    /**
-     * @return SurrogateInterface
-     */
-    protected function createSurrogate()
+    protected function createSurrogate(): SurrogateInterface
     {
         return $this->surrogate ?? new Esi();
     }
 
-    /**
-     * @return StoreInterface
-     */
-    protected function createStore()
+    protected function createStore(): StoreInterface
     {
         return $this->store ?? new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');
     }

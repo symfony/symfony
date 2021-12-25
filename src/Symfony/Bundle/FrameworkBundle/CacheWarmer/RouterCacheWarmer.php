@@ -26,7 +26,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {

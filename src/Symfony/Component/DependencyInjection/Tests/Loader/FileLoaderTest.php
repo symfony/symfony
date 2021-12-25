@@ -12,12 +12,10 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
@@ -101,14 +99,7 @@ class FileLoaderTest extends TestCase
             ['service_container', Bar::class],
             array_keys($container->getDefinitions())
         );
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                BarInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        $this->assertEquals([BarInterface::class], array_keys($container->getAliases()));
     }
 
     public function testRegisterClassesWithExclude()
@@ -130,14 +121,7 @@ class FileLoaderTest extends TestCase
         $this->assertFalse($container->has(Foo::class));
         $this->assertFalse($container->has(DeeperBaz::class));
 
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                BarInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        $this->assertEquals([BarInterface::class], array_keys($container->getAliases()));
 
         $loader->registerClasses(
             new Definition(),
@@ -179,23 +163,14 @@ class FileLoaderTest extends TestCase
         $this->assertTrue($container->has(Baz::class));
         $this->assertTrue($container->has(Foo::class));
 
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                FooInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        $this->assertEquals([FooInterface::class], array_keys($container->getAliases()));
 
         $alias = $container->getAlias(FooInterface::class);
         $this->assertSame(Foo::class, (string) $alias);
         $this->assertFalse($alias->isPublic());
         $this->assertTrue($alias->isPrivate());
 
-        if (\PHP_VERSION_ID >= 80000) {
-            $this->assertEquals([FooInterface::class => (new ChildDefinition(''))->addTag('foo')], $container->getAutoconfiguredInstanceof());
-        }
+        $this->assertEquals([FooInterface::class => (new ChildDefinition(''))->addTag('foo')], $container->getAutoconfiguredInstanceof());
     }
 
     public function testMissingParentClass()
@@ -274,8 +249,6 @@ class FileLoaderTest extends TestCase
     }
 
     /**
-     * @requires PHP 8
-     *
      * @testWith ["prod", true]
      *           ["dev", true]
      *           ["bar", false]
@@ -299,12 +272,12 @@ class TestFileLoader extends FileLoader
 {
     public $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
-    public function load($resource, string $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
         return $resource;
     }
 
-    public function supports($resource, string $type = null): bool
+    public function supports(mixed $resource, string $type = null): bool
     {
         return false;
     }

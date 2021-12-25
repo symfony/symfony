@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocator;
@@ -46,8 +45,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class YamlFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     protected static $fixturesPath;
 
     public static function setUpBeforeClass(): void
@@ -295,24 +292,14 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame('1.1', $deprecation['version']);
     }
 
-    /**
-     * @group legacy
-     */
     public function testDeprecatedAliasesWithoutPackageAndVersion()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the "deprecated" option in "%s" is deprecated.');
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: Not setting the attribute "version" of the "deprecated" option in "%s" is deprecated.');
-
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
-        $loader->load('deprecated_alias_definitions_without_package_and_version.yml');
 
-        $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
-        $message = 'The "alias_for_foobar" service alias is deprecated.';
-        $deprecation = $container->getAlias('alias_for_foobar')->getDeprecation('alias_for_foobar');
-        $this->assertSame($message, $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/^Missing attribute "package" of the "deprecated" option in "[^"]*".$/');
+        $loader->load('deprecated_alias_definitions_without_package_and_version.yml');
     }
 
     public function testFactorySyntaxError()

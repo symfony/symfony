@@ -22,10 +22,8 @@ interface TokenStorageInterface
 {
     /**
      * Returns the current security token.
-     *
-     * @return TokenInterface|null
      */
-    public function getToken();
+    public function getToken(): ?TokenInterface;
 
     /**
      * Sets the authentication token.

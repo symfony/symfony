@@ -12,7 +12,6 @@ jobs:
 
   tests:
     name: Tests
-    runs-on: Ubuntu-20.04
 
     env:
       extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis-5.3.4
@@ -20,15 +19,22 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '7.2'
           - php: '8.1'
-          - php: '7.4'
-            mode: high-deps
+            os: ubuntu-20.04
           - php: '8.0'
+            os: macos-11
+          - php: '8.0'
+            mode: high-deps
+            os: ubuntu-20.04
+          - php: '8.1'
             mode: low-deps
+            os: ubuntu-20.04
           - php: '8.2'
             mode: experimental
+            os: ubuntu-20.04
       fail-fast: false
+
+    runs-on: "${{ matrix.os }}"
 
     steps:
       - name: Checkout
@@ -50,6 +56,11 @@ jobs:
           extensions: "${{ env.extensions }}"
           tools: flex
 
+      - name: Install Homebrew packages
+        if: "matrix.os == 'macos-11'"
+        run: |
+          brew install parallel
+
       - name: Configure environment
         run: |
           git config --global user.email ""
@@ -61,12 +72,11 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
 
           echo COLUMNS=120 >> $GITHUB_ENV
-          echo PHPUNIT="$(readlink -f ./phpunit) --exclude-group tty,benchmark,intl-data" >> $GITHUB_ENV
+          echo PHPUNIT="$(pwd)/phpunit --exclude-group tty,benchmark,intl-data$([[ ${{ matrix.os }} = macos* ]] && echo ',transient-on-macos')" >> $GITHUB_ENV
           echo COMPOSER_UP='composer update --no-progress --ansi' >> $GITHUB_ENV
-          echo SYMFONY_DEPRECATIONS_HELPER=max[direct]=1 >> $GITHUB_ENV # to be removed once DbalLogger is compatible with dbal 3.2+
 
           SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
-          SYMFONY_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+')
+          SYMFONY_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | cut -d "'" -f2 | cut -d '.' -f 1-2)
           SYMFONY_FEATURE_BRANCH=$(curl -s https://raw.githubusercontent.com/symfony/recipes/flex/main/index.json | jq -r '.versions."dev-name"')
 
           # Install the phpunit-bridge from a PR if required
@@ -112,9 +122,9 @@ jobs:
 
           # Skip the phpunit-bridge on bugfix-branches when not in *-deps mode
           if [[ ! "${{ matrix.mode }}" = *-deps && $SYMFONY_VERSION != $SYMFONY_FEATURE_BRANCH ]]; then
-            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h ') >> $GITHUB_ENV
+            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' | xargs -I{} dirname {}) >> $GITHUB_ENV
           else
-            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h ') >> $GITHUB_ENV
+            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist | xargs -I{} dirname {}) >> $GITHUB_ENV
           fi
 
           # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
@@ -136,15 +146,14 @@ jobs:
           echo "::endgroup::"
 
       - name: Patch return types
-        if: "matrix.php == '8.1' && ! matrix.mode"
+        if: "matrix.php == '8.1' && ! matrix.mode && matrix.os != 'macos-11'"
         run: |
-          sed -i 's/"\*\*\/Tests\/"//' composer.json
+          patch -sp1 < .github/expected-missing-return-types.diff
           git add .
           composer install -q --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=1&php=7.2' php .github/patch-types.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=1&php=7.2' php .github/patch-types.php # ensure the script is idempotent
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.0' php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.0' php .github/patch-types.php # ensure the script is idempotent
           git diff --exit-code
-          echo PHPUNIT="$PHPUNIT,legacy" >> $GITHUB_ENV
 
       - name: Run tests
         run: |
@@ -175,19 +184,21 @@ jobs:
             exit 0
           fi
 
-          (cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb)
-
           if [[ "${{ matrix.mode }}" = low-deps ]]; then
             echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} 'cd {} && $COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT'"
 
             exit 0
           fi
 
+          (cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb)
+          (cd src/Symfony/Component/Lock; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb)
+
           # matrix.mode = high-deps
           echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} 'cd {} && $COMPOSER_UP && $PHPUNIT$LEGACY'" || X=1
 
           # get a list of the patched components (relies on .github/build-packages.php being called in the previous step)
           (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
+          (cd src/Symfony/Component/Lock; mv composer.bak composer.json)
           PATCHED_COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
           # for 5.4 LTS, checkout and test previous major with the patched components (only for patched components)
@@ -201,6 +212,7 @@ jobs:
               git checkout -m FETCH_HEAD
               PATCHED_COMPONENTS=$(echo "$PATCHED_COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort || true)
               (cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
+              (cd src/Symfony/Component/Lock; composer require --dev --no-update mongodb/mongodb)
               if [[ $PATCHED_COMPONENTS ]]; then
                 echo "::group::install phpunit"
                 ./phpunit install
@@ -212,12 +224,12 @@ jobs:
           [[ ! $X ]] || (exit 1)
 
       - name: Run tests with SIGCHLD enabled PHP
-        if: "matrix.php == '7.2' && ! matrix.mode"
+        if: "matrix.php == '8.0' && ! matrix.mode && matrix.os != 'macos-11'"
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.2.5-pcntl-sigchild.tar.bz2
-          tar -xjf php-7.2.5-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.0.2-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.0.2-pcntl-sigchild.tar.bz2
           cd ..
 
           ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process

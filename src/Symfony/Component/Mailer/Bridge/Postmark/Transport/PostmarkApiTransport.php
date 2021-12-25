@@ -32,7 +32,7 @@ class PostmarkApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.postmarkapp.com';
 
-    private $key;
+    private string $key;
 
     private $messageStream;
 
@@ -159,7 +159,7 @@ class PostmarkApiTransport extends AbstractApiTransport
     /**
      * @return $this
      */
-    public function setMessageStream(string $messageStream): self
+    public function setMessageStream(string $messageStream): static
     {
         $this->messageStream = $messageStream;
 

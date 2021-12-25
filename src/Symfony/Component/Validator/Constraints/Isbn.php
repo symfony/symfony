@@ -47,19 +47,14 @@ class Isbn extends Constraint
     public $type;
     public $message;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param string|array|null $type The ISBN standard to validate or a set of options
-     */
     public function __construct(
-        $type = null,
+        string|array $type = null,
         string $message = null,
         string $isbn10Message = null,
         string $isbn13Message = null,
         string $bothIsbnMessage = null,
         array $groups = null,
-        $payload = null,
+        mixed $payload = null,
         array $options = []
     ) {
         if (\is_array($type)) {
@@ -79,7 +74,7 @@ class Isbn extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'type';
     }

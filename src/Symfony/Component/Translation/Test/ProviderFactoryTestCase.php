@@ -31,11 +31,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 abstract class ProviderFactoryTestCase extends TestCase
 {
-    protected $client;
-    protected $logger;
-    protected $defaultLocale;
-    protected $loader;
-    protected $xliffFileDumper;
+    protected HttpClientInterface $client;
+    protected LoggerInterface $logger;
+    protected string $defaultLocale;
+    protected LoaderInterface $loader;
+    protected XliffFileDumper $xliffFileDumper;
 
     abstract public function createFactory(): ProviderFactoryInterface;
 
@@ -122,26 +122,26 @@ abstract class ProviderFactoryTestCase extends TestCase
 
     protected function getClient(): HttpClientInterface
     {
-        return $this->client ?? $this->client = new MockHttpClient();
+        return $this->client ??= new MockHttpClient();
     }
 
     protected function getLogger(): LoggerInterface
     {
-        return $this->logger ?? $this->logger = $this->createMock(LoggerInterface::class);
+        return $this->logger ??= $this->createMock(LoggerInterface::class);
     }
 
     protected function getDefaultLocale(): string
     {
-        return $this->defaultLocale ?? $this->defaultLocale = 'en';
+        return $this->defaultLocale ??= 'en';
     }
 
     protected function getLoader(): LoaderInterface
     {
-        return $this->loader ?? $this->loader = $this->createMock(LoaderInterface::class);
+        return $this->loader ??= $this->createMock(LoaderInterface::class);
     }
 
     protected function getXliffFileDumper(): XliffFileDumper
     {
-        return $this->xliffFileDumper ?? $this->xliffFileDumper = $this->createMock(XliffFileDumper::class);
+        return $this->xliffFileDumper ??= $this->createMock(XliffFileDumper::class);
     }
 }

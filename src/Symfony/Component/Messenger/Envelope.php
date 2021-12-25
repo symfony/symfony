@@ -23,10 +23,11 @@ final class Envelope
     /**
      * @var array<string, list<StampInterface>>
      */
-    private $stamps = [];
-    private $message;
+    private array $stamps = [];
+    private object $message;
 
     /**
+     * @param object|Envelope  $message
      * @param StampInterface[] $stamps
      */
     public function __construct(object $message, array $stamps = [])
@@ -41,7 +42,6 @@ final class Envelope
     /**
      * Makes sure the message is in an Envelope and adds the given stamps.
      *
-     * @param object|Envelope  $message
      * @param StampInterface[] $stamps
      */
     public static function wrap(object $message, array $stamps = []): self
@@ -52,9 +52,9 @@ final class Envelope
     }
 
     /**
-     * @return static A new Envelope instance with additional stamp
+     * Adds one or more stamps.
      */
-    public function with(StampInterface ...$stamps): self
+    public function with(StampInterface ...$stamps): static
     {
         $cloned = clone $this;
 
@@ -66,13 +66,13 @@ final class Envelope
     }
 
     /**
-     * @return static A new Envelope instance without any stamps of the given class
+     * Removes all stamps of the given class.
      */
-    public function withoutAll(string $stampFqcn): self
+    public function withoutAll(string $stampFqcn): static
     {
         $cloned = clone $this;
 
-        unset($cloned->stamps[$this->resolveAlias($stampFqcn)]);
+        unset($cloned->stamps[$stampFqcn]);
 
         return $cloned;
     }
@@ -83,7 +83,6 @@ final class Envelope
     public function withoutStampsOfType(string $type): self
     {
         $cloned = clone $this;
-        $type = $this->resolveAlias($type);
 
         foreach ($cloned->stamps as $class => $stamps) {
             if ($class === $type || is_subclass_of($class, $type)) {
@@ -94,9 +93,16 @@ final class Envelope
         return $cloned;
     }
 
+    /**
+     * @template TStamp of StampInterface
+     *
+     * @param class-string<TStamp> $stampFqcn
+     *
+     * @return TStamp|null
+     */
     public function last(string $stampFqcn): ?StampInterface
     {
-        return isset($this->stamps[$stampFqcn = $this->resolveAlias($stampFqcn)]) ? end($this->stamps[$stampFqcn]) : null;
+        return isset($this->stamps[$stampFqcn]) ? end($this->stamps[$stampFqcn]) : null;
     }
 
     /**
@@ -105,27 +111,14 @@ final class Envelope
     public function all(string $stampFqcn = null): array
     {
         if (null !== $stampFqcn) {
-            return $this->stamps[$this->resolveAlias($stampFqcn)] ?? [];
+            return $this->stamps[$stampFqcn] ?? [];
         }
 
         return $this->stamps;
     }
 
-    /**
-     * @return object The original message contained in the envelope
-     */
     public function getMessage(): object
     {
         return $this->message;
-    }
-
-    /**
-     * BC to be removed in 6.0.
-     */
-    private function resolveAlias(string $fqcn): string
-    {
-        static $resolved;
-
-        return $resolved[$fqcn] ?? ($resolved[$fqcn] = class_exists($fqcn) ? (new \ReflectionClass($fqcn))->getName() : $fqcn);
     }
 }

@@ -33,26 +33,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
 {
-    private $resolverServiceId;
-    private $controllerTag;
-    private $controllerLocator;
-    private $notTaggedControllerResolverServiceId;
-
-    public function __construct(string $resolverServiceId = 'argument_resolver.service', string $controllerTag = 'controller.service_arguments', string $controllerLocator = 'argument_resolver.controller_locator', string $notTaggedControllerResolverServiceId = 'argument_resolver.not_tagged_controller')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/http-kernel', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->resolverServiceId = $resolverServiceId;
-        $this->controllerTag = $controllerTag;
-        $this->controllerLocator = $controllerLocator;
-        $this->notTaggedControllerResolverServiceId = $notTaggedControllerResolverServiceId;
-    }
-
     public function process(ContainerBuilder $container)
     {
-        if (false === $container->hasDefinition($this->resolverServiceId) && false === $container->hasDefinition($this->notTaggedControllerResolverServiceId)) {
+        if (!$container->hasDefinition('argument_resolver.service') && !$container->hasDefinition('argument_resolver.not_tagged_controller')) {
             return;
         }
 
@@ -66,7 +49,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
             }
         }
 
-        foreach ($container->findTaggedServiceIds($this->controllerTag, true) as $id => $tags) {
+        foreach ($container->findTaggedServiceIds('controller.service_arguments', true) as $id => $tags) {
             $def = $container->getDefinition($id);
             $def->setPublic(true);
             $class = $def->getClass();
@@ -106,11 +89,11 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 }
                 foreach (['action', 'argument', 'id'] as $k) {
                     if (!isset($attributes[$k][0])) {
-                        throw new InvalidArgumentException(sprintf('Missing "%s" attribute on tag "%s" %s for service "%s".', $k, $this->controllerTag, json_encode($attributes, \JSON_UNESCAPED_UNICODE), $id));
+                        throw new InvalidArgumentException(sprintf('Missing "%s" attribute on tag "controller.service_arguments" %s for service "%s".', $k, json_encode($attributes, \JSON_UNESCAPED_UNICODE), $id));
                     }
                 }
                 if (!isset($methods[$action = strtolower($attributes['action'])])) {
-                    throw new InvalidArgumentException(sprintf('Invalid "action" attribute on tag "%s" for service "%s": no public "%s()" method found on class "%s".', $this->controllerTag, $id, $attributes['action'], $class));
+                    throw new InvalidArgumentException(sprintf('Invalid "action" attribute on tag "controller.service_arguments" for service "%s": no public "%s()" method found on class "%s".', $id, $attributes['action'], $class));
                 }
                 [$r, $parameters] = $methods[$action];
                 $found = false;
@@ -126,7 +109,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 }
 
                 if (!$found) {
-                    throw new InvalidArgumentException(sprintf('Invalid "%s" tag for service "%s": method "%s()" has no "%s" argument on class "%s".', $this->controllerTag, $id, $r->name, $attributes['argument'], $class));
+                    throw new InvalidArgumentException(sprintf('Invalid "controller.service_arguments" tag for service "%s": method "%s()" has no "%s" argument on class "%s".', $id, $r->name, $attributes['argument'], $class));
                 }
             }
 
@@ -145,7 +128,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         if ('?' !== $target[0]) {
                             $invalidBehavior = ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE;
                         } elseif ('' === $target = (string) substr($target, 1)) {
-                            throw new InvalidArgumentException(sprintf('A "%s" tag must have non-empty "id" attributes for service "%s".', $this->controllerTag, $id));
+                            throw new InvalidArgumentException(sprintf('A "controller.service_arguments" tag must have non-empty "id" attributes for service "%s".', $id));
                         } elseif ($p->allowsNull() && !$p->isOptional()) {
                             $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                         }
@@ -205,16 +188,16 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
 
         $controllerLocatorRef = ServiceLocatorTagPass::register($container, $controllers);
 
-        if ($container->hasDefinition($this->resolverServiceId)) {
-            $container->getDefinition($this->resolverServiceId)
+        if ($container->hasDefinition('argument_resolver.service')) {
+            $container->getDefinition('argument_resolver.service')
                 ->replaceArgument(0, $controllerLocatorRef);
         }
 
-        if ($container->hasDefinition($this->notTaggedControllerResolverServiceId)) {
-            $container->getDefinition($this->notTaggedControllerResolverServiceId)
+        if ($container->hasDefinition('argument_resolver.not_tagged_controller')) {
+            $container->getDefinition('argument_resolver.not_tagged_controller')
                 ->replaceArgument(0, $controllerLocatorRef);
         }
 
-        $container->setAlias($this->controllerLocator, (string) $controllerLocatorRef);
+        $container->setAlias('argument_resolver.controller_locator', (string) $controllerLocatorRef);
     }
 }

@@ -24,9 +24,9 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceSubscriberInterface
 {
-    private $storage;
-    private $container;
-    private $enableUsageTracking = false;
+    private TokenStorageInterface $storage;
+    private ContainerInterface $container;
+    private bool $enableUsageTracking = false;
 
     public function __construct(TokenStorageInterface $storage, ContainerInterface $container)
     {
@@ -79,31 +79,11 @@ final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceS
 
     private function getSession(): SessionInterface
     {
-        // BC for symfony/security-bundle < 5.3
-        if ($this->container->has('session')) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Injecting the "session" in "%s" is deprecated, inject the "request_stack" instead.', __CLASS__);
-
-            return $this->container->get('session');
-        }
-
         return $this->container->get('request_stack')->getSession();
     }
 
     private function shouldTrackUsage(): bool
     {
-        if (!$this->enableUsageTracking) {
-            return false;
-        }
-
-        // BC for symfony/security-bundle < 5.3
-        if ($this->container->has('session')) {
-            return true;
-        }
-
-        if (!$this->container->get('request_stack')->getMainRequest()) {
-            return false;
-        }
-
-        return true;
+        return $this->enableUsageTracking && $this->container->get('request_stack')->getMainRequest();
     }
 }

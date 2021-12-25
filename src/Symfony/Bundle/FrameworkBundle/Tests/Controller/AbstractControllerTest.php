@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -39,7 +38,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -68,14 +66,10 @@ class AbstractControllerTest extends TestCase
             'request_stack' => '?Symfony\\Component\\HttpFoundation\\RequestStack',
             'http_kernel' => '?Symfony\\Component\\HttpKernel\\HttpKernelInterface',
             'serializer' => '?Symfony\\Component\\Serializer\\SerializerInterface',
-            'session' => '?Symfony\\Component\\HttpFoundation\\Session\\SessionInterface',
             'security.authorization_checker' => '?Symfony\\Component\\Security\\Core\\Authorization\\AuthorizationCheckerInterface',
             'twig' => '?Twig\\Environment',
-            'doctrine' => '?Doctrine\\Persistence\\ManagerRegistry',
             'form.factory' => '?Symfony\\Component\\Form\\FormFactoryInterface',
             'parameter_bag' => '?Symfony\\Component\\DependencyInjection\\ParameterBag\\ContainerBagInterface',
-            'message_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
-            'messenger.default_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
             'security.token_storage' => '?Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorageInterface',
             'security.csrf.token_manager' => '?Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
         ];
@@ -144,19 +138,6 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($this->getContainerWithTokenStorage($token));
 
         $this->assertSame($controller->getUser(), $user);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetUserAnonymousUserConvertedToNull()
-    {
-        $token = new AnonymousToken('default', 'anon.');
-
-        $controller = $this->createController();
-        $controller->setContainer($this->getContainerWithTokenStorage($token));
-
-        $this->assertNull($controller->getUser());
     }
 
     public function testGetUserWithEmptyTokenStorage()
@@ -506,7 +487,6 @@ class AbstractControllerTest extends TestCase
         $requestStack->push($request);
 
         $container = new Container();
-        $container->set('session', $session);
         $container->set('request_stack', $requestStack);
 
         $controller = $this->createController();
@@ -602,22 +582,6 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetDoctrine()
-    {
-        $doctrine = $this->createMock(ManagerRegistry::class);
-
-        $container = new Container();
-        $container->set('doctrine', $doctrine);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $this->assertEquals($doctrine, $controller->getDoctrine());
     }
 
     public function testAddLink()

@@ -54,9 +54,6 @@ class IsTrueValidatorTest extends ConstraintValidatorTestCase
         yield 'Doctrine style' => [new IsTrue([
             'message' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named parameters' => [eval('return new \Symfony\Component\Validator\Constraints\IsTrue(message: "myMessage");')];
-        }
+        yield 'named parameters' => [new IsTrue(message: 'myMessage')];
     }
 }

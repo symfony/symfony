@@ -42,25 +42,20 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  */
 class RouterListener implements EventSubscriberInterface
 {
-    private $matcher;
-    private $context;
-    private $logger;
-    private $requestStack;
-    private $projectDir;
-    private $debug;
+    private RequestMatcherInterface|UrlMatcherInterface $matcher;
+    private RequestContext $context;
+    private ?LoggerInterface $logger;
+    private RequestStack $requestStack;
+    private ?string $projectDir;
+    private bool $debug;
 
     /**
-     * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
-     * @param RequestContext|null                         $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
+     * @param RequestContext|null $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($matcher, RequestStack $requestStack, RequestContext $context = null, LoggerInterface $logger = null, string $projectDir = null, bool $debug = true)
+    public function __construct(UrlMatcherInterface|RequestMatcherInterface $matcher, RequestStack $requestStack, RequestContext $context = null, LoggerInterface $logger = null, string $projectDir = null, bool $debug = true)
     {
-        if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
-            throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
-        }
-
         if (null === $context && !$matcher instanceof RequestContextAwareInterface) {
             throw new \InvalidArgumentException('You must either pass a RequestContext or the matcher must implement RequestContextAwareInterface.');
         }
@@ -113,14 +108,12 @@ class RouterListener implements EventSubscriberInterface
                 $parameters = $this->matcher->match($request->getPathInfo());
             }
 
-            if (null !== $this->logger) {
-                $this->logger->info('Matched route "{route}".', [
-                    'route' => $parameters['_route'] ?? 'n/a',
-                    'route_parameters' => $parameters,
-                    'request_uri' => $request->getUri(),
-                    'method' => $request->getMethod(),
-                ]);
-            }
+            $this->logger?->info('Matched route "{route}".', [
+                'route' => $parameters['_route'] ?? 'n/a',
+                'route_parameters' => $parameters,
+                'request_uri' => $request->getUri(),
+                'method' => $request->getMethod(),
+            ]);
 
             $request->attributes->add($parameters);
             unset($parameters['_route'], $parameters['_controller']);

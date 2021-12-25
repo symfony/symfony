@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove the `SesApiTransport` class, use `SesApiAsyncAwsTransport` instead
+ * Remove the `SesHttpTransport` class, use `SesHttpAsyncAwsTransport` instead
+
 5.3
 ---
 

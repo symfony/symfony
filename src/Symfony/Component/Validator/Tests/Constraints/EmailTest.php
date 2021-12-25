@@ -54,9 +54,6 @@ class EmailTest extends TestCase
         new Email(['normalizer' => new \stdClass()]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttribute()
     {
         $metadata = new ClassMetadata(EmailDummy::class);

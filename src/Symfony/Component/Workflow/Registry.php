@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
  */
 class Registry
 {
-    private $workflows = [];
+    private array $workflows = [];
 
     public function addWorkflow(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy)
     {
@@ -38,10 +38,7 @@ class Registry
         return false;
     }
 
-    /**
-     * @return Workflow
-     */
-    public function get(object $subject, string $workflowName = null)
+    public function get(object $subject, string $workflowName = null): Workflow
     {
         $matched = [];
 

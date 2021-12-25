@@ -29,8 +29,8 @@ final class SmsapiTransport extends AbstractTransport
 {
     protected const HOST = 'api.smsapi.pl';
 
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

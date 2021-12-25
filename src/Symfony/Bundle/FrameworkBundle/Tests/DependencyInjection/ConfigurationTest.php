@@ -368,7 +368,7 @@ class ConfigurationTest extends TestCase
     {
         return [
             'http_method_override' => true,
-            'ide' => null,
+            'ide' => '%env(default::SYMFONY_IDE)%',
             'default_locale' => 'en',
             'enabled_locales' => [],
             'set_locale_from_accept_language' => false,
@@ -389,7 +389,6 @@ class ConfigurationTest extends TestCase
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
                 ],
-                'legacy_error_messages' => true,
             ],
             'esi' => ['enabled' => false],
             'ssi' => ['enabled' => false],
@@ -401,7 +400,6 @@ class ConfigurationTest extends TestCase
             'profiler' => [
                 'enabled' => false,
                 'only_exceptions' => false,
-                'only_master_requests' => false,
                 'only_main_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
@@ -415,7 +413,6 @@ class ConfigurationTest extends TestCase
                 'formatter' => 'translator.formatter.default',
                 'paths' => [],
                 'default_path' => '%kernel.project_dir%/translations',
-                'enabled_locales' => [],
                 'pseudo_localization' => [
                     'enabled' => false,
                     'accents' => true,
@@ -469,12 +466,11 @@ class ConfigurationTest extends TestCase
                 'http_port' => 80,
                 'https_port' => 443,
                 'strict_requirements' => true,
-                'utf8' => null,
+                'utf8' => true,
             ],
             'session' => [
                 'enabled' => false,
-                'storage_id' => 'session.storage.native',
-                'storage_factory_id' => null,
+                'storage_factory_id' => 'session.storage.factory.native',
                 'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
                 'cookie_samesite' => null,
@@ -541,7 +537,7 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
-                'reset_on_message' => null,
+                'reset_on_message' => true,
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [

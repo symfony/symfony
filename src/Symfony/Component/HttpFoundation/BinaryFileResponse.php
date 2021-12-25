@@ -44,7 +44,7 @@ class BinaryFileResponse extends Response
      * @param bool                $autoEtag           Whether the ETag header should be automatically set
      * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
      */
-    public function __construct($file, int $status = 200, array $headers = [], bool $public = true, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
+    public function __construct(\SplFileInfo|string $file, int $status = 200, array $headers = [], bool $public = true, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
     {
         parent::__construct(null, $status, $headers);
 
@@ -56,35 +56,13 @@ class BinaryFileResponse extends Response
     }
 
     /**
-     * @param \SplFileInfo|string $file               The file to stream
-     * @param int                 $status             The response status code
-     * @param array               $headers            An array of response headers
-     * @param bool                $public             Files are public by default
-     * @param string|null         $contentDisposition The type of Content-Disposition to set automatically with the filename
-     * @param bool                $autoEtag           Whether the ETag header should be automatically set
-     * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
-     *
-     * @return static
-     *
-     * @deprecated since Symfony 5.2, use __construct() instead.
-     */
-    public static function create($file = null, int $status = 200, array $headers = [], bool $public = true, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
-    {
-        trigger_deprecation('symfony/http-foundation', '5.2', 'The "%s()" method is deprecated, use "new %s()" instead.', __METHOD__, static::class);
-
-        return new static($file, $status, $headers, $public, $contentDisposition, $autoEtag, $autoLastModified);
-    }
-
-    /**
      * Sets the file to stream.
-     *
-     * @param \SplFileInfo|string $file The file to stream
      *
      * @return $this
      *
      * @throws FileException
      */
-    public function setFile($file, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
+    public function setFile(\SplFileInfo|string $file, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true): static
     {
         if (!$file instanceof File) {
             if ($file instanceof \SplFileInfo) {
@@ -117,10 +95,8 @@ class BinaryFileResponse extends Response
 
     /**
      * Gets the file.
-     *
-     * @return File
      */
-    public function getFile()
+    public function getFile(): File
     {
         return $this->file;
     }
@@ -130,7 +106,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function setAutoLastModified()
+    public function setAutoLastModified(): static
     {
         $this->setLastModified(\DateTime::createFromFormat('U', $this->file->getMTime()));
 
@@ -142,7 +118,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function setAutoEtag()
+    public function setAutoEtag(): static
     {
         $this->setEtag(base64_encode(hash_file('sha256', $this->file->getPathname(), true)));
 
@@ -158,7 +134,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function setContentDisposition(string $disposition, string $filename = '', string $filenameFallback = '')
+    public function setContentDisposition(string $disposition, string $filename = '', string $filenameFallback = ''): static
     {
         if ('' === $filename) {
             $filename = $this->file->getFilename();
@@ -187,7 +163,7 @@ class BinaryFileResponse extends Response
     /**
      * {@inheritdoc}
      */
-    public function prepare(Request $request)
+    public function prepare(Request $request): static
     {
         if (!$this->headers->has('Content-Type')) {
             $this->headers->set('Content-Type', $this->file->getMimeType() ?: 'application/octet-stream');
@@ -226,7 +202,7 @@ class BinaryFileResponse extends Response
                 $parts = HeaderUtils::split($request->headers->get('X-Accel-Mapping', ''), ',=');
                 foreach ($parts as $part) {
                     [$pathPrefix, $location] = $part;
-                    if (substr($path, 0, \strlen($pathPrefix)) === $pathPrefix) {
+                    if (str_starts_with($path, $pathPrefix)) {
                         $path = $location.substr($path, \strlen($pathPrefix));
                         // Only set X-Accel-Redirect header if a valid URI can be produced
                         // as nginx does not serve arbitrary file paths.
@@ -293,7 +269,7 @@ class BinaryFileResponse extends Response
     /**
      * {@inheritdoc}
      */
-    public function sendContent()
+    public function sendContent(): static
     {
         if (!$this->isSuccessful()) {
             return parent::sendContent();
@@ -323,7 +299,7 @@ class BinaryFileResponse extends Response
      *
      * @throws \LogicException when the content is not null
      */
-    public function setContent(?string $content)
+    public function setContent(?string $content): static
     {
         if (null !== $content) {
             throw new \LogicException('The content cannot be set on a BinaryFileResponse instance.');
@@ -335,7 +311,7 @@ class BinaryFileResponse extends Response
     /**
      * {@inheritdoc}
      */
-    public function getContent()
+    public function getContent(): string|false
     {
         return false;
     }
@@ -354,7 +330,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function deleteFileAfterSend(bool $shouldDelete = true)
+    public function deleteFileAfterSend(bool $shouldDelete = true): static
     {
         $this->deleteFileAfterSend = $shouldDelete;
 

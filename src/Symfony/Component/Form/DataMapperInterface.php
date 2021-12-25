@@ -27,7 +27,7 @@ interface DataMapperInterface
      *
      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported
      */
-    public function mapDataToForms($viewData, \Traversable $forms);
+    public function mapDataToForms(mixed $viewData, \Traversable $forms);
 
     /**
      * Maps the model data of a list of children forms into the view data of their parent.
@@ -58,5 +58,5 @@ interface DataMapperInterface
      *
      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported
      */
-    public function mapFormsToData(\Traversable $forms, &$viewData);
+    public function mapFormsToData(\Traversable $forms, mixed &$viewData);
 }

@@ -19,58 +19,104 @@ namespace Symfony\Component\Security\Core\User;
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class InMemoryUser extends User
+final class InMemoryUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since Symfony 5.3
-     */
-    public function isAccountNonExpired(): bool
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, you should stop using it.', __METHOD__);
+    private string $username;
+    private ?string $password;
+    private bool $enabled;
+    private array $roles;
 
-        return parent::isAccountNonExpired();
+    public function __construct(?string $username, ?string $password, array $roles = [], bool $enabled = true)
+    {
+        if ('' === $username || null === $username) {
+            throw new \InvalidArgumentException('The username cannot be empty.');
+        }
+
+        $this->username = $username;
+        $this->password = $password;
+        $this->enabled = $enabled;
+        $this->roles = $roles;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getUserIdentifier();
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated since Symfony 5.3
      */
-    public function isAccountNonLocked(): bool
+    public function getRoles(): array
     {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, you should stop using it.', __METHOD__);
-
-        return parent::isAccountNonLocked();
+        return $this->roles;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated since Symfony 5.3
      */
-    public function isCredentialsNonExpired(): bool
+    public function getPassword(): ?string
     {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, you should stop using it.', __METHOD__);
-
-        return parent::isCredentialsNonExpired();
+        return $this->password;
     }
 
     /**
-     * @deprecated since Symfony 5.3
+     * Returns the identifier for this user (e.g. its username or email address).
      */
-    public function getExtraFields(): array
+    public function getUserIdentifier(): string
     {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, you should stop using it.', __METHOD__);
-
-        return parent::getExtraFields();
+        return $this->username;
     }
 
-    public function setPassword(string $password)
+    /**
+     * Checks whether the user is enabled.
+     *
+     * Internally, if this method returns false, the authentication system
+     * will throw a DisabledException and prevent login.
+     *
+     * @return bool true if the user is enabled, false otherwise
+     *
+     * @see DisabledException
+     */
+    public function isEnabled(): bool
     {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, you should stop using it.', __METHOD__);
+        return $this->enabled;
+    }
 
-        parent::setPassword($password);
+    /**
+     * {@inheritdoc}
+     */
+    public function eraseCredentials()
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEqualTo(UserInterface $user): bool
+    {
+        if (!$user instanceof self) {
+            return false;
+        }
+
+        if ($this->getPassword() !== $user->getPassword()) {
+            return false;
+        }
+
+        $currentRoles = array_map('strval', (array) $this->getRoles());
+        $newRoles = array_map('strval', (array) $user->getRoles());
+        $rolesChanged = \count($currentRoles) !== \count($newRoles) || \count($currentRoles) !== \count(array_intersect($currentRoles, $newRoles));
+        if ($rolesChanged) {
+            return false;
+        }
+
+        if ($this->getUserIdentifier() !== $user->getUserIdentifier()) {
+            return false;
+        }
+
+        if ($this->isEnabled() !== $user->isEnabled()) {
+            return false;
+        }
+
+        return true;
     }
 }

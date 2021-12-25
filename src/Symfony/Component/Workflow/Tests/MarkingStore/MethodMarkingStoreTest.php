@@ -89,7 +89,7 @@ class MethodMarkingStoreTest extends TestCase
                 $this->markingValue = $markingValue;
             }
 
-            public function __toString()
+            public function __toString(): string
             {
                 return $this->markingValue;
             }

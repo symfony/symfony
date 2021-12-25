@@ -26,7 +26,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
     /**
      * @var TraceableHttpClient[]
      */
-    private $clients = [];
+    private array $clients = [];
 
     public function registerClient(string $name, TraceableHttpClient $client)
     {
@@ -140,7 +140,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
                     }
                 }
 
-                if (0 === strpos($contentType, 'image/') && class_exists(ImgStub::class)) {
+                if (str_starts_with($contentType, 'image/') && class_exists(ImgStub::class)) {
                     $content = new ImgStub($content, $contentType, '');
                 } else {
                     $content = [$content];

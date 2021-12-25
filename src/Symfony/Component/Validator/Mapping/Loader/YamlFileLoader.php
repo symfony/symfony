@@ -33,15 +33,13 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Caches the used YAML parser.
-     *
-     * @var YamlParser
      */
-    private $yamlParser;
+    private YamlParser $yamlParser;
 
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         if (null === $this->classes) {
             $this->loadClassesFromYaml();
@@ -63,7 +61,7 @@ class YamlFileLoader extends FileLoader
      *
      * @return string[]
      */
-    public function getMappedClasses()
+    public function getMappedClasses(): array
     {
         if (null === $this->classes) {
             $this->loadClassesFromYaml();
@@ -79,7 +77,7 @@ class YamlFileLoader extends FileLoader
      *
      * @return array<array|scalar|Constraint>
      */
-    protected function parseNodes(array $nodes)
+    protected function parseNodes(array $nodes): array
     {
         $values = [];
 
@@ -133,10 +131,7 @@ class YamlFileLoader extends FileLoader
 
     private function loadClassesFromYaml()
     {
-        if (null === $this->yamlParser) {
-            $this->yamlParser = new YamlParser();
-        }
-
+        $this->yamlParser ??= new YamlParser();
         $this->classes = $this->parseFile($this->file);
 
         if (isset($this->classes['namespaces'])) {

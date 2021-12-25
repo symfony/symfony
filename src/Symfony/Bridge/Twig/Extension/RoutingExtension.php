@@ -25,7 +25,7 @@ use Twig\TwigFunction;
  */
 final class RoutingExtension extends AbstractExtension
 {
-    private $generator;
+    private UrlGeneratorInterface $generator;
 
     public function __construct(UrlGeneratorInterface $generator)
     {

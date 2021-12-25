@@ -22,15 +22,12 @@ use Symfony\Contracts\HttpClient\ChunkInterface;
  */
 class ErrorChunk implements ChunkInterface
 {
-    private $didThrow = false;
-    private $offset;
-    private $errorMessage;
-    private $error;
+    private bool $didThrow = false;
+    private int $offset;
+    private string $errorMessage;
+    private ?\Throwable $error = null;
 
-    /**
-     * @param \Throwable|string $error
-     */
-    public function __construct(int $offset, $error)
+    public function __construct(int $offset, \Throwable|string $error)
     {
         $this->offset = $offset;
 
@@ -108,9 +105,6 @@ class ErrorChunk implements ChunkInterface
         return $this->errorMessage;
     }
 
-    /**
-     * @return bool Whether the wrapped error has been thrown or not
-     */
     public function didThrow(bool $didThrow = null): bool
     {
         if (null !== $didThrow && $this->didThrow !== $didThrow) {

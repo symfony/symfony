@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouteCollectionBuilder;
 
 /**
  * A Kernel that provides configuration hooks.
@@ -147,7 +146,7 @@ trait MicroKernelTrait
                 ],
             ]);
 
-            $kernelClass = false !== strpos(static::class, "@anonymous\0") ? parent::class : static::class;
+            $kernelClass = str_contains(static::class, "@anonymous\0") ? parent::class : static::class;
 
             if (!$container->hasDefinition('kernel')) {
                 $container->register('kernel', $kernelClass)
@@ -208,17 +207,6 @@ trait MicroKernelTrait
         $collection = new RouteCollection();
 
         $configureRoutes = new \ReflectionMethod($this, 'configureRoutes');
-        $configuratorClass = $configureRoutes->getNumberOfParameters() > 0 && ($type = $configureRoutes->getParameters()[0]->getType()) instanceof \ReflectionNamedType && !$type->isBuiltin() ? $type->getName() : null;
-
-        if ($configuratorClass && !is_a(RoutingConfigurator::class, $configuratorClass, true)) {
-            trigger_deprecation('symfony/framework-bundle', '5.1', 'Using type "%s" for argument 1 of method "%s:configureRoutes()" is deprecated, use "%s" instead.', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class);
-
-            $routes = new RouteCollectionBuilder($loader);
-            $this->configureRoutes($routes);
-
-            return $routes->build();
-        }
-
         $configureRoutes->getClosure($this)(new RoutingConfigurator($collection, $kernelLoader, $file, $file, $this->getEnvironment()));
 
         foreach ($collection as $route) {

@@ -47,7 +47,7 @@ class CompleteCommandTest extends TestCase
 
     public function testUnsupportedShellOption()
     {
-        $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash").');
+        $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash", "fish").');
         $this->execute(['--shell' => 'unsupported']);
     }
 

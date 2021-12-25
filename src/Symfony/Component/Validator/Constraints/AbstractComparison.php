@@ -28,12 +28,7 @@ abstract class AbstractComparison extends Constraint
     public $value;
     public $propertyPath;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param mixed $value the value to compare or a set of options
-     */
-    public function __construct($value = null, $propertyPath = null, string $message = null, array $groups = null, $payload = null, array $options = [])
+    public function __construct(mixed $value = null, string $propertyPath = null, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($value)) {
             $options = array_merge($value, $options);
@@ -62,7 +57,7 @@ abstract class AbstractComparison extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'value';
     }

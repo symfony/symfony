@@ -32,8 +32,8 @@ final class DoctrineLoader implements LoaderInterface
 {
     use AutoMappingTrait;
 
-    private $entityManager;
-    private $classValidatorRegexp;
+    private EntityManagerInterface $entityManager;
+    private ?string $classValidatorRegexp;
 
     public function __construct(EntityManagerInterface $entityManager, string $classValidatorRegexp = null)
     {
@@ -49,7 +49,7 @@ final class DoctrineLoader implements LoaderInterface
         $className = $metadata->getClassName();
         try {
             $doctrineMetadata = $this->entityManager->getClassMetadata($className);
-        } catch (MappingException | OrmMappingException $exception) {
+        } catch (MappingException|OrmMappingException $exception) {
             return false;
         }
 

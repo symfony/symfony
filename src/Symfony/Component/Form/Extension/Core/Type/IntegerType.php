@@ -16,7 +16,6 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStri
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegerType extends AbstractType
@@ -49,11 +48,7 @@ class IntegerType extends AbstractType
             // Integer cast rounds towards 0, so do the same when displaying fractions
             'rounding_mode' => \NumberFormatter::ROUND_DOWN,
             'compound' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please enter an integer.';
-            },
+            'invalid_message' => 'Please enter an integer.',
         ]);
 
         $resolver->setAllowedValues('rounding_mode', [
@@ -70,7 +65,7 @@ class IntegerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'integer';
     }

@@ -95,16 +95,6 @@ class AppVariableTest extends TestCase
         $this->assertEquals($user, $this->appVariable->getUser());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetUserWithUsernameAsTokenUser()
-    {
-        $this->setTokenStorage('username');
-
-        $this->assertNull($this->appVariable->getUser());
-    }
-
     public function testGetTokenWithNoToken()
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);

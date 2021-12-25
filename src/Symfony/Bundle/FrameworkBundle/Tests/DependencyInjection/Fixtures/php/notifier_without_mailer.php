@@ -9,7 +9,6 @@ $container->loadFromExtension('framework', [
     ],
     'messenger' => [
         'enabled' => true,
-        'reset_on_message' =>  true,
     ],
     'notifier' => [
         'enabled' => true,

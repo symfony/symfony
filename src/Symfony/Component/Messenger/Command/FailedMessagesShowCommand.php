@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,11 +26,9 @@ use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
+#[AsCommand(name: 'messenger:failed:show', description: 'Show one or more messages from the failure transport')]
 class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 {
-    protected static $defaultName = 'messenger:failed:show';
-    protected static $defaultDescription = 'Show one or more messages from the failure transport';
-
     /**
      * {@inheritdoc}
      */
@@ -41,7 +40,6 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
                 new InputOption('max', null, InputOption::VALUE_REQUIRED, 'Maximum number of messages to list', 50),
                 new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> shows message that are pending in the failure transport.
 
@@ -58,7 +56,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
@@ -100,14 +98,10 @@ EOF
             $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
             /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
             $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
-            $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope, true);
 
             $errorMessage = '';
             if (null !== $lastErrorDetailsStamp) {
                 $errorMessage = $lastErrorDetailsStamp->getExceptionMessage();
-            } elseif (null !== $lastRedeliveryStampWithException) {
-                // Try reading the errorMessage for messages that are still in the queue without the new ErrorDetailStamps.
-                $errorMessage = $lastRedeliveryStampWithException->getExceptionMessage();
             }
 
             $rows[] = [

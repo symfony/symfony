@@ -16,12 +16,12 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field;
  */
 final class Fact
 {
-    private $options = [];
+    private array $options = [];
 
     /**
      * @return $this
      */
-    public function name(string $name): self
+    public function name(string $name): static
     {
         $this->options['name'] = $name;
 
@@ -31,7 +31,7 @@ final class Fact
     /**
      * @return $this
      */
-    public function value(string $value): self
+    public function value(string $value): static
     {
         $this->options['value'] = $value;
 

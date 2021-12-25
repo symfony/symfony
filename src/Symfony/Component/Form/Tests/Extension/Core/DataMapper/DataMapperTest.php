@@ -106,9 +106,6 @@ class DataMapperTest extends TestCase
         self::assertNull($form->getData());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testMapDataToFormsIgnoresUninitializedProperties()
     {
         $engineForm = new Form(new FormConfigBuilder('engine', null, $this->dispatcher));
@@ -310,9 +307,6 @@ class DataMapperTest extends TestCase
         self::assertSame($initialEngine, $car->engine);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testMapFormsToUninitializedProperties()
     {
         $car = new TypehintedPropertiesCar();

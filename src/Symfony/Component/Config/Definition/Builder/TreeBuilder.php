@@ -25,14 +25,14 @@ class TreeBuilder implements NodeParentInterface
 
     public function __construct(string $name, string $type = 'array', NodeBuilder $builder = null)
     {
-        $builder = $builder ?? new NodeBuilder();
+        $builder ??= new NodeBuilder();
         $this->root = $builder->node($name, $type)->setParent($this);
     }
 
     /**
      * @return NodeDefinition|ArrayNodeDefinition The root node (as an ArrayNodeDefinition when the type is 'array')
      */
-    public function getRootNode(): NodeDefinition
+    public function getRootNode(): NodeDefinition|ArrayNodeDefinition
     {
         return $this->root;
     }
@@ -40,11 +40,9 @@ class TreeBuilder implements NodeParentInterface
     /**
      * Builds the tree.
      *
-     * @return NodeInterface
-     *
      * @throws \RuntimeException
      */
-    public function buildTree()
+    public function buildTree(): NodeInterface
     {
         if (null !== $this->tree) {
             return $this->tree;

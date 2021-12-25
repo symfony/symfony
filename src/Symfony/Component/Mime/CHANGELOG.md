@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `Address::fromString()`, use `Address::create()` instead
+ * Remove `Serializable` interface from `RawMessage`
+
 5.2.0
 -----
 

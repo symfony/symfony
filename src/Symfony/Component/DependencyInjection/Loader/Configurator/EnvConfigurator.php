@@ -18,7 +18,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @var string[]
      */
-    private $stack;
+    private array $stack;
 
     public function __construct(string $name)
     {
@@ -33,7 +33,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function __call(string $name, array $arguments): self
+    public function __call(string $name, array $arguments): static
     {
         $processor = strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], '\1_\2', $name));
 
@@ -45,7 +45,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function custom(string $processor, ...$args): self
+    public function custom(string $processor, ...$args): static
     {
         array_unshift($this->stack, $processor, ...$args);
 
@@ -55,7 +55,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function base64(): self
+    public function base64(): static
     {
         array_unshift($this->stack, 'base64');
 
@@ -65,7 +65,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function bool(): self
+    public function bool(): static
     {
         array_unshift($this->stack, 'bool');
 
@@ -75,7 +75,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function not(): self
+    public function not(): static
     {
         array_unshift($this->stack, 'not');
 
@@ -85,7 +85,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function const(): self
+    public function const(): static
     {
         array_unshift($this->stack, 'const');
 
@@ -95,7 +95,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function csv(): self
+    public function csv(): static
     {
         array_unshift($this->stack, 'csv');
 
@@ -105,7 +105,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function file(): self
+    public function file(): static
     {
         array_unshift($this->stack, 'file');
 
@@ -115,7 +115,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function float(): self
+    public function float(): static
     {
         array_unshift($this->stack, 'float');
 
@@ -125,7 +125,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function int(): self
+    public function int(): static
     {
         array_unshift($this->stack, 'int');
 
@@ -135,7 +135,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function json(): self
+    public function json(): static
     {
         array_unshift($this->stack, 'json');
 
@@ -145,7 +145,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function key(string $key): self
+    public function key(string $key): static
     {
         array_unshift($this->stack, 'key', $key);
 
@@ -155,7 +155,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function url(): self
+    public function url(): static
     {
         array_unshift($this->stack, 'url');
 
@@ -165,7 +165,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function queryString(): self
+    public function queryString(): static
     {
         array_unshift($this->stack, 'query_string');
 
@@ -175,7 +175,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function resolve(): self
+    public function resolve(): static
     {
         array_unshift($this->stack, 'resolve');
 
@@ -185,7 +185,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function default(string $fallbackParam): self
+    public function default(string $fallbackParam): static
     {
         array_unshift($this->stack, 'default', $fallbackParam);
 
@@ -195,7 +195,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function string(): self
+    public function string(): static
     {
         array_unshift($this->stack, 'string');
 
@@ -205,7 +205,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function trim(): self
+    public function trim(): static
     {
         array_unshift($this->stack, 'trim');
 
@@ -215,7 +215,7 @@ class EnvConfigurator extends ParamConfigurator
     /**
      * @return $this
      */
-    public function require(): self
+    public function require(): static
     {
         array_unshift($this->stack, 'require');
 

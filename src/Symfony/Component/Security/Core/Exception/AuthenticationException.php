@@ -24,7 +24,7 @@ class AuthenticationException extends RuntimeException
     /** @internal */
     protected $serialized;
 
-    private $token;
+    private ?TokenInterface $token = null;
 
     public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
     {
@@ -32,10 +32,7 @@ class AuthenticationException extends RuntimeException
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return TokenInterface|null
-     */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         return $this->token;
     }
@@ -98,10 +95,8 @@ class AuthenticationException extends RuntimeException
 
     /**
      * Message data to be used by the translation component.
-     *
-     * @return array
      */
-    public function getMessageData()
+    public function getMessageData(): array
     {
         return [];
     }

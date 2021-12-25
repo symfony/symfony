@@ -52,7 +52,7 @@ abstract class FileLoader extends BaseFileLoader
      *
      * @param bool|string $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
      */
-    public function import($resource, string $type = null, $ignoreErrors = false, string $sourceResource = null, $exclude = null)
+    public function import(mixed $resource, string $type = null, bool|string $ignoreErrors = false, string $sourceResource = null, $exclude = null): mixed
     {
         $args = \func_get_args();
 
@@ -91,7 +91,7 @@ abstract class FileLoader extends BaseFileLoader
      * @param string               $resource  The directory to look for classes, glob-patterns allowed
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
      */
-    public function registerClasses(Definition $prototype, string $namespace, string $resource, $exclude = null)
+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null)
     {
         if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));

@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\Tests\Bundle;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionNotValidBundle\ExtensionNotValidBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
 
 class BundleTest extends TestCase
@@ -26,14 +25,6 @@ class BundleTest extends TestCase
             'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\DependencyInjection\ExtensionPresentExtension',
             $bundle->getContainerExtension()
         );
-    }
-
-    public function testGetContainerExtensionWithInvalidClass()
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('must implement Symfony\Component\DependencyInjection\Extension\ExtensionInterface');
-        $bundle = new ExtensionNotValidBundle();
-        $bundle->getContainerExtension();
     }
 
     public function testBundleNameIsGuessedFromClass()

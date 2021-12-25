@@ -74,9 +74,6 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidNumberNamedArguments()
     {
         $this->validator->validate(

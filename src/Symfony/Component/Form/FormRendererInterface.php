@@ -20,10 +20,8 @@ interface FormRendererInterface
 {
     /**
      * Returns the engine used by this renderer.
-     *
-     * @return FormRendererEngineInterface
      */
-    public function getEngine();
+    public function getEngine(): FormRendererEngineInterface;
 
     /**
      * Sets the theme(s) to be used for rendering a view and its children.
@@ -34,17 +32,15 @@ interface FormRendererInterface
      * @param bool     $useDefaultThemes If true, will use default themes specified
      *                                   in the renderer
      */
-    public function setTheme(FormView $view, $themes, bool $useDefaultThemes = true);
+    public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true);
 
     /**
      * Renders a named block of the form theme.
      *
      * @param FormView $view      The view for which to render the block
      * @param array    $variables The variables to pass to the template
-     *
-     * @return string
      */
-    public function renderBlock(FormView $view, string $blockName, array $variables = []);
+    public function renderBlock(FormView $view, string $blockName, array $variables = []): string;
 
     /**
      * Searches and renders a block for a given name suffix.
@@ -58,10 +54,8 @@ interface FormRendererInterface
      *
      * @param FormView $view      The view for which to render the block
      * @param array    $variables The variables to pass to the template
-     *
-     * @return string
      */
-    public function searchAndRenderBlock(FormView $view, string $blockNameSuffix, array $variables = []);
+    public function searchAndRenderBlock(FormView $view, string $blockNameSuffix, array $variables = []): string;
 
     /**
      * Renders a CSRF token.
@@ -77,10 +71,8 @@ interface FormRendererInterface
      *     if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
      *         throw new \RuntimeException('CSRF attack detected.');
      *     }
-     *
-     * @return string
      */
-    public function renderCsrfToken(string $tokenId);
+    public function renderCsrfToken(string $tokenId): string;
 
     /**
      * Makes a technical name human readable.
@@ -88,8 +80,6 @@ interface FormRendererInterface
      * Sequences of underscores are replaced by single spaces. The first letter
      * of the resulting string is capitalized, while all other letters are
      * turned to lowercase.
-     *
-     * @return string
      */
-    public function humanize(string $text);
+    public function humanize(string $text): string;
 }

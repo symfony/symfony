@@ -20,9 +20,9 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class ConstantNode extends Node
 {
-    private $isIdentifier;
+    private bool $isIdentifier;
 
-    public function __construct($value, bool $isIdentifier = false)
+    public function __construct(mixed $value, bool $isIdentifier = false)
     {
         $this->isIdentifier = $isIdentifier;
         parent::__construct(

@@ -28,9 +28,9 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class ResolveBindingsPass extends AbstractRecursivePass
 {
-    private $usedBindings = [];
-    private $unusedBindings = [];
-    private $errorMessages = [];
+    private array $usedBindings = [];
+    private array $unusedBindings = [];
+    private array $errorMessages = [];
 
     /**
      * {@inheritdoc}
@@ -93,7 +93,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof TypedReference && $value->getType() === (string) $value) {
             // Already checked
@@ -226,10 +226,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
         return parent::processValue($value, $isRoot);
     }
 
-    /**
-     * @return mixed
-     */
-    private function getBindingValue(BoundArgument $binding)
+    private function getBindingValue(BoundArgument $binding): mixed
     {
         [$bindingValue, $bindingId] = $binding->getValues();
 

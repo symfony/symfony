@@ -83,7 +83,7 @@ final class FormDataPart extends AbstractMultipartPart
         return $values;
     }
 
-    private function preparePart(string $name, $value): TextPart
+    private function preparePart(string $name, string|TextPart $value): TextPart
     {
         if (\is_string($value)) {
             return $this->configurePart($name, new TextPart($value, 'utf-8', 'plain', '8bit'));

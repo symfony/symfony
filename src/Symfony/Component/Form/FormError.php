@@ -24,15 +24,13 @@ class FormError
     protected $messageParameters;
     protected $messagePluralization;
 
-    private $message;
-    private $cause;
+    private string $message;
+    private mixed $cause;
 
     /**
      * The form that spawned this error.
-     *
-     * @var FormInterface
      */
-    private $origin;
+    private ?FormInterface $origin = null;
 
     /**
      * Any array key in $messageParameters will be used as a placeholder in
@@ -47,7 +45,7 @@ class FormError
      *
      * @see \Symfony\Component\Translation\Translator
      */
-    public function __construct(string $message, string $messageTemplate = null, array $messageParameters = [], int $messagePluralization = null, $cause = null)
+    public function __construct(string $message, string $messageTemplate = null, array $messageParameters = [], int $messagePluralization = null, mixed $cause = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate ?: $message;
@@ -58,50 +56,40 @@ class FormError
 
     /**
      * Returns the error message.
-     *
-     * @return string
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
     /**
      * Returns the error message template.
-     *
-     * @return string
      */
-    public function getMessageTemplate()
+    public function getMessageTemplate(): string
     {
         return $this->messageTemplate;
     }
 
     /**
      * Returns the parameters to be inserted in the message template.
-     *
-     * @return array
      */
-    public function getMessageParameters()
+    public function getMessageParameters(): array
     {
         return $this->messageParameters;
     }
 
     /**
      * Returns the value for error message pluralization.
-     *
-     * @return int|null
      */
-    public function getMessagePluralization()
+    public function getMessagePluralization(): ?int
     {
         return $this->messagePluralization;
     }
 
     /**
      * Returns the cause of this error.
-     *
-     * @return mixed
      */
-    public function getCause()
+    public function getCause(): mixed
     {
         return $this->cause;
     }
@@ -124,10 +112,8 @@ class FormError
 
     /**
      * Returns the form that caused this error.
-     *
-     * @return FormInterface|null
      */
-    public function getOrigin()
+    public function getOrigin(): ?FormInterface
     {
         return $this->origin;
     }

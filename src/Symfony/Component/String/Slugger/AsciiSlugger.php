@@ -54,8 +54,8 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         'zh' => 'Han-Latin',
     ];
 
-    private $defaultLocale;
-    private $symbolsMap = [
+    private ?string $defaultLocale;
+    private \Closure|array $symbolsMap = [
         'en' => ['@' => 'at', '&' => 'and'],
     ];
 
@@ -64,17 +64,10 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
      *
      * @var \Transliterator[]
      */
-    private $transliterators = [];
+    private array $transliterators = [];
 
-    /**
-     * @param array|\Closure|null $symbolsMap
-     */
-    public function __construct(string $defaultLocale = null, $symbolsMap = null)
+    public function __construct(string $defaultLocale = null, array|\Closure $symbolsMap = null)
     {
-        if (null !== $symbolsMap && !\is_array($symbolsMap) && !$symbolsMap instanceof \Closure) {
-            throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be array, Closure or null, "%s" given.', __METHOD__, \gettype($symbolsMap)));
-        }
-
         $this->defaultLocale = $defaultLocale;
         $this->symbolsMap = $symbolsMap ?? $this->symbolsMap;
     }
@@ -82,7 +75,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function setLocale($locale)
+    public function setLocale(string $locale)
     {
         $this->defaultLocale = $locale;
     }
@@ -90,7 +83,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->defaultLocale;
     }
@@ -100,10 +93,10 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
      */
     public function slug(string $string, string $separator = '-', string $locale = null): AbstractUnicodeString
     {
-        $locale = $locale ?? $this->defaultLocale;
+        $locale ??= $this->defaultLocale;
 
         $transliterator = [];
-        if ($locale && ('de' === $locale || 0 === strpos($locale, 'de_'))) {
+        if ($locale && ('de' === $locale || str_starts_with($locale, 'de_'))) {
             // Use the shortcut for German in UnicodeString::ascii() if possible (faster and no requirement on intl)
             $transliterator = ['de-ASCII'];
         } elseif (\function_exists('transliterator_transliterate') && $locale) {

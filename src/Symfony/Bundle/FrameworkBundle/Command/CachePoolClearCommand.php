@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -27,13 +28,11 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
+#[AsCommand(name: 'cache:pool:clear', description: 'Clear cache pools')]
 final class CachePoolClearCommand extends Command
 {
-    protected static $defaultName = 'cache:pool:clear';
-    protected static $defaultDescription = 'Clear cache pools';
-
-    private $poolClearer;
-    private $poolNames;
+    private Psr6CacheClearer $poolClearer;
+    private ?array $poolNames;
 
     /**
      * @param string[]|null $poolNames
@@ -55,7 +54,6 @@ final class CachePoolClearCommand extends Command
             ->setDefinition([
                 new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of cache pools or cache pool clearers'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
 

@@ -66,13 +66,11 @@ class JsonDecode implements DecoderInterface
      * json_decode_options: integer
      *      Specifies additional options as per documentation for json_decode
      *
-     * @return mixed
-     *
      * @throws NotEncodableValueException
      *
      * @see https://php.net/json_decode
      */
-    public function decode(string $data, string $format, array $context = [])
+    public function decode(string $data, string $format, array $context = []): mixed
     {
         $associative = $context[self::ASSOCIATIVE] ?? $this->defaultContext[self::ASSOCIATIVE];
         $recursionDepth = $context[self::RECURSION_DEPTH] ?? $this->defaultContext[self::RECURSION_DEPTH];
@@ -84,7 +82,7 @@ class JsonDecode implements DecoderInterface
             throw new NotEncodableValueException($e->getMessage(), 0, $e);
         }
 
-        if (\PHP_VERSION_ID >= 70300 && (\JSON_THROW_ON_ERROR & $options)) {
+        if (\JSON_THROW_ON_ERROR & $options) {
             return $decodedData;
         }
 
@@ -98,7 +96,7 @@ class JsonDecode implements DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding(string $format)
+    public function supportsDecoding(string $format): bool
     {
         return JsonEncoder::FORMAT === $format;
     }

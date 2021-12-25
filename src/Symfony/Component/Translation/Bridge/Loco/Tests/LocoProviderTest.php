@@ -148,7 +148,7 @@ class LocoProviderTest extends ProviderTestCase
                 $this->assertSame(['filter' => 'messages'], $options['query']);
                 $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
 
-                return new MockResponse('[{"id":"messages__a"}]');
+                return new MockResponse('[{"id":"messages__foo.existing_key"},{"id":"messages__a"}]');
             },
             'translateAsset1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
                 $this->assertSame('POST', $method);
@@ -164,7 +164,7 @@ class LocoProviderTest extends ProviderTestCase
                 $this->assertSame(['filter' => 'validators'], $options['query']);
                 $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
 
-                return new MockResponse('[{"id":"validators__post.num_comments"}]');
+                return new MockResponse('[{"id":"validators__foo.existing_key"},{"id":"validators__post.num_comments"}]');
             },
             'translateAsset2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
                 $this->assertSame('POST', $method);

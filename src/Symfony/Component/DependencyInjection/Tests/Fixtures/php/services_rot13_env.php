@@ -45,8 +45,6 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
     {
         return [
             '.service_locator.PWbaRiJ' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
         ];
     }
 
@@ -74,10 +72,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
         ]);
     }
 
-    /**
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|string|int|float|bool|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));

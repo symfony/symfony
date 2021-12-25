@@ -23,39 +23,9 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  */
-class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
+class HttpBasicFactory implements AuthenticatorFactoryInterface
 {
     public const PRIORITY = -50;
-
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
-    {
-        $provider = 'security.authentication.provider.dao.'.$id;
-        $container
-            ->setDefinition($provider, new ChildDefinition('security.authentication.provider.dao'))
-            ->replaceArgument(0, new Reference($userProvider))
-            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
-            ->replaceArgument(2, $id)
-        ;
-
-        // entry point
-        $entryPointId = $defaultEntryPoint;
-        if (null === $entryPointId) {
-            $entryPointId = 'security.authentication.basic_entry_point.'.$id;
-            $container
-                ->setDefinition($entryPointId, new ChildDefinition('security.authentication.basic_entry_point'))
-                ->addArgument($config['realm'])
-            ;
-        }
-
-        // listener
-        $listenerId = 'security.authentication.listener.basic.'.$id;
-        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.basic'));
-        $listener->replaceArgument(2, $id);
-        $listener->replaceArgument(3, new Reference($entryPointId));
-        $listener->addMethodCall('setSessionAuthenticationStrategy', [new Reference('security.authentication.session_strategy.'.$id)]);
-
-        return [$provider, $listenerId, $entryPointId];
-    }
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
@@ -71,11 +41,6 @@ class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactory
     public function getPriority(): int
     {
         return self::PRIORITY;
-    }
-
-    public function getPosition(): string
-    {
-        return 'http';
     }
 
     public function getKey(): string

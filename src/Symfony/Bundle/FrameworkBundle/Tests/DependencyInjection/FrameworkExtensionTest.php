@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 use Doctrine\Common\Annotations\Annotation;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
@@ -24,7 +23,6 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
-use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
@@ -49,7 +47,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -79,8 +76,6 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private static $containerCache = [];
 
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
@@ -546,22 +541,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(['_locale' => 'fr|en'], $container->getDefinition('routing.loader')->getArgument(2));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testRouterWithLegacyTranslatorEnabledLocales()
-    {
-        $container = $this->createContainerFromFile('legacy_translator_enabled_locales');
-
-        $this->assertTrue($container->has('router'), '->registerRouterConfiguration() loads routing.xml');
-        $arguments = $container->findDefinition('router')->getArguments();
-        $this->assertEquals($container->getParameter('kernel.project_dir').'/config/routing.xml', $container->getParameter('router.resource'), '->registerRouterConfiguration() sets routing resource');
-        $this->assertEquals('%router.resource%', $arguments[1], '->registerRouterConfiguration() sets routing resource');
-        $this->assertEquals('xml', $arguments[2]['resource_type'], '->registerRouterConfiguration() sets routing resource type');
-
-        $this->assertSame(['_locale' => 'fr|en'], $container->getDefinition('routing.loader')->getArgument(2));
-    }
-
     public function testRouterRequiresResourceOption()
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -574,12 +553,8 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
         $this->assertEquals('fr', $container->getParameter('kernel.default_locale'));
         $this->assertEquals('session.storage.factory.native', (string) $container->getAlias('session.storage.factory'));
-        $this->assertFalse($container->has('session.storage'));
-        $this->assertFalse($container->has('session.storage.native'));
-        $this->assertFalse($container->has('session.storage.php_bridge'));
         $this->assertEquals('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
         $options = $container->getParameter('session.storage.options');
@@ -603,31 +578,11 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('session');
 
-        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
         $this->assertNull($container->getDefinition('session.storage.factory.native')->getArgument(1));
         $this->assertNull($container->getDefinition('session.storage.factory.php_bridge')->getArgument(0));
         $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
-        $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
-        $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testNullSessionHandlerLegacy()
-    {
-        $this->expectDeprecation('Since symfony/framework-bundle 5.3: Not setting the "framework.session.storage_factory_id" configuration option is deprecated, it will default to "session.storage.factory.native" and will replace the "framework.session.storage_id" configuration option in version 6.0.');
-
-        $container = $this->createContainerFromFile('session_legacy');
-
-        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
-        $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
-        $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
-        $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
-
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
+        $expected = ['session_factory', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
         $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
@@ -738,26 +693,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_show'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_remove'));
         $this->assertFalse($container->hasDefinition('cache.messenger.restart_workers_signal'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testMessengerWithoutResetOnMessageLegacy()
-    {
-        $this->expectDeprecation('Since symfony/framework-bundle 5.4: Not setting the "framework.messenger.reset_on_message" configuration option is deprecated, it will default to "true" in version 6.0.');
-
-        $container = $this->createContainerFromFile('messenger_without_reset_on_message_legacy');
-
-        $this->assertTrue($container->hasDefinition('console.command.messenger_consume_messages'));
-        $this->assertTrue($container->hasAlias('messenger.default_bus'));
-        $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
-        $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
-        $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
-        $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
-        $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
-        $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
-        $this->assertNull($container->getDefinition('console.command.messenger_consume_messages')->getArgument(5));
     }
 
     public function testMessenger()
@@ -1018,14 +953,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage" class is being routed to a sender called "invalid". This is not a valid transport or service id.');
         $this->createContainerFromFile('messenger_routing_invalid_transport');
-    }
-
-    public function testMessengerWithDisabledResetOnMessage()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.');
-
-        $this->createContainerFromFile('messenger_with_disabled_reset_on_message');
     }
 
     public function testTranslator()
@@ -1334,16 +1261,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testFormsWithoutImprovedValidationMessages()
-    {
-        $this->expectDeprecation('Since symfony/framework-bundle 5.2: Setting the "framework.form.legacy_error_messages" option to "true" is deprecated. It will have no effect as of Symfony 6.0.');
-
-        $this->createContainerFromFile('form_legacy_messages');
-    }
-
     public function testStopwatchEnabledWithDebugModeEnabled()
     {
         $container = $this->createContainerFromFile('default_config', [
@@ -1636,23 +1553,6 @@ abstract class FrameworkExtensionTest extends TestCase
         }
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDoctrineCache()
-    {
-        if (!class_exists(DoctrineAdapter::class)) {
-            self::markTestSkipped('This test requires symfony/cache 5.4 or lower.');
-        }
-
-        $container = $this->createContainerFromFile('doctrine_cache', [], true, false);
-        $container->setParameter('cache.prefix.seed', 'test');
-        $container->addCompilerPass(new CachePoolPass());
-        $container->compile();
-
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.bar', 'cache.adapter.doctrine', 5);
-    }
-
     public function testRedisTagAwareAdapter()
     {
         $container = $this->createContainerFromFile('cache', [], true);
@@ -1688,6 +1588,32 @@ abstract class FrameworkExtensionTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider appRedisTagAwareConfigProvider
+     */
+    public function testAppRedisTagAwareAdapter(string $configFile)
+    {
+        $container = $this->createContainerFromFile($configFile);
+
+        foreach ([TagAwareCacheInterface::class, CacheInterface::class, CacheItemPoolInterface::class] as $alias) {
+            $def = $container->findDefinition($alias);
+
+            while ($def instanceof ChildDefinition) {
+                $def = $container->getDefinition($def->getParent());
+            }
+
+            $this->assertSame(RedisTagAwareAdapter::class, $def->getClass());
+        }
+    }
+
+    public function appRedisTagAwareConfigProvider(): array
+    {
+        return [
+            ['cache_app_redis_tag_aware'],
+            ['cache_app_redis_tag_aware_pool'],
+        ];
+    }
+
     public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()
     {
         $container = $this->createContainer(['kernel.debug' => true]);
@@ -1719,20 +1645,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');
 
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
-        $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSessionCookieSecureAutoLegacy()
-    {
-        $this->expectDeprecation('Since symfony/framework-bundle 5.3: Not setting the "framework.session.storage_factory_id" configuration option is deprecated, it will default to "session.storage.factory.native" and will replace the "framework.session.storage_id" configuration option in version 6.0.');
-
-        $container = $this->createContainerFromFile('session_cookie_secure_auto_legacy');
-
-        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector', 'session_storage', 'request_stack'];
+        $expected = ['session_factory', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
@@ -2099,9 +2012,6 @@ abstract class FrameworkExtensionTest extends TestCase
         switch ($adapter) {
             case 'cache.adapter.apcu':
                 $this->assertSame(ApcuAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.adapter.doctrine':
-                $this->assertSame(DoctrineAdapter::class, $parentDefinition->getClass());
                 break;
             case 'cache.app':
             case 'cache.adapter.filesystem':

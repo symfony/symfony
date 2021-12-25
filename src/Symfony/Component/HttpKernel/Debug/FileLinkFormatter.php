@@ -34,15 +34,15 @@ class FileLinkFormatter
         'vscode' => 'vscode://file/%f:%l',
     ];
 
-    private $fileLinkFormat;
-    private $requestStack;
-    private $baseDir;
-    private $urlFormat;
+    private array|false $fileLinkFormat;
+    private ?RequestStack $requestStack = null;
+    private ?string $baseDir = null;
+    private \Closure|string|null $urlFormat;
 
     /**
      * @param string|\Closure $urlFormat the URL format, or a closure that returns it on-demand
      */
-    public function __construct(string $fileLinkFormat = null, RequestStack $requestStack = null, string $baseDir = null, $urlFormat = null)
+    public function __construct(string $fileLinkFormat = null, RequestStack $requestStack = null, string $baseDir = null, string|\Closure $urlFormat = null)
     {
         $fileLinkFormat = (self::FORMATS[$fileLinkFormat] ?? $fileLinkFormat) ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         if ($fileLinkFormat && !\is_array($fileLinkFormat)) {
@@ -94,7 +94,7 @@ class FileLinkFormatter
         }
     }
 
-    private function getFileLinkFormat()
+    private function getFileLinkFormat(): array|false
     {
         if ($this->fileLinkFormat) {
             return $this->fileLinkFormat;
@@ -111,6 +111,6 @@ class FileLinkFormatter
             }
         }
 
-        return null;
+        return false;
     }
 }

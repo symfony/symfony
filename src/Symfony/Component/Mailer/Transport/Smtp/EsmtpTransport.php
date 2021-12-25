@@ -26,9 +26,9 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
  */
 class EsmtpTransport extends SmtpTransport
 {
-    private $authenticators = [];
-    private $username = '';
-    private $password = '';
+    private array $authenticators = [];
+    private string $username = '';
+    private string $password = '';
 
     public function __construct(string $host = 'localhost', int $port = 0, bool $tls = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -66,7 +66,7 @@ class EsmtpTransport extends SmtpTransport
     /**
      * @return $this
      */
-    public function setUsername(string $username): self
+    public function setUsername(string $username): static
     {
         $this->username = $username;
 
@@ -81,7 +81,7 @@ class EsmtpTransport extends SmtpTransport
     /**
      * @return $this
      */
-    public function setPassword(string $password): self
+    public function setPassword(string $password): static
     {
         $this->password = $password;
 

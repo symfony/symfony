@@ -32,13 +32,13 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class Firewall implements EventSubscriberInterface
 {
-    private $map;
-    private $dispatcher;
+    private FirewallMapInterface $map;
+    private EventDispatcherInterface $dispatcher;
 
     /**
      * @var \SplObjectStorage<Request, ExceptionListener>
      */
-    private $exceptionListeners;
+    private \SplObjectStorage $exceptionListeners;
 
     public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
     {

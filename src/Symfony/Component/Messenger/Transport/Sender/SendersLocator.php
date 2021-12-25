@@ -23,8 +23,8 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
  */
 class SendersLocator implements SendersLocatorInterface
 {
-    private $sendersMap;
-    private $sendersLocator;
+    private array $sendersMap;
+    private ContainerInterface $sendersLocator;
 
     /**
      * @param array<string, list<string>> $sendersMap     An array, keyed by "type", set to an array of sender aliases

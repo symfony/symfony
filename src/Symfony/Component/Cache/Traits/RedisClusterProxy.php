@@ -18,8 +18,8 @@ namespace Symfony\Component\Cache\Traits;
  */
 class RedisClusterProxy
 {
-    private $redis;
-    private $initializer;
+    private \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy $redis;
+    private \Closure $initializer;
 
     public function __construct(\Closure $initializer)
     {
@@ -28,35 +28,35 @@ class RedisClusterProxy
 
     public function __call(string $method, array $args)
     {
-        $this->redis ?: $this->redis = $this->initializer->__invoke();
+        $this->redis ??= ($this->initializer)();
 
         return $this->redis->{$method}(...$args);
     }
 
     public function hscan($strKey, &$iIterator, $strPattern = null, $iCount = null)
     {
-        $this->redis ?: $this->redis = $this->initializer->__invoke();
+        $this->redis ??= ($this->initializer)();
 
         return $this->redis->hscan($strKey, $iIterator, $strPattern, $iCount);
     }
 
     public function scan(&$iIterator, $strPattern = null, $iCount = null)
     {
-        $this->redis ?: $this->redis = $this->initializer->__invoke();
+        $this->redis ??= ($this->initializer)();
 
         return $this->redis->scan($iIterator, $strPattern, $iCount);
     }
 
     public function sscan($strKey, &$iIterator, $strPattern = null, $iCount = null)
     {
-        $this->redis ?: $this->redis = $this->initializer->__invoke();
+        $this->redis ??= ($this->initializer)();
 
         return $this->redis->sscan($strKey, $iIterator, $strPattern, $iCount);
     }
 
     public function zscan($strKey, &$iIterator, $strPattern = null, $iCount = null)
     {
-        $this->redis ?: $this->redis = $this->initializer->__invoke();
+        $this->redis ??= ($this->initializer)();
 
         return $this->redis->zscan($strKey, $iIterator, $strPattern, $iCount);
     }

@@ -25,7 +25,7 @@ class ConstraintA extends Constraint
         return 'property2';
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT];
     }

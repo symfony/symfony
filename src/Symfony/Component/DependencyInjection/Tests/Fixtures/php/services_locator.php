@@ -46,8 +46,6 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'baz_service' => true,
             'translator.loader_1_locator' => true,
             'translator.loader_2_locator' => true,

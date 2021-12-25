@@ -19,16 +19,12 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TelegramTransportTest extends TransportTestCase
 {
-    /**
-     * @return TelegramTransport
-     */
-    public function createTransport(HttpClientInterface $client = null, string $channel = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null, string $channel = null): TelegramTransport
     {
         return new TelegramTransport('token', $channel, $client ?? $this->createMock(HttpClientInterface::class));
     }

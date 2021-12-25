@@ -32,11 +32,10 @@ class Connection
         'group' => 'symfony',
         'consumer' => 'consumer',
         'auto_setup' => true,
-        'delete_after_ack' => false,
+        'delete_after_ack' => true,
         'delete_after_reject' => true,
         'stream_max_entries' => 0, // any value higher than 0 defines an approximate maximum number of stream entries
         'dbindex' => 0,
-        'tls' => false,
         'redeliver_timeout' => 3600, // Timeout before redeliver messages still in pending state (seconds)
         'claim_interval' => 60000, // Interval by which pending/abandoned messages should be checked
         'lazy' => false,
@@ -44,24 +43,21 @@ class Connection
         'serializer' => \Redis::SERIALIZER_PHP,
     ];
 
-    private $connection;
-    private $stream;
-    private $queue;
-    private $group;
-    private $consumer;
-    private $autoSetup;
-    private $maxEntries;
-    private $redeliverTimeout;
-    private $nextClaim = 0;
-    private $claimInterval;
-    private $deleteAfterAck;
-    private $deleteAfterReject;
-    private $couldHavePendingMessages = true;
+    private \Redis|\RedisCluster|RedisProxy|RedisClusterProxy $connection;
+    private string $stream;
+    private string $queue;
+    private string $group;
+    private string $consumer;
+    private bool $autoSetup;
+    private int $maxEntries;
+    private int $redeliverTimeout;
+    private int $nextClaim = 0;
+    private mixed $claimInterval;
+    private mixed $deleteAfterAck;
+    private mixed $deleteAfterReject;
+    private bool $couldHavePendingMessages = true;
 
-    /**
-     * @param \Redis|\RedisCluster|null $redis
-     */
-    public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], $redis = null)
+    public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis|\RedisCluster $redis = null)
     {
         if (version_compare(phpversion('redis'), '4.3.0', '<')) {
             throw new LogicException('The redis transport requires php-redis 4.3.0 or higher.');
@@ -114,7 +110,7 @@ class Connection
     /**
      * @param string|string[]|null $auth
      */
-    private static function initializeRedis(\Redis $redis, string $host, int $port, $auth, int $serializer, int $dbIndex): \Redis
+    private static function initializeRedis(\Redis $redis, string $host, int $port, string|array|null $auth, int $serializer, int $dbIndex): \Redis
     {
         $redis->connect($host, $port);
         $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
@@ -133,7 +129,7 @@ class Connection
     /**
      * @param string|string[]|null $auth
      */
-    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, $auth, int $serializer): \RedisCluster
+    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, string|array|null $auth, int $serializer): \RedisCluster
     {
         if (null === $redis) {
             $redis = new \RedisCluster(null, $hosts, 0.0, 0.0, false, $auth);
@@ -144,12 +140,9 @@ class Connection
         return $redis;
     }
 
-    /**
-     * @param \Redis|\RedisCluster|null $redis
-     */
-    public static function fromDsn(string $dsn, array $redisOptions = [], $redis = null): self
+    public static function fromDsn(string $dsn, array $redisOptions = [], \Redis|\RedisCluster $redis = null): self
     {
-        if (false === strpos($dsn, ',')) {
+        if (!str_contains($dsn, ',')) {
             $parsedUrl = self::parseDsn($dsn, $redisOptions);
         } else {
             $dsns = explode(',', $dsn);
@@ -188,8 +181,6 @@ class Connection
         if (\array_key_exists('delete_after_ack', $redisOptions)) {
             $deleteAfterAck = filter_var($redisOptions['delete_after_ack'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['delete_after_ack']);
-        } else {
-            trigger_deprecation('symfony/redis-messenger', '5.4', 'Not setting the "delete_after_ack" boolean option explicitly is deprecated, its default value will change to true in 6.0.');
         }
 
         $deleteAfterReject = null;
@@ -205,11 +196,6 @@ class Connection
         }
 
         $tls = 'rediss' === $parsedUrl['scheme'];
-        if (\array_key_exists('tls', $redisOptions)) {
-            trigger_deprecation('symfony/redis-messenger', '5.3', 'Providing "tls" parameter is deprecated, use "rediss://" DSN scheme instead');
-            $tls = filter_var($redisOptions['tls'], \FILTER_VALIDATE_BOOLEAN);
-            unset($redisOptions['tls']);
-        }
 
         $redeliverTimeout = null;
         if (\array_key_exists('redeliver_timeout', $redisOptions)) {
@@ -268,7 +254,7 @@ class Connection
     private static function parseDsn(string $dsn, array &$redisOptions): array
     {
         $url = $dsn;
-        $scheme = 0 === strpos($dsn, 'rediss:') ? 'rediss' : 'redis';
+        $scheme = str_starts_with($dsn, 'rediss:') ? 'rediss' : 'redis';
 
         if (preg_match('#^'.$scheme.':///([^:@])+$#', $dsn)) {
             $url = str_replace($scheme.':', 'file:', $dsn);
@@ -290,7 +276,7 @@ class Connection
         $availableOptions = array_keys(self::DEFAULT_OPTIONS);
 
         if (0 < \count($invalidOptions = array_diff(array_keys($options), $availableOptions))) {
-            trigger_deprecation('symfony/messenger', '5.1', 'Invalid option(s) "%s" passed to the Redis Messenger transport. Passing invalid options is deprecated.', implode('", "', $invalidOptions));
+            throw new LogicException(sprintf('Invalid option(s) "%s" passed to the Redis Messenger transport.', implode('", "', $invalidOptions)));
         }
     }
 
@@ -474,7 +460,7 @@ class Connection
                     throw new TransportException(json_last_error_msg());
                 }
 
-                $score = (int) ($this->getCurrentTimeInMilliseconds() + $delayInMs);
+                $score = $this->getCurrentTimeInMilliseconds() + $delayInMs;
                 $added = $this->connection->zadd($this->queue, ['NX'], $score, $message);
             } else {
                 $message = json_encode([

@@ -28,7 +28,7 @@ class YunpianTransport extends AbstractTransport
 {
     protected const HOST = 'sms.yunpian.com';
 
-    private $apiKey;
+    private string $apiKey;
 
     public function __construct(string $apiKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

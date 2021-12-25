@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
@@ -24,8 +23,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class RequestTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     protected function tearDown(): void
     {
         Request::setTrustedProxies([], -1);
@@ -2256,7 +2253,10 @@ class RequestTest extends TestCase
         $request = new Request();
         $request->server->set('SERVER_PROTOCOL', $serverProtocol);
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
-        $request->headers->set('Via', $via);
+
+        if (null !== $via) {
+            $request->headers->set('Via', $via);
+        }
 
         $this->assertSame($expected, $request->getProtocolVersion());
     }
@@ -2264,9 +2264,11 @@ class RequestTest extends TestCase
     public function protocolVersionProvider()
     {
         return [
-            'untrusted without via' => ['HTTP/2.0', false, '', 'HTTP/2.0'],
+            'untrusted with empty via' => ['HTTP/2.0', false, '', 'HTTP/2.0'],
+            'untrusted without via' => ['HTTP/2.0', false, null, 'HTTP/2.0'],
             'untrusted with via' => ['HTTP/2.0', false, '1.0 fred, 1.1 nowhere.com (Apache/1.1)', 'HTTP/2.0'],
-            'trusted without via' => ['HTTP/2.0', true, '', 'HTTP/2.0'],
+            'trusted with empty via' => ['HTTP/2.0', true, '', 'HTTP/2.0'],
+            'trusted without via' => ['HTTP/2.0', true, null, 'HTTP/2.0'],
             'trusted with via' => ['HTTP/2.0', true, '1.0 fred, 1.1 nowhere.com (Apache/1.1)', 'HTTP/1.0'],
             'trusted with via and protocol name' => ['HTTP/2.0', true, 'HTTP/1.0 fred, HTTP/1.1 nowhere.com (Apache/1.1)', 'HTTP/1.0'],
             'trusted with broken via' => ['HTTP/2.0', true, 'HTTP/1^0 foo', 'HTTP/2.0'],
@@ -2511,16 +2513,6 @@ class RequestTest extends TestCase
                 true,
             ],
         ];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testXForwarededAllConstantDeprecated()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 5.2: The "HEADER_X_FORWARDED_ALL" constant is deprecated, use either "HEADER_X_FORWARDED_FOR | HEADER_X_FORWARDED_HOST | HEADER_X_FORWARDED_PORT | HEADER_X_FORWARDED_PROTO" or "HEADER_X_FORWARDED_AWS_ELB" or "HEADER_X_FORWARDED_TRAEFIK" constants instead.');
-
-        Request::setTrustedProxies([], Request::HEADER_X_FORWARDED_ALL);
     }
 
     public function testReservedFlags()

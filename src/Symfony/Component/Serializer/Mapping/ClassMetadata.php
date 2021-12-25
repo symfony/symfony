@@ -128,7 +128,7 @@ class ClassMetadata implements ClassMetadataInterface
      *
      * @return string[]
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return [
             'name',

@@ -14,28 +14,25 @@ namespace Symfony\Component\Mailer\Transport;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as SymfonyEventDispatcherInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class AbstractTransport implements TransportInterface
 {
-    private $dispatcher;
-    private $logger;
-    private $rate = 0;
-    private $lastSent = 0;
+    private ?EventDispatcherInterface $dispatcher;
+    private LoggerInterface $logger;
+    private float $rate = 0;
+    private float $lastSent = 0;
 
     public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        $this->dispatcher = class_exists(Event::class) && $dispatcher instanceof SymfonyEventDispatcherInterface ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
+        $this->dispatcher = $dispatcher;
         $this->logger = $logger ?? new NullLogger();
     }
 
@@ -44,7 +41,7 @@ abstract class AbstractTransport implements TransportInterface
      *
      * @return $this
      */
-    public function setMaxPerSecond(float $rate): self
+    public function setMaxPerSecond(float $rate): static
     {
         if (0 >= $rate) {
             $rate = 0;

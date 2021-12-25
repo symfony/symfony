@@ -155,7 +155,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                             break;
 
                         case 'parent':
-                            if (false !== $resolvedClass = $parentClass ?? $parentClass = get_parent_class($class)) {
+                            if (false !== $resolvedClass = $parentClass ??= get_parent_class($class)) {
                                 break;
                             }
                             // no break

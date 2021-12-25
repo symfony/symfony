@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Event\Event;
  */
 class AuditTrailListener implements EventSubscriberInterface
 {
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {
@@ -46,7 +46,7 @@ class AuditTrailListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'workflow.leave' => ['onLeave'],

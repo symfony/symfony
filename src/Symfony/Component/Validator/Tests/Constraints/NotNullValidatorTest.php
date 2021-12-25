@@ -60,9 +60,6 @@ class NotNullValidatorTest extends ConstraintValidatorTestCase
         yield 'Doctrine style' => [new NotNull([
             'message' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named parameters' => [eval('return new \Symfony\Component\Validator\Constraints\NotNull(message: "myMessage");')];
-        }
+        yield 'named parameters' => [new NotNull(message: 'myMessage')];
     }
 }

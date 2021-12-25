@@ -48,8 +48,6 @@ class ProjectServiceContainer extends Container
             '.service_locator.KIgkoLM' => true,
             '.service_locator.qUb.lJI' => true,
             '.service_locator.qUb.lJI.foo_service' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
         ];
     }

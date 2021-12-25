@@ -11,7 +11,7 @@ class FooHiddenCommand extends Command
         $this
             ->setName('foo:hidden')
             ->setAliases(['afoohidden'])
-            ->setHidden(true)
+            ->setHidden()
         ;
     }
 

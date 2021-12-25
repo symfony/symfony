@@ -20,9 +20,8 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class FormFieldRegistry
 {
-    private $fields = [];
-
-    private $base = '';
+    private array $fields = [];
+    private string $base = '';
 
     /**
      * Adds a field to the registry.
@@ -70,7 +69,7 @@ class FormFieldRegistry
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function &get(string $name)
+    public function &get(string $name): FormField|array
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -87,8 +86,6 @@ class FormFieldRegistry
 
     /**
      * Tests whether the form has the given field based on the fully qualified name.
-     *
-     * @return bool
      */
     public function has(string $name): bool
     {
@@ -104,11 +101,9 @@ class FormFieldRegistry
     /**
      * Set the value of a field based on the fully qualified name and its children.
      *
-     * @param mixed $value The value
-     *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function set(string $name, $value)
+    public function set(string $name, mixed $value)
     {
         $target = &$this->get($name);
         if ((!\is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {

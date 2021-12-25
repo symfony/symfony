@@ -22,11 +22,11 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class ReflectionClassResource implements SelfCheckingResourceInterface
 {
-    private $files = [];
-    private $className;
-    private $classReflector;
-    private $excludedVendors = [];
-    private $hash;
+    private array $files = [];
+    private string $className;
+    private \ReflectionClass $classReflector;
+    private array $excludedVendors = [];
+    private string $hash;
 
     public function __construct(\ReflectionClass $classReflector, array $excludedVendors = [])
     {
@@ -40,7 +40,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
      */
     public function isFresh(int $timestamp): bool
     {
-        if (null === $this->hash) {
+        if (!isset($this->hash)) {
             $this->hash = $this->computeHash();
             $this->loadFiles($this->classReflector);
         }
@@ -68,7 +68,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
      */
     public function __sleep(): array
     {
-        if (null === $this->hash) {
+        if (!isset($this->hash)) {
             $this->hash = $this->computeHash();
             $this->loadFiles($this->classReflector);
         }
@@ -102,13 +102,11 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
 
     private function computeHash(): string
     {
-        if (null === $this->classReflector) {
-            try {
-                $this->classReflector = new \ReflectionClass($this->className);
-            } catch (\ReflectionException $e) {
-                // the class does not exist anymore
-                return false;
-            }
+        try {
+            $this->classReflector ??= new \ReflectionClass($this->className);
+        } catch (\ReflectionException $e) {
+            // the class does not exist anymore
+            return false;
         }
         $hash = hash_init('md5');
 
@@ -121,14 +119,12 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
 
     private function generateSignature(\ReflectionClass $class): iterable
     {
-        if (\PHP_VERSION_ID >= 80000) {
-            $attributes = [];
-            foreach ($class->getAttributes() as $a) {
-                $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
-            }
-            yield print_r($attributes, true);
-            $attributes = [];
+        $attributes = [];
+        foreach ($class->getAttributes() as $a) {
+            $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
         }
+        yield print_r($attributes, true);
+        $attributes = [];
 
         yield $class->getDocComment();
         yield (int) $class->isFinal();
@@ -146,13 +142,11 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             $defaults = $class->getDefaultProperties();
 
             foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED) as $p) {
-                if (\PHP_VERSION_ID >= 80000) {
-                    foreach ($p->getAttributes() as $a) {
-                        $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
-                    }
-                    yield print_r($attributes, true);
-                    $attributes = [];
+                foreach ($p->getAttributes() as $a) {
+                    $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
                 }
+                yield print_r($attributes, true);
+                $attributes = [];
 
                 yield $p->getDocComment();
                 yield $p->isDefault() ? '<default>' : '';
@@ -166,24 +160,20 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         $defined = \Closure::bind(static function ($c) { return \defined($c); }, null, $class->name);
 
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
-            if (\PHP_VERSION_ID >= 80000) {
-                foreach ($m->getAttributes() as $a) {
-                    $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
-                }
-                yield print_r($attributes, true);
-                $attributes = [];
+            foreach ($m->getAttributes() as $a) {
+                $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
             }
+            yield print_r($attributes, true);
+            $attributes = [];
 
             $defaults = [];
             $parametersWithUndefinedConstants = [];
             foreach ($m->getParameters() as $p) {
-                if (\PHP_VERSION_ID >= 80000) {
-                    foreach ($p->getAttributes() as $a) {
-                        $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
-                    }
-                    yield print_r($attributes, true);
-                    $attributes = [];
+                foreach ($p->getAttributes() as $a) {
+                    $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
                 }
+                yield print_r($attributes, true);
+                $attributes = [];
 
                 if (!$p->isDefaultValueAvailable()) {
                     $defaults[$p->name] = null;

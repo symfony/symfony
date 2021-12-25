@@ -55,49 +55,39 @@ abstract class AbstractUriElement
 
     /**
      * Gets the node associated with this link.
-     *
-     * @return \DOMElement
      */
-    public function getNode()
+    public function getNode(): \DOMElement
     {
         return $this->node;
     }
 
     /**
      * Gets the method associated with this link.
-     *
-     * @return string
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method ?? 'GET';
     }
 
     /**
      * Gets the URI associated with this link.
-     *
-     * @return string
      */
-    public function getUri()
+    public function getUri(): string
     {
         return UriResolver::resolve($this->getRawUri(), $this->currentUri);
     }
 
     /**
      * Returns raw URI data.
-     *
-     * @return string
      */
-    abstract protected function getRawUri();
+    abstract protected function getRawUri(): string;
 
     /**
      * Returns the canonicalized URI path (see RFC 3986, section 5.2.4).
      *
      * @param string $path URI path
-     *
-     * @return string
      */
-    protected function canonicalizePath(string $path)
+    protected function canonicalizePath(string $path): string
     {
         if ('' === $path || '/' === $path) {
             return $path;

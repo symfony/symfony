@@ -21,15 +21,8 @@ use Twig\Template;
  */
 class TwigRendererEngine extends AbstractRendererEngine
 {
-    /**
-     * @var Environment
-     */
-    private $environment;
-
-    /**
-     * @var Template
-     */
-    private $template;
+    private Environment $environment;
+    private Template $template;
 
     public function __construct(array $defaultThemes, Environment $environment)
     {
@@ -40,7 +33,7 @@ class TwigRendererEngine extends AbstractRendererEngine
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, $resource, string $blockName, array $variables = [])
+    public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []): string
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
@@ -69,10 +62,8 @@ class TwigRendererEngine extends AbstractRendererEngine
      * case that the function "block()" is used in the Twig template.
      *
      * @see getResourceForBlock()
-     *
-     * @return bool
      */
-    protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName)
+    protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool
     {
         // The caller guarantees that $this->resources[$cacheKey][$block] is
         // not set, but it doesn't have to check whether $this->resources[$cacheKey]
@@ -145,20 +136,17 @@ class TwigRendererEngine extends AbstractRendererEngine
      *                     this variable will be kept and be available upon
      *                     further calls to this method using the same theme.
      */
-    protected function loadResourcesFromTheme(string $cacheKey, &$theme)
+    protected function loadResourcesFromTheme(string $cacheKey, mixed &$theme)
     {
         if (!$theme instanceof Template) {
-            /* @var Template $theme */
             $theme = $this->environment->load($theme)->unwrap();
         }
 
-        if (null === $this->template) {
-            // Store the first Template instance that we find so that
-            // we can call displayBlock() later on. It doesn't matter *which*
-            // template we use for that, since we pass the used blocks manually
-            // anyway.
-            $this->template = $theme;
-        }
+        // Store the first Template instance that we find so that
+        // we can call displayBlock() later on. It doesn't matter *which*
+        // template we use for that, since we pass the used blocks manually
+        // anyway.
+        $this->template ??= $theme;
 
         // Use a separate variable for the inheritance traversal, because
         // theme is a reference and we don't want to change it.

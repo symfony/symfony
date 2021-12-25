@@ -5,8 +5,6 @@ Array
 namespace Container%s;
 
 return [
-    'Psr\\Container\\ContainerInterface' => true,
-    'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
     'configurator_service' => true,
     'configurator_service_simple' => true,
     'decorated.pif-pouf' => true,
@@ -628,7 +626,7 @@ class getRuntimeErrorService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        return $container->services['runtime_error'] = new \stdClass($container->throw('Service "errored_definition" is broken.'));
+        return $container->services['runtime_error'] = new \stdClass(throw new RuntimeException('Service "errored_definition" is broken.'));
     }
 }
 
@@ -700,7 +698,7 @@ class getThrowingOneService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        return $container->services['throwing_one'] = new \Bar\FooClass($container->throw('No-no-no-no'));
+        return $container->services['throwing_one'] = new \Bar\FooClass(throw new RuntimeException('No-no-no-no'));
     }
 }
 
@@ -823,10 +821,7 @@ class ProjectServiceContainer extends Container
         return $instance;
     }
 
-    /**
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|string|int|float|bool|null
     {
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];
@@ -887,11 +882,6 @@ class ProjectServiceContainer extends Container
             'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
         ];
-    }
-
-    protected function throw($message)
-    {
-        throw new RuntimeException($message);
     }
 }
 

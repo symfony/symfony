@@ -18,15 +18,12 @@
         "php-http/async-client-implementation": "*",
         "php-http/client-implementation": "*",
         "psr/http-client-implementation": "1.0",
-        "symfony/http-client-implementation": "2.4"
+        "symfony/http-client-implementation": "3.0"
     },
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0.2",
         "psr/log": "^1|^2|^3",
-        "symfony/deprecation-contracts": "^2.1|^3",
-        "symfony/http-client-contracts": "^2.4",
-        "symfony/polyfill-php73": "^1.11",
-        "symfony/polyfill-php80": "^1.16",
+        "symfony/http-client-contracts": "^3",
         "symfony/service-contracts": "^1.0|^2|^3"
     },
     "require-dev": {
@@ -38,10 +35,10 @@
         "nyholm/psr7": "^1.0",
         "php-http/httplug": "^1.0|^2.0",
         "psr/http-client": "^1.0",
-        "symfony/dependency-injection": "^4.4|^5.0|^6.0",
-        "symfony/http-kernel": "^4.4.13|^5.1.5|^6.0",
-        "symfony/process": "^4.4|^5.0|^6.0",
-        "symfony/stopwatch": "^4.4|^5.0|^6.0"
+        "symfony/dependency-injection": "^5.4|^6.0",
+        "symfony/http-kernel": "^5.4|^6.0",
+        "symfony/process": "^5.4|^6.0",
+        "symfony/stopwatch": "^5.4|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpClient\\": "" },

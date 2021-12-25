@@ -17,9 +17,10 @@ class VariableTypeConfig implements \Symfony\Component\Config\Builder\ConfigBuil
     /**
      * @default null
      * @param ParamConfigurator|mixed $value
+     *
      * @return $this
      */
-    public function anyValue($value): self
+    public function anyValue(mixed $value): static
     {
         $this->anyValue = $value;
     

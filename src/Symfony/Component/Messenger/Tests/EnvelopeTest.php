@@ -12,16 +12,12 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceivedStamp;
-use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceivedStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceivedStamp as LegacyDoctrineReceivedStamp;
-use Symfony\Component\Messenger\Transport\RedisExt\RedisReceivedStamp as LegacyRedisReceivedStamp;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
@@ -145,40 +141,6 @@ class EnvelopeTest extends TestCase
 
         $this->assertCount(1, $envelope->all(DelayStamp::class));
         $this->assertCount(1, $envelope->all(ReceivedStamp::class));
-    }
-
-    /**
-     * To be removed in 6.0.
-     *
-     * @group legacy
-     */
-    public function testWithAliases()
-    {
-        $envelope = new Envelope(new \stdClass(), [
-            $s1 = new DoctrineReceivedStamp(1),
-            $s2 = new RedisReceivedStamp(2),
-            $s3 = new DoctrineReceivedStamp(3),
-        ]);
-
-        self::assertSame([
-            DoctrineReceivedStamp::class => [$s1, $s3],
-            RedisReceivedStamp::class => [$s2],
-        ], $envelope->all());
-
-        self::assertSame([$s1, $s3], $envelope->all(DoctrineReceivedStamp::class));
-        self::assertSame([$s2], $envelope->all(RedisReceivedStamp::class));
-
-        self::assertSame([$s1, $s3], $envelope->all(LegacyDoctrineReceivedStamp::class));
-        self::assertSame([$s2], $envelope->all(LegacyRedisReceivedStamp::class));
-
-        self::assertSame($s3, $envelope->last(LegacyDoctrineReceivedStamp::class));
-        self::assertSame($s2, $envelope->last(LegacyRedisReceivedStamp::class));
-
-        self::assertSame([RedisReceivedStamp::class => [$s2]], $envelope->withoutAll(LegacyDoctrineReceivedStamp::class)->all());
-        self::assertSame([DoctrineReceivedStamp::class => [$s1, $s3]], $envelope->withoutAll(LegacyRedisReceivedStamp::class)->all());
-
-        self::assertSame([RedisReceivedStamp::class => [$s2]], $envelope->withoutStampsOfType(LegacyDoctrineReceivedStamp::class)->all());
-        self::assertSame([DoctrineReceivedStamp::class => [$s1, $s3]], $envelope->withoutStampsOfType(LegacyRedisReceivedStamp::class)->all());
     }
 }
 

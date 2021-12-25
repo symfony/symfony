@@ -26,8 +26,8 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
 {
     use CheckPasswordLengthTrait;
 
-    private $opsLimit;
-    private $memLimit;
+    private int $opsLimit;
+    private int $memLimit;
 
     public function __construct(int $opsLimit = null, int $memLimit = null)
     {
@@ -79,8 +79,8 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
             return false;
         }
 
-        if (0 !== strpos($hashedPassword, '$argon')) {
-            if (0 === strpos($hashedPassword, '$2') && (72 < \strlen($plainPassword) || false !== strpos($plainPassword, "\0"))) {
+        if (!str_starts_with($hashedPassword, '$argon')) {
+            if (str_starts_with($hashedPassword, '$2') && (72 < \strlen($plainPassword) || str_contains($plainPassword, "\0"))) {
                 $plainPassword = base64_encode(hash('sha512', $plainPassword, true));
             }
 

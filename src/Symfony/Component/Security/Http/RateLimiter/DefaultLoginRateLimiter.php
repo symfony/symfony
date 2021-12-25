@@ -26,8 +26,8 @@ use Symfony\Component\Security\Core\Security;
  */
 final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
 {
-    private $globalFactory;
-    private $localFactory;
+    private RateLimiterFactory $globalFactory;
+    private RateLimiterFactory $localFactory;
 
     public function __construct(RateLimiterFactory $globalFactory, RateLimiterFactory $localFactory)
     {

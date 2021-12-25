@@ -137,7 +137,7 @@ class PdoSessionHandlerTest extends TestCase
         $stream = $this->createStream($content);
 
         $pdo->prepareResult->expects($this->once())->method('fetchAll')
-            ->willReturn([[$stream, 42, time()]]);
+            ->willReturn([[$stream, time() + 42]]);
 
         $storage = new PdoSessionHandler($pdo);
         $result = $storage->read('foo');
@@ -165,7 +165,7 @@ class PdoSessionHandlerTest extends TestCase
 
         $selectStmt->expects($this->atLeast(2))->method('fetchAll')
             ->willReturnCallback(function () use (&$exception, $stream) {
-                return $exception ? [[$stream, 42, time()]] : [];
+                return $exception ? [[$stream, time() + 42]] : [];
             });
 
         $insertStmt->expects($this->once())->method('execute')
@@ -373,11 +373,7 @@ class MockPdo extends \PDO
         $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;
     }
 
-    /**
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function getAttribute($attribute)
+    public function getAttribute($attribute): mixed
     {
         if (\PDO::ATTR_ERRMODE === $attribute) {
             return $this->errorMode;
@@ -390,11 +386,7 @@ class MockPdo extends \PDO
         return parent::getAttribute($attribute);
     }
 
-    /**
-     * @return false|\PDOStatement
-     */
-    #[\ReturnTypeWillChange]
-    public function prepare($statement, $driverOptions = [])
+    public function prepare($statement, $driverOptions = []): \PDOStatement|false
     {
         return \is_callable($this->prepareResult)
             ? ($this->prepareResult)($statement, $driverOptions)

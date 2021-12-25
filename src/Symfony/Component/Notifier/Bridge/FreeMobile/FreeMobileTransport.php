@@ -28,9 +28,9 @@ final class FreeMobileTransport extends AbstractTransport
 {
     protected const HOST = 'smsapi.free-mobile.fr/sendmsg';
 
-    private $login;
-    private $password;
-    private $phone;
+    private string $login;
+    private string $password;
+    private string $phone;
 
     public function __construct(string $login, string $password, string $phone, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

@@ -30,10 +30,10 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class HttplugWaitLoop
 {
-    private $client;
-    private $promisePool;
-    private $responseFactory;
-    private $streamFactory;
+    private HttpClientInterface $client;
+    private ?\SplObjectStorage $promisePool;
+    private ResponseFactoryInterface $responseFactory;
+    private StreamFactoryInterface $streamFactory;
 
     /**
      * @param \SplObjectStorage<ResponseInterface, array{Psr7RequestInterface, Promise}>|null $promisePool

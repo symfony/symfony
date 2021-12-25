@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,11 +25,9 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
+#[AsCommand(name: 'messenger:failed:remove', description: 'Remove given messages from the failure transport')]
 class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
 {
-    protected static $defaultName = 'messenger:failed:remove';
-    protected static $defaultDescription = 'Remove given messages from the failure transport';
-
     /**
      * {@inheritdoc}
      */
@@ -41,7 +40,6 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
                 new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
                 new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> removes given messages that are pending in the failure transport.
 
@@ -56,7 +54,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 

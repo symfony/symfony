@@ -20,16 +20,12 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TurboSmsTransportTest extends TransportTestCase
 {
-    /**
-     * @return TurboSmsTransport
-     */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): TurboSmsTransport
     {
         return new TurboSmsTransport('authToken', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
     }

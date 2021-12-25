@@ -94,9 +94,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     {
         yield 'Doctrine style' => [new UserPassword(['message' => 'myMessage'])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval('return new \Symfony\Component\Security\Core\Validator\Constraints\UserPassword(message: "myMessage");')];
-        }
+        yield 'named arguments' => [new UserPassword(message: 'myMessage')];
     }
 
     /**

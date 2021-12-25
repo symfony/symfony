@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Removed `LdapUser::getUsername()` method, use `getUserIdentifier()` instead
+ * Removed `LdapUserProvider::loadUserByUsername()` method, use `loadUserByIdentifier()` instead
+
 5.3
 ---
 

@@ -27,10 +27,8 @@ trait CacheTrait
 {
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null): mixed
     {
         return $this->doGet($this, $key, $callback, $beta, $metadata);
     }
@@ -43,9 +41,9 @@ trait CacheTrait
         return $this->deleteItem($key);
     }
 
-    private function doGet(CacheItemPoolInterface $pool, string $key, callable $callback, ?float $beta, array &$metadata = null, LoggerInterface $logger = null)
+    private function doGet(CacheItemPoolInterface $pool, string $key, callable $callback, ?float $beta, array &$metadata = null, LoggerInterface $logger = null): mixed
     {
-        if (0 > $beta = $beta ?? 1.0) {
+        if (0 > $beta ??= 1.0) {
             throw new class(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', static::class, $beta)) extends \InvalidArgumentException implements InvalidArgumentException { };
         }
 
@@ -60,7 +58,7 @@ trait CacheTrait
             if ($recompute = $ctime && $expiry && $expiry <= ($now = microtime(true)) - $ctime / 1000 * $beta * log(random_int(1, \PHP_INT_MAX) / \PHP_INT_MAX)) {
                 // force applying defaultLifetime to expiry
                 $item->expiresAt(null);
-                $logger && $logger->info('Item "{key}" elected for early recomputation {delta}s before its expiration', [
+                $logger?->info('Item "{key}" elected for early recomputation {delta}s before its expiration', [
                     'key' => $key,
                     'delta' => sprintf('%.1f', $expiry - $now),
                 ]);

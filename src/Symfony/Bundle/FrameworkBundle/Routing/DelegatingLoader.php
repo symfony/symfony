@@ -28,9 +28,9 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class DelegatingLoader extends BaseDelegatingLoader
 {
-    private $loading = false;
-    private $defaultOptions;
-    private $defaultRequirements;
+    private bool $loading = false;
+    private array $defaultOptions;
+    private array $defaultRequirements;
 
     public function __construct(LoaderResolverInterface $resolver, array $defaultOptions = [], array $defaultRequirements = [])
     {
@@ -43,7 +43,7 @@ class DelegatingLoader extends BaseDelegatingLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, string $type = null): RouteCollection
+    public function load(mixed $resource, string $type = null): RouteCollection
     {
         if ($this->loading) {
             // This can happen if a fatal error occurs in parent::load().

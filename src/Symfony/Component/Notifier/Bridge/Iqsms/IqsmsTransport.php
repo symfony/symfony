@@ -28,9 +28,9 @@ final class IqsmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.iqsms.ru';
 
-    private $login;
-    private $password;
-    private $from;
+    private string $login;
+    private string $password;
+    private string $from;
 
     public function __construct(string $login, string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

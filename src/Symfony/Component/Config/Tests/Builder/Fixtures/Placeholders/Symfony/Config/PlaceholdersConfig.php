@@ -21,7 +21,7 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
      * @param ParamConfigurator|bool $value
      * @return $this
      */
-    public function enabled($value): self
+    public function enabled($value): static
     {
         $this->enabled = $value;
     
@@ -33,7 +33,7 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
      * @param ParamConfigurator|float $value
      * @return $this
      */
-    public function favoriteFloat($value): self
+    public function favoriteFloat($value): static
     {
         $this->favoriteFloat = $value;
     
@@ -41,10 +41,11 @@ class PlaceholdersConfig implements \Symfony\Component\Config\Builder\ConfigBuil
     }
     
     /**
-     * @param ParamConfigurator|list<int|ParamConfigurator> $value
+     * @param ParamConfigurator|list<ParamConfigurator|int> $value
+     *
      * @return $this
      */
-    public function goodIntegers($value): self
+    public function goodIntegers(ParamConfigurator|array $value): static
     {
         $this->goodIntegers = $value;
     

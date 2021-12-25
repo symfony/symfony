@@ -34,8 +34,8 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  */
 class RememberMeListener implements EventSubscriberInterface
 {
-    private $rememberMeHandler;
-    private $logger;
+    private RememberMeHandlerInterface $rememberMeHandler;
+    private ?LoggerInterface $logger;
 
     public function __construct(RememberMeHandlerInterface $rememberMeHandler, LoggerInterface $logger = null)
     {
@@ -47,9 +47,7 @@ class RememberMeListener implements EventSubscriberInterface
     {
         $passport = $event->getPassport();
         if (!$passport->hasBadge(RememberMeBadge::class)) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Remember me skipped: your authenticator does not support it.', ['authenticator' => \get_class($event->getAuthenticator())]);
-            }
+            $this->logger?->debug('Remember me skipped: your authenticator does not support it.', ['authenticator' => \get_class($event->getAuthenticator())]);
 
             return;
         }
@@ -60,16 +58,12 @@ class RememberMeListener implements EventSubscriberInterface
         /** @var RememberMeBadge $badge */
         $badge = $passport->getBadge(RememberMeBadge::class);
         if (!$badge->isEnabled()) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Remember me skipped: the RememberMeBadge is not enabled.');
-            }
+            $this->logger?->debug('Remember me skipped: the RememberMeBadge is not enabled.');
 
             return;
         }
 
-        if (null !== $this->logger) {
-            $this->logger->debug('Remember-me was requested; setting cookie.');
-        }
+        $this->logger?->debug('Remember-me was requested; setting cookie.');
 
         $this->rememberMeHandler->createRememberMeCookie($event->getUser());
     }

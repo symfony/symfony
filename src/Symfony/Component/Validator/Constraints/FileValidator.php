@@ -41,7 +41,7 @@ class FileValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof File) {
             throw new UnexpectedTypeException($constraint, File::class);
@@ -116,7 +116,7 @@ class FileValidator extends ConstraintValidator
             }
         }
 
-        if (!is_scalar($value) && !$value instanceof FileObject && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !$value instanceof FileObject && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -214,10 +214,8 @@ class FileValidator extends ConstraintValidator
     /**
      * Convert the limit to the smallest possible number
      * (i.e. try "MB", then "kB", then "bytes").
-     *
-     * @param int|float $limit
      */
-    private function factorizeSizes(int $size, $limit, bool $binaryFormat): array
+    private function factorizeSizes(int $size, int|float $limit, bool $binaryFormat): array
     {
         if ($binaryFormat) {
             $coef = self::MIB_BYTES;

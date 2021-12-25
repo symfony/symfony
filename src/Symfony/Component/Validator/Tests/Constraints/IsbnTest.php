@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class IsbnTest extends TestCase
 {
     public function testAttributes()

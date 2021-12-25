@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * @author Alexander M. Turek <me@derrabus.de>
@@ -28,7 +29,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 
     public function process(ContainerBuilder $container): void
     {
-        if (80000 > \PHP_VERSION_ID || !$container->getAutoconfiguredAttributes()) {
+        if (!$container->getAutoconfiguredAttributes()) {
             return;
         }
 
@@ -77,7 +78,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         parent::process($container);
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Definition
             || !$value->isAutoconfigured()
@@ -99,11 +100,19 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
             }
         }
 
-        if ($this->parameterAttributeConfigurators && $constructorReflector = $this->getConstructor($value, false)) {
-            foreach ($constructorReflector->getParameters() as $parameterReflector) {
-                foreach ($parameterReflector->getAttributes() as $attribute) {
-                    if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
-                        $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
+        if ($this->parameterAttributeConfigurators) {
+            try {
+                $constructorReflector = $this->getConstructor($value, false);
+            } catch (RuntimeException $e) {
+                $constructorReflector = null;
+            }
+
+            if ($constructorReflector) {
+                foreach ($constructorReflector->getParameters() as $parameterReflector) {
+                    foreach ($parameterReflector->getAttributes() as $attribute) {
+                        if ($configurator = $this->parameterAttributeConfigurators[$attribute->getName()] ?? null) {
+                            $configurator($conditionals, $attribute->newInstance(), $parameterReflector);
+                        }
                     }
                 }
             }

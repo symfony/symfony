@@ -27,8 +27,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class InlineFragmentRenderer extends RoutableFragmentRenderer
 {
-    private $kernel;
-    private $dispatcher;
+    private HttpKernelInterface $kernel;
+    private ?EventDispatcherInterface $dispatcher;
 
     public function __construct(HttpKernelInterface $kernel, EventDispatcherInterface $dispatcher = null)
     {
@@ -43,7 +43,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
      *
      *  * alt: an alternative URI to render in case of an error
      */
-    public function render($uri, Request $request, array $options = [])
+    public function render(string|ControllerReference $uri, Request $request, array $options = []): Response
     {
         $reference = null;
         if ($uri instanceof ControllerReference) {
@@ -138,7 +138,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'inline';
     }

@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @requires extension redis >= 4.3.0
+ * @requires extension redis
  */
 class RedisTransportFactoryTest extends TestCase
 {

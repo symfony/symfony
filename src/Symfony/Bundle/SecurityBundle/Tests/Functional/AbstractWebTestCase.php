@@ -19,7 +19,7 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
 {
     public static function assertRedirect($response, $location)
     {
-        self::assertTrue($response->isRedirect(), 'Response is not a redirect, got status code: '.substr($response, 0, 2000));
+        self::assertTrue($response->isRedirect(), "Response is not a redirect, got:\n".(($p = strpos($response, '-->')) ? substr($response, 0, $p + 3) : $response));
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
     }
 
@@ -31,12 +31,6 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
     public static function tearDownAfterClass(): void
     {
         static::deleteTmpDir();
-    }
-
-    public function provideSecuritySystems()
-    {
-        yield [['enable_authenticator_manager' => true]];
-        yield [['enable_authenticator_manager' => false]];
     }
 
     protected static function deleteTmpDir()
@@ -70,7 +64,6 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
             $options['root_config'] ?? 'config.yml',
             $options['environment'] ?? strtolower(static::getVarDir().$options['test_case']),
             $options['debug'] ?? false,
-            $options['enable_authenticator_manager'] ?? false
         );
     }
 

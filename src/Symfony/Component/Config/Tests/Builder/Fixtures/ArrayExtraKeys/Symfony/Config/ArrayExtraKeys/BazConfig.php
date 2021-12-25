@@ -29,9 +29,10 @@ class BazConfig
     
     /**
      * @param ParamConfigurator|mixed $value
+     *
      * @return $this
      */
-    public function set(string $key, $value): self
+    public function set(string $key, mixed $value): static
     {
         if (null === $value) {
             unset($this->_extraKeys[$key]);

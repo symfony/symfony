@@ -31,8 +31,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
  */
 class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
 {
-    private $classes;
-    private $outputDir;
+    private array $classes = [];
+    private string $outputDir;
 
     public function __construct(string $outputDir)
     {
@@ -156,9 +156,10 @@ public function NAME(array $value = []): CLASS
 
         $body = '
 /**
-COMMENT * @return $this
+COMMENT *
+ * @return $this
  */
-public function NAME($valueDEFAULT): self
+public function NAME(mixed $valueDEFAULT): static
 {
     $this->PROPERTY = $value;
 
@@ -181,10 +182,11 @@ public function NAME($valueDEFAULT): self
                 // This is an array of values; don't use singular name
                 $body = '
 /**
- * @param ParamConfigurator|list<TYPE|ParamConfigurator> $value
+ * @param ParamConfigurator|list<ParamConfigurator|TYPE> $value
+ *
  * @return $this
  */
-public function NAME($value): self
+public function NAME(ParamConfigurator|array $value): static
 {
     $this->PROPERTY = $value;
 
@@ -195,17 +197,16 @@ public function NAME($value): self
             } else {
                 $body = '
 /**
- * @param ParamConfigurator|TYPE $value
  * @return $this
  */
-public function NAME(string $VAR, $VALUE): self
+public function NAME(string $VAR, TYPE $VALUE): static
 {
     $this->PROPERTY[$VAR] = $VALUE;
 
     return $this;
 }';
 
-                $class->addMethod($methodName, $body, ['PROPERTY' => $property->getName(), 'TYPE' => '' === $parameterType ? 'mixed' : $parameterType, 'VAR' => '' === $key ? 'key' : $key, 'VALUE' => 'value' === $key ? 'data' : 'value']);
+                $class->addMethod($methodName, $body, ['PROPERTY' => $property->getName(), 'TYPE' => '' === $parameterType ? 'mixed' : 'ParamConfigurator|'.$parameterType, 'VAR' => '' === $key ? 'key' : $key, 'VALUE' => 'value' === $key ? 'data' : 'value']);
             }
 
             return;
@@ -256,7 +257,7 @@ public function NAME(string $VAR, array $VALUE = []): CLASS
 /**
 COMMENT * @return $this
  */
-public function NAME($value): self
+public function NAME($value): static
 {
     $this->PROPERTY = $value;
 
@@ -337,7 +338,7 @@ public function NAME($value): self
     private function getSingularName(PrototypedArrayNode $node): string
     {
         $name = $node->getName();
-        if ('s' !== substr($name, -1)) {
+        if (!str_ends_with($name, 's')) {
             return $name;
         }
 
@@ -437,9 +438,10 @@ public function __construct(array $value = [])
         $class->addMethod('set', '
 /**
  * @param ParamConfigurator|mixed $value
+ *
  * @return $this
  */
-public function NAME(string $key, $value): self
+public function NAME(string $key, mixed $value): static
 {
     if (null === $value) {
         unset($this->_extraKeys[$key]);

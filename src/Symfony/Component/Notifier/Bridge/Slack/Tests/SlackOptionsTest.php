@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
@@ -24,8 +23,6 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class SlackOptionsTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * @dataProvider toArrayProvider
      * @dataProvider toArraySimpleOptionsProvider
@@ -122,16 +119,6 @@ final class SlackOptionsTest extends TestCase
         $options = (new SlackOptions())->block(new SlackDividerBlock());
 
         $this->assertSame([['type' => 'divider']], $options->toArray()['blocks']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testChannelMethodRaisesDeprecation()
-    {
-        $this->expectDeprecation('Since symfony/slack-notifier 5.1: The "Symfony\Component\Notifier\Bridge\Slack\SlackOptions::channel()" method is deprecated, use "recipient()" instead.');
-
-        (new SlackOptions())->channel('channel');
     }
 
     /**

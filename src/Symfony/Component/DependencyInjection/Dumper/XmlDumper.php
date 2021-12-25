@@ -32,17 +32,12 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 class XmlDumper extends Dumper
 {
-    /**
-     * @var \DOMDocument
-     */
-    private $document;
+    private \DOMDocument $document;
 
     /**
      * Dumps the service container as an XML string.
-     *
-     * @return string
      */
-    public function dump(array $options = [])
+    public function dump(array $options = []): string
     {
         $this->document = new \DOMDocument('1.0', 'utf-8');
         $this->document->formatOutput = true;
@@ -56,7 +51,7 @@ class XmlDumper extends Dumper
 
         $this->document->appendChild($container);
         $xml = $this->document->saveXML();
-        $this->document = null;
+        unset($this->document);
 
         return $this->container->resolveEnvPlaceholders($xml);
     }
@@ -99,7 +94,7 @@ class XmlDumper extends Dumper
             $service->setAttribute('id', $id);
         }
         if ($class = $definition->getClass()) {
-            if ('\\' === substr($class, 0, 1)) {
+            if (str_starts_with($class, '\\')) {
                 $class = substr($class, 1);
             }
 
@@ -143,7 +138,7 @@ class XmlDumper extends Dumper
                     $tag->appendChild($this->document->createTextNode($name));
                 }
                 foreach ($attributes as $key => $value) {
-                    $tag->setAttribute($key, $value);
+                    $tag->setAttribute($key, $value ?? '');
                 }
                 $service->appendChild($tag);
             }
@@ -369,11 +364,9 @@ class XmlDumper extends Dumper
     /**
      * Converts php types to xml types.
      *
-     * @param mixed $value Value to convert
-     *
      * @throws RuntimeException When trying to dump object or resource
      */
-    public static function phpToXml($value): string
+    public static function phpToXml(mixed $value): string
     {
         switch (true) {
             case null === $value:

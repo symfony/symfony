@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use Symfony\Component\HttpClient\Chunk\DataChunk;
+use Symfony\Component\HttpClient\Chunk\ErrorChunk;
+use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -18,7 +21,6 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MockHttpClientTest extends HttpClientTestCase
 {
@@ -185,6 +187,90 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
+    public function testZeroStatusCode()
+    {
+        $client = new MockHttpClient(new MockResponse('', ['response_headers' => ['HTTP/1.1 000 ']]));
+        $response = $client->request('GET', 'https://foo.bar');
+        $this->assertSame(0, $response->getStatusCode());
+    }
+
+    public function testThrowExceptionInBodyGenerator()
+    {
+        $mockHttpClient = new MockHttpClient([
+            new MockResponse((static function (): \Generator {
+                yield 'foo';
+                throw new TransportException('foo ccc');
+            })()),
+            new MockResponse((static function (): \Generator {
+                yield 'bar';
+                throw new \RuntimeException('bar ccc');
+            })()),
+        ]);
+
+        try {
+            $mockHttpClient->request('GET', 'https://symfony.com', [])->getContent();
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new TransportException('foo ccc'), $e->getPrevious());
+            $this->assertSame('foo ccc', $e->getMessage());
+        }
+
+        $chunks = [];
+        try {
+            foreach ($mockHttpClient->stream($mockHttpClient->request('GET', 'https://symfony.com', [])) as $chunk) {
+                $chunks[] = $chunk;
+            }
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new \RuntimeException('bar ccc'), $e->getPrevious());
+            $this->assertSame('bar ccc', $e->getMessage());
+        }
+
+        $this->assertCount(3, $chunks);
+        $this->assertEquals(new FirstChunk(0, ''), $chunks[0]);
+        $this->assertEquals(new DataChunk(0, 'bar'), $chunks[1]);
+        $this->assertInstanceOf(ErrorChunk::class, $chunks[2]);
+        $this->assertSame(3, $chunks[2]->getOffset());
+        $this->assertSame('bar ccc', $chunks[2]->getError());
+    }
+
+    public function testExceptionDirectlyInBody()
+    {
+        $mockHttpClient = new MockHttpClient([
+            new MockResponse(['foo', new \RuntimeException('foo ccc')]),
+            new MockResponse((static function (): \Generator {
+                yield 'bar';
+                yield new TransportException('bar ccc');
+            })()),
+        ]);
+
+        try {
+            $mockHttpClient->request('GET', 'https://symfony.com', [])->getContent();
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new \RuntimeException('foo ccc'), $e->getPrevious());
+            $this->assertSame('foo ccc', $e->getMessage());
+        }
+
+        $chunks = [];
+        try {
+            foreach ($mockHttpClient->stream($mockHttpClient->request('GET', 'https://symfony.com', [])) as $chunk) {
+                $chunks[] = $chunk;
+            }
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new TransportException('bar ccc'), $e->getPrevious());
+            $this->assertSame('bar ccc', $e->getMessage());
+        }
+
+        $this->assertCount(3, $chunks);
+        $this->assertEquals(new FirstChunk(0, ''), $chunks[0]);
+        $this->assertEquals(new DataChunk(0, 'bar'), $chunks[1]);
+        $this->assertInstanceOf(ErrorChunk::class, $chunks[2]);
+        $this->assertSame(3, $chunks[2]->getOffset());
+        $this->assertSame('bar ccc', $chunks[2]->getError());
+    }
+
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
         $responses = [];
@@ -236,6 +322,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 $this->markTestSkipped('Real transport required');
                 break;
 
+            case 'testTimeoutOnInitialize':
             case 'testTimeoutOnDestruct':
                 $this->markTestSkipped('Real transport required');
                 break;
@@ -272,16 +359,8 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testDnsError':
-                $mock = $this->createMock(ResponseInterface::class);
-                $mock->expects($this->any())
-                    ->method('getStatusCode')
-                    ->willThrowException(new TransportException('DSN error'));
-                $mock->expects($this->any())
-                    ->method('getInfo')
-                    ->willReturn([]);
-
-                $responses[] = $mock;
-                $responses[] = $mock;
+                $responses[] = $mockResponse = new MockResponse('', ['error' => 'DNS error']);
+                $responses[] = $mockResponse;
                 break;
 
             case 'testToStream':
@@ -296,12 +375,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testTimeoutOnAccess':
-                $mock = $this->createMock(ResponseInterface::class);
-                $mock->expects($this->any())
-                    ->method('getHeaders')
-                    ->willThrowException(new TransportException('Timeout'));
-
-                $responses[] = $mock;
+                $responses[] = new MockResponse('', ['error' => 'Timeout']);
                 break;
 
             case 'testAcceptHeader':
@@ -313,7 +387,7 @@ class MockHttpClientTest extends HttpClientTestCase
             case 'testResolve':
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
-                $responses[] = new MockResponse((function () { throw new \Exception('Fake connection timeout'); yield ''; })(), ['response_headers' => $headers]);
+                $responses[] = new MockResponse((function () { yield ''; })(), ['response_headers' => $headers]);
                 break;
 
             case 'testTimeoutOnStream':
@@ -363,16 +437,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testMaxDuration':
-                $mock = $this->createMock(ResponseInterface::class);
-                $mock->expects($this->any())
-                    ->method('getContent')
-                    ->willReturnCallback(static function (): void {
-                        usleep(100000);
-
-                        throw new TransportException('Max duration was reached.');
-                    });
-
-                $responses[] = $mock;
+                $responses[] = new MockResponse('', ['error' => 'Max duration was reached.']);
                 break;
         }
 

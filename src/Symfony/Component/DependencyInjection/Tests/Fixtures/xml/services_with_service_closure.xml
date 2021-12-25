@@ -5,11 +5,5 @@
     <service id="foo" class="Foo">
       <argument type="service_closure" id="bar" on-invalid="ignore"/>
     </service>
-    <service id="Psr\Container\ContainerInterface" alias="service_container">
-      <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
-    <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container">
-      <deprecated package="symfony/dependency-injection" version="5.1">The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.</deprecated>
-    </service>
   </services>
 </container>

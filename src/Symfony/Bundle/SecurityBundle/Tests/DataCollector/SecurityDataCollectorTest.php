@@ -72,7 +72,6 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertCount(0, $collector->getInheritedRoles());
         $this->assertEmpty($collector->getUser());
         $this->assertNull($collector->getFirewall());
-        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     /** @dataProvider provideRoles */
@@ -95,7 +94,6 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($normalizedRoles, $collector->getRoles()->getValue(true));
         $this->assertSame($inheritedRoles, $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
-        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     public function testCollectSwitchUserToken()
@@ -151,7 +149,6 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($firewallConfig->getAccessDeniedUrl(), $collected['access_denied_url']);
         $this->assertSame($firewallConfig->getUserChecker(), $collected['user_checker']);
         $this->assertSame($firewallConfig->getAuthenticators(), $collected['authenticators']->getValue());
-        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     public function testGetFirewallReturnsNull()

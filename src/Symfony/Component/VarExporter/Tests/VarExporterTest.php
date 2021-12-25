@@ -69,13 +69,10 @@ class VarExporterTest extends TestCase
 
         yield [$a];
 
-        // This test segfaults on the final PHP 7.2 release
-        if (\PHP_VERSION_ID !== 70234) {
-            $a = [null, $h];
-            $a[0] = &$a;
+        $a = [null, $h];
+        $a[0] = &$a;
 
-            yield [$a];
-        }
+        yield [$a];
     }
 
     /**
@@ -95,13 +92,7 @@ class VarExporterTest extends TestCase
         $dump = "<?php\n\nreturn ".$marshalledValue.";\n";
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
 
-        if (\PHP_VERSION_ID >= 70406 || !\in_array($testName, ['array-object', 'array-iterator', 'array-object-custom', 'spl-object-storage', 'final-array-iterator', 'final-error'], true)) {
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
-        } elseif (\PHP_VERSION_ID < 70400) {
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
-        } else {
-            $this->markTestSkipped('PHP >= 7.4.6 required.');
-        }
+        $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
         if ('incomplete-class' === $testName || 'external-references' === $testName) {
@@ -187,13 +178,10 @@ class VarExporterTest extends TestCase
 
         yield ['hard-references', $value];
 
-        // This test segfaults on the final PHP 7.2 release
-        if (\PHP_VERSION_ID !== 70234) {
-            $value = [];
-            $value[0] = &$value;
+        $value = [];
+        $value[0] = &$value;
 
-            yield ['hard-references-recursive', $value];
-        }
+        yield ['hard-references-recursive', $value];
 
         static $value = [123];
 

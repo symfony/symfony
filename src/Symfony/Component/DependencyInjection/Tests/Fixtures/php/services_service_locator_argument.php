@@ -46,8 +46,6 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
     {
         return [
             '.service_locator.ZP1tNYN' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
             'foo3' => true,
             'foo4' => true,
@@ -121,11 +119,6 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      */
     protected function getFoo4Service()
     {
-        $this->throw('BOOM');
-    }
-
-    protected function throw($message)
-    {
-        throw new RuntimeException($message);
+        throw new RuntimeException('BOOM');
     }
 }

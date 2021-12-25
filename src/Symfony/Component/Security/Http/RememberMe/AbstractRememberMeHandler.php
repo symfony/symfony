@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
 {
-    private $userProvider;
+    private UserProviderInterface $userProvider;
     protected $requestStack;
     protected $options;
     protected $logger;
@@ -63,15 +63,7 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
     public function consumeRememberMeCookie(RememberMeDetails $rememberMeDetails): UserInterface
     {
         try {
-            // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
-            $method = 'loadUserByIdentifier';
-            if (!method_exists($this->userProvider, 'loadUserByIdentifier')) {
-                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
-
-                $method = 'loadUserByUsername';
-            }
-
-            $user = $this->userProvider->$method($rememberMeDetails->getUserIdentifier());
+            $user = $this->userProvider->loadUserByIdentifier($rememberMeDetails->getUserIdentifier());
         } catch (AuthenticationException $e) {
             throw $e;
         }
@@ -82,9 +74,7 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
 
         $this->processRememberMe($rememberMeDetails, $user);
 
-        if (null !== $this->logger) {
-            $this->logger->info('Remember-me cookie accepted.');
-        }
+        $this->logger?->info('Remember-me cookie accepted.');
 
         return $user;
     }
@@ -94,9 +84,7 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
      */
     public function clearRememberMeCookie(): void
     {
-        if (null !== $this->logger) {
-            $this->logger->debug('Clearing remember-me cookie.', ['name' => $this->options['name']]);
-        }
+        $this->logger?->debug('Clearing remember-me cookie.', ['name' => $this->options['name']]);
 
         $this->createCookie(null);
     }
@@ -116,8 +104,8 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
         // the ResponseListener configures the cookie saved in this attribute on the final response object
         $request->attributes->set(ResponseListener::COOKIE_ATTR_NAME, new Cookie(
             $this->options['name'],
-            $rememberMeDetails ? $rememberMeDetails->toString() : null,
-            $rememberMeDetails ? $rememberMeDetails->getExpires() : 1,
+            $rememberMeDetails?->toString(),
+            $rememberMeDetails?->getExpires() ?? 1,
             $this->options['path'],
             $this->options['domain'],
             $this->options['secure'] ?? $request->isSecure(),

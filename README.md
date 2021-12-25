@@ -17,13 +17,15 @@ Installation
 Sponsor
 -------
 
-Symfony 5.4 is [backed][27] by [Private Packagist][28].
+Symfony 6.1 is [backed][27] by [basecom][28].
 
-Private Packagist is a fast, reliable, and secure Composer repository for your
-private packages. It mirrors all your open-source dependencies for better
-availability and monitors them for security vulnerabilities.
+As a professional software service provider, basecom implements customized
+solutions in the areas of e-commerce, PIM solutions and web portals. With our
+experience and certified expertise, we have been one of the most renowned
+Symfony specialists in Germany for many years.
 
 Help Symfony by [sponsoring][29] its development!
+
 
 Documentation
 -------------
@@ -86,5 +88,5 @@ and supported by [Symfony contributors][19].
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
 [27]: https://symfony.com/backers
-[28]: https://packagist.com/
+[28]: https://www.basecom.de/
 [29]: https://symfony.com/sponsor

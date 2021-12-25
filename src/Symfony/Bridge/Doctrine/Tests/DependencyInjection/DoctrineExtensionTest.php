@@ -189,7 +189,7 @@ class DoctrineExtensionTest extends TestCase
 
         // In the attribute folder, attributes are used
         $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures/Attribute', $container);
-        $this->assertSame($mappingType, \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute');
+        $this->assertSame($mappingType, 'attribute');
     }
 
     public function providerBasicDrivers()

@@ -20,7 +20,7 @@ class SomeCleverNameConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function first($value): self
+    public function first($value): static
     {
         $this->first = $value;
     
@@ -32,7 +32,7 @@ class SomeCleverNameConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function second($value): self
+    public function second($value): static
     {
         $this->second = $value;
     

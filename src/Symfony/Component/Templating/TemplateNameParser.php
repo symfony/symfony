@@ -24,7 +24,7 @@ class TemplateNameParser implements TemplateNameParserInterface
     /**
      * {@inheritdoc}
      */
-    public function parse($name)
+    public function parse(string|TemplateReferenceInterface $name): TemplateReferenceInterface
     {
         if ($name instanceof TemplateReferenceInterface) {
             return $name;

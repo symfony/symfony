@@ -26,11 +26,9 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
-     * @return int|null
-     *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
-    public function transform($dateTime)
+    public function transform(mixed $dateTime): ?int
     {
         if (null === $dateTime) {
             return null;
@@ -48,12 +46,10 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      *
      * @param string $value A timestamp
      *
-     * @return \DateTime|null
-     *
      * @throws TransformationFailedException If the given value is not a timestamp
      *                                       or if the given timestamp is invalid
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): ?\DateTime
     {
         if (null === $value) {
             return null;

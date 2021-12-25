@@ -33,8 +33,8 @@ final class SpotHitTransport extends AbstractTransport
 {
     protected const HOST = 'spot-hit.fr';
 
-    private $token;
-    private $from;
+    private string $token;
+    private ?string $from;
 
     public function __construct(string $token, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -87,7 +87,7 @@ final class SpotHitTransport extends AbstractTransport
             $data = $response->toArray();
         } catch (TransportExceptionInterface $e) {
             throw new TransportException('Could not reach the remote SpotHit server.', $response, 0, $e);
-        } catch (HttpExceptionInterface | DecodingExceptionInterface $e) {
+        } catch (HttpExceptionInterface|DecodingExceptionInterface $e) {
             throw new TransportException('Unexpected reply from the remote SpotHit server.', $response, 0, $e);
         }
 

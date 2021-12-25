@@ -39,8 +39,8 @@ class MailjetApiTransport extends AbstractApiTransport
         'X-Mailjet-TrackOpen', 'X-Mailjet-TrackClick', 'X-MJ-TemplateID', 'X-MJ-WorkflowID',
     ];
 
-    private $privateKey;
-    private $publicKey;
+    private string $privateKey;
+    private string $publicKey;
 
     public function __construct(string $publicKey, string $privateKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {

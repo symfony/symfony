@@ -38,12 +38,12 @@ class SymfonyStyle extends OutputStyle
 {
     public const MAX_LINE_LENGTH = 120;
 
-    private $input;
-    private $output;
-    private $questionHelper;
-    private $progressBar;
-    private $lineLength;
-    private $bufferedOutput;
+    private InputInterface $input;
+    private OutputInterface $output;
+    private SymfonyQuestionHelper $questionHelper;
+    private ProgressBar $progressBar;
+    private int $lineLength;
+    private TrimmedBufferOutput $bufferedOutput;
 
     public function __construct(InputInterface $input, OutputInterface $output)
     {
@@ -58,10 +58,8 @@ class SymfonyStyle extends OutputStyle
 
     /**
      * Formats a message as a block of text.
-     *
-     * @param string|array $messages The message to write in the block
      */
-    public function block($messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
+    public function block(string|array $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true)
     {
         $messages = \is_array($messages) ? array_values($messages) : [$messages];
 
@@ -113,7 +111,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function text($message)
+    public function text(string|array $message)
     {
         $this->autoPrependText();
 
@@ -125,10 +123,8 @@ class SymfonyStyle extends OutputStyle
 
     /**
      * Formats a command comment.
-     *
-     * @param string|array $message
      */
-    public function comment($message)
+    public function comment(string|array $message)
     {
         $this->block($message, null, null, '<fg=default;bg=default> // </>', false, false);
     }
@@ -136,7 +132,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function success($message)
+    public function success(string|array $message)
     {
         $this->block($message, 'OK', 'fg=black;bg=green', ' ', true);
     }
@@ -144,7 +140,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function error($message)
+    public function error(string|array $message)
     {
         $this->block($message, 'ERROR', 'fg=white;bg=red', ' ', true);
     }
@@ -152,7 +148,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function warning($message)
+    public function warning(string|array $message)
     {
         $this->block($message, 'WARNING', 'fg=black;bg=yellow', ' ', true);
     }
@@ -160,17 +156,15 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function note($message)
+    public function note(string|array $message)
     {
         $this->block($message, 'NOTE', 'fg=yellow', ' ! ');
     }
 
     /**
      * Formats an info message.
-     *
-     * @param string|array $message
      */
-    public function info($message)
+    public function info(string|array $message)
     {
         $this->block($message, 'INFO', 'fg=green', ' ', true);
     }
@@ -178,7 +172,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function caution($message)
+    public function caution(string|array $message)
     {
         $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ', true);
     }
@@ -219,10 +213,8 @@ class SymfonyStyle extends OutputStyle
      * * 'A title'
      * * ['key' => 'value']
      * * new TableSeparator()
-     *
-     * @param string|array|TableSeparator ...$list
      */
-    public function definitionList(...$list)
+    public function definitionList(string|array|TableSeparator ...$list)
     {
         $headers = [];
         $row = [];
@@ -250,7 +242,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function ask(string $question, string $default = null, callable $validator = null)
+    public function ask(string $question, string $default = null, callable $validator = null): mixed
     {
         $question = new Question($question, $default);
         $question->setValidator($validator);
@@ -261,7 +253,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function askHidden(string $question, callable $validator = null)
+    public function askHidden(string $question, callable $validator = null): mixed
     {
         $question = new Question($question);
 
@@ -274,7 +266,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function confirm(string $question, bool $default = true)
+    public function confirm(string $question, bool $default = true): bool
     {
         return $this->askQuestion(new ConfirmationQuestion($question, $default));
     }
@@ -282,7 +274,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function choice(string $question, array $choices, $default = null)
+    public function choice(string $question, array $choices, mixed $default = null): mixed
     {
         if (null !== $default) {
             $values = array_flip($choices);
@@ -316,13 +308,13 @@ class SymfonyStyle extends OutputStyle
     {
         $this->getProgressBar()->finish();
         $this->newLine(2);
-        $this->progressBar = null;
+        unset($this->progressBar);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createProgressBar(int $max = 0)
+    public function createProgressBar(int $max = 0): ProgressBar
     {
         $progressBar = parent::createProgressBar($max);
 
@@ -345,18 +337,13 @@ class SymfonyStyle extends OutputStyle
         $this->newLine(2);
     }
 
-    /**
-     * @return mixed
-     */
-    public function askQuestion(Question $question)
+    public function askQuestion(Question $question): mixed
     {
         if ($this->input->isInteractive()) {
             $this->autoPrependBlock();
         }
 
-        if (!$this->questionHelper) {
-            $this->questionHelper = new SymfonyQuestionHelper();
-        }
+        $this->questionHelper ??= new SymfonyQuestionHelper();
 
         $answer = $this->questionHelper->ask($this->input, $this, $question);
 
@@ -371,7 +358,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function writeln($messages, int $type = self::OUTPUT_NORMAL)
+    public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL)
     {
         if (!is_iterable($messages)) {
             $messages = [$messages];
@@ -386,7 +373,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function write($messages, bool $newline = false, int $type = self::OUTPUT_NORMAL)
+    public function write(string|iterable $messages, bool $newline = false, int $type = self::OUTPUT_NORMAL)
     {
         if (!is_iterable($messages)) {
             $messages = [$messages];
@@ -409,10 +396,8 @@ class SymfonyStyle extends OutputStyle
 
     /**
      * Returns a new instance which makes use of stderr if available.
-     *
-     * @return self
      */
-    public function getErrorStyle()
+    public function getErrorStyle(): self
     {
         return new self($this->input, $this->getErrorOutput());
     }
@@ -428,11 +413,8 @@ class SymfonyStyle extends OutputStyle
 
     private function getProgressBar(): ProgressBar
     {
-        if (!$this->progressBar) {
-            throw new RuntimeException('The ProgressBar is not started.');
-        }
-
-        return $this->progressBar;
+        return $this->progressBar
+            ?? throw new RuntimeException('The ProgressBar is not started.');
     }
 
     private function autoPrependBlock(): void

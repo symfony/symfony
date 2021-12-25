@@ -19,7 +19,7 @@ class DiscordMediaEmbedObject extends AbstractDiscordEmbedObject
     /**
      * @return $this
      */
-    public function url(string $url): self
+    public function url(string $url): static
     {
         $this->options['url'] = $url;
 
@@ -29,7 +29,7 @@ class DiscordMediaEmbedObject extends AbstractDiscordEmbedObject
     /**
      * @return $this
      */
-    public function proxyUrl(string $proxyUrl): self
+    public function proxyUrl(string $proxyUrl): static
     {
         $this->options['proxy_url'] = $proxyUrl;
 
@@ -39,7 +39,7 @@ class DiscordMediaEmbedObject extends AbstractDiscordEmbedObject
     /**
      * @return $this
      */
-    public function height(int $height): self
+    public function height(int $height): static
     {
         $this->options['height'] = $height;
 
@@ -49,7 +49,7 @@ class DiscordMediaEmbedObject extends AbstractDiscordEmbedObject
     /**
      * @return $this
      */
-    public function width(int $width): self
+    public function width(int $width): static
     {
         $this->options['width'] = $width;
 

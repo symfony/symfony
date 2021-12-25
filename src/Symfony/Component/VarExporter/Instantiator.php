@@ -65,7 +65,7 @@ final class Instantiator
             $wrappedInstance = [$reflector->newInstanceWithoutConstructor()];
         } elseif (null === Registry::$prototypes[$class]) {
             throw new NotInstantiableTypeException($class);
-        } elseif ($reflector->implementsInterface('Serializable') && (\PHP_VERSION_ID < 70400 || !method_exists($class, '__unserialize'))) {
+        } elseif ($reflector->implementsInterface('Serializable') && !method_exists($class, '__unserialize')) {
             $wrappedInstance = [unserialize('C:'.\strlen($class).':"'.$class.'":0:{}')];
         } else {
             $wrappedInstance = [unserialize('O:'.\strlen($class).':"'.$class.'":0:{}')];

@@ -12,8 +12,6 @@
 namespace Symfony\Component\Messenger;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
@@ -40,14 +38,14 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class Worker
 {
-    private $receivers;
-    private $bus;
-    private $eventDispatcher;
-    private $logger;
-    private $shouldStop = false;
-    private $metadata;
-    private $acks = [];
-    private $unacks;
+    private array $receivers;
+    private MessageBusInterface $bus;
+    private ?EventDispatcherInterface $eventDispatcher;
+    private ?LoggerInterface $logger;
+    private bool $shouldStop = false;
+    private WorkerMetadata $metadata;
+    private array $acks = [];
+    private \SplObjectStorage $unacks;
 
     /**
      * @param ReceiverInterface[] $receivers Where the key is the transport name
@@ -57,7 +55,7 @@ class Worker
         $this->receivers = $receivers;
         $this->bus = $bus;
         $this->logger = $logger;
-        $this->eventDispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($eventDispatcher) : $eventDispatcher;
+        $this->eventDispatcher = $eventDispatcher;
         $this->metadata = new WorkerMetadata([
             'transportNames' => array_keys($receivers),
         ]);
@@ -246,9 +244,7 @@ class Worker
 
     public function stop(): void
     {
-        if (null !== $this->logger) {
-            $this->logger->info('Stopping worker.', ['transport_names' => $this->metadata->getTransportNames()]);
-        }
+        $this->logger?->info('Stopping worker.', ['transport_names' => $this->metadata->getTransportNames()]);
 
         $this->shouldStop = true;
     }

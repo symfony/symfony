@@ -20,7 +20,7 @@ class ReceivingConfig
      * @param ParamConfigurator|int $value
      * @return $this
      */
-    public function priority($value): self
+    public function priority($value): static
     {
         $this->priority = $value;
     
@@ -32,7 +32,7 @@ class ReceivingConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function color($value): self
+    public function color($value): static
     {
         $this->color = $value;
     

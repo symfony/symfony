@@ -521,10 +521,7 @@ EOF
                 return '';
             }
 
-            /**
-             * @return string|false
-             */
-            public function getXsdValidationBasePath()
+            public function getXsdValidationBasePath(): string|false
             {
                 return false;
             }

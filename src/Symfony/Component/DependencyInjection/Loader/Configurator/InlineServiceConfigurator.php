@@ -32,9 +32,9 @@ class InlineServiceConfigurator extends AbstractConfigurator
 
     public const FACTORY = 'service';
 
-    private $id = '[inline]';
-    private $allowParent = true;
-    private $path = null;
+    private string $id = '[inline]';
+    private bool $allowParent = true;
+    private ?string $path = null;
 
     public function __construct(Definition $definition)
     {

@@ -24,7 +24,7 @@ class RequestStack
     /**
      * @var Request[]
      */
-    private $requests = [];
+    private array $requests = [];
 
     /**
      * Pushes a Request on the stack.
@@ -44,10 +44,8 @@ class RequestStack
      *
      * This method should generally not be called directly as the stack
      * management should be taken care of by the application itself.
-     *
-     * @return Request|null
      */
-    public function pop()
+    public function pop(): ?Request
     {
         if (!$this->requests) {
             return null;
@@ -56,10 +54,7 @@ class RequestStack
         return array_pop($this->requests);
     }
 
-    /**
-     * @return Request|null
-     */
-    public function getCurrentRequest()
+    public function getCurrentRequest(): ?Request
     {
         return end($this->requests) ?: null;
     }
@@ -81,20 +76,6 @@ class RequestStack
     }
 
     /**
-     * Gets the master request.
-     *
-     * @return Request|null
-     *
-     * @deprecated since symfony/http-foundation 5.3, use getMainRequest() instead
-     */
-    public function getMasterRequest()
-    {
-        trigger_deprecation('symfony/http-foundation', '5.3', '"%s()" is deprecated, use "getMainRequest()" instead.', __METHOD__);
-
-        return $this->getMainRequest();
-    }
-
-    /**
      * Returns the parent request of the current.
      *
      * Be warned that making your code aware of the parent request
@@ -102,10 +83,8 @@ class RequestStack
      * like ESI support.
      *
      * If current Request is the main request, it returns null.
-     *
-     * @return Request|null
      */
-    public function getParentRequest()
+    public function getParentRequest(): ?Request
     {
         $pos = \count($this->requests) - 2;
 

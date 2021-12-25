@@ -105,9 +105,6 @@ class MessengerPassTest extends TestCase
         $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, [DummyHandler::class], [['from_transport' => 'async']]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedMessageHandler()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');

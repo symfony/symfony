@@ -324,10 +324,8 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame(array_merge(
-        \PHP_VERSION_ID >= 80000 ? [
+        $this->assertSame([
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::staticMethod()" might add "Foo&Bar" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualAbstract" now to avoid errors or add an explicit @return annotation to suppress this message.',
-        ] : [], [
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::interfaceMethod()" might add "string" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualAbstract" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Class "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::staticReturningMethod(): static".',
             'Class "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::sameLineInterfaceMethodNoBraces()".',
@@ -342,7 +340,7 @@ class DebugClassLoaderTest extends TestCase
             'Class "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualParent" should implement method "static Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::staticMethodTypedNoBraces(): \stdClass[]".',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::staticMethodNoBraces()" might add "mixed" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualParent" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Class "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtual" should implement method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualSubInterface::subInterfaceMethod(): string".',
-        ]), $deprecations);
+        ], $deprecations);
     }
 
     public function testVirtualUseWithMagicCall()
@@ -375,7 +373,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame(array_merge([
+        $this->assertSame([
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeGrandParent::returnTypeGrandParent()" might add "string" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParentInterface::returnTypeParentInterface()" might add "string" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeInterface::returnTypeInterface()" might add "string" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
@@ -385,10 +383,8 @@ class DebugClassLoaderTest extends TestCase
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::oneNullableReturnableTypeWithNull()" might add "?bool" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::oneOtherType()" might add "\ArrayIterator" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::oneOtherTypeWithNull()" might add "?\ArrayIterator" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
-        ], \PHP_VERSION_ID >= 80000 ? [
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::twoNullableReturnableTypes()" might add "int|\Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::threeReturnTypes()" might add "bool|string|null" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
-        ] : [], [
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::manyIterables()" might add "array" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::nullableReturnableTypeNormalization()" might add "object" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::nonNullableReturnableTypeNormalization()" might add "void" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
@@ -402,7 +398,7 @@ class DebugClassLoaderTest extends TestCase
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::mixed()" might add "mixed" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::nullableMixed()" might add "mixed" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::static()" might add "static" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
-        ]), $deprecations);
+        ], $deprecations);
     }
 }
 
@@ -443,7 +439,7 @@ class ClassLoader
             eval('namespace Test\\'.__NAMESPACE__.'; class NonDeprecatedInterfaceClass implements \\'.__NAMESPACE__.'\Fixtures\NonDeprecatedInterface {}');
         } elseif ('Test\\'.Float::class === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class Float {}');
-        } elseif (0 === strpos($class, 'Test\\'.ExtendsFinalClass::class)) {
+        } elseif (str_starts_with($class, 'Test\\' . ExtendsFinalClass::class)) {
             $classShortName = substr($class, strrpos($class, '\\') + 1);
             eval('namespace Test\\'.__NAMESPACE__.'; class '.$classShortName.' extends \\'.__NAMESPACE__.'\Fixtures\\'.substr($classShortName, 7).' {}');
         } elseif ('Test\\'.ExtendsAnnotatedClass::class === $class) {

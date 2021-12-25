@@ -11,7 +11,7 @@ class BarHiddenCommand extends Command
         $this
             ->setName('bar:hidden')
             ->setAliases(['abarhidden'])
-            ->setHidden(true)
+            ->setHidden()
         ;
     }
 

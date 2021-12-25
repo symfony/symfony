@@ -13,9 +13,6 @@ namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class AnnotationLoaderWithAttributesTest extends AnnotationLoaderTest
 {
     protected function createLoader(): AnnotationLoader

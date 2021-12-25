@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\Isin;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class IsinTest extends TestCase
 {
     public function testAttributes()

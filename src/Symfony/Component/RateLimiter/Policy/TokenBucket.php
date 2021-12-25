@@ -20,24 +20,12 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
-    private $stringRate;
-    private $id;
-    private $rate;
-
-    /**
-     * @var int
-     */
-    private $tokens;
-
-    /**
-     * @var int
-     */
-    private $burstSize;
-
-    /**
-     * @var float
-     */
-    private $timer;
+    private string $stringRate;
+    private string $id;
+    private Rate $rate;
+    private int $tokens;
+    private int $burstSize;
+    private float $timer;
 
     /**
      * @param string     $id            unique identifier for this bucket
@@ -81,7 +69,7 @@ final class TokenBucket implements LimiterStateInterface
 
     public function getAvailableTokens(float $now): int
     {
-        $elapsed = $now - $this->timer;
+        $elapsed = max(0, $now - $this->timer);
 
         return min($this->burstSize, $this->tokens + $this->rate->calculateNewTokensDuringInterval($elapsed));
     }
@@ -106,10 +94,6 @@ final class TokenBucket implements LimiterStateInterface
      */
     public function __wakeup(): void
     {
-        if (!\is_string($this->stringRate)) {
-            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-        }
-
         $this->rate = Rate::fromString($this->stringRate);
         unset($this->stringRate);
     }

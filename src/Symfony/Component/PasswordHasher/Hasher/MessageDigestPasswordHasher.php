@@ -24,10 +24,10 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
 {
     use CheckPasswordLengthTrait;
 
-    private $algorithm;
-    private $encodeHashAsBase64;
-    private $iterations = 1;
-    private $hashLength = -1;
+    private string $algorithm;
+    private bool $encodeHashAsBase64;
+    private int $iterations = 1;
+    private int $hashLength = -1;
 
     /**
      * @param string $algorithm          The digest algorithm to use
@@ -71,7 +71,7 @@ class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
 
     public function verify(string $hashedPassword, string $plainPassword, string $salt = null): bool
     {
-        if (\strlen($hashedPassword) !== $this->hashLength || false !== strpos($hashedPassword, '$')) {
+        if (\strlen($hashedPassword) !== $this->hashLength || str_contains($hashedPassword, '$')) {
             return false;
         }
 

@@ -50,14 +50,19 @@ if (trait_exists(FormattableHandlerTrait::class)) {
  */
 trait ServerLogHandlerTrait
 {
-    private $host;
-    private $context;
-    private $socket;
+    private string $host;
 
     /**
-     * @param string|int $level The minimum logging level at which this handler will be triggered
+     * @var resource
      */
-    public function __construct(string $host, $level = Logger::DEBUG, bool $bubble = true, array $context = [])
+    private $context;
+
+    /**
+     * @var resource|null
+     */
+    private $socket;
+
+    public function __construct(string $host, string|int $level = Logger::DEBUG, bool $bubble = true, array $context = [])
     {
         parent::__construct($level, $bubble);
 

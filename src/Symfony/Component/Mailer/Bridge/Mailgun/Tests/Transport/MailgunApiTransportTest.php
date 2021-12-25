@@ -152,6 +152,38 @@ class MailgunApiTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
+    public function testSendWithMultipleTagHeaders()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $content = '';
+            while ($chunk = $options['body']()) {
+                $content .= $chunk;
+            }
+
+            $this->assertStringContainsString("Content-Disposition: form-data; name=\"o:tag\"\r\n\r\npassword-reset\r\n", $content);
+            $this->assertStringContainsString("Content-Disposition: form-data; name=\"o:tag\"\r\n\r\nproduct-name\r\n", $content);
+
+            return new MockResponse(json_encode(['id' => 'foobar2']), [
+                'http_code' => 200,
+            ]);
+        });
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us-east-1', $client);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $mail->getHeaders()
+            ->add(new TagHeader('password-reset'))
+            ->add(new TagHeader('product-name'));
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar2', $message->getMessageId());
+    }
+
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
@@ -216,6 +248,7 @@ class MailgunApiTransportTest extends TestCase
         $email->getHeaders()->addTextHeader('h:X-Mailgun-Variables', $json);
         $email->getHeaders()->addTextHeader('Custom-Header', 'value');
         $email->getHeaders()->add(new TagHeader('password-reset'));
+        $email->getHeaders()->add(new TagHeader('product-name'));
         $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
         $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
@@ -228,8 +261,10 @@ class MailgunApiTransportTest extends TestCase
         $this->assertEquals($json, $payload['h:x-mailgun-variables']);
         $this->assertArrayHasKey('h:custom-header', $payload);
         $this->assertEquals('value', $payload['h:custom-header']);
-        $this->assertArrayHasKey('o:tag', $payload);
-        $this->assertSame('password-reset', $payload['o:tag']);
+        $this->assertArrayHasKey(0, $payload);
+        $this->assertArrayHasKey(1, $payload);
+        $this->assertSame('password-reset', $payload[0]['o:tag']);
+        $this->assertSame('product-name', $payload[1]['o:tag']);
         $this->assertArrayHasKey('v:Color', $payload);
         $this->assertSame('blue', $payload['v:Color']);
         $this->assertArrayHasKey('v:Client-ID', $payload);

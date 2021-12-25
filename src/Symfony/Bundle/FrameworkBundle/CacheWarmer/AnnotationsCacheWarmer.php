@@ -25,9 +25,9 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
  */
 class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
 {
-    private $annotationReader;
-    private $excludeRegexp;
-    private $debug;
+    private Reader $annotationReader;
+    private ?string $excludeRegexp;
+    private bool $debug;
 
     /**
      * @param string $phpArrayFile The PHP file where annotations are cached
@@ -43,7 +43,7 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * {@inheritdoc}
      */
-    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter)
+    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter): bool
     {
         $annotatedClassPatterns = $cacheDir.'/annotations.map';
 
@@ -71,7 +71,7 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * @return string[] A list of classes to preload on PHP 7.4+
      */
-    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values): array
     {
         // make sure we don't cache null values
         $values = array_filter($values, function ($val) { return null !== $val; });

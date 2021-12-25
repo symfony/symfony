@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
@@ -33,8 +32,6 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class ReflectionExtractorTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * @var ReflectionExtractor
      */
@@ -261,7 +258,6 @@ class ReflectionExtractorTest extends TestCase
 
     /**
      * @dataProvider php80TypesProvider
-     * @requires PHP 8
      */
     public function testExtractPhp80Type($property, array $type = null)
     {
@@ -464,9 +460,6 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals(PropertyWriteInfo::TYPE_NONE, $bazMutator->getType());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testTypedProperties()
     {
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(Php74Dummy::class, 'dummy'));
@@ -577,32 +570,6 @@ class ReflectionExtractorTest extends TestCase
             [Php71DummyExtended2::class, 'string', true, false,  '', '', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [Php71DummyExtended2::class, 'baz', false, true, PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, null, 'addBaz', 'removeBaz', PropertyWriteInfo::VISIBILITY_PUBLIC, false],
         ];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetReadInfoDeprecatedEnableMagicCallExtractionInContext()
-    {
-        $this->expectDeprecation('Since symfony/property-info 5.2: Using the "enable_magic_call_extraction" context option in "Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor::getReadInfo()" is deprecated. Use "enable_magic_methods_extraction" instead.');
-
-        $extractor = new ReflectionExtractor();
-        $extractor->getReadInfo(\stdClass::class, 'foo', [
-            'enable_magic_call_extraction' => true,
-        ]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetWriteInfoDeprecatedEnableMagicCallExtractionInContext()
-    {
-        $this->expectDeprecation('Since symfony/property-info 5.2: Using the "enable_magic_call_extraction" context option in "Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor::getWriteInfo()" is deprecated. Use "enable_magic_methods_extraction" instead.');
-
-        $extractor = new ReflectionExtractor();
-        $extractor->getWriteInfo(\stdClass::class, 'foo', [
-            'enable_magic_call_extraction' => true,
-        ]);
     }
 
     /**

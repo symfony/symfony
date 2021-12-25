@@ -38,11 +38,9 @@ class TemplateManager
     /**
      * Gets the template name for a given panel.
      *
-     * @return mixed
-     *
      * @throws NotFoundHttpException
      */
-    public function getName(Profile $profile, string $panel)
+    public function getName(Profile $profile, string $panel): mixed
     {
         $templates = $this->getNames($profile);
 

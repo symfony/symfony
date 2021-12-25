@@ -23,11 +23,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
-    private $entry;
-    private $username;
-    private $password;
-    private $roles;
-    private $extraFields;
+    private Entry $entry;
+    private string $username;
+    private ?string $password;
+    private array $roles;
+    private array $extraFields;
 
     public function __construct(Entry $entry, string $username, ?string $password, array $roles = [], array $extraFields = [])
     {
@@ -72,13 +72,11 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
     }
 
     /**
-     * {@inheritdoc}
+     * @internal for compatibility with Symfony 5.4
      */
     public function getUsername(): string
     {
-        trigger_deprecation('symfony/ldap', '5.3', 'Method "%s()" is deprecated and will be removed in 6.0, use getUserIdentifier() instead.', __METHOD__);
-
-        return $this->username;
+        return $this->getUserIdentifier();
     }
 
     public function getUserIdentifier(): string

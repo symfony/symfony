@@ -34,10 +34,8 @@ abstract class WebTestCase extends KernelTestCase
      *
      * @param array $options An array of options to pass to the createKernel method
      * @param array $server  An array of server parameters
-     *
-     * @return KernelBrowser
      */
-    protected static function createClient(array $options = [], array $server = [])
+    protected static function createClient(array $options = [], array $server = []): KernelBrowser
     {
         if (static::$booted) {
             throw new \LogicException(sprintf('Booting the kernel before calling "%s()" is not supported, the kernel should only be booted once.', __METHOD__));

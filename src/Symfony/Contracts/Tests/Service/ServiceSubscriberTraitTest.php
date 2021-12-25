@@ -19,23 +19,9 @@ use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberTrait;
-use Symfony\Contracts\Tests\Fixtures\TestServiceSubscriberUnion;
 
 class ServiceSubscriberTraitTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
-    {
-        $expected = [LegacyTestService::class.'::aService' => '?'.Service2::class];
-
-        $this->assertEquals($expected, LegacyChildTestService::getSubscribedServices());
-    }
-
-    /**
-     * @requires PHP 8
-     */
     public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
     {
         $expected = [
@@ -54,17 +40,6 @@ class ServiceSubscriberTraitTest extends TestCase
 
         $this->assertSame($container, (new TestService())->setContainer($container));
     }
-
-    /**
-     * @requires PHP 8
-     * @group legacy
-     */
-    public function testMethodsWithUnionReturnTypesAreIgnored()
-    {
-        $expected = [TestServiceSubscriberUnion::class.'::method1' => '?Symfony\Contracts\Tests\Fixtures\Service1'];
-
-        $this->assertEquals($expected, TestServiceSubscriberUnion::getSubscribedServices());
-    }
 }
 
 class ParentTestService
@@ -76,22 +51,6 @@ class ParentTestService
     public function setContainer(ContainerInterface $container)
     {
         return $container;
-    }
-}
-
-class LegacyTestService extends ParentTestService implements ServiceSubscriberInterface
-{
-    use ServiceSubscriberTrait;
-
-    public function aService(): Service2
-    {
-    }
-}
-
-class LegacyChildTestService extends LegacyTestService
-{
-    public function aChildService(): Service3
-    {
     }
 }
 

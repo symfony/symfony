@@ -29,7 +29,7 @@ class MaxIdLengthAdapterTest extends TestCase
             ->withConsecutive(
                 [$this->equalTo('----------:nWfzGiCgLczv3SSUzXL3kg:')],
                 [$this->equalTo('----------:---------------------------------------')]
-            );
+            )->willReturn(false);
 
         $cache->hasItem(str_repeat('-', 40));
         $cache->hasItem(str_repeat('-', 39));

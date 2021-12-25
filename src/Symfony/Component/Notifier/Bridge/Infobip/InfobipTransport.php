@@ -27,8 +27,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class InfobipTransport extends AbstractTransport
 {
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private string $from;
 
     public function __construct(string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

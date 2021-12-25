@@ -78,8 +78,6 @@ interface FormDataCollectorInterface extends DataCollectorInterface
 
     /**
      * Returns all collected data.
-     *
-     * @return array|Data
      */
-    public function getData();
+    public function getData(): array|Data;
 }

@@ -24,62 +24,9 @@ class UsernamePasswordTokenTest extends TestCase
         $this->assertEquals('key', $token->getFirewallName());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyConstructor()
-    {
-        $token = new UsernamePasswordToken('foo', 'bar', 'key', ['ROLE_FOO']);
-        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-        $this->assertEquals('bar', $token->getCredentials());
-        $this->assertEquals('key', $token->getFirewallName());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testIsAuthenticated()
-    {
-        $token = new UsernamePasswordToken('foo', 'bar', 'key');
-        $this->assertFalse($token->isAuthenticated());
-
-        $token = new UsernamePasswordToken('foo', 'bar', 'key', ['ROLE_FOO']);
-        $this->assertTrue($token->isAuthenticated());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetAuthenticatedToTrue()
-    {
-        $this->expectException(\LogicException::class);
-        $token = new UsernamePasswordToken('foo', 'bar', 'key');
-        $token->setAuthenticated(true);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetAuthenticatedToFalse()
-    {
-        $token = new UsernamePasswordToken('foo', 'bar', 'key');
-        $token->setAuthenticated(false);
-        $this->assertFalse($token->isAuthenticated());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testEraseCredentials()
-    {
-        $token = new UsernamePasswordToken('foo', 'bar', 'key');
-        $token->eraseCredentials();
-        $this->assertEquals('', $token->getCredentials());
-    }
-
     public function testToString()
     {
         $token = new UsernamePasswordToken(new InMemoryUser('foo', '', ['A', 'B']), 'foo', ['A', 'B']);
-        $this->assertEquals('UsernamePasswordToken(user="foo", authenticated=true, roles="A, B")', (string) $token);
+        $this->assertEquals('UsernamePasswordToken(user="foo", roles="A, B")', (string) $token);
     }
 }

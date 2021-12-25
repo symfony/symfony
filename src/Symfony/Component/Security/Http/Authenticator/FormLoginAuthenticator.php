@@ -30,7 +30,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 
@@ -42,12 +41,12 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  */
 class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 {
-    private $httpUtils;
-    private $userProvider;
-    private $successHandler;
-    private $failureHandler;
-    private $options;
-    private $httpKernel;
+    private HttpUtils $httpUtils;
+    private UserProviderInterface $userProvider;
+    private AuthenticationSuccessHandlerInterface $successHandler;
+    private AuthenticationFailureHandlerInterface $failureHandler;
+    private array $options;
+    private HttpKernelInterface $httpKernel;
 
     public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options)
     {
@@ -83,16 +82,8 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         $credentials = $this->getCredentials($request);
 
-        // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
-        $method = 'loadUserByIdentifier';
-        if (!method_exists($this->userProvider, 'loadUserByIdentifier')) {
-            trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
-
-            $method = 'loadUserByUsername';
-        }
-
         $passport = new Passport(
-            new UserBadge($credentials['username'], [$this->userProvider, $method]),
+            new UserBadge($credentials['username'], [$this->userProvider, 'loadUserByIdentifier']),
             new PasswordCredentials($credentials['password']),
             [new RememberMeBadge()]
         );
@@ -105,16 +96,6 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         }
 
         return $passport;
-    }
-
-    /**
-     * @deprecated since Symfony 5.4, use {@link createToken()} instead
-     */
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
-    {
-        trigger_deprecation('symfony/security-http', '5.4', 'Method "%s()" is deprecated, use "%s::createToken()" instead.', __METHOD__, __CLASS__);
-
-        return $this->createToken($passport, $firewallName);
     }
 
     public function createToken(Passport $passport, string $firewallName): TokenInterface
@@ -145,7 +126,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             $credentials['password'] = ParameterBagUtils::getRequestParameterValue($request, $this->options['password_parameter']) ?? '';
         }
 
-        if (!\is_string($credentials['username']) && (!\is_object($credentials['username']) || !method_exists($credentials['username'], '__toString'))) {
+        if (!\is_string($credentials['username']) && !$credentials['username'] instanceof \Stringable) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['username_parameter'], \gettype($credentials['username'])));
         }
 

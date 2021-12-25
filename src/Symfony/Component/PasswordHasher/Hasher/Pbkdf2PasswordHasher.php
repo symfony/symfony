@@ -32,11 +32,11 @@ final class Pbkdf2PasswordHasher implements LegacyPasswordHasherInterface
 {
     use CheckPasswordLengthTrait;
 
-    private $algorithm;
-    private $encodeHashAsBase64;
-    private $iterations = 1;
-    private $length;
-    private $encodedLength = -1;
+    private string $algorithm;
+    private bool $encodeHashAsBase64;
+    private int $iterations = 1;
+    private int $length;
+    private int $encodedLength = -1;
 
     /**
      * @param string $algorithm          The digest algorithm to use
@@ -76,7 +76,7 @@ final class Pbkdf2PasswordHasher implements LegacyPasswordHasherInterface
 
     public function verify(string $hashedPassword, string $plainPassword, string $salt = null): bool
     {
-        if (\strlen($hashedPassword) !== $this->encodedLength || false !== strpos($hashedPassword, '$')) {
+        if (\strlen($hashedPassword) !== $this->encodedLength || str_contains($hashedPassword, '$')) {
             return false;
         }
 

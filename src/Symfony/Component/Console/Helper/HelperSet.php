@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
@@ -24,8 +23,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 class HelperSet implements \IteratorAggregate
 {
     /** @var array<string, Helper> */
-    private $helpers = [];
-    private $command;
+    private array $helpers = [];
 
     /**
      * @param Helper[] $helpers An array of helper
@@ -49,10 +47,8 @@ class HelperSet implements \IteratorAggregate
 
     /**
      * Returns true if the helper if defined.
-     *
-     * @return bool
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return isset($this->helpers[$name]);
     }
@@ -60,11 +56,9 @@ class HelperSet implements \IteratorAggregate
     /**
      * Gets a helper value.
      *
-     * @return HelperInterface
-     *
      * @throws InvalidArgumentException if the helper is not defined
      */
-    public function get(string $name)
+    public function get(string $name): HelperInterface
     {
         if (!$this->has($name)) {
             throw new InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
@@ -73,35 +67,7 @@ class HelperSet implements \IteratorAggregate
         return $this->helpers[$name];
     }
 
-    /**
-     * @deprecated since Symfony 5.4
-     */
-    public function setCommand(Command $command = null)
-    {
-        trigger_deprecation('symfony/console', '5.4', 'Method "%s()" is deprecated.', __METHOD__);
-
-        $this->command = $command;
-    }
-
-    /**
-     * Gets the command associated with this helper set.
-     *
-     * @return Command
-     *
-     * @deprecated since Symfony 5.4
-     */
-    public function getCommand()
-    {
-        trigger_deprecation('symfony/console', '5.4', 'Method "%s()" is deprecated.', __METHOD__);
-
-        return $this->command;
-    }
-
-    /**
-     * @return \Traversable<string, Helper>
-     */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->helpers);
     }

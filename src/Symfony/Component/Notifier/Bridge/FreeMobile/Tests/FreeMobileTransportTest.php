@@ -16,15 +16,11 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FreeMobileTransportTest extends TransportTestCase
 {
-    /**
-     * @return FreeMobileTransport
-     */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): FreeMobileTransport
     {
         return new FreeMobileTransport('login', 'pass', '0611223344', $client ?? $this->createMock(HttpClientInterface::class));
     }

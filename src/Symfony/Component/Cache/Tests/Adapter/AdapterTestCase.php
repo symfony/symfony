@@ -79,7 +79,7 @@ abstract class AdapterTestCase extends CachePoolTest
                 $this->value = $value;
             }
 
-            public function __invoke(CacheItemInterface $item, bool &$save)
+            public function __invoke(CacheItemInterface $item, bool &$save): mixed
             {
                 Assert::assertSame('bar', $item->getKey());
 
@@ -128,7 +128,7 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $metadata = $item->getMetadata();
         $this->assertArrayHasKey(CacheItem::METADATA_CTIME, $metadata);
-        $this->assertEqualsWithDelta(999, $metadata[CacheItem::METADATA_CTIME], 10);
+        $this->assertEqualsWithDelta(999, $metadata[CacheItem::METADATA_CTIME], 150);
         $this->assertArrayHasKey(CacheItem::METADATA_EXPIRY, $metadata);
         $this->assertEqualsWithDelta(9 + time(), $metadata[CacheItem::METADATA_EXPIRY], 1);
     }

@@ -34,7 +34,7 @@ class RedisExtIntegrationTest extends TestCase
 
         try {
             $this->redis = new \Redis();
-            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], $this->redis);
+            $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
             $this->connection->cleanup();
             $this->connection->setup();
         } catch (\Exception $e) {
@@ -142,7 +142,7 @@ class RedisExtIntegrationTest extends TestCase
     public function testConnectionBelowRedeliverTimeout()
     {
         // lower redeliver timeout and claim interval
-        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], $this->redis);
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
 
         $connection->cleanup();
         $connection->setup();
@@ -170,7 +170,7 @@ class RedisExtIntegrationTest extends TestCase
         // lower redeliver timeout and claim interval
         $connection = Connection::fromDsn(
             getenv('MESSENGER_REDIS_DSN'),
-            ['redeliver_timeout' => 0, 'claim_interval' => 500, 'delete_after_ack' => true],
+            ['redeliver_timeout' => 0, 'claim_interval' => 500],
             $this->redis
         );
 
@@ -221,7 +221,7 @@ class RedisExtIntegrationTest extends TestCase
         $connection = new Connection(
             ['lazy' => true],
             ['host' => explode(' ', getenv('REDIS_CLUSTER_HOSTS'))],
-            ['delete_after_ack' => true]
+            []
         );
 
         $connection->add('1', []);
@@ -239,7 +239,7 @@ class RedisExtIntegrationTest extends TestCase
     public function testLazy()
     {
         $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', [], $redis);
 
         $connection->add('1', []);
         $this->assertNotEmpty($message = $connection->get());
@@ -257,7 +257,7 @@ class RedisExtIntegrationTest extends TestCase
     {
         $redis = new \Redis();
 
-        Connection::fromDsn('redis://localhost/queue?dbindex=2', ['delete_after_ack' => true], $redis);
+        Connection::fromDsn('redis://localhost/queue?dbindex=2', [], $redis);
 
         $this->assertSame(2, $redis->getDbNum());
     }
@@ -273,13 +273,13 @@ class RedisExtIntegrationTest extends TestCase
         }, $hosts);
         $dsn = implode(',', $dsn);
 
-        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['delete_after_ack' => true]));
+        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn));
     }
 
     public function testJsonError()
     {
         $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/json-error', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/json-error', [], $redis);
         try {
             $connection->add("\xB1\x31", []);
         } catch (TransportException $e) {
@@ -292,7 +292,7 @@ class RedisExtIntegrationTest extends TestCase
     {
         $redis = new \Redis();
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', [], $redis);
 
         $this->assertNull($connection->get()); // no message, should return null immediately
         $connection->add('1', []);
@@ -304,7 +304,7 @@ class RedisExtIntegrationTest extends TestCase
     public function testGetAfterReject()
     {
         $redis = new \Redis();
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', [], $redis);
 
         $connection->add('1', []);
         $connection->add('2', []);
@@ -312,7 +312,7 @@ class RedisExtIntegrationTest extends TestCase
         $failing = $connection->get();
         $connection->reject($failing['id']);
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true]);
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', []);
         $this->assertNotNull($connection->get());
 
         $redis->del('messenger-rejectthenget');

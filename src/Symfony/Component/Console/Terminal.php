@@ -13,16 +13,14 @@ namespace Symfony\Component\Console;
 
 class Terminal
 {
-    private static $width;
-    private static $height;
-    private static $stty;
+    private static ?int $width = null;
+    private static ?int $height = null;
+    private static ?bool $stty = null;
 
     /**
      * Gets the terminal width.
-     *
-     * @return int
      */
-    public function getWidth()
+    public function getWidth(): int
     {
         $width = getenv('COLUMNS');
         if (false !== $width) {
@@ -38,10 +36,8 @@ class Terminal
 
     /**
      * Gets the terminal height.
-     *
-     * @return int
      */
-    public function getHeight()
+    public function getHeight(): int
     {
         $height = getenv('LINES');
         if (false !== $height) {

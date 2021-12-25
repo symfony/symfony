@@ -13,11 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Tests;
 
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class MicrosoftTeamsTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): MicrosoftTeamsTransportFactory
     {
         return new MicrosoftTeamsTransportFactory();
     }

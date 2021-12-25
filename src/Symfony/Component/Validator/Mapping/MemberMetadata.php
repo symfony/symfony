@@ -53,7 +53,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * @var \ReflectionMethod[]|\ReflectionProperty[]
      */
-    private $reflMember = [];
+    private array $reflMember = [];
 
     /**
      * @param string $class    The name of the class this member is defined on
@@ -70,7 +70,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * {@inheritdoc}
      */
-    public function addConstraint(Constraint $constraint)
+    public function addConstraint(Constraint $constraint): static
     {
         $this->checkConstraint($constraint);
 
@@ -82,7 +82,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * {@inheritdoc}
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return array_merge(parent::__sleep(), [
             'class',
@@ -93,10 +93,8 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
 
     /**
      * Returns the name of the member.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -112,55 +110,39 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * {@inheritdoc}
      */
-    public function getPropertyName()
+    public function getPropertyName(): string
     {
         return $this->property;
     }
 
     /**
      * Returns whether this member is public.
-     *
-     * @param object|string $objectOrClassName The object or the class name
-     *
-     * @return bool
      */
-    public function isPublic($objectOrClassName)
+    public function isPublic(object|string $objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isPublic();
     }
 
     /**
      * Returns whether this member is protected.
-     *
-     * @param object|string $objectOrClassName The object or the class name
-     *
-     * @return bool
      */
-    public function isProtected($objectOrClassName)
+    public function isProtected(object|string $objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isProtected();
     }
 
     /**
      * Returns whether this member is private.
-     *
-     * @param object|string $objectOrClassName The object or the class name
-     *
-     * @return bool
      */
-    public function isPrivate($objectOrClassName)
+    public function isPrivate(object|string $objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isPrivate();
     }
 
     /**
      * Returns the reflection instance for accessing the member's value.
-     *
-     * @param object|string $objectOrClassName The object or the class name
-     *
-     * @return \ReflectionMethod|\ReflectionProperty
      */
-    public function getReflectionMember($objectOrClassName)
+    public function getReflectionMember(object|string $objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
         $className = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);
         if (!isset($this->reflMember[$className])) {
@@ -172,12 +154,8 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
 
     /**
      * Creates a new reflection instance for accessing the member's value.
-     *
-     * @param object|string $objectOrClassName The object or the class name
-     *
-     * @return \ReflectionMethod|\ReflectionProperty
      */
-    abstract protected function newReflectionMember($objectOrClassName);
+    abstract protected function newReflectionMember(object|string $objectOrClassName): \ReflectionMethod|\ReflectionProperty;
 
     private function checkConstraint(Constraint $constraint)
     {

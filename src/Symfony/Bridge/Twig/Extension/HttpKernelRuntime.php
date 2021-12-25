@@ -22,8 +22,8 @@ use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
  */
 final class HttpKernelRuntime
 {
-    private $handler;
-    private $fragmentUriGenerator;
+    private FragmentHandler $handler;
+    private ?FragmentUriGeneratorInterface $fragmentUriGenerator;
 
     public function __construct(FragmentHandler $handler, FragmentUriGeneratorInterface $fragmentUriGenerator = null)
     {
@@ -34,11 +34,9 @@ final class HttpKernelRuntime
     /**
      * Renders a fragment.
      *
-     * @param string|ControllerReference $uri A URI as a string or a ControllerReference instance
-     *
      * @see FragmentHandler::render()
      */
-    public function renderFragment($uri, array $options = []): string
+    public function renderFragment(string|ControllerReference $uri, array $options = []): string
     {
         $strategy = $options['strategy'] ?? 'inline';
         unset($options['strategy']);
@@ -49,11 +47,9 @@ final class HttpKernelRuntime
     /**
      * Renders a fragment.
      *
-     * @param string|ControllerReference $uri A URI as a string or a ControllerReference instance
-     *
      * @see FragmentHandler::render()
      */
-    public function renderFragmentStrategy(string $strategy, $uri, array $options = []): string
+    public function renderFragmentStrategy(string $strategy, string|ControllerReference $uri, array $options = []): string
     {
         return $this->handler->render($uri, $strategy, $options);
     }

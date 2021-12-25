@@ -219,9 +219,8 @@
   <xsd:complexType name="deprecated">
     <xsd:simpleContent>
       <xsd:extension base="xsd:string">
-        <!-- In Symfony 6, make these attributes required -->
-        <xsd:attribute name="package" type="xsd:string" />
-        <xsd:attribute name="version" type="xsd:string" />
+        <xsd:attribute name="package" type="xsd:string" use="required" />
+        <xsd:attribute name="version" type="xsd:string" use="required" />
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>

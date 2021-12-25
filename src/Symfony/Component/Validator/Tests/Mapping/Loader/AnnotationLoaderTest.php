@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -65,6 +66,9 @@ class AnnotationLoaderTest extends TestCase
         $expected->setGroupSequence(['Foo', 'Entity']);
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new Callback(['Symfony\Component\Validator\Tests\Fixtures\CallbackClass', 'callback']));
+        $expected->addConstraint(new Sequentially([
+            new Expression('this.getFirstName() != null'),
+        ]));
         $expected->addConstraint(new Callback(['callback' => 'validateMe', 'payload' => 'foo']));
         $expected->addConstraint(new Callback('validateMeStatic'));
         $expected->addPropertyConstraint('firstName', new NotNull());
@@ -151,6 +155,9 @@ class AnnotationLoaderTest extends TestCase
         $expected->setGroupSequence(['Foo', 'Entity']);
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new Callback(['Symfony\Component\Validator\Tests\Fixtures\CallbackClass', 'callback']));
+        $expected->addConstraint(new Sequentially([
+            new Expression('this.getFirstName() != null'),
+        ]));
         $expected->addConstraint(new Callback(['callback' => 'validateMe', 'payload' => 'foo']));
         $expected->addConstraint(new Callback('validateMeStatic'));
         $expected->addPropertyConstraint('firstName', new NotNull());
@@ -207,10 +214,7 @@ class AnnotationLoaderTest extends TestCase
     public function provideNamespaces(): iterable
     {
         yield 'annotations' => ['Symfony\Component\Validator\Tests\Fixtures\Annotation'];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'attributes' => ['Symfony\Component\Validator\Tests\Fixtures\Attribute'];
-        }
+        yield 'attributes' => ['Symfony\Component\Validator\Tests\Fixtures\Attribute'];
 
         if (\PHP_VERSION_ID >= 80100) {
             yield 'nested_attributes' => ['Symfony\Component\Validator\Tests\Fixtures\NestedAttribute'];

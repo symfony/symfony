@@ -35,17 +35,10 @@ class XmlFileLoader extends FileLoader
     public const SCHEME_PATH = '/schema/routing/routing-1.0.xsd';
 
     /**
-     * Loads an XML file.
-     *
-     * @param string      $file An XML file path
-     * @param string|null $type The resource type
-     *
-     * @return RouteCollection
-     *
      * @throws \InvalidArgumentException when the file cannot be loaded or when the XML cannot be
      *                                   parsed because it does not validate against the scheme
      */
-    public function load($file, string $type = null)
+    public function load(mixed $file, string $type = null): RouteCollection
     {
         $path = $this->locator->locate($file);
 
@@ -102,7 +95,7 @@ class XmlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, string $type = null)
+    public function supports(mixed $resource, string $type = null): bool
     {
         return \is_string($resource) && 'xml' === pathinfo($resource, \PATHINFO_EXTENSION) && (!$type || 'xml' === $type);
     }
@@ -229,13 +222,11 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * @return \DOMDocument
-     *
      * @throws \InvalidArgumentException When loading of XML file fails because of syntax errors
      *                                   or when the XML structure is not as expected by the scheme -
      *                                   see validate()
      */
-    protected function loadFile(string $file)
+    protected function loadFile(string $file): \DOMDocument
     {
         return XmlUtils::loadFile($file, __DIR__.static::SCHEME_PATH);
     }
@@ -330,10 +321,8 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses the "default" elements.
-     *
-     * @return array|bool|float|int|string|null
      */
-    private function parseDefaultsConfig(\DOMElement $element, string $path)
+    private function parseDefaultsConfig(\DOMElement $element, string $path): array|bool|float|int|string|null
     {
         if ($this->isElementValueNull($element)) {
             return null;
@@ -363,11 +352,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Recursively parses the value of a "default" element.
      *
-     * @return array|bool|float|int|string|null
-     *
      * @throws \InvalidArgumentException when the XML is invalid
      */
-    private function parseDefaultNode(\DOMElement $node, string $path)
+    private function parseDefaultNode(\DOMElement $node, string $path): array|bool|float|int|string|null
     {
         if ($this->isElementValueNull($node)) {
             return null;

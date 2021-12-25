@@ -32,9 +32,9 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 {
-    private $tokenProvider;
-    private $tokenVerifier;
-    private $secret;
+    private TokenProviderInterface $tokenProvider;
+    private ?TokenVerifierInterface $tokenVerifier;
+    private string $secret;
 
     public function __construct(TokenProviderInterface $tokenProvider, string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null, TokenVerifierInterface $tokenVerifier = null)
     {
@@ -55,7 +55,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
     {
         $series = base64_encode(random_bytes(64));
         $tokenValue = $this->generateHash(base64_encode(random_bytes(64)));
-        $token = new PersistentToken(\get_class($user), method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), $series, $tokenValue, new \DateTime());
+        $token = new PersistentToken(\get_class($user), $user->getUserIdentifier(), $series, $tokenValue, new \DateTime());
 
         $this->tokenProvider->createNewToken($token);
         $this->createCookie(RememberMeDetails::fromPersistentToken($token, time() + $this->options['lifetime']));
@@ -91,9 +91,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         if ($persistentToken->getLastUsed()->getTimestamp() + 60 < time()) {
             $tokenValue = $this->generateHash(base64_encode(random_bytes(64)));
             $tokenLastUsed = new \DateTime();
-            if ($this->tokenVerifier) {
-                $this->tokenVerifier->updateExistingToken($persistentToken, $tokenValue, $tokenLastUsed);
-            }
+            $this->tokenVerifier?->updateExistingToken($persistentToken, $tokenValue, $tokenLastUsed);
             $this->tokenProvider->updateToken($series, $tokenValue, $tokenLastUsed);
         }
 

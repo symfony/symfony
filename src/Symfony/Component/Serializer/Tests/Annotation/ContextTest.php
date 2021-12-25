@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
@@ -23,7 +22,6 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
  */
 class ContextTest extends TestCase
 {
-    use ExpectDeprecationTrait;
     use VarDumperTestTrait;
 
     protected function setUp(): void
@@ -39,72 +37,12 @@ class ContextTest extends TestCase
         new Context();
     }
 
-    /**
-     * @group legacy
-     * @dataProvider provideTestThrowsOnEmptyContextLegacyData
-     */
-    public function testThrowsOnEmptyContextLegacy(callable $factory)
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('At least one of the "context", "normalizationContext", or "denormalizationContext" options of annotation "Symfony\Component\Serializer\Annotation\Context" must be provided as a non-empty array.');
-
-        $factory();
-    }
-
-    public function provideTestThrowsOnEmptyContextLegacyData(): iterable
-    {
-        yield 'doctrine-style: value option as empty array' => [function () { new Context(['value' => []]); }];
-        yield 'doctrine-style: context option as empty array' => [function () { new Context(['context' => []]); }];
-        yield 'doctrine-style: context option not provided' => [function () { new Context(['groups' => ['group_1']]); }];
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider provideTestThrowsOnNonArrayContextData
-     */
-    public function testThrowsOnNonArrayContext(array $options)
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Option "%s" of annotation "%s" must be an array.', key($options), Context::class));
-
-        new Context($options);
-    }
-
-    public function provideTestThrowsOnNonArrayContextData(): iterable
-    {
-        yield 'non-array context' => [['context' => 'not_an_array']];
-        yield 'non-array normalization context' => [['normalizationContext' => 'not_an_array']];
-        yield 'non-array denormalization context' => [['normalizationContext' => 'not_an_array']];
-    }
-
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidGroupOption()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Parameter "groups" of annotation "%s" must be a string or an array of strings. Got "stdClass"', Context::class));
 
-        new Context(...['context' => ['foo' => 'bar'], 'groups' => ['fine', new \stdClass()]]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testInvalidGroupOptionLegacy()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Parameter "groups" of annotation "%s" must be a string or an array of strings. Got "stdClass"', Context::class));
-
-        new Context(['context' => ['foo' => 'bar'], 'groups' => ['fine', new \stdClass()]]);
-    }
-
-    public function testInvalidGroupArgument()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Parameter "groups" of annotation "%s" must be a string or an array of strings. Got "stdClass"', Context::class));
-
-        new Context([], ['foo' => 'bar'], [], [], ['fine', new \stdClass()]);
+        new Context(context: ['foo' => 'bar'], groups: ['fine', new \stdClass()]);
     }
 
     public function testAsFirstArg()
@@ -119,7 +57,7 @@ class ContextTest extends TestCase
 
     public function testAsContextArg()
     {
-        $context = new Context([], ['foo' => 'bar']);
+        $context = new Context(context: ['foo' => 'bar']);
 
         self::assertSame(['foo' => 'bar'], $context->getContext());
         self::assertEmpty($context->getNormalizationContext());
@@ -128,7 +66,6 @@ class ContextTest extends TestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider provideValidInputs
      */
     public function testValidInputs(callable $factory, string $expectedDump)
@@ -139,164 +76,76 @@ class ContextTest extends TestCase
     public function provideValidInputs(): iterable
     {
         yield 'named arguments: with context option' => [
-            function () { return new Context(...['context' => ['foo' => 'bar']]); },
+            function () { return new Context(context: ['foo' => 'bar']); },
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {
+  -groups: []
   -context: [
     "foo" => "bar",
   ]
   -normalizationContext: []
   -denormalizationContext: []
-  -groups: []
 }
 DUMP
         ];
 
         yield 'named arguments: with normalization context option' => [
-            function () { return new Context(...['normalizationContext' => ['foo' => 'bar']]); },
+            function () { return new Context(normalizationContext: ['foo' => 'bar']); },
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {
+  -groups: []
   -context: []
   -normalizationContext: [
     "foo" => "bar",
   ]
   -denormalizationContext: []
-  -groups: []
 }
 DUMP
         ];
 
         yield 'named arguments: with denormalization context option' => [
-            function () { return new Context(...['denormalizationContext' => ['foo' => 'bar']]); },
+            function () { return new Context(denormalizationContext: ['foo' => 'bar']); },
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {
+  -groups: []
   -context: []
   -normalizationContext: []
   -denormalizationContext: [
     "foo" => "bar",
   ]
-  -groups: []
 }
 DUMP
         ];
 
         yield 'named arguments: with groups option as string' => [
-            function () { return new Context(...['context' => ['foo' => 'bar'], 'groups' => 'a']); },
+            function () { return new Context(context: ['foo' => 'bar'], groups: 'a'); },
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {
+  -groups: [
+    "a",
+  ]
   -context: [
     "foo" => "bar",
   ]
   -normalizationContext: []
   -denormalizationContext: []
-  -groups: [
-    "a",
-  ]
 }
 DUMP
         ];
 
         yield 'named arguemnts: with groups option as array' => [
-            function () { return new Context(...['context' => ['foo' => 'bar'], 'groups' => ['a', 'b']]); },
+            function () { return new Context(context: ['foo' => 'bar'], groups: ['a', 'b']); },
             <<<DUMP
 Symfony\Component\Serializer\Annotation\Context {
-  -context: [
-    "foo" => "bar",
-  ]
-  -normalizationContext: []
-  -denormalizationContext: []
   -groups: [
     "a",
     "b",
   ]
-}
-DUMP
-        ];
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider provideValidLegacyInputs
-     */
-    public function testValidLegacyInputs(callable $factory, string $expectedDump)
-    {
-        $this->expectDeprecation('Since symfony/serializer 5.3: Passing an array of properties as first argument to "Symfony\Component\Serializer\Annotation\Context::__construct" is deprecated. Use named arguments instead.');
-        $this->assertDumpEquals($expectedDump, $factory());
-    }
-
-    public function provideValidLegacyInputs(): iterable
-    {
-        yield 'doctrine-style: with context option' => [
-            function () { return new Context(['context' => ['foo' => 'bar']]); },
-            <<<DUMP
-Symfony\Component\Serializer\Annotation\Context {
   -context: [
     "foo" => "bar",
   ]
   -normalizationContext: []
   -denormalizationContext: []
-  -groups: []
-}
-DUMP
-        ];
-
-        yield 'doctrine-style: with normalization context option' => [
-            function () { return new Context(['normalizationContext' => ['foo' => 'bar']]); },
-            <<<DUMP
-Symfony\Component\Serializer\Annotation\Context {
-  -context: []
-  -normalizationContext: [
-    "foo" => "bar",
-  ]
-  -denormalizationContext: []
-  -groups: []
-}
-DUMP
-        ];
-
-        yield 'doctrine-style: with denormalization context option' => [
-            function () { return new Context(['denormalizationContext' => ['foo' => 'bar']]); },
-            <<<DUMP
-Symfony\Component\Serializer\Annotation\Context {
-  -context: []
-  -normalizationContext: []
-  -denormalizationContext: [
-    "foo" => "bar",
-  ]
-  -groups: []
-}
-DUMP
-        ];
-
-        yield 'doctrine-style: with groups option as string' => [
-            function () { return new Context(['context' => ['foo' => 'bar'], 'groups' => 'a']); },
-            <<<DUMP
-Symfony\Component\Serializer\Annotation\Context {
-  -context: [
-    "foo" => "bar",
-  ]
-  -normalizationContext: []
-  -denormalizationContext: []
-  -groups: [
-    "a",
-  ]
-}
-DUMP
-        ];
-
-        yield 'doctrine-style: with groups option as array' => [
-            function () { return new Context(['context' => ['foo' => 'bar'], 'groups' => ['a', 'b']]); },
-            <<<DUMP
-Symfony\Component\Serializer\Annotation\Context {
-  -context: [
-    "foo" => "bar",
-  ]
-  -normalizationContext: []
-  -denormalizationContext: []
-  -groups: [
-    "a",
-    "b",
-  ]
 }
 DUMP
         ];

@@ -70,4 +70,20 @@ class SecurityTest extends AbstractWebTestCase
         $client->request('GET', '/main/user_profile');
         $this->assertEquals('Welcome the-username!', $client->getResponse()->getContent());
     }
+
+    public function testLoginUserMultipleTimes()
+    {
+        $userFoo = new InMemoryUser('the-username', 'the-password', ['ROLE_FOO']);
+        $userBar = new InMemoryUser('no-role-username', 'the-password');
+        $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
+        $client->loginUser($userFoo);
+
+        $client->request('GET', '/main/user_profile');
+        $this->assertEquals('Welcome the-username!', $client->getResponse()->getContent());
+
+        $client->loginUser($userBar);
+
+        $client->request('GET', '/main/user_profile');
+        $this->assertEquals('Welcome no-role-username!', $client->getResponse()->getContent());
+    }
 }

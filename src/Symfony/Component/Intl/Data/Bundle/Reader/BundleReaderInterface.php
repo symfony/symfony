@@ -24,5 +24,5 @@ interface BundleReaderInterface
      * @return mixed returns an array or {@link \ArrayAccess} instance for
      *               complex data, a scalar value otherwise
      */
-    public function read(string $path, string $locale);
+    public function read(string $path, string $locale): mixed;
 }

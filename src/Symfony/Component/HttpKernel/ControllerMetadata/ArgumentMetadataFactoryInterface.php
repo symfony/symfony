@@ -19,9 +19,7 @@ namespace Symfony\Component\HttpKernel\ControllerMetadata;
 interface ArgumentMetadataFactoryInterface
 {
     /**
-     * @param string|object|array $controller The controller to resolve the arguments for
-     *
      * @return ArgumentMetadata[]
      */
-    public function createArgumentMetadata($controller);
+    public function createArgumentMetadata(string|object|array $controller): array;
 }

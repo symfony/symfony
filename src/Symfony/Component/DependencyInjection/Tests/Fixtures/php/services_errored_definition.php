@@ -70,8 +70,6 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
     public function getRemovedIds(): array
     {
         return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'configurator_service' => true,
             'configurator_service_simple' => true,
             'decorated.pif-pouf' => true,
@@ -381,7 +379,7 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
      */
     protected function getRuntimeErrorService()
     {
-        return $this->services['runtime_error'] = new \stdClass($this->throw('Service "errored_definition" is broken.'));
+        return $this->services['runtime_error'] = new \stdClass(throw new RuntimeException('Service "errored_definition" is broken.'));
     }
 
     /**
@@ -421,10 +419,7 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
         return new \SimpleFactoryClass('foo');
     }
 
-    /**
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|string|int|float|bool|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
@@ -475,10 +470,5 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
             'foo' => 'bar',
             'foo_bar' => 'foo_bar',
         ];
-    }
-
-    protected function throw($message)
-    {
-        throw new RuntimeException($message);
     }
 }

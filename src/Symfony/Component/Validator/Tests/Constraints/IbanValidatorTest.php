@@ -425,9 +425,6 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertViolationRaised($iban, Iban::INVALID_COUNTRY_CODE_ERROR);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testLoadFromAttribute()
     {
         $classMetadata = new ClassMetadata(IbanDummy::class);

@@ -20,8 +20,8 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class GoogleChatOptions implements MessageOptionsInterface
 {
-    private $threadKey;
-    private $options = [];
+    private ?string $threadKey = null;
+    private array $options = [];
 
     public function __construct(array $options = [])
     {
@@ -64,7 +64,7 @@ final class GoogleChatOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function card(array $card): self
+    public function card(array $card): static
     {
         $this->options['cards'][] = $card;
 
@@ -74,7 +74,7 @@ final class GoogleChatOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function text(string $text): self
+    public function text(string $text): static
     {
         $this->options['text'] = $text;
 
@@ -84,7 +84,7 @@ final class GoogleChatOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function setThreadKey(?string $threadKey): self
+    public function setThreadKey(?string $threadKey): static
     {
         $this->threadKey = $threadKey;
 

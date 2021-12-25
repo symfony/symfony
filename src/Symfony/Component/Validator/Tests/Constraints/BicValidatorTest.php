@@ -71,9 +71,6 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidComparisonToPropertyPathFromAttribute()
     {
         $classMetadata = new ClassMetadata(BicDummy::class);
@@ -116,9 +113,6 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidComparisonToValueFromAttribute()
     {
         $classMetadata = new ClassMetadata(BicDummy::class);
@@ -156,9 +150,6 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         ]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPathNamed()
     {
         $this->expectException(ConstraintDefinitionException::class);
@@ -228,12 +219,11 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getInvalidBics
      */
     public function testInvalidBicsNamed($bic, $code)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Bic(message: "myMessage");');
+        $constraint = new Bic(message: 'myMessage');
 
         $this->validator->validate($bic, $constraint);
 

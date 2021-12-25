@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\SmsBiuras\Tests;
 
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class SmsBiurasTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return SmsBiurasTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): SmsBiurasTransportFactory
     {
         return new SmsBiurasTransportFactory();
     }

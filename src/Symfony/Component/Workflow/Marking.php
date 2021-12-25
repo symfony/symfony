@@ -18,8 +18,8 @@ namespace Symfony\Component\Workflow;
  */
 class Marking
 {
-    private $places = [];
-    private $context = null;
+    private array $places = [];
+    private ?array $context = null;
 
     /**
      * @param int[] $representation Keys are the place name and values should be 1

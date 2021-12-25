@@ -21,10 +21,10 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class ExcludeDirectoryFilterIterator extends \FilterIterator implements \RecursiveIterator
 {
-    private $iterator;
-    private $isRecursive;
-    private $excludedDirs = [];
-    private $excludedPattern;
+    private \Iterator $iterator;
+    private bool $isRecursive;
+    private array $excludedDirs = [];
+    private ?string $excludedPattern = null;
 
     /**
      * @param \Iterator $iterator    The Iterator to filter
@@ -52,11 +52,8 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
 
     /**
      * Filters the iterator values.
-     *
-     * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function accept()
+    public function accept(): bool
     {
         if ($this->isRecursive && isset($this->excludedDirs[$this->getFilename()]) && $this->isDir()) {
             return false;
@@ -72,20 +69,12 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    #[\ReturnTypeWillChange]
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return $this->isRecursive && $this->iterator->hasChildren();
     }
 
-    /**
-     * @return self
-     */
-    #[\ReturnTypeWillChange]
-    public function getChildren()
+    public function getChildren(): self
     {
         $children = new self($this->iterator->getChildren(), []);
         $children->excludedDirs = $this->excludedDirs;

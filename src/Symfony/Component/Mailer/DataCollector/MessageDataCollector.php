@@ -22,7 +22,7 @@ use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
  */
 final class MessageDataCollector extends DataCollector
 {
-    private $events;
+    private MessageEvents $events;
 
     public function __construct(MessageLoggerListener $logger)
     {

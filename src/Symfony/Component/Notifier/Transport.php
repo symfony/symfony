@@ -30,7 +30,6 @@ use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransport;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
-use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
@@ -45,6 +44,7 @@ use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
@@ -60,10 +60,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 5.4
  */
-class Transport
+final class Transport
 {
     private const FACTORY_CLASSES = [
         AllMySmsTransportFactory::class,
@@ -85,7 +83,6 @@ class Transport
         MessageMediaTransportFactory::class,
         MicrosoftTeamsTransport::class,
         MobytTransportFactory::class,
-        NexmoTransportFactory::class,
         OctopushTransportFactory::class,
         OvhCloudTransportFactory::class,
         RocketChatTransportFactory::class,
@@ -100,11 +97,12 @@ class Transport
         TelnyxTransportFactory::class,
         TurboSmsTransportFactory::class,
         TwilioTransportFactory::class,
+        VonageTransportFactory::class,
         YunpianTransportFactory::class,
         ZulipTransportFactory::class,
     ];
 
-    private $factories;
+    private iterable $factories;
 
     public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
     {
@@ -121,7 +119,7 @@ class Transport
     }
 
     /**
-     * @param TransportFactoryInterface[] $factories
+     * @param iterable<mixed, TransportFactoryInterface> $factories
      */
     public function __construct(iterable $factories)
     {

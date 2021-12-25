@@ -19,7 +19,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 final class GitRepository
 {
-    private $path;
+    private string $path;
 
     public function __construct(string $path)
     {

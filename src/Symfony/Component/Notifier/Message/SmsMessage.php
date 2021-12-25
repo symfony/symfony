@@ -20,9 +20,9 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
  */
 final class SmsMessage implements MessageInterface
 {
-    private $transport;
-    private $subject;
-    private $phone;
+    private ?string $transport = null;
+    private string $subject;
+    private string $phone;
 
     public function __construct(string $phone, string $subject)
     {
@@ -42,7 +42,7 @@ final class SmsMessage implements MessageInterface
     /**
      * @return $this
      */
-    public function phone(string $phone): self
+    public function phone(string $phone): static
     {
         if ('' === $phone) {
             throw new InvalidArgumentException(sprintf('"%s" needs a phone number, it cannot be empty.', static::class));
@@ -66,7 +66,7 @@ final class SmsMessage implements MessageInterface
     /**
      * @return $this
      */
-    public function subject(string $subject): self
+    public function subject(string $subject): static
     {
         $this->subject = $subject;
 
@@ -81,7 +81,7 @@ final class SmsMessage implements MessageInterface
     /**
      * @return $this
      */
-    public function transport(?string $transport): self
+    public function transport(?string $transport): static
     {
         $this->transport = $transport;
 

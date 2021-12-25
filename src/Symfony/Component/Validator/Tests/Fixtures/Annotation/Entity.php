@@ -19,6 +19,9 @@ use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
  * @Symfony\Component\Validator\Tests\Fixtures\ConstraintA
  * @Assert\GroupSequence({"Foo", "Entity"})
  * @Assert\Callback({"Symfony\Component\Validator\Tests\Fixtures\CallbackClass", "callback"})
+ * @Assert\Sequentially({
+ *     @Assert\Expression("this.getFirstName() != null")
+ * })
  */
 class Entity extends EntityParent implements EntityInterfaceB
 {
@@ -120,10 +123,7 @@ class Entity extends EntityParent implements EntityInterfaceB
     {
     }
 
-    /**
-     * @return mixed
-     */
-    public function getChildA()
+    public function getChildA(): mixed
     {
         return $this->childA;
     }
@@ -136,10 +136,7 @@ class Entity extends EntityParent implements EntityInterfaceB
         $this->childA = $childA;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getChildB()
+    public function getChildB(): mixed
     {
         return $this->childB;
     }

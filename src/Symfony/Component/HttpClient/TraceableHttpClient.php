@@ -26,14 +26,15 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 final class TraceableHttpClient implements HttpClientInterface, ResetInterface, LoggerAwareInterface
 {
-    private $client;
-    private $tracedRequests = [];
-    private $stopwatch;
+    private HttpClientInterface $client;
+    private ?Stopwatch $stopwatch;
+    private \ArrayObject $tracedRequests;
 
     public function __construct(HttpClientInterface $client, Stopwatch $stopwatch = null)
     {
         $this->client = $client;
         $this->stopwatch = $stopwatch;
+        $this->tracedRequests = new \ArrayObject();
     }
 
     /**
@@ -65,18 +66,16 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
             }
         };
 
-        return new TraceableResponse($this->client, $this->client->request($method, $url, $options), $content, null === $this->stopwatch ? null : $this->stopwatch->start("$method $url", 'http_client'));
+        return new TraceableResponse($this->client, $this->client->request($method, $url, $options), $content, $this->stopwatch?->start("$method $url", 'http_client'));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof TraceableResponse) {
             $responses = [$responses];
-        } elseif (!is_iterable($responses)) {
-            throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of TraceableResponse objects, "%s" given.', __METHOD__, get_debug_type($responses)));
         }
 
         return new ResponseStream(TraceableResponse::stream($this->client, $responses, $timeout));
@@ -84,7 +83,7 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
 
     public function getTracedRequests(): array
     {
-        return $this->tracedRequests;
+        return $this->tracedRequests->getArrayCopy();
     }
 
     public function reset()
@@ -93,7 +92,7 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
             $this->client->reset();
         }
 
-        $this->tracedRequests = [];
+        $this->tracedRequests->exchangeArray([]);
     }
 
     /**
@@ -109,7 +108,7 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
     /**
      * {@inheritdoc}
      */
-    public function withOptions(array $options): self
+    public function withOptions(array $options): static
     {
         $clone = clone $this;
         $clone->client = $this->client->withOptions($options);

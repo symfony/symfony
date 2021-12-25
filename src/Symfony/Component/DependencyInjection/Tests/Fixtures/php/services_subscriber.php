@@ -48,8 +48,6 @@ class ProjectServiceContainer extends Container
             '.service_locator.t5IGRMW' => true,
             '.service_locator.zFfA7ng' => true,
             '.service_locator.zFfA7ng.foo_service' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
         ];
     }

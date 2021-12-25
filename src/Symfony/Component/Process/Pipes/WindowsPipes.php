@@ -35,7 +35,7 @@ class WindowsPipes extends AbstractPipes
     ];
     private $haveReadSupport;
 
-    public function __construct($input, bool $haveReadSupport)
+    public function __construct(mixed $input, bool $haveReadSupport)
     {
         $this->haveReadSupport = $haveReadSupport;
 

@@ -30,15 +30,15 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AnalyzeServiceReferencesPass extends AbstractRecursivePass
 {
-    private $graph;
-    private $currentDefinition;
-    private $onlyConstructorArguments;
-    private $hasProxyDumper;
-    private $lazy;
-    private $byConstructor;
-    private $byFactory;
-    private $definitions;
-    private $aliases;
+    private ServiceReferenceGraph $graph;
+    private ?Definition $currentDefinition = null;
+    private bool $onlyConstructorArguments;
+    private bool $hasProxyDumper;
+    private bool $lazy;
+    private bool $byConstructor;
+    private bool $byFactory;
+    private array $definitions;
+    private array $aliases;
 
     /**
      * @param bool $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
@@ -76,7 +76,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
         }
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         $lazy = $this->lazy;
         $inExpression = $this->inExpression();
@@ -98,7 +98,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
                 $targetId,
                 $targetDefinition,
                 $value,
-                $this->lazy || ($this->hasProxyDumper && $targetDefinition && $targetDefinition->isLazy()),
+                $this->lazy || ($this->hasProxyDumper && $targetDefinition?->isLazy()),
                 ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $value->getInvalidBehavior(),
                 $this->byConstructor
             );
@@ -110,7 +110,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
                     $targetId,
                     $targetDefinition,
                     $value,
-                    $this->lazy || ($targetDefinition && $targetDefinition->isLazy()),
+                    $this->lazy || $targetDefinition?->isLazy(),
                     true
                );
             }

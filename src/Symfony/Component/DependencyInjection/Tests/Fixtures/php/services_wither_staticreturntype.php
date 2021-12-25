@@ -39,8 +39,6 @@ class Symfony_DI_PhpDumper_Service_WitherStaticReturnType extends Container
     public function getRemovedIds(): array
     {
         return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Foo' => true,
         ];
     }

@@ -27,12 +27,9 @@ class AcceptHeader
     /**
      * @var AcceptHeaderItem[]
      */
-    private $items = [];
+    private array $items = [];
 
-    /**
-     * @var bool
-     */
-    private $sorted = true;
+    private bool $sorted = true;
 
     /**
      * @param AcceptHeaderItem[] $items
@@ -46,10 +43,8 @@ class AcceptHeader
 
     /**
      * Builds an AcceptHeader instance from a string.
-     *
-     * @return self
      */
-    public static function fromString(?string $headerValue)
+    public static function fromString(?string $headerValue): self
     {
         $index = 0;
 
@@ -68,30 +63,24 @@ class AcceptHeader
 
     /**
      * Returns header value's string representation.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return implode(',', $this->items);
     }
 
     /**
      * Tests if header has given value.
-     *
-     * @return bool
      */
-    public function has(string $value)
+    public function has(string $value): bool
     {
         return isset($this->items[$value]);
     }
 
     /**
      * Returns given value's item, if exists.
-     *
-     * @return AcceptHeaderItem|null
      */
-    public function get(string $value)
+    public function get(string $value): ?AcceptHeaderItem
     {
         return $this->items[$value] ?? $this->items[explode('/', $value)[0].'/*'] ?? $this->items['*/*'] ?? $this->items['*'] ?? null;
     }
@@ -101,7 +90,7 @@ class AcceptHeader
      *
      * @return $this
      */
-    public function add(AcceptHeaderItem $item)
+    public function add(AcceptHeaderItem $item): static
     {
         $this->items[$item->getValue()] = $item;
         $this->sorted = false;
@@ -114,7 +103,7 @@ class AcceptHeader
      *
      * @return AcceptHeaderItem[]
      */
-    public function all()
+    public function all(): array
     {
         $this->sort();
 
@@ -123,10 +112,8 @@ class AcceptHeader
 
     /**
      * Filters items on their value using given regex.
-     *
-     * @return self
      */
-    public function filter(string $pattern)
+    public function filter(string $pattern): self
     {
         return new self(array_filter($this->items, function (AcceptHeaderItem $item) use ($pattern) {
             return preg_match($pattern, $item->getValue());
@@ -135,10 +122,8 @@ class AcceptHeader
 
     /**
      * Returns first item.
-     *
-     * @return AcceptHeaderItem|null
      */
-    public function first()
+    public function first(): ?AcceptHeaderItem
     {
         $this->sort();
 

@@ -113,12 +113,11 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getInvalidCurrencies
      */
     public function testInvalidCurrenciesNamed($currency)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Currency(message: "myMessage");');
+        $constraint = new Currency(message: 'myMessage');
 
         $this->validator->validate($currency, $constraint);
 

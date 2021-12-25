@@ -25,8 +25,8 @@ use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
  */
 final class EmailMessage implements MessageInterface
 {
-    private $message;
-    private $envelope;
+    private RawMessage $message;
+    private ?Envelope $envelope;
 
     public function __construct(RawMessage $message, Envelope $envelope = null)
     {
@@ -75,7 +75,7 @@ final class EmailMessage implements MessageInterface
     /**
      * @return $this
      */
-    public function envelope(Envelope $envelope): self
+    public function envelope(Envelope $envelope): static
     {
         $this->envelope = $envelope;
 
@@ -100,7 +100,7 @@ final class EmailMessage implements MessageInterface
     /**
      * @return $this
      */
-    public function transport(?string $transport): self
+    public function transport(?string $transport): static
     {
         if (!$this->message instanceof Email) {
             throw new LogicException('Cannot set a Transport on a RawMessage instance.');

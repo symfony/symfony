@@ -43,8 +43,6 @@ class ProjectServiceContainer extends Container
     {
         return [
             '.service_locator.mtT6G8y' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo' => true,
         ];
     }

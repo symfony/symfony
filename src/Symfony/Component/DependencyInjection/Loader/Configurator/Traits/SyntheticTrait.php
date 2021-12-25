@@ -19,7 +19,7 @@ trait SyntheticTrait
      *
      * @return $this
      */
-    final public function synthetic(bool $synthetic = true): self
+    final public function synthetic(bool $synthetic = true): static
     {
         $this->definition->setSynthetic($synthetic);
 

@@ -35,12 +35,7 @@ class DateTime extends Constraint
     public $format = 'Y-m-d H:i:s';
     public $message = 'This value is not a valid datetime.';
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param string|array|null $format
-     */
-    public function __construct($format = null, string $message = null, array $groups = null, $payload = null, array $options = [])
+    public function __construct(string|array $format = null, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($format)) {
             $options = array_merge($format, $options);
@@ -53,7 +48,7 @@ class DateTime extends Constraint
         $this->message = $message ?? $this->message;
     }
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'format';
     }

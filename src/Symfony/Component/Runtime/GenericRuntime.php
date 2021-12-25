@@ -59,8 +59,8 @@ class GenericRuntime implements RuntimeInterface
      */
     public function __construct(array $options = [])
     {
-        $options['env_var_name'] ?? $options['env_var_name'] = 'APP_ENV';
-        $debugKey = $options['debug_var_name'] ?? $options['debug_var_name'] = 'APP_DEBUG';
+        $options['env_var_name'] ??= 'APP_ENV';
+        $debugKey = $options['debug_var_name'] ??= 'APP_DEBUG';
 
         $debug = $options['debug'] ?? $_SERVER[$debugKey] ?? $_ENV[$debugKey] ?? true;
 
@@ -149,10 +149,7 @@ class GenericRuntime implements RuntimeInterface
         return new ClosureRunner($application);
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getArgument(\ReflectionParameter $parameter, ?string $type)
+    protected function getArgument(\ReflectionParameter $parameter, ?string $type): mixed
     {
         if ('array' === $type) {
             switch ($parameter->name) {

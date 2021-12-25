@@ -45,7 +45,7 @@ class SubmitType extends AbstractType implements SubmitButtonTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ButtonType::class;
     }
@@ -53,7 +53,7 @@ class SubmitType extends AbstractType implements SubmitButtonTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'submit';
     }

@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\Discord;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Mathieu Piot <math.piot@gmail.com>
  */
 final class DiscordTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return DiscordTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): DiscordTransport
     {
         $scheme = $dsn->getScheme();
 

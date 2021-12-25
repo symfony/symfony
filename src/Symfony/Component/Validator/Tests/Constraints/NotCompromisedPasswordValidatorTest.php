@@ -106,10 +106,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function provideConstraintsWithThreshold(): iterable
     {
         yield 'Doctrine style' => [new NotCompromisedPassword(['threshold' => 10])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval('return new \Symfony\Component\Validator\Constraints\NotCompromisedPassword(threshold: 10);')];
-        }
+        yield 'named arguments' => [new NotCompromisedPassword(threshold: 10)];
     }
 
     public function testValidPassword()
@@ -196,10 +193,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function provideErrorSkippingConstraints(): iterable
     {
         yield 'Doctrine style' => [new NotCompromisedPassword(['skipOnError' => true])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval('return new \Symfony\Component\Validator\Constraints\NotCompromisedPassword(skipOnError: true);')];
-        }
+        yield 'named arguments' => [new NotCompromisedPassword(skipOnError: true)];
     }
 
     private function createHttpClientStub(): HttpClientInterface

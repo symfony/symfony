@@ -26,7 +26,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
     protected $registry;
 
-    private $cache = [];
+    private array $cache = [];
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -36,7 +36,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessType(string $class, string $property)
+    public function guessType(string $class, string $property): ?TypeGuess
     {
         if (!$ret = $this->getMetadata($class)) {
             return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TextType', [], Guess::LOW_CONFIDENCE);
@@ -94,7 +94,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessRequired(string $class, string $property)
+    public function guessRequired(string $class, string $property): ?ValueGuess
     {
         $classMetadatas = $this->getMetadata($class);
 
@@ -134,7 +134,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessMaxLength(string $class, string $property)
+    public function guessMaxLength(string $class, string $property): ?ValueGuess
     {
         $ret = $this->getMetadata($class);
         if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {
@@ -155,7 +155,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessPattern(string $class, string $property)
+    public function guessPattern(string $class, string $property): ?ValueGuess
     {
         $ret = $this->getMetadata($class);
         if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {

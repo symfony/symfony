@@ -59,9 +59,6 @@ CSV
         ], $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testDoubleQuotesAndSlashes()
     {
         $this->assertSame($csv = <<<'CSV'
@@ -74,9 +71,6 @@ CSV
         $this->assertSame($data, $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testSingleSlash()
     {
         $this->assertSame($csv = "0\n\\\n", $this->encoder->encode($data = ['\\'], 'csv'));

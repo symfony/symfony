@@ -21,48 +21,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HttpCodeActivationStrategyTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testExclusionsWithoutCodeLegacy()
-    {
-        $this->expectException(\LogicException::class);
-        new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], Logger::WARNING);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testExclusionsWithoutUrlsLegacy()
-    {
-        $this->expectException(\LogicException::class);
-        new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], Logger::WARNING);
-    }
-
-    /**
-     * @dataProvider isActivatedProvider
-     *
-     * @group legacy
-     */
-    public function testIsActivatedLegacy($url, $record, $expected)
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push(Request::create($url));
-
-        $strategy = new HttpCodeActivationStrategy(
-            $requestStack,
-            [
-                ['code' => 403, 'urls' => []],
-                ['code' => 404, 'urls' => []],
-                ['code' => 405, 'urls' => []],
-                ['code' => 400, 'urls' => ['^/400/a', '^/400/b']],
-            ],
-            Logger::WARNING
-        );
-
-        self::assertEquals($expected, $strategy->isHandlerActivated($record));
-    }
-
     public function testExclusionsWithoutCode()
     {
         $this->expectException(\LogicException::class);

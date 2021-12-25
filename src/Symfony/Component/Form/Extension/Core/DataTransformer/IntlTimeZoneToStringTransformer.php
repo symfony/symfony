@@ -21,7 +21,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class IntlTimeZoneToStringTransformer implements DataTransformerInterface
 {
-    private $multiple;
+    private bool $multiple;
 
     public function __construct(bool $multiple = false)
     {
@@ -31,7 +31,7 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($intlTimeZone)
+    public function transform(mixed $intlTimeZone): mixed
     {
         if (null === $intlTimeZone) {
             return null;
@@ -55,10 +55,10 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         if (null === $value) {
-            return;
+            return null;
         }
 
         if ($this->multiple) {

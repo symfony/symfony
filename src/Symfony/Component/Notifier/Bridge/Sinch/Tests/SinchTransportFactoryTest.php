@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Sinch\Tests;
 
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class SinchTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return SinchTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): SinchTransportFactory
     {
         return new SinchTransportFactory();
     }

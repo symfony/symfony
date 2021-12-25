@@ -43,9 +43,6 @@ class UrlTest extends TestCase
         new Url(['normalizer' => new \stdClass()]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(UrlDummy::class);

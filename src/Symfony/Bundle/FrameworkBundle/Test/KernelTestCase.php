@@ -33,16 +33,9 @@ abstract class KernelTestCase extends TestCase
      */
     protected static $kernel;
 
-    /**
-     * @var ContainerInterface
-     *
-     * @deprecated since Symfony 5.3, use static::getContainer() instead
-     */
-    protected static $container;
-
     protected static $booted = false;
 
-    private static $kernelContainer;
+    private static ?ContainerInterface $kernelContainer = null;
 
     protected function tearDown(): void
     {
@@ -52,12 +45,10 @@ abstract class KernelTestCase extends TestCase
     }
 
     /**
-     * @return string
-     *
      * @throws \RuntimeException
      * @throws \LogicException
      */
-    protected static function getKernelClass()
+    protected static function getKernelClass(): string
     {
         if (!isset($_SERVER['KERNEL_CLASS']) && !isset($_ENV['KERNEL_CLASS'])) {
             throw new \LogicException(sprintf('You must set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel in phpunit.xml / phpunit.xml.dist or override the "%1$s::createKernel()" or "%1$s::getKernelClass()" method.', static::class));
@@ -72,10 +63,8 @@ abstract class KernelTestCase extends TestCase
 
     /**
      * Boots the Kernel for this test.
-     *
-     * @return KernelInterface
      */
-    protected static function bootKernel(array $options = [])
+    protected static function bootKernel(array $options = []): KernelInterface
     {
         static::ensureKernelShutdown();
 
@@ -83,8 +72,7 @@ abstract class KernelTestCase extends TestCase
         static::$kernel->boot();
         static::$booted = true;
 
-        self::$kernelContainer = $container = static::$kernel->getContainer();
-        static::$container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
+        self::$kernelContainer = static::$kernel->getContainer();
 
         return static::$kernel;
     }
@@ -96,6 +84,8 @@ abstract class KernelTestCase extends TestCase
      * used by other services.
      *
      * Using this method is the best way to get a container from your test code.
+     *
+     * @return TestContainer
      */
     protected static function getContainer(): ContainerInterface
     {
@@ -117,10 +107,8 @@ abstract class KernelTestCase extends TestCase
      *
      *  * environment
      *  * debug
-     *
-     * @return KernelInterface
      */
-    protected static function createKernel(array $options = [])
+    protected static function createKernel(array $options = []): KernelInterface
     {
         if (null === static::$class) {
             static::$class = static::getKernelClass();
@@ -163,6 +151,6 @@ abstract class KernelTestCase extends TestCase
             self::$kernelContainer->reset();
         }
 
-        static::$container = self::$kernelContainer = null;
+        self::$kernelContainer = null;
     }
 }

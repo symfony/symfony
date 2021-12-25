@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Command;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -22,12 +23,10 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
+#[AsCommand(name: 'messenger:stop-workers', description: 'Stop workers after their current message')]
 class StopWorkersCommand extends Command
 {
-    protected static $defaultName = 'messenger:stop-workers';
-    protected static $defaultDescription = 'Stop workers after their current message';
-
-    private $restartSignalCachePool;
+    private CacheItemPoolInterface $restartSignalCachePool;
 
     public function __construct(CacheItemPoolInterface $restartSignalCachePool)
     {
@@ -43,7 +42,6 @@ class StopWorkersCommand extends Command
     {
         $this
             ->setDefinition([])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command sends a signal to stop any <info>messenger:consume</info> processes that are running.
 
@@ -60,7 +58,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 

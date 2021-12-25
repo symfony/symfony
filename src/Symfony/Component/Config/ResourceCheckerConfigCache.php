@@ -23,15 +23,12 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class ResourceCheckerConfigCache implements ConfigCacheInterface
 {
-    /**
-     * @var string
-     */
-    private $file;
+    private string $file;
 
     /**
      * @var iterable<mixed, ResourceCheckerInterface>
      */
-    private $resourceCheckers;
+    private iterable $resourceCheckers;
 
     /**
      * @param string                                    $file             The absolute cache path
@@ -46,7 +43,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     /**
      * {@inheritdoc}
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->file;
     }
@@ -59,10 +56,8 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      *
      * The first ResourceChecker that supports a given resource is considered authoritative.
      * Resources with no matching ResourceChecker will silently be ignored and considered fresh.
-     *
-     * @return bool
      */
-    public function isFresh()
+    public function isFresh(): bool
     {
         if (!is_file($this->file)) {
             return false;

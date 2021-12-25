@@ -43,9 +43,6 @@ class IpTest extends TestCase
         new Ip(['normalizer' => new \stdClass()]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(IpDummy::class);

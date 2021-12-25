@@ -29,11 +29,11 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    private $store;
-    private $key;
-    private $ttl;
-    private $autoRelease;
-    private $dirty = false;
+    private PersistingStoreInterface $store;
+    private Key $key;
+    private ?float $ttl;
+    private bool $autoRelease;
+    private bool $dirty = false;
 
     /**
      * @param float|null $ttl         Maximum expected lock duration in seconds

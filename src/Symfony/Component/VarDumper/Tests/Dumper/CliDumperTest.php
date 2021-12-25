@@ -198,28 +198,6 @@ EOTXT;
         yield [$expected, CliDumper::DUMP_TRAILING_COMMA];
     }
 
-    /**
-     * @requires extension xml
-     * @requires PHP < 8.0
-     */
-    public function testXmlResource()
-    {
-        $var = xml_parser_create();
-
-        $this->assertDumpMatchesFormat(
-            <<<'EOTXT'
-xml resource {
-  current_byte_index: %i
-  current_column_number: %i
-  current_line_number: 1
-  error_code: XML_ERROR_NONE
-}
-EOTXT
-            ,
-            $var
-        );
-    }
-
     public function testJsonCast()
     {
         $var = (array) json_decode('{"0":{},"1":null}');

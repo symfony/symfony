@@ -14,14 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\OvhCloud;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Thomas Ferney <thomas.ferney@gmail.com>
  */
 final class OvhCloudTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): OvhCloudTransport
     {
         $scheme = $dsn->getScheme();
 

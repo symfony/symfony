@@ -2,7 +2,6 @@
 
 $container->loadFromExtension('framework', [
     'messenger' => [
-        'reset_on_message' =>  true,
         'transports' => [
             'transport_1' => [
                 'dsn' => 'null://',

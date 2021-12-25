@@ -20,17 +20,11 @@ interface RequestHandlerInterface
 {
     /**
      * Submits a form if it was submitted.
-     *
-     * @param mixed $request The current request
      */
-    public function handleRequest(FormInterface $form, $request = null);
+    public function handleRequest(FormInterface $form, mixed $request = null);
 
     /**
      * Returns true if the given data is a file upload.
-     *
-     * @param mixed $data The form field data
-     *
-     * @return bool
      */
-    public function isFileUpload($data);
+    public function isFileUpload(mixed $data): bool;
 }

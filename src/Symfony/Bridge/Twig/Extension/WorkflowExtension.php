@@ -25,7 +25,7 @@ use Twig\TwigFunction;
  */
 final class WorkflowExtension extends AbstractExtension
 {
-    private $workflowRegistry;
+    private Registry $workflowRegistry;
 
     public function __construct(Registry $workflowRegistry)
     {
@@ -102,7 +102,7 @@ final class WorkflowExtension extends AbstractExtension
      *                                                Use a string (the place name) to get place metadata
      *                                                Use a Transition instance to get transition metadata
      */
-    public function getMetadata(object $subject, string $key, $metadataSubject = null, string $name = null)
+    public function getMetadata(object $subject, string $key, string|Transition $metadataSubject = null, string $name = null)
     {
         return $this
             ->workflowRegistry

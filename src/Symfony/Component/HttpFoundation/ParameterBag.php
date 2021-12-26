@@ -135,8 +135,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the parameter value converted to string.
-     *
-     * @return string
      */
     public function getString(string $key, string $default = ''): string
     {

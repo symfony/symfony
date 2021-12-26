@@ -42,7 +42,7 @@ class RedisSender implements SenderInterface
         $delayStamp = $envelope->last(DelayStamp::class);
         $delayInMs = null !== $delayStamp ? $delayStamp->getDelay() : 0;
 
-        $this->connection->add($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delayInMs);
+        $this->connection->add($encodedMessage['body'], $encodedMessage['headers'] ?? [], (float) $delayInMs);
 
         return $envelope;
     }

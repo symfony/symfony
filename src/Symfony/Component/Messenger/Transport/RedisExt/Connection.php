@@ -248,7 +248,7 @@ class Connection
         }
     }
 
-    public function add(string $body, array $headers, int $delayInMs = 0): void
+    public function add(string $body, array $headers, float $delayInMs = 0): void
     {
         if ($this->autoSetup) {
             $this->setup();
@@ -267,7 +267,7 @@ class Connection
                     throw new TransportException(json_last_error_msg());
                 }
 
-                $score = $this->getCurrentTimeInMilliseconds() + $delayInMs;
+                $score = $this->getCurrentTimeInMilliseconds() + (float) $delayInMs;
                 $added = $this->connection->zadd($this->queue, ['NX'], $score, $message);
             } else {
                 $message = json_encode([
@@ -316,9 +316,9 @@ class Connection
         $this->autoSetup = false;
     }
 
-    private function getCurrentTimeInMilliseconds(): int
+    private function getCurrentTimeInMilliseconds(): float
     {
-        return (int) (microtime(true) * 1000);
+        return microtime(true) * (float) 1000;
     }
 
     public function cleanup(): void

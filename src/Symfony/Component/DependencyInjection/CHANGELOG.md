@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-6.1
----
-
- * Add method `getString` to `ParameterBag`
- 
 6.0
 ---
 

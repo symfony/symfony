@@ -70,17 +70,17 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
 
         yield [
             new Dsn('sendgrid', 'default', self::USER),
-            new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
+            new SendgridSmtpTransport(self::USER, 465, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('sendgrid+smtp', 'default', self::USER),
-            new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
+            new SendgridSmtpTransport(self::USER, 465, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('sendgrid+smtps', 'default', self::USER),
-            new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
+            new SendgridSmtpTransport(self::USER, 465, $dispatcher, $logger),
         ];
     }
 

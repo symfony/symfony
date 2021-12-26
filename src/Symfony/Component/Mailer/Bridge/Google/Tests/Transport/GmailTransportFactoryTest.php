@@ -42,17 +42,17 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('gmail', 'default', self::USER, self::PASSWORD),
-            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, 465, $this->getDispatcher(), $this->getLogger()),
         ];
 
         yield [
             new Dsn('gmail+smtp', 'default', self::USER, self::PASSWORD),
-            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, 465, $this->getDispatcher(), $this->getLogger()),
         ];
 
         yield [
             new Dsn('gmail+smtps', 'default', self::USER, self::PASSWORD),
-            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, 465, $this->getDispatcher(), $this->getLogger()),
         ];
     }
 

@@ -97,6 +97,20 @@ class CompletionInputTest extends TestCase
         yield [CompletionInput::fromTokens(['bin/console', 'symfony', 'sen'], 2), 'sen'];
     }
 
+    public function testBindArgumentWithDefault()
+    {
+        $definition = new InputDefinition([
+            new InputArgument('arg-with-default', InputArgument::OPTIONAL, '', 'default'),
+        ]);
+
+        $input = CompletionInput::fromTokens(['bin/console'], 1);
+        $input->bind($definition);
+
+        $this->assertEquals(CompletionInput::TYPE_ARGUMENT_VALUE, $input->getCompletionType(), 'Unexpected type');
+        $this->assertEquals('arg-with-default', $input->getCompletionName(), 'Unexpected name');
+        $this->assertEquals('', $input->getCompletionValue(), 'Unexpected value');
+    }
+
     /**
      * @dataProvider provideFromStringData
      */

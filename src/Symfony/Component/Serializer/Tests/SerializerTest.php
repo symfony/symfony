@@ -1078,7 +1078,7 @@ class SerializerTest extends TestCase
             $this->assertSame('array', $error->getCurrentType());
             $this->assertSame(['bool'], $error->getExpectedTypes());
             $this->assertSame('bool', $error->getPath());
-            $this->assertSame(false, $error->canUseMessageForUser());
+            $this->assertFalse($error->canUseMessageForUser());
             $this->assertSame('The type of the "bool" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php80WithPromotedTypedConstructor" must be one of "bool" ("array" given).', $error->getMessage());
 
             return;

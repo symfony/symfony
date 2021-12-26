@@ -1069,35 +1069,22 @@ class SerializerTest extends TestCase
             ]);
 
             $this->fail();
-        } catch (\Throwable $th) {
-            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        } catch (PartialDenormalizationException $e) {
+            $this->assertInstanceOf(Php80WithPromotedTypedConstructor::class, $e->getData());
+            $this->assertCount(1, $e->getErrors());
+
+            $error = $e->getErrors()[0];
+            $this->assertInstanceOf(NotNormalizableValueException::class, $error);
+            $this->assertSame('array', $error->getCurrentType());
+            $this->assertSame(['bool'], $error->getExpectedTypes());
+            $this->assertSame('bool', $error->getPath());
+            $this->assertSame(false, $error->canUseMessageForUser());
+            $this->assertSame('The type of the "bool" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php80WithPromotedTypedConstructor" must be one of "bool" ("array" given).', $error->getMessage());
+
+            return;
         }
 
-        $this->assertInstanceOf(Php80WithPromotedTypedConstructor::class, $th->getData());
-
-        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
-            return [
-                'currentType' => $e->getCurrentType(),
-                'expectedTypes' => $e->getExpectedTypes(),
-                'path' => $e->getPath(),
-                'useMessageForUser' => $e->canUseMessageForUser(),
-                'message' => $e->getMessage(),
-            ];
-        }, $th->getErrors());
-
-        $expected = [
-            [
-                'currentType' => 'array',
-                'expectedTypes' => [
-                    'bool',
-                ],
-                'path' => 'bool',
-                'useMessageForUser' => false,
-                'message' => 'The type of the "bool" attribute for class "Symfony\\Component\\Serializer\\Tests\\Fixtures\\Php80WithPromotedTypedConstructor" must be one of "bool" ("array" given).',
-            ],
-        ];
-
-        $this->assertSame($expected, $exceptionsAsArray);
+        $this->fail();
     }
 }
 

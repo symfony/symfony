@@ -62,81 +62,20 @@ class TagAwareAdapterTest extends AdapterTestCase
         $item->tag(['baz']);
         $item->expiresAfter(100);
 
-        $tag = $tagsPool->getItem('baz'.TagAwareAdapter::TAGS_PREFIX);
-        $tagsPool->save($tag->set(10));
-
         $pool->save($item);
         $this->assertTrue($pool->getItem('foo')->isHit());
-        $this->assertTrue($pool->getItem('foo')->isHit());
 
-        sleep(20);
+        $tagsPool->deleteItem('#baz');
 
         $this->assertTrue($pool->getItem('foo')->isHit());
 
         sleep(5);
 
         $this->assertTrue($pool->getItem('foo')->isHit());
-    }
 
-    public function testTagEntryIsCreatedForItemWithoutTags()
-    {
-        $pool = $this->createCachePool();
+        sleep(20);
 
-        $itemKey = 'foo';
-        $item = $pool->getItem($itemKey);
-        $pool->save($item);
-
-        $adapter = new FilesystemAdapter();
-        $this->assertTrue($adapter->hasItem(TagAwareAdapter::TAGS_PREFIX.$itemKey));
-    }
-
-    public function testHasItemReturnsFalseWhenPoolDoesNotHaveItemTags()
-    {
-        $pool = $this->createCachePool();
-
-        $itemKey = 'foo';
-        $item = $pool->getItem($itemKey);
-        $pool->save($item);
-
-        $anotherPool = $this->createCachePool();
-
-        $adapter = new FilesystemAdapter();
-        $adapter->deleteItem(TagAwareAdapter::TAGS_PREFIX.$itemKey); //simulate item losing tags pair
-
-        $this->assertFalse($anotherPool->hasItem($itemKey));
-    }
-
-    public function testGetItemReturnsCacheMissWhenPoolDoesNotHaveItemTags()
-    {
-        $pool = $this->createCachePool();
-
-        $itemKey = 'foo';
-        $item = $pool->getItem($itemKey);
-        $pool->save($item);
-
-        $anotherPool = $this->createCachePool();
-
-        $adapter = new FilesystemAdapter();
-        $adapter->deleteItem(TagAwareAdapter::TAGS_PREFIX.$itemKey); //simulate item losing tags pair
-
-        $item = $anotherPool->getItem($itemKey);
-        $this->assertFalse($item->isHit());
-    }
-
-    public function testHasItemReturnsFalseWhenPoolDoesNotHaveItemAndOnlyHasTags()
-    {
-        $pool = $this->createCachePool();
-
-        $itemKey = 'foo';
-        $item = $pool->getItem($itemKey);
-        $pool->save($item);
-
-        $anotherPool = $this->createCachePool();
-
-        $adapter = new FilesystemAdapter();
-        $adapter->deleteItem($itemKey); //simulate losing item but keeping tags
-
-        $this->assertFalse($anotherPool->hasItem($itemKey));
+        $this->assertFalse($pool->getItem('foo')->isHit());
     }
 
     public function testInvalidateTagsWithArrayAdapter()
@@ -158,21 +97,65 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($adapter->getItem('foo')->isHit());
     }
 
-    public function testGetItemReturnsCacheMissWhenPoolDoesNotHaveItemAndOnlyHasTags()
+    /**
+     * @dataProvider providePackedItemValue
+     */
+    public function testUnpackCacheItem($packedItemValue, $isValid, $value)
     {
         $pool = $this->createCachePool();
-
         $itemKey = 'foo';
-        $item = $pool->getItem($itemKey);
-        $pool->save($item);
-
-        $anotherPool = $this->createCachePool();
 
         $adapter = new FilesystemAdapter();
-        $adapter->deleteItem($itemKey); //simulate losing item but keeping tags
+        $item = $adapter->getItem('$'.$itemKey);
+        $adapter->save($item->set($packedItemValue));
 
-        $item = $anotherPool->getItem($itemKey);
-        $this->assertFalse($item->isHit());
+        $item = $pool->getItem($itemKey);
+        $this->assertSame($isValid, $item->isHit());
+        $this->assertEquals($value, $item->get());
+
+        foreach ($pool->getItems([$itemKey]) as $item) {
+            $this->assertSame($isValid, $item->isHit());
+            $this->assertEquals($value, $item->get());
+        }
+    }
+
+    public function providePackedItemValue()
+    {
+        return [
+            // missed fields
+            [[], false, null],
+            [['$' => ''], false, null],
+            [['#' => []], false, null],
+            [['$' => '', '^' => ''], false, null],
+            [['#' => [], '^' => ''], false, null],
+            // extra fields
+            [[null, '$' => '', '#' => []], false, null],
+            [['$' => '', '#' => [], '' => ''], false, null],
+            // wrong order of fields
+            [['#' => [], '$' => ''], false, null],
+            [['$' => '$', '^' => '', '#' => []], false, null],
+            [['^' => '', '$' => '', '#' => []], false, null],
+            // bad types
+            [null, false, null],
+            [serialize(['$' => '$', '#' => []]), false, null],
+            [(object) ['$' => '$', '#' => []], false, null],
+            [['$' => '', '#' => ''], false, null],
+            [['$' => '', '#' => null], false, null],
+            [['$' => '', '#' => new \stdClass()], false, null],
+            [['$' => '', '#' => [], '^' => []], false, null],
+            [['$' => '', '#' => [], '^' => null], false, null],
+            [['$' => '', '#' => [], '^' => new \stdClass()], false, null],
+            // good items
+            [['$' => 0, '#' => []], true, 0],
+            [['$' => '0', '#' => []], true, '0'],
+            [['$' => [''], '#' => []], true, ['']],
+            [['$' => (object) ['$' => '$'], '#' => []], true, (object) ['$' => '$']],
+            [['$' => null, '#' => []], true, null],
+            [['$' => null, '#' => [], '^' => ''], true, null],
+            [['$' => '1', '#' => [], '^' => ''], true, '1'],
+            [['$' => [[0]], '#' => [], '^' => ''], true, [[0]]],
+            [['$' => serialize((object) ['$' => '$']), '#' => [], '^' => ''], true, serialize((object) ['$' => '$'])],
+        ];
     }
 
     private function getPruneableMock(): PruneableInterface&MockObject

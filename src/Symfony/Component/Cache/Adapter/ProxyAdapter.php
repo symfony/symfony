@@ -83,11 +83,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
              * @param array $item A CacheItem cast to (array); accessing protected properties requires adding the "\0*\0" PHP prefix
              */
             static function (CacheItemInterface $innerItem, array $item) {
-                // Tags are stored separately, no need to account for them when considering this item's newly set metadata
-                if (isset(($metadata = $item["\0*\0newMetadata"])[CacheItem::METADATA_TAGS])) {
-                    unset($metadata[CacheItem::METADATA_TAGS]);
-                }
-                if ($metadata) {
+                if ($metadata = $item["\0*\0newMetadata"]) {
                     // For compactness, expiry and creation duration are packed in the key of an array, using magic numbers as separators
                     $item["\0*\0value"] = ["\x9D".pack('VN', (int) (0.1 + $metadata[self::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET), $metadata[self::METADATA_CTIME])."\x5F" => $item["\0*\0value"]];
                 }

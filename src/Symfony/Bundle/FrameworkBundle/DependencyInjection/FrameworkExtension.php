@@ -73,6 +73,9 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
@@ -530,6 +533,14 @@ class FrameworkExtension extends Extension
 
         // profiler depends on form, validation, translation, messenger, mailer, http-client, notifier, serializer being registered
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
+
+        if ($this->isConfigEnabled($container, $config['html_sanitizer'])) {
+            if (!class_exists(HtmlSanitizerConfig::class)) {
+                throw new LogicException('HtmlSanitizer support cannot be enabled as the HtmlSanitizer component is not installed. Try running "composer require symfony/html-sanitizer".');
+            }
+
+            $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
+        }
 
         $this->addAnnotatedClassesToCompile([
             '**\\Controller\\',
@@ -2657,6 +2668,81 @@ class FrameworkExtension extends Extension
         if (!class_exists(UidValueResolver::class)) {
             $container->removeDefinition('argument_resolver.uid');
         }
+    }
+
+    private function registerHtmlSanitizerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    {
+        $loader->load('html_sanitizer.php');
+
+        foreach ($config['sanitizers'] as $sanitizerName => $sanitizerConfig) {
+            $configId = 'html_sanitizer.config.'.$sanitizerName;
+            $def = $container->register($configId, HtmlSanitizerConfig::class);
+
+            // Base
+            if ($sanitizerConfig['allow_safe_elements']) {
+                $def->addMethodCall('allowSafeElements', [], true);
+            }
+
+            if ($sanitizerConfig['allow_all_static_elements']) {
+                $def->addMethodCall('allowAllStaticElements', [], true);
+            }
+
+            // Configures elements
+            foreach ($sanitizerConfig['allow_elements'] as $element => $attributes) {
+                $def->addMethodCall('allowElement', [$element, $attributes], true);
+            }
+
+            foreach ($sanitizerConfig['block_elements'] as $element) {
+                $def->addMethodCall('blockElement', [$element], true);
+            }
+
+            foreach ($sanitizerConfig['drop_elements'] as $element) {
+                $def->addMethodCall('dropElement', [$element], true);
+            }
+
+            // Configures attributes
+            foreach ($sanitizerConfig['allow_attributes'] as $attribute => $elements) {
+                $def->addMethodCall('allowAttribute', [$attribute, $elements], true);
+            }
+
+            foreach ($sanitizerConfig['drop_attributes'] as $attribute => $elements) {
+                $def->addMethodCall('dropAttribute', [$attribute, $elements], true);
+            }
+
+            // Force attributes
+            foreach ($sanitizerConfig['force_attributes'] as $element => $attributes) {
+                foreach ($attributes as $attrName => $attrValue) {
+                    $def->addMethodCall('forceAttribute', [$element, $attrName, $attrValue], true);
+                }
+            }
+
+            // Settings
+            $def->addMethodCall('forceHttpsUrls', [$sanitizerConfig['force_https_urls']], true);
+            $def->addMethodCall('allowLinkSchemes', [$sanitizerConfig['allowed_link_schemes']], true);
+            $def->addMethodCall('allowLinkHosts', [$sanitizerConfig['allowed_link_hosts']], true);
+            $def->addMethodCall('allowRelativeLinks', [$sanitizerConfig['allow_relative_links']], true);
+            $def->addMethodCall('allowMediaSchemes', [$sanitizerConfig['allowed_media_schemes']], true);
+            $def->addMethodCall('allowMediaHosts', [$sanitizerConfig['allowed_media_hosts']], true);
+            $def->addMethodCall('allowRelativeMedias', [$sanitizerConfig['allow_relative_medias']], true);
+
+            // Custom attribute sanitizers
+            foreach ($sanitizerConfig['with_attribute_sanitizers'] as $serviceName) {
+                $def->addMethodCall('withAttributeSanitizer', [new Reference($serviceName)], true);
+            }
+
+            foreach ($sanitizerConfig['without_attribute_sanitizers'] as $serviceName) {
+                $def->addMethodCall('withoutAttributeSanitizer', [new Reference($serviceName)], true);
+            }
+
+            // Create the sanitizer and link its config
+            $sanitizerId = 'html_sanitizer.sanitizer.'.$sanitizerName;
+            $container->register($sanitizerId, HtmlSanitizer::class)->addArgument(new Reference($configId));
+
+            $container->registerAliasForArgument($sanitizerId, HtmlSanitizerInterface::class, $sanitizerName);
+        }
+
+        $default = $config['default'] ? 'html_sanitizer.sanitizer.'.$config['default'] : 'html_sanitizer';
+        $container->setAlias(HtmlSanitizerInterface::class, new Reference($default));
     }
 
     private function resolveTrustedHeaders(array $headers): int

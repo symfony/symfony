@@ -47,6 +47,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
@@ -2025,6 +2028,111 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf(TaggedIteratorArgument::class, $switcherDef->getArgument(1));
         $this->assertSame('kernel.locale_aware', $switcherDef->getArgument(1)->getTag());
         $this->assertEquals(new Reference('router.request_context', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $switcherDef->getArgument(2));
+    }
+
+    public function testHtmlSanitizerDefault()
+    {
+        $container = $this->createContainerFromFile('html_sanitizer_default');
+
+        // html_sanitizer service
+        $this->assertTrue($container->hasDefinition('html_sanitizer'), '->registerHtmlSanitizerConfiguration() loads html_sanitizer.php');
+        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer')->getClass());
+        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer')->getArguments());
+        $this->assertSame('html_sanitizer.config', (string) $args[0]);
+
+        // html_sanitizer.config service
+        $this->assertTrue($container->hasDefinition('html_sanitizer.config'), '->registerHtmlSanitizerConfiguration() loads html_sanitizer.php');
+        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config')->getClass());
+        $this->assertCount(1, $calls = $container->getDefinition('html_sanitizer.config')->getMethodCalls());
+        $this->assertSame(['allowSafeElements', []], $calls[0]);
+
+        // Default alias
+        $this->assertSame(
+            'html_sanitizer',
+            (string) $container->getAlias(HtmlSanitizerInterface::class),
+            '->registerHtmlSanitizerConfiguration() creates appropriate default alias'
+        );
+    }
+
+    public function testHtmlSanitizerFull()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        // html_sanitizer service
+        $this->assertTrue($container->hasDefinition('html_sanitizer'), '->registerHtmlSanitizerConfiguration() loads html_sanitizer.php');
+        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer')->getClass());
+        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer')->getArguments());
+        $this->assertSame('html_sanitizer.config', (string) $args[0]);
+
+        // html_sanitizer.config service
+        $this->assertTrue($container->hasDefinition('html_sanitizer.config'), '->registerHtmlSanitizerConfiguration() loads html_sanitizer.php');
+        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config')->getClass());
+        $this->assertCount(1, $calls = $container->getDefinition('html_sanitizer.config')->getMethodCalls());
+        $this->assertSame(['allowSafeElements', []], $calls[0]);
+
+        // my.sanitizer
+        $this->assertTrue($container->hasDefinition('html_sanitizer.sanitizer.my.sanitizer'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
+        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer.sanitizer.my.sanitizer')->getClass());
+        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer.sanitizer.my.sanitizer')->getArguments());
+        $this->assertSame('html_sanitizer.config.my.sanitizer', (string) $args[0]);
+
+        // my.sanitizer config
+        $this->assertTrue($container->hasDefinition('html_sanitizer.config.my.sanitizer'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
+        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config.my.sanitizer')->getClass());
+        $this->assertCount(23, $calls = $container->getDefinition('html_sanitizer.config.my.sanitizer')->getMethodCalls());
+        $this->assertSame(
+            [
+                ['allowSafeElements', [], true],
+                ['allowAllStaticElements', [], true],
+                ['allowElement', ['custom-tag-1', ['data-attr-1']], true],
+                ['allowElement', ['custom-tag-2', []], true],
+                ['allowElement', ['custom-tag-3', '*'], true],
+                ['blockElement', ['custom-tag-4'], true],
+                ['dropElement', ['custom-tag-5'], true],
+                ['allowAttribute', ['data-attr-2', ['custom-tag-6']], true],
+                ['allowAttribute', ['data-attr-3', []], true],
+                ['allowAttribute', ['data-attr-4', '*'], true],
+                ['dropAttribute', ['data-attr-5', ['custom-tag-6']], true],
+                ['dropAttribute', ['data-attr-6', []], true],
+                ['dropAttribute', ['data-attr-7', '*'], true],
+                ['forceAttribute', ['custom-tag-7', 'data-attr-8', 'value'], true],
+                ['forceHttpsUrls', [true], true],
+                ['allowLinkSchemes', [['http', 'https', 'mailto']], true],
+                ['allowLinkHosts', [['symfony.com']], true],
+                ['allowRelativeLinks', [true], true],
+                ['allowMediaSchemes', [['http', 'https', 'data']], true],
+                ['allowMediaHosts', [['symfony.com']], true],
+                ['allowRelativeMedias', [true], true],
+                ['withAttributeSanitizer', ['@App\\Sanitizer\\CustomAttributeSanitizer'], true],
+                ['withoutAttributeSanitizer', ['@App\\Sanitizer\\OtherCustomAttributeSanitizer'], true],
+            ],
+
+            // Convert references to their names for easier assertion
+            array_map(
+                static function ($call) {
+                    foreach ($call[1] as $k => $arg) {
+                        $call[1][$k] = $arg instanceof Reference ? '@'.$arg : $arg;
+                    }
+
+                    return $call;
+                },
+                $calls
+            )
+        );
+
+        // Named alias
+        $this->assertSame(
+            'html_sanitizer.sanitizer.my.sanitizer',
+            (string) $container->getAlias(HtmlSanitizerInterface::class.' $mySanitizer'),
+            '->registerHtmlSanitizerConfiguration() creates appropriate named alias'
+        );
+
+        // Default alias
+        $this->assertSame(
+            'html_sanitizer.sanitizer.my.sanitizer',
+            (string) $container->getAlias(HtmlSanitizerInterface::class),
+            '->registerHtmlSanitizerConfiguration() creates appropriate default alias'
+        );
     }
 
     protected function createContainer(array $data = [])

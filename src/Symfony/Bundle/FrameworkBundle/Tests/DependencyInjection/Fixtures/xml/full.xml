@@ -39,5 +39,14 @@
             </framework:default-context>
         </framework:serializer>
         <framework:property-info />
+        <framework:html-sanitizer>
+            <framework:format name="csv">
+                <framework:mime-type>text/csv</framework:mime-type>
+                <framework:mime-type>text/plain</framework:mime-type>
+            </framework:format>
+            <framework:format name="pdf">
+                <framework:mime-type>application/pdf</framework:mime-type>
+            </framework:format>
+        </framework:html-sanitizer>
     </framework:config>
 </container>

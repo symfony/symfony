@@ -44,6 +44,7 @@
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/form": "^5.4|^6.0",
         "symfony/expression-language": "^5.4|^6.0",
+        "symfony/html-sanitizer": "^6.1",
         "symfony/http-client": "^5.4|^6.0",
         "symfony/lock": "^5.4|^6.0",
         "symfony/mailer": "^5.4|^6.0",

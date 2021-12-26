@@ -296,6 +296,15 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $this->assertTrue($cache->hasItem('foobar'));
     }
+
+    public function testNullByteInKey()
+    {
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $cache->save($cache->getItem("a\0b")->set(123));
+
+        $this->assertSame(123, $cache->getItem("a\0b")->get());
+    }
 }
 
 class NotUnserializable

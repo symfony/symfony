@@ -16,8 +16,8 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @implements \ArrayAccess<string, FormView>
- * @implements \IteratorAggregate<string, FormView>
+ * @implements \ArrayAccess<int|string, FormView>
+ * @implements \IteratorAggregate<int|string, FormView>
  */
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -37,7 +37,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * The child views.
      *
-     * @var array<string, FormView>
+     * @var array<int|string, FormView>
      */
     public $children = [];
 
@@ -107,7 +107,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns a child by name (implements \ArrayAccess).
      *
-     * @param string $name The child name
+     * @param int|string $name The child name
      *
      * @return self
      */
@@ -120,7 +120,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns whether the given child exists (implements \ArrayAccess).
      *
-     * @param string $name The child name
+     * @param int|string $name The child name
      *
      * @return bool
      */
@@ -146,7 +146,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Removes a child (implements \ArrayAccess).
      *
-     * @param string $name The child name
+     * @param int|string $name The child name
      *
      * @return void
      */
@@ -159,7 +159,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns an iterator to iterate over children (implements \IteratorAggregate).
      *
-     * @return \ArrayIterator<string, FormView>
+     * @return \ArrayIterator<int|string, FormView>
      */
     #[\ReturnTypeWillChange]
     public function getIterator()

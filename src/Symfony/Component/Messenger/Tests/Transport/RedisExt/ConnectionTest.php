@@ -220,6 +220,7 @@ class ConnectionTest extends TestCase
     {
         $redis = new \Redis();
         $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', [], $redis);
+        $connection->cleanup();
 
         $connection->add('1', []);
         $connection->add('2', []);
@@ -230,7 +231,7 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget');
         $this->assertNotNull($connection->get());
 
-        $redis->del('messenger-rejectthenget');
+        $connection->cleanup();
     }
 
     public function testGetNonBlocking()
@@ -238,12 +239,30 @@ class ConnectionTest extends TestCase
         $redis = new \Redis();
 
         $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', [], $redis);
+        $connection->cleanup();
 
         $this->assertNull($connection->get()); // no message, should return null immediately
         $connection->add('1', []);
         $this->assertNotEmpty($message = $connection->get());
         $connection->reject($message['id']);
-        $redis->del('messenger-getnonblocking');
+
+        $connection->cleanup();
+    }
+
+    public function testGetDelayed()
+    {
+        $redis = new \Redis();
+
+        $connection = Connection::fromDsn('redis://localhost/messenger-delayed', [], $redis);
+        $connection->cleanup();
+
+        $connection->add('1', [], 100);
+        $this->assertNull($connection->get());
+        usleep(300000);
+        $this->assertNotEmpty($message = $connection->get());
+        $connection->reject($message['id']);
+
+        $connection->cleanup();
     }
 
     public function testJsonError()

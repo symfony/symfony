@@ -58,7 +58,10 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['memory'];
     }
 
-    public function getMemoryLimit(): int
+    /**
+     * @return int|float
+     */
+    public function getMemoryLimit()
     {
         return $this->data['memory_limit'];
     }

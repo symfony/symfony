@@ -424,7 +424,8 @@ Security
    ```
  * The `LdapUserProvider` class has been removed, use `Symfony\Component\Ldap\Security\LdapUserProvider` instead.
  * Implementations of `PasswordEncoderInterface` and `UserPasswordEncoderInterface` must have a new `needsRehash()` method
- * The `Role` and `SwitchUserRole` classes have been removed.
+ * The `Role` and `SwitchUserRole` classes have been removed. This change will terminate all active sessions when upgrading from Symfony 4.x.
+   To avoid this issue, require the `ajgl/sf4-to-sf5-role-unserialization` component in you composer.json.
  * The `getReachableRoles()` method of the `RoleHierarchy` class has been removed. It has been replaced by the new
    `getReachableRoleNames()` method.
  * The `getRoles()` method has been removed from the `TokenInterface`. It has been replaced by the new

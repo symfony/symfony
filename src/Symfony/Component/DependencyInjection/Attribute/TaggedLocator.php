@@ -19,6 +19,7 @@ class TaggedLocator
         public ?string $indexAttribute = null,
         public ?string $defaultIndexMethod = null,
         public ?string $defaultPriorityMethod = null,
+        public string|array $exclude = [],
     ) {
     }
 }

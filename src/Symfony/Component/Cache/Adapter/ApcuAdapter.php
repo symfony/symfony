@@ -60,7 +60,14 @@ class ApcuAdapter extends AbstractAdapter
         $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
         try {
             $values = [];
-            foreach (apcu_fetch($ids, $ok) ?: [] as $k => $v) {
+            $ids = array_flip($ids);
+            foreach (apcu_fetch(array_keys($ids), $ok) ?: [] as $k => $v) {
+                if (!isset($ids[$k])) {
+                    // work around https://github.com/krakjoe/apcu/issues/247
+                    $k = key($ids);
+                }
+                unset($ids[$k]);
+
                 if (null !== $v || $ok) {
                     $values[$k] = null !== $this->marshaller ? $this->marshaller->unmarshall($v) : $v;
                 }

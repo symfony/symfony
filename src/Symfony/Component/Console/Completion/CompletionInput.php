@@ -109,12 +109,12 @@ final class CompletionInput extends ArgvInput
         // complete argument value
         $this->completionType = self::TYPE_ARGUMENT_VALUE;
 
-        $arguments = $this->getArguments();
-        foreach ($arguments as $argumentName => $argumentValue) {
-            if (null === $argumentValue) {
+        foreach ($this->definition->getArguments() as $argumentName => $argument) {
+            if (!isset($this->arguments[$argumentName])) {
                 break;
             }
 
+            $argumentValue = $this->arguments[$argumentName];
             $this->completionName = $argumentName;
             if (\is_array($argumentValue)) {
                 $this->completionValue = $argumentValue ? $argumentValue[array_key_last($argumentValue)] : null;
@@ -124,7 +124,7 @@ final class CompletionInput extends ArgvInput
         }
 
         if ($this->currentIndex >= \count($this->tokens)) {
-            if (null === $arguments[$argumentName] || $this->definition->getArgument($argumentName)->isArray()) {
+            if (!isset($this->arguments[$argumentName]) || $this->definition->getArgument($argumentName)->isArray()) {
                 $this->completionName = $argumentName;
                 $this->completionValue = '';
             } else {

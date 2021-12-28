@@ -22,7 +22,7 @@ $config = (new HtmlSanitizerConfig())
     // standard. All scripts will be removed but the output may still contain
     // other dangerous behaviors like CSS injection (click-jacking), CSS
     // expressions, ...
-    ->allowAllStaticElements()
+    ->allowStaticElements()
 
     // Allow the "div" element and no attribute can be on it
     ->allowElement('div')

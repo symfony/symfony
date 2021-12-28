@@ -57,7 +57,7 @@ abstract class AbstractExtension implements FormExtensionInterface
         }
 
         if (!isset($this->types[$name])) {
-            throw new InvalidArgumentException(sprintf('The type "%s" can not be loaded by this extension.', $name));
+            throw new InvalidArgumentException(sprintf('The type "%s" cannot be loaded by this extension.', $name));
         }
 
         return $this->types[$name];
@@ -115,7 +115,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * Registers the types.
      *
-     * @return FormTypeInterface[] An array of FormTypeInterface instances
+     * @return FormTypeInterface[]
      */
     protected function loadTypes()
     {
@@ -125,7 +125,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * Registers the type extensions.
      *
-     * @return FormTypeExtensionInterface[] An array of FormTypeExtensionInterface instances
+     * @return FormTypeExtensionInterface[]
      */
     protected function loadTypeExtensions()
     {

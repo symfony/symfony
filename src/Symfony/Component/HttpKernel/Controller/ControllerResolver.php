@@ -98,7 +98,7 @@ class ControllerResolver implements ControllerResolverInterface
     /**
      * Returns a callable for the given controller.
      *
-     * @return callable A PHP callable
+     * @return callable
      *
      * @throws \InvalidArgumentException When the controller cannot be created
      */

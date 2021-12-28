@@ -15,6 +15,8 @@ use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -43,6 +45,10 @@ final class DebugFirewallCommand extends Command
      */
     public function __construct(array $firewallNames, ContainerInterface $contexts, ContainerInterface $eventDispatchers, array $authenticators, bool $authenticatorManagerEnabled)
     {
+        if (!$authenticatorManagerEnabled) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'Setting the $authenticatorManagerEnabled argument of "%s" to "false" is deprecated, use the new authenticator system instead.', __METHOD__);
+        }
+
         $this->firewallNames = $firewallNames;
         $this->contexts = $contexts;
         $this->eventDispatchers = $eventDispatchers;
@@ -272,5 +278,12 @@ EOF
         }
 
         return $name;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('name')) {
+            $suggestions->suggestValues($this->firewallNames);
+        }
     }
 }

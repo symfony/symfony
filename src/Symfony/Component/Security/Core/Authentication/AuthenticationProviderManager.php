@@ -47,8 +47,8 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
     private $eventDispatcher;
 
     /**
-     * @param iterable|AuthenticationProviderInterface[] $providers        An iterable with AuthenticationProviderInterface instances as values
-     * @param bool                                       $eraseCredentials Whether to erase credentials after authentication or not
+     * @param iterable<mixed, AuthenticationProviderInterface> $providers        An iterable with AuthenticationProviderInterface instances as values
+     * @param bool                                             $eraseCredentials Whether to erase credentials after authentication or not
      *
      * @throws \InvalidArgumentException
      */
@@ -111,7 +111,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
             }
 
             // @deprecated since Symfony 5.3
-            if ($user = $result->getUser() instanceof UserInterface && !method_exists($result->getUser(), 'getUserIdentifier')) {
+            if ($result->getUser() instanceof UserInterface && !method_exists($result->getUser(), 'getUserIdentifier')) {
                 trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "getUserIdentifier(): string" in user class "%s" is deprecated. This method will replace "getUsername()" in Symfony 6.0.', get_debug_type($result->getUser()));
             }
 

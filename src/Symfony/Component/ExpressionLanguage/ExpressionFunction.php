@@ -42,20 +42,29 @@ class ExpressionFunction
     public function __construct(string $name, callable $compiler, callable $evaluator)
     {
         $this->name = $name;
-        $this->compiler = $compiler;
-        $this->evaluator = $evaluator;
+        $this->compiler = $compiler instanceof \Closure ? $compiler : \Closure::fromCallable($compiler);
+        $this->evaluator = $evaluator instanceof \Closure ? $evaluator : \Closure::fromCallable($evaluator);
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @return \Closure
+     */
     public function getCompiler()
     {
         return $this->compiler;
     }
 
+    /**
+     * @return \Closure
+     */
     public function getEvaluator()
     {
         return $this->evaluator;

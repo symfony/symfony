@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 
 /**
  * @group functional
@@ -161,7 +162,7 @@ TXT
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Controller\Controller', $tester->getDisplay());
         $this->assertStringContainsString('/home/hamza/projet/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php', $tester->getDisplay());
     }
@@ -181,7 +182,7 @@ TXT
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] There are no deprecations in the logs!', $tester->getDisplay());
     }
 
@@ -199,7 +200,7 @@ TXT
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[WARNING] The deprecation file does not exist', $tester->getDisplay());
     }
 
@@ -209,6 +210,70 @@ TXT
             [BackslashClass::class],
             ['FixturesBackslashClass'],
             ['\\'.BackslashClass::class],
+        ];
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions, array $notExpectedSuggestions = [])
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $tester = new CommandCompletionTester($application->find('debug:container'));
+        $suggestions = $tester->complete($input);
+
+        foreach ($expectedSuggestions as $expectedSuggestion) {
+            $this->assertContains($expectedSuggestion, $suggestions);
+        }
+        foreach ($notExpectedSuggestions as $notExpectedSuggestion) {
+            $this->assertNotContains($notExpectedSuggestion, $suggestions);
+        }
+    }
+
+    public function provideCompletionSuggestions()
+    {
+        $serviceId = 'console.command.container_debug';
+        $hiddenServiceId = '.console.command.container_debug.lazy';
+        $interfaceServiceId = 'Symfony\Component\HttpKernel\HttpKernelInterface';
+
+        yield 'name' => [
+            [''],
+            [$serviceId, $interfaceServiceId],
+            [$hiddenServiceId],
+        ];
+
+        yield 'name (with hidden)' => [
+            ['--show-hidden', ''],
+            [$serviceId, $interfaceServiceId, $hiddenServiceId],
+        ];
+
+        yield 'name (with current value)' => [
+            ['--show-hidden', 'console'],
+            [$serviceId, $hiddenServiceId],
+            [$interfaceServiceId],
+        ];
+
+        yield 'name (no suggestion with --tags)' => [
+            ['--tags', ''],
+            [],
+            [$serviceId, $interfaceServiceId, $hiddenServiceId],
+        ];
+
+        yield 'option --tag' => [
+            ['--tag', ''],
+            ['console.command'],
+        ];
+
+        yield 'option --parameter' => [
+            ['--parameter', ''],
+            ['kernel.debug'],
+        ];
+
+        yield 'option --format' => [
+            ['--format', ''],
+            ['txt', 'xml', 'json', 'md'],
         ];
     }
 }

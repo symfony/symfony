@@ -17,11 +17,13 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<int, string>
  */
 class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 {
     /**
-     * @var array
+     * @var list<string>
      */
     private $elements = [];
 
@@ -203,7 +205,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      * In this example, "address" and "office" map to forms, while
      * "street does not.
      *
-     * @return bool Whether the element maps to a form
+     * @return bool
      *
      * @throws OutOfBoundsException if the offset is invalid
      */

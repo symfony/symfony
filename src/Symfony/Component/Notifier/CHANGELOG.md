@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `SentMessageEvent` and `FailedMessageEvent`
+ * Add `push` channel
+
 5.3
 ---
 

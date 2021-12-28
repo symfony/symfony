@@ -85,7 +85,8 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $this->lastMessage = null;
         $this->validateName($name);
         $this->loadKeys();
-        $this->export($name.'.'.substr(md5($name), 0, 6), sodium_crypto_box_seal($value, $this->encryptionKey ?? sodium_crypto_box_publickey($this->decryptionKey)));
+        $filename = $this->getFilename($name);
+        $this->export($filename, sodium_crypto_box_seal($value, $this->encryptionKey ?? sodium_crypto_box_publickey($this->decryptionKey)));
 
         $list = $this->list();
         $list[$name] = null;
@@ -100,7 +101,8 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $this->lastMessage = null;
         $this->validateName($name);
 
-        if (!is_file($file = $this->pathPrefix.$name.'.'.substr_replace(md5($name), '.php', -26))) {
+        $filename = $this->getFilename($name);
+        if (!is_file($file = $this->pathPrefix.$filename.'.php')) {
             $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return null;
@@ -134,7 +136,8 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $this->lastMessage = null;
         $this->validateName($name);
 
-        if (!is_file($file = $this->pathPrefix.$name.'.'.substr_replace(md5($name), '.php', -26))) {
+        $filename = $this->getFilename($name);
+        if (!is_file($file = $this->pathPrefix.$filename.'.php')) {
             $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return false;
@@ -198,15 +201,16 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         }
     }
 
-    private function export(string $file, string $data): void
+    private function export(string $filename, string $data): void
     {
-        $name = basename($this->pathPrefix.$file);
+        $b64 = 'decrypt.private' === $filename ? '// SYMFONY_DECRYPTION_SECRET='.base64_encode($data)."\n" : '';
+        $name = basename($this->pathPrefix.$filename);
         $data = str_replace('%', '\x', rawurlencode($data));
-        $data = sprintf("<?php // %s on %s\n\nreturn \"%s\";\n", $name, date('r'), $data);
+        $data = sprintf("<?php // %s on %s\n\n%sreturn \"%s\";\n", $name, date('r'), $b64, $data);
 
         $this->createSecretsDir();
 
-        if (false === file_put_contents($this->pathPrefix.$file.'.php', $data, \LOCK_EX)) {
+        if (false === file_put_contents($this->pathPrefix.$filename.'.php', $data, \LOCK_EX)) {
             $e = error_get_last();
             throw new \ErrorException($e['message'] ?? 'Failed to write secrets data.', 0, $e['type'] ?? \E_USER_WARNING);
         }
@@ -219,5 +223,11 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         }
 
         $this->secretsDir = null;
+    }
+
+    private function getFilename(string $name): string
+    {
+        // The MD5 hash allows making secrets case-sensitive. The filename is not enough on Windows.
+        return $name.'.'.substr(md5($name), 0, 6);
     }
 }

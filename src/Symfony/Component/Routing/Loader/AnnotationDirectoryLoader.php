@@ -28,7 +28,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      * @param string      $path A directory path
      * @param string|null $type The resource type
      *
-     * @return RouteCollection A RouteCollection instance
+     * @return RouteCollection
      *
      * @throws \InvalidArgumentException When the directory does not exist or its routes cannot be parsed
      */

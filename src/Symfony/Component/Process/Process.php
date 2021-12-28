@@ -27,6 +27,8 @@ use Symfony\Component\Process\Pipes\WindowsPipes;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Romain Neutron <imprec@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, string>
  */
 class Process implements \IteratorAggregate
 {
@@ -530,7 +532,7 @@ class Process implements \IteratorAggregate
             throw new RuntimeException('Disabling output while the process is running is not possible.');
         }
         if (null !== $this->idleTimeout) {
-            throw new LogicException('Output can not be disabled while an idle timeout is set.');
+            throw new LogicException('Output cannot be disabled while an idle timeout is set.');
         }
 
         $this->outputDisabled = true;
@@ -569,7 +571,7 @@ class Process implements \IteratorAggregate
     /**
      * Returns the current output of the process (STDOUT).
      *
-     * @return string The process output
+     * @return string
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
@@ -591,7 +593,7 @@ class Process implements \IteratorAggregate
      * In comparison with the getOutput method which always return the whole
      * output, this one returns the new output since the last call.
      *
-     * @return string The process output since the last call
+     * @return string
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
@@ -618,7 +620,7 @@ class Process implements \IteratorAggregate
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
      *
-     * @return \Generator
+     * @return \Generator<string, string>
      */
     #[\ReturnTypeWillChange]
     public function getIterator(int $flags = 0)
@@ -685,7 +687,7 @@ class Process implements \IteratorAggregate
     /**
      * Returns the current error output of the process (STDERR).
      *
-     * @return string The process error output
+     * @return string
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
@@ -708,7 +710,7 @@ class Process implements \IteratorAggregate
      * whole error output, this one returns the new error output since the last
      * call.
      *
-     * @return string The process error output since the last call
+     * @return string
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
@@ -776,7 +778,7 @@ class Process implements \IteratorAggregate
     /**
      * Checks if the process ended successfully.
      *
-     * @return bool true if the process ended successfully, false otherwise
+     * @return bool
      */
     public function isSuccessful()
     {
@@ -814,7 +816,7 @@ class Process implements \IteratorAggregate
         $this->requireProcessIsTerminated(__FUNCTION__);
 
         if ($this->isSigchildEnabled() && -1 === $this->processInformation['termsig']) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.');
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal cannot be retrieved.');
         }
 
         return $this->processInformation['termsig'];
@@ -855,7 +857,7 @@ class Process implements \IteratorAggregate
     /**
      * Checks if the process is currently running.
      *
-     * @return bool true if the process is currently running, false otherwise
+     * @return bool
      */
     public function isRunning()
     {
@@ -871,7 +873,7 @@ class Process implements \IteratorAggregate
     /**
      * Checks if the process has been started with no regard to the current state.
      *
-     * @return bool true if status is ready, false otherwise
+     * @return bool
      */
     public function isStarted()
     {
@@ -881,7 +883,7 @@ class Process implements \IteratorAggregate
     /**
      * Checks if the process is terminated.
      *
-     * @return bool true if process is terminated, false otherwise
+     * @return bool
      */
     public function isTerminated()
     {
@@ -895,7 +897,7 @@ class Process implements \IteratorAggregate
      *
      * The status is one of: ready, started, terminated.
      *
-     * @return string The current process status
+     * @return string
      */
     public function getStatus()
     {
@@ -980,7 +982,7 @@ class Process implements \IteratorAggregate
     /**
      * Gets the command line to be executed.
      *
-     * @return string The command to execute
+     * @return string
      */
     public function getCommandLine()
     {
@@ -988,9 +990,9 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Gets the process timeout (max. runtime).
+     * Gets the process timeout in seconds (max. runtime).
      *
-     * @return float|null The timeout in seconds or null if it's disabled
+     * @return float|null
      */
     public function getTimeout()
     {
@@ -998,9 +1000,9 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Gets the process idle timeout (max. time since last output).
+     * Gets the process idle timeout in seconds (max. time since last output).
      *
-     * @return float|null The timeout in seconds or null if it's disabled
+     * @return float|null
      */
     public function getIdleTimeout()
     {
@@ -1036,7 +1038,7 @@ class Process implements \IteratorAggregate
     public function setIdleTimeout(?float $timeout)
     {
         if (null !== $timeout && $this->outputDisabled) {
-            throw new LogicException('Idle timeout can not be set while the output is disabled.');
+            throw new LogicException('Idle timeout cannot be set while the output is disabled.');
         }
 
         $this->idleTimeout = $this->validateTimeout($timeout);
@@ -1069,7 +1071,7 @@ class Process implements \IteratorAggregate
     /**
      * Checks if the TTY mode is enabled.
      *
-     * @return bool true if the TTY mode is enabled, false otherwise
+     * @return bool
      */
     public function isTty()
     {
@@ -1101,7 +1103,7 @@ class Process implements \IteratorAggregate
     /**
      * Gets the working directory.
      *
-     * @return string|null The current working directory or null on failure
+     * @return string|null
      */
     public function getWorkingDirectory()
     {
@@ -1129,7 +1131,7 @@ class Process implements \IteratorAggregate
     /**
      * Gets the environment variables.
      *
-     * @return array The current environment variables
+     * @return array
      */
     public function getEnv()
     {
@@ -1153,7 +1155,7 @@ class Process implements \IteratorAggregate
     /**
      * Gets the Process input.
      *
-     * @return resource|string|\Iterator|null The Process input
+     * @return resource|string|\Iterator|null
      */
     public function getInput()
     {
@@ -1174,7 +1176,7 @@ class Process implements \IteratorAggregate
     public function setInput($input)
     {
         if ($this->isRunning()) {
-            throw new LogicException('Input can not be set while the process is running.');
+            throw new LogicException('Input cannot be set while the process is running.');
         }
 
         $this->input = ProcessUtils::validateInput(__METHOD__, $input);
@@ -1306,7 +1308,7 @@ class Process implements \IteratorAggregate
      *
      * @param callable|null $callback The user defined PHP callback
      *
-     * @return \Closure A PHP closure
+     * @return \Closure
      */
     protected function buildCallback(callable $callback = null)
     {
@@ -1497,7 +1499,7 @@ class Process implements \IteratorAggregate
     {
         if (null === $pid = $this->getPid()) {
             if ($throwException) {
-                throw new LogicException('Can not send signal on a non running process.');
+                throw new LogicException('Cannot send signal on a non running process.');
             }
 
             return false;

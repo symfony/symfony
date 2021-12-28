@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add support for getting updated context after a transition
+
 5.3
 ---
 

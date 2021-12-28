@@ -52,7 +52,7 @@ abstract class KernelTestCase extends TestCase
     }
 
     /**
-     * @return string The Kernel class name
+     * @return string
      *
      * @throws \RuntimeException
      * @throws \LogicException
@@ -73,7 +73,7 @@ abstract class KernelTestCase extends TestCase
     /**
      * Boots the Kernel for this test.
      *
-     * @return KernelInterface A KernelInterface instance
+     * @return KernelInterface
      */
     protected static function bootKernel(array $options = [])
     {
@@ -118,7 +118,7 @@ abstract class KernelTestCase extends TestCase
      *  * environment
      *  * debug
      *
-     * @return KernelInterface A KernelInterface instance
+     * @return KernelInterface
      */
     protected static function createKernel(array $options = [])
     {

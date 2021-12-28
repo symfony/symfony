@@ -158,17 +158,13 @@ class Query extends AbstractQuery
      * Returns an LDAP search resource. If this query resulted in multiple searches, only the first
      * page will be returned.
      *
-     * @return resource|Result
+     * @return resource|Result|null
      *
      * @internal
      */
     public function getResource(int $idx = 0)
     {
-        if (null === $this->results || $idx >= \count($this->results)) {
-            return null;
-        }
-
-        return $this->results[$idx];
+        return $this->results[$idx] ?? null;
     }
 
     /**
@@ -261,9 +257,9 @@ class Query extends AbstractQuery
      *
      * @param resource|LDAPConnection $con
      *
-     * @return resource|Result
+     * @return resource|Result|false
      */
-    private function callSearchFunction($con, string $func, int $sizeLimit)
+    private function callSearchFunction($con, callable $func, int $sizeLimit)
     {
         if (\PHP_VERSION_ID < 70300) {
             return @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref']);

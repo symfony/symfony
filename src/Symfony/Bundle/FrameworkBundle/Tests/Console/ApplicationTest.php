@@ -147,7 +147,7 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'fine']);
         $output = $tester->getDisplay();
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('Some commands could not be registered:', $output);
         $this->assertStringContainsString('throwing', $output);
         $this->assertStringContainsString('fine', $output);
@@ -204,7 +204,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'list']);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $tester->assertCommandIsSuccessful();
         $display = explode('List commands', $tester->getDisplay());
 
         $this->assertStringContainsString(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));

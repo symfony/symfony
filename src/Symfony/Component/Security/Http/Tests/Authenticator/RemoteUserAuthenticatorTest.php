@@ -41,7 +41,7 @@ class RemoteUserAuthenticatorTest extends TestCase
     public function testSupportTokenStorageWithToken()
     {
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new PreAuthenticatedToken('username', 'credentials', 'main'));
+        $tokenStorage->setToken(new PreAuthenticatedToken(new InMemoryUser('username', null), 'main'));
 
         $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), $tokenStorage, 'main');
 

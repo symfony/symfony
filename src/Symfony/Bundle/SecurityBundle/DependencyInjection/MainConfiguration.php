@@ -12,11 +12,12 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
@@ -28,11 +29,29 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
  */
 class MainConfiguration implements ConfigurationInterface
 {
+    /** @internal */
+    public const STRATEGY_AFFIRMATIVE = 'affirmative';
+    /** @internal */
+    public const STRATEGY_CONSENSUS = 'consensus';
+    /** @internal */
+    public const STRATEGY_UNANIMOUS = 'unanimous';
+    /** @internal */
+    public const STRATEGY_PRIORITY = 'priority';
+
     private $factories;
     private $userProviderFactories;
 
+    /**
+     * @param array<array-key, SecurityFactoryInterface|AuthenticatorFactoryInterface> $factories
+     */
     public function __construct(array $factories, array $userProviderFactories)
     {
+        if (\is_array(current($factories))) {
+            trigger_deprecation('symfony/security-bundle', '5.4', 'Passing an array of arrays as 1st argument to "%s" is deprecated, pass a sorted array of factories instead.', __METHOD__);
+
+            $factories = array_merge(...array_values($factories));
+        }
+
         $this->factories = $factories;
         $this->userProviderFactories = $userProviderFactories;
     }
@@ -40,7 +59,7 @@ class MainConfiguration implements ConfigurationInterface
     /**
      * Generates the configuration tree builder.
      *
-     * @return TreeBuilder The tree builder
+     * @return TreeBuilder
      */
     public function getConfigTreeBuilder()
     {
@@ -72,7 +91,10 @@ class MainConfiguration implements ConfigurationInterface
                     ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
                 ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
-                ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
+                ->booleanNode('always_authenticate_before_granting')
+                    ->defaultFalse()
+                    ->setDeprecated('symfony/security-bundle', '5.4')
+                ->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
                 ->booleanNode('enable_authenticator_manager')->defaultFalse()->info('Enables the new Symfony Security system based on Authenticators, all used authenticators must support this before enabling this.')->end()
                 ->arrayNode('access_decision_manager')
@@ -82,12 +104,21 @@ class MainConfiguration implements ConfigurationInterface
                             ->values($this->getAccessDecisionStrategies())
                         ->end()
                         ->scalarNode('service')->end()
+                        ->scalarNode('strategy_service')->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) { return isset($v['strategy']) && isset($v['service']); })
+                        ->ifTrue(function ($v) { return isset($v['strategy'], $v['service']); })
                         ->thenInvalid('"strategy" and "service" cannot be used together.')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) { return isset($v['strategy'], $v['strategy_service']); })
+                        ->thenInvalid('"strategy" and "strategy_service" cannot be used together.')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) { return isset($v['service'], $v['strategy_service']); })
+                        ->thenInvalid('"service" and "strategy_service" cannot be used together.')
                     ->end()
                 ->end()
             ->end()
@@ -166,6 +197,9 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param array<array-key, SecurityFactoryInterface|AuthenticatorFactoryInterface> $factories
+     */
     private function addFirewallsSection(ArrayNodeDefinition $rootNode, array $factories)
     {
         $firewallNodeBuilder = $rootNode
@@ -276,19 +310,17 @@ class MainConfiguration implements ConfigurationInterface
         ;
 
         $abstractFactoryKeys = [];
-        foreach ($factories as $factoriesAtPosition) {
-            foreach ($factoriesAtPosition as $factory) {
-                $name = str_replace('-', '_', $factory->getKey());
-                $factoryNode = $firewallNodeBuilder->arrayNode($name)
-                    ->canBeUnset()
-                ;
+        foreach ($factories as $factory) {
+            $name = str_replace('-', '_', $factory->getKey());
+            $factoryNode = $firewallNodeBuilder->arrayNode($name)
+                ->canBeUnset()
+            ;
 
-                if ($factory instanceof AbstractFactory) {
-                    $abstractFactoryKeys[] = $name;
-                }
-
-                $factory->addConfiguration($factoryNode);
+            if ($factory instanceof AbstractFactory) {
+                $abstractFactoryKeys[] = $name;
             }
+
+            $factory->addConfiguration($factoryNode);
         }
 
         // check for unreachable check paths
@@ -477,18 +509,13 @@ class MainConfiguration implements ConfigurationInterface
         ->end();
     }
 
-    private function getAccessDecisionStrategies()
+    private function getAccessDecisionStrategies(): array
     {
-        $strategies = [
-            AccessDecisionManager::STRATEGY_AFFIRMATIVE,
-            AccessDecisionManager::STRATEGY_CONSENSUS,
-            AccessDecisionManager::STRATEGY_UNANIMOUS,
+        return [
+            self::STRATEGY_AFFIRMATIVE,
+            self::STRATEGY_CONSENSUS,
+            self::STRATEGY_UNANIMOUS,
+            self::STRATEGY_PRIORITY,
         ];
-
-        if (\defined(AccessDecisionManager::class.'::STRATEGY_PRIORITY')) {
-            $strategies[] = AccessDecisionManager::STRATEGY_PRIORITY;
-        }
-
-        return $strategies;
     }
 }

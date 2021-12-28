@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\Session\DeprecatedSessionFactory;
+use Symfony\Bundle\FrameworkBundle\Session\ServiceSessionFactory;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -31,7 +32,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorageFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorageFactory;
-use Symfony\Component\HttpFoundation\Session\Storage\ServiceSessionFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\HttpKernel\EventListener\SessionListener;
 
@@ -146,14 +146,17 @@ return static function (ContainerConfigurator $container) {
         ->set('session_listener', SessionListener::class)
             ->args([
                 service_locator([
+                    'session_factory' => service('session.factory')->ignoreOnInvalid(),
                     'session' => service('.session.do-not-use')->ignoreOnInvalid(),
                     'initialized_session' => service('.session.do-not-use')->ignoreOnUninitialized(),
                     'logger' => service('logger')->ignoreOnInvalid(),
                     'session_collector' => service('data_collector.request.session_collector')->ignoreOnInvalid(),
                 ]),
                 param('kernel.debug'),
+                param('session.storage.options'),
             ])
             ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         // for BC
         ->alias('session.storage.filesystem', 'session.storage.mock_file')

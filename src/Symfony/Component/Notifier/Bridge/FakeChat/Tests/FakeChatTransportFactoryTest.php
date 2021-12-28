@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeChat\Tests;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
@@ -23,7 +24,7 @@ final class FakeChatTransportFactoryTest extends TransportFactoryTestCase
      */
     public function createFactory(): TransportFactoryInterface
     {
-        return new FakeChatTransportFactory($this->createMock(MailerInterface::class));
+        return new FakeChatTransportFactory($this->createMock(MailerInterface::class), $this->createMock(LoggerInterface::class));
     }
 
     public function createProvider(): iterable
@@ -36,6 +37,11 @@ final class FakeChatTransportFactoryTest extends TransportFactoryTestCase
         yield [
             'fakechat+email://mailchimp?to=recipient@email.net&from=sender@email.net',
             'fakechat+email://mailchimp?to=recipient@email.net&from=sender@email.net',
+        ];
+
+        yield [
+            'fakechat+logger://default',
+            'fakechat+logger://default',
         ];
     }
 

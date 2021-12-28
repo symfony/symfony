@@ -24,7 +24,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
     /**
      * Transforms a collection into an array.
      *
-     * @return mixed An array of entities
+     * @return mixed
      *
      * @throws TransformationFailedException
      */
@@ -52,7 +52,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
      *
      * @param mixed $array An array of entities
      *
-     * @return Collection A collection of entities
+     * @return Collection
      */
     public function reverseTransform($array)
     {

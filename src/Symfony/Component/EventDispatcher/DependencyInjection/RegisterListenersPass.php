@@ -31,9 +31,9 @@ class RegisterListenersPass implements CompilerPassInterface
     protected $eventAliasesParameter;
 
     private $hotPathEvents = [];
-    private $hotPathTagName;
+    private $hotPathTagName = 'container.hot_path';
     private $noPreloadEvents = [];
-    private $noPreloadTagName;
+    private $noPreloadTagName = 'container.no_preload';
 
     public function __construct(string $dispatcherService = 'event_dispatcher', string $listenerTag = 'kernel.event_listener', string $subscriberTag = 'kernel.event_subscriber', string $eventAliasesParameter = 'event_dispatcher.event_aliases')
     {
@@ -50,10 +50,14 @@ class RegisterListenersPass implements CompilerPassInterface
     /**
      * @return $this
      */
-    public function setHotPathEvents(array $hotPathEvents, string $tagName = 'container.hot_path')
+    public function setHotPathEvents(array $hotPathEvents)
     {
         $this->hotPathEvents = array_flip($hotPathEvents);
-        $this->hotPathTagName = $tagName;
+
+        if (1 < \func_num_args()) {
+            trigger_deprecation('symfony/event-dispatcher', '5.4', 'Configuring "$tagName" in "%s" is deprecated.', __METHOD__);
+            $this->hotPathTagName = func_get_arg(1);
+        }
 
         return $this;
     }
@@ -61,10 +65,14 @@ class RegisterListenersPass implements CompilerPassInterface
     /**
      * @return $this
      */
-    public function setNoPreloadEvents(array $noPreloadEvents, string $tagName = 'container.no_preload'): self
+    public function setNoPreloadEvents(array $noPreloadEvents): self
     {
         $this->noPreloadEvents = array_flip($noPreloadEvents);
-        $this->noPreloadTagName = $tagName;
+
+        if (1 < \func_num_args()) {
+            trigger_deprecation('symfony/event-dispatcher', '5.4', 'Configuring "$tagName" in "%s" is deprecated.', __METHOD__);
+            $this->noPreloadTagName = func_get_arg(1);
+        }
 
         return $this;
     }

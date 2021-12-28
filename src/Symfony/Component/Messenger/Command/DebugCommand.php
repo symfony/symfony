@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -137,5 +139,12 @@ EOF
         }
 
         return '';
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('bus')) {
+            $suggestions->suggestValues(array_keys($this->mapping));
+        }
     }
 }

@@ -44,7 +44,7 @@ class Token
     /**
      * Returns a string representation of the token.
      *
-     * @return string A string representation of the token
+     * @return string
      */
     public function __toString()
     {

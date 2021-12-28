@@ -53,11 +53,9 @@ class InputOption
     private $description;
 
     /**
-     * @param string                           $name        The option name
-     * @param string|array|null                $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param int|null                         $mode        The option mode: One of the VALUE_* constants
-     * @param string                           $description A description text
-     * @param string|bool|int|float|array|null $default     The default value (must be null for self::VALUE_NONE)
+     * @param string|array|null                $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param int|null                         $mode     The option mode: One of the VALUE_* constants
+     * @param string|bool|int|float|array|null $default  The default value (must be null for self::VALUE_NONE)
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
@@ -112,7 +110,7 @@ class InputOption
     /**
      * Returns the option shortcut.
      *
-     * @return string|null The shortcut
+     * @return string|null
      */
     public function getShortcut()
     {
@@ -122,7 +120,7 @@ class InputOption
     /**
      * Returns the option name.
      *
-     * @return string The name
+     * @return string
      */
     public function getName()
     {
@@ -207,7 +205,7 @@ class InputOption
     /**
      * Returns the description text.
      *
-     * @return string The description text
+     * @return string
      */
     public function getDescription()
     {

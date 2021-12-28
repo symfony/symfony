@@ -29,12 +29,17 @@ use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
  */
 class GuardAuthenticationFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'pre_auth';
     }
 
-    public function getKey()
+    public function getPriority(): int
+    {
+        return 0;
+    }
+
+    public function getKey(): string
     {
         return 'guard';
     }
@@ -60,7 +65,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface, Authentica
         ;
     }
 
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $authenticatorIds = $config['authenticators'];
         $authenticatorReferences = [];

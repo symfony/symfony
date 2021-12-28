@@ -41,6 +41,7 @@ class AbstractTokenTest extends TestCase
 
             public function getRoles()
             {
+                return [];
             }
 
             public function getPassword()
@@ -62,18 +63,38 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals('fabien', $token->getUserIdentifier());
     }
 
-    public function testGetUserIdentifier()
+    /**
+     * @dataProvider provideUsers
+     */
+    public function testGetUserIdentifier($user, string $username)
     {
         $token = new ConcreteToken(['ROLE_FOO']);
-        $token->setUser('fabien');
-        $this->assertEquals('fabien', $token->getUserIdentifier());
-
-        $token->setUser(new TestUser('fabien'));
-        $this->assertEquals('fabien', $token->getUserIdentifier());
-
-        $user = new InMemoryUser('fabien', null);
         $token->setUser($user);
-        $this->assertEquals('fabien', $token->getUserIdentifier());
+        $this->assertEquals($username, $token->getUserIdentifier());
+    }
+
+    public function provideUsers()
+    {
+        yield [new InMemoryUser('fabien', null), 'fabien'];
+    }
+
+    /**
+     * @dataProvider provideLegacyUsers
+     * @group legacy
+     */
+    public function testLegacyGetUserIdentifier($user, string $username)
+    {
+        $token = new ConcreteToken(['ROLE_FOO']);
+        $token->setUser($user);
+        $this->assertEquals($username, $token->getUserIdentifier());
+    }
+
+    public function provideLegacyUsers()
+    {
+        return [
+            [new TestUser('fabien'), 'fabien'],
+            ['fabien', 'fabien'],
+        ];
     }
 
     public function testEraseCredentials()
@@ -104,6 +125,9 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
     }
 
+    /**
+     * @group legacy
+     */
     public function testAuthenticatedFlag()
     {
         $token = new ConcreteToken();
@@ -139,7 +163,7 @@ class AbstractTokenTest extends TestCase
     }
 
     /**
-     * @dataProvider getUsers
+     * @dataProvider provideUsers
      */
     public function testSetUser($user)
     {
@@ -148,16 +172,8 @@ class AbstractTokenTest extends TestCase
         $this->assertSame($user, $token->getUser());
     }
 
-    public function getUsers()
-    {
-        return [
-            [new InMemoryUser('foo', null)],
-            [new TestUser('foo')],
-            ['foo'],
-        ];
-    }
-
     /**
+     * @group legacy
      * @dataProvider getUserChanges
      */
     public function testSetUserSetsAuthenticatedToFalseWhenUserChanges($firstUser, $secondUser)
@@ -190,7 +206,9 @@ class AbstractTokenTest extends TestCase
     }
 
     /**
-     * @dataProvider getUsers
+     * @group legacy
+     * @dataProvider provideUsers
+     * @dataProvider provideLegacyUsers
      */
     public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)
     {
@@ -205,6 +223,9 @@ class AbstractTokenTest extends TestCase
         $this->assertTrue($token->isAuthenticated());
     }
 
+    /**
+     * @group legacy
+     */
     public function testIsUserChangedWhenSerializing()
     {
         $token = new ConcreteToken(['ROLE_ADMIN']);
@@ -247,22 +268,22 @@ class SerializableUser implements UserInterface, \Serializable
         $this->roles = $roles;
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->name;
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         return $this->name;
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return '***';
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         if (empty($this->roles)) {
             return ['ROLE_USER'];
@@ -275,7 +296,7 @@ class SerializableUser implements UserInterface, \Serializable
     {
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return null;
     }

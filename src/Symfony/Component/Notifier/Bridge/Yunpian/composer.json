@@ -1,0 +1,30 @@
+{
+    "name": "symfony/yunpian-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Yunpian Notifier Bridge",
+    "keywords": ["sms", "yunpian", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathieu Santostefano",
+            "email": "msantostefano@protonmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/http-client": "^4.4|^5.2|^6.0",
+        "symfony/notifier": "^5.3|^6.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Yunpian\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

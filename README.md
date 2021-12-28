@@ -17,11 +17,11 @@ Installation
 Sponsor
 -------
 
-Symfony 5.3 is [backed][27] by [JoliCode][28].
+Symfony 5.4 is [backed][27] by [Private Packagist][28].
 
-JoliCode is a team of passionate developers and open-source lovers, with a
-strong expertise in PHP & Symfony technologies. They can help you build your
-projects using state-of-the-art practices.
+Private Packagist is a fast, reliable, and secure Composer repository for your
+private packages. It mirrors all your open-source dependencies for better
+availability and monitors them for security vulnerabilities.
 
 Help Symfony by [sponsoring][29] its development!
 
@@ -86,5 +86,5 @@ and supported by [Symfony contributors][19].
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
 [27]: https://symfony.com/backers
-[28]: https://jolicode.com/
+[28]: https://packagist.com/
 [29]: https://symfony.com/sponsor

@@ -83,6 +83,21 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('ses+api', 'default', self::USER, self::PASSWORD, null, ['session_token' => 'se$sion']),
+            new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1', 'sessionToken' => 'se$sion']), null, $client, $logger), $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('ses+api', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-2', 'session_token' => 'se$sion']),
+            new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-2', 'sessionToken' => 'se$sion']), null, $client, $logger), $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('ses+api', 'example.com', self::USER, self::PASSWORD, 8080, ['session_token' => 'se$sion']),
+            new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1', 'endpoint' => 'https://example.com:8080', 'sessionToken' => 'se$sion']), null, $client, $logger), $dispatcher, $logger),
+        ];
+
+        yield [
             new Dsn('ses+https', 'default', self::USER, self::PASSWORD),
             new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1']), null, $client, $logger), $dispatcher, $logger),
         ];
@@ -103,6 +118,26 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('ses+https', 'default', self::USER, self::PASSWORD, null, ['session_token' => 'se$sion']),
+            new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1', 'sessionToken' => 'se$sion']), null, $client, $logger), $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('ses', 'default', self::USER, self::PASSWORD, null, ['session_token' => 'se$sion']),
+            new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1', 'sessionToken' => 'se$sion']), null, $client, $logger), $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('ses+https', 'example.com', self::USER, self::PASSWORD, 8080, ['session_token' => 'se$sion']),
+            new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1', 'endpoint' => 'https://example.com:8080', 'sessionToken' => 'se$sion']), null, $client, $logger), $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('ses+https', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-2', 'session_token' => 'se$sion']),
+            new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-2', 'sessionToken' => 'se$sion']), null, $client, $logger), $dispatcher, $logger),
+        ];
+
+        yield [
             new Dsn('ses+smtp', 'default', self::USER, self::PASSWORD),
             new SesSmtpTransport(self::USER, self::PASSWORD, null, $dispatcher, $logger),
         ];
@@ -115,6 +150,11 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
         yield [
             new Dsn('ses+smtps', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
             new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('ses+smtps', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1', 'ping_threshold' => '10']),
+            (new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', $dispatcher, $logger))->setPingThreshold(10),
         ];
     }
 

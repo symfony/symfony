@@ -20,22 +20,22 @@ use Symfony\Component\Serializer\Tests\Fixtures\GroupDummyInterface;
  */
 class GroupDummy extends GroupDummyParent implements GroupDummyInterface
 {
-    #[Groups(["a"])]
+    #[Groups(['a'])]
     private $foo;
-    #[Groups(["b", "c", "name_converter"])]
+    #[Groups(['b', 'c', 'name_converter'])]
     protected $bar;
     #[ChildOfGroupsAnnotationDummy]
     protected $quux;
     private $fooBar;
     private $symfony;
 
-    #[Groups(["b"])]
+    #[Groups(['b'])]
     public function setBar($bar)
     {
         $this->bar = $bar;
     }
 
-    #[Groups(["c"])]
+    #[Groups(['c'])]
     public function getBar()
     {
         return $this->bar;
@@ -56,7 +56,7 @@ class GroupDummy extends GroupDummyParent implements GroupDummyInterface
         $this->fooBar = $fooBar;
     }
 
-    #[Groups(["a", "b", "name_converter"])]
+    #[Groups(['a', 'b', 'name_converter'])]
     public function isFooBar()
     {
         return $this->fooBar;

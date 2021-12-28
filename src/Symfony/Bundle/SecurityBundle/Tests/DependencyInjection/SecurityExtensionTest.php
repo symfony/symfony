@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
@@ -37,10 +38,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
 class SecurityExtensionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testInvalidCheckPath()
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -371,6 +375,33 @@ class SecurityExtensionTest extends TestCase
     }
 
     /**
+     * @group legacy
+     */
+    public function testFirewallWithNoUserProviderTriggerDeprecation()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+
+            'providers' => [
+                'first' => ['id' => 'foo'],
+                'second' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'some_firewall' => [
+                    'custom_authenticator' => 'my_authenticator',
+                ],
+            ],
+        ]);
+
+        $this->expectDeprecation('Since symfony/security-bundle 5.4: Not configuring explicitly the provider for the "some_firewall" firewall is deprecated because it\'s ambiguous as there is more than one registered provider. Set the "provider" key to one of the configured providers, even if your custom authenticators don\'t use it.');
+
+        $container->compile();
+    }
+
+    /**
      * @dataProvider sessionConfigurationProvider
      * @group legacy
      */
@@ -634,6 +665,9 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
+    /**
+     * @group legacy
+     */
     public function testAlwaysAuthenticateBeforeGrantingCannotBeTrueWithAuthenticatorManager()
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -784,6 +818,26 @@ class SecurityExtensionTest extends TestCase
         $this->assertContains('custom_firewall_listener_id', $firewallListeners);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyAuthorizationManagerSignature()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'always_authenticate_before_granting' => true,
+            'firewalls' => ['main' => ['http_basic' => true]],
+        ]);
+
+        $container->compile();
+
+        $args = $container->getDefinition('security.authorization_checker')->getArguments();
+        $this->assertEquals('security.token_storage', (string) $args[0]);
+        $this->assertEquals('security.authentication.manager', (string) $args[1]);
+        $this->assertEquals('security.access.decision_manager', (string) $args[2]);
+        $this->assertEquals('%security.access.always_authenticate_before_granting%', (string) $args[3]);
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();
@@ -817,7 +871,7 @@ class TestAuthenticator implements AuthenticatorInterface
     {
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
     }
 
@@ -830,6 +884,10 @@ class TestAuthenticator implements AuthenticatorInterface
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    {
+    }
+
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
     }
 }
@@ -854,7 +912,7 @@ class TestFirewallListenerFactory implements SecurityFactoryInterface, FirewallL
         return ['custom_firewall_listener_id'];
     }
 
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $container->register('provider_id', \stdClass::class);
         $container->register('listener_id', \stdClass::class);
@@ -862,12 +920,12 @@ class TestFirewallListenerFactory implements SecurityFactoryInterface, FirewallL
         return ['provider_id', 'listener_id', $defaultEntryPoint];
     }
 
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'form';
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'custom_listener';
     }

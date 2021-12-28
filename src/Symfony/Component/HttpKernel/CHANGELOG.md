@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add the ability to enable the profiler using a request query parameter, body parameter or attribute
+ * Deprecate `AbstractTestSessionListener::getSession` inject a session in the request instead
+ * Deprecate the `fileLinkFormat` parameter of `DebugHandlersListener`
+ * Add support for configuring log level, and status code by exception class
+ * Allow ignoring "kernel.reset" methods that don't exist with "on_invalid" attribute
+
 5.3
 ---
 

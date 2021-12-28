@@ -24,21 +24,21 @@ interface ParameterBagInterface
     /**
      * Clears all parameters.
      *
-     * @throws LogicException if the ParameterBagInterface can not be cleared
+     * @throws LogicException if the ParameterBagInterface cannot be cleared
      */
     public function clear();
 
     /**
      * Adds parameters to the service container parameters.
      *
-     * @throws LogicException if the parameter can not be added
+     * @throws LogicException if the parameter cannot be added
      */
     public function add(array $parameters);
 
     /**
      * Gets the service container parameters.
      *
-     * @return array An array of parameters
+     * @return array
      */
     public function all();
 
@@ -61,14 +61,14 @@ interface ParameterBagInterface
      *
      * @param array|bool|string|int|float|null $value The parameter value
      *
-     * @throws LogicException if the parameter can not be set
+     * @throws LogicException if the parameter cannot be set
      */
     public function set(string $name, $value);
 
     /**
      * Returns true if a parameter name is defined.
      *
-     * @return bool true if the parameter name is defined, false otherwise
+     * @return bool
      */
     public function has(string $name);
 

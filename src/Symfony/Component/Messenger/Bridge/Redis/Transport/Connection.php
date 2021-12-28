@@ -188,6 +188,8 @@ class Connection
         if (\array_key_exists('delete_after_ack', $redisOptions)) {
             $deleteAfterAck = filter_var($redisOptions['delete_after_ack'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['delete_after_ack']);
+        } else {
+            trigger_deprecation('symfony/redis-messenger', '5.4', 'Not setting the "delete_after_ack" boolean option explicitly is deprecated, its default value will change to true in 6.0.');
         }
 
         $deleteAfterReject = null;
@@ -356,13 +358,13 @@ class Connection
                 }
 
                 foreach ($queuedMessages as $queuedMessage => $time) {
-                    $queuedMessage = json_decode($queuedMessage, true);
+                    $decodedQueuedMessage = json_decode($queuedMessage, true);
                     // if a futured placed message is actually popped because of a race condition with
                     // another running message consumer, the message is readded to the queue by add function
                     // else its just added stream and will be available for all stream consumers
                     $this->add(
-                        $queuedMessage['body'],
-                        $queuedMessage['headers'],
+                        \array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage,
+                        $decodedQueuedMessage['headers'] ?? [],
                         $time - $this->getCurrentTimeInMilliseconds()
                     );
                 }
@@ -406,12 +408,9 @@ class Connection
         }
 
         foreach ($messages[$this->stream] ?? [] as $key => $message) {
-            $redisEnvelope = json_decode($message['message'], true);
-
             return [
                 'id' => $key,
-                'body' => $redisEnvelope['body'],
-                'headers' => $redisEnvelope['headers'],
+                'data' => $message,
             ];
         }
 
@@ -529,7 +528,7 @@ class Connection
                 // support for Redis extension version 4.x
                 || (\is_string($groups) && substr_count($groups, '"name"'))
             ) {
-                throw new LogicException(sprintf('More than one group exists for stream "%s", delete_after_ack and delete_after_reject can not be enabled as it risks deleting messages before all groups could consume them.', $this->stream));
+                throw new LogicException(sprintf('More than one group exists for stream "%s", delete_after_ack and delete_after_reject cannot be enabled as it risks deleting messages before all groups could consume them.', $this->stream));
             }
         }
 

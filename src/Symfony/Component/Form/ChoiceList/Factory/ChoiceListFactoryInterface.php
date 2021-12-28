@@ -33,7 +33,7 @@ interface ChoiceListFactoryInterface
      *
      * @param callable|null $filter The callable filtering the choices
      *
-     * @return ChoiceListInterface The choice list
+     * @return ChoiceListInterface
      */
     public function createListFromChoices(iterable $choices, callable $value = null/*, callable $filter = null*/);
 
@@ -46,7 +46,7 @@ interface ChoiceListFactoryInterface
      *
      * @param callable|null $filter The callable filtering the choices
      *
-     * @return ChoiceListInterface The choice list
+     * @return ChoiceListInterface
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null/*, callable $filter = null*/);
 
@@ -82,7 +82,7 @@ interface ChoiceListFactoryInterface
      * @param array|callable|null $attr                       The callable generating the HTML attributes
      * @param array|callable      $labelTranslationParameters The parameters used to translate the choice labels
      *
-     * @return ChoiceListView The choice list view
+     * @return ChoiceListView
      */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null/*, $labelTranslationParameters = []*/);
 }

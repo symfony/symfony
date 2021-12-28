@@ -44,11 +44,15 @@ abstract class TranslationProviderTestCase extends TestCase
         parent::tearDown();
     }
 
-    protected function getProviderCollection(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages']): TranslationProviderCollection
+    protected function getProviderCollection(ProviderInterface $provider, array $providerNames = ['loco'], array $locales = ['en'], array $domains = ['messages']): TranslationProviderCollection
     {
-        return new TranslationProviderCollection([
-            'loco' => new FilteringProvider($provider, $locales, $domains),
-        ]);
+        $collection = [];
+
+        foreach ($providerNames as $providerName) {
+            $collection[$providerName] = new FilteringProvider($provider, $locales, $domains);
+        }
+
+        return new TranslationProviderCollection($collection);
     }
 
     protected function createFile(array $messages = ['note' => 'NOTE'], $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.xlf', string $xlfVersion = 'xlf12'): string

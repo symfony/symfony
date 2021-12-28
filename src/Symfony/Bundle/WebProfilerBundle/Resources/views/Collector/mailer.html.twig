@@ -141,30 +141,48 @@
                                             </div>
                                             {% if message.htmlBody is defined %}
                                                 {# Email instance #}
-                                                <div class="tab">
-                                                    <h3 class="tab-title">HTML Content</h3>
-                                                    <div class="tab-content">
-                                                        <pre class="prewrap" style="max-height: 600px">
-                                                            {%- if message.htmlCharset() %}
-                                                                {{- message.htmlBody()|convert_encoding('UTF-8', message.htmlCharset()) }}
-                                                            {%- else %}
-                                                                {{- message.htmlBody() }}
-                                                            {%- endif -%}
-                                                        </pre>
+                                                {% set htmlBody = message.htmlBody() %}
+                                                {% if htmlBody is not null %}
+                                                    <div class="tab">
+                                                        <h3 class="tab-title">HTML Preview</h3>
+                                                        <div class="tab-content">
+                                                            <pre class="prewrap" style="max-height: 600px">
+                                                                <iframe
+                                                                    src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}"
+                                                                    style="height: 80vh;width: 100%;"
+                                                                >
+                                                                </iframe>
+                                                            </pre>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="tab">
-                                                    <h3 class="tab-title">Text Content</h3>
-                                                    <div class="tab-content">
-                                                        <pre class="prewrap" style="max-height: 600px">
-                                                            {%- if message.textCharset() %}
-                                                                {{- message.textBody()|convert_encoding('UTF-8', message.textCharset()) }}
-                                                            {%- else %}
-                                                                {{- message.textBody() }}
-                                                            {%- endif -%}
-                                                        </pre>
+                                                    <div class="tab">
+                                                        <h3 class="tab-title">HTML Content</h3>
+                                                        <div class="tab-content">
+                                                            <pre class="prewrap" style="max-height: 600px">
+                                                                {%- if message.htmlCharset() %}
+                                                                    {{- htmlBody|convert_encoding('UTF-8', message.htmlCharset()) }}
+                                                                {%- else %}
+                                                                    {{- htmlBody }}
+                                                                {%- endif -%}
+                                                            </pre>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                {% endif %}
+                                                {% set textBody = message.textBody() %}
+                                                {% if textBody is not null %}
+                                                    <div class="tab">
+                                                        <h3 class="tab-title">Text Content</h3>
+                                                        <div class="tab-content">
+                                                            <pre class="prewrap" style="max-height: 600px">
+                                                                {%- if message.textCharset() %}
+                                                                    {{- textBody|convert_encoding('UTF-8', message.textCharset()) }}
+                                                                {%- else %}
+                                                                    {{- textBody }}
+                                                                {%- endif -%}
+                                                            </pre>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
                                                 {% for attachment in message.attachments %}
                                                     <div class="tab">
                                                         <h3 class="tab-title">Attachment #{{ loop.index }}</h3>

@@ -74,7 +74,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * Returns the decorated factory.
      *
-     * @return ChoiceListFactoryInterface The decorated factory
+     * @return ChoiceListFactoryInterface
      */
     public function getDecoratedFactory()
     {

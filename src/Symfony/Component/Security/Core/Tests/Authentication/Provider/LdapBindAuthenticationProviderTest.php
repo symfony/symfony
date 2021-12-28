@@ -105,7 +105,12 @@ class LdapBindAuthenticationProviderTest extends TestCase
     {
         $userProvider = $this->createMock(UserProviderInterface::class);
 
-        $collection = new \ArrayIterator([new Entry('')]);
+        $collection = new class([new Entry('')]) extends \ArrayObject implements CollectionInterface {
+            public function toArray(): array
+            {
+                return $this->getArrayCopy();
+            }
+        };
 
         $query = $this->createMock(QueryInterface::class);
         $query
@@ -146,7 +151,12 @@ class LdapBindAuthenticationProviderTest extends TestCase
     {
         $userProvider = $this->createMock(UserProviderInterface::class);
 
-        $collection = new \ArrayIterator([new Entry('')]);
+        $collection = new class([new Entry('')]) extends \ArrayObject implements CollectionInterface {
+            public function toArray(): array
+            {
+                return $this->getArrayCopy();
+            }
+        };
 
         $query = $this->createMock(QueryInterface::class);
         $query

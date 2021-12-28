@@ -56,7 +56,7 @@ abstract class AbstractUriElement
     /**
      * Gets the node associated with this link.
      *
-     * @return \DOMElement A \DOMElement instance
+     * @return \DOMElement
      */
     public function getNode()
     {
@@ -66,7 +66,7 @@ abstract class AbstractUriElement
     /**
      * Gets the method associated with this link.
      *
-     * @return string The method
+     * @return string
      */
     public function getMethod()
     {
@@ -76,7 +76,7 @@ abstract class AbstractUriElement
     /**
      * Gets the URI associated with this link.
      *
-     * @return string The URI
+     * @return string
      */
     public function getUri()
     {

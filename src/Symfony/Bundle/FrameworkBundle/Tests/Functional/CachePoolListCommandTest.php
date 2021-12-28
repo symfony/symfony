@@ -30,7 +30,7 @@ class CachePoolListCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester(['cache.app', 'cache.system']);
         $tester->execute([]);
 
-        $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:list exits with 0 in case of success');
+        $tester->assertCommandIsSuccessful('cache:pool:list exits with 0 in case of success');
         $this->assertStringContainsString('cache.app', $tester->getDisplay());
         $this->assertStringContainsString('cache.system', $tester->getDisplay());
     }
@@ -40,7 +40,7 @@ class CachePoolListCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester([]);
         $tester->execute([]);
 
-        $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:list exits with 0 in case of success');
+        $tester->assertCommandIsSuccessful('cache:pool:list exits with 0 in case of success');
     }
 
     private function createCommandTester(array $poolNames)

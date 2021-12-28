@@ -65,11 +65,21 @@ class PasswordMigratingListenerTest extends TestCase
 
         // blank password
         yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(TestPasswordAuthenticatedUser::class); }), [new PasswordUpgradeBadge('', $this->createPasswordUpgrader())]))];
-
-        // no user
-        yield [$this->createEvent($this->createMock(PassportInterface::class))];
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyUnsupportedEvents()
+    {
+        $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
+
+        $this->listener->onLoginSuccess($this->createEvent($this->createMock(PassportInterface::class)));
+    }
+
+    /**
+     * @group legacy
+     */
     public function testUnsupportedPassport()
     {
         // A custom Passport, without an UserBadge
@@ -142,5 +152,5 @@ abstract class TestPasswordAuthenticatedUser implements UserInterface, PasswordA
 {
     abstract public function getPassword(): ?string;
 
-    abstract public function getSalt();
+    abstract public function getSalt(): ?string;
 }

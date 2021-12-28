@@ -25,6 +25,7 @@ class TestNormalizer implements NormalizerInterface
      */
     public function normalize($object, string $format = null, array $context = [])
     {
+        return null;
     }
 
     /**

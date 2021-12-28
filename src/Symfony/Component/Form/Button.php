@@ -18,6 +18,8 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  * A form button.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, FormInterface>
  */
 class Button implements \IteratorAggregate, FormInterface
 {
@@ -47,9 +49,9 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @param mixed $offset
+     * @param string $offset
      *
-     * @return bool Always returns false
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function offsetExists($offset)
@@ -62,9 +64,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $offset
+     * @param string $offset
      *
-     * @return mixed
+     * @return FormInterface
      *
      * @throws BadMethodCallException
      */
@@ -79,8 +81,8 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $offset
-     * @param mixed $value
+     * @param string        $offset
+     * @param FormInterface $value
      *
      * @return void
      *
@@ -97,7 +99,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param mixed $offset
+     * @param string $offset
      *
      * @return void
      *
@@ -158,7 +160,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @return bool Always returns false
+     * @return bool
      */
     public function has(string $name)
     {
@@ -235,7 +237,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @return array Always returns an empty array
+     * @return array
      */
     public function getExtraData()
     {
@@ -245,7 +247,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Returns the button's configuration.
      *
-     * @return FormConfigInterface The configuration instance
+     * @return FormConfigInterface
      */
     public function getConfig()
     {
@@ -255,7 +257,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Returns whether the button is submitted.
      *
-     * @return bool true if the button was submitted
+     * @return bool
      */
     public function isSubmitted()
     {
@@ -265,7 +267,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Returns the name by which the button is identified in forms.
      *
-     * @return string The name of the button
+     * @return string
      */
     public function getName()
     {
@@ -293,7 +295,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @return bool Always returns true
+     * @return bool
      */
     public function isValid()
     {
@@ -303,7 +305,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @return bool Always returns false
+     * @return bool
      */
     public function isRequired()
     {
@@ -325,7 +327,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @return bool Always returns true
+     * @return bool
      */
     public function isEmpty()
     {
@@ -335,7 +337,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @return bool Always returns true
+     * @return bool
      */
     public function isSynchronized()
     {
@@ -432,7 +434,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @return int Always returns 0
+     * @return int
      */
     #[\ReturnTypeWillChange]
     public function count()
@@ -443,7 +445,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @return \EmptyIterator Always returns an empty iterator
+     * @return \EmptyIterator
      */
     #[\ReturnTypeWillChange]
     public function getIterator()

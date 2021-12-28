@@ -48,13 +48,6 @@ abstract class AbstractDescriptorTest extends TestCase
     /** @dataProvider getDescribeApplicationTestData */
     public function testDescribeApplication(Application $application, $expectedDescription)
     {
-        // Replaces the dynamic placeholders of the command help text with a static version.
-        // The placeholder %command.full_name% includes the script path that is not predictable
-        // and can not be tested against.
-        foreach ($application->all() as $command) {
-            $command->setHelp(str_replace('%command.full_name%', 'app/console %command.name%', $command->getHelp()));
-        }
-
         $this->assertDescription($expectedDescription, $application);
     }
 
@@ -102,6 +95,13 @@ abstract class AbstractDescriptorTest extends TestCase
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $this->getDescriptor()->describe($output, $describedObject, $options + ['raw_output' => true]);
-        $this->assertEquals(trim($expectedDescription), trim(str_replace(\PHP_EOL, "\n", $output->fetch())));
+        $this->assertEquals($this->normalizeOutput($expectedDescription), $this->normalizeOutput($output->fetch()));
+    }
+
+    protected function normalizeOutput(string $output)
+    {
+        $output = str_replace(['%%PHP_SELF%%', '%%PHP_SELF_FULL%%', '%%COMMAND_NAME%%', '%%SHELL%%'], [$_SERVER['PHP_SELF'], realpath($_SERVER['PHP_SELF']), basename($_SERVER['PHP_SELF']), basename($_SERVER['SHELL'] ?? '')], $output);
+
+        return trim(str_replace(\PHP_EOL, "\n", $output));
     }
 }

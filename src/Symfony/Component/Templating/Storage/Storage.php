@@ -31,7 +31,7 @@ abstract class Storage
     /**
      * Returns the object string representation.
      *
-     * @return string The template name
+     * @return string
      */
     public function __toString()
     {
@@ -41,7 +41,7 @@ abstract class Storage
     /**
      * Returns the content of the template.
      *
-     * @return string The template content
+     * @return string
      */
     abstract public function getContent();
 }

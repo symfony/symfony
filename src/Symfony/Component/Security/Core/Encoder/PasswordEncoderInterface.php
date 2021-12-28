@@ -28,7 +28,7 @@ interface PasswordEncoderInterface
     /**
      * Encodes the raw password.
      *
-     * @return string The encoded password
+     * @return string
      *
      * @throws BadCredentialsException   If the raw password is invalid, e.g. excessively long
      * @throws \InvalidArgumentException If the salt is invalid
@@ -42,7 +42,7 @@ interface PasswordEncoderInterface
      * @param string      $raw     A raw password
      * @param string|null $salt    The salt
      *
-     * @return bool true if the password is valid, false otherwise
+     * @return bool
      *
      * @throws \InvalidArgumentException If the salt is invalid
      */

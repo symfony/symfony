@@ -40,7 +40,7 @@ class XmlFileLoader extends FileLoader
      * @param string      $file An XML file path
      * @param string|null $type The resource type
      *
-     * @return RouteCollection A RouteCollection instance
+     * @return RouteCollection
      *
      * @throws \InvalidArgumentException when the file cannot be loaded or when the XML cannot be
      *                                   parsed because it does not validate against the scheme
@@ -116,6 +116,16 @@ class XmlFileLoader extends FileLoader
     {
         if ('' === $id = $node->getAttribute('id')) {
             throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" attribute.', $path));
+        }
+
+        if ('' !== $alias = $node->getAttribute('alias')) {
+            $alias = $collection->addAlias($id, $alias);
+
+            if ($deprecationInfo = $this->parseDeprecation($node, $path)) {
+                $alias->setDeprecated($deprecationInfo['package'], $deprecationInfo['version'], $deprecationInfo['message']);
+            }
+
+            return;
         }
 
         $schemes = preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, \PREG_SPLIT_NO_EMPTY);
@@ -321,7 +331,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses the "default" elements.
      *
-     * @return array|bool|float|int|string|null The parsed value of the "default" element
+     * @return array|bool|float|int|string|null
      */
     private function parseDefaultsConfig(\DOMElement $element, string $path)
     {
@@ -353,7 +363,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Recursively parses the value of a "default" element.
      *
-     * @return array|bool|float|int|string|null The parsed value
+     * @return array|bool|float|int|string|null
      *
      * @throws \InvalidArgumentException when the XML is invalid
      */
@@ -418,5 +428,42 @@ class XmlFileLoader extends FileLoader
         }
 
         return 'true' === $element->getAttributeNS($namespaceUri, 'nil') || '1' === $element->getAttributeNS($namespaceUri, 'nil');
+    }
+
+    /**
+     * Parses the deprecation elements.
+     *
+     * @throws \InvalidArgumentException When the XML is invalid
+     */
+    private function parseDeprecation(\DOMElement $node, string $path): array
+    {
+        $deprecatedNode = null;
+        foreach ($node->childNodes as $child) {
+            if (!$child instanceof \DOMElement || self::NAMESPACE_URI !== $child->namespaceURI) {
+                continue;
+            }
+            if ('deprecated' !== $child->localName) {
+                throw new \InvalidArgumentException(sprintf('Invalid child element "%s" defined for alias "%s" in "%s".', $child->localName, $node->getAttribute('id'), $path));
+            }
+
+            $deprecatedNode = $child;
+        }
+
+        if (null === $deprecatedNode) {
+            return [];
+        }
+
+        if (!$deprecatedNode->hasAttribute('package')) {
+            throw new \InvalidArgumentException(sprintf('The <deprecated> element in file "%s" must have a "package" attribute.', $path));
+        }
+        if (!$deprecatedNode->hasAttribute('version')) {
+            throw new \InvalidArgumentException(sprintf('The <deprecated> element in file "%s" must have a "version" attribute.', $path));
+        }
+
+        return [
+            'package' => $deprecatedNode->getAttribute('package'),
+            'version' => $deprecatedNode->getAttribute('version'),
+            'message' => trim($deprecatedNode->nodeValue),
+        ];
     }
 }

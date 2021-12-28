@@ -48,7 +48,7 @@ trait HttpClientTrait
                 throw new InvalidArgumentException(sprintf('Invalid HTTP method "%s", only uppercase letters are accepted.', $method));
             }
             if (!$method) {
-                throw new InvalidArgumentException('The HTTP method can not be empty.');
+                throw new InvalidArgumentException('The HTTP method cannot be empty.');
             }
         }
 
@@ -291,7 +291,18 @@ trait HttpClientTrait
     private static function normalizeBody($body)
     {
         if (\is_array($body)) {
-            return http_build_query($body, '', '&', \PHP_QUERY_RFC1738);
+            array_walk_recursive($body, $caster = static function (&$v) use (&$caster) {
+                if (\is_object($v)) {
+                    if ($vars = get_object_vars($v)) {
+                        array_walk_recursive($vars, $caster);
+                        $v = $vars;
+                    } elseif (method_exists($v, '__toString')) {
+                        $v = (string) $v;
+                    }
+                }
+            });
+
+            return http_build_query($body, '', '&');
         }
 
         if (\is_string($body)) {

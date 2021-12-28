@@ -22,6 +22,8 @@ use Symfony\Component\Finder\Glob;
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @final
+ *
+ * @implements \IteratorAggregate<string, \SplFileInfo>
  */
 class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 {

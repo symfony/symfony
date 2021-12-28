@@ -3,6 +3,7 @@
 $container->loadFromExtension('framework', [
     'serializer' => true,
     'messenger' => [
+        'reset_on_message' =>  true,
         'serializer' => [
             'default_serializer' => 'messenger.transport.symfony_serializer',
             'symfony_serializer' => [

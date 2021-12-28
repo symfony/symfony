@@ -92,7 +92,7 @@ class ApplicationTest extends TestCase
     /**
      * Replaces the dynamic placeholders of the command help text with a static version.
      * The placeholder %command.full_name% includes the script path that is not predictable
-     * and can not be tested against.
+     * and cannot be tested against.
      */
     protected function ensureStaticCommandHelp(Application $application)
     {
@@ -106,7 +106,7 @@ class ApplicationTest extends TestCase
         $application = new Application('foo', 'bar');
         $this->assertEquals('foo', $application->getName(), '__construct() takes the application name as its first argument');
         $this->assertEquals('bar', $application->getVersion(), '__construct() takes the application version as its second argument');
-        $this->assertEquals(['help', 'list'], array_keys($application->all()), '__construct() registered the help and list commands by default');
+        $this->assertEquals(['help', 'list', '_complete', 'completion'], array_keys($application->all()), '__construct() registered the help and list commands by default');
     }
 
     public function testSetGetName()
@@ -1888,8 +1888,6 @@ class CustomApplication extends Application
 {
     /**
      * Overwrites the default input definition.
-     *
-     * @return InputDefinition An InputDefinition instance
      */
     protected function getDefaultInputDefinition(): InputDefinition
     {
@@ -1898,8 +1896,6 @@ class CustomApplication extends Application
 
     /**
      * Gets the default helper set with the helpers that should always be available.
-     *
-     * @return HelperSet A HelperSet instance
      */
     protected function getDefaultHelperSet(): HelperSet
     {
@@ -1957,7 +1953,7 @@ class SignableCommand extends Command implements SignalableCommandInterface
         $this->signaled = true;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         for ($i = 0; $i < $this->loop; ++$i) {
             usleep(100);

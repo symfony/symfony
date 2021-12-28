@@ -23,20 +23,31 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAnyAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAutoconfiguration;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomMethodAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomParameterAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomPropertyAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\IteratorConsumer;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\IteratorConsumerWithDefaultIndexMethod;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\IteratorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\IteratorConsumerWithDefaultPriorityMethod;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerFactory;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefaultIndexMethod;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithDefaultPriorityMethod;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerWithoutIndex;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3Configurator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService4;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -376,30 +387,85 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
-    public function testTaggedIteratorWithMultipleIndexAttribute()
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedIteratorWithDefaultIndexMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
             ->setPublic(true)
-            ->addTag('foo_bar', ['foo' => 'bar'])
-            ->addTag('foo_bar', ['foo' => 'bar_duplicate'])
+            ->addTag('foo_bar')
         ;
         $container->register(FooTagClass::class)
             ->setPublic(true)
             ->addTag('foo_bar')
-            ->addTag('foo_bar')
         ;
-        $container->register(FooBarTaggedClass::class)
-            ->addArgument(new TaggedIteratorArgument('foo_bar', 'foo'))
+        $container->register(IteratorConsumerWithDefaultIndexMethod::class)
+            ->setAutowired(true)
             ->setPublic(true)
         ;
 
         $container->compile();
 
-        $s = $container->get(FooBarTaggedClass::class);
+        $s = $container->get(IteratorConsumerWithDefaultIndexMethod::class);
 
         $param = iterator_to_array($s->getParam()->getIterator());
-        $this->assertSame(['bar' => $container->get(BarTagClass::class), 'bar_duplicate' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
+        $this->assertSame(['bar_tag_class' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedIteratorWithDefaultPriorityMethodConfiguredViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(IteratorConsumerWithDefaultPriorityMethod::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(IteratorConsumerWithDefaultPriorityMethod::class);
+
+        $param = iterator_to_array($s->getParam()->getIterator());
+        $this->assertSame([0 => $container->get(FooTagClass::class), 1 => $container->get(BarTagClass::class)], $param);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedIteratorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(IteratorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(IteratorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod::class);
+
+        $param = iterator_to_array($s->getParam()->getIterator());
+        $this->assertSame(['foo_tag_class' => $container->get(FooTagClass::class), 'bar_tag_class' => $container->get(BarTagClass::class)], $param);
     }
 
     /**
@@ -458,6 +524,103 @@ class IntegrationTest extends TestCase
         $locator = $s->getLocator();
         self::assertSame($container->get(BarTagClass::class), $locator->get(BarTagClass::class));
         self::assertSame($container->get(FooTagClass::class), $locator->get(FooTagClass::class));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedLocatorWithDefaultIndexMethodConfiguredViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(LocatorConsumerWithDefaultIndexMethod::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumerWithoutIndex $s */
+        $s = $container->get(LocatorConsumerWithDefaultIndexMethod::class);
+
+        $locator = $s->getLocator();
+        self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tag_class'));
+        self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedLocatorWithDefaultPriorityMethodConfiguredViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(LocatorConsumerWithDefaultPriorityMethod::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumerWithoutIndex $s */
+        $s = $container->get(LocatorConsumerWithDefaultPriorityMethod::class);
+
+        $locator = $s->getLocator();
+
+        // We need to check priority of instances in the factories
+        $factories = (new \ReflectionClass($locator))->getProperty('factories');
+        $factories->setAccessible(true);
+
+        self::assertSame([FooTagClass::class, BarTagClass::class], array_keys($factories->getValue($locator)));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(LocatorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumerWithoutIndex $s */
+        $s = $container->get(LocatorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod::class);
+
+        $locator = $s->getLocator();
+
+        // We need to check priority of instances in the factories
+        $factories = (new \ReflectionClass($locator))->getProperty('factories');
+        $factories->setAccessible(true);
+
+        self::assertSame(['foo_tag_class', 'bar_tag_class'], array_keys($factories->getValue($locator)));
+        self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tag_class'));
+        self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }
 
     /**
@@ -752,6 +915,102 @@ class IntegrationTest extends TestCase
         self::assertSame([
             'two' => [
                 ['someAttribute' => 'prio 100', 'priority' => 100],
+            ],
+        ], $collector->collectedTags);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTagsViaAttributeOnPropertyMethodAndParameter()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(
+            CustomMethodAttribute::class,
+            static function (ChildDefinition $definition, CustomMethodAttribute $attribute, \ReflectionMethod $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+                $tagAttributes['method'] = $reflector->getName();
+
+                $definition->addTag('app.custom_tag', $tagAttributes);
+            }
+        );
+        $container->registerAttributeForAutoconfiguration(
+            CustomPropertyAttribute::class,
+            static function (ChildDefinition $definition, CustomPropertyAttribute $attribute, \ReflectionProperty $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+                $tagAttributes['property'] = $reflector->getName();
+
+                $definition->addTag('app.custom_tag', $tagAttributes);
+            }
+        );
+        $container->registerAttributeForAutoconfiguration(
+            CustomParameterAttribute::class,
+            static function (ChildDefinition $definition, CustomParameterAttribute $attribute, \ReflectionParameter $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+                $tagAttributes['parameter'] = $reflector->getName();
+
+                $definition->addTag('app.custom_tag', $tagAttributes);
+            }
+        );
+        $container->registerAttributeForAutoconfiguration(
+            CustomAnyAttribute::class,
+            eval(<<<'PHP'
+            return static function (\Symfony\Component\DependencyInjection\ChildDefinition $definition, \Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAnyAttribute $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter $reflector) {
+                $tagAttributes = get_object_vars($attribute);
+                if ($reflector instanceof \ReflectionClass) {
+                    $tagAttributes['class'] = $reflector->getName();
+                } elseif ($reflector instanceof \ReflectionMethod) {
+                    $tagAttributes['method'] = $reflector->getName();
+                } elseif ($reflector instanceof \ReflectionProperty) {
+                    $tagAttributes['property'] = $reflector->getName();
+                } elseif ($reflector instanceof \ReflectionParameter) {
+                    $tagAttributes['parameter'] = $reflector->getName();
+                }
+
+                $definition->addTag('app.custom_tag', $tagAttributes);
+            };
+PHP
+            ));
+
+        $container->register(TaggedService4::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+
+        $container->register('failing_factory', \stdClass::class);
+        $container->register('ccc', TaggedService4::class)
+            ->setFactory([new Reference('failing_factory'), 'create'])
+            ->setAutoconfigured(true);
+
+        $collector = new TagCollector();
+        $container->addCompilerPass($collector);
+
+        $container->compile();
+
+        self::assertSame([
+            TaggedService4::class => [
+                ['class' => TaggedService4::class],
+                ['parameter' => 'param1'],
+                ['someAttribute' => 'on param1 in constructor', 'priority' => 0, 'parameter' => 'param1'],
+                ['parameter' => 'param2'],
+                ['someAttribute' => 'on param2 in constructor', 'priority' => 0, 'parameter' => 'param2'],
+                ['method' => 'fooAction'],
+                ['someAttribute' => 'on fooAction', 'priority' => 0, 'method' => 'fooAction'],
+                ['someAttribute' => 'on param1 in fooAction', 'priority' => 0, 'parameter' => 'param1'],
+                ['method' => 'barAction'],
+                ['someAttribute' => 'on barAction', 'priority' => 0, 'method' => 'barAction'],
+                ['property' => 'name'],
+                ['someAttribute' => 'on name', 'priority' => 0, 'property' => 'name'],
+            ],
+            'ccc' => [
+                ['class' => TaggedService4::class],
+                ['method' => 'fooAction'],
+                ['someAttribute' => 'on fooAction', 'priority' => 0, 'method' => 'fooAction'],
+                ['parameter' => 'param1'],
+                ['someAttribute' => 'on param1 in fooAction', 'priority' => 0, 'parameter' => 'param1'],
+                ['method' => 'barAction'],
+                ['someAttribute' => 'on barAction', 'priority' => 0, 'method' => 'barAction'],
+                ['property' => 'name'],
+                ['someAttribute' => 'on name', 'priority' => 0, 'property' => 'name'],
             ],
         ], $collector->collectedTags);
     }

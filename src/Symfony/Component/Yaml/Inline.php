@@ -54,7 +54,7 @@ class Inline
      * @param int    $flags      A bit field of PARSE_* constants to customize the YAML parser behavior
      * @param array  $references Mapping of variable names to values
      *
-     * @return mixed A PHP value
+     * @return mixed
      *
      * @throws ParseException
      */
@@ -111,8 +111,6 @@ class Inline
      *
      * @param mixed $value The PHP variable to convert
      * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
-     *
-     * @return string The YAML string representing the PHP value
      *
      * @throws DumpException When trying to dump PHP resource
      */
@@ -174,7 +172,9 @@ class Inline
                         $repr = str_ireplace('INF', '.Inf', $repr);
                     } elseif (floor($value) == $value && $repr == $value) {
                         // Preserve float data type since storing a whole number will result in integer value.
-                        $repr = '!!float '.$repr;
+                        if (false === strpos($repr, 'E')) {
+                            $repr = $repr.'.0';
+                        }
                     }
                 } else {
                     $repr = \is_string($value) ? "'$value'" : (string) $value;
@@ -204,8 +204,6 @@ class Inline
      * Check if given array is hash or just normal indexed array.
      *
      * @param array|\ArrayObject|\stdClass $value The PHP array or array-like object to check
-     *
-     * @return bool true if value is hash array, false otherwise
      */
     public static function isHash($value): bool
     {
@@ -229,8 +227,6 @@ class Inline
      *
      * @param array $value The PHP array to dump
      * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
-     *
-     * @return string The YAML string representing the PHP array
      */
     private static function dumpArray(array $value, int $flags): string
     {
@@ -558,7 +554,7 @@ class Inline
     /**
      * Evaluates scalars and replaces magic values.
      *
-     * @return mixed The evaluated YAML string
+     * @return mixed
      *
      * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a reference could not be resolved
      */
@@ -788,8 +784,6 @@ class Inline
 
     /**
      * Gets a regex that matches a YAML date.
-     *
-     * @return string The regular expression
      *
      * @see http://www.yaml.org/spec/1.2/spec.html#id2761573
      */

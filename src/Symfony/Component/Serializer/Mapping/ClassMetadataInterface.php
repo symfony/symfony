@@ -26,8 +26,6 @@ interface ClassMetadataInterface
 {
     /**
      * Returns the name of the backing PHP class.
-     *
-     * @return string The name of the backing class
      */
     public function getName(): string;
 

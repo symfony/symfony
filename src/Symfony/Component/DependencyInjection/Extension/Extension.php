@@ -60,7 +60,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      *
      * This can be overridden in a sub-class to specify the alias manually.
      *
-     * @return string The alias
+     * @return string
      *
      * @throws BadMethodCallException When the extension name does not follow conventions
      */
@@ -124,7 +124,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     }
 
     /**
-     * @return bool Whether the configuration is enabled
+     * @return bool
      *
      * @throws InvalidArgumentException When the config is not enableable
      */

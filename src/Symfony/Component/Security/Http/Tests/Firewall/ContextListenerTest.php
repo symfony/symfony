@@ -29,6 +29,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
@@ -63,7 +64,7 @@ class ContextListenerTest extends TestCase
     public function testOnKernelResponseWillAddSession()
     {
         $session = $this->runSessionOnKernelResponse(
-            new UsernamePasswordToken('test1', 'pass1', 'phpunit'),
+            new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']),
             null
         );
 
@@ -75,7 +76,7 @@ class ContextListenerTest extends TestCase
     public function testOnKernelResponseWillReplaceSession()
     {
         $session = $this->runSessionOnKernelResponse(
-            new UsernamePasswordToken('test1', 'pass1', 'phpunit'),
+            new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']),
             'C:10:"serialized"'
         );
 
@@ -94,6 +95,9 @@ class ContextListenerTest extends TestCase
         $this->assertFalse($session->has('_security_session'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testOnKernelResponseWillRemoveSessionOnAnonymousToken()
     {
         $session = $this->runSessionOnKernelResponse(new AnonymousToken('secret', 'anon.'), 'C:10:"serialized"');
@@ -104,7 +108,7 @@ class ContextListenerTest extends TestCase
     public function testOnKernelResponseWithoutSession()
     {
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken('test1', 'pass1', 'phpunit'));
+        $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']));
         $request = new Request();
         $request->attributes->set('_security_firewall_run', '_security_session');
         $session = new Session(new MockArraySessionStorage());
@@ -230,6 +234,27 @@ class ContextListenerTest extends TestCase
         $this->assertNull($tokenStorage->getToken());
     }
 
+    public function testTokenIsNotDeauthenticatedOnUserChangeIfNotAnInstanceOfAbstractToken()
+    {
+        $tokenStorage = new TokenStorage();
+        $refreshedUser = new InMemoryUser('changed', 'baz');
+
+        $token = new CustomToken(new InMemoryUser('original', 'foo'), ['ROLE_FOO']);
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize($token));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $listener = new ContextListener($tokenStorage, [new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)], 'context_key');
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $this->assertInstanceOf(CustomToken::class, $tokenStorage->getToken());
+        $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
+    }
+
     public function testIfTokenIsNotDeauthenticated()
     {
         $tokenStorage = new TokenStorage();
@@ -239,6 +264,9 @@ class ContextListenerTest extends TestCase
         $this->assertSame($goodRefreshedUser, $tokenStorage->getToken()->getUser());
     }
 
+    /**
+     * @group legacy
+     */
     public function testRememberMeGetsCanceledIfTokenIsDeauthenticated()
     {
         $tokenStorage = new TokenStorage();
@@ -289,6 +317,9 @@ class ContextListenerTest extends TestCase
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
     }
 
+    /**
+     * @group legacy
+     */
     public function testDeauthenticatedEvent()
     {
         $tokenStorage = new TokenStorage();
@@ -296,7 +327,7 @@ class ContextListenerTest extends TestCase
 
         $user = new InMemoryUser('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
-        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, '', 'context_key', ['ROLE_USER'])));
+        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, 'context_key', ['ROLE_USER'])));
 
         $request = new Request();
         $request->setSession($session);
@@ -363,10 +394,8 @@ class ContextListenerTest extends TestCase
             $session->set('_security_session', $original);
         }
 
-        $tokenStorage = new UsageTrackingTokenStorage(new TokenStorage(), new class(['request_stack' => function () use ($requestStack) {
-            return $requestStack;
-        },
-        ]) implements ContainerInterface {
+        $factories = ['request_stack' => function () use ($requestStack) { return $requestStack; }];
+        $tokenStorage = new UsageTrackingTokenStorage(new TokenStorage(), new class($factories) implements ContainerInterface {
             use ServiceLocatorTrait;
         });
 
@@ -400,7 +429,7 @@ class ContextListenerTest extends TestCase
     {
         $tokenUser = $user ?? new InMemoryUser('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
-        $session->set('_security_context_key', serialize(new UsernamePasswordToken($tokenUser, '', 'context_key', ['ROLE_USER'])));
+        $session->set('_security_context_key', serialize(new UsernamePasswordToken($tokenUser, 'context_key', ['ROLE_USER'])));
 
         $request = new Request();
         $request->setSession($session);
@@ -410,17 +439,14 @@ class ContextListenerTest extends TestCase
 
         $tokenStorage = new TokenStorage();
         $usageIndex = $session->getUsageIndex();
-        $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class(
-            (new \ReflectionClass(UsageTrackingTokenStorage::class))->hasMethod('getSession') ? [
-                'request_stack' => function () use ($requestStack) {
-                return $requestStack;
-            }] : [
-                // BC for symfony/framework-bundle < 5.3
-                'session' => function () use ($session) {
-                    return $session;
-                },
-            ]
-        ) implements ContainerInterface {
+
+        if ((new \ReflectionClass(UsageTrackingTokenStorage::class))->hasMethod('getSession')) {
+            $factories = ['request_stack' => function () use ($requestStack) { return $requestStack; }];
+        } else {
+            // BC for symfony/framework-bundle < 5.3
+            $factories = ['session' => function () use ($session) { return $session; }];
+        }
+        $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class($factories) implements ContainerInterface {
             use ServiceLocatorTrait;
         });
         $sessionTrackerEnabler = [$tokenStorage, 'enableUsageTracking'];
@@ -512,5 +538,119 @@ class SupportingUserProvider implements UserProviderInterface
     public function supportsClass($class): bool
     {
         return InMemoryUser::class === $class;
+    }
+}
+
+abstract class BaseCustomToken implements TokenInterface
+{
+    private $user;
+    private $roles;
+
+    public function __construct(UserInterface $user, array $roles)
+    {
+        $this->user = $user;
+        $this->roles = $roles;
+    }
+
+    public function __serialize(): array
+    {
+        return [$this->user, $this->roles];
+    }
+
+    public function serialize(): string
+    {
+        return serialize($this->__serialize());
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$this->user, $this->roles] = $data;
+    }
+
+    public function unserialize($serialized)
+    {
+        $this->__unserialize(\is_array($serialized) ? $serialized : unserialize($serialized));
+    }
+
+    public function __toString(): string
+    {
+        return $this->user->getUserIdentifier();
+    }
+
+    public function getRoleNames(): array
+    {
+        return $this->roles;
+    }
+
+    public function getCredentials()
+    {
+    }
+
+    public function getUser(): UserInterface
+    {
+        return $this->user;
+    }
+
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    public function getUsername(): string
+    {
+        return $this->user->getUserIdentifier();
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->getUserIdentifier();
+    }
+
+    public function isAuthenticated(): bool
+    {
+        return true;
+    }
+
+    public function setAuthenticated(bool $isAuthenticated)
+    {
+    }
+
+    public function eraseCredentials()
+    {
+    }
+
+    public function getAttributes(): array
+    {
+        return [];
+    }
+
+    public function setAttributes(array $attributes)
+    {
+    }
+
+    public function hasAttribute(string $name): bool
+    {
+        return false;
+    }
+
+    public function setAttribute(string $name, $value)
+    {
+    }
+}
+
+if (\PHP_VERSION_ID >= 80000) {
+    class CustomToken extends BaseCustomToken
+    {
+        public function getAttribute(string $name): mixed
+        {
+            return null;
+        }
+    }
+} else {
+    class CustomToken extends BaseCustomToken
+    {
+        public function getAttribute(string $name)
+        {
+        }
     }
 }

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Translation\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,8 +27,6 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
- *
- * @experimental in 5.3
  */
 final class TranslationPullCommand extends Command
 {
@@ -52,6 +52,36 @@ final class TranslationPullCommand extends Command
         $this->enabledLocales = $enabledLocales;
 
         parent::__construct();
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('provider')) {
+            $suggestions->suggestValues($this->providerCollection->keys());
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('domains')) {
+            $provider = $this->providerCollection->get($input->getArgument('provider'));
+
+            if ($provider && method_exists($provider, 'getDomains')) {
+                $domains = $provider->getDomains();
+                $suggestions->suggestValues($domains);
+            }
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('locales')) {
+            $suggestions->suggestValues($this->enabledLocales);
+
+            return;
+        }
+
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues(['php', 'xlf', 'xlf12', 'xlf20', 'po', 'mo', 'yml', 'yaml', 'ts', 'csv', 'json', 'ini', 'res']);
+        }
     }
 
     /**

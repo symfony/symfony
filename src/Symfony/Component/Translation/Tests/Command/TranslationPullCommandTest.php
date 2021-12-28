@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Tests\Command;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Translation\Command\TranslationPullCommand;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
@@ -237,20 +238,30 @@ XLIFF
     public function testPullForceMessages()
     {
         $arrayLoader = new ArrayLoader();
-        $filenameEn = $this->createFile();
-        $filenameFr = $this->createFile(['note' => 'NOTE'], 'fr');
+        $filenameMessagesEn = $this->createFile(['note' => 'NOTE'], 'en');
+        $filenameMessagesFr = $this->createFile(['note' => 'NOTE'], 'fr');
+        $filenameValidatorsEn = $this->createFile(['foo.error' => 'Wrong value'], 'en', 'validators.%locale%.xlf');
+        $filenameValidatorsFr = $this->createFile(['foo.error' => 'Valeur erronée'], 'fr', 'validators.%locale%.xlf');
         $locales = ['en', 'fr'];
-        $domains = ['messages'];
+        $domains = ['messages', 'validators'];
 
         $providerReadTranslatorBag = new TranslatorBag();
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
             'note' => 'UPDATED NOTE',
             'new.foo' => 'newFoo',
-        ], 'en'));
+        ], 'en', 'messages'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
             'note' => 'NOTE MISE À JOUR',
             'new.foo' => 'nouveauFoo',
-        ], 'fr'));
+        ], 'fr', 'messages'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'foo.error' => 'Bad value',
+            'bar.error' => 'Bar error',
+        ], 'en', 'validators'));
+        $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
+            'foo.error' => 'Valeur invalide',
+            'bar.error' => 'Bar erreur',
+        ], 'fr', 'validators'));
 
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())
@@ -263,9 +274,9 @@ XLIFF
             ->willReturn('null://default');
 
         $tester = $this->createCommandTester($provider, $locales, $domains);
-        $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--force' => true]);
+        $tester->execute(['--locales' => $locales, '--domains' => $domains, '--force' => true]);
 
-        $this->assertStringContainsString('[OK] Local translations has been updated from "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] Local translations has been updated from "null" (for "en, fr" locale(s), and "messages, validators" domain(s)).', trim($tester->getDisplay()));
         $this->assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
@@ -286,7 +297,7 @@ XLIFF
     </file>
 </xliff>
 XLIFF
-            , file_get_contents($filenameEn));
+            , file_get_contents($filenameMessagesEn));
         $this->assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
@@ -307,7 +318,50 @@ XLIFF
     </file>
 </xliff>
 XLIFF
-            , file_get_contents($filenameFr));
+            , file_get_contents($filenameMessagesFr));
+
+        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+        <header>
+            <tool tool-id="symfony" tool-name="Symfony"/>
+        </header>
+        <body>
+            <trans-unit id="kA4akVr" resname="foo.error">
+                <source>foo.error</source>
+                <target>Bad value</target>
+            </trans-unit>
+            <trans-unit id="OcBtn3X" resname="bar.error">
+                <source>bar.error</source>
+                <target>Bar error</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+XLIFF
+            , file_get_contents($filenameValidatorsEn));
+        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
+        <header>
+            <tool tool-id="symfony" tool-name="Symfony"/>
+        </header>
+        <body>
+            <trans-unit id="kA4akVr" resname="foo.error">
+                <source>foo.error</source>
+                <target>Valeur invalide</target>
+            </trans-unit>
+            <trans-unit id="OcBtn3X" resname="bar.error">
+                <source>bar.error</source>
+                <target>Bar erreur</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+XLIFF
+            , file_get_contents($filenameValidatorsFr));
     }
 
     /**
@@ -543,7 +597,51 @@ XLIFF
             , file_get_contents($filenameDomain));
     }
 
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        if (!class_exists(CommandCompletionTester::class)) {
+            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+        }
+
+        $application = new Application();
+        $application->add($this->createCommand($this->createMock(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], 'en', ['loco', 'crowdin', 'lokalise']));
+
+        $tester = new CommandCompletionTester($application->get('translation:pull'));
+        $suggestions = $tester->complete($input);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions(): \Generator
+    {
+        yield 'provider' => [
+            [''],
+            ['loco', 'crowdin', 'lokalise'],
+        ];
+
+        yield '--domains' => [
+            ['loco', '--domains'],
+            ['messages', 'validators'],
+        ];
+
+        yield '--locales' => [
+            ['loco', '--locales'],
+            ['en', 'fr', 'it'],
+        ];
+    }
+
     private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en'): CommandTester
+    {
+        $command = $this->createCommand($provider, $locales, $domains, $defaultLocale);
+        $application = new Application();
+        $application->add($command);
+
+        return new CommandTester($application->find('translation:pull'));
+    }
+
+    private function createCommand(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], $defaultLocale = 'en', array $providerNames = ['loco']): TranslationPullCommand
     {
         $writer = new TranslationWriter();
         $writer->addDumper('xlf', new XliffFileDumper());
@@ -551,16 +649,13 @@ XLIFF
         $reader = new TranslationReader();
         $reader->addLoader('xlf', new XliffFileLoader());
 
-        $command = new TranslationPullCommand(
-            $this->getProviderCollection($provider, $locales, $domains),
+        return new TranslationPullCommand(
+            $this->getProviderCollection($provider, $providerNames, $locales, $domains),
             $writer,
             $reader,
             $defaultLocale,
-            [$this->translationAppDir.'/translations']
+            [$this->translationAppDir.'/translations'],
+            $locales
         );
-        $application = new Application();
-        $application->add($command);
-
-        return new CommandTester($application->find('translation:pull'));
     }
 }

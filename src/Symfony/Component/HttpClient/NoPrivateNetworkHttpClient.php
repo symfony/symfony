@@ -19,13 +19,14 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Decorator that blocks requests to private networks by default.
  *
  * @author Hallison Boaventura <hallisonboaventura@gmail.com>
  */
-final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwareInterface
+final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {
     use HttpClientTrait;
 
@@ -58,7 +59,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         }
 
         if (!class_exists(IpUtils::class)) {
-            throw new \LogicException(sprintf('You can not use "%s" if the HttpFoundation component is not installed. Try running "composer require symfony/http-foundation".', __CLASS__));
+            throw new \LogicException(sprintf('You cannot use "%s" if the HttpFoundation component is not installed. Try running "composer require symfony/http-foundation".', __CLASS__));
         }
 
         $this->client = $client;
@@ -80,7 +81,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
 
         $options['on_progress'] = function (int $dlNow, int $dlSize, array $info) use ($onProgress, $subnets, &$lastPrimaryIp): void {
             if ($info['primary_ip'] !== $lastPrimaryIp) {
-                if (IpUtils::checkIp($info['primary_ip'], $subnets ?? self::PRIVATE_SUBNETS)) {
+                if ($info['primary_ip'] && IpUtils::checkIp($info['primary_ip'], $subnets ?? self::PRIVATE_SUBNETS)) {
                     throw new TransportException(sprintf('IP "%s" is blocked for "%s".', $info['primary_ip'], $info['url']));
                 }
 
@@ -120,5 +121,12 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         $clone->client = $this->client->withOptions($options);
 
         return $clone;
+    }
+
+    public function reset()
+    {
+        if ($this->client instanceof ResetInterface) {
+            $this->client->reset();
+        }
     }
 }

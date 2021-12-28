@@ -97,7 +97,7 @@ class TimezoneTransformer extends Transformer
      * @see https://php.net/timezones.others
      *
      * @throws NotImplementedException   When the GMT time zone have minutes offset different than zero
-     * @throws \InvalidArgumentException When the value can not be matched with pattern
+     * @throws \InvalidArgumentException When the value cannot be matched with pattern
      */
     public static function getEtcTimeZoneId(string $formattedTimeZone): string
     {

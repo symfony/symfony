@@ -29,6 +29,7 @@
             <xsd:element name="cache" type="cache" minOccurs="0" maxOccurs="1" />
             <xsd:element name="workflow" type="workflow" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="php-errors" type="php-errors" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="exceptions" type="exceptions" minOccurs="0" maxOccurs="1" />
             <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-client" type="http_client" minOccurs="0" maxOccurs="1" />
@@ -37,12 +38,15 @@
             <xsd:element name="rate-limiter" type="rate_limiter" minOccurs="0" maxOccurs="1" />
             <xsd:element name="uid" type="uid" minOccurs="0" maxOccurs="1" />
             <xsd:element name="notifier" type="notifier" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="enabled-locale" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />
+        <xsd:attribute name="set_locale_from_accept_language" type="xsd:boolean" />
+        <xsd:attribute name="set_content_language_from_locale" type="xsd:boolean" />
         <xsd:attribute name="test" type="xsd:boolean" />
         <xsd:attribute name="error-controller" type="xsd:string" />
         <xsd:attribute name="trusted-hosts" type="xsd:string" />
@@ -87,6 +91,7 @@
 
     <xsd:complexType name="profiler">
         <xsd:attribute name="collect" type="xsd:string" />
+        <xsd:attribute name="collect-parameter" type="xsd:string" />
         <xsd:attribute name="only-exceptions" type="xsd:string" />
         <xsd:attribute name="only-main-requests" type="xsd:string" />
         <xsd:attribute name="only-master-requests" type="xsd:string" />
@@ -155,6 +160,7 @@
         <xsd:attribute name="version" type="xsd:string" />
         <xsd:attribute name="version-format" type="xsd:string" />
         <xsd:attribute name="json-manifest-path" type="xsd:string" />
+        <xsd:attribute name="strict-mode" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="package">
@@ -168,6 +174,7 @@
         <xsd:attribute name="version" type="xsd:string" />
         <xsd:attribute name="version-format" type="xsd:string" />
         <xsd:attribute name="json-manifest-path" type="xsd:string" />
+        <xsd:attribute name="strict-mode" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="translator">
@@ -260,6 +267,7 @@
     <xsd:complexType name="serializer">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="mapping" type="file_mapping" />
+            <xsd:element name="default-context" type="metadata" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />
@@ -342,6 +350,18 @@
 
     <xsd:complexType name="audit_trail">
         <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="exceptions">
+        <xsd:sequence>
+            <xsd:element name="exception" type="exception" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="exception">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="log-level" type="xsd:string" />
+        <xsd:attribute name="status-code" type="xsd:int" />
     </xsd:complexType>
 
     <xsd:complexType name="marking_store">
@@ -472,6 +492,7 @@
         <xsd:attribute name="default-bus" type="xsd:string" />
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="failure-transport" type="xsd:string" />
+        <xsd:attribute name="reset-on-message" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_serializer">

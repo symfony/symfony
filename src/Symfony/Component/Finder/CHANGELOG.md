@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+5.4.0
+-----
+
+ * Deprecate `Comparator::setTarget()` and `Comparator::setOperator()`
+ * Add a constructor to `Comparator` that allows setting target and operator
+ * Finder's iterator has now `Symfony\Component\Finder\SplFileInfo` inner type specified
+ * Add recursive .gitignore files support
+
 5.0.0
 -----
 

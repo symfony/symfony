@@ -44,7 +44,7 @@ class YamlFileLoader extends FileLoader
      * @param string      $file A Yaml file path
      * @param string|null $type The resource type
      *
-     * @return RouteCollection A RouteCollection instance
+     * @return RouteCollection
      *
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
      */
@@ -127,6 +127,20 @@ class YamlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, string $name, array $config, string $path)
     {
+        if (isset($config['alias'])) {
+            $alias = $collection->addAlias($name, $config['alias']);
+            $deprecation = $config['deprecated'] ?? null;
+            if (null !== $deprecation) {
+                $alias->setDeprecated(
+                    $deprecation['package'],
+                    $deprecation['version'],
+                    $deprecation['message'] ?? ''
+                );
+            }
+
+            return;
+        }
+
         $defaults = $config['defaults'] ?? [];
         $requirements = $config['requirements'] ?? [];
         $options = $config['options'] ?? [];
@@ -250,6 +264,11 @@ class YamlFileLoader extends FileLoader
         if (!\is_array($config)) {
             throw new \InvalidArgumentException(sprintf('The definition of "%s" in "%s" must be a YAML array.', $name, $path));
         }
+        if (isset($config['alias'])) {
+            $this->validateAlias($config, $name, $path);
+
+            return;
+        }
         if ($extraKeys = array_diff(array_keys($config), self::AVAILABLE_KEYS)) {
             throw new \InvalidArgumentException(sprintf('The routing file "%s" contains unsupported keys for "%s": "%s". Expected one of: "%s".', $path, $name, implode('", "', $extraKeys), implode('", "', self::AVAILABLE_KEYS)));
         }
@@ -267,6 +286,29 @@ class YamlFileLoader extends FileLoader
         }
         if (isset($config['stateless']) && isset($config['defaults']['_stateless'])) {
             throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "stateless" key and the defaults key "_stateless" for "%s".', $path, $name));
+        }
+    }
+
+    /**
+     * @throws \InvalidArgumentException If one of the provided config keys is not supported,
+     *                                   something is missing or the combination is nonsense
+     */
+    private function validateAlias(array $config, string $name, string $path): void
+    {
+        foreach ($config as $key => $value) {
+            if (!\in_array($key, ['alias', 'deprecated'], true)) {
+                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify other keys than "alias" and "deprecated" for "%s".', $path, $name));
+            }
+
+            if ('deprecated' === $key) {
+                if (!isset($value['package'])) {
+                    throw new \InvalidArgumentException(sprintf('The routing file "%s" must specify the attribute "package" of the "deprecated" option for "%s".', $path, $name));
+                }
+
+                if (!isset($value['version'])) {
+                    throw new \InvalidArgumentException(sprintf('The routing file "%s" must specify the attribute "version" of the "deprecated" option for "%s".', $path, $name));
+                }
+            }
         }
     }
 }

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `TesterTrait::assertCommandIsSuccessful()` to test command
+ * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
+
 5.3
 ---
 

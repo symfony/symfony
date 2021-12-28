@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Tests\Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
@@ -28,23 +29,32 @@ use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
+use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
+use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
+use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
+use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
+use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
+use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -59,6 +69,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         ClassExistsMock::register(__CLASS__);
         ClassExistsMock::withMockedClasses([
             AllMySmsTransportFactory::class => false,
+            AmazonSnsTransportFactory::class => false,
             ClickatellTransportFactory::class => false,
             DiscordTransportFactory::class => false,
             EsendexTransportFactory::class => false,
@@ -73,23 +84,32 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             IqsmsTransportFactory::class => false,
             LightSmsTransportFactory::class => false,
             LinkedInTransportFactory::class => false,
+            MailjetTransportFactory::class => false,
             MattermostTransportFactory::class => false,
             MercureTransportFactory::class => false,
             MessageBirdTransportFactory::class => false,
+            MessageMediaTransportFactory::class => false,
             MicrosoftTeamsTransportFactory::class => false,
             MobytTransportFactory::class => false,
             NexmoTransportFactory::class => false,
             OctopushTransportFactory::class => false,
+            OneSignalTransportFactory::class => false,
             OvhCloudTransportFactory::class => false,
             RocketChatTransportFactory::class => false,
             SendinblueTransportFactory::class => false,
             SinchTransportFactory::class => false,
             SlackTransportFactory::class => false,
+            Sms77TransportFactory::class => false,
             SmsapiTransportFactory::class => false,
             SmsBiurasTransportFactory::class => false,
+            SmscTransportFactory::class => false,
             SpotHitTransportFactory::class => false,
             TelegramTransportFactory::class => false,
+            TelnyxTransportFactory::class => false,
+            TurboSmsTransportFactory::class => false,
             TwilioTransportFactory::class => false,
+            VonageTransportFactory::class => false,
+            YunpianTransportFactory::class => false,
             ZulipTransportFactory::class => false,
         ]);
     }
@@ -110,6 +130,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     public function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
     {
         yield ['allmysms', 'symfony/all-my-sms-notifier'];
+        yield ['sns', 'symfony/amazon-sns-notifier'];
         yield ['clickatell', 'symfony/clickatell-notifier'];
         yield ['discord', 'symfony/discord-notifier'];
         yield ['esendex', 'symfony/esendex-notifier'];
@@ -124,22 +145,29 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['iqsms', 'symfony/iqsms-notifier'];
         yield ['lightsms', 'symfony/light-sms-notifier'];
         yield ['linkedin', 'symfony/linked-in-notifier'];
+        yield ['mailjet', 'symfony/mailjet-notifier'];
         yield ['mattermost', 'symfony/mattermost-notifier'];
         yield ['mercure', 'symfony/mercure-notifier'];
         yield ['messagebird', 'symfony/message-bird-notifier'];
+        yield ['messagemedia', 'symfony/message-media-notifier'];
         yield ['microsoftteams', 'symfony/microsoft-teams-notifier'];
         yield ['mobyt', 'symfony/mobyt-notifier'];
         yield ['nexmo', 'symfony/nexmo-notifier'];
         yield ['octopush', 'symfony/octopush-notifier'];
+        yield ['onesignal', 'symfony/one-signal-notifier'];
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
         yield ['sendinblue', 'symfony/sendinblue-notifier'];
         yield ['sinch', 'symfony/sinch-notifier'];
         yield ['slack', 'symfony/slack-notifier'];
+        yield ['sms77', 'symfony/sms77-notifier'];
         yield ['smsapi', 'symfony/smsapi-notifier'];
         yield ['smsbiuras', 'symfony/sms-biuras-notifier'];
+        yield ['smsc', 'symfony/smsc-notifier'];
         yield ['spothit', 'symfony/spot-hit-notifier'];
         yield ['telegram', 'symfony/telegram-notifier'];
+        yield ['telnyx', 'symfony/telnyx-notifier'];
+        yield ['turbosms', 'symfony/turbo-sms-notifier'];
         yield ['twilio', 'symfony/twilio-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];
     }

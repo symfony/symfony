@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
-use Doctrine\Common\Annotations\PsrCachedReader;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
@@ -522,9 +521,37 @@ abstract class FrameworkExtensionTest extends TestCase
         ], $definition->getArgument(2));
     }
 
+    public function testExceptionsConfig()
+    {
+        $container = $this->createContainerFromFile('exceptions');
+
+        $this->assertSame([
+            \Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class => [
+                'log_level' => 'info',
+                'status_code' => 422,
+            ],
+        ], $container->getDefinition('exception_listener')->getArgument(3));
+    }
+
     public function testRouter()
     {
         $container = $this->createContainerFromFile('full');
+
+        $this->assertTrue($container->has('router'), '->registerRouterConfiguration() loads routing.xml');
+        $arguments = $container->findDefinition('router')->getArguments();
+        $this->assertEquals($container->getParameter('kernel.project_dir').'/config/routing.xml', $container->getParameter('router.resource'), '->registerRouterConfiguration() sets routing resource');
+        $this->assertEquals('%router.resource%', $arguments[1], '->registerRouterConfiguration() sets routing resource');
+        $this->assertEquals('xml', $arguments[2]['resource_type'], '->registerRouterConfiguration() sets routing resource type');
+
+        $this->assertSame(['_locale' => 'fr|en'], $container->getDefinition('routing.loader')->getArgument(2));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testRouterWithLegacyTranslatorEnabledLocales()
+    {
+        $container = $this->createContainerFromFile('legacy_translator_enabled_locales');
 
         $this->assertTrue($container->has('router'), '->registerRouterConfiguration() loads routing.xml');
         $arguments = $container->findDefinition('router')->getArguments();
@@ -581,7 +608,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertNull($container->getDefinition('session.storage.factory.php_bridge')->getArgument(0));
         $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
-        $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
+        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
         $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
@@ -600,7 +627,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
         $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
-        $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
+        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
         $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
@@ -632,7 +659,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // packages
         $packageTags = $container->findTaggedServiceIds('assets.package');
-        $this->assertCount(9, $packageTags);
+        $this->assertCount(10, $packageTags);
 
         $packages = [];
         foreach ($packageTags as $serviceId => $tagAttributes) {
@@ -658,6 +685,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $versionStrategy = $container->getDefinition((string) $package->getArgument(1));
         $this->assertEquals('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertEquals('/path/to/manifest.json', $versionStrategy->getArgument(0));
+        $this->assertFalse($versionStrategy->getArgument(2));
 
         $package = $container->getDefinition($packages['remote_manifest']);
         $versionStrategy = $container->getDefinition($package->getArgument(1));
@@ -668,11 +696,19 @@ abstract class FrameworkExtensionTest extends TestCase
         $versionStrategy = $container->getDefinition($package->getArgument(1));
         $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertSame('https://cdn.example.com/manifest.json', $versionStrategy->getArgument(0));
+        $this->assertFalse($versionStrategy->getArgument(2));
 
         $package = $container->getDefinition($packages['env_manifest']);
         $versionStrategy = $container->getDefinition($package->getArgument(1));
         $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertStringMatchesFormat('env_%s', $versionStrategy->getArgument(0));
+        $this->assertFalse($versionStrategy->getArgument(2));
+
+        $package = $container->getDefinition((string) $packages['strict_manifest_strategy']);
+        $versionStrategy = $container->getDefinition((string) $package->getArgument(1));
+        $this->assertEquals('assets.json_manifest_version_strategy', $versionStrategy->getParent());
+        $this->assertEquals('/path/to/manifest.json', $versionStrategy->getArgument(0));
+        $this->assertTrue($versionStrategy->getArgument(2));
     }
 
     public function testAssetsDefaultVersionStrategyAsService()
@@ -704,6 +740,26 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('cache.messenger.restart_workers_signal'));
     }
 
+    /**
+     * @group legacy
+     */
+    public function testMessengerWithoutResetOnMessageLegacy()
+    {
+        $this->expectDeprecation('Since symfony/framework-bundle 5.4: Not setting the "framework.messenger.reset_on_message" configuration option is deprecated, it will default to "true" in version 6.0.');
+
+        $container = $this->createContainerFromFile('messenger_without_reset_on_message_legacy');
+
+        $this->assertTrue($container->hasDefinition('console.command.messenger_consume_messages'));
+        $this->assertTrue($container->hasAlias('messenger.default_bus'));
+        $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
+        $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
+        $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
+        $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
+        $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
+        $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
+        $this->assertNull($container->getDefinition('console.command.messenger_consume_messages')->getArgument(5));
+    }
+
     public function testMessenger()
     {
         $container = $this->createContainerFromFile('messenger');
@@ -714,6 +770,27 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
         $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
         $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
+        $this->assertTrue($container->hasDefinition('messenger.listener.reset_services'));
+        $this->assertSame('messenger.listener.reset_services', (string) $container->getDefinition('console.command.messenger_consume_messages')->getArgument(5));
+    }
+
+    public function testMessengerWithoutConsole()
+    {
+        $extension = $this->createPartialMock(FrameworkExtension::class, ['hasConsole', 'getAlias']);
+        $extension->method('hasConsole')->willReturn(false);
+        $extension->method('getAlias')->willReturn((new FrameworkExtension())->getAlias());
+
+        $container = $this->createContainerFromFile('messenger', [], true, false, $extension);
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('console.command.messenger_consume_messages'));
+        $this->assertTrue($container->hasAlias('messenger.default_bus'));
+        $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
+        $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
+        $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
+        $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
+        $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
+        $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
     }
 
     public function testMessengerMultipleFailureTransports()
@@ -943,6 +1020,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->createContainerFromFile('messenger_routing_invalid_transport');
     }
 
+    public function testMessengerWithDisabledResetOnMessage()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.');
+
+        $this->createContainerFromFile('messenger_with_disabled_reset_on_message');
+    }
+
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');
@@ -1080,7 +1165,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container->compile();
 
         $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.filesystem_cache_adapter')->getArgument(2));
-        $this->assertSame(class_exists(PsrCachedReader::class) ? 'annotations.filesystem_cache_adapter' : 'annotations.filesystem_cache', (string) $container->getDefinition('annotation_reader')->getArgument(1));
+        $this->assertSame('annotations.filesystem_cache_adapter', (string) $container->getDefinition('annotation_reader')->getArgument(1));
     }
 
     public function testFileLinkFormat()
@@ -1510,7 +1595,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $container->compile();
 
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foo', 'cache.adapter.apcu', 30);
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.bar', 'cache.adapter.doctrine', 5);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.baz', 'cache.adapter.filesystem', 7);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foobar', 'cache.adapter.psr6', 10);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.def', 'cache.app', 'PT11S');
@@ -1550,6 +1634,23 @@ abstract class FrameworkExtensionTest extends TestCase
                 ['setLogger', [new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]],
             ], $tagAwareDefinition->getMethodCalls());
         }
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDoctrineCache()
+    {
+        if (!class_exists(DoctrineAdapter::class)) {
+            self::markTestSkipped('This test requires symfony/cache 5.4 or lower.');
+        }
+
+        $container = $this->createContainerFromFile('doctrine_cache', [], true, false);
+        $container->setParameter('cache.prefix.seed', 'test');
+        $container->addCompilerPass(new CachePoolPass());
+        $container->compile();
+
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.bar', 'cache.adapter.doctrine', 5);
     }
 
     public function testRedisTagAwareAdapter()
@@ -1644,7 +1745,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');
 
-        $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
+        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
@@ -1657,7 +1758,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $container = $this->createContainerFromFile('session_cookie_secure_auto_legacy');
 
-        $expected = ['session', 'initialized_session', 'logger', 'session_collector', 'session_storage', 'request_stack'];
+        $expected = ['session_factory', 'session', 'initialized_session', 'logger', 'session_collector', 'session_storage', 'request_stack'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
@@ -1909,7 +2010,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('notifier');
 
         foreach ((new Finder())->in(\dirname(__DIR__, 4).'/Component/Notifier/Bridge')->directories()->depth(0)->exclude('Mercure') as $bridgeDirectory) {
-            $transportFactoryName = strtolower($bridgeDirectory->getFilename());
+            $transportFactoryName = strtolower(preg_replace('/(.)([A-Z])/', '$1-$2', $bridgeDirectory->getFilename()));
             $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), sprintf('Did you forget to add the "%s" TransportFactory to the $classToServices array in FrameworkExtension?', $bridgeDirectory->getFilename()));
         }
     }
@@ -1932,14 +2033,14 @@ abstract class FrameworkExtensionTest extends TestCase
         ], $data)));
     }
 
-    protected function createContainerFromFile($file, $data = [], $resetCompilerPasses = true, $compile = true)
+    protected function createContainerFromFile($file, $data = [], $resetCompilerPasses = true, $compile = true, FrameworkExtension $extension = null)
     {
         $cacheKey = md5(static::class.$file.serialize($data));
         if ($compile && isset(self::$containerCache[$cacheKey])) {
             return self::$containerCache[$cacheKey];
         }
         $container = $this->createContainer($data);
-        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension($extension ?: new FrameworkExtension());
         $this->loadFromFile($container, $file);
 
         if ($resetCompilerPasses) {

@@ -36,6 +36,9 @@ final class SlackHeaderBlock extends AbstractSlackBlock
         ];
     }
 
+    /**
+     * @return $this
+     */
     public function id(string $id): self
     {
         if (\strlen($id) > self::ID_LIMIT) {

@@ -27,15 +27,11 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 
     /**
      * Prefix for new found message.
-     *
-     * @var string
      */
     private $prefix = '';
 
     /**
      * The sequence that captures translation messages.
-     *
-     * @var array
      */
     protected $sequences = [
         [
@@ -329,6 +325,10 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      */
     protected function extractFromDirectory($directory)
     {
+        if (!class_exists(Finder::class)) {
+            throw new \LogicException(sprintf('You cannot use "%s" as the "symfony/finder" package is not installed. Try running "composer require symfony/finder".', static::class));
+        }
+
         $finder = new Finder();
 
         return $finder->files()->name('*.php')->in($directory);

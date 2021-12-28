@@ -40,8 +40,6 @@ trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecat
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @internal
- *
  * @deprecated since Symfony 5.3
  */
 class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
@@ -97,6 +95,11 @@ class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, Aut
         return $passport;
     }
 
+    public function getGuardAuthenticator(): GuardAuthenticatorInterface
+    {
+        return $this->guard;
+    }
+
     private function getUser($credentials): UserInterface
     {
         $user = $this->guard->getUser($credentials, $this->userProvider);
@@ -118,6 +121,11 @@ class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, Aut
             throw new \LogicException(sprintf('"%s" does not support non-user passports.', __CLASS__));
         }
 
+        return $this->guard->createAuthenticatedToken($passport->getUser(), $firewallName);
+    }
+
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
+    {
         return $this->guard->createAuthenticatedToken($passport->getUser(), $firewallName);
     }
 

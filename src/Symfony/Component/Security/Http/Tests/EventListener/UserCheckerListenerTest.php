@@ -45,6 +45,9 @@ class UserCheckerListenerTest extends TestCase
         $this->listener->preCheckCredentials($this->createCheckPassportEvent());
     }
 
+    /**
+     * @group legacy
+     */
     public function testPreAuthNoUser()
     {
         $this->userChecker->expects($this->never())->method('checkPreAuth');
@@ -66,11 +69,14 @@ class UserCheckerListenerTest extends TestCase
         $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PostAuthenticationToken($this->user, 'main', [])));
     }
 
+    /**
+     * @group legacy
+     */
     public function testPostAuthNoUser()
     {
         $this->userChecker->expects($this->never())->method('checkPostAuth');
 
-        $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PreAuthenticatedToken('nobody', null, 'main')));
+        $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PreAuthenticatedToken('nobody', 'main')));
     }
 
     private function createCheckPassportEvent($passport = null)

@@ -42,7 +42,7 @@ class PreAuthenticationGuardToken extends AbstractToken implements GuardTokenInt
 
         parent::__construct([]);
 
-        // never authenticated
+        // @deprecated since Symfony 5.4
         parent::setAuthenticated(false);
     }
 
@@ -55,13 +55,16 @@ class PreAuthenticationGuardToken extends AbstractToken implements GuardTokenInt
      * Returns the user credentials, which might be an array of anything you
      * wanted to put in there (e.g. username, password, favoriteColor).
      *
-     * @return mixed The user credentials
+     * @return mixed
      */
     public function getCredentials()
     {
         return $this->credentials;
     }
 
+    /**
+     * @deprecated since Symfony 5.4
+     */
     public function setAuthenticated(bool $authenticated)
     {
         throw new \LogicException('The PreAuthenticationGuardToken is *never* authenticated.');

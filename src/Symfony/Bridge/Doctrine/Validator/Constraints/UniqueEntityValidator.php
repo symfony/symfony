@@ -139,7 +139,18 @@ class UniqueEntityValidator extends ConstraintValidator
             $repository = $em->getRepository(\get_class($entity));
         }
 
-        $result = $repository->{$constraint->repositoryMethod}($criteria);
+        $arguments = [$criteria];
+
+        /* If the default repository method is used, it is always enough to retrieve at most two entities because:
+         * - No entity returned, the current entity is definitely unique.
+         * - More than one entity returned, the current entity cannot be unique.
+         * - One entity returned the uniqueness depends on the current entity.
+         */
+        if ('findBy' === $constraint->repositoryMethod) {
+            $arguments = [$criteria, null, 2];
+        }
+
+        $result = $repository->{$constraint->repositoryMethod}(...$arguments);
 
         if ($result instanceof \IteratorAggregate) {
             $result = $result->getIterator();

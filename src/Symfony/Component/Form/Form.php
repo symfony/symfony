@@ -66,6 +66,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, FormInterface>
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
@@ -82,7 +84,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * A map of FormInterface instances.
      *
-     * @var FormInterface[]|OrderedHashMap
+     * @var OrderedHashMap<string, FormInterface>
      */
     private $children;
 
@@ -820,8 +822,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * {@inheritdoc}
-     *
-     * @return $this
      */
     public function clearErrors(bool $deep = false): self
     {
@@ -976,7 +976,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @param string $name The name of the child
      *
-     * @return FormInterface The child form
+     * @return FormInterface
      *
      * @throws OutOfBoundsException if the named child does not exist
      */
@@ -1023,7 +1023,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the iterator for this group.
      *
-     * @return \Traversable<FormInterface>
+     * @return \Traversable<string, FormInterface>
      */
     #[\ReturnTypeWillChange]
     public function getIterator()
@@ -1034,7 +1034,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the number of form children (implements the \Countable interface).
      *
-     * @return int The number of embedded form children
+     * @return int
      */
     #[\ReturnTypeWillChange]
     public function count()

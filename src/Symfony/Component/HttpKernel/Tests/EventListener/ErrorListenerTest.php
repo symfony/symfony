@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -95,6 +96,27 @@ class ErrorListenerTest extends TestCase
 
         $this->assertEquals(3, $logger->countErrors());
         $this->assertCount(3, $logger->getLogs('critical'));
+    }
+
+    public function testHandleWithLoggerAndCustomConfiguration()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new \RuntimeException('bar'));
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger, false, [
+            \RuntimeException::class => [
+                'log_level' => 'warning',
+                'status_code' => 401,
+            ],
+        ]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(new Response('foo', 401), $event->getResponse());
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogs('critical'));
+        $this->assertCount(1, $logger->getLogs('warning'));
     }
 
     public function provider()
@@ -210,6 +232,11 @@ class TestKernel implements HttpKernelInterface
 {
     public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
+        $e = $request->attributes->get('exception');
+        if ($e instanceof HttpExceptionInterface) {
+            return new Response('foo', $e->getStatusCode(), $e->getHeaders());
+        }
+
         return new Response('foo');
     }
 }

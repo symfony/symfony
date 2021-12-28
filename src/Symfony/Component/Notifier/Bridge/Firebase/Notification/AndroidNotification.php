@@ -15,6 +15,9 @@ use Symfony\Component\Notifier\Bridge\Firebase\FirebaseOptions;
 
 final class AndroidNotification extends FirebaseOptions
 {
+    /**
+     * @return $this
+     */
     public function channelId(string $channelId): self
     {
         $this->options['android_channel_id'] = $channelId;
@@ -22,6 +25,9 @@ final class AndroidNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function icon(string $icon): self
     {
         $this->options['icon'] = $icon;
@@ -29,6 +35,9 @@ final class AndroidNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function sound(string $sound): self
     {
         $this->options['sound'] = $sound;
@@ -36,6 +45,9 @@ final class AndroidNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function tag(string $tag): self
     {
         $this->options['tag'] = $tag;
@@ -43,6 +55,9 @@ final class AndroidNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function color(string $color): self
     {
         $this->options['color'] = $color;
@@ -50,6 +65,9 @@ final class AndroidNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function clickAction(string $clickAction): self
     {
         $this->options['click_action'] = $clickAction;
@@ -57,6 +75,9 @@ final class AndroidNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function bodyLocKey(string $bodyLocKey): self
     {
         $this->options['body_loc_key'] = $bodyLocKey;
@@ -66,6 +87,8 @@ final class AndroidNotification extends FirebaseOptions
 
     /**
      * @param string[] $bodyLocArgs
+     *
+     * @return $this
      */
     public function bodyLocArgs(array $bodyLocArgs): self
     {
@@ -74,6 +97,9 @@ final class AndroidNotification extends FirebaseOptions
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function titleLocKey(string $titleLocKey): self
     {
         $this->options['title_loc_key'] = $titleLocKey;
@@ -83,6 +109,8 @@ final class AndroidNotification extends FirebaseOptions
 
     /**
      * @param string[] $titleLocArgs
+     *
+     * @return $this
      */
     public function titleLocArgs(array $titleLocArgs): self
     {

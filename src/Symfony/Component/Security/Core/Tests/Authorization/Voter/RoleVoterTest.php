@@ -13,7 +13,9 @@ namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -56,6 +58,35 @@ class RoleVoterTest extends TestCase
         $voter = new RoleVoter();
 
         $voter->vote($this->getTokenWithRoleNames(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN']), null, ['ROLE_PREVIOUS_ADMIN']);
+    }
+
+    /**
+     * @dataProvider provideAttributes
+     */
+    public function testSupportsAttribute(string $prefix, string $attribute, bool $expected)
+    {
+        $voter = new RoleVoter($prefix);
+
+        $this->assertSame($expected, $voter->supportsAttribute($attribute));
+    }
+
+    public function provideAttributes()
+    {
+        yield ['ROLE_', 'ROLE_foo', true];
+        yield ['ROLE_', 'ROLE_', true];
+        yield ['FOO_', 'FOO_bar', true];
+
+        yield ['ROLE_', '', false];
+        yield ['ROLE_', 'foo', false];
+    }
+
+    public function testSupportsType()
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->assertTrue($voter->supportsType(get_debug_type('foo')));
+        $this->assertTrue($voter->supportsType(get_debug_type(null)));
+        $this->assertTrue($voter->supportsType(get_debug_type(new \StdClass())));
     }
 
     protected function getTokenWithRoleNames(array $roles)

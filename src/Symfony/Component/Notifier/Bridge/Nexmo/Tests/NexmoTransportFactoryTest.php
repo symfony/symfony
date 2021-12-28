@@ -15,6 +15,9 @@ use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
+/**
+ * @group legacy
+ */
 final class NexmoTransportFactoryTest extends TransportFactoryTestCase
 {
     /**

@@ -51,7 +51,7 @@ EOF;
             ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
-        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $tester->assertCommandIsSuccessful('Returns 0 in case of success');
         $this->assertStringContainsString('[OK] All 0 XLIFF files contain valid syntax', trim($tester->getDisplay()));
     }
 

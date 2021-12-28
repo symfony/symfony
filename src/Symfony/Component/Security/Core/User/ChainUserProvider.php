@@ -27,7 +27,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     private $providers;
 
     /**
-     * @param iterable|UserProviderInterface[] $providers
+     * @param iterable<array-key, UserProviderInterface> $providers
      */
     public function __construct(iterable $providers)
     {
@@ -35,7 +35,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
     }
 
     /**
-     * @return array
+     * @return UserProviderInterface[]
      */
     public function getProviders()
     {
@@ -56,7 +56,7 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         return $this->loadUserByIdentifier($username);
     }
 
-    public function loadUserByIdentifier(string $userIdentifier): UserInterface
+    public function loadUserByIdentifier(string $identifier): UserInterface
     {
         foreach ($this->providers as $provider) {
             try {
@@ -64,17 +64,17 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
                 if (!method_exists($provider, 'loadUserByIdentifier')) {
                     trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($provider));
 
-                    return $provider->loadUserByUsername($userIdentifier);
+                    return $provider->loadUserByUsername($identifier);
                 }
 
-                return $provider->loadUserByIdentifier($userIdentifier);
+                return $provider->loadUserByIdentifier($identifier);
             } catch (UserNotFoundException $e) {
                 // try next one
             }
         }
 
-        $ex = new UserNotFoundException(sprintf('There is no user with identifier "%s".', $userIdentifier));
-        $ex->setUserIdentifier($userIdentifier);
+        $ex = new UserNotFoundException(sprintf('There is no user with identifier "%s".', $identifier));
+        $ex->setUserIdentifier($identifier);
         throw $ex;
     }
 

@@ -8,6 +8,9 @@ class ArrayCache extends CacheProvider
 {
     private $data = [];
 
+    /**
+     * @return mixed
+     */
     protected function doFetch($id)
     {
         return $this->doContains($id) ? $this->data[$id][0] : false;

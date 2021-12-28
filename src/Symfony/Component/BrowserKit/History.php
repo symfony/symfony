@@ -43,7 +43,7 @@ class History
     /**
      * Returns true if the history is empty.
      *
-     * @return bool true if the history is empty, false otherwise
+     * @return bool
      */
     public function isEmpty()
     {
@@ -53,7 +53,7 @@ class History
     /**
      * Goes back in the history.
      *
-     * @return Request A Request instance
+     * @return Request
      *
      * @throws \LogicException if the stack is already on the first page
      */
@@ -69,7 +69,7 @@ class History
     /**
      * Goes forward in the history.
      *
-     * @return Request A Request instance
+     * @return Request
      *
      * @throws \LogicException if the stack is already on the last page
      */
@@ -85,7 +85,7 @@ class History
     /**
      * Returns the current element in the history.
      *
-     * @return Request A Request instance
+     * @return Request
      *
      * @throws \LogicException if the stack is empty
      */

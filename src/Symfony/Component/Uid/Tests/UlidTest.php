@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\NilUlid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV4;
@@ -241,5 +242,23 @@ class UlidTest extends TestCase
     public function testFromStringBase58Padding()
     {
         $this->assertInstanceOf(Ulid::class, Ulid::fromString('111111111u9QRyVM94rdmZ'));
+    }
+
+    /**
+     * @testWith    ["00000000-0000-0000-0000-000000000000"]
+     *              ["1111111111111111111111"]
+     *              ["00000000000000000000000000"]
+     */
+    public function testNilUlid(string $ulid)
+    {
+        $ulid = Ulid::fromString($ulid);
+
+        $this->assertInstanceOf(NilUlid::class, $ulid);
+        $this->assertSame('00000000000000000000000000', (string) $ulid);
+    }
+
+    public function testNewNilUlid()
+    {
+        $this->assertSame('00000000000000000000000000', (string) new NilUlid());
     }
 }

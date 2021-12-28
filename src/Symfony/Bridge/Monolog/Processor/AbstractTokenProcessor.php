@@ -42,7 +42,7 @@ abstract class AbstractTokenProcessor
 
         if (null !== $token = $this->getToken()) {
             $record['extra'][$this->getKey()] = [
-                'authenticated' => $token->isAuthenticated(),
+                'authenticated' => method_exists($token, 'isAuthenticated') ? $token->isAuthenticated(false) : (bool) $token->getUser(),
                 'roles' => $token->getRoleNames(),
             ];
 

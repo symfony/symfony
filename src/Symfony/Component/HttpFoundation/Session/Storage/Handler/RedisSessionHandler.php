@@ -128,6 +128,7 @@ class RedisSessionHandler extends AbstractSessionHandler
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function updateTimestamp($sessionId, $data)
     {
         return (bool) $this->redis->expire($this->prefix.$sessionId, (int) ($this->ttl ?? ini_get('session.gc_maxlifetime')));

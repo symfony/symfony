@@ -24,6 +24,9 @@ use Symfony\Component\Notifier\Message\SentMessage;
  */
 class RoundRobinTransport implements TransportInterface
 {
+    /**
+     * @var \SplObjectStorage<TransportInterface, float>
+     */
     private $deadTransports;
     private $transports = [];
     private $retryPeriod;

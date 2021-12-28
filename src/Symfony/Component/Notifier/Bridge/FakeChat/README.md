@@ -1,9 +1,9 @@
 Fake Chat Notifier
 ==================
 
-Provides Fake Chat (as email during development) integration for Symfony Notifier.
+Provides Fake Chat (as email or log during development) integration for Symfony Notifier.
 
-#### DSN example
+#### DSN example for email
 
 ```
 FAKE_CHAT_DSN=fakechat+email://default?to=TO&from=FROM
@@ -17,6 +17,12 @@ To use a custom mailer transport:
 ```
 FAKE_CHAT_DSN=fakechat+email://mailchimp?to=TO&from=FROM
 ```
+
+#### DSN example for logger
+
+```
+ FAKE_CHAT_DSN=fakechat+logger://default
+ ```
 
 Resources
 ---------

@@ -1,6 +1,6 @@
 {
     "name": "symfony/amazon-mailer",
-    "type": "symfony-bridge",
+    "type": "symfony-mailer-bridge",
     "description": "Symfony Amazon Mailer Bridge",
     "keywords": [],
     "homepage": "https://symfony.com",
@@ -18,11 +18,12 @@
     "require": {
         "php": ">=7.2.5",
         "async-aws/ses": "^1.0",
-        "symfony/deprecation-contracts": "^2.1",
-        "symfony/mailer": "^4.4.21|^5.2.6"
+        "psr/event-dispatcher": "^1",
+        "symfony/deprecation-contracts": "^2.1|^3",
+        "symfony/mailer": "^4.4.21|^5.2.6|^6.0"
     },
     "require-dev": {
-        "symfony/http-client": "^4.4|^5.0"
+        "symfony/http-client": "^4.4|^5.0|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Amazon\\": "" },

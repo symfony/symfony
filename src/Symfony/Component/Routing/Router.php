@@ -171,7 +171,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Gets an option value.
      *
-     * @return mixed The value
+     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -303,7 +303,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Gets the UrlGenerator instance associated with this Router.
      *
-     * @return UrlGeneratorInterface A UrlGeneratorInterface instance
+     * @return UrlGeneratorInterface
      */
     public function getGenerator()
     {
@@ -313,11 +313,14 @@ class Router implements RouterInterface, RequestMatcherInterface
 
         if (null === $this->options['cache_dir']) {
             $routes = $this->getRouteCollection();
+            $aliases = [];
             $compiled = is_a($this->options['generator_class'], CompiledUrlGenerator::class, true);
             if ($compiled) {
-                $routes = (new CompiledUrlGeneratorDumper($routes))->getCompiledRoutes();
+                $generatorDumper = new CompiledUrlGeneratorDumper($routes);
+                $routes = $generatorDumper->getCompiledRoutes();
+                $aliases = $generatorDumper->getCompiledAliases();
             }
-            $this->generator = new $this->options['generator_class']($routes, $this->context, $this->logger, $this->defaultLocale);
+            $this->generator = new $this->options['generator_class'](array_merge($routes, $aliases), $this->context, $this->logger, $this->defaultLocale);
         } else {
             $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/url_generating_routes.php',
                 function (ConfigCacheInterface $cache) {

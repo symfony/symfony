@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `NilUlid`
+
 5.3
 ---
 

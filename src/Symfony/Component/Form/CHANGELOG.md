@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Deprecate calling `FormErrorIterator::children()` if the current element is not iterable.
+ * Allow to pass `TranslatableMessage` objects to the `help` option
+ * Add the `EnumType`
+
 5.3
 ---
 

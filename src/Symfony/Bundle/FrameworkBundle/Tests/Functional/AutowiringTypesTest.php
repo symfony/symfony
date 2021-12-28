@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -34,11 +33,7 @@ class AutowiringTypesTest extends AbstractWebTestCase
         static::bootKernel();
 
         $annotationReader = self::getContainer()->get('test.autowiring_types.autowired_services')->getAnnotationReader();
-        if (class_exists(PsrCachedReader::class)) {
-            $this->assertInstanceOf(PsrCachedReader::class, $annotationReader);
-        } else {
-            $this->assertInstanceOf(CachedReader::class, $annotationReader);
-        }
+        $this->assertInstanceOf(PsrCachedReader::class, $annotationReader);
     }
 
     public function testEventDispatcherAutowiring()

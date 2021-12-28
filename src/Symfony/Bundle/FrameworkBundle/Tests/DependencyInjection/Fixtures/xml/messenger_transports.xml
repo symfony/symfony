@@ -7,7 +7,7 @@
 
     <framework:config>
         <framework:serializer enabled="true" />
-        <framework:messenger failure-transport="failed">
+        <framework:messenger failure-transport="failed" reset-on-message="true">
             <framework:serializer default-serializer="messenger.transport.symfony_serializer" />
             <framework:transport name="default" dsn="amqp://localhost/%2f/messages" />
             <framework:transport name="customised" dsn="amqp://localhost/%2f/messages?exchange_name=exchange_name" serializer="messenger.transport.native_php_serializer">

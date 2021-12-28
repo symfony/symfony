@@ -26,10 +26,14 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 
+trigger_deprecation('symfony/security-http', '5.4', 'The "%s" class is deprecated, use "%s" instead.', AbstractRememberMeServices::class, AbstractRememberMeHandler::class);
+
 /**
  * Base class implementing the RememberMeServicesInterface.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.4, use {@see AbstractRememberMeHandler} instead
  */
 abstract class AbstractRememberMeServices implements RememberMeServicesInterface, LogoutHandlerInterface
 {

@@ -38,6 +38,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RemoteUse
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\X509Factory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMemoryFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\LdapFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
@@ -56,21 +57,22 @@ class SecurityBundle extends Bundle
     {
         parent::build($container);
 
+        /** @var SecurityExtension $extension */
         $extension = $container->getExtension('security');
-        $extension->addSecurityListenerFactory(new FormLoginFactory());
-        $extension->addSecurityListenerFactory(new FormLoginLdapFactory());
-        $extension->addSecurityListenerFactory(new JsonLoginFactory());
-        $extension->addSecurityListenerFactory(new JsonLoginLdapFactory());
-        $extension->addSecurityListenerFactory(new HttpBasicFactory());
-        $extension->addSecurityListenerFactory(new HttpBasicLdapFactory());
-        $extension->addSecurityListenerFactory(new RememberMeFactory());
-        $extension->addSecurityListenerFactory(new X509Factory());
-        $extension->addSecurityListenerFactory(new RemoteUserFactory());
-        $extension->addSecurityListenerFactory(new GuardAuthenticationFactory());
-        $extension->addSecurityListenerFactory(new AnonymousFactory());
-        $extension->addSecurityListenerFactory(new CustomAuthenticatorFactory());
-        $extension->addSecurityListenerFactory(new LoginThrottlingFactory());
-        $extension->addSecurityListenerFactory(new LoginLinkFactory());
+        $extension->addAuthenticatorFactory(new FormLoginFactory());
+        $extension->addAuthenticatorFactory(new FormLoginLdapFactory());
+        $extension->addAuthenticatorFactory(new JsonLoginFactory());
+        $extension->addAuthenticatorFactory(new JsonLoginLdapFactory());
+        $extension->addAuthenticatorFactory(new HttpBasicFactory());
+        $extension->addAuthenticatorFactory(new HttpBasicLdapFactory());
+        $extension->addAuthenticatorFactory(new RememberMeFactory());
+        $extension->addAuthenticatorFactory(new X509Factory());
+        $extension->addAuthenticatorFactory(new RemoteUserFactory());
+        $extension->addAuthenticatorFactory(new GuardAuthenticationFactory());
+        $extension->addAuthenticatorFactory(new AnonymousFactory());
+        $extension->addAuthenticatorFactory(new CustomAuthenticatorFactory());
+        $extension->addAuthenticatorFactory(new LoginThrottlingFactory());
+        $extension->addAuthenticatorFactory(new LoginLinkFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());

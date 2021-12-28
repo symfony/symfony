@@ -132,7 +132,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *
      * @see getResourceForBlock()
      *
-     * @return bool True if the resource could be loaded, false otherwise
+     * @return bool
      */
     abstract protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName);
 

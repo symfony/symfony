@@ -23,7 +23,7 @@ class WebProfilerBundleKernel extends Kernel
         parent::__construct('test', false);
     }
 
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return [
             new FrameworkBundle(),
@@ -32,14 +32,14 @@ class WebProfilerBundleKernel extends Kernel
         ];
     }
 
-    protected function configureRoutes(RoutingConfigurator $routes)
+    protected function configureRoutes(RoutingConfigurator $routes): void
     {
         $routes->import(__DIR__.'/../../Resources/config/routing/profiler.xml')->prefix('/_profiler');
         $routes->import(__DIR__.'/../../Resources/config/routing/wdt.xml')->prefix('/_wdt');
         $routes->add('_', '/')->controller('kernel::homepageController');
     }
 
-    protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader)
+    protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader): void
     {
         $containerBuilder->loadFromExtension('framework', [
             'secret' => 'foo-secret',
@@ -54,12 +54,12 @@ class WebProfilerBundleKernel extends Kernel
         ]);
     }
 
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sys_get_temp_dir().'/cache-'.spl_object_hash($this);
     }
 
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return sys_get_temp_dir().'/log-'.spl_object_hash($this);
     }

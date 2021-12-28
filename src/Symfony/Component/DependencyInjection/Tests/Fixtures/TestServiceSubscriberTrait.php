@@ -2,9 +2,16 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
+use Symfony\Contracts\Service\Attribute\SubscribedService;
+
 trait TestServiceSubscriberTrait
 {
-    private function testDefinition3(): TestDefinition3
+    protected function protectedFunction1(): SomeClass
+    {
+    }
+
+    #[SubscribedService]
+    private function testDefinition4(): TestDefinition3
     {
         return $this->container->get(__CLASS__.'::'.__FUNCTION__);
     }

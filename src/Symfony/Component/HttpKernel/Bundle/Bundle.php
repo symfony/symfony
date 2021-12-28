@@ -58,7 +58,7 @@ abstract class Bundle implements BundleInterface
     /**
      * Returns the bundle's container extension.
      *
-     * @return ExtensionInterface|null The container extension
+     * @return ExtensionInterface|null
      *
      * @throws \LogicException
      */

@@ -364,14 +364,14 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return $mutator;
         }
 
-        $errors = array_merge($errors, $adderAndRemoverErrors);
+        $errors[] = $adderAndRemoverErrors;
 
         foreach ($this->mutatorPrefixes as $mutatorPrefix) {
             $methodName = $mutatorPrefix.$camelized;
 
             [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, $methodName, 1);
             if (!$accessible) {
-                $errors = array_merge($errors, $methodAccessibleErrors);
+                $errors[] = $methodAccessibleErrors;
                 continue;
             }
 
@@ -392,7 +392,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $getsetter, $this->getWriteVisiblityForMethod($method), $method->isStatic());
             }
 
-            $errors = array_merge($errors, $methodAccessibleErrors);
+            $errors[] = $methodAccessibleErrors;
         }
 
         if ($reflClass->hasProperty($property) && ($reflClass->getProperty($property)->getModifiers() & $this->propertyReflectionFlags)) {
@@ -407,7 +407,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
             }
 
-            $errors = array_merge($errors, $methodAccessibleErrors);
+            $errors[] = $methodAccessibleErrors;
         }
 
         if ($allowMagicCall) {
@@ -416,21 +416,21 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, 'set'.$camelized, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
             }
 
-            $errors = array_merge($errors, $methodAccessibleErrors);
+            $errors[] = $methodAccessibleErrors;
         }
 
         if (!$allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
-            $errors[] = sprintf(
+            $errors[] = [sprintf(
                 'The property "%s" in class "%s" can be defined with the methods "%s()" but '.
                 'the new value must be an array or an instance of \Traversable',
                 $property,
                 $reflClass->getName(),
                 implode('()", "', [$adderAccessName, $removerAccessName])
-            );
+            )];
         }
 
         $noneProperty = new PropertyWriteInfo();
-        $noneProperty->setErrors($errors);
+        $noneProperty->setErrors(array_merge([], ...$errors));
 
         return $noneProperty;
     }
@@ -727,20 +727,21 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
             [$addMethodFound, $addMethodAccessibleErrors] = $this->isMethodAccessible($reflClass, $addMethod, 1);
             [$removeMethodFound, $removeMethodAccessibleErrors] = $this->isMethodAccessible($reflClass, $removeMethod, 1);
-            $errors = array_merge($errors, $addMethodAccessibleErrors, $removeMethodAccessibleErrors);
+            $errors[] = $addMethodAccessibleErrors;
+            $errors[] = $removeMethodAccessibleErrors;
 
             if ($addMethodFound && $removeMethodFound) {
                 return [$addMethod, $removeMethod, []];
             }
 
             if ($addMethodFound && !$removeMethodFound) {
-                $errors[] = sprintf('The add method "%s" in class "%s" was found, but the corresponding remove method "%s" was not found', $addMethod, $reflClass->getName(), $removeMethod);
+                $errors[] = [sprintf('The add method "%s" in class "%s" was found, but the corresponding remove method "%s" was not found', $addMethod, $reflClass->getName(), $removeMethod)];
             } elseif (!$addMethodFound && $removeMethodFound) {
-                $errors[] = sprintf('The remove method "%s" in class "%s" was found, but the corresponding add method "%s" was not found', $removeMethod, $reflClass->getName(), $addMethod);
+                $errors[] = [sprintf('The remove method "%s" in class "%s" was found, but the corresponding add method "%s" was not found', $removeMethod, $reflClass->getName(), $addMethod)];
             }
         }
 
-        return [null, null, $errors];
+        return [null, null, array_merge([], ...$errors)];
     }
 
     /**

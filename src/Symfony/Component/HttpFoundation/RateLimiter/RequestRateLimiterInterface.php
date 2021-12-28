@@ -21,8 +21,6 @@ use Symfony\Component\RateLimiter\RateLimit;
  * from the requests.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 interface RequestRateLimiterInterface
 {

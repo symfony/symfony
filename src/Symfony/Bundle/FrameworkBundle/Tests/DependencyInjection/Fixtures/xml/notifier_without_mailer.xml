@@ -7,7 +7,7 @@
 
     <framework:config>
         <framework:mailer enabled="false" />
-        <framework:messenger enabled="true" />
+        <framework:messenger enabled="true" reset-on-message="true" />
         <framework:notifier enabled="true" notification-on-failed-messages="true">
             <framework:chatter-transport name="slack">null</framework:chatter-transport>
             <framework:texter-transport name="twilio">null</framework:texter-transport>

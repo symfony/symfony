@@ -16,6 +16,9 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
  */
 final class DiscordAuthorEmbedObject extends AbstractDiscordEmbedObject
 {
+    /**
+     * @return $this
+     */
     public function name(string $name): self
     {
         $this->options['name'] = $name;
@@ -23,6 +26,9 @@ final class DiscordAuthorEmbedObject extends AbstractDiscordEmbedObject
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function url(string $url): self
     {
         $this->options['url'] = $url;
@@ -30,6 +36,9 @@ final class DiscordAuthorEmbedObject extends AbstractDiscordEmbedObject
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function iconUrl(string $iconUrl): self
     {
         $this->options['icon_url'] = $iconUrl;
@@ -37,6 +46,9 @@ final class DiscordAuthorEmbedObject extends AbstractDiscordEmbedObject
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function proxyIconUrl(string $proxyIconUrl): self
     {
         $this->options['proxy_icon_url'] = $proxyIconUrl;

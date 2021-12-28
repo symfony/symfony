@@ -12,8 +12,10 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -39,6 +41,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\AttributesTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
@@ -49,6 +52,9 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectToPopulateTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipNullValuesTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipUninitializedValuesTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObjectWithGetters;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
 
 /**
@@ -57,6 +63,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTr
 class ObjectNormalizerTest extends TestCase
 {
     use AttributesTestTrait;
+    use CacheableObjectAttributesTestTrait;
     use CallbacksTestTrait;
     use CircularReferenceTestTrait;
     use ConstructorArgumentsTestTrait;
@@ -66,6 +73,7 @@ class ObjectNormalizerTest extends TestCase
     use MaxDepthTestTrait;
     use ObjectToPopulateTestTrait;
     use SkipNullValuesTestTrait;
+    use SkipUninitializedValuesTestTrait;
     use TypeEnforcementTestTrait;
 
     /**
@@ -567,6 +575,42 @@ class ObjectNormalizerTest extends TestCase
         return new ObjectNormalizer();
     }
 
+    // skip uninitialized
+
+    protected function getNormalizerForSkipUninitializedValues(): ObjectNormalizer
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        return new ObjectNormalizer($classMetadataFactory);
+    }
+
+    protected function getObjectCollectionWithExpectedArray(): array
+    {
+        $typedPropsObject = new TypedPropertiesObject();
+        $typedPropsObject->unInitialized = 'value2';
+
+        $collection = [
+            new TypedPropertiesObject(),
+            $typedPropsObject,
+            new TypedPropertiesObjectWithGetters(),
+            (new TypedPropertiesObjectWithGetters())->setUninitialized('value2'),
+        ];
+
+        $expectedArrays = [
+            ['initialized' => 'value', 'initialized2' => 'value'],
+            ['unInitialized' => 'value2', 'initialized' => 'value', 'initialized2' => 'value'],
+            ['initialized' => 'value', 'initialized2' => 'value'],
+            ['unInitialized' => 'value2', 'initialized' => 'value', 'initialized2' => 'value'],
+        ];
+
+        return [$collection, $expectedArrays];
+    }
+
+    protected function getNormalizerForCacheableObjectAttributesTest(): ObjectNormalizer
+    {
+        return new ObjectNormalizer();
+    }
+
     // type enforcement
 
     protected function getDenormalizerForTypeEnforcement(): ObjectNormalizer
@@ -634,9 +678,11 @@ class ObjectNormalizerTest extends TestCase
     public function testDefaultExcludeFromCacheKey()
     {
         $normalizer = new class(null, null, null, null, null, null, [ObjectNormalizer::EXCLUDE_FROM_CACHE_KEY => ['foo']]) extends ObjectNormalizer {
-            protected function isCircularReference($object, &$context)
+            protected function isCircularReference($object, &$context): bool
             {
                 ObjectNormalizerTest::assertContains('foo', $this->defaultContext[ObjectNormalizer::EXCLUDE_FROM_CACHE_KEY]);
+
+                return false;
             }
         };
         $normalizer->normalize(new ObjectDummy());
@@ -675,6 +721,22 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'json')->number);
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'jsonld')->number);
+    }
+
+    public function testDoesntHaveIssuesWithUnionConstTypes()
+    {
+        if (!class_exists(PhpStanExtractor::class) || !class_exists(PhpDocParser::class)) {
+            $this->markTestSkipped('phpstan/phpdoc-parser required for this test');
+        }
+
+        $extractor = new PropertyInfoExtractor([], [new PhpStanExtractor(), new PhpDocExtractor(), new ReflectionExtractor()]);
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+
+        $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], \get_class(new class() {
+            /** @var self::*|null */
+            public $foo;
+        }))->foo);
     }
 
     public function testExtractAttributesRespectsFormat()

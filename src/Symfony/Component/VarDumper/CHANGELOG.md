@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add ability to style integer and double values independently
+ * Add casters for Symfony's UUIDs and ULIDs
+ * Add support for `Fiber`
+
 5.2.0
 -----
 

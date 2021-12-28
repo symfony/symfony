@@ -25,7 +25,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-main": "2.4-dev"
+            "dev-main": "2.5-dev"
         },
         "thanks": {
             "name": "symfony/contracts",

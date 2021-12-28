@@ -42,6 +42,8 @@ return (new PhpCsFixer\Config())
             ->notPath('Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources/Custom/_name_entry_label.html.php')
             // explicit trigger_error tests
             ->notPath('Symfony/Component/ErrorHandler/Tests/DebugClassLoaderTest.php')
+            // stop removing spaces on the end of the line in strings
+            ->notPath('Symfony/Component/Messenger/Tests/Command/FailedMessagesShowCommandTest.php')
     )
     ->setCacheFile('.php-cs-fixer.cache')
 ;

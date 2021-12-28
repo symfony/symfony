@@ -77,7 +77,9 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         $managerDefs = [];
         foreach ($taggedServices as $taggedSubscriber) {
             [$tagName, $id, $tag] = $taggedSubscriber;
-            $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
+            $connections = isset($tag['connection'])
+                ? [$container->getParameterBag()->resolveValue($tag['connection'])]
+                : array_keys($this->connections);
             if ($listenerTag === $tagName && !isset($tag['event'])) {
                 throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
             }

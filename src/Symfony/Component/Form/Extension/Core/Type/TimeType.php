@@ -43,7 +43,7 @@ class TimeType extends AbstractType
         $format = 'H';
 
         if ($options['with_seconds'] && !$options['with_minutes']) {
-            throw new InvalidConfigurationException('You can not disable minutes if you have enabled seconds.');
+            throw new InvalidConfigurationException('You cannot disable minutes if you have enabled seconds.');
         }
 
         if (null !== $options['reference_date'] && $options['reference_date']->getTimezone()->getName() !== $options['model_timezone']) {

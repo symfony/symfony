@@ -12,12 +12,14 @@
 namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
 class FailedMessagesRetryCommandTest extends TestCase
@@ -143,5 +145,84 @@ EOF;
         $tester->execute(['id' => [10, 12], '--transport' => $failureTransportName, '--force' => true]);
 
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testCompletingTransport()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('getProvidedServices')->willReturn([
+            'global_receiver' => $receiver,
+            $globalFailureReceiverName => $receiver,
+        ]);
+
+        $command = new FailedMessagesRetryCommand(
+            $globalFailureReceiverName,
+            $serviceLocator,
+            $this->createMock(MessageBusInterface::class),
+            new EventDispatcher()
+        );
+        $tester = new CommandCompletionTester($command);
+
+        $suggestions = $tester->complete(['--transport']);
+        $this->assertSame(['global_receiver', 'failure_receiver'], $suggestions);
+    }
+
+    public function testCompleteId()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->with(50)->willReturn([
+            Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('2ab50dfa1fbf')]),
+            Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('78c2da843723')]),
+        ]);
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+
+        $command = new FailedMessagesRetryCommand(
+            $globalFailureReceiverName,
+            $serviceLocator,
+            $this->createMock(MessageBusInterface::class),
+            new EventDispatcher()
+        );
+        $tester = new CommandCompletionTester($command);
+
+        $suggestions = $tester->complete(['']);
+
+        $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
+    }
+
+    public function testCompleteIdWithSpecifiedTransport()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+        $anotherFailureReceiverName = 'another_receiver';
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->with(50)->willReturn([
+            Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('2ab50dfa1fbf')]),
+            Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('78c2da843723')]),
+        ]);
+
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('has')->with($anotherFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects($this->any())->method('get')->with($anotherFailureReceiverName)->willReturn($receiver);
+
+        $command = new FailedMessagesRetryCommand(
+            $globalFailureReceiverName,
+            $serviceLocator,
+            $this->createMock(MessageBusInterface::class),
+            new EventDispatcher()
+        );
+        $tester = new CommandCompletionTester($command);
+
+        $suggestions = $tester->complete(['--transport', $anotherFailureReceiverName, ' ']);
+
+        $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
     }
 }

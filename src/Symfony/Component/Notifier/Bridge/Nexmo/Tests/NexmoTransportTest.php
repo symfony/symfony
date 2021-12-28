@@ -19,6 +19,9 @@ use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * @group legacy
+ */
 final class NexmoTransportTest extends TransportTestCase
 {
     /**

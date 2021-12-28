@@ -58,7 +58,7 @@ class_exists(ConfigCache::class);
 abstract class Kernel implements KernelInterface, RebootableInterface, TerminableInterface
 {
     /**
-     * @var BundleInterface[]
+     * @var array<string, BundleInterface>
      */
     protected $bundles = [];
 
@@ -73,17 +73,20 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     private $requestStackSize = 0;
     private $resetServices = false;
 
+    /**
+     * @var array<string, bool>
+     */
     private static $freshCache = [];
 
-    public const VERSION = '5.3.13-DEV';
-    public const VERSION_ID = 50313;
+    public const VERSION = '5.4.2-DEV';
+    public const VERSION_ID = 50402;
     public const MAJOR_VERSION = 5;
-    public const MINOR_VERSION = 3;
-    public const RELEASE_VERSION = 13;
+    public const MINOR_VERSION = 4;
+    public const RELEASE_VERSION = 2;
     public const EXTRA_VERSION = 'DEV';
 
-    public const END_OF_MAINTENANCE = '01/2022';
-    public const END_OF_LIFE = '01/2022';
+    public const END_OF_MAINTENANCE = '11/2024';
+    public const END_OF_LIFE = '11/2025';
 
     public function __construct(string $environment, bool $debug)
     {
@@ -278,7 +281,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Gets the application root dir (path of the project's composer file).
      *
-     * @return string The project root dir
+     * @return string
      */
     public function getProjectDir()
     {
@@ -403,7 +406,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @throws \InvalidArgumentException If the generated classname is invalid
      *
-     * @return string The container class
+     * @return string
      */
     protected function getContainerClass()
     {
@@ -592,7 +595,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Returns the kernel parameters.
      *
-     * @return array An array of kernel parameters
+     * @return array
      */
     protected function getKernelParameters()
     {
@@ -625,7 +628,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Builds the service container.
      *
-     * @return ContainerBuilder The compiled service container
+     * @return ContainerBuilder
      *
      * @throws \RuntimeException
      */
@@ -752,7 +755,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Returns a loader for the container.
      *
-     * @return DelegatingLoader The loader
+     * @return DelegatingLoader
      */
     protected function getContainerLoader(ContainerInterface $container)
     {
@@ -804,7 +807,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * We don't use the PHP php_strip_whitespace() function
      * as we want the content to be readable and well-formatted.
      *
-     * @return string The PHP string with the comments removed
+     * @return string
      */
     public static function stripComments(string $source)
     {

@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 
 class ResponseListenerTest extends TestCase
@@ -29,7 +28,7 @@ class ResponseListenerTest extends TestCase
         $cookie = new Cookie('rememberme', null, 0, '/', null, false, true, false, null);
 
         $request = $this->getRequest([
-            RememberMeServicesInterface::COOKIE_ATTR_NAME => $cookie,
+            ResponseListener::COOKIE_ATTR_NAME => $cookie,
         ]);
 
         $response = $this->getResponse();
@@ -44,7 +43,7 @@ class ResponseListenerTest extends TestCase
         $cookie = new Cookie('rememberme', null, 0, '/', null, false, true, false, null);
 
         $request = $this->getRequest([
-            RememberMeServicesInterface::COOKIE_ATTR_NAME => $cookie,
+            ResponseListener::COOKIE_ATTR_NAME => $cookie,
         ]);
 
         $response = $this->getResponse();

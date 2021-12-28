@@ -1,6 +1,6 @@
 {
     "name": "symfony/clickatell-notifier",
-    "type": "symfony-bridge",
+    "type": "symfony-notifier-bridge",
     "description": "Symfony Clickatell Notifier Bridge",
     "keywords": ["sms", "clickatell", "notifier"],
     "homepage": "https://symfony.com",
@@ -21,11 +21,11 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/http-client": "^4.3|^5.0",
-        "symfony/notifier": "^5.3"
+        "symfony/http-client": "^4.3|^5.0|^6.0",
+        "symfony/notifier": "^5.3|^6.0"
     },
     "require-dev": {
-        "symfony/event-dispatcher": "^4.3|^5.0"
+        "symfony/event-dispatcher": "^4.3|^5.0|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Clickatell\\": "" },

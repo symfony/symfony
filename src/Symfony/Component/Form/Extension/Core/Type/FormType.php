@@ -25,6 +25,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class FormType extends BaseType
 {
@@ -226,7 +227,7 @@ class FormType extends BaseType
         $resolver->setAllowedTypes('label_attr', 'array');
         $resolver->setAllowedTypes('action', 'string');
         $resolver->setAllowedTypes('upload_max_size_message', ['callable']);
-        $resolver->setAllowedTypes('help', ['string', 'null']);
+        $resolver->setAllowedTypes('help', ['string', 'null', TranslatableMessage::class]);
         $resolver->setAllowedTypes('help_attr', 'array');
         $resolver->setAllowedTypes('help_html', 'bool');
         $resolver->setAllowedTypes('is_empty_callback', ['null', 'callable']);

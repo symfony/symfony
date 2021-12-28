@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -30,8 +31,10 @@ use Symfony\Component\Security\Http\EventListener\RememberMeLogoutListener;
 /**
  * @internal
  */
-class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
+class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface, PrependExtensionInterface
 {
+    public const PRIORITY = -50;
+
     protected $options = [
         'name' => 'REMEMBERME',
         'lifetime' => 31536000,
@@ -44,7 +47,7 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         'remember_me_parameter' => '_remember_me',
     ];
 
-    public function create(ContainerBuilder $container, string $id, array $config, ?string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, ?string $userProvider, ?string $defaultEntryPoint): array
     {
         // authentication provider
         $authProviderId = 'security.authentication.provider.rememberme.'.$id;
@@ -176,12 +179,20 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         return $authenticatorId;
     }
 
-    public function getPosition()
+    public function getPosition(): string
     {
         return 'remember_me';
     }
 
-    public function getKey()
+    /**
+     * {@inheritDoc}
+     */
+    public function getPriority(): int
+    {
+        return self::PRIORITY;
+    }
+
+    public function getKey(): string
     {
         return 'remember-me';
     }
@@ -331,5 +342,28 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
             ->addArgument('rememberme-'.$firewallName.'-stale-');
 
         return new Reference($tokenVerifierId, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $rememberMeSecureDefault = false;
+        $rememberMeSameSiteDefault = null;
+
+        if (!isset($container->getExtensions()['framework'])) {
+            return;
+        }
+
+        foreach ($container->getExtensionConfig('framework') as $config) {
+            if (isset($config['session']) && \is_array($config['session'])) {
+                $rememberMeSecureDefault = $config['session']['cookie_secure'] ?? $rememberMeSecureDefault;
+                $rememberMeSameSiteDefault = \array_key_exists('cookie_samesite', $config['session']) ? $config['session']['cookie_samesite'] : $rememberMeSameSiteDefault;
+            }
+        }
+
+        $this->options['secure'] = $rememberMeSecureDefault;
+        $this->options['samesite'] = $rememberMeSameSiteDefault;
     }
 }

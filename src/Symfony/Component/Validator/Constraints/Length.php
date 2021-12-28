@@ -26,11 +26,13 @@ class Length extends Constraint
 {
     public const TOO_SHORT_ERROR = '9ff3fdc4-b214-49db-8718-39c315e33d45';
     public const TOO_LONG_ERROR = 'd94b19cc-114f-4f44-9cc4-4138e80a87b9';
+    public const NOT_EQUAL_LENGTH_ERROR = '4b6f5c76-22b4-409d-af16-fbe823ba9332';
     public const INVALID_CHARACTERS_ERROR = '35e6a710-aa2e-4719-b58e-24b35749b767';
 
     protected static $errorNames = [
         self::TOO_SHORT_ERROR => 'TOO_SHORT_ERROR',
         self::TOO_LONG_ERROR => 'TOO_LONG_ERROR',
+        self::NOT_EQUAL_LENGTH_ERROR => 'NOT_EQUAL_LENGTH_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
     ];
 

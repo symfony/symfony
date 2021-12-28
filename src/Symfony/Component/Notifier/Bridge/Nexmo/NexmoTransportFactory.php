@@ -18,6 +18,8 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.4, use the Vonage bridge instead.
  */
 final class NexmoTransportFactory extends AbstractTransportFactory
 {

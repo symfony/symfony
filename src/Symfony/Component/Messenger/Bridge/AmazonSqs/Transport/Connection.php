@@ -23,8 +23,6 @@ use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * A SQS connection.
- *
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @internal
@@ -68,10 +66,7 @@ class Connection
         $this->queueUrl = $queueUrl;
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -191,7 +186,7 @@ class Connection
     }
 
     /**
-     * @return array[]
+     * @return \Generator<int, array>
      */
     private function getNextMessages(): \Generator
     {
@@ -200,7 +195,7 @@ class Connection
     }
 
     /**
-     * @return array[]
+     * @return \Generator<int, array>
      */
     private function getPendingMessages(): \Generator
     {
@@ -210,7 +205,7 @@ class Connection
     }
 
     /**
-     * @return array[]
+     * @return \Generator<int, array>
      */
     private function getNewMessages(): \Generator
     {

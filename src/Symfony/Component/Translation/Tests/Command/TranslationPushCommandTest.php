@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Tests\Command;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Translation\Command\TranslationPushCommand;
 use Symfony\Component\Translation\Loader\ArrayLoader;
@@ -89,22 +90,32 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
     public function testPushForceMessages()
     {
         $xliffLoader = new XliffFileLoader();
-        $filenameEn = $this->createFile([
+        $filenameMessagesEn = $this->createFile([
             'note' => 'NOTE UPDATED',
             'new.foo' => 'newFoo',
-        ]);
-        $filenameFr = $this->createFile([
+        ], 'en');
+        $filenameMessagesFr = $this->createFile([
             'note' => 'NOTE MISE À JOUR',
             'new.foo' => 'nouveauFoo',
         ], 'fr');
+        $filenameValidatorsEn = $this->createFile([
+            'foo.error' => 'Wrong value',
+            'bar.success' => 'Form valid!',
+        ], 'en', 'validators.%locale%.xlf');
+        $filenameValidatorsFr = $this->createFile([
+            'foo.error' => 'Valeur erronée',
+            'bar.success' => 'Formulaire valide !',
+        ], 'fr', 'validators.%locale%.xlf');
         $locales = ['en', 'fr'];
-        $domains = ['messages'];
+        $domains = ['messages', 'validators'];
 
         $provider = $this->createMock(ProviderInterface::class);
 
         $localTranslatorBag = new TranslatorBag();
-        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameEn, 'en'));
-        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameFr, 'fr'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameMessagesEn, 'en', 'messages'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameMessagesFr, 'fr', 'messages'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameValidatorsEn, 'en', 'validators'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameValidatorsFr, 'fr', 'validators'));
 
         $provider->expects($this->once())
             ->method('write')
@@ -116,9 +127,9 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester = $this->createCommandTester($provider, $locales, $domains);
 
-        $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--force' => true]);
+        $tester->execute(['--locales' => $locales, '--domains' => $domains, '--force' => true]);
 
-        $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages, validators" domain(s)).', trim($tester->getDisplay()));
     }
 
     public function testDeleteMissingMessages()
@@ -248,20 +259,60 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        if (!class_exists(CommandCompletionTester::class)) {
+            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+        }
+
+        $application = new Application();
+        $application->add($this->createCommand($this->createMock(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], ['loco', 'crowdin', 'lokalise']));
+
+        $tester = new CommandCompletionTester($application->get('translation:push'));
+        $suggestions = $tester->complete($input);
+        $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function provideCompletionSuggestions(): \Generator
+    {
+        yield 'provider' => [
+            [''],
+            ['loco', 'crowdin', 'lokalise'],
+        ];
+
+        yield '--domains' => [
+            ['loco', '--domains'],
+            ['messages', 'validators'],
+        ];
+
+        yield '--locales' => [
+            ['loco', '--locales'],
+            ['en', 'fr', 'it'],
+        ];
+    }
+
     private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages']): CommandTester
     {
-        $reader = new TranslationReader();
-        $reader->addLoader('xlf', new XliffFileLoader());
-
-        $command = new TranslationPushCommand(
-            $this->getProviderCollection($provider, $locales, $domains),
-            $reader,
-            [$this->translationAppDir.'/translations'],
-            $locales
-        );
+        $command = $this->createCommand($provider, $locales, $domains);
         $application = new Application();
         $application->add($command);
 
         return new CommandTester($application->find('translation:push'));
+    }
+
+    private function createCommand(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages'], array $providerNames = ['loco']): TranslationPushCommand
+    {
+        $reader = new TranslationReader();
+        $reader->addLoader('xlf', new XliffFileLoader());
+
+        return new TranslationPushCommand(
+            $this->getProviderCollection($provider, $providerNames, $locales, $domains),
+            $reader,
+            [$this->translationAppDir.'/translations'],
+            $locales
+        );
     }
 }

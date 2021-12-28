@@ -48,4 +48,12 @@ class AnnotatedController
     {
         return new Response($value);
     }
+
+    /**
+     * @Route("/create-transaction")
+     */
+    public function createTransaction()
+    {
+        return new Response();
+    }
 }

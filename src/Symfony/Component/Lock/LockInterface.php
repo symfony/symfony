@@ -26,10 +26,10 @@ interface LockInterface
      * Acquires the lock. If the lock is acquired by someone else, the parameter `blocking` determines whether or not
      * the call should block until the release of the lock.
      *
-     * @return bool whether or not the lock had been acquired
+     * @return bool
      *
      * @throws LockConflictedException If the lock is acquired by someone else in blocking mode
-     * @throws LockAcquiringException  If the lock can not be acquired
+     * @throws LockAcquiringException  If the lock cannot be acquired
      */
     public function acquire(bool $blocking = false);
 
@@ -39,7 +39,7 @@ interface LockInterface
      * @param float|null $ttl Maximum expected lock duration in seconds
      *
      * @throws LockConflictedException If the lock is acquired by someone else
-     * @throws LockAcquiringException  If the lock can not be refreshed
+     * @throws LockAcquiringException  If the lock cannot be refreshed
      */
     public function refresh(float $ttl = null);
 
@@ -53,7 +53,7 @@ interface LockInterface
     /**
      * Release the lock.
      *
-     * @throws LockReleasingException If the lock can not be released
+     * @throws LockReleasingException If the lock cannot be released
      */
     public function release();
 
@@ -63,9 +63,9 @@ interface LockInterface
     public function isExpired();
 
     /**
-     * Returns the remaining lifetime.
+     * Returns the remaining lifetime in seconds.
      *
-     * @return float|null Remaining lifetime in seconds. Null when the lock won't expire.
+     * @return float|null
      */
     public function getRemainingLifetime();
 }

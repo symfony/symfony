@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
-use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -127,7 +126,7 @@ class YamlFileLoader extends FileLoader
 
         // empty file
         if (null === $content) {
-            return;
+            return null;
         }
 
         $this->loadContent($content, $path);
@@ -146,6 +145,8 @@ class YamlFileLoader extends FileLoader
                 $this->env = $env;
             }
         }
+
+        return null;
     }
 
     private function loadContent(array $content, string $path)
@@ -708,7 +709,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When errors occur
      *
-     * @return string|array|Reference A parsed callable
+     * @return string|array|Reference
      */
     private function parseCallable($callable, string $parameter, string $id, string $file)
     {
@@ -742,7 +743,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a YAML file.
      *
-     * @return array The file content
+     * @return array|null
      *
      * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
      */
@@ -803,9 +804,7 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Resolves services.
-     *
-     * @return array|string|Reference|ArgumentInterface
+     * @return mixed
      */
     private function resolveServices($value, string $file, bool $isParameter = false)
     {

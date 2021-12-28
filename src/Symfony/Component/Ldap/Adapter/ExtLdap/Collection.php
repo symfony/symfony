@@ -22,6 +22,7 @@ class Collection implements CollectionInterface
 {
     private $connection;
     private $search;
+    /** @var list<Entry>|null */
     private $entries;
 
     public function __construct(Connection $connection, Query $search)
@@ -63,8 +64,9 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @return \Traversable
+     * @return \Traversable<int, Entry>
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         if (0 === $this->count()) {
@@ -91,6 +93,7 @@ class Collection implements CollectionInterface
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         $this->toArray();
@@ -99,8 +102,9 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @return mixed
+     * @return Entry|null
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         $this->toArray();
@@ -111,6 +115,7 @@ class Collection implements CollectionInterface
     /**
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->toArray();
@@ -121,6 +126,7 @@ class Collection implements CollectionInterface
     /**
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->toArray();

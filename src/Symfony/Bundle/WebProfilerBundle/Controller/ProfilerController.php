@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
+use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -52,11 +53,9 @@ class ProfilerController
     /**
      * Redirects to the last profiles.
      *
-     * @return RedirectResponse A RedirectResponse instance
-     *
      * @throws NotFoundHttpException
      */
-    public function homeAction()
+    public function homeAction(): RedirectResponse
     {
         $this->denyAccessIfProfilerDisabled();
 
@@ -66,11 +65,9 @@ class ProfilerController
     /**
      * Renders a profiler panel for the given token.
      *
-     * @return Response A Response instance
-     *
      * @throws NotFoundHttpException
      */
-    public function panelAction(Request $request, string $token)
+    public function panelAction(Request $request, string $token): Response
     {
         $this->denyAccessIfProfilerDisabled();
 
@@ -125,11 +122,9 @@ class ProfilerController
     /**
      * Renders the Web Debug Toolbar.
      *
-     * @return Response A Response instance
-     *
      * @throws NotFoundHttpException
      */
-    public function toolbarAction(Request $request, string $token = null)
+    public function toolbarAction(Request $request, string $token = null): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -158,6 +153,7 @@ class ProfilerController
         }
 
         return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/toolbar.html.twig', [
+            'full_stack' => class_exists(FullStack::class),
             'request' => $request,
             'profile' => $profile,
             'templates' => $this->getTemplateManager()->getNames($profile),
@@ -170,11 +166,9 @@ class ProfilerController
     /**
      * Renders the profiler search bar.
      *
-     * @return Response A Response instance
-     *
      * @throws NotFoundHttpException
      */
-    public function searchBarAction(Request $request)
+    public function searchBarAction(Request $request): Response
     {
         $this->denyAccessIfProfilerDisabled();
 
@@ -224,11 +218,9 @@ class ProfilerController
     /**
      * Renders the search results.
      *
-     * @return Response A Response instance
-     *
      * @throws NotFoundHttpException
      */
-    public function searchResultsAction(Request $request, string $token)
+    public function searchResultsAction(Request $request, string $token): Response
     {
         $this->denyAccessIfProfilerDisabled();
 
@@ -265,11 +257,9 @@ class ProfilerController
     /**
      * Narrows the search bar.
      *
-     * @return Response A Response instance
-     *
      * @throws NotFoundHttpException
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request): Response
     {
         $this->denyAccessIfProfilerDisabled();
 
@@ -316,11 +306,9 @@ class ProfilerController
     /**
      * Displays the PHP info.
      *
-     * @return Response A Response instance
-     *
      * @throws NotFoundHttpException
      */
-    public function phpinfoAction()
+    public function phpinfoAction(): Response
     {
         $this->denyAccessIfProfilerDisabled();
 
@@ -338,11 +326,9 @@ class ProfilerController
     /**
      * Displays the source of a file.
      *
-     * @return Response A Response instance
-     *
      * @throws NotFoundHttpException
      */
-    public function openAction(Request $request)
+    public function openAction(Request $request): Response
     {
         if (null === $this->baseDir) {
             throw new NotFoundHttpException('The base dir should be set.');
@@ -370,10 +356,8 @@ class ProfilerController
 
     /**
      * Gets the Template Manager.
-     *
-     * @return TemplateManager The Template Manager
      */
-    protected function getTemplateManager()
+    protected function getTemplateManager(): TemplateManager
     {
         if (null === $this->templateManager) {
             $this->templateManager = new TemplateManager($this->profiler, $this->twig, $this->templates);

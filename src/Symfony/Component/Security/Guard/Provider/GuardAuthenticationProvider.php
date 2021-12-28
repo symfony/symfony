@@ -41,9 +41,6 @@ trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecat
  */
 class GuardAuthenticationProvider implements AuthenticationProviderInterface
 {
-    /**
-     * @var AuthenticatorInterface[]
-     */
     private $guardAuthenticators;
     private $userProvider;
     private $providerKey;
@@ -51,9 +48,9 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     private $passwordHasher;
 
     /**
-     * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
-     * @param string                            $providerKey         The provider (i.e. firewall) key
-     * @param UserPasswordHasherInterface       $passwordHasher
+     * @param iterable<array-key, AuthenticatorInterface> $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
+     * @param string                                      $providerKey         The provider (i.e. firewall) key
+     * @param UserPasswordHasherInterface                 $passwordHasher
      */
     public function __construct(iterable $guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker, $passwordHasher = null)
     {
@@ -93,7 +90,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
             // this should never happen - but technically, the token is
             // authenticated... so it could just be returned
-            if ($token->isAuthenticated()) {
+            if ($token->isAuthenticated(false)) {
                 return $token;
             }
 

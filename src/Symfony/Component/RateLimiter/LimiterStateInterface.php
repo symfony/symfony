@@ -19,8 +19,6 @@ namespace Symfony\Component\RateLimiter;
  * object.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 interface LimiterStateInterface
 {

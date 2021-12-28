@@ -111,7 +111,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public function decode(string $data, string $format, array $context = [])
     {
         if ('' === trim($data)) {
-            throw new NotEncodableValueException('Invalid XML data, it can not be empty.');
+            throw new NotEncodableValueException('Invalid XML data, it cannot be empty.');
         }
 
         $internalErrors = libxml_use_internal_errors(true);

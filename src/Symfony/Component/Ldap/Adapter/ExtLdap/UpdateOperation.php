@@ -19,7 +19,7 @@ class UpdateOperation
     private $values;
     private $attribute;
 
-    private $validOperationTypes = [
+    private const VALID_OPERATION_TYPES = [
         \LDAP_MODIFY_BATCH_ADD,
         \LDAP_MODIFY_BATCH_REMOVE,
         \LDAP_MODIFY_BATCH_REMOVE_ALL,
@@ -34,7 +34,7 @@ class UpdateOperation
      */
     public function __construct(int $operationType, string $attribute, ?array $values)
     {
-        if (!\in_array($operationType, $this->validOperationTypes, true)) {
+        if (!\in_array($operationType, self::VALID_OPERATION_TYPES, true)) {
             throw new UpdateOperationException(sprintf('"%s" is not a valid modification type.', $operationType));
         }
         if (\LDAP_MODIFY_BATCH_REMOVE_ALL === $operationType && null !== $values) {

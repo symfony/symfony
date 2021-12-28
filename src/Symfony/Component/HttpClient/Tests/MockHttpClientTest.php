@@ -29,7 +29,7 @@ class MockHttpClientTest extends HttpClientTestCase
      */
     public function testMocking($factory, array $expectedResponses)
     {
-        $client = new MockHttpClient($factory, 'https://example.com/');
+        $client = new MockHttpClient($factory);
         $this->assertSame(0, $client->getRequestsCount());
 
         $urls = ['/foo', '/bar'];
@@ -128,7 +128,7 @@ class MockHttpClientTest extends HttpClientTestCase
      */
     public function testTransportExceptionThrowsIfPerformedMoreRequestsThanConfigured($factory)
     {
-        $client = new MockHttpClient($factory, 'https://example.com/');
+        $client = new MockHttpClient($factory);
 
         $client->request('POST', '/foo');
         $client->request('POST', '/foo');
@@ -333,6 +333,7 @@ class MockHttpClientTest extends HttpClientTestCase
             case 'testReentrantBufferCallback':
             case 'testThrowingBufferCallback':
             case 'testInfoOnCanceledResponse':
+            case 'testChangeResponseFactory':
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;
 
@@ -414,5 +415,47 @@ class MockHttpClientTest extends HttpClientTestCase
     public function testHttp2PushVulcainWithUnusedResponse()
     {
         $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
+    }
+
+    public function testChangeResponseFactory()
+    {
+        /* @var MockHttpClient $client */
+        $client = $this->getHttpClient(__METHOD__);
+        $expectedBody = '{"foo": "bar"}';
+        $client->setResponseFactory(new MockResponse($expectedBody));
+
+        $response = $client->request('GET', 'http://localhost:8057');
+
+        $this->assertSame($expectedBody, $response->getContent());
+    }
+
+    public function testStringableBodyParam()
+    {
+        $client = new MockHttpClient();
+
+        $param = new class() {
+            public function __toString()
+            {
+                return 'bar';
+            }
+        };
+
+        $response = $client->request('GET', 'https://example.com', [
+            'body' => ['foo' => $param],
+        ]);
+
+        $this->assertSame('foo=bar', $response->getRequestOptions()['body']);
+    }
+
+    public function testResetsRequestCount()
+    {
+        $client = new MockHttpClient([new MockResponse()]);
+        $this->assertSame(0, $client->getRequestsCount());
+
+        $client->request('POST', '/url', ['body' => 'payload']);
+
+        $this->assertSame(1, $client->getRequestsCount());
+        $client->reset();
+        $this->assertSame(0, $client->getRequestsCount());
     }
 }

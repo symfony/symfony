@@ -185,7 +185,7 @@ class RequestMatcher implements RequestMatcherInterface
             return false;
         }
 
-        if (IpUtils::checkIp($request->getClientIp(), $this->ips)) {
+        if (IpUtils::checkIp($request->getClientIp() ?? '', $this->ips)) {
             return true;
         }
 

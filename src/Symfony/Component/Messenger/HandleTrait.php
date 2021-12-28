@@ -32,7 +32,7 @@ trait HandleTrait
      *
      * @param object|Envelope $message The message or the message pre-wrapped in an envelope
      *
-     * @return mixed The handler returned value
+     * @return mixed
      */
     private function handle(object $message)
     {

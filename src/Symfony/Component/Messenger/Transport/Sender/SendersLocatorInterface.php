@@ -24,7 +24,7 @@ interface SendersLocatorInterface
     /**
      * Gets the senders for the given message name.
      *
-     * @return iterable|SenderInterface[] Indexed by sender alias if available
+     * @return iterable<string, SenderInterface> Indexed by sender alias if available
      */
     public function getSenders(Envelope $envelope): iterable;
 }

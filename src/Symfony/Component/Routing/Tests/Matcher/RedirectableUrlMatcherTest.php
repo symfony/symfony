@@ -198,7 +198,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals(['_route' => 'a', 'a' => '123'], $matcher->match('/123/'));
     }
 
-    public function testTrailingRequirementWithDefault_A()
+    public function testTrailingRequirementWithDefaultA()
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/fr-fr/{a}', ['a' => 'aaa'], ['a' => '.+']));

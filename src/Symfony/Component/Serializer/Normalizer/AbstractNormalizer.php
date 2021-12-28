@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
@@ -388,7 +389,16 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     }
 
                     // Don't run set for a parameter passed to the constructor
-                    $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
+                    try {
+                        $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
+                    } catch (NotNormalizableValueException $exception) {
+                        if (!isset($context['not_normalizable_value_exceptions'])) {
+                            throw $exception;
+                        }
+
+                        $context['not_normalizable_value_exceptions'][] = $exception;
+                        $params[] = $parameterData;
+                    }
                     unset($data[$key]);
                 } elseif (\array_key_exists($key, $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
                     $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
@@ -399,7 +409,20 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 } elseif ($constructorParameter->hasType() && $constructorParameter->getType()->allowsNull()) {
                     $params[] = null;
                 } else {
-                    throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
+                    if (!isset($context['not_normalizable_value_exceptions'])) {
+                        throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name), 0, null, [$constructorParameter->name]);
+                    }
+
+                    $exception = NotNormalizableValueException::createForUnexpectedDataType(
+                        sprintf('Failed to create object because the object miss the "%s" property.', $constructorParameter->name),
+                        $data,
+                        ['unknown'],
+                        $context['deserialization_path'] ?? null,
+                        true
+                    );
+                    $context['not_normalizable_value_exceptions'][] = $exception;
+
+                    return $reflectionClass->newInstanceWithoutConstructor();
                 }
             }
 

@@ -456,7 +456,7 @@ class LockTest extends TestCase
                 unset($this->keys[spl_object_hash($key)]);
             }
 
-            public function exists(Key $key)
+            public function exists(Key $key): bool
             {
                 return isset($this->keys[spl_object_hash($key)]);
             }
@@ -502,7 +502,7 @@ class LockTest extends TestCase
                 unset($this->keys[spl_object_hash($key)]);
             }
 
-            public function exists(Key $key)
+            public function exists(Key $key): bool
             {
                 return isset($this->keys[spl_object_hash($key)]);
             }

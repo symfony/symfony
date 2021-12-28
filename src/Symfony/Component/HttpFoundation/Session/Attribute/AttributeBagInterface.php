@@ -23,7 +23,7 @@ interface AttributeBagInterface extends SessionBagInterface
     /**
      * Checks if an attribute is defined.
      *
-     * @return bool true if the attribute is defined, false otherwise
+     * @return bool
      */
     public function has(string $name);
 
@@ -46,7 +46,7 @@ interface AttributeBagInterface extends SessionBagInterface
     /**
      * Returns attributes.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function all();
 

@@ -17,21 +17,22 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/deprecation-contracts": "^2.1",
+        "symfony/deprecation-contracts": "^2.1|^3",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php80": "^1.16",
         "symfony/translation-contracts": "^2.3"
     },
     "require-dev": {
-        "symfony/config": "^4.4|^5.0",
-        "symfony/console": "^4.4|^5.0",
-        "symfony/dependency-injection": "^5.0",
-        "symfony/http-kernel": "^5.0",
-        "symfony/intl": "^4.4|^5.0",
+        "symfony/config": "^4.4|^5.0|^6.0",
+        "symfony/console": "^5.4|^6.0",
+        "symfony/dependency-injection": "^5.0|^6.0",
+        "symfony/http-client-contracts": "^1.1|^2.0|^3.0",
+        "symfony/http-kernel": "^5.0|^6.0",
+        "symfony/intl": "^4.4|^5.0|^6.0",
         "symfony/polyfill-intl-icu": "^1.21",
-        "symfony/service-contracts": "^1.1.2|^2",
-        "symfony/yaml": "^4.4|^5.0",
-        "symfony/finder": "^4.4|^5.0",
+        "symfony/service-contracts": "^1.1.2|^2|^3",
+        "symfony/yaml": "^4.4|^5.0|^6.0",
+        "symfony/finder": "^4.4|^5.0|^6.0",
         "psr/log": "^1|^2|^3"
     },
     "conflict": {
@@ -39,7 +40,8 @@
         "symfony/dependency-injection": "<5.0",
         "symfony/http-kernel": "<5.0",
         "symfony/twig-bundle": "<5.0",
-        "symfony/yaml": "<4.4"
+        "symfony/yaml": "<4.4",
+        "symfony/console": "<5.3"
     },
     "provide": {
         "symfony/translation-implementation": "2.3"

@@ -35,7 +35,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
     /**
      * {@inheritdoc}
      */
-    final public function encode($data, string $format, array $context = [])
+    final public function encode($data, string $format, array $context = []): string
     {
         return $this->getEncoder($format, $context)->encode($data, $format, $context);
     }

@@ -11,9 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -109,6 +111,31 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
         $tester = $this->createCommandTester();
         $tester->execute(['name' => 'ExtensionWithoutConfigTestBundle']);
+    }
+
+    /**
+     * @dataProvider provideCompletionSuggestions
+     */
+    public function testComplete(array $input, array $expectedSuggestions)
+    {
+        $this->application->add(new ConfigDebugCommand());
+
+        $tester = new CommandCompletionTester($this->application->get('debug:config'));
+
+        $suggestions = $tester->complete($input);
+
+        foreach ($expectedSuggestions as $expectedSuggestion) {
+            $this->assertContains($expectedSuggestion, $suggestions);
+        }
+    }
+
+    public function provideCompletionSuggestions(): \Generator
+    {
+        yield 'name' => [[''], ['default_config_test', 'extension_without_config_test', 'framework', 'test']];
+
+        yield 'name (started CamelCase)' => [['Fra'], ['DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'FrameworkBundle', 'TestBundle']];
+
+        yield 'name with existing path' => [['framework', ''], ['secret', 'router.resource', 'router.utf8', 'router.enabled', 'validation.enabled', 'default_locale']];
     }
 
     private function createCommandTester(): CommandTester

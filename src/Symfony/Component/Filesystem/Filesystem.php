@@ -688,6 +688,61 @@ class Filesystem
         }
     }
 
+    /**
+     * Appends the contents of a file to another file using stream_copy_to_stream().
+     *
+     * @param string $originFile The origin file to copy the contents from
+     * @param string $targetFile The target file to which the contents are copied
+     * @param bool   $lockTarget Whether the file should be locked when writing to it
+     *
+     * @throws IOException If the file is not writable or copying the contents failed
+     */
+    public function appendStreamToFile(string $originFile, string $targetFile, bool $lockTarget = false): void
+    {
+        $dir = \dirname($targetFile);
+
+        if (!is_dir($dir)) {
+            $this->mkdir($dir);
+        }
+
+        $source = self::box('fopen', $originFile, 'rb');
+
+        if (!$source) {
+            throw new IOException(sprintf('Failed to copy "%s" to "%s" because source file could not be opened for reading: ', $originFile, $targetFile).self::$lastError, 0, null, $originFile);
+        }
+
+        $target = self::box('fopen', $targetFile, 'ab');
+
+        if (!$target) {
+            throw new IOException(sprintf('Failed to copy "%s" to "%s" because target file could not be opened for writing: ', $originFile, $targetFile).self::$lastError, 0, null, $originFile);
+        }
+
+        if ($lockTarget) {
+            flock($target, LOCK_EX);
+        }
+
+        $bytesCopied = \stream_copy_to_stream($source, $target);
+
+        if ($lockTarget) {
+            fflush($target);
+            flock($target, LOCK_UN);
+        }
+
+        fclose($source);
+        fclose($target);
+        unset($source, $target);
+
+        if (!is_file($targetFile)) {
+            throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
+        }
+
+        $bytesOrigin = filesize($originFile);
+
+        if ($bytesCopied !== $bytesOrigin) {
+            throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
+        }
+    }
+
     private function toIterable(string|iterable $files): iterable
     {
         return is_iterable($files) ? $files : [$files];

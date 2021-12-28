@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by ajgarlag at 2021-12-27T10:47:57Z
+
+IMO these classes should exist only to allow unserialization, so in my [package](https://packagist.org/packages/ajgl/sf4-to-sf5-role-unserialization), every method throws a `LogicException`. WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-27T10:51:23Z
+
+I think there is no need for such detailed care. I made the constructor private and the class `@internal`, that's enough a warning to me.
+
+---------------------------------------------------------------------------
+
+by ajgarlag at 2021-12-27T11:21:46Z
+
+> I think there is no need for such detailed care. I made the constructor private and the class `@internal`, that's enough a warning to me.
+
+Ok, I see, then I would remove any public method. These classes only exist for BC and IMO should not have any behavior.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-27T12:29:38Z
+
+We should add a test that deserializes a token serialized with 4.4 and checks if that token is usable. For instance, I would expect to run into new problems if the tokens returned arrays of `Role` objects again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-28T10:55:53Z
+
+I removed all methods but `__toString()`.
+@derrabus would you mind sending a PR to my fork with the test you have in mind? :pray:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-28T11:48:02Z
+
+Thanks for the hint, test added.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-28T13:21:33Z
+
+nicolas-grekas/symfony#40 🙂

@@ -62,7 +62,7 @@ final class DkimSigner
     {
         $options += $this->defaultOptions;
         if (!\in_array($options['algorithm'], [self::ALGO_SHA256, self::ALGO_ED25519], true)) {
-            throw new InvalidArgumentException('Invalid DKIM signing algorithm "%s".', $options['algorithm']);
+            throw new InvalidArgumentException(sprintf('Invalid DKIM signing algorithm "%s".', $options['algorithm']));
         }
         $headersToIgnore['return-path'] = true;
         $headersToIgnore['x-transport'] = true;
@@ -202,7 +202,7 @@ final class DkimSigner
         }
 
         // Add trailing Line return if last line is non empty
-        if (\strlen($currentLine) > 0) {
+        if ('' !== $currentLine) {
             hash_update($hash, "\r\n");
             $length += \strlen("\r\n");
         }

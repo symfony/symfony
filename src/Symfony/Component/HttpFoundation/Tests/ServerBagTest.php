@@ -57,6 +57,16 @@ class ServerBagTest extends TestCase
         ], $bag->getHeaders());
     }
 
+    public function testHttpPasswordIsOptionalWhenPassedWithHttpPrefix()
+    {
+        $bag = new ServerBag(['HTTP_PHP_AUTH_USER' => 'foo']);
+
+        $this->assertEquals([
+            'AUTHORIZATION' => 'Basic '.base64_encode('foo:'),
+            'PHP_AUTH_USER' => 'foo',
+        ], $bag->getHeaders());
+    }
+
     public function testHttpBasicAuthWithPhpCgi()
     {
         $bag = new ServerBag(['HTTP_AUTHORIZATION' => 'Basic '.base64_encode('foo:bar')]);

@@ -1053,7 +1053,7 @@ class Crawler implements \Countable, \IteratorAggregate
 
     private function parseHtml5(string $htmlContent, string $charset = 'UTF-8'): \DOMDocument
     {
-        return $this->html5Parser->parse($this->convertToHtmlEntities($htmlContent, $charset), [], $charset);
+        return $this->html5Parser->parse($this->convertToHtmlEntities($htmlContent, $charset));
     }
 
     private function parseXhtml(string $htmlContent, string $charset = 'UTF-8'): \DOMDocument

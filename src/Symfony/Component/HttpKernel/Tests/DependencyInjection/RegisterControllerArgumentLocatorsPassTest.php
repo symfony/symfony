@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 
 class RegisterControllerArgumentLocatorsPassTest extends TestCase
 {
@@ -401,6 +402,25 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     }
 
     /**
+     * @requires PHP 8.1
+     */
+    public function testEnumArgumentIsIgnored()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+
+        $container->register('foo', NonNullableEnumArgumentWithDefaultController::class)
+            ->addTag('controller.service_arguments')
+        ;
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertEmpty(array_keys($locator), 'enum typed argument is ignored');
+    }
+
+    /**
      * @requires PHP 8
      */
     public function testBindWithTarget()
@@ -478,6 +498,13 @@ class NonExistentClassOptionalController
 class ArgumentWithoutTypeController
 {
     public function fooAction(string $someArg)
+    {
+    }
+}
+
+class NonNullableEnumArgumentWithDefaultController
+{
+    public function fooAction(Suit $suit = Suit::Spades)
     {
     }
 }

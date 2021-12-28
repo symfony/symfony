@@ -157,7 +157,6 @@ jobs:
       - name: Run tests
         run: ./phpunit --group integration -v
         env:
-          REDIS_HOST: localhost
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
           REDIS_SENTINEL_HOSTS: 'localhost:26379'
           REDIS_SENTINEL_SERVICE: redis_sentinel
@@ -165,10 +164,6 @@ jobs:
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
           MESSENGER_SQS_DSN: "sqs://localhost:9494/messages?sslmode=disable&poll_timeout=0.01"
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:9494/messages.fifo?sslmode=disable&poll_timeout=0.01"
-          MEMCACHED_HOST: localhost
-          LDAP_HOST: localhost
-          LDAP_PORT: 3389
-          MONGODB_HOST: localhost
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
 

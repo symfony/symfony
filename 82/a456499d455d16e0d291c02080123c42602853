@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-11-22T08:26:03Z
+
+The code change is OK for me but some tests are now failing because the encoding is really taken into account I guess.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-22T10:14:40Z
+
+Given that DomCrawler was converting things to HTML entities before running the parser, making the right fix is to remove the charset entirely from the parser call.

@@ -132,7 +132,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function getInt(string $key, int $default = 0): int
     {
-        trigger_deprecation('symfony/http-foundation', '6.1', 'Method "getInt" is deprecated beacouse renamed to "convertInt".');
+        trigger_deprecation('symfony/http-foundation', '6.1', 'Method "getInt" is deprecated because renamed to "convertInt".');
 
         return (int) $this->get($key, $default);
     }

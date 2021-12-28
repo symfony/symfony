@@ -59,7 +59,9 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingUse()
     {
         $view = $this->factory
-            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', null, [
+                'empty_data' => null,
+            ])
             ->createView()
         ;
 
@@ -74,7 +76,9 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingExtend()
     {
         $view = $this->factory
-            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', null, [
+                'empty_data' => null,
+            ])
             ->createView()
         ;
 
@@ -89,7 +93,9 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingDynamicExtend()
     {
         $view = $this->factory
-            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', null, [
+                'empty_data' => null,
+            ])
             ->createView()
         ;
 
@@ -194,6 +200,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testHelpAttr()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help text test!',
             'help_attr' => [
                 'class' => 'class-test',
@@ -214,6 +221,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testHelpHtmlDefaultIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
         ]);
 
@@ -241,6 +249,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testHelpHtmlIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
             'help_html' => false,
         ]);
@@ -269,6 +278,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testHelpHtmlIsTrue()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
             'help_html' => true,
         ]);
@@ -297,6 +307,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testLabelHtmlDefaultIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => '<b>Bolded label</b>',
         ]);
 
@@ -313,6 +324,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testLabelHtmlIsTrue()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => '<b>Bolded label</b>',
             'label_html' => true,
         ]);

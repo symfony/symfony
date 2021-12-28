@@ -32,7 +32,9 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 {
     public function testRow()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
+        $form = $this->factory->createNamed('name', TextType::class, null, [
+            'empty_data' => null,
+        ]);
         $form->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
         $html = $this->renderRow($view);
@@ -72,7 +74,9 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 
     public function testLabelDoesNotRenderFieldAttributes()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
+        $form = $this->factory->createNamed('name', TextType::class, null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderLabel($form->createView(), null, [
             'attr' => [
                 'class' => 'my&class',
@@ -89,7 +93,9 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 
     public function testLabelWithCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
+        $form = $this->factory->createNamed('name', TextType::class, null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderLabel($form->createView(), null, [
             'label_attr' => [
                 'class' => 'my&class',
@@ -106,7 +112,9 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 
     public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
+        $form = $this->factory->createNamed('name', TextType::class, null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderLabel($form->createView(), 'Custom label', [
             'label_attr' => [
                 'class' => 'my&class',
@@ -125,6 +133,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
+            'empty_data' => null,
             'label' => 'Custom label',
         ]);
         $html = $this->renderLabel($form->createView(), null, [
@@ -145,6 +154,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     public function testLabelHtmlDefaultIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => '<b>Bolded label</b>',
         ]);
 
@@ -161,6 +171,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     public function testLabelHtmlIsTrue()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => '<b>Bolded label</b>',
             'label_html' => true,
         ]);
@@ -197,6 +208,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     public function testHelp()
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
+            'empty_data' => null,
             'help' => 'Help text test!',
         ]);
         $view = $form->createView();
@@ -214,6 +226,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     public function testHelpAttr()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help text test!',
             'help_attr' => [
                 'class' => 'class-test',
@@ -234,6 +247,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     public function testHelpHtmlDefaultIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
         ]);
 
@@ -261,6 +275,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     public function testHelpHtmlIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
             'help_html' => false,
         ]);
@@ -289,6 +304,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     public function testHelpHtmlIsTrue()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
             'help_html' => true,
         ]);
@@ -316,7 +332,9 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 
     public function testErrors()
     {
-        $form = $this->factory->createNamed('name', TextType::class);
+        $form = $this->factory->createNamed('name', TextType::class, null, [
+            'empty_data' => null,
+        ]);
         $form->addError(new FormError('[trans]Error 1[/trans]'));
         $form->addError(new FormError('[trans]Error 2[/trans]'));
         $view = $form->createView();
@@ -341,7 +359,9 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 
     public function testErrorWithNoLabel()
     {
-        $form = $this->factory->createNamed('name', TextType::class, ['label' => false]);
+        $form = $this->factory->createNamed('name', TextType::class, ['label' => false], [
+            'empty_data' => null,
+        ]);
         $form->addError(new FormError('[trans]Error 1[/trans]'));
         $view = $form->createView();
         $html = $this->renderLabel($view);
@@ -1252,7 +1272,10 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 
     public function testRange()
     {
-        $form = $this->factory->createNamed('name', RangeType::class, 42, ['attr' => ['min' => 5]]);
+        $form = $this->factory->createNamed('name', RangeType::class, 42, [
+            'empty_data' => null,
+            'attr' => ['min' => 5],
+        ]);
 
         $this->assertWidgetMatchesXpath(
             $form->createView(),
@@ -1269,7 +1292,10 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 
     public function testRangeWithMinMaxValues()
     {
-        $form = $this->factory->createNamed('name', RangeType::class, 42, ['attr' => ['min' => 5, 'max' => 57]]);
+        $form = $this->factory->createNamed('name', RangeType::class, 42, [
+            'empty_data' => null,
+            'attr' => ['min' => 5, 'max' => 57],
+        ]);
 
         $this->assertWidgetMatchesXpath(
             $form->createView(),

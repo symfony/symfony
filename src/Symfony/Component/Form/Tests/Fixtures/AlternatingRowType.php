@@ -16,7 +16,9 @@ class AlternatingRowType extends AbstractType
             $type = 0 === $form->getName() % 2
                 ? 'Symfony\Component\Form\Extension\Core\Type\TextType'
                 : 'Symfony\Component\Form\Extension\Core\Type\TextareaType';
-            $form->add('title', $type);
+            $form->add('title', $type, [
+                'empty_data' => null,
+            ]);
         });
     }
 }

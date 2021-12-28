@@ -34,7 +34,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testLabelDoesNotRenderFieldAttributes()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderLabel($form->createView(), null, [
             'attr' => [
                 'class' => 'my&class',
@@ -51,7 +53,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testLabelWithCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderLabel($form->createView(), null, [
             'label_attr' => [
                 'class' => 'my&class',
@@ -68,7 +72,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderLabel($form->createView(), 'Custom label', [
             'label_attr' => [
                 'class' => 'my&class',
@@ -87,6 +93,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => 'Custom label',
         ]);
         $html = $this->renderLabel($form->createView(), null, [
@@ -107,6 +114,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testLabelHtmlDefaultIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => '<b>Bolded label</b>',
         ]);
 
@@ -123,6 +131,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testLabelHtmlIsTrue()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => '<b>Bolded label</b>',
             'label_html' => true,
         ]);
@@ -140,6 +149,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testHelp()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help text test!',
         ]);
         $view = $form->createView();
@@ -157,6 +167,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testHelpAttr()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help text test!',
             'help_attr' => [
                 'class' => 'class-test',
@@ -177,6 +188,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testHelpHtmlDefaultIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
         ]);
 
@@ -204,6 +216,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testHelpHtmlIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
             'help_html' => false,
         ]);
@@ -232,6 +245,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testHelpHtmlIsTrue()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
             'help_html' => true,
         ]);
@@ -259,7 +273,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testErrors()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $form->addError(new FormError('[trans]Error 1[/trans]'));
         $form->addError(new FormError('[trans]Error 2[/trans]'));
         $view = $form->createView();
@@ -292,7 +308,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testOverrideWidgetBlock()
     {
         // see custom_widgets.html.twig
-        $form = $this->factory->createNamed('text_id', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('text_id', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderWidget($form->createView());
 
         $this->assertMatchesXpath($html,
@@ -1970,7 +1988,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testEmail()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', 'foo&bar', [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
@@ -1986,6 +2006,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testEmailWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', 'foo&bar', [
+            'empty_data' => null,
             'attr' => ['maxlength' => 123],
         ]);
 
@@ -2017,6 +2038,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testDisabled()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'disabled' => true,
         ]);
 
@@ -2163,7 +2185,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testPassword()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar', [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
@@ -2177,6 +2201,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testPasswordSubmittedWithNotAlwaysEmpty()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', null, [
+            'empty_data' => null,
             'always_empty' => false,
         ]);
         $form->submit('foo&bar');
@@ -2194,6 +2219,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testPasswordWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar', [
+            'empty_data' => null,
             'attr' => ['maxlength' => 123],
         ]);
 
@@ -2353,7 +2379,10 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testRange()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, ['attr' => ['min' => 5]]);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, [
+            'empty_data' => null,
+            'attr' => ['min' => 5],
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
@@ -2368,7 +2397,10 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testRangeWithMinMaxValues()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, ['attr' => ['min' => 5, 'max' => 57]]);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, [
+            'empty_data' => null,
+            'attr' => ['min' => 5, 'max' => 57],
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
@@ -2385,6 +2417,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testTextarea()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextareaType', 'foo&bar', [
+            'empty_data' => null,
             'attr' => ['pattern' => 'foo'],
         ]);
 
@@ -2400,7 +2433,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testText()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'foo&bar', [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
@@ -2416,6 +2451,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testTextWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'foo&bar', [
+            'empty_data' => null,
             'attr' => ['maxlength' => 123],
         ]);
 
@@ -2432,7 +2468,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testSearch()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\SearchType', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\SearchType', 'foo&bar', [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
@@ -2646,7 +2684,10 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testUrlWithDefaultProtocol()
     {
         $url = 'http://www.example.com?foo1=bar1&foo2=bar2';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => 'http']);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, [
+            'empty_data' => null,
+            'default_protocol' => 'http',
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
@@ -2662,7 +2703,10 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testUrlWithoutDefaultProtocol()
     {
         $url = 'http://www.example.com?foo1=bar1&foo2=bar2';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => null]);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, [
+            'empty_data' => null,
+            'default_protocol' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
@@ -2740,6 +2784,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testWidgetAttributes()
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [
+            'empty_data' => null,
             'required' => true,
             'disabled' => true,
             'attr' => ['readonly' => true, 'maxlength' => 10, 'pattern' => '\d+', 'class' => 'foobar', 'data-foo' => 'bar'],
@@ -2754,6 +2799,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testWidgetAttributeNameRepeatedIfTrue()
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [
+            'empty_data' => null,
             'attr' => ['foo' => true],
         ]);
 
@@ -2791,7 +2837,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testTel()
     {
         $tel = '0102030405';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TelType', $tel);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TelType', $tel, [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
@@ -2806,7 +2854,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testColor()
     {
         $color = '#0000ff';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ColorType', $color);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ColorType', $color, [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input

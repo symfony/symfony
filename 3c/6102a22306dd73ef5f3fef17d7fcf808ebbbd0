@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-12-28T13:36:06Z
+
+Can you rebase on 5.3 an create another PR for the exception that did not exist back then?
+
+---------------------------------------------------------------------------
+
+by alamirault at 2021-12-28T14:08:04Z
+
+This PR is now only for AccessListener (6.0).
+
+https://github.com/symfony/symfony/pull/44824 for DkimSigner (5.3)
+
+Is it ok ? did I misunderstand ?

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add `$exclude` to `TaggedIterator` and `TaggedLocator` attributes
+ * Add `$exclude` to `tagged_iterator` and `tagged_locator` configurator
+
 6.0
 ---
 

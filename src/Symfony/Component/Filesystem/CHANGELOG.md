@@ -4,7 +4,7 @@ CHANGELOG
 6.1
 ---
 
- * added method `Filesystem::appendStreamToFile()` to append contents from one file to another using stream_copy_to_stream()
+ * Add method `Filesystem::appendStreamToFile()` to append contents from one file to another using stream_copy_to_stream()
 
 5.4
 ---

@@ -13,6 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
@@ -58,5 +59,31 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
     {
         yield ['sqlite:///tmp/foo.db'];
         yield [DriverManager::getConnection(['url' => 'sqlite:///tmp/foo.db'])];
+    }
+
+    public function testSaveAfterConflict()
+    {
+        $store1 = $this->getStore();
+        $store2 = $this->getStore();
+
+        $key = new Key(uniqid(__METHOD__, true));
+
+        $store1->save($key);
+        $this->assertTrue($store1->exists($key));
+
+        $lockConflicted = false;
+        try {
+            $store2->save($key);
+        } catch (LockConflictedException $lockConflictedException) {
+            $lockConflicted = true;
+        }
+
+        $this->assertTrue($lockConflicted);
+        $this->assertFalse($store2->exists($key));
+
+        $store1->delete($key);
+
+        $store2->save($key);
+        $this->assertTrue($store2->exists($key));
     }
 }

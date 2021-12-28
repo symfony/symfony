@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-12-28T15:17:36Z
+
+`testUninitializedSession()` fails on `6.0` right now as the `initialized_session` service does not exist there anymore. I propose to add tests covering both cases (session from container and session from request) in `5.3` and removing the `testUninitializedSessionUsingInitializedSessionService()` case after merging this up to the `6.0` branch.

@@ -4,7 +4,8 @@ CHANGELOG
 6.1
 ---
 
- * Add method `getString` to `ParameterBag`
+ * Add method `convertString` to `ParameterBag`
+ * Rename method `getInt` to `convertInt` in `ParameterBag`
  
 6.0
 ---

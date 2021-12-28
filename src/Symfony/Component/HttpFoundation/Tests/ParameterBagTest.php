@@ -133,6 +133,9 @@ class ParameterBagTest extends TestCase
         $this->assertEquals('', $bag->getDigits('unknown'), '->getDigits() returns empty string if a parameter is not defined');
     }
 
+    /**
+     * @deprecated 6.1
+     */
     public function testGetInt()
     {
         $bag = new ParameterBag(['digits' => '0123']);
@@ -141,13 +144,24 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
     }
 
-    public function testGetString()
+    public function testConvertInt()
     {
-        $bag = new ParameterBag(['first' => 'shtikov', 'second' => 123]);
+        $bag = new ParameterBag(['first' => '123', 'second' => 1.2, 'third' => [123, '0123']]);
 
-        $this->assertSame('shtikov', $bag->getString('first'), '->getString() gets a value of parameter as string');
-        $this->assertSame('123', $bag->getString('second'), '->getString() gets a value of parameter as string');
-        $this->assertSame('', $bag->getString('unknown'), '->getString() returns empty string if a parameter is not defined');
+        $this->assertEquals(123, $bag->convertInt('first'), '->convertInt() gets a value of parameter as integer');
+        $this->assertEquals(0, $bag->convertInt('second'), '->convertInt() gets a value of parameter as integer');
+        $this->assertEquals(0, $bag->convertInt('third'), '->convertInt() gets a value of parameter as integer');
+        $this->assertEquals(0, $bag->convertInt('unknown'), '->convertInt() returns zero if a parameter is not defined');
+    }
+
+    public function testConvertString()
+    {
+        $bag = new ParameterBag(['first' => 'shtikov', 'second' => 123, 'third' => [123, '0123']]);
+
+        $this->assertSame('shtikov', $bag->convertString('first'), '->convertString() gets a value of parameter as string');
+        $this->assertSame('123', $bag->convertString('second'), '->convertString() gets a value of parameter as string');
+        $this->assertSame('', $bag->convertString('third'), '->convertString() gets a value of parameter as string');
+        $this->assertSame('', $bag->convertString('unknown'), '->convertString() returns empty string if a parameter is not defined');
     }
 
     public function testFilter()

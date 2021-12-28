@@ -16,6 +16,7 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Message;
 
 /**
  * @group time-sensitive
@@ -88,6 +89,21 @@ EOF;
             1591597612, DkimSigner::CANON_SIMPLE, DkimSigner::CANON_RELAXED,
             'v=1; q=dns/txt; a=rsa-sha256; bh=JC6qmm3afMaxL3Rm1YHxrzIpqiUuB7aAarWMcZfuca4=; d=testdkim.symfony.net; h=From: To: Subject: Date: MIME-Version; i=@testdkim.symfony.net; s=sf; t=1591597612; c=relaxed/simple; b=E+BszWWfYJfrWXk5uggwZJmLlh+4IeVScnJhqAj0G4h0dhqRZ0Qs1XNPSS0IZtPSTUgNxAeTi mc8jjVCnrROPnYnaomvgTdkxwRU5ZcA4felmGjcXODrdy9GUAokES6qjy4bVwBvaHxMgr00eP J3sJqBBwcg/HsO52ppJma/1HM=',
         ];
+    }
+
+    public function testSignWithUnsupportedAlgorithm()
+    {
+        $message = $this->createMock(Message::class);
+
+        $signer = new DkimSigner(self::$pk, 'testdkim.symfony.net', 'sf', [
+            'algorithm' => 'unsupported-value',
+        ]);
+
+        $this->expectExceptionObject(
+            new \LogicException('Invalid DKIM signing algorithm "unsupported-value".')
+        );
+
+        $signer->sign($message, []);
     }
 
     /**

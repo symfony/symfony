@@ -37,7 +37,7 @@ class AccessListener extends AbstractListener
     public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, bool $exceptionOnNoToken = false)
     {
         if (false !== $exceptionOnNoToken) {
-            throw new \LogicException('Argument $exceptionOnNoToken of "%s()" must be set to "false".', __METHOD__);
+            throw new \LogicException(sprintf('Argument $exceptionOnNoToken of "%s()" must be set to "false".', __METHOD__));
         }
 
         $this->tokenStorage = $tokenStorage;

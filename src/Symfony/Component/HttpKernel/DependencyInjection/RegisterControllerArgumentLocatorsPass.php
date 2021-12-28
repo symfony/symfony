@@ -127,7 +127,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                     $type = ltrim($target = (string) ProxyHelper::getTypeHint($r, $p), '\\');
                     $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
 
-                    if (is_subclass_of($type, \UnitEnum::class, true)) {
+                    if (is_subclass_of($type, \UnitEnum::class)) {
                         // do not attempt to register enum typed arguments
                         continue;
                     }

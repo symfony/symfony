@@ -32,7 +32,7 @@ class TextType extends AbstractType implements DataTransformerInterface
 
             if (null !== $scope && FormType::class === $scope->getName()) {
                 // "empty_data" option is the default value from FormType::configureOptions()
-                trigger_deprecation('symfony/form', '5.4', 'The default value of "empty_data" option in "%s" will be changed to empty string. Declare "NULL" as value for "empty_data" if you still want use "NULL" as data.', __CLASS__);
+                trigger_deprecation('symfony/form', '6.1', 'The default value of "empty_data" option in "%s" will be changed to empty string. Declare "NULL" as value for "empty_data" if you still want use "NULL" as data.', __CLASS__);
             }
         }
     }

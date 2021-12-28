@@ -44,7 +44,7 @@ class TextTypeTest extends BaseTypeTest
      */
     public function testDefaultEmptyDataCallback()
     {
-        $this->expectDeprecation('Since symfony/form 5.4: The default value of "empty_data" option in "Symfony\Component\Form\Extension\Core\Type\TextType" will be changed to empty string. Declare "NULL" as value for "empty_data" if you still want use "NULL" as data.');
+        $this->expectDeprecation('Since symfony/form 6.1: The default value of "empty_data" option in "Symfony\Component\Form\Extension\Core\Type\TextType" will be changed to empty string. Declare "NULL" as value for "empty_data" if you still want use "NULL" as data.');
 
         $form = $this->factory->create(static::TESTED_TYPE);
 

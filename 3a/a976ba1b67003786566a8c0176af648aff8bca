@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by ruudk at 2021-12-23T14:24:22Z
+
+The fabbot.io suggestion doesn't make any sense.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-12-23T14:25:17Z
+
+@nicolas-grekas Curious what you think about this approach.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-12-24T09:24:44Z
+
+Hey!
+
+I think @fractalzombie has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fractalzombie at 2021-12-24T11:31:19Z
+
+@ruudk Hi, this is the first time I've seen such use of tags, I don't quite understand the rationality of this solution.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-12-24T13:29:48Z
+
+I think it's quiet common when working with Delegator or Chain services that call a list of services that implement an interface, to also want to implement the interface on Delegator/Chain.
+
+An example of this is in the Symfony HttpKernel component:
+
+https://github.com/symfony/symfony/blob/0d6e859db236e37b8baa2b2bf4c8b7d14d151570/src/Symfony/Component/HttpKernel/CacheClearer/CacheClearerInterface.php#L19-L25
+
+https://github.com/symfony/symfony/blob/0d6e859db236e37b8baa2b2bf4c8b7d14d151570/src/Symfony/Component/HttpKernel/CacheClearer/ChainCacheClearer.php#L21-L31
+
+The `ChainCacheClearer` implements `CacheClearerInterface` and calls a list of `CacheClearerInterface` clearers.
+
+If that would have been configured with `#[AutoconfigureTag]` and `#[TaggedIterator]`, the `ChainCacheClearer` would receive itself in the `iterable $clearers`.
+
+With this PR, it can exclude itself and rely fully on autowire/configure.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-12-24T14:16:00Z
+
+Should it be added to this method too [DependencyInjection/Loader/Configurator/ContainerConfigurator.php#L142](https://github.com/symfony/symfony/blob/6.1/src/Symfony/Component/DependencyInjection/Loader/Configurator/ContainerConfigurator.php#L142) ?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-12-24T14:22:29Z
+
+@Jeroeny Good one, added it to the to-do. First I would like to know if this is something that _could_ be merged. Then I can improve/finalize the PR.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-12-24T14:24:25Z
+
+> The fabbot.io suggestion doesn't make any sense.
+
+Yes, you can ignore the suggestion. Fabbot tries really hard to act like a human, but sometimes they just can't hide being a robot :)
+
+---------------------------------------------------------------------------
+
+by ruudk at 2021-12-27T12:34:19Z
+
+@nicolas-grekas Thanks for your review, I applied your feedback and added more tests. The CI fails due to unrelated errors on `6.1` branch.

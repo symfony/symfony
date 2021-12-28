@@ -52,7 +52,7 @@ class Connection
     private $autoSetup;
     private $maxEntries;
     private $redeliverTimeout;
-    private $nextClaim = 0;
+    private $nextClaim = 0.0;
     private $claimInterval;
     private $deleteAfterAck;
     private $deleteAfterReject;
@@ -108,7 +108,7 @@ class Connection
         $this->deleteAfterAck = $configuration['delete_after_ack'] ?? self::DEFAULT_OPTIONS['delete_after_ack'];
         $this->deleteAfterReject = $configuration['delete_after_reject'] ?? self::DEFAULT_OPTIONS['delete_after_reject'];
         $this->redeliverTimeout = ($configuration['redeliver_timeout'] ?? self::DEFAULT_OPTIONS['redeliver_timeout']) * 1000;
-        $this->claimInterval = $configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval'];
+        $this->claimInterval = ($configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval']) / 1000;
     }
 
     /**
@@ -334,7 +334,7 @@ class Connection
             }
         }
 
-        $this->nextClaim = $this->getCurrentTimeInMilliseconds() + $this->claimInterval;
+        $this->nextClaim = microtime(true) + $this->claimInterval;
     }
 
     public function get(): ?array
@@ -342,36 +342,32 @@ class Connection
         if ($this->autoSetup) {
             $this->setup();
         }
+        $now = microtime();
+        $now = substr($now, 11).substr($now, 2, 3);
 
-        try {
-            $queuedMessageCount = $this->connection->zcount($this->queue, 0, $this->getCurrentTimeInMilliseconds());
-        } catch (\RedisException $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
-        }
+        $queuedMessageCount = $this->rawCommand('ZCOUNT', 0, $now);
 
-        if ($queuedMessageCount) {
-            for ($i = 0; $i < $queuedMessageCount; ++$i) {
-                try {
-                    $queuedMessages = $this->connection->zpopmin($this->queue, 1);
-                } catch (\RedisException $e) {
-                    throw new TransportException($e->getMessage(), 0, $e);
-                }
-
-                foreach ($queuedMessages as $queuedMessage => $time) {
-                    $decodedQueuedMessage = json_decode($queuedMessage, true);
-                    // if a futured placed message is actually popped because of a race condition with
-                    // another running message consumer, the message is readded to the queue by add function
-                    // else its just added stream and will be available for all stream consumers
-                    $this->add(
-                        \array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage,
-                        $decodedQueuedMessage['headers'] ?? [],
-                        $time - $this->getCurrentTimeInMilliseconds()
-                    );
-                }
+        while ($queuedMessageCount--) {
+            if (![$queuedMessage, $expiry] = $this->rawCommand('ZPOPMIN', 1)) {
+                break;
             }
+
+            if (\strlen($expiry) === \strlen($now) ? $expiry > $now : \strlen($expiry) < \strlen($now)) {
+                // if a future-placed message is popped because of a race condition with
+                // another running consumer, the message is readded to the queue
+
+                if (!$this->rawCommand('ZADD', 'NX', $expiry, $queuedMessage)) {
+                    throw new TransportException('Could not add a message to the redis stream.');
+                }
+
+                break;
+            }
+
+            $decodedQueuedMessage = json_decode($queuedMessage, true);
+            $this->add(\array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage, $decodedQueuedMessage['headers'] ?? [], 0);
         }
 
-        if (!$this->couldHavePendingMessages && $this->nextClaim <= $this->getCurrentTimeInMilliseconds()) {
+        if (!$this->couldHavePendingMessages && $this->nextClaim <= microtime(true)) {
             $this->claimOldPendingMessages();
         }
 
@@ -462,7 +458,7 @@ class Connection
         }
 
         try {
-            if ($delayInMs > 0) { // the delay could be smaller 0 in a queued message
+            if ($delayInMs > 0) { // the delay is <= 0 for queued messages
                 $message = json_encode([
                     'body' => $body,
                     'headers' => $headers,
@@ -474,8 +470,18 @@ class Connection
                     throw new TransportException(json_last_error_msg());
                 }
 
-                $score = $this->getCurrentTimeInMilliseconds() + $delayInMs;
-                $added = $this->connection->zadd($this->queue, ['NX'], $score, $message);
+                $now = explode(' ', microtime(), 2);
+                $now[0] = str_pad($delayInMs + substr($now[0], 2, 3), 3, '0', \STR_PAD_LEFT);
+                if (3 < \strlen($now[0])) {
+                    $now[1] += substr($now[0], 0, -3);
+                    $now[0] = substr($now[0], -3);
+
+                    if (\is_float($now[1])) {
+                        throw new TransportException("Message delay is too big: {$delayInMs}ms.");
+                    }
+                }
+
+                $added = $this->rawCommand('ZADD', 'NX', $now[1].$now[0], $message);
             } else {
                 $message = json_encode([
                     'body' => $body,
@@ -555,6 +561,31 @@ class Connection
         if (!$unlink) {
             $this->connection->del($this->stream, $this->queue);
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    private function rawCommand(string $command, ...$arguments)
+    {
+        try {
+            if ($this->connection instanceof \RedisCluster || $this->connection instanceof RedisClusterProxy) {
+                $result = $this->connection->rawCommand($this->queue, $command, $this->queue, ...$arguments);
+            } else {
+                $result = $this->connection->rawCommand($command, $this->queue, ...$arguments);
+            }
+        } catch (\RedisException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (false === $result) {
+            if ($error = $this->connection->getLastError() ?: null) {
+                $this->connection->clearLastError();
+            }
+            throw new TransportException($error ?? sprintf('Could not run "%s" on Redis queue.', $command));
+        }
+
+        return $result;
     }
 }
 

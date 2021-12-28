@@ -1,0 +1,138 @@
+---------------------------------------------------------------------------
+
+by xorik at 2021-12-16T22:55:33Z
+
+Hi.
+
+First of all, thank you for you effort, this is really cool idea!
+
+Second: I'm not a Symony team member, so feel free to ignore me.
+
+My concern is that configuring will create a bunch of temporary objects. Maybe it's better to make a separate builder class, something like:
+
+```php
+<?php
+
+$config = (new HtmlSanitizerConfigBuilder())
+    ->allowElement('div')
+    ->allowElement('a', ['title'])
+    ->getConfig()
+;
+$sanitizer = new HtmlSanitizer($config);
+```
+And call constructor only in the `getConfig` method, and not on every step, so it will be less CPU intensive. But maybe it's not required, if this will be somehow optimized in DI to a single constructor call.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-17T09:39:20Z
+
+@xorik using a builder for the config could be an alternative indeed, but I think there is an advantage of using an immutable object and withers: the ability to store a "standard" configuration as a service and use it as a prototype to configure in your application. Using a builder would make this more complex while introducing a state in the service, which is IMO not a good idea.
+
+Also, having a few more instantiated objects won't have any measurable performance impact, so I think we should stick to an immutable configuration object (immutability was proposed by @stof and @nicolas-grekas and I think that's a great idea).
+
+@OskarStark I'm reviewing all your feedback (thanks for it!), I don't think we put final keywords on tests classes anywhere or did we? I feel like this is unnecessary as tests are excluded from the BC promise anyway.
+
+Applying the other changes now :)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-17T15:12:42Z
+
+I updated the PR for requested changes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-17T15:35:47Z
+
+It'd be nice to be able to force an attribute on an element, eg rel=nofollow on `<a>`
+
+---------------------------------------------------------------------------
+
+by tigitz at 2021-12-19T13:28:19Z
+
+General question, is it planned to support only specific browser versions ?
+
+I'm asking this because `<BGSOUND SRC="javascript:alert('XSS');">` (found [here](https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html#bgsound)) for example is not tested (so not supported I guess ?) but seems to be problematic only for IE AFAIU (https://developer.mozilla.org/fr/docs/Web/HTML/Element/bgsound).
+
+So it could be legitimately ignored because it's an outdated browser but library consumers that still needs to support those browsers (and they exist) will probably require the package and won't realise it actually does not cover their needs **by design**.
+
+If that's the plan I would recommend to be more upfront about the supported browsers and versions, whether it's phpdoc or doc itself.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-19T13:53:26Z
+
+> General question, is it planned to support only specific browser versions ?
+
+I think the aim is to be as safe as possible, ie. ensuring we remove all sources of XSS for all browsers.
+
+You raise an important question though: I'm the one who originally explored sources of potential XSS evasions, and I may have missed some. Your example is a good one: `<BGSOUND SRC="javascript:alert('XSS');">` was indeed missing (because it wasn't listed on https://www.w3schools.com/tags/att_src.asp and I used this reference for the attribute sanitizer).
+
+I'm going to explore https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html in more details (thanks for the link!) but I think if people reviewing this PR could also have a look at potentially missed XSS evasion strategies, that's be great!
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-19T14:00:40Z
+
+@tigitz I added a test and a sanitization for your case FYI.
+
+@nicolas-grekas I just added the ability to call `->forceAttribute('a', 'rel', 'noopener noreferrer')` to force the value of an attribute on an element.
+
+@stof
+> should we allow using * inside the array too, in case we want to allow all standard attributes plus some custom ones ?
+
+I guess one could easily call `allowAttribute` right after? I think it would complexify a bit the code without much added benefit but I can do it if it's a deal breaker.
+
+---------------------------------------------------------------------------
+
+by tigitz at 2021-12-19T14:19:46Z
+
+> I think the aim is to be as safe as possible, ie. ensuring we remove all sources of XSS for all browsers.
+
+Understood. I guess you evaluate the performance penalty of doing unnecessary "outdated browsers" sanitation checks in a "modern browsers" context to be marginal ?
+
+> if people reviewing this PR could also have a look at potentially missed XSS evasion strategies, that's be great!
+
+Sure! For completeness, I found the given link through test suites of other open-source html sanitization libs. Could be useful to increase case coverage:
+
+- https://github.com/mganss/HtmlSanitizer/blob/master/test/HtmlSanitizer.Tests/Tests.cs
+- https://github.com/apostrophecms/sanitize-html/blob/main/test/test.js
+- https://github.com/rgrove/sanitize/tree/main/test
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-19T15:25:06Z
+
+I pushed more cases coming from https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html#bgsound (thanks @tigitz !) and I refactored the default attribute sanitizer to check all elements for URL attributes (`'src', 'href', 'lowsrc', 'background', 'ping'`). It should be more reliable and safe than having a manual list.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-19T21:19:42Z
+
+I fixed all reviews :)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-20T21:35:15Z
+
+Updated
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-26T14:17:58Z
+
+@nicolas-grekas I'm working on FWB integration but we could indeed open a new PR for that. I don't mind either way
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-26T14:26:23Z
+
+Let's open a different PR, it'll ease reviewing of the configuration/FW integration without having too much comments here.
+
+@derrabus are you OK with the component now?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-26T16:14:21Z
+
+Just opened https://github.com/symfony/symfony/pull/44798 for the FWB integration

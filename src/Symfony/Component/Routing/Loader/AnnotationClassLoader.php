@@ -187,6 +187,12 @@ abstract class AnnotationClassLoader implements LoaderInterface
                 foreach ($path as $locale => $localePath) {
                     $paths[$locale] = $prefix.$localePath;
                 }
+            } elseif (array_is_list($path) && array_is_list($prefix)) {
+                foreach ($prefix as $subPrefix) {
+                    foreach ($path as $subPath) {
+                        $paths[] = $subPrefix.$subPath;
+                    }
+                }
             } elseif ($missing = array_diff_key($prefix, $path)) {
                 throw new \LogicException(sprintf('Route to "%s" is missing paths for locale(s) "%s".', $class->name.'::'.$method->name, implode('", "', array_keys($missing))));
             } else {

@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -180,7 +182,23 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
+            try {
+                $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
+            } catch (AccessException $e) {
+                if (sprintf('The property "%s::$%s" is not initialized.', \get_class($object), $attribute) === $e->getMessage()) {
+                    continue;
+                }
+                if (($p = $e->getPrevious()) && 'Error' === \get_class($p) && $this->isUninitializedValueError($p)) {
+                    continue;
+                }
+                throw $e;
+            } catch (\Error $e) {
+                if ($this->isUninitializedValueError($e)) {
+                    continue;
+                }
+                throw $e;
+            }
+
             if ($maxDepthReached) {
                 $attributeValue = $maxDepthHandler($attributeValue, $object, $attribute, $format, $context);
             }
@@ -411,6 +429,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $data = [$data];
             }
 
+            if (XmlEncoder::FORMAT === $format && '' === $data && Type::BUILTIN_TYPE_ARRAY === $type->getBuiltinType()) {
+                return [];
+            }
+
             if (null !== $collectionValueType && Type::BUILTIN_TYPE_OBJECT === $collectionValueType->getBuiltinType()) {
                 $builtinType = Type::BUILTIN_TYPE_OBJECT;
                 $class = $collectionValueType->getClassName().'[]';
@@ -631,5 +653,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // The context cannot be serialized, skip the cache
             return false;
         }
+    }
+
+    /**
+     * This error may occur when specific object normalizer implementation gets attribute value
+     * by accessing a public uninitialized property or by calling a method accessing such property.
+     */
+    private function isUninitializedValueError(\Error $e): bool
+    {
+        return \PHP_VERSION_ID >= 70400
+            && str_starts_with($e->getMessage(), 'Typed property')
+            && str_ends_with($e->getMessage(), 'must not be accessed before initialization');
     }
 }

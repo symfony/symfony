@@ -214,18 +214,24 @@ class ExceptionCaster
 
                 if (file_exists($f['file']) && 0 <= self::$srcContext) {
                     if (!empty($f['class']) && (is_subclass_of($f['class'], 'Twig\Template') || is_subclass_of($f['class'], 'Twig_Template')) && method_exists($f['class'], 'getDebugInfo')) {
-                        $template = $f['object'] ?? unserialize(sprintf('O:%d:"%s":0:{}', \strlen($f['class']), $f['class']));
-
-                        $ellipsis = 0;
-                        $templateSrc = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : '');
-                        $templateInfo = $template->getDebugInfo();
-                        if (isset($templateInfo[$f['line']])) {
-                            if (!method_exists($template, 'getSourceContext') || !file_exists($templatePath = $template->getSourceContext()->getPath())) {
-                                $templatePath = null;
-                            }
-                            if ($templateSrc) {
-                                $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, 'twig', $templatePath, $f);
-                                $srcKey = ($templatePath ?: $template->getTemplateName()).':'.$templateInfo[$f['line']];
+                        $template = null;
+                        if (isset($f['object'])) {
+                            $template = $f['object'];
+                        } elseif ((new \ReflectionClass($f['class']))->isInstantiable()) {
+                            $template = unserialize(sprintf('O:%d:"%s":0:{}', \strlen($f['class']), $f['class']));
+                        }
+                        if (null !== $template) {
+                            $ellipsis = 0;
+                            $templateSrc = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : '');
+                            $templateInfo = $template->getDebugInfo();
+                            if (isset($templateInfo[$f['line']])) {
+                                if (!method_exists($template, 'getSourceContext') || !file_exists($templatePath = $template->getSourceContext()->getPath())) {
+                                    $templatePath = null;
+                                }
+                                if ($templateSrc) {
+                                    $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, 'twig', $templatePath, $f);
+                                    $srcKey = ($templatePath ?: $template->getTemplateName()).':'.$templateInfo[$f['line']];
+                                }
                             }
                         }
                     }

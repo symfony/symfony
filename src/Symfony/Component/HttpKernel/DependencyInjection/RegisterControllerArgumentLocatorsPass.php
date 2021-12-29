@@ -152,6 +152,9 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         }
 
                         continue;
+                    } elseif (is_subclass_of($type, \UnitEnum::class)) {
+                        // do not attempt to register enum typed arguments if not already present in bindings
+                        continue;
                     } elseif (!$type || !$autowire || '\\' !== $target[0]) {
                         continue;
                     } elseif (!$p->allowsNull()) {

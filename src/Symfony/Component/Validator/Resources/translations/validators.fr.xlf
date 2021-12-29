@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>Aucun répertoire temporaire n'a été configuré dans le php.ini.</target>
+                <target>Aucun répertoire temporaire n'a été configuré dans le php.ini, ou le répertoire configuré n'existe pas.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -389,6 +389,18 @@
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
                 <target>Cette valeur doit être une expression valide.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Cette valeur n'est pas une couleur CSS valide.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Cette valeur n'est pas une notation CIDR valide.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>La valeur du masque de réseau doit être comprise entre {{ min }} et {{ max }}.</target>
             </trans-unit>
         </body>
     </file>

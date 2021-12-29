@@ -253,7 +253,6 @@ class ContainerBuilderTest extends TestCase
     {
         $builder = new ContainerBuilder();
         $builder->register('foo', 'stdClass');
-        $builder->bar = $bar = new \stdClass();
         $builder->register('bar', 'stdClass');
         $this->assertEquals(
             [

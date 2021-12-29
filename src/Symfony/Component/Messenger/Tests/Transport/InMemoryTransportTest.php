@@ -41,9 +41,9 @@ class InMemoryTransportTest extends TestCase
     public function testQueue()
     {
         $envelope1 = new Envelope(new \stdClass());
-        $this->transport->send($envelope1);
+        $envelope1 = $this->transport->send($envelope1);
         $envelope2 = new Envelope(new \stdClass());
-        $this->transport->send($envelope2);
+        $envelope2 = $this->transport->send($envelope2);
         $this->assertSame([$envelope1, $envelope2], $this->transport->get());
         $this->transport->ack($envelope1);
         $this->assertSame([$envelope2], $this->transport->get());
@@ -54,9 +54,9 @@ class InMemoryTransportTest extends TestCase
     public function testAcknowledgeSameMessageWithDifferentStamps()
     {
         $envelope1 = new Envelope(new \stdClass(), [new AnEnvelopeStamp()]);
-        $this->transport->send($envelope1);
+        $envelope1 = $this->transport->send($envelope1);
         $envelope2 = new Envelope(new \stdClass(), [new AnEnvelopeStamp()]);
-        $this->transport->send($envelope2);
+        $envelope2 = $this->transport->send($envelope2);
         $this->assertSame([$envelope1, $envelope2], $this->transport->get());
         $this->transport->ack($envelope1->with(new AnEnvelopeStamp()));
         $this->assertSame([$envelope2], $this->transport->get());
@@ -67,6 +67,7 @@ class InMemoryTransportTest extends TestCase
     public function testAck()
     {
         $envelope = new Envelope(new \stdClass());
+        $envelope = $this->transport->send($envelope);
         $this->transport->ack($envelope);
         $this->assertSame([$envelope], $this->transport->getAcknowledged());
     }
@@ -74,6 +75,7 @@ class InMemoryTransportTest extends TestCase
     public function testReject()
     {
         $envelope = new Envelope(new \stdClass());
+        $envelope = $this->transport->send($envelope);
         $this->transport->reject($envelope);
         $this->assertSame([$envelope], $this->transport->getRejected());
     }
@@ -81,7 +83,7 @@ class InMemoryTransportTest extends TestCase
     public function testReset()
     {
         $envelope = new Envelope(new \stdClass());
-        $this->transport->send($envelope);
+        $envelope = $this->transport->send($envelope);
         $this->transport->ack($envelope);
         $this->transport->reject($envelope);
 

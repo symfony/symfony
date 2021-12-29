@@ -332,6 +332,10 @@
             "LRD",
             "Dollari liberian"
         ],
+        "LSL": [
+            "LSL",
+            "Lota lesotiane"
+        ],
         "LTL": [
             "LTL",
             "Lita lituaneze"
@@ -625,7 +629,7 @@
             "Dollari i Karaibeve Lindore"
         ],
         "XOF": [
-            "CFA",
+            "F CFA",
             "Franga e Bregut të Fildishtë"
         ],
         "XPF": [

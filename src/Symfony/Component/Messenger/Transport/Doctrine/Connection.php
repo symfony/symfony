@@ -225,7 +225,7 @@ class Connection
     {
         try {
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException|Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
@@ -234,7 +234,7 @@ class Connection
     {
         try {
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException|Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }

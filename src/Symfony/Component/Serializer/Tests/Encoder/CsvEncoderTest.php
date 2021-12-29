@@ -285,31 +285,52 @@ CSV;
 
         $this->assertSame(<<<'CSV'
 0
-"	=2+3"
+'=2+3
 
 CSV
             , $this->encoder->encode(['=2+3'], 'csv'));
 
         $this->assertSame(<<<'CSV'
 0
-"	-2+3"
+'-2+3
 
 CSV
             , $this->encoder->encode(['-2+3'], 'csv'));
 
         $this->assertSame(<<<'CSV'
 0
-"	+2+3"
+'+2+3
 
 CSV
             , $this->encoder->encode(['+2+3'], 'csv'));
 
         $this->assertSame(<<<'CSV'
 0
-"	@MyDataColumn"
+'@MyDataColumn
 
 CSV
             , $this->encoder->encode(['@MyDataColumn'], 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+"'	tab"
+
+CSV
+            , $this->encoder->encode(["\ttab"], 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+"'=1+2"";=1+2"
+
+CSV
+            , $this->encoder->encode(['=1+2";=1+2'], 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+"'=1+2'"" ;,=1+2"
+
+CSV
+            , $this->encoder->encode(['=1+2\'" ;,=1+2'], 'csv'));
     }
 
     public function testDoNotEncodeFormulas()
@@ -341,13 +362,34 @@ CSV
 
 CSV
             , $this->encoder->encode(['@MyDataColumn'], 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+"	tab"
+
+CSV
+            , $this->encoder->encode(["\ttab"], 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+"=1+2"";=1+2"
+
+CSV
+            , $this->encoder->encode(['=1+2";=1+2'], 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+"=1+2'"" ;,=1+2"
+
+CSV
+            , $this->encoder->encode(['=1+2\'" ;,=1+2'], 'csv'));
     }
 
     public function testEncodeFormulasWithSettingsPassedInContext()
     {
         $this->assertSame(<<<'CSV'
 0
-"	=2+3"
+'=2+3
 
 CSV
             , $this->encoder->encode(['=2+3'], 'csv', [
@@ -356,7 +398,7 @@ CSV
 
         $this->assertSame(<<<'CSV'
 0
-"	-2+3"
+'-2+3
 
 CSV
             , $this->encoder->encode(['-2+3'], 'csv', [
@@ -365,7 +407,7 @@ CSV
 
         $this->assertSame(<<<'CSV'
 0
-"	+2+3"
+'+2+3
 
 CSV
             , $this->encoder->encode(['+2+3'], 'csv', [
@@ -374,10 +416,37 @@ CSV
 
         $this->assertSame(<<<'CSV'
 0
-"	@MyDataColumn"
+'@MyDataColumn
 
 CSV
             , $this->encoder->encode(['@MyDataColumn'], 'csv', [
+                CsvEncoder::ESCAPE_FORMULAS_KEY => true,
+            ]));
+
+        $this->assertSame(<<<'CSV'
+0
+"'	tab"
+
+CSV
+            , $this->encoder->encode(["\ttab"], 'csv', [
+                CsvEncoder::ESCAPE_FORMULAS_KEY => true,
+            ]));
+
+        $this->assertSame(<<<'CSV'
+0
+"'=1+2"";=1+2"
+
+CSV
+            , $this->encoder->encode(['=1+2";=1+2'], 'csv', [
+                CsvEncoder::ESCAPE_FORMULAS_KEY => true,
+            ]));
+
+        $this->assertSame(<<<'CSV'
+0
+"'=1+2'"" ;,=1+2"
+
+CSV
+            , $this->encoder->encode(['=1+2\'" ;,=1+2'], 'csv', [
                 CsvEncoder::ESCAPE_FORMULAS_KEY => true,
             ]));
     }

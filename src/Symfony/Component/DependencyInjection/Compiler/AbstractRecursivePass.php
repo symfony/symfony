@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -131,25 +132,35 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
 
         if ($factory) {
             [$class, $method] = $factory;
+
+            if ('__construct' === $method) {
+                throw new RuntimeException(sprintf('Invalid service "%s": "__construct()" cannot be used as a factory method.', $this->currentId));
+            }
+
             if ($class instanceof Reference) {
-                $class = $this->container->findDefinition((string) $class)->getClass();
+                $factoryDefinition = $this->container->findDefinition((string) $class);
+                while ((null === $class = $factoryDefinition->getClass()) && $factoryDefinition instanceof ChildDefinition) {
+                    $factoryDefinition = $this->container->findDefinition($factoryDefinition->getParent());
+                }
             } elseif ($class instanceof Definition) {
                 $class = $class->getClass();
             } elseif (null === $class) {
                 $class = $definition->getClass();
             }
 
-            if ('__construct' === $method) {
-                throw new RuntimeException(sprintf('Invalid service "%s": "__construct()" cannot be used as a factory method.', $this->currentId));
-            }
-
             return $this->getReflectionMethod(new Definition($class), $method);
         }
 
-        $class = $definition->getClass();
+        while ((null === $class = $definition->getClass()) && $definition instanceof ChildDefinition) {
+            $definition = $this->container->findDefinition($definition->getParent());
+        }
 
         try {
             if (!$r = $this->container->getReflectionClass($class)) {
+                if (null === $class) {
+                    throw new RuntimeException(sprintf('Invalid service "%s": the class is not set.', $this->currentId));
+                }
+
                 throw new RuntimeException(sprintf('Invalid service "%s": class "%s" does not exist.', $this->currentId, $class));
             }
         } catch (\ReflectionException $e) {
@@ -179,7 +190,11 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
             return $this->getConstructor($definition, true);
         }
 
-        if (!$class = $definition->getClass()) {
+        while ((null === $class = $definition->getClass()) && $definition instanceof ChildDefinition) {
+            $definition = $this->container->findDefinition($definition->getParent());
+        }
+
+        if (null === $class) {
             throw new RuntimeException(sprintf('Invalid service "%s": the class is not set.', $this->currentId));
         }
 
@@ -188,6 +203,10 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         }
 
         if (!$r->hasMethod($method)) {
+            if ($r->hasMethod('__call') && ($r = $r->getMethod('__call')) && $r->isPublic()) {
+                return new \ReflectionMethod(static function (...$arguments) {}, '__invoke');
+            }
+
             throw new RuntimeException(sprintf('Invalid service "%s": method "%s()" does not exist.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
         }
 

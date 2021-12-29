@@ -772,7 +772,8 @@ class ProcessTest extends TestCase
         $start = microtime(true);
         try {
             $process->start();
-            foreach ($process as $buffer);
+            foreach ($process as $buffer) {
+            }
             $this->fail('A RuntimeException should have been raised');
         } catch (RuntimeException $e) {
         }
@@ -1520,6 +1521,18 @@ class ProcessTest extends TestCase
         $process->setTimeout(2);
         $process->wait();
         $this->assertFalse($process->isRunning());
+    }
+
+    public function testEnvCaseInsensitiveOnWindows()
+    {
+        $p = $this->getProcessForCode('print_r([$_SERVER[\'PATH\'] ?? 1, $_SERVER[\'Path\'] ?? 2]);', null, ['PATH' => 'bar/baz']);
+        $p->run(null, ['Path' => 'foo/bar']);
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->assertSame('Array ( [0] => 1 [1] => foo/bar )', preg_replace('/\s++/', ' ', trim($p->getOutput())));
+        } else {
+            $this->assertSame('Array ( [0] => bar/baz [1] => foo/bar )', preg_replace('/\s++/', ' ', trim($p->getOutput())));
+        }
     }
 
     /**

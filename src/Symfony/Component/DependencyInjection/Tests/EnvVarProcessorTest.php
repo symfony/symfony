@@ -624,8 +624,8 @@ CSV;
     public function provideGetEnvUrlPath()
     {
         return [
-            [null, 'https://symfony.com'],
-            [null, 'https://symfony.com/'],
+            ['', 'https://symfony.com'],
+            ['', 'https://symfony.com/'],
             ['/', 'https://symfony.com//'],
             ['blog', 'https://symfony.com/blog'],
             ['blog/', 'https://symfony.com/blog/'],

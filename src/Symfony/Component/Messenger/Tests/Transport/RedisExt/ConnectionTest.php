@@ -113,15 +113,29 @@ class ConnectionTest extends TestCase
         $this->assertNotNull($connection->get());
     }
 
-    public function testAuth()
+    /**
+     * @param string|array $expected
+     *
+     * @dataProvider provideAuthDsn
+     */
+    public function testAuth($expected, string $dsn)
     {
         $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('auth')
-            ->with('password')
+            ->with($expected)
             ->willReturn(true);
 
-        Connection::fromDsn('redis://password@localhost/queue', [], $redis);
+        Connection::fromDsn($dsn, [], $redis);
+    }
+
+    public function provideAuthDsn(): \Generator
+    {
+        yield 'Password only' => ['password', 'redis://password@localhost/queue'];
+        yield 'User and password' => [['user', 'password'], 'redis://user:password@localhost/queue'];
+        yield 'User and colon' => ['user', 'redis://user:@localhost/queue'];
+        yield 'Colon and password' => ['password', 'redis://:password@localhost/queue'];
+        yield 'Colon and falsy password' => ['0', 'redis://:0@localhost/queue'];
     }
 
     public function testNoAuthWithEmptyPassword()
@@ -206,6 +220,7 @@ class ConnectionTest extends TestCase
     {
         $redis = new \Redis();
         $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', [], $redis);
+        $connection->cleanup();
 
         $connection->add('1', []);
         $connection->add('2', []);
@@ -216,7 +231,7 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget');
         $this->assertNotNull($connection->get());
 
-        $redis->del('messenger-rejectthenget');
+        $connection->cleanup();
     }
 
     public function testGetNonBlocking()
@@ -224,12 +239,30 @@ class ConnectionTest extends TestCase
         $redis = new \Redis();
 
         $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', [], $redis);
+        $connection->cleanup();
 
         $this->assertNull($connection->get()); // no message, should return null immediately
         $connection->add('1', []);
         $this->assertNotEmpty($message = $connection->get());
         $connection->reject($message['id']);
-        $redis->del('messenger-getnonblocking');
+
+        $connection->cleanup();
+    }
+
+    public function testGetDelayed()
+    {
+        $redis = new \Redis();
+
+        $connection = Connection::fromDsn('redis://localhost/messenger-delayed', [], $redis);
+        $connection->cleanup();
+
+        $connection->add('1', [], 100);
+        $this->assertNull($connection->get());
+        usleep(300000);
+        $this->assertNotEmpty($message = $connection->get());
+        $connection->reject($message['id']);
+
+        $connection->cleanup();
     }
 
     public function testJsonError()

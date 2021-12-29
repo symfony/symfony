@@ -132,6 +132,26 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testNormalizeObjectWithUnsetProperties()
+    {
+        $obj = new ObjectInner();
+        unset($obj->foo);
+        $this->assertEquals(
+            ['bar' => null],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
+    public function testNormalizeObjectWithLazyProperties()
+    {
+        $obj = new LazyObjectInner();
+        unset($obj->foo);
+        $this->assertEquals(
+            ['foo' => 123, 'bar' => null],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     /**
      * @requires PHP 7.4
      */
@@ -163,6 +183,19 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->bar);
         $this->assertTrue($obj->isBaz());
+    }
+
+    public function testDenormalizeEmptyXmlArray()
+    {
+        $normalizer = $this->getDenormalizerForObjectToPopulate();
+        $obj = $normalizer->denormalize(
+            ['bar' => ''],
+            ObjectDummy::class,
+            'xml'
+        );
+
+        $this->assertIsArray($obj->bar);
+        $this->assertEmpty($obj->bar);
     }
 
     public function testDenormalizeWithObject()
@@ -1068,6 +1101,16 @@ class ObjectInner
 {
     public $foo;
     public $bar;
+}
+
+class LazyObjectInner extends ObjectInner
+{
+    public function __get($name)
+    {
+        if ('foo' === $name) {
+            return $this->foo = 123;
+        }
+    }
 }
 
 class FormatAndContextAwareNormalizer extends ObjectNormalizer

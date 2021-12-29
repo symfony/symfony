@@ -18,6 +18,7 @@
         <env name="LDAP_HOST" value="localhost" />
         <env name="LDAP_PORT" value="3389" />
         <env name="REDIS_HOST" value="localhost" />
+        <env name="MESSENGER_REDIS_DSN" value="redis://localhost/messages" />
         <env name="MEMCACHED_HOST" value="localhost" />
         <env name="MONGODB_HOST" value="localhost" />
         <env name="ZOOKEEPER_HOST" value="localhost" />

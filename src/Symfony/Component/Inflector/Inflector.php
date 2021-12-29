@@ -60,6 +60,9 @@ final class Inflector
         // indices (index), appendices (appendix), prices (price)
         ['seci', 4, false, true, ['ex', 'ix', 'ice']],
 
+        // zombies (zombie)
+        ['seibmoz', 7, true, true, 'zombie'],
+
         // selfies (selfie)
         ['seifles', 7, true, true, 'selfie'],
 

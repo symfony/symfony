@@ -19,9 +19,6 @@
         "php": ">=7.1.3",
         "symfony/mailer": "^4.4|^5.0"
     },
-    "require-dev": {
-        "symfony/http-client": "^4.3|^5.0"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Google\\": "" },
         "exclude-from-classmap": [

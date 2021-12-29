@@ -37,6 +37,10 @@ class IpUtils
      */
     public static function checkIp($requestIp, $ips)
     {
+        if (null === $requestIp) {
+            return false;
+        }
+
         if (!\is_array($ips)) {
             $ips = [$ips];
         }
@@ -145,7 +149,7 @@ class IpUtils
         for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; ++$i) {
             $left = $netmask - 16 * ($i - 1);
             $left = ($left <= 16) ? $left : 16;
-            $mask = ~(0xffff >> $left) & 0xffff;
+            $mask = ~(0xFFFF >> $left) & 0xFFFF;
             if (($bytesAddr[$i] & $mask) != ($bytesTest[$i] & $mask)) {
                 return self::$checkedIps[$cacheKey] = false;
             }

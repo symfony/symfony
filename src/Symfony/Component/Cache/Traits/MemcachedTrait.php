@@ -255,7 +255,7 @@ trait MemcachedTrait
     protected function doFetch(array $ids)
     {
         try {
-            $encodedIds = array_map('self::encodeKey', $ids);
+            $encodedIds = array_map([__CLASS__, 'encodeKey'], $ids);
 
             $encodedResult = $this->checkResultCode($this->getClient()->getMulti($encodedIds));
 
@@ -284,7 +284,7 @@ trait MemcachedTrait
     protected function doDelete(array $ids)
     {
         $ok = true;
-        $encodedIds = array_map('self::encodeKey', $ids);
+        $encodedIds = array_map([__CLASS__, 'encodeKey'], $ids);
         foreach ($this->checkResultCode($this->getClient()->deleteMulti($encodedIds)) as $result) {
             if (\Memcached::RES_SUCCESS !== $result && \Memcached::RES_NOTFOUND !== $result) {
                 $ok = false;

@@ -185,6 +185,10 @@ class ParserTest extends TestCase
                 'not foo or foo.not',
                 ['foo'],
             ],
+            [
+                new Node\BinaryNode('..', new Node\ConstantNode(0), new Node\ConstantNode(3)),
+                '0..3',
+            ],
         ];
     }
 

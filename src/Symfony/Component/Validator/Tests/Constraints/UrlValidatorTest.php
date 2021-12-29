@@ -106,6 +106,10 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://a.pl'],
             ['http://www.example.com'],
             ['http://tt.example.com'],
+            ['http://m.example.com'],
+            ['http://m.m.m.example.com'],
+            ['http://example.m.example.com'],
+            ['https://long-string_with+symbols.m.example.com'],
             ['http://www.example.com.'],
             ['http://www.example.museum'],
             ['https://example.com/'],
@@ -124,6 +128,10 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://very.long.domain.name.com/'],
             ['http://localhost/'],
             ['http://myhost123/'],
+            ['http://internal-api'],
+            ['http://internal-api.'],
+            ['http://internal-api/'],
+            ['http://internal-api/path'],
             ['http://127.0.0.1/'],
             ['http://127.0.0.1:80/'],
             ['http://[::1]/'],
@@ -170,6 +178,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://symfony.com/#fragment'],
             ['http://symfony.com/#one_more%20test'],
             ['http://example.com/exploit.html?hello[0]=test'],
+            ['http://বিডিআইএ.বাংলা'],
         ];
     }
 
@@ -255,7 +264,14 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://127.0.0.1:aa/'],
             ['ftp://[::1]/'],
             ['http://[::1'],
+            ['http://☎'],
+            ['http://☎.'],
+            ['http://☎/'],
+            ['http://☎/path'],
+            ['http://hello.☎'],
+            ['http://hello.☎.'],
             ['http://hello.☎/'],
+            ['http://hello.☎/path'],
             ['http://:password@symfony.com'],
             ['http://:password@@symfony.com'],
             ['http://username:passwordsymfony.com'],
@@ -268,8 +284,13 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://'],
             ['http://www..com'],
             ['http://www..example.com'],
+            ['http://www..m.example.com'],
+            ['http://.m.example.com'],
             ['http://wwww.example..com'],
             ['http://.www.example.com'],
+            ['http://example.co-'],
+            ['http://example.co-/path'],
+            ['http:///path'],
         ];
     }
 

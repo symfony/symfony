@@ -328,6 +328,10 @@
             "LRD",
             "Dolar Liberia"
         ],
+        "LSL": [
+            "LSL",
+            "Lesotho Loti"
+        ],
         "LYD": [
             "LYD",
             "Dinar Libya"
@@ -433,7 +437,7 @@
             "Kina Papua Nugini"
         ],
         "PHP": [
-            "PHP",
+            "₱",
             "Piso Filipina"
         ],
         "PKR": [
@@ -609,7 +613,7 @@
             "Dolar Karibia Wetan"
         ],
         "XOF": [
-            "CFA",
+            "F CFA",
             "CFA Franc Afrika Kulon"
         ],
         "XPF": [

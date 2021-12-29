@@ -17,7 +17,7 @@
     ],
     "provide": {
         "psr/cache-implementation": "1.0|2.0",
-        "psr/simple-cache-implementation": "1.0",
+        "psr/simple-cache-implementation": "1.0|2.0",
         "symfony/cache-implementation": "1.0|2.0"
     },
     "require": {
@@ -35,7 +35,7 @@
         "doctrine/cache": "^1.6|^2.0",
         "doctrine/dbal": "^2.7|^3.0",
         "predis/predis": "^1.1",
-        "psr/simple-cache": "^1.0",
+        "psr/simple-cache": "^1.0|^2.0",
         "symfony/config": "^4.2|^5.0",
         "symfony/dependency-injection": "^3.4|^4.1|^5.0",
         "symfony/filesystem": "^4.4|^5.0",

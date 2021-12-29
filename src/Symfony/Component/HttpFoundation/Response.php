@@ -125,7 +125,7 @@ class Response
      *
      * The list of codes is complete according to the
      * {@link https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml Hypertext Transfer Protocol (HTTP) Status Code Registry}
-     * (last updated 2016-03-01).
+     * (last updated 2018-09-21).
      *
      * Unless otherwise noted, the status code is defined in RFC2616.
      *

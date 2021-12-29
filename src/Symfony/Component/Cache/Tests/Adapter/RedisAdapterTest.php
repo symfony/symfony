@@ -96,6 +96,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
             ['redis://localhost:1234'],
             ['redis://foo@localhost'],
             ['redis://localhost/123'],
+            ['redis:///some/local/path'],
         ];
     }
 
@@ -112,6 +113,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     public function provideInvalidCreateConnection(): array
     {
         return [
+            ['redis://localhost/foo'],
             ['foo://localhost'],
             ['redis://'],
         ];

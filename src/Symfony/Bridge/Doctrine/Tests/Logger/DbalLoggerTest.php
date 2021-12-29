@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\Logger\DbalLogger;
 
+/**
+ * @group legacy
+ */
 class DbalLoggerTest extends TestCase
 {
     /**
@@ -46,8 +49,8 @@ class DbalLoggerTest extends TestCase
             ['SQL', null, []],
             ['SQL', [], []],
             ['SQL', ['foo' => 'bar'], ['foo' => 'bar']],
-            ['SQL', ['foo' => "\x7F\xFF"], ['foo' => DbalLogger::BINARY_DATA_VALUE]],
-            ['SQL', ['foo' => "bar\x7F\xFF"], ['foo' => DbalLogger::BINARY_DATA_VALUE]],
+            ['SQL', ['foo' => "\x7F\xFF"], ['foo' => '(binary value)']],
+            ['SQL', ['foo' => "bar\x7F\xFF"], ['foo' => '(binary value)']],
             ['SQL', ['foo' => ''], ['foo' => '']],
         ];
     }

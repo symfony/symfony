@@ -268,7 +268,7 @@
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>TŠai vērtībai ir jābūt mazākai vai vienādai ar {{ compared_value }}.</target>
+                <target>Šai vērtībai ir jābūt mazākai vai vienādai ar {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
@@ -336,23 +336,23 @@
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
-                <target>Šai kolekcijai jāsatur tikai derīgi elementi.</target>
+                <target>Šai kolekcijai jāsatur tikai unikāli elementi.</target>
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
-                <target>Šai vērtībāi jābūt pozitīvai.</target>
+                <target>Šai vērtībai jābūt pozitīvai.</target>
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>Šai vērtībāi jābūt pozitīvai vai vienādai ar nulli.</target>
+                <target>Šai vērtībai jābūt pozitīvai vai vienādai ar nulli.</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
-                <target>Šai vērtībāi jābūt negatīvai.</target>
+                <target>Šai vērtībai jābūt negatīvai.</target>
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
-                <target>Šai vērtībāi jābūt negatīvai vai vienādai ar nulli.</target>
+                <target>Šai vērtībai jābūt negatīvai vai vienādai ar nulli.</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
@@ -385,6 +385,22 @@
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Šī vērtība nav derīgs starptautiskais vērtspapīru identifikācijas numurs (ISIN).</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Šai vērtībai jābūt korektai izteiksmei.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Šī vērtība nav korekta CSS krāsa.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Šī vērtība nav korekts CIDR apzīmējums.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Tīkla maskas (netmask) vērtībai jābūt starp {{ min }} un {{ max }}.</target>
             </trans-unit>
         </body>
     </file>

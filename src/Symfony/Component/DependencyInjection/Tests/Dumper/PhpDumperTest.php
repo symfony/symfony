@@ -42,6 +42,7 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\NewInInitializer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
@@ -1185,6 +1186,24 @@ class PhpDumperTest extends TestCase
         $container = new \Symfony_DI_PhpDumper_Test_Object_Class_Name();
 
         $this->assertInstanceOf(\stdClass::class, $container->get('bar'));
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testNewInInitializer()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', NewInInitializer::class)
+            ->setPublic(true)
+            ->setAutowired(true)
+            ->setArguments(['$bar' => 234]);
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_new_in_initializer.php', $dumper->dump());
     }
 
     /**

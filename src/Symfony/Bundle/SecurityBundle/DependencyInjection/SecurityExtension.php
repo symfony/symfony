@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
@@ -130,7 +131,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         } else {
             $container
                 ->getDefinition('security.access.decision_manager')
-                ->addArgument($config['access_decision_manager']['strategy'])
+                ->addArgument($config['access_decision_manager']['strategy'] ?? AccessDecisionManager::STRATEGY_AFFIRMATIVE)
                 ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
                 ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied']);
         }
@@ -729,7 +730,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private function createRequestMatcher(ContainerBuilder $container, string $path = null, string $host = null, int $port = null, array $methods = [], array $ips = null, array $attributes = []): Reference
     {
         if ($methods) {
-            $methods = array_map('strtoupper', (array) $methods);
+            $methods = array_map('strtoupper', $methods);
         }
 
         if (null !== $ips) {

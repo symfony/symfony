@@ -96,7 +96,7 @@ CHANGELOG
 3.2.0
 -----
 
- * deprecated `Tests\Constraints\AbstractContraintValidatorTest` in favor of `Test\ConstraintValidatorTestCase`
+ * deprecated `Tests\Constraints\AbstractConstraintValidatorTest` in favor of `Test\ConstraintValidatorTestCase`
  * added support for PHP constants in YAML configuration files
 
 3.1.0

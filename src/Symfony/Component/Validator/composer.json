@@ -41,7 +41,7 @@
         "egulias/email-validator": "^2.1.10|^3"
     },
     "conflict": {
-        "doctrine/lexer": "<1.0.2",
+        "doctrine/lexer": "<1.1",
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/dependency-injection": "<3.4",
         "symfony/http-kernel": "<4.4",

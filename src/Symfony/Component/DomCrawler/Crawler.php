@@ -1186,7 +1186,7 @@ class Crawler implements \Countable, \IteratorAggregate
 
     private function parseHtml5(string $htmlContent, string $charset = 'UTF-8'): \DOMDocument
     {
-        return $this->html5Parser->parse($this->convertToHtmlEntities($htmlContent, $charset), [], $charset);
+        return $this->html5Parser->parse($this->convertToHtmlEntities($htmlContent, $charset));
     }
 
     private function parseXhtml(string $htmlContent, string $charset = 'UTF-8'): \DOMDocument
@@ -1222,11 +1222,11 @@ class Crawler implements \Countable, \IteratorAggregate
 
         try {
             return mb_convert_encoding($htmlContent, 'HTML-ENTITIES', $charset);
-        } catch (\Exception | \ValueError $e) {
+        } catch (\Exception|\ValueError $e) {
             try {
                 $htmlContent = iconv($charset, 'UTF-8', $htmlContent);
                 $htmlContent = mb_convert_encoding($htmlContent, 'HTML-ENTITIES', 'UTF-8');
-            } catch (\Exception | \ValueError $e) {
+            } catch (\Exception|\ValueError $e) {
             }
 
             return $htmlContent;

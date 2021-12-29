@@ -385,6 +385,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $result = self::RESULT_PROTO;
         $object = $zval[self::VALUE];
+        $class = \get_class($object);
         $access = $this->getReadAccessInfo(\get_class($object), $property);
 
         try {
@@ -406,6 +407,11 @@ class PropertyAccessor implements PropertyAccessorInterface
                     throw $e;
                 }
             } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
+                $name = $access[self::ACCESS_NAME];
+                if ($access[self::ACCESS_REF] && !isset($object->$name) && !\array_key_exists($name, (array) $object) && (\PHP_VERSION_ID < 70400 || !(new \ReflectionProperty($class, $name))->hasType())) {
+                    throw new AccessException(sprintf('The property "%s::$%s" is not initialized.', $class, $name));
+                }
+
                 $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]};
 
                 if ($access[self::ACCESS_REF] && isset($zval[self::REF])) {

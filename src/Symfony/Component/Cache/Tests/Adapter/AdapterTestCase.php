@@ -118,7 +118,7 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $metadata = $item->getMetadata();
         $this->assertArrayHasKey(CacheItem::METADATA_CTIME, $metadata);
-        $this->assertEqualsWithDelta(999, $metadata[CacheItem::METADATA_CTIME], 10);
+        $this->assertEqualsWithDelta(999, $metadata[CacheItem::METADATA_CTIME], 150);
         $this->assertArrayHasKey(CacheItem::METADATA_EXPIRY, $metadata);
         $this->assertEqualsWithDelta(9 + time(), $metadata[CacheItem::METADATA_EXPIRY], 1);
     }
@@ -295,6 +295,15 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->save($item->set($weirdDataMatchingMedatataWrappedValue));
 
         $this->assertTrue($cache->hasItem('foobar'));
+    }
+
+    public function testNullByteInKey()
+    {
+        $cache = $this->createCachePool(0, __FUNCTION__);
+
+        $cache->save($cache->getItem("a\0b")->set(123));
+
+        $this->assertSame(123, $cache->getItem("a\0b")->get());
     }
 }
 

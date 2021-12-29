@@ -134,7 +134,7 @@ class ReflectionCaster
             array_unshift($trace, [
                 'function' => 'yield',
                 'file' => $function->getExecutingFile(),
-                'line' => $function->getExecutingLine() - 1,
+                'line' => $function->getExecutingLine() - (int) (\PHP_VERSION_ID < 80100),
             ]);
             $trace[] = $frame;
             $a[$prefix.'trace'] = new TraceStub($trace, false, 0, -1, -1);
@@ -263,15 +263,17 @@ class ReflectionCaster
             unset($a[$prefix.'allowsNull']);
         }
 
-        try {
-            $a[$prefix.'default'] = $v = $c->getDefaultValue();
-            if ($c->isDefaultValueConstant()) {
-                $a[$prefix.'default'] = new ConstStub($c->getDefaultValueConstantName(), $v);
+        if ($c->isOptional()) {
+            try {
+                $a[$prefix.'default'] = $v = $c->getDefaultValue();
+                if ($c->isDefaultValueConstant()) {
+                    $a[$prefix.'default'] = new ConstStub($c->getDefaultValueConstantName(), $v);
+                }
+                if (null === $v) {
+                    unset($a[$prefix.'allowsNull']);
+                }
+            } catch (\ReflectionException $e) {
             }
-            if (null === $v) {
-                unset($a[$prefix.'allowsNull']);
-            }
-        } catch (\ReflectionException $e) {
         }
 
         return $a;
@@ -356,6 +358,8 @@ class ReflectionCaster
                     $signature .= 10 > \strlen($v) && !str_contains($v, '\\') ? "'{$v}'" : "'…".\strlen($v)."'";
                 } elseif (\is_bool($v)) {
                     $signature .= $v ? 'true' : 'false';
+                } elseif (\is_object($v)) {
+                    $signature .= 'new '.substr(strrchr('\\'.get_debug_type($v), '\\'), 1);
                 } else {
                     $signature .= $v;
                 }

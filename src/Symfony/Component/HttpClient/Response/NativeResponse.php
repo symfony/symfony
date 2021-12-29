@@ -183,6 +183,7 @@ final class NativeResponse implements ResponseInterface
             return;
         }
 
+        $this->multi->lastTimeout = null;
         $this->multi->openHandles[$this->id] = [$h, $this->buffer, $this->onProgress, &$this->remaining, &$this->info];
     }
 

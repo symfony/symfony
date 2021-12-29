@@ -24,7 +24,9 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedEnumArgumentDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
 use Symfony\Component\DependencyInjection\TypedReference;
 
@@ -61,6 +63,27 @@ class ResolveBindingsPassTest extends TestCase
         ];
         $this->assertEquals($expected, $definition->getArguments());
         $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testProcessEnum()
+    {
+        $container = new ContainerBuilder();
+
+        $bindings = [
+            FooUnitEnum::class.' $bar' => new BoundArgument(FooUnitEnum::BAR),
+        ];
+
+        $definition = $container->register(NamedEnumArgumentDummy::class, NamedEnumArgumentDummy::class);
+        $definition->setBindings($bindings);
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+
+        $expected = [FooUnitEnum::BAR];
+        $this->assertEquals($expected, $definition->getArguments());
     }
 
     public function testUnusedBinding()

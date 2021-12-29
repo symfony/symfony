@@ -52,6 +52,7 @@ class LoginLinkHandlerTest extends TestCase
     }
 
     /**
+     * @group time-sensitive
      * @dataProvider provideCreateLoginLinkData
      */
     public function testCreateLoginLink($user, array $extraProperties, Request $request = null)

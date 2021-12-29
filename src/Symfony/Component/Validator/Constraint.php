@@ -61,7 +61,7 @@ abstract class Constraint
      *
      * @var string[]
      */
-    public $groups;
+    public $groups = [self::DEFAULT_GROUP];
 
     /**
      * Returns the name of the given error code.

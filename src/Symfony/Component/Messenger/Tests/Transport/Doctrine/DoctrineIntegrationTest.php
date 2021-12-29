@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Transport\Doctrine\Connection;
 
 /**
  * @requires extension pdo_sqlite
+ * @group transient-on-macos
  */
 class DoctrineIntegrationTest extends TestCase
 {

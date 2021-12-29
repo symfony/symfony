@@ -34,7 +34,7 @@
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
         "symfony/property-access": "^5.3.13",
-        "symfony/property-info": "^5.3",
+        "symfony/property-info": "^5.3.13",
         "symfony/uid": "^5.3",
         "symfony/validator": "^4.4|^5.0",
         "symfony/var-dumper": "^4.4|^5.0",
@@ -47,7 +47,7 @@
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/dependency-injection": "<4.4",
         "symfony/property-access": "<5.3.13",
-        "symfony/property-info": "<5.3",
+        "symfony/property-info": "<5.3.13",
         "symfony/uid": "<5.3",
         "symfony/yaml": "<4.4"
     },

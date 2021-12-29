@@ -58,18 +58,28 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         // prevent concurrency within the same connection
         $this->getInternalStore()->save($key);
 
-        $sql = 'SELECT pg_try_advisory_lock(:key)';
-        $result = $this->conn->executeQuery($sql, [
-            'key' => $this->getHashedKey($key),
-        ]);
+        $lockAcquired = false;
 
-        // Check if lock is acquired
-        if (true === $result->fetchOne()) {
-            $key->markUnserializable();
-            // release sharedLock in case of promotion
-            $this->unlockShared($key);
+        try {
+            $sql = 'SELECT pg_try_advisory_lock(:key)';
+            $result = $this->conn->executeQuery($sql, [
+                'key' => $this->getHashedKey($key),
+            ]);
 
-            return;
+            // Check if lock is acquired
+            if (true === $result->fetchOne()) {
+                $key->markUnserializable();
+                // release sharedLock in case of promotion
+                $this->unlockShared($key);
+
+                $lockAcquired = true;
+
+                return;
+            }
+        } finally {
+            if (!$lockAcquired) {
+                $this->getInternalStore()->delete($key);
+            }
         }
 
         throw new LockConflictedException();
@@ -80,18 +90,28 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         // prevent concurrency within the same connection
         $this->getInternalStore()->saveRead($key);
 
-        $sql = 'SELECT pg_try_advisory_lock_shared(:key)';
-        $result = $this->conn->executeQuery($sql, [
-            'key' => $this->getHashedKey($key),
-        ]);
+        $lockAcquired = false;
 
-        // Check if lock is acquired
-        if (true === $result->fetchOne()) {
-            $key->markUnserializable();
-            // release lock in case of demotion
-            $this->unlock($key);
+        try {
+            $sql = 'SELECT pg_try_advisory_lock_shared(:key)';
+            $result = $this->conn->executeQuery($sql, [
+                'key' => $this->getHashedKey($key),
+            ]);
 
-            return;
+            // Check if lock is acquired
+            if (true === $result->fetchOne()) {
+                $key->markUnserializable();
+                // release lock in case of demotion
+                $this->unlock($key);
+
+                $lockAcquired = true;
+
+                return;
+            }
+        } finally {
+            if (!$lockAcquired) {
+                $this->getInternalStore()->delete($key);
+            }
         }
 
         throw new LockConflictedException();

@@ -116,7 +116,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     public function __unserialize(array $data): void
     {
         [$user, , , $this->attributes, $this->roleNames] = $data;
-        $this->user = \is_string($user) ? new InMemoryUser($user, '', $this->roleNames) : $user;
+        $this->user = \is_string($user) ? new InMemoryUser($user, '', $this->roleNames, false) : $user;
     }
 
     /**

@@ -46,9 +46,9 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     public function createLoginLink(UserInterface $user, Request $request = null): LoginLinkDetails
     {
-        $expiresAt = new \DateTimeImmutable(sprintf('+%d seconds', $this->options['lifetime']));
+        $expires = time() + $this->options['lifetime'];
+        $expiresAt = new \DateTimeImmutable('@'.$expires);
 
-        $expires = $expiresAt->format('U');
         $parameters = [
             // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
             'user' => method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(),

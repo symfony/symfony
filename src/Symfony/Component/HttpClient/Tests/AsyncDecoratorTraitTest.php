@@ -54,6 +54,9 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         };
     }
 
+    /**
+     * @group transient-on-macos
+     */
     public function testTimeoutOnDestruct()
     {
         if (HttpClient::create() instanceof NativeHttpClient) {

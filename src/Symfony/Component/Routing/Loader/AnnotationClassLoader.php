@@ -271,28 +271,38 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return $name;
     }
 
+    /**
+     * @return array
+     */
     protected function getGlobals(\ReflectionClass $class)
     {
         $globals = $this->resetGlobals();
 
-        $annot = null;
-        if ($attribute = $class->getAttributes($this->routeAnnotationClass, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null) {
-            $annot = $attribute->newInstance();
-        }
-        if (!$annot && $this->reader) {
-            $annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass);
+        $annotations = [];
+
+        foreach ($class->getAttributes($this->routeAnnotationClass, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            $annotations[] = $attribute->newInstance();
         }
 
-        if ($annot) {
+        if (!$annotations && $this->reader) {
+            $annotations = array_filter(
+                $this->reader->getClassAnnotations($class),
+                fn ($annotation) => ($annotation instanceof $this->routeAnnotationClass),
+            );
+        }
+
+        foreach ($annotations as $annot) {
             if (null !== $annot->getName()) {
                 $globals['name'] = $annot->getName();
             }
 
             if (null !== $annot->getPath()) {
-                $globals['path'] = $annot->getPath();
+                $globals['path'] = null === $globals['path']
+                    ? $annot->getPath()
+                    : [...(array) $globals['path'], ...(array) $annot->getPath()];
             }
 
-            $globals['localized_paths'] = $annot->getLocalizedPaths();
+            array_push($globals['localized_paths'], ...$annot->getLocalizedPaths());
 
             if (null !== $annot->getRequirements()) {
                 $globals['requirements'] = $annot->getRequirements();

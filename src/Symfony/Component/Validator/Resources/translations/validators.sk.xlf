@@ -386,6 +386,10 @@
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Táto hodnota nie je platné medzinárodné označenie cenného papiera (ISIN).</target>
             </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Táto hodnota by mala byť platným výrazom.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

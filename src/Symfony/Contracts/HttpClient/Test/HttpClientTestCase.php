@@ -810,9 +810,6 @@ abstract class HttpClientTestCase extends TestCase
         }
     }
 
-    /**
-     * @group transient-on-macos
-     */
     public function testTimeoutOnInitialize()
     {
         $p1 = TestHttpServer::start(8067);
@@ -846,9 +843,6 @@ abstract class HttpClientTestCase extends TestCase
         }
     }
 
-    /**
-     * @group transient-on-macos
-     */
     public function testTimeoutOnDestruct()
     {
         $p1 = TestHttpServer::start(8067);

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-12-29T22:46:27Z
+
+it looks like 2f3ddb6b8b74c95744d69cc08069380b9a61eecd is required to make the lowest deps tests pass for the Serializer component

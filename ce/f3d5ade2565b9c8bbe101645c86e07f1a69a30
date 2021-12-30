@@ -1,0 +1,132 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-06-19T16:50:42Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-06-20T12:54:33Z
+
+Hey!
+
+I think @jschaedl has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2021-06-21T16:11:29Z
+
+what should happen for a string containing both single quoted and double quoted strings but no other character ? Or for string containing single quotes and chars that cannot be kept unescaped in double-quoted strings ? for those 2 cases, the readability argument might still justify keeping single quotes. So maybe it should be implemented differently than putting the single quote in this regex
+
+---------------------------------------------------------------------------
+
+by Ostrzyciel at 2021-06-21T17:01:21Z
+
+> what should happen for a string containing both single quoted and double quoted strings but no other character ? Or for string containing single quotes and chars that cannot be kept unescaped in double-quoted strings ? for those 2 cases, the readability argument might still justify keeping single quotes. So maybe it should be implemented differently than putting the single quote in this regex
+
+That's a valid point. I fiddled a bit with yamllint.com to see how their implementation works and it seems the algorithm for establishing what should be single- and double-quoted is a bit more complex. I don't speak Ruby, so I gave up on reading the code.
+
+(sigh) At this point I'm thinking if just adding a new flag for forcing double-quoting on all strings would be easier. That would certainly make sense for some types of configuration files.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-06-21T17:16:10Z
+
+> I don't speak Ruby, so I gave up on reading the code.
+
+Can you link to that code ? I don't write Ruby, but I'm generally able to read it.
+
+---------------------------------------------------------------------------
+
+by Ostrzyciel at 2021-06-21T17:27:15Z
+
+> Can you link to that code ? I don't write Ruby, but I'm generally able to read it.
+
+I think the source code for yamllint.com is here: https://github.com/gilltots/yamllint
+They use this library for dumping YAML: https://github.com/afunai/ya2yaml
+
+---------------------------------------------------------------------------
+
+by gharlan at 2021-12-19T22:17:35Z
+
+We could change this code:
+https://github.com/symfony/symfony/blob/3d8efd54fdaa1c88c0da68fb5c8b15e892fef759/src/Symfony/Component/Yaml/Inline.php#L177-L183
+
+to:
+```php
+    case Escaper::requiresDoubleQuoting($value):
+        return Escaper::escapeWithDoubleQuotes($value);
+    case Escaper::requiresSingleQuoting($value):
+        $singleQuoted = Escaper::escapeWithSingleQuotes($value);
+
+        if (!str_contains($value, "'") {
+             return $singleQuoted;
+        }
+
+        $doubleQuoted = Escaper::escapeWithDoubleQuotes($value);
+
+        return \strlen($doubleQuoted) < \strlen($singleQuoted) ? $doubleQuoted : $singleQuoted;
+    case Parser::preg_match('{^[0-9]+[_0-9]*$}', $value):
+    case Parser::preg_match(self::getHexRegex(), $value):
+    case Parser::preg_match(self::getTimestampRegex(), $value):
+        return Escaper::escapeWithSingleQuotes($value);
+```
+
+So if the string contains single quotes, the decision is made by resulting length of single quoted vs. double quoted string.
+
+---------------------------------------------------------------------------
+
+by Ostrzyciel at 2021-12-20T08:49:28Z
+
+> So if the string contains single quotes, the decision is made bei resulting length of single quoted vs. double quoted string.
+
+Huh, that's smart. Thanks for the suggestion, I'll try to incorporate this into the code next week :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-27T16:03:51Z
+
+(please rebase to remove the merge commit)
+
+---------------------------------------------------------------------------
+
+by Ostrzyciel at 2021-12-27T16:49:44Z
+
+Yay, I think it works. I did my best trying to clean up git history, with moderate success.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-12-30T08:43:01Z
+
+@Ostrzyciel FYI, I have rebased and squashed the changes on your fork. :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-12-30T08:47:43Z
+
+looks good to me, great work 👍

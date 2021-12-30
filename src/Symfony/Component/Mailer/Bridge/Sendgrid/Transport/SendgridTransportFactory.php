@@ -25,7 +25,8 @@ final class SendgridTransportFactory extends AbstractTransportFactory
     {
         $scheme = $dsn->getScheme();
         $key = $this->getUser($dsn);
-        $port = $dsn->getPort();
+        $port = $dsn->getPort(465);
+        $tls = (bool) $dsn->getOption('verify_peer', true);
 
         if ('sendgrid+api' === $scheme) {
             $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
@@ -34,7 +35,7 @@ final class SendgridTransportFactory extends AbstractTransportFactory
         }
 
         if ('sendgrid+smtp' === $scheme || 'sendgrid+smtps' === $scheme || 'sendgrid' === $scheme) {
-            return new SendgridSmtpTransport($key, $port, $this->dispatcher, $this->logger);
+            return new SendgridSmtpTransport($key, $port, $tls, $this->dispatcher, $this->logger);
         }
 
         throw new UnsupportedSchemeException($dsn, 'sendgrid', $this->getSupportedSchemes());

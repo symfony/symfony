@@ -23,8 +23,11 @@ final class GmailTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
+        $port = $dsn->getPort(465);
+        $secure = $dsn->getOption('verify_peer', true);
+
         if (\in_array($dsn->getScheme(), $this->getSupportedSchemes())) {
-            return new GmailSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $dsn->getPort(465), $this->dispatcher, $this->logger);
+            return new GmailSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $port, $secure, $this->dispatcher, $this->logger);
         }
 
         throw new UnsupportedSchemeException($dsn, 'gmail', $this->getSupportedSchemes());

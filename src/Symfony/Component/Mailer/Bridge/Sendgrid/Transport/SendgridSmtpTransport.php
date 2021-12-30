@@ -20,9 +20,9 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
  */
 class SendgridSmtpTransport extends EsmtpTransport
 {
-    public function __construct(string $key, int $port, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $key, int $port, bool $tls, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        parent::__construct('smtp.sendgrid.net', $port, true, $dispatcher, $logger);
+        parent::__construct('smtp.sendgrid.net', $port, $tls, $dispatcher, $logger);
 
         $this->setUsername('apikey');
         $this->setPassword($key);

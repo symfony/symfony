@@ -20,9 +20,9 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
  */
 class GmailSmtpTransport extends EsmtpTransport
 {
-    public function __construct(string $username, string $password, int $port, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $username, string $password, int $port, bool $tls, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        parent::__construct('smtp.gmail.com', $port, true, $dispatcher, $logger);
+        parent::__construct('smtp.gmail.com', $port, $tls, $dispatcher, $logger);
 
         $this->setUsername($username);
         $this->setPassword($password);

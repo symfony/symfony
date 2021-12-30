@@ -44,6 +44,14 @@ final class Transports implements TransportInterface
         }
     }
 
+    /**
+     * @return TransportInterface[]
+     */
+    public function getTransports(): array
+    {
+        return $this->transports;
+    }
+
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         /** @var Message $message */

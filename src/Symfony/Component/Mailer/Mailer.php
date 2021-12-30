@@ -34,6 +34,11 @@ final class Mailer implements MailerInterface
         $this->dispatcher = $dispatcher;
     }
 
+    public function getTransport(): TransportInterface
+    {
+        return $this->transport;
+    }
+
     public function send(RawMessage $message, Envelope $envelope = null): void
     {
         if (null === $this->bus) {

@@ -1255,7 +1255,14 @@ class Process implements \IteratorAggregate
         static $isTtySupported;
 
         if (null === $isTtySupported) {
-            $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', [['file', '/dev/tty', 'r'], ['file', '/dev/tty', 'w'], ['file', '/dev/tty', 'w']], $pipes);
+            $handle = @proc_open('echo 1 >/dev/null', [['file', '/dev/tty', 'r'], ['file', '/dev/tty', 'w'], ['file', '/dev/tty', 'w']], $pipes);
+            $isTtySupported = (bool) $handle;
+            if (false !== $handle) {
+                fclose($pipes[0]);
+                fclose($pipes[1]);
+                fclose($pipes[2]);
+                proc_close($handle);
+            }
         }
 
         return $isTtySupported;
@@ -1278,7 +1285,16 @@ class Process implements \IteratorAggregate
             return $result = false;
         }
 
-        return $result = (bool) @proc_open('echo 1 >/dev/null', [['pty'], ['pty'], ['pty']], $pipes);
+        $handle = @proc_open('echo 1 >/dev/null', [['pty'], ['pty'], ['pty']], $pipes);
+        $result = (bool) $handle;
+        if (false !== $handle) {
+            fclose($pipes[0]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($handle);
+        }
+
+        return $result;
     }
 
     /**
@@ -1517,8 +1533,12 @@ class Process implements \IteratorAggregate
                 $ok = @proc_terminate($this->process, $signal);
             } elseif (\function_exists('posix_kill')) {
                 $ok = @posix_kill($pid, $signal);
-            } elseif ($ok = proc_open(sprintf('kill -%d %d', $signal, $pid), [2 => ['pipe', 'w']], $pipes)) {
+            } elseif ($handle = proc_open(sprintf('kill -%d %d', $signal, $pid), [2 => ['pipe', 'w']], $pipes)) {
                 $ok = false === fgets($pipes[2]);
+                fclose($pipes[2]);
+                proc_close($handle);
+            } else {
+                $ok = false;
             }
             if (!$ok) {
                 if ($throwException) {

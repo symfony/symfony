@@ -20,11 +20,12 @@ final class Cursor
 {
     private $output;
     private $input;
+    private $inputResource = null;
 
     public function __construct(OutputInterface $output, $input = null)
     {
         $this->output = $output;
-        $this->input = $input ?? (\defined('STDIN') ? \STDIN : fopen('php://input', 'r+'));
+        $this->input = $input ?? (\defined('STDIN') ? \STDIN : $this->inputResource = fopen('php://input', 'r+'));
     }
 
     public function moveUp(int $lines = 1): self
@@ -171,5 +172,12 @@ final class Cursor
         sscanf($code, "\033[%d;%dR", $row, $col);
 
         return [$col, $row];
+    }
+
+    public function __destruct()
+    {
+        if (null !== $this->inputResource) {
+            fclose($this->inputResource);
+        }
     }
 }

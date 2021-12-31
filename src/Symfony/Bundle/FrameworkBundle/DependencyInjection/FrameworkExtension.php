@@ -122,6 +122,7 @@ use Symfony\Component\Notifier\Bridge\Expo\ExpoTransportFactory;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
+use Symfony\Component\Notifier\Bridge\FortySixElks\FortySixElksTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
 use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
@@ -2421,6 +2422,7 @@ class FrameworkExtension extends Extension
             FakeChatTransportFactory::class => 'notifier.transport_factory.fake-chat',
             FakeSmsTransportFactory::class => 'notifier.transport_factory.fake-sms',
             FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
+            FortySixElksTransportFactory::class => 'notifier.transport_factory.forty-six-elks',
             FreeMobileTransportFactory::class => 'notifier.transport_factory.free-mobile',
             GatewayApiTransportFactory::class => 'notifier.transport_factory.gateway-api',
             GitterTransportFactory::class => 'notifier.transport_factory.gitter',

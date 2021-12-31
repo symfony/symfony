@@ -18,6 +18,7 @@ use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Expo\ExpoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
+use Symfony\Component\Notifier\Bridge\FortySixElks\FortySixElksTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
 use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
@@ -72,6 +73,7 @@ final class Transport
         EsendexTransportFactory::class,
         ExpoTransportFactory::class,
         FirebaseTransportFactory::class,
+        FortySixElksTransportFactory::class,
         FreeMobileTransportFactory::class,
         GatewayApiTransportFactory::class,
         GitterTransportFactory::class,

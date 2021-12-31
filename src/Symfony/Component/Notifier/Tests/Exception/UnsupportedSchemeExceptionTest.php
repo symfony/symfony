@@ -21,6 +21,7 @@ use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
+use Symfony\Component\Notifier\Bridge\FortySixElks\FortySixElksTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
 use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
@@ -75,6 +76,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             FakeChatTransportFactory::class => false,
             FakeSmsTransportFactory::class => false,
             FirebaseTransportFactory::class => false,
+            FortySixElksTransportFactory::class => false,
             FreeMobileTransportFactory::class => false,
             GatewayApiTransportFactory::class => false,
             GitterTransportFactory::class => false,

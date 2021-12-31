@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+
+use PHPUnit\Framework\Constraint\LogicalNot;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\PropertyAccess\Tests\Constraint\ObjectHasInitializedProperty;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
@@ -588,6 +591,143 @@ class PropertyAccessorTest extends TestCase
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'date', null);
+    }
+
+    /**
+     * @dataProvider getNullablePropertyData
+     */
+    public function testSetPropertyToNullWithMagicUnsetAllowedWithoutUnsetMethod(string $property, string $setter)
+    {
+        $object = eval(sprintf('return new class() {
+                    private %s;
+                    public function setA(%s) { $this->a = $a; }
+                    public function getA() { return $this->a; }
+                };',
+            $property,
+            $setter
+        ));
+
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_UNSET);
+
+        if (strpos($property, 'int') === 0) {
+            $this->expectException(\TypeError::class);
+            $this->expectErrorMessageMatches('/Cannot assign null to property .*::\$a of type int/');
+            $propertyAccessor->setValue($object, 'a', null);
+        }
+        else {
+            $propertyAccessor->setValue($object, 'a', null);
+            $this->assertNull($propertyAccessor->getValue($object, 'a'));
+        }
+    }
+
+    /**
+     * @dataProvider getNullablePropertyData
+     */
+    public function testSetPropertyToNullWithMagicUnsetAllowed(string $property, string $setter)
+    {
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_UNSET);
+
+        $objectWithPrivate = eval(sprintf('return new class() {
+                    private %s;
+                    public function setA(%s) { $this->a = $a; }
+                    public function getA() { return $this->a; }
+                    public function __unset($name) { unset($this->$name); }
+                };',
+            $property,
+            $setter
+        ));
+
+        $objectWithPublic = eval(sprintf('return new class() {
+                    public %s;
+                };',
+            $property
+        ));
+
+        $propertyAccessor->setValue($objectWithPrivate, 'a', null);
+        $propertyAccessor->setValue($objectWithPublic, 'a', null);
+
+        if (strpos($property, 'int') === 0) {
+            $this->assertThat($objectWithPrivate, new LogicalNot(new ObjectHasInitializedProperty('a')));
+            $this->assertThat($objectWithPublic, new LogicalNot(new ObjectHasInitializedProperty('a')));
+        }
+        else {
+            $this->assertNull($propertyAccessor->getValue($objectWithPrivate, 'a'));
+            $this->assertNull($propertyAccessor->getValue($objectWithPublic, 'a'));
+        }
+    }
+
+    /**
+     * @dataProvider getNullablePropertyData
+     */
+    public function testSetPrivatePropertyToNullWithoutMagicUnsetAllowed(string $property, string $setter)
+    {
+        $object = eval(sprintf('return new class() {
+                    private %s;
+                    public function setA(%s) { $this->a = $a; }
+                    public function getA() { return $this->a; }
+                };',
+            $property,
+            $setter
+        ));
+
+        if (strpos($setter, 'int') === 0) {
+            $this->expectException(\TypeError::class);
+            $this->expectErrorMessageMatches('/Argument #1 \(\$a\) must be of type int, null given/');
+            $this->propertyAccessor->setValue($object, 'a', null);
+        }
+        elseif (strpos($property, 'int') === 0) {
+            $this->expectException(\TypeError::class);
+            $this->expectErrorMessageMatches('/Cannot assign null to property .*::\$a of type int/');
+            $this->propertyAccessor->setValue($object, 'a', null);
+        }
+        else {
+            $this->propertyAccessor->setValue($object, 'a', null);
+            $this->assertNull($this->propertyAccessor->getValue($object, 'a'));
+        }
+    }
+
+    /**
+     * @dataProvider getNullablePropertyData
+     */
+    public function testSetPublicPropertyToNullWithoutMagicUnsetAllowed(string $property, string $setter)
+    {
+        $object = eval(sprintf('return new class() {
+                    public %s;
+                };',
+            $property
+        ));
+
+        if (strpos($property, 'int') === 0) {
+            $this->expectException(\TypeError::class);
+            $this->expectErrorMessageMatches('/Cannot assign null to property .*::\$a of type int/');
+            $this->propertyAccessor->setValue($object, 'a', null);
+        }
+        else {
+            $this->propertyAccessor->setValue($object, 'a', null);
+            $this->assertNull($this->propertyAccessor->getValue($object, 'a'));
+        }
+    }
+
+    public function getNullablePropertyData()
+    {
+        return [
+            'typed property' => ['int $a', '$a'],
+            'nullable setter, typed property' => ['int $a', '?int $a'],
+            'typed property, default value' => ['int $a = 1', '$a'],
+            'nullable setter, typed property, default value' => ['int $a = 1', '?int $a'],
+            'no types' => ['$a', '$a'],
+            'typed setter' => ['$a', 'int $a'],
+            'nullable property' => ['?int $a', '$a'],
+            'nullable setter' => ['$a', '?int $a'],
+            'nullable property, typed setter' => ['?int $a', 'int $a'],
+            'nullable property, nullable setter' => ['?int $a', '?int $a'],
+            'no types, default value' => ['$a = 1', '$a'],
+            'typed setter, default value' => ['$a = 1', 'int $a'],
+            'nullable property, default value' => ['?int $a = 1', '$a'],
+            'nullable setter, default value' => ['$a = 1', '?int $a'],
+            'nullable property, typed setter, default value' => ['?int $a = 1', 'int $a'],
+            'nullable property, nullable setter, default value' => ['?int $a = 1', '?int $a'],
+        ];
     }
 
     public function testSetTypeHint()

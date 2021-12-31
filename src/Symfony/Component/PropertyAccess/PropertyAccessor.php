@@ -24,6 +24,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyNullableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
@@ -44,6 +45,8 @@ class PropertyAccessor implements PropertyAccessorInterface
     public const MAGIC_GET = ReflectionExtractor::ALLOW_MAGIC_GET;
     /** @var int Allow magic __set methods */
     public const MAGIC_SET = ReflectionExtractor::ALLOW_MAGIC_SET;
+    /** @var int Allow magic __set methods */
+    public const MAGIC_UNSET = ReflectionExtractor::ALLOW_MAGIC_UNSET;
     /** @var int Allow magic __call methods */
     public const MAGIC_CALL = ReflectionExtractor::ALLOW_MAGIC_CALL;
 
@@ -57,6 +60,13 @@ class PropertyAccessor implements PropertyAccessorInterface
     private const CACHE_PREFIX_READ = 'r';
     private const CACHE_PREFIX_WRITE = 'w';
     private const CACHE_PREFIX_PROPERTY_PATH = 'p';
+
+    private const RESET_WITH_NOTHING = 0;
+    private const RESET_WITH_UNSET = 1;
+    private const RESET_WITH_NULL = 2;
+
+    private const PROPERTY_NULLABLE = ReflectionExtractor::PROPERTY_NULLABLE;
+    private const SETTER_NULLABLE = ReflectionExtractor::SETTER_NULLABLE;
 
     private $magicMethodsFlags;
     private $ignoreInvalidIndices;
@@ -516,12 +526,14 @@ class PropertyAccessor implements PropertyAccessorInterface
         if (PropertyWriteInfo::TYPE_NONE !== $mutator->getType()) {
             $type = $mutator->getType();
 
-            if (PropertyWriteInfo::TYPE_METHOD === $type) {
-                $object->{$mutator->getName()}($value);
-            } elseif (PropertyWriteInfo::TYPE_PROPERTY === $type) {
-                $object->{$mutator->getName()} = $value;
-            } elseif (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $type) {
-                $this->writeCollection($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
+            if (!(null === $value && $this->resetProperty($object, $property, $type))) {
+                if (PropertyWriteInfo::TYPE_METHOD === $type) {
+                    $object->{$mutator->getName()}($value);
+                } elseif (PropertyWriteInfo::TYPE_PROPERTY === $type) {
+                    $object->{$mutator->getName()} = $value;
+                } elseif (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $type) {
+                    $this->writeCollection($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
+                }
             }
         } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
             $object->$property = $value;
@@ -532,6 +544,73 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, get_debug_type($object)));
         }
+    }
+
+    private function resetProperty(object $object, string $property, string $type): bool
+    {
+        switch ($this->getResetMode($object::class, $property, $type)) {
+            case self::RESET_WITH_NULL:
+                try {
+                    $propertyRefl = new \ReflectionProperty($object::class, $property);
+                    $propertyRefl->setAccessible(true);
+                    $propertyRefl->setValue($object, null);
+                }
+                catch (\ReflectionException $e) {
+                    return false;
+                }
+                break;
+            case self::RESET_WITH_UNSET:
+                unset($object->$property);
+                break;
+            default:
+                return false;
+        }
+
+        return true;
+    }
+
+    private function getResetMode(string $class, string $property, string $type): int
+    {
+        if (false === (bool) ($this->magicMethodsFlags & self::MAGIC_UNSET)) {
+            return self::RESET_WITH_NOTHING;
+        }
+
+        switch ($type) {
+            case PropertyWriteInfo::TYPE_METHOD:
+            case PropertyWriteInfo::TYPE_PROPERTY:
+                // intentionally blank
+                break;
+            default:
+                return self::RESET_WITH_NOTHING;
+        }
+
+        if (!$this->writeInfoExtractor instanceof PropertyNullableExtractorInterface) {
+            return self::RESET_WITH_NOTHING;
+        }
+
+        $nullableInfo = $this->writeInfoExtractor->getNullableInfo($class, $property);
+
+        // property & setter nullable
+        if ($nullableInfo === (self::PROPERTY_NULLABLE | self::SETTER_NULLABLE)) {
+            return self::RESET_WITH_NOTHING;
+        }
+
+        // property nullable & setter not nullable
+        if (true === (bool) ($nullableInfo & self::PROPERTY_NULLABLE)) {
+            return self::RESET_WITH_NULL;
+        }
+
+        if (PropertyWriteInfo::TYPE_METHOD === $type) {
+            try {
+                if (false === (new \ReflectionClass($class))->hasMethod('__unset')) {
+                    return self::RESET_WITH_NOTHING;
+                }
+            } catch (\ReflectionException $e) {
+                return self::RESET_WITH_NOTHING;
+            }
+        }
+
+        return self::RESET_WITH_UNSET;
     }
 
     /**

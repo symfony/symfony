@@ -707,6 +707,17 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame(2, $obj->getInners()[1]->foo);
     }
 
+    public function testDenomalizeRecursiveWithObjectAttributeWithStringValue()
+    {
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+
+        $this->expectException(UnexpectedValueException::class);
+
+        $serializer->denormalize(['inner' => 'foo'], ObjectOuter::class);
+    }
+
     public function testAcceptJsonNumber()
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);

@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
+namespace Symfony\Component\Notifier\Bridge\OrangeSms\Tests;
 
-use Symfony\Component\Notifier\Bridge\Esendex\OrangeSmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 

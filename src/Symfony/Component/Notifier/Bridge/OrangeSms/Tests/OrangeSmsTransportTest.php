@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
+namespace Symfony\Component\Notifier\Bridge\OrangeSms\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\Notifier\Bridge\Esendex\OrangeSmsTransport;
+use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;

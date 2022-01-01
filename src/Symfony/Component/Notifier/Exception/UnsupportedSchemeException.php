@@ -124,6 +124,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\OneSignal\OneSignalTransportFactory::class,
             'package' => 'symfony/one-signal-notifier',
         ],
+        'orangesms' => [
+            'class' => Bridge\OrangeSms\OrangeSmsTransportFactory::class,
+            'package' => 'symfony/orange-sms-notifier',
+        ],
         'ovhcloud' => [
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovh-cloud-notifier',

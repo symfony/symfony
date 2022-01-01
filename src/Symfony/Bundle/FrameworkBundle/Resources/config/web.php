@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
@@ -43,6 +44,11 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('argument_metadata_factory'),
                 abstract_arg('argument value resolvers'),
+            ])
+
+        ->set('argument_resolver.backed_enum_resolver', BackedEnumValueResolver::class)
+            ->tag('controller.argument_value_resolver', [
+                'priority' => 105, // prior to the RequestAttributeValueResolver
             ])
 
         ->set('argument_resolver.request_attribute', RequestAttributeValueResolver::class)

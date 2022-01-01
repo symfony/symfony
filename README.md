@@ -13,6 +13,7 @@ Installation
 * Symfony follows the [semantic versioning][5] strictly, publishes "Long Term
   Support" (LTS) versions and has a [release process][6] that is predictable and
   business-friendly.
+* Or Run without installation [![TeamCode try-it-now](https://static01.teamcode.com/badge/teamcode-badge-run-in-cloud-en.svg)](https://www.teamcode.com/tin/clone?applicationId=275260578471518208)
 
 Sponsor
 -------

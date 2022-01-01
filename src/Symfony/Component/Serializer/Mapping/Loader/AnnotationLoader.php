@@ -157,7 +157,21 @@ class AnnotationLoader implements LoaderInterface
     {
         foreach ($reflector->getAttributes() as $attribute) {
             if ($this->isKnownAttribute($attribute->getName())) {
-                yield $attribute->newInstance();
+                try {
+                    yield $attribute->newInstance();
+                } catch (\Error $e) {
+                    if ($e::class !== \Error::class) {
+                        throw $e;
+                    }
+                    $on = match (true) {
+                        $reflector instanceof \ReflectionClass => ' on class '.$reflector->name,
+                        $reflector instanceof \ReflectionMethod => sprintf(' on "%s::%s()"', $reflector->getDeclaringClass()->name, $reflector->name),
+                        $reflector instanceof \ReflectionProperty => sprintf(' on "%s::$%s"', $reflector->getDeclaringClass()->name, $reflector->name),
+                        default => '',
+                    };
+
+                    throw new MappingException(sprintf('Could not instantiate attribute "%s"%s.', $attribute->getName(), $on), 0, $e);
+                }
             }
         }
 

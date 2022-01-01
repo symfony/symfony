@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\Notifier\Bridge\OrangeSms;
 
-use Symfony\Component\Notifier\Exception\LogicException;
-use Symfony\Component\Notifier\Exception\TransportException;
-use Symfony\Component\Notifier\Message\MessageInterface;
-use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Transport\AbstractTransport;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Transport\AbstractTransport;
+use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 
 final class OrangeSmsTransport extends AbstractTransport
 {
@@ -47,7 +48,7 @@ final class OrangeSmsTransport extends AbstractTransport
     public function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $url = 'https://'.$this->getEndpoint().'/smsmessaging/v1/outbound/'.urlencode('tel:'.$this->from).'/requests';

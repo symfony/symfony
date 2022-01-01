@@ -22,7 +22,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class OrangeSmsTransport extends AbstractTransport
 {
-    protected const HOST = 'https://api.orange.com';
+    protected const HOST = 'api.orange.com';
 
     private $clientID;
     private $clientSecret;
@@ -50,8 +50,8 @@ final class OrangeSmsTransport extends AbstractTransport
         if (!$message instanceof SmsMessage) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
         }
-        
-        $url = $this->getEndpoint() . '/smsmessaging/v1/outbound/' . urlencode('tel:' . $this->from) . '/requests';
+
+        $url = 'https://' . $this->getEndpoint() . '/smsmessaging/v1/outbound/' . urlencode('tel:' . $this->from) . '/requests';
         $headers = [
             'Authorization' =>  'Bearer ' . $this->getAccessToken(),
             'Content-Type'  =>  'application/json'
@@ -106,7 +106,7 @@ final class OrangeSmsTransport extends AbstractTransport
         if (200 !== $response->getStatusCode()) {
             throw new TransportException('Get Access Token Failled', $response);
         }
-        
+
         return $response->toArray()['access_token'];
     }
 

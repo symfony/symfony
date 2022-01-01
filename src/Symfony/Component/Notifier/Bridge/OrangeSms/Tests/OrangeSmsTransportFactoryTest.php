@@ -42,8 +42,8 @@ final class OrangeSmsTransportFactoryTest extends TransportFactoryTestCase
     public function incompleteDsnProvider(): iterable
     {
         yield 'missing credentials' => ['orangesms://default?from=FROM&sender_name=SENDER_NAME'];
-        yield 'missing Client ID' => ['orangesms://:CLIENT_SECRET@default?from=FROM&sender_name=SENDER_NAME'];
-        yield 'missing client Secret' => ['orangesms://CLIENT_ID:@default?from=FROM&sender_name=SENDER_NAME'];
+        yield 'missing CLIENT_ID' => ['orangesms://:CLIENT_SECRET@default?from=FROM&sender_name=SENDER_NAME'];
+        yield 'missing CLIENT_SECRET' => ['orangesms://CLIENT_ID:@default?from=FROM&sender_name=SENDER_NAME'];
     }
 
     public function missingRequiredOptionProvider(): iterable

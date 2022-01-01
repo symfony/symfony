@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Notifier\Bridge\OrangeSms;
 
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
+use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
+use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 
 final class OrangeSmsTransportFactory extends AbstractTransportFactory
 {
@@ -34,7 +34,7 @@ final class OrangeSmsTransportFactory extends AbstractTransportFactory
         $password = $this->getPassword($dsn);
         $from = $dsn->getOption('from');
         $senderName = $dsn->getOption('senderName');
-        
+
         if (!$from) {
             throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
         }

@@ -373,4 +373,13 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $this->assertNotEmpty($traceInfo['debug']);
     }
+
+    public function testNegativeTimeout()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->assertSame(200, $client->request('GET', 'http://localhost:8057', [
+            'timeout' => -1,
+        ])->getStatusCode());
+    }
 }

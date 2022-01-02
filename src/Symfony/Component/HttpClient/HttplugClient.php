@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient;
 
 use GuzzleHttp\Promise\Promise as GuzzlePromise;
 use GuzzleHttp\Promise\RejectedPromise;
+use GuzzleHttp\Promise\Utils;
 use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;
 use Http\Client\HttpAsyncClient;
@@ -69,7 +70,7 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         $this->client = $client ?? HttpClient::create();
         $this->responseFactory = $responseFactory;
         $this->streamFactory = $streamFactory ?? ($responseFactory instanceof StreamFactoryInterface ? $responseFactory : null);
-        $this->promisePool = \function_exists('GuzzleHttp\Promise\queue') ? new \SplObjectStorage() : null;
+        $this->promisePool = class_exists(Utils::class) ? new \SplObjectStorage() : null;
 
         if (null === $this->responseFactory || null === $this->streamFactory) {
             if (!class_exists(Psr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {

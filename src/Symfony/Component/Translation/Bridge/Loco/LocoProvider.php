@@ -79,9 +79,14 @@ final class LocoProvider implements ProviderInterface
                     $keysIdsMap[$this->retrieveKeyFromId($id, $domain)] = $id;
                 }
 
-                $ids = array_intersect_key($keysIdsMap, $messages);
+                $assets = [];
+                foreach ($keysIdsMap as $key => $id) {
+                    if (isset($messages[$key])) {
+                        $assets[$id] = $messages[$key];
+                    }
+                }
 
-                $this->translateAssets(array_combine(array_values($ids), array_values($messages)), $locale);
+                $this->translateAssets($assets, $locale);
             }
         }
     }

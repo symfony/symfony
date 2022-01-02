@@ -15,7 +15,7 @@ Additionally (see https://symfony.com/releases):
  - Always add tests and ensure they pass.
  - Bug fixes must be submitted against the lowest maintained branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too.)
- - Features and deprecations must be submitted against branch 5.x.
+ - Features and deprecations must be submitted against the latest branch.
  - Changelog entry should follow https://symfony.com/doc/current/contributing/code/conventions.html#writing-a-changelog-entry
  - Never break backward compatibility (see https://symfony.com/bc).
 -->

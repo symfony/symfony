@@ -32,12 +32,8 @@ final class OrangeSmsTransportFactory extends AbstractTransportFactory
 
         $user = $this->getUser($dsn);
         $password = $this->getPassword($dsn);
-        $from = $dsn->getOption('from');
+        $from = $dsn->getRequiredOption('from');
         $senderName = $dsn->getOption('sender_name');
-
-        if (!$from) {
-            throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
-        }
 
         return new OrangeSmsTransport($user, $password, $from, $senderName, $this->client, $this->dispatcher);
     }

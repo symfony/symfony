@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-5.4.0
+6.1
 -----
 
- * Added the bridge
+ * Add the bridge

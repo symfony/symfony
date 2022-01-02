@@ -11,24 +11,23 @@
 
 namespace Symfony\Component\Notifier\Bridge\OrangeSms;
 
-use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Message\SentMessage;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\Notifier\Exception\LogicException;
-use Symfony\Component\Notifier\Message\MessageInterface;
-use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
+use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Transport\AbstractTransport;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class OrangeSmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.orange.com';
 
-    private $clientID;
-    private $clientSecret;
-    private $from;
-    private $senderName;
+    private string $clientID;
+    private string $clientSecret;
+    private string $from;
+    private string $senderName;
 
     public function __construct(string $clientID, string $clientSecret, string $from, ?string $senderName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -112,6 +111,6 @@ final class OrangeSmsTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('orangesms://%s?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('orangesms://%s?from=%s&sender_name=%s', $this->getEndpoint(), $this->from, $this->senderName);
     }
 }

@@ -29,7 +29,7 @@ class LdapUserProviderTest extends TestCase
 {
     public function testLoadUserByUsernameFailsIfCantConnectToLdap()
     {
-        $this->expectException(UserNotFoundException::class);
+        $this->expectException(ConnectionException::class);
 
         $ldap = $this->createMock(LdapInterface::class);
         $ldap

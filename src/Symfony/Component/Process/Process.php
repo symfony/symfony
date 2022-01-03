@@ -398,6 +398,7 @@ class Process implements \IteratorAggregate
      * It allows to have feedback from the independent process during execution.
      *
      * @param callable|null $callback A valid PHP callback
+     * @param callable|null $waitingCallback A valid PHP callback triggered while waiting
      *
      * @return int The exitcode of the process
      *
@@ -405,7 +406,7 @@ class Process implements \IteratorAggregate
      * @throws ProcessSignaledException When process stopped after receiving signal
      * @throws LogicException           When process is not yet started
      */
-    public function wait(callable $callback = null): int
+    public function wait(callable $callback = null, callable $waitingCallback): int
     {
         $this->requireProcessIsStarted(__FUNCTION__);
 
@@ -420,6 +421,7 @@ class Process implements \IteratorAggregate
         }
 
         do {
+            $waitingCallback($this);
             $this->checkTimeout();
             $running = '\\' === \DIRECTORY_SEPARATOR ? $this->isRunning() : $this->processPipes->areOpen();
             $this->readPipes($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);

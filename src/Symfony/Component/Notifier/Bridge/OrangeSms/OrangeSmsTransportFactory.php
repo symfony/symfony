@@ -33,8 +33,10 @@ final class OrangeSmsTransportFactory extends AbstractTransportFactory
         $password = $this->getPassword($dsn);
         $from = $dsn->getRequiredOption('from');
         $senderName = $dsn->getOption('sender_name');
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
 
-        return new OrangeSmsTransport($user, $password, $from, $senderName, $this->client, $this->dispatcher);
+        return (new OrangeSmsTransport($user, $password, $from, $senderName, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

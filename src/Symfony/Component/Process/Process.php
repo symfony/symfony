@@ -406,7 +406,7 @@ class Process implements \IteratorAggregate
      * @throws ProcessSignaledException When process stopped after receiving signal
      * @throws LogicException           When process is not yet started
      */
-    public function wait(callable $callback = null, callable $waitingCallback): int
+    public function wait(callable $callback = null, callable $waitingCallback = null): int
     {
         $this->requireProcessIsStarted(__FUNCTION__);
 

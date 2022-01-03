@@ -1535,6 +1535,16 @@ class ProcessTest extends TestCase
         }
     }
 
+    public function testProcessWaitingCallback()
+    {
+        $p = Process::fromShellCommandline('ls');
+        $p->wait(null,
+            function () {
+            }
+        );
+        $this->assertEquals(true, false);
+    }
+
     /**
      * @param string|array $commandline
      * @param mixed        $input

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1.0
+-----
+
+* Add the possibility to add a callback while waiting for the process to finish. This allows to add Logging or other actions.
+
 5.2.0
 -----
 

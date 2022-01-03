@@ -82,7 +82,7 @@ jobs:
                 echo "Verifying new package"
                 _correct_license_file $DIR/LICENSE || localExit=1
 
-                if [ $TYPE == 'component_bridge' ]; then
+                if [ $TYPE != 'component_bridge' ]; then
                   if [ ! $(cat composer.json | jq -e ".replace.\"$NAME\"|test(\"self.version\")") ]; then
                     echo "Composer.json's replace section needs to contain $NAME"
                     localExit=1

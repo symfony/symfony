@@ -95,7 +95,7 @@ final class OrangeSmsTransport extends AbstractTransport
         return new SentMessage($message, (string) $this);
     }
 
-    public function getAccessToken()
+    public function getAccessToken(): string
     {
         $url = 'https://'.$this->getEndpoint().'/oauth/v3/token';
         $credentials = $this->clientID.':'.$this->clientSecret;

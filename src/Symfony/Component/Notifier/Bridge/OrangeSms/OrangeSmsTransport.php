@@ -111,6 +111,10 @@ final class OrangeSmsTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('orangesms://%s?from=%s&sender_name=%s', $this->getEndpoint(), $this->from, $this->senderName);
+        if (null !== $this->senderName) {
+            return sprintf('orangesms://%s?from=%s&sender_name=%s', $this->getEndpoint(), $this->from, $this->senderName);
+        }
+
+        return sprintf('orangesms://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 }

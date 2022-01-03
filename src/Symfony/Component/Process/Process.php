@@ -397,7 +397,7 @@ class Process implements \IteratorAggregate
      * from the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
      *
-     * @param callable|null $callback A valid PHP callback
+     * @param callable|null $callback        A valid PHP callback
      * @param callable|null $waitingCallback A valid PHP callback triggered while waiting
      *
      * @return int The exitcode of the process

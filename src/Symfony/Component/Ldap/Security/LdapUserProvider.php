@@ -12,7 +12,6 @@
 namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Exception\ExceptionInterface;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
@@ -74,17 +73,10 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        try {
-            $this->ldap->bind($this->searchDn, $this->searchPassword);
-            $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
-            $query = str_replace(['{username}', '{user_identifier}'], $identifier, $this->defaultSearch);
-            $search = $this->ldap->query($this->baseDn, $query);
-        } catch (ConnectionException $e) {
-            $e = new UserNotFoundException(sprintf('User "%s" not found.', $identifier), 0, $e);
-            $e->setUserIdentifier($identifier);
-
-            throw $e;
-        }
+        $this->ldap->bind($this->searchDn, $this->searchPassword);
+        $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
+        $query = str_replace(['{username}', '{user_identifier}'], $identifier, $this->defaultSearch);
+        $search = $this->ldap->query($this->baseDn, $query);
 
         $entries = $search->execute();
         $count = \count($entries);

@@ -713,9 +713,9 @@ class ObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
         $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
 
-        $this->expectException(UnexpectedValueException::class);
+        $obj = $serializer->denormalize(['inner' => 'foo'], ObjectOuter::class);
 
-        $serializer->denormalize(['inner' => 'foo'], ObjectOuter::class);
+        self::assertInstanceOf(ObjectInner::class, $obj->getInner());
     }
 
     public function testAcceptJsonNumber()

@@ -13,7 +13,7 @@ namespace Symfony\Component\Ldap\Security;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\LogicException;
@@ -99,7 +99,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
             }
 
             $ldap->bind($dn, $presentedPassword);
-        } catch (ConnectionException $e) {
+        } catch (InvalidCredentialsException $e) {
             throw new BadCredentialsException('The presented password is invalid.');
         }
 

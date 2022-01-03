@@ -1537,12 +1537,14 @@ class ProcessTest extends TestCase
 
     public function testProcessWaitingCallback()
     {
-        $p = Process::fromShellCommandline('ls');
+        $p =  $this->getProcessForCode('usleep(3000000);');
+        $callCounter = 0;
         $p->wait(null,
-            function () {
+            function ($type, $buffer) use (&$callCounter) {
+                $callCounter++;
             }
         );
-        $this->assertEquals(true, false);
+        $this->assertSame(2, $callCounter, 'The callback should be executed while waiting');
     }
 
     /**

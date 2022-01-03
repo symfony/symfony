@@ -39,6 +39,15 @@ final class OrangeSmsTransport extends AbstractTransport
         parent::__construct($client, $dispatcher);
     }
 
+    public function __toString(): string
+    {
+        if (null !== $this->senderName) {
+            return sprintf('orangesms://%s?from=%s&sender_name=%s', $this->getEndpoint(), $this->from, $this->senderName);
+        }
+
+        return sprintf('orangesms://%s?from=%s', $this->getEndpoint(), $this->from);
+    }
+
     public function supports(MessageInterface $message): bool
     {
         return $message instanceof SmsMessage;
@@ -107,14 +116,5 @@ final class OrangeSmsTransport extends AbstractTransport
         }
 
         return $response->toArray()['access_token'];
-    }
-
-    public function __toString(): string
-    {
-        if (null !== $this->senderName) {
-            return sprintf('orangesms://%s?from=%s&sender_name=%s', $this->getEndpoint(), $this->from, $this->senderName);
-        }
-
-        return sprintf('orangesms://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 }

@@ -28,8 +28,8 @@ final class OrangeSmsTransportFactoryTest extends TransportFactoryTestCase
     public function createProvider(): iterable
     {
         yield [
-            'orangesms://default?from=FROM&sender_name=SENDER_NAME',
-            'orangesms://CLIENT_ID:CLIENT_SECRET@default?from=FROM&sender_name=SENDER_NAME',
+            'orangesms://host.test?from=FROM&sender_name=SENDER_NAME',
+            'orangesms://CLIENT_ID:CLIENT_SECRET@host.test?from=FROM&sender_name=SENDER_NAME',
         ];
     }
 

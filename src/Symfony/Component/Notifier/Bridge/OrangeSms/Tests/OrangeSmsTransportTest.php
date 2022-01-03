@@ -26,12 +26,12 @@ final class OrangeSmsTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new OrangeSmsTransport('CLIENT_ID', 'CLIENT_SECRET', 'FROM', 'SENDER_NAME', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('default');
+        return (new OrangeSmsTransport('CLIENT_ID', 'CLIENT_SECRET', 'FROM', 'SENDER_NAME', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
     {
-        yield ['orangesms://default?from=FROM&sender_name=SENDER_NAME', $this->createTransport()];
+        yield ['orangesms://host.test?from=FROM&sender_name=SENDER_NAME', $this->createTransport()];
     }
 
     public function supportedMessagesProvider(): iterable

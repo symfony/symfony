@@ -29,7 +29,7 @@ final class OrangeSmsTransport extends AbstractTransport
     private string $from;
     private ?string $senderName;
 
-    public function __construct(string $clientID, string $clientSecret, string $from, ?string $senderName = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $clientID, string $clientSecret, string $from, string $senderName = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->clientID = $clientID;
         $this->clientSecret = $clientSecret;
@@ -89,7 +89,7 @@ final class OrangeSmsTransport extends AbstractTransport
             $errorMessage = $content['requestError']['serviceException']['messageId'] ?? '';
             $errorInfo = $content['requestError']['serviceException']['text'] ?? '';
 
-            throw new TransportException(sprintf('Unable to send the SMS: %s (%s).', $errorMessage, $errorInfo), $response);
+            throw new TransportException(sprintf('Unable to send the SMS: "%s" (%s).', $errorMessage, $errorInfo), $response);
         }
 
         return new SentMessage($message, (string) $this);

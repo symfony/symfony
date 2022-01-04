@@ -1545,7 +1545,7 @@ class ProcessTest extends TestCase
                 ++$callCounter;
             }
         );
-        $this->assertSame(2, $callCounter, 'The callback should be executed while waiting');
+        $this->assertGreaterThanOrEqual(2, $callCounter, 'The callback should be executed while waiting');
     }
 
     /**

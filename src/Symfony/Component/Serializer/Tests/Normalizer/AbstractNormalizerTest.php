@@ -5,6 +5,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
@@ -216,5 +217,16 @@ class AbstractNormalizerTest extends TestCase
         $normalizer = new PropertyNormalizer($this->classMetadata);
 
         $this->assertSame([], $normalizer->normalize($dummy));
+    }
+
+    public function testDenormalizeRecursiveWithObjectAttributeWithStringValue()
+    {
+        $extractor = new ReflectionExtractor();
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([$normalizer]);
+
+        $obj = $serializer->denormalize(['inner' => 'foo'], ObjectOuter::class);
+
+        $this->assertInstanceOf(ObjectInner::class, $obj->getInner());
     }
 }

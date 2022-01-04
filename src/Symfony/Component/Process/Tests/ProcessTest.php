@@ -1540,7 +1540,8 @@ class ProcessTest extends TestCase
         $p = $this->getProcessForCode('usleep(3000000);');
         $callCounter = 0;
         $p->wait(null,
-            function ($type, $buffer) use (&$callCounter) {
+            function ($process) use (&$callCounter) {
+                $this->assertInstanceOf(Process::class,$process);
                 ++$callCounter;
             }
         );

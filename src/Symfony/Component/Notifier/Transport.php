@@ -31,6 +31,7 @@ use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
+use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
@@ -84,6 +85,7 @@ final class Transport
         MicrosoftTeamsTransportFactory::class,
         MobytTransportFactory::class,
         OctopushTransportFactory::class,
+        OrangeSmsTransportFactory::class,
         OvhCloudTransportFactory::class,
         RocketChatTransportFactory::class,
         SendinblueTransportFactory::class,

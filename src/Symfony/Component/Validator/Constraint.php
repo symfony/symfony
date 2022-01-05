@@ -233,6 +233,10 @@ abstract class Constraint
      */
     public function addImplicitGroupName(string $group)
     {
+        if (null === $this->groups && \array_key_exists('groups', (array) $this)) {
+            throw new \LogicException(sprintf('"%s::$groups" is set to null. Did you forget to call "%s::__construct()"?', static::class, self::class));
+        }
+
         if (\in_array(self::DEFAULT_GROUP, $this->groups) && !\in_array($group, $this->groups)) {
             $this->groups[] = $group;
         }

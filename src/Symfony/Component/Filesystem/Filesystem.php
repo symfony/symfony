@@ -519,7 +519,7 @@ class Filesystem
 
         // Iterate in destination folder to remove obsolete entries
         if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
-            $deleteIterator = 4 < \func_num_args() ? func_get_arg(4) : $iterator;
+            $deleteIterator = (4 < \func_num_args() ? func_get_arg(4) : null) ?? $iterator;
             if (null === $deleteIterator) {
                 $flags = \FilesystemIterator::SKIP_DOTS;
                 $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST);

@@ -187,6 +187,15 @@
                                                     <div class="tab">
                                                         <h3 class="tab-title">Attachment #{{ loop.index }}</h3>
                                                         <div class="tab-content">
+                                                            <p>
+                                                                <a href="data:{{ attachment.contentType|default('application/octet-stream') }};base64,{{ collector.base64Encode(attachment.body) }}" download="{{ attachment.filename|default('attachment') }}">
+                                                                    {% if attachment.filename|default %}
+                                                                        {{ attachment.filename }}
+                                                                    {% else %}
+                                                                        <em>(no filename)</em>
+                                                                    {% endif %}
+                                                                </a>
+                                                            </p>
                                                             <pre class="prewrap" style="max-height: 600px">{{ attachment.toString() }}</pre>
                                                         </div>
                                                     </div>

@@ -1252,6 +1252,33 @@ class FilesystemTest extends FilesystemTestCase
         self::assertFileDoesNotExist($targetFile2);
     }
 
+    public function testMirrorOriginAndTargetIterator()
+    {
+        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
+        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+        $sourceFile1 = $sourcePath.'file1';
+        $sourceFile2 = $sourcePath.'file2';
+        $targetFile1 = $targetPath.'file1';
+        $targetFile2 = $targetPath.'file2';
+
+        mkdir($sourcePath);
+        mkdir($targetPath);
+        file_put_contents($sourceFile1, 'FILE1');
+        file_put_contents($targetFile1, 'FILE1');
+        file_put_contents($targetFile2, 'FILE2');
+
+        $originIterator = Finder::create();
+        $originIterator->files()->in($sourcePath)->name('file1');
+
+        $targetIterator = Finder::create();
+        $targetIterator->files()->in($targetPath)->name('file2');
+
+        $this->filesystem->mirror($sourcePath, $targetPath, $originIterator, ['delete' => true], $targetIterator);
+
+        self::assertFileExists($targetFile1);
+        self::assertFileDoesNotExist($targetFile2);
+    }
+
     public function testMirrorCopiesFilesAndDirectoriesRecursively()
     {
         $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;

@@ -20,45 +20,49 @@ use Symfony\Component\Form\FormEvent;
 
 class FixUrlProtocolListenerTest extends TestCase
 {
-    public function testFixHttpUrl()
-    {
-        $data = 'www.symfony.com';
-        $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
-        $event = new FormEvent($form, $data);
-
-        $filter = new FixUrlProtocolListener('http');
-        $filter->onSubmit($event);
-
-        $this->assertEquals('http://www.symfony.com', $event->getData());
-    }
-
-    public function testSkipKnownUrl()
-    {
-        $data = 'http://www.symfony.com';
-        $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
-        $event = new FormEvent($form, $data);
-
-        $filter = new FixUrlProtocolListener('http');
-        $filter->onSubmit($event);
-
-        $this->assertEquals('http://www.symfony.com', $event->getData());
-    }
-
-    public function provideUrlsWithSupportedProtocols()
+    public function provideUrlToFix()
     {
         return [
-            ['ftp://www.symfony.com'],
-            ['chrome-extension://foo'],
-            ['h323://foo'],
-            ['iris.beep://foo'],
-            ['foo+bar://foo'],
+            ['www.symfony.com'],
+            ['twitter.com/@symfony'],
+            ['symfony.com?foo@bar'],
+            ['symfony.com#foo@bar'],
+            ['localhost'],
         ];
     }
 
     /**
-     * @dataProvider provideUrlsWithSupportedProtocols
+     * @dataProvider provideUrlToFix
      */
-    public function testSkipOtherProtocol($url)
+    public function testFixUrl($data)
+    {
+        $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
+        $event = new FormEvent($form, $data);
+
+        $filter = new FixUrlProtocolListener('http');
+        $filter->onSubmit($event);
+
+        $this->assertEquals('http://'.$data, $event->getData());
+    }
+
+    public function provideUrlToSkip()
+    {
+        return [
+            ['http://www.symfony.com'],
+            ['ftp://www.symfony.com'],
+            ['https://twitter.com/@symfony'],
+            ['chrome-extension://foo'],
+            ['h323://foo'],
+            ['iris.beep://foo'],
+            ['foo+bar://foo'],
+            ['fabien@symfony.com'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideUrlToSkip
+     */
+    public function testSkipUrl($url)
     {
         $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
         $event = new FormEvent($form, $url);

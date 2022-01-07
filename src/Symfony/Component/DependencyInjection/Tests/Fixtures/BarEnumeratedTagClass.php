@@ -11,17 +11,15 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-class FooEnumeratedTagClass
+class BarEnumeratedTagClass
 {
     public static function getDefaultFooName()
     {
-        return FooBackedEnum::FOO;
+        return FooBackedEnum::BAR;
     }
 
     public static function getPriority(): int
     {
-        // Should be more than BarTagClass. More because this class is after
-        // BarTagClass (order by name). So we want to ensure it will be before it
-        return 20;
+        return 0;
     }
 }

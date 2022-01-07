@@ -13,5 +13,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 enum FooBackedEnum: string
 {
+    case FOO = 'foo';
     case BAR = 'bar';
 }

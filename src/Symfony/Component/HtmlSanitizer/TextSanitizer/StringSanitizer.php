@@ -26,7 +26,7 @@ final class StringSanitizer
             // "&#34;" is shorter than "&quot;"
             '&quot;',
 
-            // Fix several potential issues in how browsers intepret attributes values
+            // Fix several potential issues in how browsers interpret attributes values
             '+',
             '=',
             '@',

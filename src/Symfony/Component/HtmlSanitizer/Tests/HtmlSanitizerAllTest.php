@@ -21,7 +21,7 @@ class HtmlSanitizerAllTest extends TestCase
     {
         return new HtmlSanitizer(
             (new HtmlSanitizerConfig())
-                ->allowAllStaticElements()
+                ->allowStaticElements()
                 ->allowLinkHosts(['trusted.com', 'external.com'])
                 ->allowMediaHosts(['trusted.com', 'external.com'])
                 ->allowRelativeLinks()

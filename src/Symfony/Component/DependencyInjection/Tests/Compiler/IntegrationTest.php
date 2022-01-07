@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooEnumeratedTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarEnumeratedTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAnyAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAutoconfiguration;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomMethodAttribute;
@@ -545,6 +546,10 @@ class IntegrationTest extends TestCase
             ->setPublic(true)
             ->addTag('foo_bar')
         ;
+        $container->register(BarEnumeratedTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
 
         $container->register(LocatorConsumerWithDefaultIndexMethod::class)
             ->setAutowired(true)
@@ -557,7 +562,42 @@ class IntegrationTest extends TestCase
         $s = $container->get(LocatorConsumerWithDefaultIndexMethod::class);
 
         $locator = $s->getLocator();
-        self::assertSame($container->get(FooEnumeratedTagClass::class), $locator->get('bar'));
+        self::assertSame($container->get(FooEnumeratedTagClass::class), $locator->get('foo'));
+        self::assertSame($container->get(BarEnumeratedTagClass::class), $locator->get('bar'));
+    }
+
+    /**
+     * @requires 8.1
+     */
+    public function testTaggedLocatorWithDefaultIndexMethodConfiguredViaAttributeAndEnumeratedKeysAndDefaultIndexMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooEnumeratedTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(BarEnumeratedTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+
+        $container->register(LocatorConsumerWithDefaultPriorityMethod::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumerWithDefaultPriorityMethod $s */
+        $s = $container->get(LocatorConsumerWithDefaultPriorityMethod::class);
+
+        $locator = $s->getLocator();
+
+        // We need to check priority of instances in the factories
+        $factories = (new \ReflectionClass($locator))->getProperty('factories');
+        $factories->setAccessible(true);
+
+        self::assertSame([FooEnumeratedTagClass::class, BarEnumeratedTagClass::class], array_keys($factories->getValue($locator)));
     }
 
     public function testTaggedLocatorWithDefaultPriorityMethodConfiguredViaAttribute()

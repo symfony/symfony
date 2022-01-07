@@ -75,6 +75,8 @@ class ReflectionExtractorTest extends TestCase
                 'files',
                 'propertyTypeStatic',
                 'parentAnnotationNoParent',
+                'rootDummyItems',
+                'rootDummyItem',
                 'a',
                 'DOB',
                 'Id',
@@ -135,6 +137,8 @@ class ReflectionExtractorTest extends TestCase
                 'files',
                 'propertyTypeStatic',
                 'parentAnnotationNoParent',
+                'rootDummyItems',
+                'rootDummyItem',
                 'date',
                 'c',
                 'ct',
@@ -184,6 +188,8 @@ class ReflectionExtractorTest extends TestCase
                 'files',
                 'propertyTypeStatic',
                 'parentAnnotationNoParent',
+                'rootDummyItems',
+                'rootDummyItem',
             ],
             $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );

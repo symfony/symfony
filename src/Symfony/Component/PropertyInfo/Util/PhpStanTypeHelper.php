@@ -19,6 +19,7 @@ use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
@@ -102,6 +103,10 @@ final class PhpStanTypeHelper
         if ($node instanceof UnionTypeNode) {
             $types = [];
             foreach ($node->types as $type) {
+                if ($type instanceof ConstTypeNode) {
+                    // It's safer to fall back to other extractors here, as resolving const types correctly is not easy at the moment
+                    return [];
+                }
                 foreach ($this->extractTypes($type, $nameScope) as $subType) {
                     $types[] = $subType;
                 }
@@ -110,6 +115,10 @@ final class PhpStanTypeHelper
             return $this->compressNullableType($types);
         }
         if ($node instanceof GenericTypeNode) {
+            if ('class-string' === $node->type->name) {
+                return [new Type(Type::BUILTIN_TYPE_STRING)];
+            }
+
             [$mainType] = $this->extractTypes($node->type, $nameScope);
 
             $collectionKeyTypes = $mainType->getCollectionKeyTypes();
@@ -158,9 +167,16 @@ final class PhpStanTypeHelper
 
             switch ($node->name) {
                 case 'integer':
+                case 'positive-int':
+                case 'negative-int':
                     return [new Type(Type::BUILTIN_TYPE_INT)];
+                case 'double':
+                    return [new Type(Type::BUILTIN_TYPE_FLOAT)];
                 case 'list':
+                case 'non-empty-list':
                     return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT))];
+                case 'non-empty-array':
+                    return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)];
                 case 'mixed':
                     return []; // mixed seems to be ignored in all other extractors
                 case 'parent':
@@ -168,8 +184,26 @@ final class PhpStanTypeHelper
                 case 'static':
                 case 'self':
                     return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveRootClass())];
+                case 'class-string':
+                case 'html-escaped-string':
+                case 'lowercase-string':
+                case 'non-empty-lowercase-string':
+                case 'non-empty-string':
+                case 'numeric-string':
+                case 'trait-string':
+                case 'interface-string':
+                case 'literal-string':
+                    return [new Type(Type::BUILTIN_TYPE_STRING)];
                 case 'void':
                     return [new Type(Type::BUILTIN_TYPE_NULL)];
+                case 'scalar':
+                    return [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT), new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_BOOL)];
+                case 'number':
+                    return [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT)];
+                case 'numeric':
+                    return [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT), new Type(Type::BUILTIN_TYPE_STRING)];
+                case 'array-key':
+                    return [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)];
             }
 
             return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveStringName($node->name))];

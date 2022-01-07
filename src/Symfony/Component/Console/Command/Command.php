@@ -556,7 +556,7 @@ class Command
     public function getProcessedHelp(): string
     {
         $name = $this->name;
-        $isSingleCommand = $this->application && $this->application->isSingleCommand();
+        $isSingleCommand = $this->application?->isSingleCommand();
 
         $placeholders = [
             '%command.name%',

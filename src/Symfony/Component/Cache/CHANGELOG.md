@@ -10,7 +10,6 @@ CHANGELOG
 5.4
 ---
 
- * Make `LockRegistry` use semaphores when possible
  * Deprecate `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
  * Add `DoctrineDbalAdapter` identical to `PdoAdapter` for `Doctrine\DBAL\Connection` or DBAL URL
  * Deprecate usage of `PdoAdapter` with `Doctrine\DBAL\Connection` or DBAL URL

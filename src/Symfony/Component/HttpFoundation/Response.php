@@ -397,8 +397,6 @@ class Response
 
     /**
      * Gets the current response content.
-     *
-     * @return string|false
      */
     public function getContent(): string|false
     {

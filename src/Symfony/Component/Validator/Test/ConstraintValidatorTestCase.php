@@ -60,6 +60,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected $propertyPath;
     protected $constraint;
     protected $defaultTimezone;
+    private string $defaultLocale;
     private array $expectedViolations;
     private int $call;
 
@@ -80,10 +81,11 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $this->validator = $this->createValidator();
         $this->validator->initialize($this->context);
 
+        $this->defaultLocale = \Locale::getDefault();
+        \Locale::setDefault('en');
+
         $this->expectedViolations = [];
         $this->call = 0;
-
-        \Locale::setDefault('en');
 
         $this->setDefaultTimezone('UTC');
     }
@@ -91,6 +93,8 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected function tearDown(): void
     {
         $this->restoreDefaultTimezone();
+
+        \Locale::setDefault($this->defaultLocale);
     }
 
     protected function setDefaultTimezone(?string $defaultTimezone)

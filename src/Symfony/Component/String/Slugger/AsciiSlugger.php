@@ -93,7 +93,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
      */
     public function slug(string $string, string $separator = '-', string $locale = null): AbstractUnicodeString
     {
-        $locale = $locale ?? $this->defaultLocale;
+        $locale ??= $this->defaultLocale;
 
         $transliterator = [];
         if ($locale && ('de' === $locale || str_starts_with($locale, 'de_'))) {

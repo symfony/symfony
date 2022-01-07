@@ -62,8 +62,6 @@ class KernelBrowser extends HttpKernelBrowser
 
     /**
      * Gets the profile associated with the current Response.
-     *
-     * @return HttpProfile|false|null
      */
     public function getProfile(): HttpProfile|false|null
     {

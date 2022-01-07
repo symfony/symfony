@@ -16,6 +16,9 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
  */
 class DummyUnionType
 {
+    private const TYPE_A = 'a';
+    private const TYPE_B = 'b';
+
     /**
      * @var string|int
      */
@@ -40,4 +43,14 @@ class DummyUnionType
      * @var (Dummy<array<mixed, string>, (int | (string<DefaultValue>)[])> | ParentDummy | null)
      */
     public $e;
+
+    /**
+     * @var self::TYPE_*|null
+     */
+    public $f;
+
+    /**
+     * @var non-empty-array<string|int>
+     */
+    public $g;
 }

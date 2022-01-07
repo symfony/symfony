@@ -90,8 +90,10 @@ class ExprBuilder
 
     /**
      * Tests if the value is empty.
+     *
+     * @return $this
      */
-    public function ifEmpty(): self
+    public function ifEmpty(): static
     {
         $this->ifPart = function ($v) { return empty($v); };
 
@@ -203,8 +205,6 @@ class ExprBuilder
 
     /**
      * Returns the related node.
-     *
-     * @return NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
      *
      * @throws \RuntimeException
      */

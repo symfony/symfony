@@ -22,21 +22,33 @@ final class NameScopeFactory
 {
     public function create(string $fullClassName): NameScope
     {
+        $reflection = new \ReflectionClass($fullClassName);
         $path = explode('\\', $fullClassName);
         $className = array_pop($path);
-        [$namespace, $uses] = $this->extractFromFullClassName($fullClassName);
+        [$namespace, $uses] = $this->extractFromFullClassName($reflection);
 
-        foreach (class_uses($fullClassName) as $traitFullClassName) {
-            [, $traitUses] = $this->extractFromFullClassName($traitFullClassName);
-            $uses = array_merge($uses, $traitUses);
-        }
+        $uses = array_merge($uses, $this->collectUses($reflection));
 
         return new NameScope($className, $namespace, $uses);
     }
 
-    private function extractFromFullClassName(string $fullClassName): array
+    private function collectUses(\ReflectionClass $reflection): array
     {
-        $reflection = new \ReflectionClass($fullClassName);
+        $uses = [$this->extractFromFullClassName($reflection)[1]];
+
+        foreach ($reflection->getTraits() as $traitReflection) {
+            $uses[] = $this->extractFromFullClassName($traitReflection)[1];
+        }
+
+        if (false !== $parentClass = $reflection->getParentClass()) {
+            $uses[] = $this->collectUses($parentClass);
+        }
+
+        return $uses ? array_merge(...$uses) : [];
+    }
+
+    private function extractFromFullClassName(\ReflectionClass $reflection): array
+    {
         $namespace = trim($reflection->getNamespaceName(), '\\');
         $fileName = $reflection->getFileName();
 

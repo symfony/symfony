@@ -41,7 +41,7 @@ class NativeSessionStorageFactory implements SessionStorageFactoryInterface
     public function createStorage(?Request $request): SessionStorageInterface
     {
         $storage = new NativeSessionStorage($this->options, $this->handler, $this->metaBag);
-        if ($this->secure && $request && $request->isSecure()) {
+        if ($this->secure && $request?->isSecure()) {
             $storage->setOptions(['cookie_secure' => true]);
         }
 

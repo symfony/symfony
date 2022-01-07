@@ -84,7 +84,7 @@ final class CompletionInput extends ArgvInput
                 return;
             }
 
-            if (null !== $option && $option->acceptValue()) {
+            if ($option?->acceptValue()) {
                 $this->completionType = self::TYPE_OPTION_VALUE;
                 $this->completionName = $option->getName();
                 $this->completionValue = $optionValue ?: (!str_starts_with($optionToken, '--') ? substr($optionToken, 2) : '');
@@ -97,7 +97,7 @@ final class CompletionInput extends ArgvInput
         if ('-' === $previousToken[0] && '' !== trim($previousToken, '-')) {
             // check if previous option accepted a value
             $previousOption = $this->getOptionFromToken($previousToken);
-            if (null !== $previousOption && $previousOption->acceptValue()) {
+            if ($previousOption?->acceptValue()) {
                 $this->completionType = self::TYPE_OPTION_VALUE;
                 $this->completionName = $previousOption->getName();
                 $this->completionValue = $relevantToken;
@@ -109,12 +109,12 @@ final class CompletionInput extends ArgvInput
         // complete argument value
         $this->completionType = self::TYPE_ARGUMENT_VALUE;
 
-        $arguments = $this->getArguments();
-        foreach ($arguments as $argumentName => $argumentValue) {
-            if (null === $argumentValue) {
+        foreach ($this->definition->getArguments() as $argumentName => $argument) {
+            if (!isset($this->arguments[$argumentName])) {
                 break;
             }
 
+            $argumentValue = $this->arguments[$argumentName];
             $this->completionName = $argumentName;
             if (\is_array($argumentValue)) {
                 $this->completionValue = $argumentValue ? $argumentValue[array_key_last($argumentValue)] : null;
@@ -124,7 +124,7 @@ final class CompletionInput extends ArgvInput
         }
 
         if ($this->currentIndex >= \count($this->tokens)) {
-            if (null === $arguments[$argumentName] || $this->definition->getArgument($argumentName)->isArray()) {
+            if (!isset($this->arguments[$argumentName]) || $this->definition->getArgument($argumentName)->isArray()) {
                 $this->completionName = $argumentName;
                 $this->completionValue = '';
             } else {

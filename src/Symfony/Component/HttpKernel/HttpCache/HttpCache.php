@@ -633,7 +633,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
     protected function processResponseBody(Request $request, Response $response)
     {
-        if (null !== $this->surrogate && $this->surrogate->needsParsing($response)) {
+        if ($this->surrogate?->needsParsing($response)) {
             $this->surrogate->process($request, $response);
         }
     }

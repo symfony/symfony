@@ -40,7 +40,7 @@ final class MobytTransport extends AbstractTransport
         $this->authToken = $authToken;
         $this->from = $from;
 
-        $typeQuality = $typeQuality ?? MobytOptions::MESSAGE_TYPE_QUALITY_LOW;
+        $typeQuality ??= MobytOptions::MESSAGE_TYPE_QUALITY_LOW;
         MobytOptions::validateMessageType($typeQuality);
 
         $this->typeQuality = $typeQuality;
@@ -69,12 +69,12 @@ final class MobytTransport extends AbstractTransport
         }
 
         $options = $message->getOptions() ? $message->getOptions()->toArray() : [];
-        $options['message_type'] = $options['message_type'] ?? $this->typeQuality;
+        $options['message_type'] ??= $this->typeQuality;
 
-        $options['message'] = $options['message'] ?? $message->getSubject();
+        $options['message'] ??= $message->getSubject();
         $options['recipient'] = [$message->getPhone()];
 
-        $options['sender'] = $options['sender'] ?? $this->from;
+        $options['sender'] ??= $this->from;
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/API/v1.0/REST/sms', [
             'headers' => [

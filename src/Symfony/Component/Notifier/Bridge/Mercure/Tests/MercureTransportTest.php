@@ -36,7 +36,7 @@ final class MercureTransportTest extends TransportTestCase
 {
     public function createTransport(HttpClientInterface $client = null, HubInterface $hub = null, string $hubId = 'hubId', $topics = null): MercureTransport
     {
-        $hub = $hub ?? $this->createMock(HubInterface::class);
+        $hub ??= $this->createMock(HubInterface::class);
 
         return new MercureTransport($hub, $hubId, $topics);
     }

@@ -426,12 +426,16 @@ XLIFF
         $expectedTranslatorBag = new TranslatorBag();
         $expectedTranslatorBag->addCatalogue($arrayLoader->load([
             'index.hello' => 'Hello',
-            'index.greetings' => 'Welcome, {firstname}!',
         ], 'en'));
         $expectedTranslatorBag->addCatalogue($arrayLoader->load([
+            'index.greetings' => 'Welcome, {firstname}!',
+        ], 'en', 'messages+intl-icu'));
+        $expectedTranslatorBag->addCatalogue($arrayLoader->load([
             'index.hello' => 'Bonjour',
-            'index.greetings' => 'Bienvenue, {firstname} !',
         ], 'fr'));
+        $expectedTranslatorBag->addCatalogue($arrayLoader->load([
+            'index.greetings' => 'Bienvenue, {firstname} !',
+        ], 'fr', 'messages+intl-icu'));
         $expectedTranslatorBag->addCatalogue($arrayLoader->load([
             'firstname.error' => 'Firstname must contains only letters.',
             'lastname.error' => 'Lastname must contains only letters.',
@@ -443,7 +447,7 @@ XLIFF
 
         yield [
             ['en', 'fr'],
-            ['messages', 'validators'],
+            ['messages', 'messages+intl-icu', 'validators'],
             [
                 'en' => [
                     'messages' => <<<'XLIFF'
@@ -458,6 +462,19 @@ XLIFF
         <source>index.hello</source>
         <target state="translated">Hello</target>
       </trans-unit>
+    </body>
+  </file>
+</xliff>
+XLIFF
+                    ,
+                    'messages+intl-icu' => <<<'XLIFF'
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+  <file original="https://localise.biz/user/symfony-translation-provider" source-language="en" datatype="database" tool-id="loco">
+    <header>
+      <tool tool-id="loco" tool-name="Loco" tool-version="1.0.25 20201211-1" tool-company="Loco"/>
+    </header>
+    <body>
       <trans-unit id="loco:5fd89b8542e5aa5cc27457e2" resname="index.greetings" datatype="plaintext" extradata="loco:format=icu">
         <source>index.greetings</source>
         <target state="translated">Welcome, {firstname}!</target>
@@ -502,6 +519,19 @@ XLIFF
         <source>index.hello</source>
         <target state="translated">Bonjour</target>
       </trans-unit>
+    </body>
+  </file>
+</xliff>
+XLIFF
+                    ,
+                    'messages+intl-icu' => <<<'XLIFF'
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+  <file original="https://localise.biz/user/symfony-translation-provider" source-language="en" datatype="database" tool-id="loco">
+    <header>
+      <tool tool-id="loco" tool-name="Loco" tool-version="1.0.25 20201211-1" tool-company="Loco"/>
+    </header>
+    <body>
       <trans-unit id="loco:5fd89b8542e5aa5cc27457e2" resname="index.greetings" datatype="plaintext" extradata="loco:format=icu">
         <source>index.greetings</source>
         <target state="translated">Bienvenue, {firstname} !</target>

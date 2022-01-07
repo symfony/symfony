@@ -6,7 +6,7 @@ head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
 (echo "$head" && echo && git diff -U2 composer.json src/) > .github/expected-missing-return-types.diff
 
 diff --git a/composer.json b/composer.json
-index 1bc576b112..589ef8c260 100644
+index 1750d55ee2..c18494167a 100644
 --- a/composer.json
 +++ b/composer.json
 @@ -175,5 +175,5 @@
@@ -16,8 +16,19 @@ index 1bc576b112..589ef8c260 100644
 +
          ]
      },
+diff --git a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php b/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
+index d68ae4c8b3..8e980a9e70 100644
+--- a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
++++ b/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
+@@ -88,5 +88,5 @@ abstract class KernelTestCase extends TestCase
+      * @return TestContainer
+      */
+-    protected static function getContainer(): ContainerInterface
++    protected static function getContainer(): TestContainer
+     {
+         if (!static::$booted) {
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
-index 152050159b..e2ec1aeea2 100644
+index 697e34cb77..9a1e4c5618 100644
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 +++ b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 @@ -408,5 +408,5 @@ abstract class AbstractBrowser
@@ -144,7 +155,7 @@ index 6b1c6c5fbe..bb80ed461e 100644
 +    public function isFresh(ResourceInterface $resource, int $timestamp): bool;
  }
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index b582435f7d..3d5f064773 100644
+index 0ed5649b8a..6c814bf82c 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
 @@ -218,5 +218,5 @@ class Application implements ResetInterface
@@ -197,7 +208,7 @@ index b582435f7d..3d5f064773 100644
      {
          foreach ($command->getHelperSet() as $helper) {
 diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Component/Console/Command/Command.php
-index d6354b4ab1..b267917312 100644
+index 0bd3426c07..b38caf989e 100644
 --- a/src/Symfony/Component/Console/Command/Command.php
 +++ b/src/Symfony/Component/Console/Command/Command.php
 @@ -171,5 +171,5 @@ class Command
@@ -250,10 +261,10 @@ index 024da1884e..943790e875 100644
  
      /**
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
-index 1acec50de5..904e67a47b 100644
+index 326d8d4f5f..e62124c7af 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 +++ b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
-@@ -70,5 +70,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
+@@ -71,5 +71,5 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
       * @return mixed
       */
 -    protected function processValue(mixed $value, bool $isRoot = false)
@@ -261,7 +272,7 @@ index 1acec50de5..904e67a47b 100644
      {
          if (\is_array($value)) {
 diff --git a/src/Symfony/Component/DependencyInjection/Container.php b/src/Symfony/Component/DependencyInjection/Container.php
-index 0532120adf..78fba5ef79 100644
+index b9dd838898..3a8cb63eac 100644
 --- a/src/Symfony/Component/DependencyInjection/Container.php
 +++ b/src/Symfony/Component/DependencyInjection/Container.php
 @@ -108,5 +108,5 @@ class Container implements ContainerInterface, ResetInterface
@@ -535,7 +546,7 @@ index 1cb865fd66..f6f4efe7a7 100644
 +    public function getName(): string;
  }
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-index 8e7b80a909..d757429d36 100644
+index cf0e243c6b..292b907ea8 100644
 --- a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 @@ -448,5 +448,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
@@ -544,9 +555,9 @@ index 8e7b80a909..d757429d36 100644
 -    protected function forward(Request $request, bool $catch = false, Response $entry = null)
 +    protected function forward(Request $request, bool $catch = false, Response $entry = null): Response
      {
-         if ($this->surrogate) {
+         $this->surrogate?->addSurrogateCapability($request);
 diff --git a/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php b/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php
-index f4773eb62a..0ba648b57f 100644
+index 3ecc2c739c..d50834b6d9 100644
 --- a/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php
 +++ b/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php
 @@ -61,5 +61,5 @@ class HttpKernelBrowser extends AbstractBrowser
@@ -581,8 +592,43 @@ index 19ff0db181..f0f4a5829f 100644
 +    public function countErrors(Request $request = null): int;
  
      /**
+diff --git a/src/Symfony/Component/Lock/LockFactory.php b/src/Symfony/Component/Lock/LockFactory.php
+index 125b6eae50..ac327e8981 100644
+--- a/src/Symfony/Component/Lock/LockFactory.php
++++ b/src/Symfony/Component/Lock/LockFactory.php
+@@ -44,5 +44,5 @@ class LockFactory implements LoggerAwareInterface
+      * @return SharedLockInterface
+      */
+-    public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
++    public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): SharedLockInterface
+     {
+         return $this->createLockFromKey(new Key($resource), $ttl, $autoRelease);
+@@ -58,5 +58,5 @@ class LockFactory implements LoggerAwareInterface
+      * @return SharedLockInterface
+      */
+-    public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
++    public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true): SharedLockInterface
+     {
+         $lock = new Lock($key, $this->store, $ttl, $autoRelease);
+diff --git a/src/Symfony/Component/Messenger/Envelope.php b/src/Symfony/Component/Messenger/Envelope.php
+index bb1194ad1b..27731b9cb0 100644
+--- a/src/Symfony/Component/Messenger/Envelope.php
++++ b/src/Symfony/Component/Messenger/Envelope.php
+@@ -13,4 +13,5 @@ namespace Symfony\Component\Messenger;
+ 
+ use Symfony\Component\Messenger\Stamp\StampInterface;
++use Symfony\Component\Messenger\Stamp\StampInterface as TStamp;
+ 
+ /**
+@@ -101,5 +102,5 @@ final class Envelope
+      * @return TStamp|null
+      */
+-    public function last(string $stampFqcn): ?StampInterface
++    public function last(string $stampFqcn): ?TStamp
+     {
+         return isset($this->stamps[$stampFqcn]) ? end($this->stamps[$stampFqcn]) : null;
 diff --git a/src/Symfony/Component/OptionsResolver/OptionsResolver.php b/src/Symfony/Component/OptionsResolver/OptionsResolver.php
-index fe77644762..09dcfe166b 100644
+index 205c15b4cd..e93e460ed1 100644
 --- a/src/Symfony/Component/OptionsResolver/OptionsResolver.php
 +++ b/src/Symfony/Component/OptionsResolver/OptionsResolver.php
 @@ -486,5 +486,5 @@ class OptionsResolver implements Options
@@ -858,7 +904,7 @@ index b0a1f3218b..893fe59e2f 100644
      {
          if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-index a241215133..2ed1af7a02 100644
+index 3e1e7edc8e..e025b2bc4a 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 @@ -136,5 +136,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
@@ -1002,3 +1048,35 @@ index d6dcdf178f..0ab8d9c10e 100644
 +    public function getTargets(): string|array
      {
          return self::PROPERTY_CONSTRAINT;
+diff --git a/src/Symfony/Component/Workflow/Event/Event.php b/src/Symfony/Component/Workflow/Event/Event.php
+index cd7fab7896..b340eba38e 100644
+--- a/src/Symfony/Component/Workflow/Event/Event.php
++++ b/src/Symfony/Component/Workflow/Event/Event.php
+@@ -42,5 +42,5 @@ class Event extends BaseEvent
+      * @return Marking
+      */
+-    public function getMarking()
++    public function getMarking(): Marking
+     {
+         return $this->marking;
+@@ -50,5 +50,5 @@ class Event extends BaseEvent
+      * @return object
+      */
+-    public function getSubject()
++    public function getSubject(): object
+     {
+         return $this->subject;
+@@ -58,5 +58,5 @@ class Event extends BaseEvent
+      * @return Transition|null
+      */
+-    public function getTransition()
++    public function getTransition(): ?Transition
+     {
+         return $this->transition;
+@@ -71,5 +71,5 @@ class Event extends BaseEvent
+      * @return string
+      */
+-    public function getWorkflowName()
++    public function getWorkflowName(): string
+     {
+         return $this->workflow->getName();

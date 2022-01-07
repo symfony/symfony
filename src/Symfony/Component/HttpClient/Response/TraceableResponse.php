@@ -59,7 +59,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
         try {
             $this->response->__destruct();
         } finally {
-            if ($this->event && $this->event->isStarted()) {
+            if ($this->event?->isStarted()) {
                 $this->event->stop();
             }
         }
@@ -70,7 +70,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
         try {
             return $this->response->getStatusCode();
         } finally {
-            if ($this->event && $this->event->isStarted()) {
+            if ($this->event?->isStarted()) {
                 $this->event->lap();
             }
         }
@@ -81,7 +81,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
         try {
             return $this->response->getHeaders($throw);
         } finally {
-            if ($this->event && $this->event->isStarted()) {
+            if ($this->event?->isStarted()) {
                 $this->event->lap();
             }
         }
@@ -96,7 +96,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
 
             return $this->content = $this->response->getContent(false);
         } finally {
-            if ($this->event && $this->event->isStarted()) {
+            if ($this->event?->isStarted()) {
                 $this->event->stop();
             }
             if ($throw) {
@@ -114,7 +114,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
 
             return $this->content = $this->response->toArray(false);
         } finally {
-            if ($this->event && $this->event->isStarted()) {
+            if ($this->event?->isStarted()) {
                 $this->event->stop();
             }
             if ($throw) {
@@ -127,7 +127,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
     {
         $this->response->cancel();
 
-        if ($this->event && $this->event->isStarted()) {
+        if ($this->event?->isStarted()) {
             $this->event->stop();
         }
     }

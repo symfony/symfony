@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -71,6 +72,8 @@ class Serializer implements SerializerInterface
         }
 
         $stamps = $this->decodeStamps($encodedEnvelope);
+        $stamps[] = new SerializedMessageStamp($encodedEnvelope['body']);
+
         $serializerStamp = $this->findFirstSerializerStamp($stamps);
 
         $context = $this->context;
@@ -98,12 +101,17 @@ class Serializer implements SerializerInterface
             $context = $serializerStamp->getContext() + $context;
         }
 
+        /** @var SerializedMessageStamp|null $serializedMessageStamp */
+        $serializedMessageStamp = $envelope->last(SerializedMessageStamp::class);
+
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 
         $headers = ['type' => \get_class($envelope->getMessage())] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
 
         return [
-            'body' => $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
+            'body' => $serializedMessageStamp
+                ? $serializedMessageStamp->getSerializedMessage()
+                : $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
             'headers' => $headers,
         ];
     }

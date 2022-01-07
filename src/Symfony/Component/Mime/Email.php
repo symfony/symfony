@@ -386,11 +386,20 @@ class Email extends Message
 
     public function ensureValidity()
     {
-        if (null === $this->text && null === $this->html && !$this->attachments) {
-            throw new LogicException('A message must have a text or an HTML part or attachments.');
+        $this->ensureBodyValid();
+
+        if ('1' === $this->getHeaders()->getHeaderBody('X-Unsent')) {
+            throw new LogicException('Cannot send messages marked as "draft".');
         }
 
         parent::ensureValidity();
+    }
+
+    private function ensureBodyValid(): void
+    {
+        if (null === $this->text && null === $this->html && !$this->attachments) {
+            throw new LogicException('A message must have a text or an HTML part or attachments.');
+        }
     }
 
     /**
@@ -415,7 +424,7 @@ class Email extends Message
      */
     private function generateBody(): AbstractPart
     {
-        $this->ensureValidity();
+        $this->ensureBodyValid();
 
         [$htmlPart, $attachmentParts, $inlineParts] = $this->prepareParts();
 

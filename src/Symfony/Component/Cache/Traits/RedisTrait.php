@@ -441,7 +441,7 @@ trait RedisTrait
 
         if ($this->redis instanceof \Predis\ClientInterface && $this->redis->getConnection() instanceof ClusterInterface) {
             static $del;
-            $del = $del ?? (class_exists(UNLINK::class) ? 'unlink' : 'del');
+            $del ??= (class_exists(UNLINK::class) ? 'unlink' : 'del');
 
             $this->pipeline(function () use ($ids, $del) {
                 foreach ($ids as $id) {
@@ -498,7 +498,7 @@ trait RedisTrait
     private function pipeline(\Closure $generator, object $redis = null): \Generator
     {
         $ids = [];
-        $redis = $redis ?? $this->redis;
+        $redis ??= $this->redis;
 
         if ($redis instanceof RedisClusterProxy || $redis instanceof \RedisCluster || ($redis instanceof \Predis\ClientInterface && $redis->getConnection() instanceof RedisCluster)) {
             // phpredis & predis don't support pipelining with RedisCluster

@@ -152,7 +152,7 @@ class StaticPrefixCollection
         try {
             for ($i = $baseLength; $i < $end && $prefix[$i] === $anotherPrefix[$i]; ++$i) {
                 if ('(' === $prefix[$i]) {
-                    $staticLength = $staticLength ?? $i;
+                    $staticLength ??= $i;
                     for ($j = 1 + $i, $n = 1; $j < $end && 0 < $n; ++$j) {
                         if ($prefix[$j] !== $anotherPrefix[$j]) {
                             break 2;

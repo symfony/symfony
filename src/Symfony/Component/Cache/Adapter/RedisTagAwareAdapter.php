@@ -55,7 +55,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     private const DEFAULT_CACHE_TTL = 8640000;
 
     /**
-     * detected eviction policy used on Redis server
+     * detected eviction policy used on Redis server.
      */
     private string $redisEvictionPolicy;
 

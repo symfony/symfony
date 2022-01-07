@@ -26,12 +26,12 @@ trait AbstractAdapterTrait
     use LoggerAwareTrait;
 
     /**
-     * needs to be set by class, signature is function(string <key>, mixed <value>, bool <isHit>)
+     * needs to be set by class, signature is function(string <key>, mixed <value>, bool <isHit>).
      */
     private static \Closure $createCacheItem;
 
     /**
-     * needs to be set by class, signature is function(array <deferred>, string <namespace>, array <&expiredIds>)
+     * needs to be set by class, signature is function(array <deferred>, string <namespace>, array <&expiredIds>).
      */
     private static \Closure $mergeByLifetime;
 

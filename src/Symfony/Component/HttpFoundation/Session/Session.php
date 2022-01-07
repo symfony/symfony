@@ -45,11 +45,11 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
         $this->storage = $storage ?? new NativeSessionStorage();
         $this->usageReporter = $usageReporter instanceof \Closure || !\is_callable($usageReporter) ? $usageReporter : \Closure::fromCallable($usageReporter);
 
-        $attributes = $attributes ?? new AttributeBag();
+        $attributes ??= new AttributeBag();
         $this->attributeName = $attributes->getName();
         $this->registerBag($attributes);
 
-        $flashes = $flashes ?? new FlashBag();
+        $flashes ??= new FlashBag();
         $this->flashName = $flashes->getName();
         $this->registerBag($flashes);
     }
@@ -128,6 +128,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * Returns an iterator for attributes.
+     *
+     * @return \ArrayIterator<string, mixed>
      */
     public function getIterator(): \ArrayIterator
     {

@@ -88,7 +88,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
 
     public function onKernelResponse(ResponseEvent $event)
     {
-        if (!$event->isMainRequest()) {
+        if (!$event->isMainRequest() || (!$this->container->has('initialized_session') && !$event->getRequest()->hasSession())) {
             return;
         }
 
@@ -135,11 +135,12 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
              */
             $sessionName = $session->getName();
             $sessionId = $session->getId();
-            $sessionCookiePath = $this->sessionOptions['cookie_path'] ?? '/';
-            $sessionCookieDomain = $this->sessionOptions['cookie_domain'] ?? null;
-            $sessionCookieSecure = $this->sessionOptions['cookie_secure'] ?? false;
-            $sessionCookieHttpOnly = $this->sessionOptions['cookie_httponly'] ?? true;
-            $sessionCookieSameSite = $this->sessionOptions['cookie_samesite'] ?? Cookie::SAMESITE_LAX;
+            $sessionOptions = $this->getSessionOptions($this->sessionOptions);
+            $sessionCookiePath = $sessionOptions['cookie_path'] ?? '/';
+            $sessionCookieDomain = $sessionOptions['cookie_domain'] ?? null;
+            $sessionCookieSecure = $sessionOptions['cookie_secure'] ?? false;
+            $sessionCookieHttpOnly = $sessionOptions['cookie_httponly'] ?? true;
+            $sessionCookieSameSite = $sessionOptions['cookie_samesite'] ?? Cookie::SAMESITE_LAX;
 
             SessionUtils::popSessionCookie($sessionName, $sessionId);
 
@@ -157,7 +158,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
                 );
             } elseif ($sessionId !== $requestSessionCookieId) {
                 $expire = 0;
-                $lifetime = $this->sessionOptions['cookie_lifetime'] ?? null;
+                $lifetime = $sessionOptions['cookie_lifetime'] ?? null;
                 if ($lifetime) {
                     $expire = time() + $lifetime;
                 }
@@ -209,11 +210,11 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
             return;
         }
 
-        if ($this->container && $this->container->has('session_collector')) {
+        if ($this->container?->has('session_collector')) {
             $this->container->get('session_collector')();
         }
 
-        if (!$requestStack = $this->container && $this->container->has('request_stack') ? $this->container->get('request_stack') : null) {
+        if (!$requestStack = $this->container?->has('request_stack') ? $this->container->get('request_stack') : null) {
             return;
         }
 
@@ -265,4 +266,23 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
      * Gets the session object.
      */
     abstract protected function getSession(): ?SessionInterface;
+
+    private function getSessionOptions(array $sessionOptions): array
+    {
+        $mergedSessionOptions = [];
+
+        foreach (session_get_cookie_params() as $key => $value) {
+            $mergedSessionOptions['cookie_'.$key] = $value;
+        }
+
+        foreach ($sessionOptions as $key => $value) {
+            // do the same logic as in the NativeSessionStorage
+            if ('cookie_secure' === $key && 'auto' === $value) {
+                continue;
+            }
+            $mergedSessionOptions[$key] = $value;
+        }
+
+        return $mergedSessionOptions;
+    }
 }

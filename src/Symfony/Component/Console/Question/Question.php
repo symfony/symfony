@@ -52,8 +52,6 @@ class Question
 
     /**
      * Returns the default answer.
-     *
-     * @return string|bool|int|float|null
      */
     public function getDefault(): string|bool|int|float|null
     {
@@ -154,7 +152,7 @@ class Question
         } elseif ($values instanceof \Traversable) {
             $valueCache = null;
             $callback = static function () use ($values, &$valueCache) {
-                return $valueCache ?? $valueCache = iterator_to_array($values, false);
+                return $valueCache ??= iterator_to_array($values, false);
             };
         } else {
             $callback = null;

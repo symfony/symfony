@@ -275,7 +275,7 @@ EOF
         if (!class_exists($class) || !is_subclass_of($class, FormTypeInterface::class)) {
             $classes = $this->getFqcnTypeClasses($class);
 
-            if (1 === count($classes)) {
+            if (1 === \count($classes)) {
                 $class = $classes[0];
             }
         }

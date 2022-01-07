@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-12-28T09:52:44Z
+
+Thanks for 1!
+
+I'm fine with 2, I included the "all" to clarify the fact that all elements would be added, meaning possibly CSS injection issues, clickjacking issues, ... If we think the new name is enough, I'm good with it, it's good to have shorter names.
+
+For 3, I have more reserves. I do think the sanitizer shouldn't have behaviors where the default includes everything. Your proposal would for instance allow style attributes by default, which probably shouldn't happen. I think I'm -1 on this 3rd point.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-01-04T11:33:22Z
+
+I've reverted all the changes related to (3). Thanks.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2022-01-05T08:04:37Z
+
+Could you update the README as well with the new method name?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-01-07T18:26:46Z
+
+@tgalopin done! Sorry I forgot about this!

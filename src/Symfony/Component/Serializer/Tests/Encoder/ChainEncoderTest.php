@@ -90,7 +90,7 @@ class ChainEncoderTest extends TestCase
 
 class NormalizationAwareEncoder implements EncoderInterface, NormalizationAwareInterface
 {
-    public function supportsEncoding(string $format): bool
+    public function supportsEncoding(string $format, array $context = []): bool
     {
         return true;
     }

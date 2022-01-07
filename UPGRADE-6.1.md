@@ -12,6 +12,8 @@ Console
 -------
 
  * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+ * Add argument `$suggestedValues` to `Command::addArgument` and `Command::addOption`
+ * Add argument `$suggestedValues` to `InputArgument` and `InputOption` constructors
 
 HttpKernel
 ----------

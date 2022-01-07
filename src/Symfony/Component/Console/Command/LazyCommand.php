@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Command;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -108,16 +109,28 @@ final class LazyCommand extends Command
         return $this->getCommand()->getNativeDefinition();
     }
 
-    public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null): static
+    /**
+     * {@inheritdoc}
+     *
+     * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
+     */
+    public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null, /*array|\Closure $suggestedValues = []*/): static
     {
-        $this->getCommand()->addArgument($name, $mode, $description, $default);
+        $suggestedValues = 5 <= \func_num_args() ? func_get_arg(4) : [];
+        $this->getCommand()->addArgument($name, $mode, $description, $default, $suggestedValues);
 
         return $this;
     }
 
-    public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null): static
+    /**
+     * {@inheritdoc}
+     *
+     * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
+     */
+    public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null, /*array|\Closure $suggestedValues = []*/): static
     {
-        $this->getCommand()->addOption($name, $shortcut, $mode, $description, $default);
+        $suggestedValues = 6 <= \func_num_args() ? func_get_arg(5) : [];
+        $this->getCommand()->addOption($name, $shortcut, $mode, $description, $default, $suggestedValues);
 
         return $this;
     }

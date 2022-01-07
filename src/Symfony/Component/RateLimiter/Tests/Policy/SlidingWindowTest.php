@@ -102,4 +102,13 @@ class SlidingWindowTest extends TestCase
         // should be 500ms left (10 - 9.5)
         $this->assertEqualsWithDelta(0.5, $window->getRetryAfter()->format('U.u') - microtime(true), 0.2);
     }
+
+    public function testCreateAtExactTime()
+    {
+        ClockMock::register(SlidingWindow::class);
+        ClockMock::withClockMock(1234567890.000000);
+        $window = new SlidingWindow('foo', 10);
+        $window->getRetryAfter();
+        $this->assertEquals('1234567900.000000', $window->getRetryAfter()->format('U.u'));
+    }
 }

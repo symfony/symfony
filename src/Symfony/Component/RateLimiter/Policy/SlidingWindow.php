@@ -122,6 +122,6 @@ final class SlidingWindow implements LimiterStateInterface
 
     public function getRetryAfter(): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromFormat('U.u', $this->windowEndAt);
+        return \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $this->windowEndAt));
     }
 }

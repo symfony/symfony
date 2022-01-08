@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by micheh at 2022-01-06T14:10:47Z
+
+Why don't you add `--limit=1` to stop the worker after one message?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-01-06T14:11:32Z
+
+@micheh that's a legitimate question. But to me, the PR still makes sense.
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2022-01-06T14:54:23Z
+
+> Why don't you add `--limit=1` to stop the worker after one message?
+
+Using only `--limit=1` would still let the worker run indefinitely - until a message actually arrives. I want to let the worker stop immediately.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-01-08T19:45:56Z
+
+While I am fine with this PR, wouldn't time-limit=1 and limit=1 work for you?
+
+The usage of time-limit=0 could be confusing?
+
+Why not add an option --stop-immediately or sth more explanatory?
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2022-01-08T19:52:12Z
+
+> The usage of time-limit=0 could be confusing?
+
+Not to an engineer? ;)

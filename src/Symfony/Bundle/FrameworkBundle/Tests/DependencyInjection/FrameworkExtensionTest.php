@@ -37,6 +37,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionals
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
@@ -901,8 +902,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('messenger.transport.symfony_serializer', (string) $container->getAlias('messenger.default_serializer'));
 
         $serializerTransportDefinition = $container->getDefinition('messenger.transport.symfony_serializer');
-        $this->assertSame('csv', $serializerTransportDefinition->getArgument(1));
-        $this->assertSame(['enable_max_depth' => true], $serializerTransportDefinition->getArgument(2));
+        self::assertSame(
+            [
+                ['setFormat', ['csv']],
+                ['setContext', [['enable_max_depth' => true]]],
+            ],
+            $serializerTransportDefinition->getMethodCalls()
+        );
     }
 
     public function testMessengerWithMultipleBuses()
@@ -953,6 +959,29 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage" class is being routed to a sender called "invalid". This is not a valid transport or service id.');
         $this->createContainerFromFile('messenger_routing_invalid_transport');
+    }
+
+    public function testMessengerWithTransportSerializerConfig()
+    {
+        $container = $this->createContainerFromFile('messenger_transport_serializer_config');
+        self::assertTrue($container->has('messenger.transport.foo.serializer'));
+
+        $serializerDefinition = $container->findDefinition('messenger.transport.foo.serializer');
+        self::assertSame(
+            [
+                ['setFormat', ['xml']],
+                ['setContext', [['some_other_context' => true, 'some_context' => true]]],
+            ],
+            $serializerDefinition->getMethodCalls()
+        );
+    }
+
+    public function testMessengerWithTransportSerializerConfigThrowsIfWrongSerializerClass()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Serializer for transport "foo" should implement "Symfony\Component\Messenger\Transport\Serialization\FormatAndContextAwareSerializerInterface" in order to have custom format or context.');
+
+        $this->createContainerFromFile('messenger_transport_serializer_config_invalid');
     }
 
     public function testTranslator()

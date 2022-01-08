@@ -29,20 +29,20 @@ use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterfa
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class Serializer implements SerializerInterface
+class Serializer implements FormatAndContextAwareSerializerInterface
 {
+    use FormatAndContextAwareSerializerTrait;
+
     public const MESSENGER_SERIALIZATION_CONTEXT = 'messenger_serialization';
     private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
 
     private SymfonySerializerInterface $serializer;
-    private string $format;
-    private array $context;
 
     public function __construct(SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [])
     {
         $this->serializer = $serializer ?? self::create()->serializer;
-        $this->format = $format;
-        $this->context = $context + [self::MESSENGER_SERIALIZATION_CONTEXT => true];
+        $this->setFormat($format);
+        $this->setContext($context);
     }
 
     public static function create(): self

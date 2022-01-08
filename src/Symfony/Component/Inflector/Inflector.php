@@ -30,6 +30,9 @@ final class Inflector
         // Fourth entry: Whether the suffix may succeed a consonant
         // Fifth entry: singular suffix, normal
 
+        // podiums (podium)
+        ['smuidop', 7, true, true, 'podium'],
+
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
         ['a', 1, true, true, ['on', 'um']],
 
@@ -227,6 +230,9 @@ final class Inflector
 
         // teeth (tooth)
         ['htoot', 5, true, true, 'teeth'],
+
+        // podiums (podium)
+        ['muidop', 6, true, true, ['podia', 'podiums']],
 
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
         ['mu', 2, true, true, 'a'],

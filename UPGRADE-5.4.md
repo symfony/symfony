@@ -134,7 +134,7 @@ Security
  * Deprecate the `$authManager` argument of `AccessListener`, the argument will be removed
  * Deprecate the `$authenticationManager` argument of the `AuthorizationChecker` constructor, the argument will be removed
  * Deprecate setting the `$alwaysAuthenticate` argument to `true` and not setting the
-   `$exceptionOnNoToken argument to `false` of `AuthorizationChecker` (this is the default
+   `$exceptionOnNoToken` argument to `false` of `AuthorizationChecker` (this is the default
    behavior when using `enable_authenticator_manager: true`)
  * Deprecate not setting the `$exceptionOnNoToken` argument of `AccessListener` to `false`
    (this is the default behavior when using `enable_authenticator_manager: true`)

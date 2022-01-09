@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-12-31T15:46:37Z
+
+What about using the factory return type when it has one?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-12-31T15:49:37Z
+
+Sure, but that would be a feature isn'it? Because right now, it relies only on the definition class and either it's good or not. Fall backing on the return type is a new behavior.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-31T16:29:11Z
+
+The class is supposed to be used for that purpose. Can't we fix the class of the definition instead?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-12-31T16:39:05Z
+
+I don’t think so because we are talking about
+AbstractAdapter::createConnection from the Cache component which can return
+different values depending of the passed dsn. The factory class should be
+set to a sensible value but it can’t always be the case I guess.
+
+On Fri 31 Dec 2021 at 17:29, Nicolas Grekas ***@***.***>
+wrote:
+
+> The class is supposed to be used for that purpose. Can't we fix the class
+> of the definition instead?
+>
+> —
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/44879#issuecomment-1003413258>,
+> or unsubscribe
+> <https://github.com/notifications/unsubscribe-auth/AA35DB56HNRQVAWGYFZX733UTXK6DANCNFSM5LBN37MA>
+> .
+> You are receiving this because you authored the thread.Message ID:
+> ***@***.***>
+>
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-01-04T11:24:25Z
+
+> AbstractAdapter::createConnection from the Cache component which can return
+different values depending of the passed dsn.
+
+These various connections instances could probably be wrapped in a core domain object.

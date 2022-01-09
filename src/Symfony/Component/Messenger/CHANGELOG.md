@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `SerializedMessageStamp` to avoid serializing a message when a retry occurs.
+ * Add serializer configuration at transport level.
 
 6.0
 ---

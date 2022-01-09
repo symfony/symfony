@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2021-11-09T17:46:02Z
+
+fabbot.io isn't happy because I touched to `XmlEncoder`:
+```diff
+-        throw new NotEncodableValueException('An unexpected value could not be serialized: '.(!\is_resource($data) ? var_export($data, true) : sprintf('%s resource', get_resource_type($data))));
++        throw new NotEncodableValueException('An unexpected value could not be serialized: '.(!\is_resource($data) ? var_export($data, true) : sprintf('"%s" resource', get_resource_type($data))));
+```
+
+But this isn't related to the current PR.

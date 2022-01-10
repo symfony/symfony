@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+6.1
+---
+* LoginLinkHandler and LoginLinkHandlerInterface accept options for: customizing lifetime and route_name parameters and allow passing custom parameters to the login link uri. 
+
 6.0
 ---
 

@@ -44,29 +44,31 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         ], $options);
     }
 
-    public function createLoginLink(UserInterface $user, Request $request = null): LoginLinkDetails
+    public function createLoginLink(UserInterface $user, Request $request = null, array $options = []): LoginLinkDetails
     {
-        $expires = time() + $this->options['lifetime'];
+        $options = array_merge($this->options, $options);
+        $optionsParameters = isset($options['parameters']) && \is_array($options['parameters']) ? $options['parameters'] : [];
+        $expires = time() + $options['lifetime'];
         $expiresAt = new \DateTimeImmutable('@'.$expires);
 
-        $parameters = [
+        $parameters = array_merge([
             'user' => $user->getUserIdentifier(),
             'expires' => $expires,
             'hash' => $this->signatureHashUtil->computeSignatureHash($user, $expires),
-        ];
+        ], $optionsParameters);
 
         if ($request) {
             $currentRequestContext = $this->urlGenerator->getContext();
             $this->urlGenerator->setContext(
                 (new RequestContext())
                     ->fromRequest($request)
-                    ->setParameter('_locale', $request->getLocale())
+                    ->setParameters(array_merge(['_locale' => $request->getLocale()], $optionsParameters))
             );
         }
 
         try {
             $url = $this->urlGenerator->generate(
-                $this->options['route_name'],
+                $options['route_name'],
                 $parameters,
                 UrlGeneratorInterface::ABSOLUTE_URL
             );

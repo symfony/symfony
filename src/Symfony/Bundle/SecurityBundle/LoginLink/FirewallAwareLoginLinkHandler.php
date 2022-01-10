@@ -38,9 +38,9 @@ class FirewallAwareLoginLinkHandler implements LoginLinkHandlerInterface
         $this->requestStack = $requestStack;
     }
 
-    public function createLoginLink(UserInterface $user, Request $request = null): LoginLinkDetails
+    public function createLoginLink(UserInterface $user, Request $request = null, array $options = []): LoginLinkDetails
     {
-        return $this->getForFirewall()->createLoginLink($user, $request);
+        return $this->getForFirewall()->createLoginLink($user, $request, $options);
     }
 
     public function consumeLoginLink(Request $request): UserInterface

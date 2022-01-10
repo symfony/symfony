@@ -55,18 +55,18 @@ class LoginLinkHandlerTest extends TestCase
      * @group time-sensitive
      * @dataProvider provideCreateLoginLinkData
      */
-    public function testCreateLoginLink($user, array $extraProperties, Request $request = null)
+    public function testCreateLoginLink($user, array $extraProperties, Request $request = null, array $options = [])
     {
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
-                'app_check_login_link_route',
-                $this->callback(function ($parameters) use ($extraProperties) {
+                $options['route_name'] ?? 'app_check_login_link_route',
+                $this->callback(function ($parameters) use ($extraProperties, $options) {
                     return 'weaverryan' == $parameters['user']
                         && isset($parameters['expires'])
                         && isset($parameters['hash'])
                          // allow a small expiration offset to avoid time-sensitivity
-                        && abs(time() + 600 - $parameters['expires']) <= 1
+                        && abs(time() + ($options['lifetime'] ?? 600) - $parameters['expires']) <= 1
                         // make sure hash is what we expect
                         && $parameters['hash'] === $this->createSignatureHash('weaverryan', $parameters['expires'], array_values($extraProperties));
                 }),
@@ -81,10 +81,10 @@ class LoginLinkHandlerTest extends TestCase
 
             $this->router->expects($this->exactly(2))
                 ->method('setContext')
-                ->withConsecutive([$this->equalTo((new RequestContext())->fromRequest($request)->setParameter('_locale', $request->getLocale()))], [$currentRequestContext]);
+                ->withConsecutive([$this->equalTo((new RequestContext())->fromRequest($request)->setParameters(array_merge(['_locale' => $request->getLocale()], $options['parameters'] ?? [])))], [$currentRequestContext]);
         }
 
-        $loginLink = $this->createLinker([], array_keys($extraProperties))->createLoginLink($user, $request);
+        $loginLink = $this->createLinker($options, array_keys($extraProperties))->createLoginLink($user, $request, $options);
         $this->assertSame('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000', $loginLink->getUrl());
     }
 
@@ -109,6 +109,24 @@ class LoginLinkHandlerTest extends TestCase
         yield [
             new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash', new \DateTime('2020-06-01 00:00:00', new \DateTimeZone('+0000'))),
             ['lastAuthenticatedAt' => '2020-06-01T00:00:00+00:00'],
+        ];
+
+        yield [
+            new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash', new \DateTime('2020-06-01 00:00:00', new \DateTimeZone('+0000'))),
+            ['lastAuthenticatedAt' => '2020-06-01T00:00:00+00:00'],
+            null, ['lifetime' => 300],
+        ];
+
+        yield [
+            new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash', new \DateTime('2020-06-01 00:00:00', new \DateTimeZone('+0000'))),
+            ['lastAuthenticatedAt' => '2020-06-01T00:00:00+00:00'],
+            null, ['parameters' => ['uri' => 'uri_to_redirect_value']],
+        ];
+
+        yield [
+            new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash', new \DateTime('2020-06-01 00:00:00', new \DateTimeZone('+0000'))),
+            ['lastAuthenticatedAt' => '2020-06-01T00:00:00+00:00'],
+            Request::create('https://example.com'), ['lifetime' => 1200, 'route_name' => 'new_checker', 'parameters' => ['uri' => 'uri_to_redirect_value']],
         ];
     }
 

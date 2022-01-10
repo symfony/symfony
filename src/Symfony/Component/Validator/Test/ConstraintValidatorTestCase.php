@@ -271,8 +271,6 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $context = $this->createContext();
 
-        $validatorClassname = $constraint->validatedBy();
-
         $validator = $this->createValidator();
         $validator->initialize($context);
         $validator->validate($value, $constraint);

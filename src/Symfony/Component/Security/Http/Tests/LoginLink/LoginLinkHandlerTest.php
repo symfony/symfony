@@ -274,7 +274,7 @@ class TestLoginLinkHandlerUserProvider implements UserProviderInterface
 
     public function refreshUser(UserInterface $user): TestLoginLinkHandlerUser
     {
-        return $this->users[$username];
+        return $this->users[$user->getUserIdentifier()];
     }
 
     public function supportsClass(string $class): bool

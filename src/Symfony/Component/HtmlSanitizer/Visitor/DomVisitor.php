@@ -47,7 +47,7 @@ final class DomVisitor
     private array $elementsConfig;
 
     /**
-     * Registry of attributes to forcefuly set on nodes, index by element and attribute.
+     * Registry of attributes to forcefully set on nodes, index by element and attribute.
      *
      * @var array<string, array<string, string>>
      */

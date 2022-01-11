@@ -123,8 +123,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsEncoding(string $format): bool
+    public function supportsEncoding(string $format /*, array $context = [] */): bool
     {
         return self::FORMAT === $format;
     }
@@ -209,8 +211,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context
      */
-    public function supportsDecoding(string $format): bool
+    public function supportsDecoding(string $format /*, array $context = [] */): bool
     {
         return self::FORMAT === $format;
     }

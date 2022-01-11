@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Deprecate `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
+ * Deprecate `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
+ * Deprecate `ContextAwareEncoderInterface`, use `EncoderInterface` instead
+ * Deprecate `ContextAwareDecoderInterface`, use `DecoderInterface` instead
+
 6.0
 ---
 

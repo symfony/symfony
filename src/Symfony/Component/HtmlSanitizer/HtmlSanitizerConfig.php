@@ -105,7 +105,7 @@ class HtmlSanitizerConfig
      * All scripts will be removed but the output may still contain other dangerous
      * behaviors like CSS injection (click-jacking), CSS expressions, ...
      */
-    public function allowAllStaticElements(): static
+    public function allowStaticElements(): static
     {
         $elements = array_merge(
             array_keys(W3CReference::HEAD_ELEMENTS),

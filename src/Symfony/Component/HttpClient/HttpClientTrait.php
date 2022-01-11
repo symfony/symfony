@@ -159,7 +159,10 @@ trait HttpClientTrait
 
         // Finalize normalization of options
         $options['http_version'] = (string) ($options['http_version'] ?? '') ?: null;
-        $options['timeout'] = (float) ($options['timeout'] ?? ini_get('default_socket_timeout'));
+        if (0 > $options['timeout'] = (float) ($options['timeout'] ?? ini_get('default_socket_timeout'))) {
+            $options['timeout'] = 172800.0; // 2 days
+        }
+
         $options['max_duration'] = isset($options['max_duration']) ? (float) $options['max_duration'] : 0;
 
         return [$url, $options];

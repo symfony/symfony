@@ -535,7 +535,7 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
         return null;
     }
 
-    public function supportsDenormalization($data, string $type, string $format = null): bool
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return true;
     }

@@ -1861,6 +1861,7 @@ class Request
             'atom' => ['application/atom+xml'],
             'rss' => ['application/rss+xml'],
             'form' => ['application/x-www-form-urlencoded', 'multipart/form-data'],
+            'turbo_stream' => ['text/vnd.turbo-stream.html'],
         ];
     }
 

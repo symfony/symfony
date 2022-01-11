@@ -499,6 +499,7 @@ class RequestTest extends TestCase
             ['rdf', ['application/rdf+xml']],
             ['atom', ['application/atom+xml']],
             ['form', ['application/x-www-form-urlencoded', 'multipart/form-data']],
+            ['turbo_stream', ['text/vnd.turbo-stream.html']],
         ];
     }
 

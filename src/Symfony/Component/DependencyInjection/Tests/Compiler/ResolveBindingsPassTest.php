@@ -213,6 +213,13 @@ class ResolveBindingsPassTest extends TestCase
 
     public function testIterableBindingTypehint()
     {
+        $autoloader = static function ($class) {
+            if ('iterable' === $class) {
+                throw new \RuntimeException('We should not search pseudo-type iterable as class');
+            }
+        };
+        spl_autoload_register($autoloader);
+
         $container = new ContainerBuilder();
         $definition = $container->register('bar', NamedIterableArgumentDummy::class);
         $definition->setBindings([
@@ -222,5 +229,7 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
 
         $this->assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('bar')->getArgument(0));
+
+        spl_autoload_unregister($autoloader);
     }
 }

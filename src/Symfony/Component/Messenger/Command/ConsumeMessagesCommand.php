@@ -189,7 +189,7 @@ EOF
             $this->eventDispatcher->addSubscriber(new StopWorkerOnMemoryLimitListener($this->convertToBytes($memoryLimit), $this->logger));
         }
 
-        if ($timeLimit = $input->getOption('time-limit')) {
+        if (null !== ($timeLimit = $input->getOption('time-limit'))) {
             $stopsWhen[] = "been running for {$timeLimit}s";
             $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitListener($timeLimit, $this->logger));
         }

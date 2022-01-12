@@ -330,33 +330,9 @@ class FrameworkExtension extends Extension
             }
         }
 
-        // register cache before session so both can share the connection services
-        $this->registerCacheConfiguration($config['cache'], $container);
-
-        if ($this->isConfigEnabled($container, $config['session'])) {
-            if (!\extension_loaded('session')) {
-                throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://php.net/session.installation for instructions.');
-            }
-
-            $this->sessionConfigEnabled = true;
-            $this->registerSessionConfiguration($config['session'], $container, $loader);
-            if (!empty($config['test'])) {
-                // test listener will replace the existing session listener
-                // as we are aliasing to avoid duplicated registered events
-                $container->setAlias('session_listener', 'test.session.listener');
-            }
-        } elseif (!empty($config['test'])) {
-            $container->removeDefinition('test.session.listener');
-        }
-
         if ($this->isConfigEnabled($container, $config['request'])) {
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
-
-        if (null === $config['csrf_protection']['enabled']) {
-            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && ContainerBuilder::willBeAvailable('symfony/security-csrf', CsrfTokenManagerInterface::class, ['symfony/framework-bundle']);
-        }
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['form'])) {
             if (!class_exists(Form::class)) {
@@ -487,6 +463,31 @@ class FrameworkExtension extends Extension
 
             $this->registerUidConfiguration($config['uid'], $container, $loader);
         }
+
+        // register cache before session so both can share the connection services
+        $this->registerCacheConfiguration($config['cache'], $container);
+
+        if ($this->isConfigEnabled($container, $config['session'])) {
+            if (!\extension_loaded('session')) {
+                throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://php.net/session.installation for instructions.');
+            }
+
+            $this->sessionConfigEnabled = true;
+            $this->registerSessionConfiguration($config['session'], $container, $loader);
+            if (!empty($config['test'])) {
+                // test listener will replace the existing session listener
+                // as we are aliasing to avoid duplicated registered events
+                $container->setAlias('session_listener', 'test.session.listener');
+            }
+        } elseif (!empty($config['test'])) {
+            $container->removeDefinition('test.session.listener');
+        }
+
+        // csrf depends on session being registered
+        if (null === $config['csrf_protection']['enabled']) {
+            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && ContainerBuilder::willBeAvailable('symfony/security-csrf', CsrfTokenManagerInterface::class, ['symfony/framework-bundle']);
+        }
+        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         $this->addAnnotatedClassesToCompile([
             '**\\Controller\\',

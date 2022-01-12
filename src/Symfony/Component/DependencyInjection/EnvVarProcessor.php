@@ -272,11 +272,17 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('resolve' === $prefix) {
-            return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($name) {
+            return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($name, $getEnv) {
                 if (!isset($match[1])) {
                     return '%';
                 }
-                $value = $this->container->getParameter($match[1]);
+
+                if (str_starts_with($match[1], 'env(') && str_ends_with($match[1], ')') && 'env()' !== $match[1]) {
+                    $value = $getEnv(substr($match[1], 4, -1));
+                } else {
+                    $value = $this->container->getParameter($match[1]);
+                }
+
                 if (!is_scalar($value)) {
                     throw new RuntimeException(sprintf('Parameter "%s" found when resolving env var "%s" must be scalar, "%s" given.', $match[1], $name, get_debug_type($value)));
                 }

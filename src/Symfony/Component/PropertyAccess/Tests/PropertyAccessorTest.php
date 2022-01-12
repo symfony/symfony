@@ -13,7 +13,6 @@ namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
@@ -144,44 +143,73 @@ class PropertyAccessorTest extends TestCase
 
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousClass()
     {
-        $this->expectException(AccessException::class);
+        $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The method "class@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
 
-        $object = eval('return new class() {
+        $object = new class() {
             private $uninitialized;
 
             public function getUninitialized(): array
             {
                 return $this->uninitialized;
             }
-        };');
+        };
+
+        $this->propertyAccessor->getValue($object, 'uninitialized');
+    }
+
+    public function testGetValueThrowsExceptionIfUninitializedNotNullablePropertyWithGetterOfAnonymousClass()
+    {
+        $this->expectException(UninitializedPropertyException::class);
+        $this->expectExceptionMessage('The property "class@anonymous::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
+
+        $object = new class() {
+            private string $uninitialized;
+
+            public function getUninitialized(): string
+            {
+                return $this->uninitialized;
+            }
+        };
+
+        $this->propertyAccessor->getValue($object, 'uninitialized');
+    }
+
+    public function testGetValueThrowsExceptionIfUninitializedPropertyOfAnonymousClass()
+    {
+        $this->expectException(UninitializedPropertyException::class);
+        $this->expectExceptionMessage('The property "class@anonymous::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
+
+        $object = new class() {
+            public string $uninitialized;
+        };
 
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousStdClass()
     {
-        $this->expectException(AccessException::class);
+        $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The method "stdClass@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
 
-        $object = eval('return new class() extends \stdClass {
+        $object = new class() extends \stdClass {
             private $uninitialized;
 
             public function getUninitialized(): array
             {
                 return $this->uninitialized;
             }
-        };');
+        };
 
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousChildClass()
     {
-        $this->expectException(AccessException::class);
+        $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The method "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
 
-        $object = eval('return new class() extends \Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty {};');
+        $object = new class() extends \Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty {};
 
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
@@ -684,7 +712,7 @@ class PropertyAccessorTest extends TestCase
 
     private function generateAnonymousClass($value)
     {
-        $obj = eval('return new class($value)
+        return new class($value)
         {
             private $foo;
 
@@ -708,9 +736,7 @@ class PropertyAccessorTest extends TestCase
             {
                 $this->foo = $foo;
             }
-        };');
-
-        return $obj;
+        };
     }
 
     public function testThrowTypeErrorInsideSetterCall()

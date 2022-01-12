@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -386,6 +387,17 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $normalizedData = $normalizer->normalize(new EmptyDummy(), 'any', ['preserve_empty_objects' => true]);
         $this->assertEquals(new \ArrayObject(), $normalizedData);
+    }
+
+    public function testDenormalizeRecursiveWithObjectAttributeWithStringValue()
+    {
+        $extractor = new ReflectionExtractor();
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([$normalizer]);
+
+        $obj = $serializer->denormalize(['inner' => 'foo'], ObjectOuter::class);
+
+        $this->assertInstanceOf(ObjectInner::class, $obj->getInner());
     }
 }
 

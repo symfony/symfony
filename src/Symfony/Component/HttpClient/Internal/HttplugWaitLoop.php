@@ -47,7 +47,7 @@ final class HttplugWaitLoop
             return 0;
         }
 
-        $guzzleQueue = \GuzzleHttp\Promise\queue();
+        $guzzleQueue = \GuzzleHttp\Promise\Utils::queue();
 
         if (0.0 === $remainingDuration = $maxDuration) {
             $idleTimeout = 0.0;

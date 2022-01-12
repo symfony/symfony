@@ -307,29 +307,9 @@ class FrameworkExtension extends Extension
             }
         }
 
-        // register cache before session so both can share the connection services
-        $this->registerCacheConfiguration($config['cache'], $container);
-
-        if ($this->isConfigEnabled($container, $config['session'])) {
-            if (!\extension_loaded('session')) {
-                throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://php.net/session.installation for instructions.');
-            }
-
-            $this->sessionConfigEnabled = true;
-            $this->registerSessionConfiguration($config['session'], $container, $loader);
-            if (!empty($config['test'])) {
-                $container->getDefinition('test.session.listener')->setArgument(1, '%session.storage.options%');
-            }
-        }
-
         if ($this->isConfigEnabled($container, $config['request'])) {
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
-
-        if (null === $config['csrf_protection']['enabled']) {
-            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && ContainerBuilder::willBeAvailable('symfony/security-csrf', CsrfTokenManagerInterface::class, ['symfony/framework-bundle']);
-        }
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['form'])) {
             if (!class_exists(Form::class)) {
@@ -458,6 +438,28 @@ class FrameworkExtension extends Extension
 
             $this->registerUidConfiguration($config['uid'], $container, $loader);
         }
+
+        // register cache & dependencies last so that user-defined cache pools take precedence over the default pools created above (e.g. in rate_limiter, validation)
+        $this->registerCacheConfiguration($config['cache'], $container);
+
+        // register session after cache so both can share the connection services
+        if ($this->isConfigEnabled($container, $config['session'])) {
+            if (!\extension_loaded('session')) {
+                throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://php.net/session.installation for instructions.');
+            }
+
+            $this->sessionConfigEnabled = true;
+            $this->registerSessionConfiguration($config['session'], $container, $loader);
+            if (!empty($config['test'])) {
+                $container->getDefinition('test.session.listener')->setArgument(1, '%session.storage.options%');
+            }
+        }
+
+        // csrf depends on session being registered
+        if (null === $config['csrf_protection']['enabled']) {
+            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && ContainerBuilder::willBeAvailable('symfony/security-csrf', CsrfTokenManagerInterface::class, ['symfony/framework-bundle']);
+        }
+        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         $this->addAnnotatedClassesToCompile([
             '**\\Controller\\',

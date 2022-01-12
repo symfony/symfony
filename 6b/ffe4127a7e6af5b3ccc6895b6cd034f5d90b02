@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-12-31T12:14:24Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-01T08:18:48Z
+
+Hey!
+
+I think @VincentLanglet has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Kocal at 2022-01-02T16:07:29Z
+
+Would it be possible to have Blackfire traces before/after your optimization?
+
+---------------------------------------------------------------------------
+
+by sveneld at 2022-01-02T18:26:21Z
+
+@Kocal only xhprof
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-01-04T09:07:56Z
+
+Great @sveneld, it would be interesting to see the before and after profiles
+
+---------------------------------------------------------------------------
+
+by sveneld at 2022-01-04T11:22:51Z
+
+https://drive.google.com/drive/folders/1GoWngjjwXA6TQrGYix7xVk-LSLl3ijvp?usp=sharing
+
+Main difference in Symfony\\Component\\DependencyInjection\\ContainerBuilder::resolveEnvPlaceholders==>stripos it calls less
+
+---------------------------------------------------------------------------
+
+by sveneld at 2022-01-10T06:19:44Z
+
+@Nyholm @Kocal have you looked?
+
+---------------------------------------------------------------------------
+
+by Kocal at 2022-01-10T07:29:29Z
+
+Not at all, I asked this question in anticipation, in order to save time for the core team :stuck_out_tongue:
+
+---------------------------------------------------------------------------
+
+by sveneld at 2022-01-11T06:57:46Z
+
+@nicolas-grekas can you look?

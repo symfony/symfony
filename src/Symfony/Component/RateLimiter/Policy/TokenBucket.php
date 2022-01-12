@@ -20,7 +20,6 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
-    private $stringRate;
     private $id;
     private $rate;
 
@@ -47,8 +46,6 @@ final class TokenBucket implements LimiterStateInterface
      */
     public function __construct(string $id, int $initialTokens, Rate $rate, float $timer = null)
     {
-        unset($this->stringRate);
-
         if ($initialTokens < 1) {
             throw new \InvalidArgumentException(sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
         }
@@ -91,9 +88,23 @@ final class TokenBucket implements LimiterStateInterface
         return $this->rate->calculateTimeForTokens($this->burstSize);
     }
 
-    /**
-     * @internal
-     */
+    public function __serialize(): array
+    {
+        return [
+            pack('N', $this->burstSize).$this->id => $this->tokens,
+            (string) $this->rate => $this->timer,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$this->tokens, $this->timer] = array_values($data);
+        [$pack, $rate] = array_keys($data);
+        $this->rate = Rate::fromString($rate);
+        $this->burstSize = unpack('Na', $pack)['a'];
+        $this->id = substr($pack, 4);
+    }
+
     public function __sleep(): array
     {
         $this->stringRate = (string) $this->rate;
@@ -101,16 +112,11 @@ final class TokenBucket implements LimiterStateInterface
         return ['id', 'tokens', 'timer', 'burstSize', 'stringRate'];
     }
 
-    /**
-     * @internal
-     */
     public function __wakeup(): void
     {
-        if (!\is_string($this->stringRate)) {
-            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        if (\is_string($rate = $this->stringRate ?? null)) {
+            $this->rate = Rate::fromString($rate);
+            unset($this->stringRate);
         }
-
-        $this->rate = Rate::fromString($this->stringRate);
-        unset($this->stringRate);
     }
 }

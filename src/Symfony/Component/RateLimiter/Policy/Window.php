@@ -85,4 +85,19 @@ final class Window implements LimiterStateInterface
 
         return $cyclesRequired * $this->intervalInSeconds;
     }
+
+    public function __serialize(): array
+    {
+        return [
+            $this->id => $this->timer,
+            pack('NN', $this->hitCount, $this->intervalInSeconds) => $this->maxSize,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$this->timer, $this->maxSize] = array_values($data);
+        [$this->id, $pack] = array_keys($data);
+        ['a' => $this->hitCount, 'b' => $this->intervalInSeconds] = unpack('Na/Nb', $pack);
+    }
 }

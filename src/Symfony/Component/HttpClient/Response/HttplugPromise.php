@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Response;
 
-use function GuzzleHttp\Promise\promise_for;
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface as GuzzlePromiseInterface;
 use Http\Promise\Promise as HttplugPromiseInterface;
 use Psr\Http\Message\ResponseInterface as Psr7ResponseInterface;
@@ -74,7 +74,7 @@ final class HttplugPromise implements HttplugPromiseInterface
         }
 
         return static function ($value) use ($callback) {
-            return promise_for($callback($value));
+            return Create::promiseFor($callback($value));
         };
     }
 }

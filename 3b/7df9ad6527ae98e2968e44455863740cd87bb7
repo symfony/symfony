@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-05T17:34:00Z
+
+Hey!
+
+I think @Th3Mouk has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-01-07T09:52:59Z
+
+It would still makes more sense to me if the test was in `AbstractObjectNormalizerTest` instead of `AbstractNormalizerTest` :pray:
+
+---------------------------------------------------------------------------
+
+by JustDylan23 at 2022-01-07T20:39:07Z
+
+@fancyweb
+
+> It would still makes more sense to me if the test was in `AbstractObjectNormalizerTest` instead of `AbstractNormalizerTest` 🙏
+
+I moved it 👍
+
+---------------------------------------------------------------------------
+
+by JustDylan23 at 2022-01-07T22:01:21Z
+
+are the tests that are failing now something on my end? I could rebase on 6.0 if desired
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-01-12T08:04:43Z
+
+Thanks. The tests look good to me.

@@ -126,7 +126,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
                 $this->unusedBindings[$bindingId] = [$key, $this->currentId, $bindingType, $file];
             }
 
-            if (preg_match('/^(?:(?:array|bool|float|int|string|([^ $]++)) )\$/', $key, $m)) {
+            if (preg_match('/^(?:(?:array|bool|float|int|string|iterable|([^ $]++)) )\$/', $key, $m)) {
                 $bindingNames[substr($key, \strlen($m[0]))] = $binding;
             }
 

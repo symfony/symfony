@@ -41,6 +41,7 @@ class Connection
         'queue_name' => 'default',
         'redeliver_timeout' => 3600,
         'auto_setup' => true,
+        'force_indexes_creation' => false,
     ];
 
     /**
@@ -53,6 +54,7 @@ class Connection
      * * queue_name: name of the queue
      * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default 3600
      * * auto_setup: Whether the table should be created automatically during send / get. Default : true
+     * * force_indexes_creation: Wheter mysql indexes should be created also on mysql
      */
     private $configuration = [];
     private $driverConnection;
@@ -397,7 +399,7 @@ class Connection
             ->setNotnull(false);
         $table->setPrimaryKey(['id']);
         // No indices on queue_name and available_at on MySQL to prevent deadlock issues when running multiple consumers.
-        if (!$this->driverConnection->getDatabasePlatform() instanceof MySqlPlatform) {
+        if ($this->configuration['force_indexes_creation'] || !$this->driverConnection->getDatabasePlatform() instanceof MySqlPlatform) {
             $table->addIndex(['queue_name']);
             $table->addIndex(['available_at']);
         }

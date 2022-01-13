@@ -414,7 +414,7 @@ class ConnectionTest extends TestCase
     /**
      * @dataProvider setupIndicesProvider
      */
-    public function testSetupIndices(string $platformClass, array $expectedIndices)
+    public function testSetupIndices(string $platformClass, array $expectedIndices, array $options = [])
     {
         $driverConnection = $this->createMock(DBALConnection::class);
         $driverConnection->method('getConfiguration')->willReturn(new Configuration());
@@ -448,7 +448,7 @@ class ConnectionTest extends TestCase
             ->willReturn([]);
         $driverConnection->method('getDatabasePlatform')->willReturn($platformMock);
 
-        $connection = new Connection([], $driverConnection);
+        $connection = new Connection($options, $driverConnection);
         $connection->setup();
     }
 
@@ -457,6 +457,12 @@ class ConnectionTest extends TestCase
         yield 'MySQL' => [
             MySQL57Platform::class,
             [['delivered_at']],
+        ];
+
+        yield 'MySQL with forced index' => [
+            MySQL57Platform::class,
+            [['queue_name'], ['available_at'], ['delivered_at']],
+            ['force_indexes_creation' => true]
         ];
 
         yield 'Other platforms' => [

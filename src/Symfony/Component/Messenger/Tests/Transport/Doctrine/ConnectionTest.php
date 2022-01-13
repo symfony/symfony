@@ -462,7 +462,7 @@ class ConnectionTest extends TestCase
         yield 'MySQL with forced index' => [
             MySQL57Platform::class,
             [['queue_name'], ['available_at'], ['delivered_at']],
-            ['force_indexes_creation' => true]
+            ['force_indexes_creation' => true],
         ];
 
         yield 'Other platforms' => [

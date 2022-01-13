@@ -19,6 +19,14 @@ use Symfony\Component\Uid\UuidV4;
 
 class UlidTest extends TestCase
 {
+    public function testStringable()
+    {
+        $ulid = new Ulid('00000000000000000000000000');
+
+        $this->assertInstanceOf(\Stringable::class, $ulid);
+        $this->assertSame('00000000000000000000000000', (string) $ulid);
+    }
+
     /**
      * @group time-sensitive
      */

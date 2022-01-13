@@ -27,6 +27,14 @@ class UuidTest extends TestCase
     private const A_UUID_V1 = 'd9e7a184-5d5b-11ea-a62a-3499710062d0';
     private const A_UUID_V4 = 'd6b3345b-2905-4048-a83c-b5988e765d98';
 
+    public function testStringable()
+    {
+        $uuid = Uuid::fromString(self::A_UUID_V4);
+
+        $this->assertInstanceOf(\Stringable::class, $uuid);
+        $this->assertSame(self::A_UUID_V4, (string) $uuid);
+    }
+
     /**
      * @dataProvider provideInvalidUuids
      */

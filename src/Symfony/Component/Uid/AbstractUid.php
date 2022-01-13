@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractUid implements \JsonSerializable
+abstract class AbstractUid implements \JsonSerializable, \Stringable
 {
     /**
      * The identifier in its canonic representation.

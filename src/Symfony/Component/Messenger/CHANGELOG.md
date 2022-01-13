@@ -3,7 +3,7 @@ CHANGELOG
 
 4.4.0
 -----
-
+ * Added option for forcing mysql indexes creation for doctrine transport
  * Added support for auto trimming of Redis streams.
  * `InMemoryTransport` handle acknowledged and rejected messages.
  * Made all dispatched worker event classes final.

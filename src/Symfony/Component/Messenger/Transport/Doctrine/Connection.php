@@ -54,7 +54,7 @@ class Connection
      * * queue_name: name of the queue
      * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default 3600
      * * auto_setup: Whether the table should be created automatically during send / get. Default : true
-     * * force_indexes_creation: Wheter mysql indexes should be created also on mysql
+     * * force_indexes_creation: Whether indexes should be created also on mysql
      */
     private $configuration = [];
     private $driverConnection;

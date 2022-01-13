@@ -23,8 +23,10 @@ use Symfony\Component\HttpClient\Response\CurlResponse;
  */
 final class CurlClientState extends ClientState
 {
-    /** @var array<\CurlMultiHandle|resource> */
-    public $handles = [];
+    /** @var \CurlMultiHandle|resource */
+    public $handle;
+    /** @var \CurlShareHandle|resource */
+    public $share;
     /** @var PushedResponse[] */
     public $pushedResponses = [];
     /** @var DnsCache */
@@ -34,27 +36,23 @@ final class CurlClientState extends ClientState
 
     public static $curlVersion;
 
-    private $maxHostConnections;
-    private $maxPendingPushes;
-
     public function __construct(int $maxHostConnections, int $maxPendingPushes)
     {
         self::$curlVersion = self::$curlVersion ?? curl_version();
 
-        array_unshift($this->handles, $mh = curl_multi_init());
+        $this->handle = curl_multi_init();
         $this->dnsCache = new DnsCache();
-        $this->maxHostConnections = $maxHostConnections;
-        $this->maxPendingPushes = $maxPendingPushes;
+        $this->reset();
 
         // Don't enable HTTP/1.1 pipelining: it forces responses to be sent in order
         if (\defined('CURLPIPE_MULTIPLEX')) {
-            curl_multi_setopt($mh, \CURLMOPT_PIPELINING, \CURLPIPE_MULTIPLEX);
+            curl_multi_setopt($this->handle, \CURLMOPT_PIPELINING, \CURLPIPE_MULTIPLEX);
         }
         if (\defined('CURLMOPT_MAX_HOST_CONNECTIONS')) {
-            $maxHostConnections = curl_multi_setopt($mh, \CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : \PHP_INT_MAX) ? 0 : $maxHostConnections;
+            $maxHostConnections = curl_multi_setopt($this->handle, \CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : \PHP_INT_MAX) ? 0 : $maxHostConnections;
         }
         if (\defined('CURLMOPT_MAXCONNECTS') && 0 < $maxHostConnections) {
-            curl_multi_setopt($mh, \CURLMOPT_MAXCONNECTS, $maxHostConnections);
+            curl_multi_setopt($this->handle, \CURLMOPT_MAXCONNECTS, $maxHostConnections);
         }
 
         // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/77535
@@ -67,17 +65,8 @@ final class CurlClientState extends ClientState
             return;
         }
 
-        // Clone to prevent a circular reference
-        $multi = clone $this;
-        $multi->handles = [$mh];
-        $multi->pushedResponses = &$this->pushedResponses;
-        $multi->logger = &$this->logger;
-        $multi->handlesActivity = &$this->handlesActivity;
-        $multi->openHandles = &$this->openHandles;
-        $multi->lastTimeout = &$this->lastTimeout;
-
-        curl_multi_setopt($mh, \CURLMOPT_PUSHFUNCTION, static function ($parent, $pushed, array $requestHeaders) use ($multi, $maxPendingPushes) {
-            return $multi->handlePush($parent, $pushed, $requestHeaders, $maxPendingPushes);
+        curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, function ($parent, $pushed, array $requestHeaders) use ($maxPendingPushes) {
+            return $this->handlePush($parent, $pushed, $requestHeaders, $maxPendingPushes);
         });
     }
 
@@ -85,10 +74,7 @@ final class CurlClientState extends ClientState
     {
         foreach ($this->pushedResponses as $url => $response) {
             $this->logger && $this->logger->debug(sprintf('Unused pushed response: "%s"', $url));
-
-            foreach ($this->handles as $mh) {
-                curl_multi_remove_handle($mh, $response->handle);
-            }
+            curl_multi_remove_handle($this->handle, $response->handle);
             curl_close($response->handle);
         }
 
@@ -96,11 +82,14 @@ final class CurlClientState extends ClientState
         $this->dnsCache->evictions = $this->dnsCache->evictions ?: $this->dnsCache->removals;
         $this->dnsCache->removals = $this->dnsCache->hostnames = [];
 
-        if (\defined('CURLMOPT_PUSHFUNCTION')) {
-            curl_multi_setopt($this->handles[0], \CURLMOPT_PUSHFUNCTION, null);
-        }
+        $this->share = curl_share_init();
 
-        $this->__construct($this->maxHostConnections, $this->maxPendingPushes);
+        curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_DNS);
+        curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_SSL_SESSION);
+
+        if (\defined('CURL_LOCK_DATA_CONNECT')) {
+            curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_CONNECT);
+        }
     }
 
     private function handlePush($parent, $pushed, array $requestHeaders, int $maxPendingPushes): int

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by jonag at 2022-01-13T16:19:03Z
+
+I was playing with the last version of Doctrine this afternoon and ran into this exact issue. This also prevent the Serializer to correctly denormalize an object which one of its property is an enum.
+
+I was looking for a way to fix this but you were faster. Anyway, I tried your patch and it works like a charm, thank you 👌 !

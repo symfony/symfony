@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-10T19:24:10Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-11T15:28:58Z
+
+Hey!
+
+I think @monteiro has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-01-11T18:54:21Z
+
+I think this should go to 6.1 as a DX improvement. It does not qualify as a bug fix.
+
+---------------------------------------------------------------------------
+
+by angelov at 2022-01-11T19:43:06Z
+
+> I think this should go to 6.1 as a DX improvement. It does not qualify as a bug fix.
+
+Thanks! I though the same, but wasn't sure. I updated the PR to point towards 6.1
+
+---------------------------------------------------------------------------
+
+by angelov at 2022-01-12T17:20:17Z
+
+The failures in the checks seem unrelated to me?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-01-13T21:44:51Z
+
+@angelov : Could you add an entry about this in the Messenger CHANGELOG.md 6.1 section ?
+Also, great first-time contrib 👌🏻
+
+---------------------------------------------------------------------------
+
+by angelov at 2022-01-13T22:22:28Z
+
+@ogizanagi thanks!
+
+Updated the changelog, I hope it's alright.

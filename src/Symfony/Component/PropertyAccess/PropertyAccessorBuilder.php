@@ -101,6 +101,18 @@ class PropertyAccessorBuilder
     }
 
     /**
+     * Enables the use of "__unset" by the PropertyAccessor.
+     *
+     * @return $this
+     */
+    public function enableMagicUnset(): static
+    {
+        $this->magicMethods |= PropertyAccessor::MAGIC_UNSET;
+
+        return $this;
+    }
+
+    /**
      * Disables the use of "__call" by the PropertyAccessor.
      *
      * @return $this
@@ -137,6 +149,18 @@ class PropertyAccessorBuilder
     }
 
     /**
+     * Disables the use of "__unset" by the PropertyAccessor.
+     *
+     * @return $this
+     */
+    public function disableMagicUnset(): static
+    {
+        $this->magicMethods &= ~PropertyAccessor::MAGIC_UNSET;
+
+        return $this;
+    }
+
+    /**
      * @return bool whether the use of "__call" by the PropertyAccessor is enabled
      */
     public function isMagicCallEnabled(): bool
@@ -158,6 +182,14 @@ class PropertyAccessorBuilder
     public function isMagicSetEnabled(): bool
     {
         return $this->magicMethods & PropertyAccessor::MAGIC_SET;
+    }
+
+    /**
+     * @return bool whether the use of "__unset" by the PropertyAccessor is enabled
+     */
+    public function isMagicUnsetEnabled(): bool
+    {
+        return $this->magicMethods & PropertyAccessor::MAGIC_UNSET;
     }
 
     /**

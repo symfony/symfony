@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyInfo\Extractor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyNullableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -30,7 +31,7 @@ use Symfony\Component\String\Inflector\InflectorInterface;
  *
  * @final
  */
-class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface, ConstructorArgumentTypeExtractorInterface
+class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface, ConstructorArgumentTypeExtractorInterface, PropertyNullableExtractorInterface
 {
     /**
      * @internal
@@ -59,6 +60,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     public const ALLOW_MAGIC_SET = 1 << 1;
     /** @var int Allow magic __call methods */
     public const ALLOW_MAGIC_CALL = 1 << 2;
+    /** @var int Allow magic __unset method */
+    public const ALLOW_MAGIC_UNSET = 1 << 3;
+
+    public const NOTHING_NULLABLE = 0;
+    public const PROPERTY_NULLABLE = 1 << 0;
+    public const SETTER_NULLABLE = 1 << 1;
 
     private const MAP_TYPES = [
         'integer' => Type::BUILTIN_TYPE_INT,
@@ -134,6 +141,25 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         return $properties ? array_values($properties) : null;
+    }
+
+    public function getNullableInfo(string $class, string $property): int
+    {
+        $nullable = self::NOTHING_NULLABLE;
+
+        $fromMutator = $this->extractFromMutator($class, $property);
+
+        if (null === $fromMutator || $fromMutator[0]->isNullable()) {
+            $nullable |= self::SETTER_NULLABLE;
+        }
+
+        $fromPropertyDeclaration = $this->extractFromPropertyDeclaration($class, $property);
+
+        if (null === $fromPropertyDeclaration || $fromPropertyDeclaration[0]->isNullable()) {
+            $nullable |= self::PROPERTY_NULLABLE;
+        }
+//dd($nullable === self::SETTER_NULLABLE);
+        return $nullable;
     }
 
     /**
@@ -575,7 +601,17 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
             $reflectionPropertyType = $reflectionProperty->getType();
 
-            return null !== $reflectionPropertyType && $reflectionPropertyType->allowsNull();
+            return null === $reflectionPropertyType || $reflectionPropertyType->allowsNull();
+//            TODO: I think this condition is not correct. Review, pls. Property $a in this class is evaluated as
+//                  not nullable according to the original condition:
+//            class A
+//            {
+//                    private $a = 1;
+//                    public function setA($a) { $this->a = $a; }
+//                    public function getA() { return $this->a; }
+//            }
+//
+//            return null !== $reflectionPropertyType && $reflectionPropertyType->allowsNull();
         } catch (\ReflectionException $e) {
             // Return false if the property doesn't exist
         }

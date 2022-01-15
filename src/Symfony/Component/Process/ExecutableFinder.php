@@ -46,10 +46,19 @@ class ExecutableFinder
      */
     public function find(string $name, string $default = null, array $extraDirs = []): ?string
     {
+        $command = strtok(exec(('\\' === \DIRECTORY_SEPARATOR ? 'where ' : 'command -v ').escapeshellarg($name)), \PHP_EOL);
+        if ($command && !@is_executable($command)) {
+            $command = null;
+        }
+
         if (ini_get('open_basedir')) {
             $searchPath = array_merge(explode(\PATH_SEPARATOR, ini_get('open_basedir')), $extraDirs);
             $dirs = [];
             foreach ($searchPath as $path) {
+                if ($command && 0 === \strpos($command, $path)) {
+                    return $command;
+                }
+
                 // Silencing against https://bugs.php.net/69240
                 if (@is_dir($path)) {
                     $dirs[] = $path;
@@ -59,6 +68,8 @@ class ExecutableFinder
                     }
                 }
             }
+        } elseif ($command) {
+            return $command;
         } else {
             $dirs = array_merge(
                 explode(\PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),

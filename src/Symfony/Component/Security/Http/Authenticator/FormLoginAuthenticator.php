@@ -74,7 +74,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         return ($this->options['post_only'] ? $request->isMethod('POST') : true)
             && $this->httpUtils->checkRequestPath($request, $this->options['check_path'])
-            && ($this->options['form_only'] ? 'form' === $request->getContentType() : true);
+            && ($this->options['form_only'] ? 'form' === (method_exists(Request::class, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType()) : true);
     }
 
     public function authenticate(Request $request): Passport

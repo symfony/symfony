@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add stale while revalidate and stale if error cache header
  * Allow dynamic session "ttl" when using a remote storage
+ * Deprecate `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
 
 6.0
 ---

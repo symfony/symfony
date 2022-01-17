@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-01-17T08:57:45Z
+
+As not having a strategy is a normal use case for the class, I'd rather make the property nullable instead.

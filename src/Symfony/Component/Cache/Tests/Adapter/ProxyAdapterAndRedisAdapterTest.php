@@ -50,6 +50,7 @@ class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTest
         );
 
         $cache = $this->createCachePool(1);
+        $cache->clear();
         $value = rand();
         $item = $cache->getItem('foo');
         $setCacheItemExpiry($item, 0);

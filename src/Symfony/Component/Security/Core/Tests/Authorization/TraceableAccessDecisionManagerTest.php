@@ -274,4 +274,13 @@ class TraceableAccessDecisionManagerTest extends TestCase
             ],
         ], $sut->getDecisionLog());
     }
+
+    public function testCustomAccessDecisionManagerReturnsEmptyStrategy()
+    {
+        $admMock = $this->createMock(AccessDecisionManagerInterface::class);
+
+        $adm = new TraceableAccessDecisionManager($admMock);
+
+        $this->assertEquals('-', $adm->getStrategy());
+    }
 }

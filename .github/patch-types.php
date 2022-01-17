@@ -31,6 +31,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/Preload/'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/Prototype/BadClasses/MissingParent.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/'):
+        case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/TestServiceSubscriberIntersectionWithTrait.php'):
         case false !== strpos($file, '/src/Symfony/Component/ErrorHandler/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Answer.php'):
         case false !== strpos($file, '/src/Symfony/Component/Form/Tests/Fixtures/Number.php'):

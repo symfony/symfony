@@ -135,13 +135,16 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         }
 
         if ($metadata->hasField($property)) {
+            $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
+            if (null !== $enumClass = $metadata->getFieldMapping($property)['enumType'] ?? null) {
+                return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $enumClass)];
+            }
+
             $typeOfField = $metadata->getTypeOfField($property);
 
             if (!$builtinType = $this->getPhpType($typeOfField)) {
                 return null;
             }
-
-            $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
 
             switch ($builtinType) {
                 case Type::BUILTIN_TYPE_OBJECT:

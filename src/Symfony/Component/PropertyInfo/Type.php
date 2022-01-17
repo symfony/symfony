@@ -162,4 +162,28 @@ class Type
     {
         return $this->collectionValueType;
     }
+
+    public static function dateTime(bool $nullable): self
+    {
+        return new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, \DateTime::class);
+    }
+
+    public static function dateTimeImmutable(bool $nullable): self
+    {
+        return new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, \DateTimeImmutable::class);
+    }
+
+    public static function dateInterval(bool $nullable): self
+    {
+        return new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, \DateInterval::class);
+    }
+
+    public static function array(bool $nullable, bool $isSimpleArray = false): self
+    {
+        if (!$isSimpleArray) {
+            return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true);
+        }
+
+        return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING));
+    }
 }

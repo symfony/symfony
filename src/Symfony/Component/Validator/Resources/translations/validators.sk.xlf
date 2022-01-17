@@ -394,6 +394,14 @@
                 <source>This value is not a valid CSS color.</source>
                 <target>Táto hodnota nie je platná CSS farba.</target>
             </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Táto hodnota nie je platnou notáciou CIDR.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Hodnota masky siete by mala byť medzi {{ min }} a {{ max }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

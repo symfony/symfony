@@ -296,7 +296,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Normalizes the given data to an array. It's particularly useful during
      * the denormalization process.
      */
-    protected function prepareForDenormalization(object|array|null $data): array
+    protected function prepareForDenormalization(mixed $data): array
     {
         return (array) $data;
     }

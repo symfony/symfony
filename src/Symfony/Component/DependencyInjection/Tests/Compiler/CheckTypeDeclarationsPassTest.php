@@ -972,6 +972,20 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         $this->addToAssertionCount(1);
     }
+
+    public function testIgnoreDefinitionFactoryArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', Bar::class)
+            ->setArguments([
+                (new Definition(Foo::class))
+                    ->setFactory([Foo::class, 'createStdClass']),
+            ]);
+
+        (new CheckTypeDeclarationsPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
 }
 
 class CallableClass

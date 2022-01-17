@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Use importance level to set flash message type
+
 5.4
 ---
 

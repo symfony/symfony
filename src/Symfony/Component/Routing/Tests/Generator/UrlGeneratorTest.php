@@ -1012,6 +1012,12 @@ class UrlGeneratorTest extends TestCase
         yield ['/app.php/bar/a/b/bam/c/d/e', '/bar/{foo}/bam/{baz}', '(?<!^).+'];
     }
 
+    public function testUtf8VarName()
+    {
+        $routes = $this->getRoutes('test', new Route('/foo/{bär}', [], [], ['utf8' => true]));
+        $this->assertSame('/app.php/foo/baz', $this->getGenerator($routes)->generate('test', ['bär' => 'baz']));
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = [], $logger = null, string $defaultLocale = null)
     {
         $context = new RequestContext('/app.php');

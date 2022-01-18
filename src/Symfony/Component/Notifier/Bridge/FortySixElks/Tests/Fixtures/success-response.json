@@ -1,0 +1,11 @@
+{
+    "status": "created",
+    "direction": "outgoing",
+    "from": "+46702222222",
+    "created": "2021-12-30T20:35:32.429389",
+    "parts": 1,
+    "to": "+46701111111",
+    "cost": 3900,
+    "message": "Symfony test",
+    "id": "s0231d6d7d6bc14a7e7734e466785c4ce"
+}

@@ -1,0 +1,102 @@
+---------------------------------------------------------------------------
+
+by jongotlin at 2021-12-31T08:40:44Z
+
+Test is failing due to the transport is named `46elks` but classes are named `FortysixElks...`. Shall I rename the transport to `fortysix-elks` or alter `FrameworkExtensionTest` somehow?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-01-02T06:05:28Z
+
+@symfony/mergers how do we proceed with the class naming? Thanks
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-01-02T11:14:09Z
+
+Awesome. Thank you.
+
+Could you add this package to the root composer.json's `replace` section? I would also like to see fabbot.io happy (just some CS)
+
+About the naming... Hm.. Im not sure. If you dont mind, I suggest to rename the transport to `fortysix-elks` or similar so the test passes.
+
+---------------------------------------------------------------------------
+
+by jongotlin at 2022-01-02T12:35:33Z
+
+Did I understand you correctly about replace @Nyholm?
+
+I made the test pass by ignoring this transport. I think it's a (slightly) better solution than renaming the transport to something that is not the service/company name.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-01-03T05:30:43Z
+
+@Nyholm I am not sure about the replace section 🧐
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-01-03T10:29:52Z
+
+> @Nyholm I am not sure about the replace section 🧐
+
+Oh. I was just reading the CI output. I thought we did that for all bridges. See the [job](https://github.com/symfony/symfony/blob/6.1/.github/workflows/package-tests.yml#L85-L90)
+
+@fancyweb Maybe we did a misstake [here](https://github.com/symfony/symfony/commit/fb3f4e403c91d985267f1e0aa8e9d5d17220619e#diff-7decc51dc40f779ca71da3591e2d1b46cacc0d1724823f5137061bc0a6297fc0R85)?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-01-03T10:38:06Z
+
+@OskarStark you are correct. It should not be in the composer's replace section. The CI job was wrong. I've updated the CI job in https://github.com/symfony/symfony/pull/44894
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-01-03T11:17:27Z
+
+Thanks Tobias!
+
+---------------------------------------------------------------------------
+
+by jongotlin at 2022-01-03T20:49:40Z
+
+Squashed and rebased. @Nyholm @OskarStark
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-04T22:03:23Z
+
+FortySix or Fortysix
+But also 46 or fortysix or forty-six in the package name (and maybe in the service name of course)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-01-05T08:28:09Z
+
+If we use letters instead of numbers, that would be `FortySix` (F and S uppercased), and so `forty-six` for the package name and where we need underscore names.
+
+In any case, we need to be consistent and only use one or the other, not both.
+
+---------------------------------------------------------------------------
+
+by jongotlin at 2022-01-05T20:56:22Z
+
+Renamed classes and transport. Some places still refers to 46elks but that's more about the company rather than the implementation. But some are in between and I'm not sure what to use 🤷
+
+---------------------------------------------------------------------------
+
+by jongotlin at 2022-01-13T06:25:36Z
+
+Regarding naming, isn't `fortysix-elks` more correct than `forty-six-elks`? It is referring to `46` and not `40 6`.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-01-13T11:47:58Z
+
+@jongotlin the textual version of 46 is `forty-six`, not `fortysix`
+
+---------------------------------------------------------------------------
+
+by jongotlin at 2022-01-13T11:56:58Z
+
+@stof, ok thanks. Didn't know.

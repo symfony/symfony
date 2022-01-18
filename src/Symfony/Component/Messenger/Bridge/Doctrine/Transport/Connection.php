@@ -153,7 +153,6 @@ class Connection implements ResetInterface
 
     public function get(): ?array
     {
-        get:
         $this->driverConnection->beginTransaction();
         try {
             $query = $this->createAvailableMessagesQueryBuilder()
@@ -214,7 +213,8 @@ class Connection implements ResetInterface
 
             if ($this->autoSetup && $e instanceof TableNotFoundException) {
                 $this->setup();
-                goto get;
+                
+                return $this->get();
             }
 
             throw $e;

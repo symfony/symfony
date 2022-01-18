@@ -111,7 +111,7 @@ final class OrangeSmsTransport extends AbstractTransport
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new TransportException('Failed to get Orange access token .', $response);
+            throw new TransportException('Failed to get Orange access token.', $response);
         }
 
         return $response->toArray()['access_token'];

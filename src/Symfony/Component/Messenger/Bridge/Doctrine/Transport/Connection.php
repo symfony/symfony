@@ -213,7 +213,7 @@ class Connection implements ResetInterface
 
             if ($this->autoSetup && $e instanceof TableNotFoundException) {
                 $this->setup();
-                
+
                 return $this->get();
             }
 

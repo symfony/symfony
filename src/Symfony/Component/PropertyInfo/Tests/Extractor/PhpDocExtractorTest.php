@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Type;
@@ -427,6 +428,22 @@ class PhpDocExtractorTest extends TestCase
             ['numericString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
             ['traitString', [new Type(Type::BUILTIN_TYPE_STRING, false, null)]],
             ['positiveInt', [new Type(Type::BUILTIN_TYPE_INT, false, null)]],
+        ];
+    }
+
+    /**
+     * @dataProvider promotedPropertyProvider
+     */
+    public function testExtractPromotedProperty(string $property, ?array $types)
+    {
+        $this->assertEquals($types, $this->extractor->getTypes(Php80Dummy::class, $property));
+    }
+
+    public function promotedPropertyProvider(): array
+    {
+        return [
+            ['promoted', null],
+            ['promotedAndMutated', [new Type(Type::BUILTIN_TYPE_STRING)]],
         ];
     }
 }

@@ -249,9 +249,21 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return $this->docBlocks[$propertyHash];
         }
 
+        $reflectionProperty = null;
+
+        try {
+            $reflectionProperty = new \ReflectionProperty($class, $property);
+        } catch (\ReflectionException $e) {
+        }
+
         $ucFirstProperty = ucfirst($property);
 
         switch (true) {
+            case $reflectionProperty?->isPromoted()
+                && ($docBlock = $this->getDocBlockFromConstructor($class, $property)):
+                $data = [$docBlock, self::MUTATOR, null];
+                break;
+
             case $docBlock = $this->getDocBlockFromProperty($class, $property):
                 $data = [$docBlock, self::PROPERTY, null];
                 break;

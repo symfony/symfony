@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for phpDocumentor and PHPStan pseudo-types
+ * Add PHP 8.0 promoted properties `@param` mutation support to `PhpDocExtractor`
 
 6.0
 ---

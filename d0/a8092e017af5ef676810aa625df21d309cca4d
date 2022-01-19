@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by adrienfr at 2022-01-19T10:51:18Z
+
+@nicolas-grekas I think the issue is related to `$this->handle`.
+If I keep the `static` way and create this :
+```php
+$multi = (object) [
+      //'handle' => $this->handle,
+      //'handle' => &$this->handle,
+      'logger' => &$this->logger,
+      'pushedResponses' => &$this->pushedResponses,
+      'dnsCache' => &$this->dnsCache,
+      'handlesActivity' => &$this->handlesActivity,
+      'openHandles' => &$this->openHandles,
+      'execCounter' => &$this->execCounter,
+      'pauseExpiries' => &$this->pauseExpiries,
+      'lastTimeout' => &$this->lastTimeout,
+  ];
+
+  // Keep a dummy "onPush" reference to work around a refcount bug in PHP
+  curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, $this->onPush = static function ($parent, $pushed, array $requestHeaders) use ($multi, $maxPendingPushes) {
+      return self::handlePush($parent, $pushed, $requestHeaders, $multi, $maxPendingPushes);
+  });
+```
+It works. But I soon as I uncomment one of the `handle` key in my `$multi` object, I have the "failed to open stream: Too many open files" error, as if this `$this->handle` is not properly "reset".
+
+One other thing I noticed, a lot more `CurlMultiHandle` usage in newer version:
+- SF 5.3.7 :
+CurlHttpClient just before `curl_multi_setopt($this->multi->handle, \CURLMOPT_PUSHFUNCTION, ...`
+```php
+var_dump($this->multi->handle);
+```
+=>
+```bash
+.  854 / 4775 ( 17%)
+resource(15232) of type (curl_multi)
+.resource(15342) of type (curl_multi)
+.resource(15383) of type (curl_multi)
+```
+- SF 5.3-dev :
+CurlClientState juste before `curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, $this->onPush, ...`
+```php
+var_dump($this->handle);
+```
+=>
+```bash
+.  854 / 4775 ( 17%)
+resource(26271) of type (curl_multi)
+.resource(26500) of type (curl_multi)
+.resource(26569) of type (curl_multi)
+```
+
+---------------------------------------------------------------------------
+
+by adrienfr at 2022-01-19T11:34:21Z
+
+@nicolas-grekas might have found a "leak" in `CurlClientState::reset()` this block has been removed in recent PRs:
+```php
+if (\is_resource($this->handle) || $this->handle instanceof \CurlMultiHandle) {
+    if (\defined('CURLMOPT_PUSHFUNCTION')) {
+        curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, null);
+    }
+
+    $active = 0;
+    while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->handle, $active));
+}
+
+foreach ($this->openHandles as [$ch]) {
+    if (\is_resource($ch) || $ch instanceof \CurlHandle) {
+        curl_setopt($ch, \CURLOPT_VERBOSE, false);
+    }
+}
+```
+If I add these 2 blocks (especially the one with the `curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, null);` call), no more issue. Do you want me to update the PR by re-adding these 2 blocks?
+
+---------------------------------------------------------------------------
+
+by adrienfr at 2022-01-19T11:47:13Z
+
+Regarding this part added in your last PR, I don't really understand the goal but shouldn't we have a call to `curl_share_close()` somewhere? This block also seems responsible for having a lot more open streams than before (5.3.7)
+```php
+$this->share = curl_share_init();
+
+curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_DNS);
+curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_SSL_SESSION);
+
+if (\defined('CURL_LOCK_DATA_CONNECT')) {
+    curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_CONNECT);
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-19T11:49:10Z
+
+I wish I could reproduce locally. If you can share the code privately with me, you can reach me on Symfony's Slack.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-19T12:48:24Z
+
+Can you please try this patch instead?
+```diff
+--- a/src/Symfony/Component/HttpClient/Internal/CurlClientState.php
++++ b/src/Symfony/Component/HttpClient/Internal/CurlClientState.php
+@@ -23,9 +23,9 @@ use Symfony\Component\HttpClient\Response\CurlResponse;
+  */
+ final class CurlClientState extends ClientState
+ {
+-    /** @var \CurlMultiHandle|resource */
++    /** @var \CurlMultiHandle|resource|null */
+     public $handle;
+-    /** @var \CurlShareHandle|resource */
++    /** @var \CurlShareHandle|resource|null */
+     public $share;
+     /** @var PushedResponse[] */
+     public $pushedResponses = [];
+@@ -65,8 +65,17 @@ final class CurlClientState extends ClientState
+             return;
+         }
+
+-        curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, function ($parent, $pushed, array $requestHeaders) use ($maxPendingPushes) {
+-            return $this->handlePush($parent, $pushed, $requestHeaders, $maxPendingPushes);
++        // Clone to prevent a circular reference
++        $multi = clone $this;
++        $multi->handle = null;
++        $multi->share = null;
++        $multi->pushedResponses = &$this->pushedResponses;
++        $multi->logger = &$this->logger;
++        $multi->handlesActivity = &$this->handlesActivity;
++        $multi->openHandles = &$this->openHandles;
++
++        curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, static function ($parent, $pushed, array $requestHeaders) use ($multi, $maxPendingPushes) {
++            return $multi->handlePush($parent, $pushed, $requestHeaders, $maxPendingPushes);
+         });
+     }
+```
+
+---------------------------------------------------------------------------
+
+by adrienfr at 2022-01-19T13:35:32Z
+
+Thanks @nicolas-grekas for the patch, it works perfectly, no more issues! 🚀

@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by kbond at 2022-01-05T14:44:46Z
+
+> Should I create a new CHANGELOG-6.1.md?
+
+Only the component/bundle/bridge changelogs need to be updated for new features.
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-01-05T15:42:09Z
+
+Can this be done without the need for a controller/temp files using data URIs to embed the file in an anchor tag or is there another *frontend-only* solution?
+
+Could this work? https://stackoverflow.com/questions/283956/is-there-any-way-to-specify-a-suggested-filename-when-using-data-uri
+
+---------------------------------------------------------------------------
+
+by dbrekelmans at 2022-01-05T15:56:33Z
+
+@kbond If I remember correctly, I tried embedding it in the url (I built this about a year ago, so not entirely sure). I believe it causes issues when the content is too big and it gets cut off from the url by the browser.
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-01-05T19:15:04Z
+
+I just tried with a larger pdf (700kb) and it worked in the latest chrome/firefox:
+
+```twig
+<a href="data:application/pdf;base64,{{ pdfContentsBase64Encoded }}" download="desired-filename.pdf">Download</a>
+
+---------------------------------------------------------------------------
+
+by dbrekelmans at 2022-01-19T12:38:24Z
+
+@kbond Sorry for the late response, I got a bit distracted.
+
+> did you test this in the context of a "real app"?
+
+Yes, I just tested it again with the code changes. Seems to work perfectly :)

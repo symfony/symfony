@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\MissingDataHandler;
 use Symfony\Component\Form\Util\ServerParams;
 
 /**
@@ -22,6 +23,7 @@ use Symfony\Component\Form\Util\ServerParams;
 class NativeRequestHandler implements RequestHandlerInterface
 {
     private ServerParams $serverParams;
+    private MissingDataHandler $missingDataHandler;
 
     /**
      * The allowed keys of the $_FILES array.
@@ -37,6 +39,7 @@ class NativeRequestHandler implements RequestHandlerInterface
     public function __construct(ServerParams $params = null)
     {
         $this->serverParams = $params ?? new ServerParams();
+        $this->missingDataHandler = new MissingDataHandler();
     }
 
     /**
@@ -61,13 +64,13 @@ class NativeRequestHandler implements RequestHandlerInterface
             if ('' === $name) {
                 $data = $_GET;
             } else {
-                // Don't submit GET requests if the form's name does not exist
-                // in the request
-                if (!isset($_GET[$name])) {
+                $missingData = $this->missingDataHandler->missingData;
+
+                if ($missingData === $data = $this->missingDataHandler->handle($form, $_GET[$name] ?? $missingData)) {
+                    // Don't submit GET requests if the form's name does not exist
+                    // in the request
                     return;
                 }
-
-                $data = $_GET[$name];
             }
         } else {
             // Mark the form with an error if the uploaded size was too large
@@ -99,6 +102,15 @@ class NativeRequestHandler implements RequestHandlerInterface
                 $params = \array_key_exists($name, $_POST) ? $_POST[$name] : $default;
                 $files = \array_key_exists($name, $fixedFiles) ? $fixedFiles[$name] : $default;
             } else {
+                $params = $this->missingDataHandler->missingData;
+                $files = null;
+            }
+
+            if ('PATCH' !== $method) {
+                $params = $this->missingDataHandler->handle($form, $params);
+            }
+
+            if ($this->missingDataHandler->missingData === $params) {
                 // Don't submit the form if it is not present in the request
                 return;
             }

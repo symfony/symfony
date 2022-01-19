@@ -28,6 +28,8 @@ use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
+use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
 
 class XmlFileLoaderTest extends TestCase
 {
@@ -96,6 +98,19 @@ class XmlFileLoaderTest extends TestCase
         $constraints = $properties[0]->getConstraints();
 
         $this->assertFalse($constraints[0]->match);
+    }
+
+    public function testLoadClassMetadataWithRequiredArguments()
+    {
+        $loader = new XmlFileLoader(__DIR__.'/constraint-mapping-required-arg.xml');
+        $metadata = new ClassMetadata(Entity_81::class);
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata(Entity_81::class);
+        $expected->addPropertyConstraint('title', new ConstraintWithRequiredArgument('X'));
+
+        $this->assertEquals($expected, $metadata);
     }
 
     public function testLoadGroupSequenceProvider()

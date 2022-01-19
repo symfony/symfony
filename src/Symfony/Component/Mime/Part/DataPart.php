@@ -122,6 +122,16 @@ class DataPart extends TextPart
         return $str;
     }
 
+    public function getFilename(): ?string
+    {
+        return $this->filename;
+    }
+
+    public function getContentType(): string
+    {
+        return implode('/', [$this->getMediaType(), $this->getMediaSubtype()]);
+    }
+
     private function generateContentId(): string
     {
         return bin2hex(random_bytes(16)).'@symfony';

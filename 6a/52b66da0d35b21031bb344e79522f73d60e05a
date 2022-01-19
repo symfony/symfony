@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-19T07:10:31Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-01-19T08:30:07Z
+
+General note: Bugfixes should target the lowest maintained branch that is affected by the bug. In this case this is probably 5.3 or 5.4.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-01-19T08:30:57Z
+
+Linking #41552 to keep track of such bugs. 🙂
+
+---------------------------------------------------------------------------
+
+by stof at 2022-01-19T08:46:42Z
+
+Doing an explicit conversion will not avoid the precision loss. It will only make it silent rather than having a warning. So to me, this does not *fix* the bug. It *hides* the bug.
+
+---------------------------------------------------------------------------
+
+by brian978 at 2022-01-19T09:08:08Z
+
+> General note: Bugfixes should target the lowest maintained branch that is affected by the bug. In this case this is probably 5.3 or 5.4.
+
+I will update this to target an older version.
+
+> Doing an explicit conversion will not avoid the precision loss. It will only make it silent rather than having a warning. So to me, this does not _fix_ the bug. It _hides_ the bug.
+
+Indeed, the better way would be to calculate the value as int instead of float (as usleep() only support int)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-01-19T09:10:37Z
+
+> Indeed, the better way would be to calculate the value as int instead of float (as usleep() only support int)
+
+No, the better way would be to perform the int cast _after_ multiplying the delta with `1e6`.

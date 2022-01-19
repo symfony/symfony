@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-12T14:50:34Z
+
+I'd prefer doing that in ResolveInstanceofConditionalsPass. Doable?
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-01-12T19:14:16Z
+
+I'll need some direction for where to do this in `ResolveInstanceofConditionalsPass`. I tried a few different places but no luck.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-12T19:27:06Z
+
+just after `$definition->setParent($parent);`?
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-01-12T19:36:45Z
+
+The definition is still synthetic at this point - this is being copied when converting to `ChildDefinition`. It's not being _copied back_ in `ResolveChildDefinitionsPass`.

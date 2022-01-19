@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Allow using UTF-8 parameter names
+
 5.3
 ---
 

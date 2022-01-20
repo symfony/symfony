@@ -208,18 +208,6 @@ class SerializerTest extends TestCase
         ]);
     }
 
-    public function testEncodedSkipsNonEncodeableStamps()
-    {
-        $serializer = new Serializer();
-
-        $envelope = new Envelope(new DummyMessage('Hello'), [
-            new DummySymfonySerializerNonSendableStamp(),
-        ]);
-
-        $encoded = $serializer->encode($envelope);
-        $this->assertStringNotContainsString('DummySymfonySerializerNonSendableStamp', print_r($encoded['headers'], true));
-    }
-
     public function testDecodingFailedConstructorDeserialization()
     {
         $serializer = new Serializer();
@@ -246,9 +234,6 @@ class SerializerTest extends TestCase
             ],
         ]);
     }
-}
-class DummySymfonySerializerNonSendableStamp implements NonSendableStampInterface
-{
 }
 class DummySymfonySerializerInvalidConstructor
 {

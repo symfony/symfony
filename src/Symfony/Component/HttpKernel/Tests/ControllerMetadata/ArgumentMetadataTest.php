@@ -48,4 +48,10 @@ class ArgumentMetadataTest extends TestCase
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value', true, [new Foo('bar')]);
         $this->assertEquals([new Foo('bar')], $argument->getAttributes());
     }
+
+    public function testGetAttributesOfType()
+    {
+        $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value', true, [new Foo('bar')]);
+        $this->assertEquals([new Foo('bar')], $argument->getAttributesOfType(Foo::class));
+    }
 }

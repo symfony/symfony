@@ -771,9 +771,9 @@ class InlineTest extends TestCase
      * @group legacy
      * @dataProvider getTestsForOctalNumbersYaml11Notation
      */
-    public function testParseOctalNumbersYaml11Notation(int $expected, string $yaml)
+    public function testParseOctalNumbersYaml11Notation(int $expected, string $yaml, string $replacement)
     {
-        $this->expectDeprecation('Since symfony/yaml 5.1: Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
+        $this->expectDeprecation(sprintf('Since symfony/yaml 5.1: Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0. Use "%s" to represent the octal number.', $replacement));
 
         self::assertSame($expected, Inline::parse($yaml));
     }
@@ -781,9 +781,9 @@ class InlineTest extends TestCase
     public function getTestsForOctalNumbersYaml11Notation()
     {
         return [
-            'positive octal number' => [28, '034'],
-            'positive octal number with separator' => [1243, '0_2_3_3_3'],
-            'negative octal number' => [-28, '-034'],
+            'positive octal number' => [28, '034', '0o34'],
+            'positive octal number with separator' => [1243, '0_2_3_3_3', '0o2333'],
+            'negative octal number' => [-28, '-034', '-0o34'],
         ];
     }
 

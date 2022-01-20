@@ -153,6 +153,11 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             [1048577, '1Mi', '1048577', '1048576', 'bytes'],
             [1053818, '1Mi', '1029.12', '1024', 'KiB'],
             [1053819, '1Mi', '1.01', '1', 'MiB'],
+
+            // $limit < $coef, @see FileValidator::factorizeSizes()
+            [169632, '100k', '169.63', '100', 'kB'],
+            [1000001, '990k', '1000', '990', 'kB'],
+            [123, '80', '123', '80', 'bytes'],
         ];
     }
 
@@ -508,8 +513,8 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ], '1000G'];
 
             $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
-                '{{ limit }}' => '0.1',
-                '{{ suffix }}' => 'MB',
+                '{{ limit }}' => '100',
+                '{{ suffix }}' => 'kB',
             ], '100K'];
         }
 

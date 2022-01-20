@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by adrienlucas at 2022-01-19T10:57:01Z
+
+> Can you tell a bit more about the use case?
+
+I'm using the `UrlGenerator::generate` to iterate over all the routes and "smoke test" an app. Without this getters, I can still compute the missing parameters but it is less convenient.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-01-19T11:05:13Z
+
+Thanks, looks sensible to me. Can you fix fabbot's report?
+
+---------------------------------------------------------------------------
+
+by adrienlucas at 2022-01-19T11:14:31Z
+
+> Thanks, looks sensible to me. Can you fix fabbot's report?
+
+Fixed ! Thank you !

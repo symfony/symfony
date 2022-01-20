@@ -321,9 +321,33 @@ class UrlGeneratorTest extends TestCase
         $generator->generate($name);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyThrowingMissingMandatoryParameters()
+    {
+        $this->expectDeprecation('Since symfony/routing 6.1: Construction of "Symfony\Component\Routing\Exception\MissingMandatoryParametersException" with an exception message is deprecated, provide the route name and an array of missing parameters instead.');
+
+        $exception = new MissingMandatoryParametersException('expected legacy message');
+        $this->assertSame('expected legacy message', $exception->getMessage());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyThrowingMissingMandatoryParametersWithAllParameters()
+    {
+        $this->expectDeprecation('Since symfony/routing 6.1: Construction of "Symfony\Component\Routing\Exception\MissingMandatoryParametersException" with an exception message is deprecated, provide the route name and an array of missing parameters instead.');
+
+        $exception = new MissingMandatoryParametersException('expected legacy message', 256, new \Exception());
+        $this->assertSame('expected legacy message', $exception->getMessage());
+        $this->assertInstanceOf(\Exception::class, $exception->getPrevious());
+    }
+
     public function testGenerateForRouteWithoutMandatoryParameter()
     {
         $this->expectException(MissingMandatoryParametersException::class);
+        $this->expectExceptionMessage('Some mandatory parameters are missing ("foo") to generate a URL for route "test".');
         $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
         $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL);
     }
@@ -554,6 +578,7 @@ class UrlGeneratorTest extends TestCase
     public function testImportantVariableWithNoDefault()
     {
         $this->expectException(MissingMandatoryParametersException::class);
+        $this->expectExceptionMessage('Some mandatory parameters are missing ("_format") to generate a URL for route "test".');
         $routes = $this->getRoutes('test', new Route('/{page}.{!_format}'));
         $generator = $this->getGenerator($routes);
 

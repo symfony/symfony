@@ -4,6 +4,7 @@ CHANGELOG
 6.1
 ---
 
+ * Add `getMissingParameters` and `getRouteName` methods on `MissingMandatoryParametersException`
  * Allow using UTF-8 parameter names
 
 5.3

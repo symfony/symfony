@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class SerializerDecoratorTest extends TestCase
 {
-    public function testDecodeJustCallsDecoratedSerializer(): void
+    public function testDecodeJustCallsDecoratedSerializer()
     {
         $serializer = $this->createMock(SerializerInterface::class);
         $decorator = new SerializerDecorator($serializer);

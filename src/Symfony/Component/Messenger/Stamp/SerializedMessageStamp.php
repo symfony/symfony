@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
-final class SerializedMessageStamp implements NonSendableStampInterface
+final class SerializedMessageStamp implements StampInterface
 {
     public function __construct(private string $serializedMessage)
     {

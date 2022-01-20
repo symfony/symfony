@@ -50,13 +50,27 @@ class ResponseTest extends ResponseTestCase
     public function testSend()
     {
         $response = new Response();
-        $responseSend = $response->send();
-        $this->assertObjectHasAttribute('headers', $responseSend);
-        $this->assertObjectHasAttribute('content', $responseSend);
-        $this->assertObjectHasAttribute('version', $responseSend);
-        $this->assertObjectHasAttribute('statusCode', $responseSend);
-        $this->assertObjectHasAttribute('statusText', $responseSend);
-        $this->assertObjectHasAttribute('charset', $responseSend);
+        $responseSent = $response->send();
+        $this->assertObjectHasAttribute('headers', $responseSent);
+        $this->assertObjectHasAttribute('content', $responseSent);
+        $this->assertObjectHasAttribute('version', $responseSent);
+        $this->assertObjectHasAttribute('statusCode', $responseSent);
+        $this->assertObjectHasAttribute('statusText', $responseSent);
+        $this->assertObjectHasAttribute('charset', $responseSent);
+        $this->assertFalse($responseSent->headers->has('Content-Length'));
+
+        ob_start();
+
+        $response = new Response('foo');
+        $responseSent = $response->send();
+        $this->assertSame('3', $responseSent->headers->get('Content-Length'));
+
+        $response = new Response('bar');
+        $response->headers->set('Transfer-Encoding', 'chunked');
+        $responseSent = $response->send();
+        $this->assertFalse($responseSent->headers->has('Content-Length'));
+
+        $this->assertSame('foobar', ob_get_clean());
     }
 
     public function testGetCharset()

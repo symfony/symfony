@@ -396,17 +396,29 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name), 0, null, [$constructorParameter->name]);
                     }
 
+                    $expectedTypes = ['unknown'];
+
+                    if ($constructorParameter->hasType()) {
+                        if ($constructorParameter->getType() instanceof \ReflectionUnionType) {
+                            $expectedTypes = array_map(fn(\ReflectionNamedType $type) => $type->getName(), $constructorParameter->getType()->getTypes());
+                        } else {
+                            $expectedTypes = [$constructorParameter->getType()->getName()];
+                        }
+                    }
+
                     $exception = NotNormalizableValueException::createForUnexpectedDataType(
                         sprintf('Failed to create object because the object miss the "%s" property.', $constructorParameter->name),
-                        $data,
-                        ['unknown'],
-                        $context['deserialization_path'] ?? null,
+                        null,
+                        $expectedTypes,
+                        $context['deserialization_path'] ?? $constructorParameter->name,
                         true
                     );
                     $context['not_normalizable_value_exceptions'][] = $exception;
-
-                    return $reflectionClass->newInstanceWithoutConstructor();
                 }
+            }
+
+            if (isset($context['not_normalizable_value_exceptions']) && \count($context['not_normalizable_value_exceptions']) > 0) {
+                return $reflectionClass->newInstanceWithoutConstructor();
             }
 
             if ($constructor->isConstructor()) {

@@ -19,6 +19,10 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\ProxyTrait;
 
+if (null !== (new \ReflectionMethod(CacheInterface::class, 'get'))->getReturnType()) {
+    throw new \LogicException('psr/simple-cache 3.0+ is not compatible with this version of symfony/cache. Please upgrade symfony/cache to 6.0+ or downgrade psr/simple-cache to 1.x or 2.x.');
+}
+
 /**
  * Turns a PSR-6 cache into a PSR-16 one.
  *

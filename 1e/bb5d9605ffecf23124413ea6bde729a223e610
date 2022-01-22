@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-01-21T09:34:57Z
+
+This PR is the same thing than https://github.com/symfony/symfony/pull/34986 that has been reverted in https://github.com/symfony/symfony/pull/36869
+-1 from me for the same reason than 2 years ago.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2022-01-21T10:33:54Z
+
+Updated after discussion in https://github.com/symfony/symfony/issues/45099. It brings `inputmode` attribute for `NumberType` only

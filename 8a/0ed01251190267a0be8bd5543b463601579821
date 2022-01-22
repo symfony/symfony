@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by colinodell at 2022-01-21T15:04:43Z
+
+> Can you please confirm that this effectively improves the situation by giving the patch a try on the case you had?
+
+Performing a quick test directly within the component's source directory shows that the exception is indeed only thrown when psr/simple-cache 3.0 is installed:
+
+![image](https://user-images.githubusercontent.com/202034/150549122-cafd421f-8621-4be6-be01-3ba5d11a4bf9.png)
+
+This does not prevent the installation of the conflicting version as I originally hoped (and thus the oddly-named feature branch here), but it at least provides a clear explanation of what's wrong and how to correct it, which is good enough for me and my library's users :)

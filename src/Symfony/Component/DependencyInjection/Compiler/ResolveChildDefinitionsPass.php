@@ -115,6 +115,8 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
 
         $def->setBindings($definition->getBindings() + $parentDef->getBindings());
 
+        $def->setSynthetic($definition->isSynthetic());
+
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();
         if (isset($changes['class'])) {

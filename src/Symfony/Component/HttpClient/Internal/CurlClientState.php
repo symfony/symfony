@@ -23,9 +23,9 @@ use Symfony\Component\HttpClient\Response\CurlResponse;
  */
 final class CurlClientState extends ClientState
 {
-    /** @var \CurlMultiHandle|resource */
+    /** @var \CurlMultiHandle|resource|null */
     public $handle;
-    /** @var \CurlShareHandle|resource */
+    /** @var \CurlShareHandle|resource|null */
     public $share;
     /** @var PushedResponse[] */
     public $pushedResponses = [];
@@ -68,8 +68,17 @@ final class CurlClientState extends ClientState
             return;
         }
 
-        curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, function ($parent, $pushed, array $requestHeaders) use ($maxPendingPushes) {
-            return $this->handlePush($parent, $pushed, $requestHeaders, $maxPendingPushes);
+        // Clone to prevent a circular reference
+        $multi = clone $this;
+        $multi->handle = null;
+        $multi->share = null;
+        $multi->pushedResponses = &$this->pushedResponses;
+        $multi->logger = &$this->logger;
+        $multi->handlesActivity = &$this->handlesActivity;
+        $multi->openHandles = &$this->openHandles;
+
+        curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, static function ($parent, $pushed, array $requestHeaders) use ($multi, $maxPendingPushes) {
+            return $multi->handlePush($parent, $pushed, $requestHeaders, $maxPendingPushes);
         });
     }
 

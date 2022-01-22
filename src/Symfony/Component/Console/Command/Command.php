@@ -411,14 +411,14 @@ class Command
     /**
      * Adds an argument.
      *
-     * @param int|null $mode    The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param mixed    $default The default value (for InputArgument::OPTIONAL mode only)
+     * @param int|null                         $mode    The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param string|bool|int|float|array|null $default The default value (for InputArgument::OPTIONAL mode only)
      *
      * @throws InvalidArgumentException When argument mode is not valid
      *
      * @return $this
      */
-    public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null): static
+    public function addArgument(string $name, int $mode = null, string $description = '', string|bool|int|float|array|null $default = null): static
     {
         $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
         if (null !== $this->fullDefinition) {
@@ -439,7 +439,7 @@ class Command
      *
      * @return $this
      */
-    public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null): static
+    public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', string|bool|int|float|array|null $default = null): static
     {
         $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
         if (null !== $this->fullDefinition) {

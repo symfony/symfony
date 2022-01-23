@@ -84,6 +84,20 @@ class ParserTest extends TestCase
         ];
     }
 
+    public function testParserIsStateless()
+    {
+        $yamlString = '# translations/messages.en.yaml
+
+';
+        $this->parser->parse($yamlString);
+        $this->parser->parse($yamlString);
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage("A YAML file cannot contain tabs as indentation at line 2 (near \"\tabc\")");
+
+        $this->parser->parse("abc:\n\tabc");
+    }
+
     /**
      * @dataProvider validTokenSeparators
      */

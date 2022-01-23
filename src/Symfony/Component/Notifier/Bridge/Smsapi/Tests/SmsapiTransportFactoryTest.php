@@ -24,14 +24,30 @@ final class SmsapiTransportFactoryTest extends TransportFactoryTestCase
     public function createProvider(): iterable
     {
         yield [
-            'smsapi://host.test?from=testFrom',
+            'smsapi://host.test?from=testFrom&fast=0',
             'smsapi://token@host.test?from=testFrom',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&fast=0',
+            'smsapi://token@host.test?from=testFrom&fast=0',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&fast=1',
+            'smsapi://token@host.test?from=testFrom&fast=1',
+        ];
+
+        yield [
+            'smsapi://host.test?from=testFrom&fast=1',
+            'smsapi://token@host.test?from=testFrom&fast=true',
         ];
     }
 
     public function supportsProvider(): iterable
     {
         yield [true, 'smsapi://host?from=testFrom'];
+        yield [true, 'smsapi://host?from=testFrom&fast=1'];
         yield [false, 'somethingElse://host?from=testFrom'];
     }
 

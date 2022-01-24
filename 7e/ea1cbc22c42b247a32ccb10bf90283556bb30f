@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-01-24T15:50:10Z
+
+Wasn't this precisely meant to test support for using `object` in bindings ? If yes, we should skip the test on PHP 7.1 instead of removing the proper testing.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-01-24T16:01:22Z
+
+Not really, it's meant to cover bindings on inline services (https://github.com/symfony/symfony/pull/45063). Still, PR updated to skip the test on PHP<7.1.

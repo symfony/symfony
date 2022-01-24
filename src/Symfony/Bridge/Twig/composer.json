@@ -83,5 +83,8 @@
             "/Tests/"
         ]
     },
+    "bin": [
+        "Resources/bin/twig-lint"
+    ],
     "minimum-stability": "dev"
 }

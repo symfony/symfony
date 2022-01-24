@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+6.1
+---
+ * Add a `twig-lint` binary
+
 5.4
 ---
 

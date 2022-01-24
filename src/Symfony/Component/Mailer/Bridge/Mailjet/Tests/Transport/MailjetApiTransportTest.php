@@ -104,4 +104,80 @@ class MailjetApiTransportTest extends TestCase
 
         $method->invoke($transport, $email, $envelope);
     }
+
+    public function testHeaderToMessage()
+    {
+        $email = (new Email())
+            ->subject('Sending email to mailjet API')
+            ->replyTo(new Address('qux@example.com', 'Qux'));
+        $email->getHeaders()
+            ->addTextHeader('X-authorized-header', 'authorized')
+            ->addTextHeader('X-MJ-TemplateLanguage', '1')
+            ->addTextHeader('X-MJ-TemplateID', '12345')
+            ->addTextHeader('X-MJ-TemplateErrorReporting', '{"Email": "errors@mailjet.com","Name": "Error Email"}')
+            ->addTextHeader('X-MJ-TemplateErrorDeliver', '1')
+            ->addTextHeader('X-MJ-Vars', '{"varname1": "value1","varname2": "value2", "varname3": "value3"}')
+            ->addTextHeader('X-MJ-CustomID', 'CustomValue')
+            ->addTextHeader('X-MJ-EventPayload', 'Eticket,1234,row,15,seat,B')
+            ->addTextHeader('X-Mailjet-Campaign', 'SendAPI_campaign')
+            ->addTextHeader('X-Mailjet-DeduplicateCampaign', '1')
+            ->addTextHeader('X-Mailjet-Prio', '2')
+            ->addTextHeader('X-Mailjet-TrackClick', 'account_default')
+            ->addTextHeader('X-Mailjet-TrackOpen', 'account_default');
+        $envelope = new Envelope(new Address('foo@example.com', 'Foo'), [
+            new Address('bar@example.com', 'Bar'),
+        ]);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+        self::assertSame(
+            [
+                'Messages' => [
+                    [
+                        'From' => [
+                            'Email' => 'foo@example.com',
+                            'Name' => 'Foo',
+                        ],
+                        'To' => [
+                            [
+                                'Email' => 'bar@example.com',
+                                'Name' => '',
+                            ],
+                        ],
+                        'Subject' => 'Sending email to mailjet API',
+                        'Attachments' => [],
+                        'InlinedAttachments' => [],
+                        'ReplyTo' => [
+                            'Email' => 'qux@example.com',
+                            'Name' => 'Qux',
+                        ],
+                        'Headers' => [
+                            'X-authorized-header' => 'authorized',
+                        ],
+                        'TemplateLanguage' => true,
+                        'TemplateID' => 12345,
+                        'TemplateErrorReporting' => [
+                            'Email' => 'errors@mailjet.com',
+                            'Name' => 'Error Email',
+                        ],
+                        'TemplateErrorDeliver' => true,
+                        'Variables' => [
+                            'varname1' => 'value1',
+                            'varname2' => 'value2',
+                            'varname3' => 'value3',
+                        ],
+                        'CustomID' => 'CustomValue',
+                        'EventPayload' => 'Eticket,1234,row,15,seat,B',
+                        'CustomCampaign' => 'SendAPI_campaign',
+                        'DeduplicateCampaign' => true,
+                        'Priority' => 2,
+                        'TrackClick' => 'account_default',
+                        'TrackOpen' => 'account_default',
+                    ],
+                ],
+            ],
+            $method->invoke($transport, $email, $envelope)
+        );
+    }
 }

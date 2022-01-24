@@ -52,6 +52,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectToPopulateTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipNullValuesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
+use Symfony\Component\Serializer\Tests\Php80Dummy;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -871,6 +872,25 @@ class ObjectNormalizerTest extends TestCase
         $data->bar = 'foo';
 
         $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $normalizer->normalize($data, null, ['include_foo_and_bar' => true]));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testDenormalizeFalsePseudoType()
+    {
+        // given a serializer that extracts the attribute types of an object via ReflectionExtractor
+        $propertyTypeExtractor = new PropertyInfoExtractor([], [new ReflectionExtractor()], [], [], []);
+        $objectNormalizer = new ObjectNormalizer(null, null, null, $propertyTypeExtractor);
+
+        $serializer = new Serializer([$objectNormalizer]);
+
+        // when denormalizing some data into an object where an attribute uses the false pseudo type
+        /** @var Php80Dummy $object */
+        $object = $serializer->denormalize(['canBeFalseOrString' => false], Php80Dummy::class);
+
+        // then the attribute that declared false was filled correctly
+        $this->assertFalse($object->canBeFalseOrString);
     }
 
     public function testAdvancedNameConverter()

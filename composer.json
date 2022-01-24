@@ -154,7 +154,6 @@
     },
     "config": {
         "allow-plugins": {
-            "composer/package-versions-deprecated": true,
             "symfony/runtime": true
         }
     },

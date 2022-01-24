@@ -14,7 +14,11 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\GenericDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TypeVariableDummy;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -38,6 +42,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\DummySecondChildQuux;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
 
 class AbstractObjectNormalizerTest extends TestCase
 {
@@ -395,6 +400,54 @@ class AbstractObjectNormalizerTest extends TestCase
         $obj = $serializer->denormalize(['inner' => 'foo'], ObjectOuter::class);
 
         $this->assertInstanceOf(ObjectInner::class, $obj->getInner());
+    }
+
+    /**
+     * @group test
+     */
+    public function testExtractorContextHasOuterClassPropertyWhileDenormalizing()
+    {
+        $propertyExtractor = $this->createMock(PropertyInfoExtractorInterface::class);
+
+        $class = $property = $previousClass = $previousProperty = null;
+        $propertyExtractor
+            ->expects($this->any())
+            ->method('getTypes')
+
+            // Since it needs to make sure the parameter value passed is a result of previously passed parameters,
+            // it uses callback method to store previous values.
+            ->with(
+                $this->callback(function ($paramClass) use (&$class) {
+                    $class = $paramClass;
+                    return true;
+                }),
+                $this->callback(function ($paramProperty) use (&$property) {
+                    $property = $paramProperty;
+                    return true;
+                }),
+                $this->callback(function($paramContext) use (&$class, &$property, &$previousClass, &$previousProperty) {
+                    if ($class === ObjectInner::class) {
+                        return ($paramContext['normalization_outer_class_property'] ?? '') === $previousClass . '::' . $previousProperty;
+                    }
+
+                    $previousClass = $class;
+                    $previousProperty = $property;
+
+                    return true;
+                })
+        )
+            ->willReturn(
+                [new Type(Type::BUILTIN_TYPE_OBJECT, false, ObjectInner::class)]
+            )
+        ;
+
+        $normalizer = new ObjectNormalizer(null, null, null, $propertyExtractor);
+        new Serializer([$normalizer]);
+
+        $normalizer->denormalize(['inner' => ['foo' => null, 'bar' => null]], ObjectOuter::class);
+
+        // Assertions are made on params passed to {@link PropertyTypeExtractorInterface::getTypes()}
+        $this->expectNotToPerformAssertions();
     }
 }
 

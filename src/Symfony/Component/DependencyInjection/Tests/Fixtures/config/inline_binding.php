@@ -13,10 +13,11 @@ return function (ContainerConfigurator $c) {
         ->autoconfigure()
         ->autowire()
         ->tag('t', ['a' => 'b'])
-        ->bind(Foo::class, service('bar'))
+        ->bind(Foo::class, ref('bar'))
         ->bind('iterable $foo', tagged_iterator('foo'))
+        ->bind('object $baz', inline_service('Baz'))
         ->public();
 
-    $s->set(Foo::class)->args([service('bar')])->public();
+    $s->set(Foo::class)->args([ref('bar')])->public();
     $s->set('bar', Foo::class)->call('setFoo')->autoconfigure(false);
 };

@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-final class Context
+class Context
 {
     private array $groups;
 

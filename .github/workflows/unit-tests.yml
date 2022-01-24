@@ -209,6 +209,11 @@ jobs:
 
           [[ ! $X ]] || (exit 1)
 
+      - name: Run TTY tests
+        if: "! matrix.mode"
+        run: |
+            script -e -c './phpunit --group tty' /dev/null
+
       - name: Run tests with SIGCHLD enabled PHP
         if: "matrix.php == '7.2' && ! matrix.mode"
         run: |

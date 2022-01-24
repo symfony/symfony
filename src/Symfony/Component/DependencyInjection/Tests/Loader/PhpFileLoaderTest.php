@@ -78,6 +78,11 @@ class PhpFileLoaderTest extends TestCase
         yield ['php7'];
         yield ['anonymous'];
         yield ['lazy_fqcn'];
+
+        // fixture uses PHP 7.2+ object typehint
+        if (70200 <= \PHP_VERSION_ID) {
+            yield ['inline_binding'];
+        }
     }
 
     public function testAutoConfigureAndChildDefinitionNotAllowed()

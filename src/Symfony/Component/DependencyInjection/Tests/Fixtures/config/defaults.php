@@ -15,7 +15,7 @@ return function (ContainerConfigurator $c) {
         ->tag('t', ['a' => 'b'])
         ->bind(Foo::class, service('bar'))
         ->bind('iterable $foo', tagged_iterator('foo'))
-        ->bind('object $baz', inline('Baz'))
+        ->bind('object $baz', inline_service('Baz'))
         ->public();
 
     $s->set(Foo::class)->args([service('bar')])->public();

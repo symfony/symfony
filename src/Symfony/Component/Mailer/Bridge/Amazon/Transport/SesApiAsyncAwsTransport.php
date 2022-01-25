@@ -12,12 +12,12 @@
 namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 
 use AsyncAws\Ses\Input\SendEmailRequest;
-use AsyncAws\Ses\ValueObject\Destination;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\MessageConverter;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -39,10 +39,23 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
 
     protected function getRequest(SentMessage $message): SendEmailRequest
     {
+        try {
+            $email = MessageConverter::toEmail($message->getOriginalMessage());
+        } catch (\Exception $e) {
+            throw new RuntimeException(sprintf('Unable to send message with the "%s" transport: ', __CLASS__).$e->getMessage(), 0, $e);
+        }
+
+        if ($email->getAttachments()) {
+            return parent::getRequest($message);
+        }
+
+        $envelope = $message->getEnvelope();
+
         $request = [
-            'Destination' => new Destination([
-                'ToAddresses' => $this->stringifyAddresses($message->getEnvelope()->getRecipients()),
-            ]),
+            'FromEmailAddress' => $envelope->getSender()->toString(),
+            'Destination' => [
+                'ToAddresses' => $this->stringifyAddresses($this->getRecipients($email, $envelope)),
+            ],
             'Content' => [
                 'Raw' => [
                     'Data' => $message->toString(),
@@ -50,13 +63,23 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
             ],
         ];
 
-        if (($message->getOriginalMessage() instanceof Message)
-            && $configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
-            $request['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
+        if ($emails = $email->getCc()) {
+            $request['Destination']['CcAddresses'] = $this->stringifyAddresses($emails);
         }
-        if (($message->getOriginalMessage() instanceof Message)
-            && $sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
-            $request['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
+        if ($emails = $email->getBcc()) {
+            $request['Destination']['BccAddresses'] = $this->stringifyAddresses($emails);
+        }
+        if ($emails = $email->getReplyTo()) {
+            $request['ReplyToAddresses'] = $this->stringifyAddresses($emails);
+        }
+        if ($header = $email->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+            $request['ConfigurationSetName'] = $header->getBodyAsString();
+        }
+        if ($header = $email->getHeaders()->get('X-SES-SOURCE-ARN')) {
+            $request['FromEmailAddressIdentityArn'] = $header->getBodyAsString();
+        }
+        if ($email->getReturnPath()) {
+            $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
         }
 
         return new SendEmailRequest($request);

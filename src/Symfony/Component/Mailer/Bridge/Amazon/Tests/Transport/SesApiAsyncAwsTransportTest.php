@@ -75,7 +75,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-           // $this->assertSame('https://email.us-east-1.amazonaws.com/v2/email/outbound-emails', $url);
+            $this->assertSame('https://email.us-east-1.amazonaws.com/v2/email/outbound-emails', $url);
 
             $body = json_decode($options['body'], true);
             $content = base64_decode($body['Content']['Raw']['Data']);

@@ -81,15 +81,15 @@ class SesApiAsyncAwsTransportTest extends TestCase
             $content = base64_decode($body['Content']['Raw']['Data']);
 
             $this->assertStringContainsString('Hello!', $content);
-            $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $content['Destination']['ToAddresses'][0]);
-            $this->assertSame('=?UTF-8?B?SsOpcsOpbXk=?= <jeremy@derusse.com>', $content['Destination']['CcAddresses'][0]);
-            $this->assertSame('"Fabien" <fabpot@symfony.com>', $content['FromEmailAddress']);
+            $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $body['Destination']['ToAddresses'][0]);
+            $this->assertSame('=?UTF-8?B?SsOpcsOpbXk=?= <jeremy@derusse.com>', $body['Destination']['CcAddresses'][0]);
+            $this->assertSame('"Fabien" <fabpot@symfony.com>', $body['FromEmailAddress']);
             $this->assertStringContainsString('Hello There!', $content);
             $this->assertStringContainsString('<b>Hello There!</b>', $content);
-            $this->assertSame(['replyto-1@example.com', 'replyto-2@example.com'], $content['ReplyToAddresses']);
-            $this->assertSame('aws-configuration-set-name', $content['ConfigurationSetName']);
-            $this->assertSame('aws-source-arn', $content['FromEmailAddressIdentityArn']);
-            $this->assertSame('bounces@example.com', $content['FeedbackForwardingEmailAddress']);
+            $this->assertSame(['replyto-1@example.com', 'replyto-2@example.com'], $body['ReplyToAddresses']);
+            $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
+            $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
+            $this->assertSame('bounces@example.com', $body['FeedbackForwardingEmailAddress']);
 
             $json = '{"MessageId": "foobar"}';
 

@@ -50,8 +50,8 @@ trait MicroKernelTrait
     {
         $configDir = $this->getConfigDir();
 
-        $container->import($configDir.'/{packages}/*.{php,xml,yaml}');
-        $container->import($configDir.'/{packages}/'.$this->environment.'/*.{php,xml,yaml}');
+        $container->import($configDir.'/{packages}/*.{yaml,xml,php}');
+        $container->import($configDir.'/{packages}/'.$this->environment.'/*.{yaml,xml,php}');
 
         if (is_file($configDir.'/services.yaml')) {
             $container->import($configDir.'/services.yaml');

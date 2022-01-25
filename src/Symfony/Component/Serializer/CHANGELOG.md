@@ -4,6 +4,7 @@ CHANGELOG
 6.1
 ---
 
+ * Set `Context` annotation as not final
  * Deprecate `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
  * Deprecate `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
  * Deprecate `ContextAwareEncoderInterface`, use `EncoderInterface` instead

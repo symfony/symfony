@@ -75,20 +75,23 @@ class SesApiAsyncAwsTransportTest extends TestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://email.us-east-1.amazonaws.com/v2/email/outbound-emails', $url);
+           // $this->assertSame('https://email.us-east-1.amazonaws.com/v2/email/outbound-emails', $url);
 
-            $content = json_decode($options['body'], true);
+            $body = json_decode($options['body'], true);
+            $content = base64_decode($body['Content']['Raw']['Data']);
 
-            $this->assertSame('Hello!', $content['Content']['Simple']['Subject']['Data']);
-            $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $content['Destination']['ToAddresses'][0]);
-            $this->assertSame('=?UTF-8?B?SsOpcsOpbXk=?= <jeremy@derusse.com>', $content['Destination']['CcAddresses'][0]);
-            $this->assertSame('"Fabien" <fabpot@symfony.com>', $content['FromEmailAddress']);
-            $this->assertSame('Hello There!', $content['Content']['Simple']['Body']['Text']['Data']);
-            $this->assertSame('<b>Hello There!</b>', $content['Content']['Simple']['Body']['Html']['Data']);
-            $this->assertSame(['replyto-1@example.com', 'replyto-2@example.com'], $content['ReplyToAddresses']);
-            $this->assertSame('aws-configuration-set-name', $content['ConfigurationSetName']);
-            $this->assertSame('aws-source-arn', $content['FromEmailAddressIdentityArn']);
-            $this->assertSame('bounces@example.com', $content['FeedbackForwardingEmailAddress']);
+            $this->assertStringContainsString('Hello!', $content);
+            $this->assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
+            $this->assertStringContainsString('=?utf-8?Q?J=C3=A9r=C3=A9my?= <jeremy@derusse.com>', $content);
+            $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
+            $this->assertStringContainsString('Hello There!', $content);
+            $this->assertStringContainsString('<b>Hello There!</b>', $content);
+            $this->assertStringContainsString('replyto-1@example.com, replyto-2@example.com', $content);
+            $this->assertStringContainsString('bounces@example.com', $content);
+
+            $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
+            $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
+
 
             $json = '{"MessageId": "foobar"}';
 

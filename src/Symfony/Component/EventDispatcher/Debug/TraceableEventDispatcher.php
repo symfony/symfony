@@ -13,6 +13,7 @@ namespace Symfony\Component\EventDispatcher\Debug;
 
 use Psr\EventDispatcher\StoppableEventInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -187,7 +188,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     public function getNotCalledListeners(Request $request = null): array
     {
         try {
-            $allListeners = $this->getListeners();
+            $allListeners = $this->dispatcher instanceof EventDispatcher ? $this->getListenersWithPriority() : $this->getListenersWithoutPriority();
         } catch (\Exception $e) {
             $this->logger?->info('An exception was thrown while getting the uncalled listeners.', ['exception' => $e]);
 
@@ -209,11 +210,12 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         }
 
         $notCalled = [];
+
         foreach ($allListeners as $eventName => $listeners) {
-            foreach ($listeners as $listener) {
+            foreach ($listeners as [$listener, $priority]) {
                 if (!\in_array($listener, $calledListeners, true)) {
                     if (!$listener instanceof WrappedListener) {
-                        $listener = new WrappedListener($listener, null, $this->stopwatch, $this);
+                        $listener = new WrappedListener($listener, null, $this->stopwatch, $this, $priority);
                     }
                     $notCalled[] = $listener->getInfo($eventName);
                 }
@@ -323,7 +325,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         }
     }
 
-    private function sortNotCalledListeners(array $a, array $b)
+    private function sortNotCalledListeners(array $a, array $b): int
     {
         if (0 !== $cmp = strcmp($a['event'], $b['event'])) {
             return $cmp;
@@ -346,5 +348,36 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         }
 
         return 1;
+    }
+
+    private function getListenersWithPriority(): array
+    {
+        $result = [];
+
+        $allListeners = new \ReflectionProperty(EventDispatcher::class, 'listeners');
+        $allListeners->setAccessible(true);
+
+        foreach ($allListeners->getValue($this->dispatcher) as $eventName => $listenersByPriority) {
+            foreach ($listenersByPriority as $priority => $listeners) {
+                foreach ($listeners as $listener) {
+                    $result[$eventName][] = [$listener, $priority];
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    private function getListenersWithoutPriority(): array
+    {
+        $result = [];
+
+        foreach ($this->getListeners() as $eventName => $listeners) {
+            foreach ($listeners as $listener) {
+                $result[$eventName][] = [$listener, null];
+            }
+        }
+
+        return $result;
     }
 }

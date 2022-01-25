@@ -1739,7 +1739,18 @@ EOF;
 
                     $code = sprintf('return %s;', $code);
 
-                    return sprintf("function ()%s {\n            %s\n        }", $returnedType, $code);
+                    $attribute = '';
+                    if ($value) {
+                        $attribute = 'name: '.$this->dumpValue((string) $value, $interpolate);
+
+                        if ($this->container->hasDefinition($value) && ($class = $this->container->findDefinition($value)->getClass()) && $class !== (string) $value) {
+                            $attribute .= ', class: '.$this->dumpValue($class, $interpolate);
+                        }
+
+                        $attribute = sprintf('#[\Closure(%s)] ', $attribute);
+                    }
+
+                    return sprintf("%sfunction ()%s {\n            %s\n        }", $attribute, $returnedType, $code);
                 }
 
                 if ($value instanceof IteratorArgument) {

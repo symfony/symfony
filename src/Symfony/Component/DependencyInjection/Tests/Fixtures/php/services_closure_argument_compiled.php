@@ -55,7 +55,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getServiceClosureService()
     {
-        return $this->services['service_closure'] = new \Bar(function () {
+        return $this->services['service_closure'] = new \Bar(#[\Closure(name: 'foo', class: 'Foo')] function () {
             return ($this->services['foo'] ?? ($this->services['foo'] = new \Foo()));
         });
     }

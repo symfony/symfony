@@ -92,7 +92,6 @@ class SesApiAsyncAwsTransportTest extends TestCase
             $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
             $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
 
-
             $json = '{"MessageId": "foobar"}';
 
             return new MockResponse($json, [

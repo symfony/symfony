@@ -38,9 +38,11 @@ use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
+use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Process\Process;
 
 class ApplicationTest extends TestCase
 {
@@ -1881,6 +1883,39 @@ class ApplicationTest extends TestCase
         $application->setDispatcher($dispatcher);
         $application->add($command);
         $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+    }
+
+    /**
+     * @group tty
+     */
+    public function testSignalableRestoresStty()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('stty not available');
+        }
+
+        if (!SignalRegistry::isSupported()) {
+            $this->markTestSkipped('pcntl signals not available');
+        }
+
+        $previousSttyMode = shell_exec('stty -g');
+
+        $p = new Process(['php', __DIR__.'/Fixtures/application_signalable.php']);
+        $p->setTty(true);
+        $p->start();
+
+        for ($i = 0; $i < 10 && shell_exec('stty -g') === $previousSttyMode; ++$i) {
+            usleep(100000);
+        }
+
+        $this->assertNotSame($previousSttyMode, shell_exec('stty -g'));
+        $p->signal(\SIGINT);
+        $p->wait();
+
+        $sttyMode = shell_exec('stty -g');
+        shell_exec('stty '.$previousSttyMode);
+
+        $this->assertSame($previousSttyMode, $sttyMode);
     }
 }
 

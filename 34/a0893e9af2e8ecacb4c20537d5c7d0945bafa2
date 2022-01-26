@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-01-20T10:14:34Z
+
+for now, I provide the full replacement in the deprecation message. this might have a negative effect on the deduplication of deprecations. An alternative could be to mention only the `0o` prefix instead.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-21T06:18:53Z
+
+Hey!
+
+I think @alexandre-daubois has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot

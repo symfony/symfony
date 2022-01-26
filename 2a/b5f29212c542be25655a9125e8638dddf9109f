@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-12-16T00:12:11Z
+
+Hey!
+
+I think @mtarld has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by devnix at 2021-12-23T07:41:08Z
+
+Hi! I think the following lines would have to be deleted. It just does not make sense to remove the cookie if the session bags are empty, because that does not mean the session is empty (and used by other application): https://github.com/symfony/symfony/blob/v5.4.0/src/Symfony/Component/HttpKernel/EventListener/AbstractSessionListener.php#L154-L162
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-12-23T09:37:10Z
+
+@devnix this lines can not be removed as they handles the correct handling of a logout when running swoole and roadrunner. I'm currently thinking about check if the PHP bridge is activated and then go with the old behaviour and let PHP handle the session cookie then again. Means that swoole and roadrunner could not be used with that applications correctly but I think that this application don't even use the symfony/runtime so I think that would be fine.
+
+---------------------------------------------------------------------------
+
+by devnix at 2021-12-23T09:47:23Z
+
+@alexander-schranz alright, that's what I feared (I didn't make directly a PR because I suspected I was going to miss a fact like that).
+
+Speaking from ignorance: maybe the listener could call a method defined by `SessionStorageInterface`, so each session storage would know how they have to handle by implementing that method?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-12-23T10:45:29Z
+
+@devnix the `isEmpty` is currently a way to know if `invalidate` was called: https://github.com/symfony/symfony/blob/0d6e859db236e37b8baa2b2bf4c8b7d14d151570/src/Symfony/Component/HttpFoundation/Session/Session.php#L175
+ As example the logout listener does it by default:
+ https://github.com/symfony/symfony/blob/d17ae344e79919caba2f19bb0cb23bf24c1f773d/src/Symfony/Component/Security/Http/EventListener/SessionLogoutListener.php#L29
+So what is missing is to know if a session is invalid or not at current state. But I did avoided to extend the SessionInterface with new methods which are not required currently and so did go with isEmpty. Personaly I think a session which is empty can savely be removed. So I would maybe we should adjust the `isEmpty` in the PHPBridge to check if there are not other values in the `$_SESSION` variable beside the empty symfony storage variable. Or find another way to check for invalid session or as said above let PHP handle the session cookie when the php bridge is used.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-12-29T11:57:21Z
+
+@devnix found that I can check if the session was even changed using the session usage index. Can you check this change with your application?
+
+---------------------------------------------------------------------------
+
+by devnix at 2021-12-29T12:49:24Z
+
+I will be able to check it next monday!
+
+I have a wild guess: if a session is started by another application, and later a Symfony controller is called without touching the session, will not be deleted because the usage index would be zero?
+
+This can even happen with coexisting, separated web applications, not only with legacy applications integrating Symfony
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2021-12-29T15:43:30Z
+
+@devnix Thank you for the feedback. Make sense. I tried to create test cases for it and check now also for `$_SESSION` to avoid these problems with other native sessions variables written before.
+
+/cc @jderusse
+
+---------------------------------------------------------------------------
+
+by devnix at 2021-12-29T15:53:05Z
+
+I will try the patch ASAP, as I don't have access to the repository right now. Thank you so much, @alexander-schranz
+
+---------------------------------------------------------------------------
+
+by johannes85 at 2022-01-17T08:57:37Z
+
+I know, I'm late to the conversation but I think it would be a good idea to give the person, implementing the session handling  a way to control the behavior of creating/deleting the session cookie (as @devnix suggested).
+
+In my case we have a centralized login which creates a session (in Redis) and writes the cookie.
+Our applications (around 20) are using this already created session.
+
+Now we want to migrate those applications away from the current framework to Symfony, so I implemented a custom authenticator for this session but also wanted to reuse this session in a custom SessionStorage.
+
+This worked up until Symfony 5.4 which now kills the externally generated session cookie.
+So, a way for my SessionStorage to tell Symfony: "don't mess with the session cookie" would be nice.
+
+My solution now is to have two sessions. One created by our login application and one created by Symfony, using one Redis connection (singleton via DI).
+This also doesn't work as intended because of https://github.com/symfony/symfony/issues/44616 but is fixed with https://github.com/symfony/symfony/pull/44657
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-01-20T13:24:45Z
+
+@johannes85 as discussed in https://github.com/symfony/symfony/pull/44634#discussion_r776405949 there would be better options. But are not possible in a bugfix as a bugfix is not allowed to extend the public API.

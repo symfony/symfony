@@ -148,10 +148,15 @@ abstract class AbstractDoctrineExtension extends Extension
             $bundleDir = func_get_arg(3);
         }
 
-        $bundleDir ?? $bundleDir = \dirname($bundle->getFileName());
+        $bundleClassDir = \dirname($bundle->getFileName());
+        $bundleDir ?? $bundleDir = $bundleClassDir;
 
         if (!$bundleConfig['type']) {
             $bundleConfig['type'] = $this->detectMetadataDriver($bundleDir, $container);
+
+            if (!$bundleConfig['type'] && $bundleDir !== $bundleClassDir) {
+                $bundleConfig['type'] = $this->detectMetadataDriver($bundleClassDir, $container);
+            }
         }
 
         if (!$bundleConfig['type']) {
@@ -161,7 +166,7 @@ abstract class AbstractDoctrineExtension extends Extension
 
         if (!$bundleConfig['dir']) {
             if (\in_array($bundleConfig['type'], ['annotation', 'staticphp', 'attribute'])) {
-                $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingObjectDefaultName();
+                $bundleConfig['dir'] = $bundleClassDir.'/'.$this->getMappingObjectDefaultName();
             } else {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory($bundleDir);
             }

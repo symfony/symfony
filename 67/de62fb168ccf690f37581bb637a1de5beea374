@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-09-24T11:20:30Z
+
+Hey!
+
+I think @greg0ire has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2021-09-24T13:36:02Z
+
+@neclimdul please also report that to PHP. I think the behavior deserved being fixed in PHP, even if we can work around it.
+
+---------------------------------------------------------------------------
+
+by neclimdul at 2021-09-24T14:39:49Z
+
+Sure thing. Not sure this sort of thing will get a lot of attention but it would be a good fix in some future version of PHP.
+
+https://bugs.php.net/bug.php?id=81475
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-26T16:13:16Z
+
+Can you please target 4.4, and fix all calls to the function (there are more in the codebase)?

@@ -64,6 +64,7 @@ final class SmsapiTransport extends AbstractTransport
                 'to' => $message->getPhone(),
                 'message' => $message->getSubject(),
                 'format' => 'json',
+                'encoding' => 'utf-8',
             ],
         ]);
 

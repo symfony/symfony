@@ -240,7 +240,8 @@ trait TransportResponseTrait
                         } elseif ($chunk instanceof FirstChunk) {
                             if ($response->logger) {
                                 $info = $response->getInfo();
-                                $response->logger->info(sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
+                                $level = $info['http_code'] >= 400 ? 'error' : 'info';
+                                $response->logger->{$level}(sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
                             }
 
                             $response->inflate = \extension_loaded('zlib') && $response->inflate && 'gzip' === ($response->headers['content-encoding'][0] ?? null) ? inflate_init(\ZLIB_ENCODING_GZIP) : null;

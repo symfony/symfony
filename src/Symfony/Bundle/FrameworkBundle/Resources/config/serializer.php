@@ -99,6 +99,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -910])
 
         ->set('serializer.normalizer.json_serializable', JsonSerializableNormalizer::class)
+            ->args([null, null])
             ->tag('serializer.normalizer', ['priority' => -900])
 
         ->set('serializer.normalizer.problem', ProblemNormalizer::class)
@@ -178,6 +179,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.encoder')
 
         ->set('serializer.encoder.yaml', YamlEncoder::class)
+            ->args([null, null])
             ->tag('serializer.encoder')
 
         ->set('serializer.encoder.csv', CsvEncoder::class)

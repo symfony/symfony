@@ -98,13 +98,24 @@ class SymfonyRuntime extends GenericRuntime
         } elseif (isset($_SERVER['argv']) && class_exists(ArgvInput::class)) {
             $this->options = $options;
             $this->getInput();
+            $inputEnv = $_SERVER[$envKey] ?? null;
+            $inputDebug = $_SERVER[$debugKey] ?? null;
         }
 
         if (!($options['disable_dotenv'] ?? false) && isset($options['project_dir']) && !class_exists(MissingDotenv::class, false)) {
             (new Dotenv($envKey, $debugKey))
                 ->setProdEnvs((array) ($options['prod_envs'] ?? ['prod']))
                 ->usePutenv($options['use_putenv'] ?? false)
-                ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $options['dotenv_overload'] ?? false);
+                ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $dotenvOverload = $options['dotenv_overload'] ?? false);
+            if ($dotenvOverload) {
+                if (isset($inputEnv) && $inputEnv !== $_SERVER[$envKey]) {
+                    throw new \LogicException(sprintf('Cannot use "--env" or "-e" when the "%s" file defines "%s" and the "dotenv_overload" runtime option is true.', $options['dotenv_path'] ?? '.env', $envKey));
+                }
+
+                if (isset($inputDebug) && $inputDebug !== $_SERVER[$debugKey]) {
+                    putenv($debugKey.'='.$_SERVER[$debugKey] = $_ENV[$debugKey] = $inputDebug);
+                }
+            }
             $options['debug'] ?? $options['debug'] = '1' === $_SERVER[$debugKey];
             $options['disable_dotenv'] = true;
         } else {

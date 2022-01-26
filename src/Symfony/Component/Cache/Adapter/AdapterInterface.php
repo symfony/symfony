@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 // Help opcache.preload discover always-needed symbols
-class_exists(CacheItemInterface::class);
+class_exists(ItemInterface::class);
 
 /**
  * Interface for adapters managing instances of Symfony's CacheItem.
@@ -27,12 +27,12 @@ interface AdapterInterface extends CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function getItem(mixed $key): CacheItemInterface;
+    public function getItem(mixed $key): ItemInterface;
 
     /**
      * {@inheritdoc}
      *
-     * @return iterable<string, CacheItemInterface>
+     * @return iterable<string, ItemInterface>
      */
     public function getItems(array $keys = []): iterable;
 

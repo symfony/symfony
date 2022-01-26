@@ -81,6 +81,7 @@ use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Lock\LockFactory;
@@ -371,6 +372,7 @@ class FrameworkExtension extends Extension
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
+        $this->registerParamConverterConfiguration($config['param_converter'], $container, $loader);
 
         $container->getDefinition('exception_listener')->replaceArgument(3, $config['exceptions']);
 
@@ -573,6 +575,8 @@ class FrameworkExtension extends Extension
             ->addTag('property_info.access_extractor');
         $container->registerForAutoconfiguration(PropertyInitializableExtractorInterface::class)
             ->addTag('property_info.initializable_extractor');
+        $container->registerForAutoconfiguration(ParamConverterInterface::class)
+            ->addTag('request.param_converter');
         $container->registerForAutoconfiguration(EncoderInterface::class)
             ->addTag('serializer.encoder');
         $container->registerForAutoconfiguration(DecoderInterface::class)
@@ -1164,6 +1168,15 @@ class FrameworkExtension extends Extension
             $listener = $container->getDefinition('request.add_request_formats_listener');
             $listener->replaceArgument(0, $config['formats']);
         }
+    }
+
+    private function registerParamConverterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    {
+        $loader->load('param_converter.php');
+
+        $container->setParameter('param_converter.disabled_converters', \is_string($config['disable']) ? implode(',', $config['disable']) : $config['disable']);
+
+        $container->getDefinition('param_converter.listener')->replaceArgument(1, $config['auto_convert']);
     }
 
     private function registerAssetsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

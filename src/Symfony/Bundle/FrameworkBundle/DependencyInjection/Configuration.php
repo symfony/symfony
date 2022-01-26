@@ -140,6 +140,7 @@ class Configuration implements ConfigurationInterface
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
         $this->addRequestSection($rootNode);
+        $this->addParamConverterSection($rootNode);
         $this->addAssetsSection($rootNode, $enableIfStandalone);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
         $this->addValidationSection($rootNode, $enableIfStandalone, $willBeAvailable);
@@ -675,6 +676,22 @@ class Configuration implements ConfigurationInterface
                                 ->prototype('scalar')->end()
                             ->end()
                         ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addParamConverterSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('param_converter')
+                    ->info('param converter configuration')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('auto_convert')->defaultTrue()->end()
+                        ->arrayNode('disable')->prototype('scalar')->end()->end()
                     ->end()
                 ->end()
             ->end()

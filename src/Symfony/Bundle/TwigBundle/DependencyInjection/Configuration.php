@@ -48,6 +48,7 @@ class Configuration implements ConfigurationInterface
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
         $this->addTwigFormatOptions($rootNode);
+        $this->addControllerPatternsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -197,6 +198,18 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('decimal_point')->defaultValue('.')->end()
                         ->scalarNode('thousands_separator')->defaultValue(',')->end()
                     ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addControllerPatternsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->fixXmlConfig('controller_pattern')
+            ->children()
+                ->arrayNode('controller_patterns')
+                    ->prototype('scalar')
                 ->end()
             ->end()
         ;

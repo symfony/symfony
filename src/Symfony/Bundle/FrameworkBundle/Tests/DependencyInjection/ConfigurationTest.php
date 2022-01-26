@@ -582,6 +582,10 @@ class ConfigurationTest extends TestCase
                 'time_based_uuid_version' => 6,
             ],
             'exceptions' => [],
+            'param_converter' => [
+                'auto_convert' => true,
+                'disable' => [],
+            ],
         ];
     }
 }

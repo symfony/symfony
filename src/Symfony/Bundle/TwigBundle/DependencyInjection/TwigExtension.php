@@ -37,6 +37,7 @@ class TwigExtension extends Extension
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.php');
+        $loader->load('web.php');
 
         if ($container::willBeAvailable('symfony/form', Form::class, ['symfony/twig-bundle'])) {
             $loader->load('form.php');
@@ -139,6 +140,10 @@ class TwigExtension extends Extension
             'auto_reload' => true,
             'optimizations' => true,
         ]));
+
+        if ($container->hasDefinition('twig.template_guesser')) {
+            $container->getDefinition('twig.template_guesser')->addArgument($config['controller_patterns']);
+        }
 
         $container->registerForAutoconfiguration(\Twig_ExtensionInterface::class)->addTag('twig.extension');
         $container->registerForAutoconfiguration(\Twig_LoaderInterface::class)->addTag('twig.loader');

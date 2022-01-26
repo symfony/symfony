@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
+use Sensio\Bundle\FrameworkExtraBundle\DependencyInjection\SensioFrameworkExtraExtension;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle\AcmeBundle;
@@ -18,12 +19,14 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\HttpKernel\Attribute\ParamConverter;
 
 class TwigExtensionTest extends TestCase
 {
@@ -264,6 +267,20 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('foo', $args['FooClass']->getValues()[0]);
     }
 
+    public function testControllerPatterns()
+    {
+        $patterns = ['/foo/', '/bar/', '/foobar/'];
+
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig', [
+            'controller_patterns' => $patterns,
+        ]);
+        $this->compileContainer($container);
+
+        $this->assertEquals($patterns, $container->getDefinition('twig.template_guesser')->getArgument(1));
+    }
+
     private function createContainer()
     {
         $container = new ContainerBuilder(new ParameterBag([
@@ -281,6 +298,8 @@ class TwigExtensionTest extends TestCase
                 ],
             ],
         ]));
+
+        $container->setDefinition('param_converter.manager', new Definition(ParamConverter::class));
 
         return $container;
     }

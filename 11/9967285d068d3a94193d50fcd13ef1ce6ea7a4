@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-24T12:23:11Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ThomasNunninger at 2022-01-24T13:04:56Z
+
+Sorry, I have no clue how to fix the failing tests for PHP 7.2 & PHP 7.4 and the appveyor build.
+
+The issue probably is because of https://github.com/symfony/symfony/pull/45154/files#diff-748599238ed60d6c9394adf834ea5b2dcbb1af524b9583600dce1eed23e47ab8 line 18 where I declare a property as `false|string` what is not allowed before PHP 8.0. (I skipped the test itself that uses that class. But I assume, some tools try to include the PHP 8.0 class and fail due to new attribute declaration.)
+
+Any idea how to fix that?
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-01-25T08:28:58Z
+
+Hey!
+
+I think @jeroennoten has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot

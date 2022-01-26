@@ -22,6 +22,7 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php73": "~1.0",
         "symfony/polyfill-php80": "^1.16",
+        "symfony/polyfill-php81": "^1.22",
         "symfony/translation-contracts": "^1.1|^2|^3"
     },
     "require-dev": {

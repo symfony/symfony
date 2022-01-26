@@ -485,11 +485,11 @@ class QuestionHelper extends Helper
         }
 
         if (\function_exists('stream_isatty')) {
-            return self::$stdinIsInteractive = stream_isatty(fopen('php://stdin', 'r'));
+            return self::$stdinIsInteractive = @stream_isatty(fopen('php://stdin', 'r'));
         }
 
         if (\function_exists('posix_isatty')) {
-            return self::$stdinIsInteractive = posix_isatty(fopen('php://stdin', 'r'));
+            return self::$stdinIsInteractive = @posix_isatty(fopen('php://stdin', 'r'));
         }
 
         if (!\function_exists('exec')) {

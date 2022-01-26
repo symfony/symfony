@@ -31,7 +31,10 @@ trait ContractsTrait
         doGet as private contractsGet;
     }
 
-    private \Closure $callbackWrapper;
+    /**
+     * @var callable
+     */
+    private $callbackWrapper;
     private array $computing = [];
 
     /**

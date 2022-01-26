@@ -16,10 +16,10 @@ use Symfony\Component\PasswordHasher\Command\UserPasswordHashCommand;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('security.command.user_password_hash', UserPasswordHashCommand::class)
-        ->args([
-            service('security.password_hasher_factory'),
-            abstract_arg('list of user classes'),
-        ])
-        ->tag('console.command')
+            ->args([
+                service('security.password_hasher_factory'),
+                abstract_arg('list of user classes'),
+            ])
+            ->tag('console.command')
     ;
 };

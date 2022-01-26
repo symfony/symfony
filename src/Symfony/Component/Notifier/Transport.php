@@ -35,6 +35,7 @@ use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
@@ -90,6 +91,7 @@ final class Transport
         OrangeSmsTransportFactory::class,
         OvhCloudTransportFactory::class,
         RocketChatTransportFactory::class,
+        SendberryTransportFactory::class,
         SendinblueTransportFactory::class,
         SinchTransportFactory::class,
         SlackTransportFactory::class,

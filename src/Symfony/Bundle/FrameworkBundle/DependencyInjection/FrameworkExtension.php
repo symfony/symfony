@@ -144,6 +144,7 @@ use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
+use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory as SendinblueNotifierTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
@@ -2445,6 +2446,7 @@ class FrameworkExtension extends Extension
             OrangeSmsTransportFactory::class => 'notifier.transport_factory.orange-sms',
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovh-cloud',
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',
+            SendberryTransportFactory::class => 'notifier.transport_factory.sendberry',
             SendinblueNotifierTransportFactory::class => 'notifier.transport_factory.sendinblue',
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
             SlackTransportFactory::class => 'notifier.transport_factory.slack',

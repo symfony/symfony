@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\Configurator\EnvConfigurator;
 
 class ValidateEnvPlaceholdersPassTest extends TestCase
 {
@@ -31,17 +32,25 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $container->setParameter('env(NULLED)', null);
         $container->setParameter('env(FLOATISH)', '3.2');
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', $expected = [
+        $container->prependExtensionConfig('env_extension', [
             'scalar_node' => '%env(NULLED)%',
             'scalar_node_not_empty' => '%env(FLOATISH)%',
             'int_node' => '%env(int:FOO)%',
             'float_node' => '%env(float:BAR)%',
             'string_node' => '%env(UNDEFINED)%',
+            'scalar_env_configurator' => (new EnvConfigurator('CCC'))->int()->default(42),
         ]);
 
         $this->doProcess($container);
 
-        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+        $this->assertSame([
+            'scalar_node' => '%env(NULLED)%',
+            'scalar_node_not_empty' => '%env(FLOATISH)%',
+            'int_node' => '%env(int:FOO)%',
+            'float_node' => '%env(float:BAR)%',
+            'string_node' => '%env(UNDEFINED)%',
+            'scalar_env_configurator' => '%env(default:42:int:CCC)%',
+        ], $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
     public function testDefaultEnvIsValidatedInConfig()
@@ -349,6 +358,7 @@ class EnvConfiguration implements ConfigurationInterface
                         ->thenInvalid('%s is not a valid string')
                     ->end()
                 ->end()
+                ->scalarNode('scalar_env_configurator')->end()
             ->end();
 
         return $treeBuilder;

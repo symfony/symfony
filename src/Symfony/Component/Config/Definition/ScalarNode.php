@@ -30,10 +30,18 @@ class ScalarNode extends VariableNode
     /**
      * {@inheritdoc}
      */
+    protected function finalizeValue(mixed $value): mixed
+    {
+        return parent::finalizeValue($value instanceof \Stringable ? (string) $value : $value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function validateType(mixed $value)
     {
-        if (!is_scalar($value) && null !== $value) {
-            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected "scalar", but got "%s".', $this->getPath(), get_debug_type($value)));
+        if (!is_scalar($value) && null !== $value && !$value instanceof \Stringable) {
+            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected "scalar" or "\Stringable", but got "%s".', $this->getPath(), get_debug_type($value)));
             if ($hint = $this->getInfo()) {
                 $ex->addHint($hint);
             }
@@ -54,7 +62,7 @@ class ScalarNode extends VariableNode
             return false;
         }
 
-        return null === $value || '' === $value;
+        return null === $value || '' === ($value instanceof \Stringable ? (string) $value : $value);
     }
 
     /**

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -115,6 +116,15 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
     {
         parent::__construct($parameterBag->all());
         $this->mergeEnvPlaceholders($parameterBag);
+    }
+
+    public function resolveValue(mixed $value, array $resolving = []): mixed
+    {
+        if ($value instanceof ParamConfigurator) {
+            $value = (string) $value;
+        }
+
+        return parent::resolveValue($value, $resolving);
     }
 
     public function freezeAfterProcessing(Extension $extension, ContainerBuilder $container)

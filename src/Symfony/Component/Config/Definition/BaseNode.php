@@ -340,7 +340,7 @@ abstract class BaseNode implements NodeInterface
 
         // replace value with their equivalent
         foreach ($this->equivalentValues as $data) {
-            if ($data[0] === $value) {
+            if ($data[0] === ($value instanceof \Stringable ? (string) $value : $value)) {
                 $value = $data[1];
             }
         }
@@ -458,14 +458,20 @@ abstract class BaseNode implements NodeInterface
     private static function resolvePlaceholderValue(mixed $value): mixed
     {
         if (\is_string($value)) {
-            if (isset(self::$placeholders[$value])) {
-                return self::$placeholders[$value];
-            }
+            $v = $value;
+        } elseif ($value instanceof \Stringable) {
+            $v = (string) $value;
+        } else {
+            return $value;
+        }
 
-            foreach (self::$placeholderUniquePrefixes as $placeholderUniquePrefix) {
-                if (str_starts_with($value, $placeholderUniquePrefix)) {
-                    return [];
-                }
+        if (isset(self::$placeholders[$v])) {
+            return self::$placeholders[$v];
+        }
+
+        foreach (self::$placeholderUniquePrefixes as $placeholderUniquePrefix) {
+            if (str_starts_with($v, $placeholderUniquePrefix)) {
+                return [];
             }
         }
 

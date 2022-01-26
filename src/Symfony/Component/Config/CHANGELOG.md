@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Support `\Stringable` objects as `ScalarNode` value
+
 6.0
 ---
 

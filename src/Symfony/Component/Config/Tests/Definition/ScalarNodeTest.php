@@ -107,7 +107,7 @@ class ScalarNodeTest extends TestCase
         $node = new ScalarNode('test');
 
         $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessage('Invalid type for path "test". Expected "scalar", but got "array".');
+        $this->expectExceptionMessage('Invalid type for path "test". Expected "scalar" or "\Stringable", but got "array".');
 
         $node->normalize([]);
     }
@@ -118,7 +118,7 @@ class ScalarNodeTest extends TestCase
         $node->setInfo('"the test value"');
 
         $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessage("Invalid type for path \"test\". Expected \"scalar\", but got \"array\".\nHint: \"the test value\"");
+        $this->expectExceptionMessage("Invalid type for path \"test\". Expected \"scalar\" or \"\\Stringable\", but got \"array\".\nHint: \"the test value\"");
 
         $node->normalize([]);
     }
@@ -168,5 +168,60 @@ class ScalarNodeTest extends TestCase
             [null],
             [''],
         ];
+    }
+
+    public function testStringableEmptyValue()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The path "foo" cannot contain an empty value, but got "".');
+
+        $node = new ScalarNode('foo');
+        $node->setAllowEmptyValue(false);
+        $node->finalize(new class() implements \Stringable {
+            public function __toString(): string
+            {
+                return '';
+            }
+        });
+    }
+
+    public function testStringableNormalize()
+    {
+        $node = new ScalarNode('foo');
+        $node->setNormalizationClosures([function (\Stringable $s): \Stringable {
+            $this->assertSame('foo', (string) $s);
+
+            return new class() implements \Stringable {
+                public function __toString(): string
+                {
+                    return 'bar';
+                }
+            };
+        }]);
+        $node->addEquivalentValue('bar', 'ccc');
+
+        $this->assertSame('ccc', $node->normalize(new class() implements \Stringable {
+            public function __toString(): string
+            {
+                return 'foo';
+            }
+        }));
+    }
+
+    public function testStringableFinalize()
+    {
+        $node = new ScalarNode('foo');
+        $node->setFinalValidationClosures([function (string $v): string {
+            $this->assertSame('bar', $v);
+
+            return 'ccc';
+        }]);
+
+        $this->assertSame('ccc', $node->finalize(new class() implements \Stringable {
+            public function __toString(): string
+            {
+                return 'bar';
+            }
+        }));
     }
 }

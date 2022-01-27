@@ -743,10 +743,7 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $requestStack->push($request);
 
-        $sessionFactory = new SessionFactory(
-            $requestStack,
-            $sessionFactory,
-        );
+        $sessionFactory = new SessionFactory($requestStack, $sessionFactory);
 
         $container = new Container();
         $container->set('request_stack', $requestStack);

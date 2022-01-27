@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-01-25T14:52:48Z
+
+For the encoding one being considered as windows-1250 by default in the API, I would treat it as a bugfix, given that Symfony assumes UTF-8 by default in most places.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-01-25T14:57:38Z
+
+> For the encoding one being considered as windows-1250 by default in the API, I would treat it as a bugfix, given that Symfony assumes UTF-8 by default in most places.
+
+You are right, but in this case this PR should be slit into two PRs 🤷‍♂️
+
+---------------------------------------------------------------------------
+
+by stof at 2022-01-25T15:09:49Z
+
+@OskarStark indeed
+
+---------------------------------------------------------------------------
+
+by marphi at 2022-01-25T16:01:04Z
+
+> > For the encoding one being considered as windows-1250 by default in the API, I would treat it as a bugfix, given that Symfony assumes UTF-8 by default in most places.
+>
+> You are right, but in this case this PR should be slit into two PRs 🤷‍♂️
+
+@stof @OskarStark We can leave this PR as new feature to 6.1 and I can prepare separate PR only with bugfix for encoding. If you prefer.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-01-25T17:50:46Z
+
+Please do so, we will merge the bugfix first then 👍🏻 thank you for your patience
+
+---------------------------------------------------------------------------
+
+by marphi at 2022-01-25T19:38:27Z
+
+@OskarStark PR only with bugfix #45174. This PR I've rebased to 6.1
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-01-26T19:47:12Z
+
+PR title should be adjusted, the encoding was fixed in a different PR
+
+---------------------------------------------------------------------------
+
+by marphi at 2022-01-26T19:49:25Z
+
+> PR title should be adjusted, the encoding was fixed in a different PR
+
+done

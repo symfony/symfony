@@ -99,7 +99,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
     public function testCreatesTableInTransaction(string $platform)
     {
         $conn = $this->createMock(Connection::class);
-        $conn->expects($this->exactly(3))
+        $conn->expects($this->atLeast(3))
             ->method('executeStatement')
             ->withConsecutive(
                 [$this->stringContains('INSERT INTO')],

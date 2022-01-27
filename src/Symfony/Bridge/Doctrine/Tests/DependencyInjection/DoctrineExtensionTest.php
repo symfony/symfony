@@ -286,7 +286,7 @@ class DoctrineExtensionTest extends TestCase
 
         yield ['SrcXmlBundle', 'xml', '/Resources/config/doctrine'];
 
-        yield ['NewAnnotationsBundle', 'annotation', '/src/Entity'];
+        yield ['NewAnnotationsBundle', 'annotation', \DIRECTORY_SEPARATOR.'src/Entity'];
         yield ['NewXmlBundle', 'xml', '/config/doctrine'];
     }
 

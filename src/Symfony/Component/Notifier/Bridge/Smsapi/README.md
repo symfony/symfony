@@ -7,12 +7,13 @@ DSN example
 -----------
 
 ```
-SMSAPI_DSN=smsapi://TOKEN@default?from=FROM
+SMSAPI_DSN=smsapi://TOKEN@default?from=FROM&fast=FAST
 ```
 
 where:
  - `TOKEN` is your API Token (OAuth)
  - `FROM` is the sender name
+ - `FAST` setting this parameter to "1" (default "0") will result in sending message with the highest priority which ensures the quickest possible time of delivery. Attention! Fast messages cost more than normal messages.
 
 See your account info at https://ssl.smsapi.pl/
 

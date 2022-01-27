@@ -418,7 +418,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     if ($constructorParameter->hasType()) {
                         if (\PHP_VERSION_ID >= 80000) {
                             if ($constructorParameter->getType() instanceof \ReflectionUnionType) {
-                                $expectedTypes = array_map( fn(\ReflectionNamedType $type) => $type->getName(), $constructorParameter->getType()->getTypes());
+                                $expectedTypes = array_map(function ($type) { return $type->getName(); }, $constructorParameter->getType()->getTypes());
                             } else {
                                 $expectedTypes = [$constructorParameter->getType()->getName()];
                             }

@@ -156,6 +156,10 @@
                                     {% endif %}
                                 </span>
                             {% endif %}
+
+                            {% if log.errorCounter > 1 %}
+                                <span class="log-type-badge badge badge-{{ css_class }} log-message-counter" title="This log message occurred {{ log.errorCounter }} times"><strong>{{ log.errorCounter }}</strong> times</span>
+                            {% endif %}
                         </td>
 
                         <td class="font-normal">

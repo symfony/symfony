@@ -85,6 +85,8 @@ class Parser
         try {
             $data = $this->doParse($value, $flags);
         } finally {
+            $this->refsBeingParsed = [];
+            $this->offset = 0;
             $this->lines = [];
             $this->currentLine = '';
             $this->numberOfParsedLines = 0;

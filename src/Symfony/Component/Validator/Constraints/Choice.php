@@ -52,7 +52,8 @@ class Choice extends Constraint
     }
 
     public function __construct(
-        string|array $choices = null,
+        string|array $options = [],
+        array $choices = null,
         callable|string $callback = null,
         bool $multiple = null,
         bool $strict = null,
@@ -63,12 +64,13 @@ class Choice extends Constraint
         string $minMessage = null,
         string $maxMessage = null,
         array $groups = null,
-        mixed $payload = null,
-        array $options = []
+        mixed $payload = null
     ) {
-        if (\is_array($choices) && \is_string(key($choices))) {
-            $options = array_merge($choices, $options);
-        } elseif (null !== $choices) {
+        if (\is_array($options) && $options && array_is_list($options)) {
+            $choices ??= $options;
+            $options = [];
+        }
+        if (null !== $choices) {
             $options['value'] = $choices;
         }
 

@@ -31,7 +31,10 @@ trait ContractsTrait
         doGet as private contractsGet;
     }
 
-    private \Closure $callbackWrapper;
+    /**
+     * @var callable
+     */
+    private $callbackWrapper;
     private array $computing = [];
 
     /**
@@ -42,7 +45,7 @@ trait ContractsTrait
     public function setCallbackWrapper(?callable $callbackWrapper): callable
     {
         if (!isset($this->callbackWrapper)) {
-            $this->callbackWrapper = \Closure::fromCallable([LockRegistry::class, 'compute']);
+            $this->callbackWrapper = [LockRegistry::class, 'compute'];
 
             if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
                 $this->setCallbackWrapper(null);

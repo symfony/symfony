@@ -22,6 +22,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorageFactory;
+use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorageFactory;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -122,6 +125,167 @@ class SessionListenerTest extends TestCase
             'sessionOptions' => ['cookie_path' => '/test/', 'cookie_httponly' => true, 'cookie_secure' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
             'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_LAX],
         ];
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testPhpBridgeAlreadyStartedSession()
+    {
+        session_start();
+        $sessionId = session_id();
+
+        $request = new Request();
+        $listener = $this->createListener($request, new PhpBridgeSessionStorageFactory());
+
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $listener->onKernelRequest($event);
+
+        $this->assertTrue($request->hasSession());
+        $this->assertSame($sessionId, $request->getSession()->getId());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testSessionCookieWrittenNoCookieGiven()
+    {
+        $request = new Request();
+        $listener = $this->createListener($request, new NativeSessionStorageFactory());
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+        $session = $request->getSession();
+        $session->set('hello', 'world');
+
+        $response = new Response();
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $sessionCookie = $cookies[0];
+
+        $this->assertSame('PHPSESSID', $sessionCookie->getName());
+        $this->assertNotEmpty($sessionCookie->getValue());
+        $this->assertFalse($sessionCookie->isCleared());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testSessionCookieNotWrittenCookieGiven()
+    {
+        $sessionId = $this->createValidSessionId();
+
+        $this->assertNotEmpty($sessionId);
+
+        $request = new Request();
+        $request->cookies->set('PHPSESSID', $sessionId);
+
+        $listener = $this->createListener($request, new NativeSessionStorageFactory());
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $session = $request->getSession();
+        $this->assertSame($sessionId, $session->getId());
+        $session->set('hello', 'world');
+
+        $response = new Response();
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+        $this->assertSame($sessionId, $session->getId());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(0, $cookies);
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testSessionCookieClearedWhenInvalidated()
+    {
+        $sessionId = $this->createValidSessionId();
+        $request = new Request();
+        $request->cookies->set('PHPSESSID', $sessionId);
+        $listener = $this->createListener($request, new NativeSessionStorageFactory());
+        $kernel = $this->createMock(HttpKernelInterface::class);
+
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $session = $request->getSession();
+        $session->start();
+        $sessionId = $session->getId();
+        $this->assertNotEmpty($sessionId);
+        $_SESSION['hello'] = 'world'; // check compatibility to php session bridge
+
+        $session->invalidate();
+
+        $response = new Response();
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $sessionCookie = $cookies[0];
+
+        $this->assertSame('PHPSESSID', $sessionCookie->getName());
+        $this->assertTrue($sessionCookie->isCleared());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testSessionCookieNotClearedWhenOtherVariablesSet()
+    {
+        $sessionId = $this->createValidSessionId();
+        $request = new Request();
+        $request->cookies->set('PHPSESSID', $sessionId);
+        $listener = $this->createListener($request, new NativeSessionStorageFactory());
+        $kernel = $this->createMock(HttpKernelInterface::class);
+
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $session = $request->getSession();
+        $session->start();
+        $sessionId = $session->getId();
+        $this->assertNotEmpty($sessionId);
+        $_SESSION['hello'] = 'world';
+
+        $response = new Response();
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(0, $cookies);
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testSessionCookieSetWhenOtherNativeVariablesSet()
+    {
+        $request = new Request();
+        $listener = $this->createListener($request, new NativeSessionStorageFactory());
+        $kernel = $this->createMock(HttpKernelInterface::class);
+
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $session = $request->getSession();
+        $session->start();
+        $sessionId = $session->getId();
+        $this->assertNotEmpty($sessionId);
+        $_SESSION['hello'] = 'world';
+
+        $response = new Response();
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $sessionCookie = $cookies[0];
+
+        $this->assertSame('PHPSESSID', $sessionCookie->getName());
+        $this->assertNotEmpty($sessionCookie->getValue());
+        $this->assertFalse($sessionCookie->isCleared());
     }
 
     public function testOnlyTriggeredOnMainRequest()
@@ -598,5 +762,37 @@ class SessionListenerTest extends TestCase
         $this->assertEmpty($_SESSION);
         $this->assertEmpty(session_id());
         $this->assertSame(\PHP_SESSION_NONE, session_status());
+    }
+
+    private function createListener(Request $request, SessionStorageFactoryInterface $sessionFactory)
+    {
+        $requestStack = new RequestStack();
+        $request = new Request();
+        $requestStack->push($request);
+
+        $sessionFactory = new SessionFactory(
+            $requestStack,
+            $sessionFactory,
+        );
+
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+        $container->set('session_factory', $sessionFactory);
+
+        $listener = new SessionListener($container);
+
+        return new SessionListener($container);
+    }
+
+    private function createValidSessionId(): string
+    {
+        session_start();
+        $sessionId = session_id();
+        $_SESSION['some'] = 'value';
+        session_write_close();
+        $_SESSION = [];
+        session_abort();
+
+        return $sessionId;
     }
 }

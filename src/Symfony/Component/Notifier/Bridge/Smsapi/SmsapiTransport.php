@@ -77,6 +77,7 @@ final class SmsapiTransport extends AbstractTransport
                 'fast' => $this->fast,
                 'encoding' => 'utf-8',
                 'format' => 'json',
+                'encoding' => 'utf-8',
             ],
         ]);
 

@@ -26,6 +26,8 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  * Constraint instances are immutable and serializable.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @property string[] $groups
  */
 abstract class Constraint
 {

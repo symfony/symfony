@@ -311,65 +311,12 @@ class FrameworkExtension extends Extension
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['form'])) {
-            if (!class_exists(Form::class)) {
-                throw new LogicException('Form support cannot be enabled as the Form component is not installed. Try running "composer require symfony/form".');
-            }
-
-            $this->formConfigEnabled = true;
-            $this->registerFormConfiguration($config, $container, $loader);
-
-            if (ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/framework-bundle', 'symfony/form'])) {
-                $config['validation']['enabled'] = true;
-            } else {
-                $container->setParameter('validator.translation_domain', 'validators');
-
-                $container->removeDefinition('form.type_extension.form.validator');
-                $container->removeDefinition('form.type_guesser.validator');
-            }
-        } else {
-            $container->removeDefinition('console.command.form_debug');
-        }
-
         if ($this->isConfigEnabled($container, $config['assets'])) {
             if (!class_exists(\Symfony\Component\Asset\Package::class)) {
                 throw new LogicException('Asset support cannot be enabled as the Asset component is not installed. Try running "composer require symfony/asset".');
             }
 
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
-        }
-
-        if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {
-            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['validation']);
-        } else {
-            $container->removeDefinition('console.command.messenger_consume_messages');
-            $container->removeDefinition('console.command.messenger_debug');
-            $container->removeDefinition('console.command.messenger_stop_workers');
-            $container->removeDefinition('console.command.messenger_setup_transports');
-            $container->removeDefinition('console.command.messenger_failed_messages_retry');
-            $container->removeDefinition('console.command.messenger_failed_messages_show');
-            $container->removeDefinition('console.command.messenger_failed_messages_remove');
-            $container->removeDefinition('cache.messenger.restart_workers_signal');
-
-            if ($container->hasDefinition('messenger.transport.amqp.factory') && !class_exists(AmqpTransportFactory::class)) {
-                if (class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class)) {
-                    $container->getDefinition('messenger.transport.amqp.factory')
-                        ->setClass(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class)
-                        ->addTag('messenger.transport_factory');
-                } else {
-                    $container->removeDefinition('messenger.transport.amqp.factory');
-                }
-            }
-
-            if ($container->hasDefinition('messenger.transport.redis.factory') && !class_exists(RedisTransportFactory::class)) {
-                if (class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class)) {
-                    $container->getDefinition('messenger.transport.redis.factory')
-                        ->setClass(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class)
-                        ->addTag('messenger.transport_factory');
-                } else {
-                    $container->removeDefinition('messenger.transport.redis.factory');
-                }
-            }
         }
 
         if ($this->httpClientConfigEnabled = $this->isConfigEnabled($container, $config['http_client'])) {
@@ -380,18 +327,12 @@ class FrameworkExtension extends Extension
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
         }
 
-        if ($this->notifierConfigEnabled = $this->isConfigEnabled($container, $config['notifier'])) {
-            $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
-        }
-
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
-        $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
         $this->registerHttpCacheConfiguration($config['http_cache'], $container, $config['http_method_override']);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale']);
-        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['translator']['enabled_locales'] ?? []);
@@ -460,6 +401,72 @@ class FrameworkExtension extends Extension
             $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && ContainerBuilder::willBeAvailable('symfony/security-csrf', CsrfTokenManagerInterface::class, ['symfony/framework-bundle']);
         }
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+
+        // form depends on csrf being registered
+        if ($this->isConfigEnabled($container, $config['form'])) {
+            if (!class_exists(Form::class)) {
+                throw new LogicException('Form support cannot be enabled as the Form component is not installed. Try running "composer require symfony/form".');
+            }
+
+            $this->formConfigEnabled = true;
+            $this->registerFormConfiguration($config, $container, $loader);
+
+            if (ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/framework-bundle', 'symfony/form'])) {
+                $config['validation']['enabled'] = true;
+            } else {
+                $container->setParameter('validator.translation_domain', 'validators');
+
+                $container->removeDefinition('form.type_extension.form.validator');
+                $container->removeDefinition('form.type_guesser.validator');
+            }
+        } else {
+            $container->removeDefinition('console.command.form_debug');
+        }
+
+        // validation depends on form, annotations being registered
+        $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
+
+        // messenger depends on validation being registered
+        if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {
+            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['validation']);
+        } else {
+            $container->removeDefinition('console.command.messenger_consume_messages');
+            $container->removeDefinition('console.command.messenger_debug');
+            $container->removeDefinition('console.command.messenger_stop_workers');
+            $container->removeDefinition('console.command.messenger_setup_transports');
+            $container->removeDefinition('console.command.messenger_failed_messages_retry');
+            $container->removeDefinition('console.command.messenger_failed_messages_show');
+            $container->removeDefinition('console.command.messenger_failed_messages_remove');
+            $container->removeDefinition('cache.messenger.restart_workers_signal');
+
+            if ($container->hasDefinition('messenger.transport.amqp.factory') && !class_exists(AmqpTransportFactory::class)) {
+                if (class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class)) {
+                    $container->getDefinition('messenger.transport.amqp.factory')
+                        ->setClass(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory::class)
+                        ->addTag('messenger.transport_factory');
+                } else {
+                    $container->removeDefinition('messenger.transport.amqp.factory');
+                }
+            }
+
+            if ($container->hasDefinition('messenger.transport.redis.factory') && !class_exists(RedisTransportFactory::class)) {
+                if (class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class)) {
+                    $container->getDefinition('messenger.transport.redis.factory')
+                        ->setClass(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory::class)
+                        ->addTag('messenger.transport_factory');
+                } else {
+                    $container->removeDefinition('messenger.transport.redis.factory');
+                }
+            }
+        }
+
+        // notifier depends on messenger, mailer being registered
+        if ($this->notifierConfigEnabled = $this->isConfigEnabled($container, $config['notifier'])) {
+            $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
+        }
+
+        // profiler depends on form, validation, translation, messenger, mailer, http-client, notifier being registered
+        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
 
         $this->addAnnotatedClassesToCompile([
             '**\\Controller\\',

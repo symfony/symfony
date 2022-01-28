@@ -159,6 +159,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.csrf.token_manager'));
     }
 
+    public function testFormsCsrfIsEnabledByDefault()
+    {
+        if (class_exists(FullStack::class)) {
+            $this->markTestSkipped('testing with the FullStack prevents verifying default values');
+        }
+        $container = $this->createContainerFromFile('form_default_csrf');
+
+        $this->assertTrue($container->hasDefinition('security.csrf.token_manager'));
+        $this->assertTrue($container->hasParameter('form.type_extension.csrf.enabled'));
+        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
+    }
+
     public function testHttpMethodOverride()
     {
         $container = $this->createContainerFromFile('full');

@@ -15,6 +15,7 @@ use AsyncAws\Ses\Input\SendEmailRequest;
 use AsyncAws\Ses\ValueObject\Content;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\RuntimeException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -97,6 +98,12 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         }
         if ($email->getReturnPath()) {
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
+        }
+
+        foreach ($email->getHeaders()->all() as $header) {
+            if ($header instanceof MetadataHeader) {
+                $request['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
+            }
         }
 
         return new SendEmailRequest($request);

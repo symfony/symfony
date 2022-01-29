@@ -7,6 +7,10 @@ in 6.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.0.0...v6.0.1
 
+* 6.0.4 (2022-01-29)
+
+ * security #cve-2022-xxxx [FrameworkBundle] Enable CSRF in FORM by default (jderusse)
+
 * 6.0.3 (2022-01-28)
 
  * bug #45193 [FrameworkBundle] Fix missing arguments when a serialization default context is bound (ArnoudThibaut)

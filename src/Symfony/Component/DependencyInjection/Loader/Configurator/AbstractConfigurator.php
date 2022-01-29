@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
@@ -87,10 +86,6 @@ abstract class AbstractConfigurator
             return $def;
         }
 
-        if ($value instanceof ParamConfigurator) {
-            return (string) $value;
-        }
-
         if ($value instanceof self) {
             throw new InvalidArgumentException(sprintf('"%s()" can be used only at the root of service configuration files.', $value::FACTORY));
         }
@@ -109,6 +104,10 @@ abstract class AbstractConfigurator
                 if ($allowServices) {
                     return $value;
                 }
+        }
+
+        if ($value instanceof \Stringable) {
+            return (string) $value;
         }
 
         throw new InvalidArgumentException(sprintf('Cannot use values of type "%s" in service configuration files.', get_debug_type($value)));

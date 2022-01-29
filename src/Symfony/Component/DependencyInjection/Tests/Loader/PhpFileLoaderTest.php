@@ -182,4 +182,13 @@ class PhpFileLoaderTest extends TestCase
 
         $loader->load($fixtures.'/config/when_env.php');
     }
+
+    public function testStringable()
+    {
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures').'/config'), 'some-env');
+        $loader->load('stringable.php');
+
+        $this->assertSame('foobarccc', $container->getDefinition('foo')->getArgument(0));
+    }
 }

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `$exclude` to `TaggedIterator` and `TaggedLocator` attributes
  * Add `$exclude` to `tagged_iterator` and `tagged_locator` configurator
+ * Support `\Stringable` values in the PHP-DSL
 
 6.0
 ---

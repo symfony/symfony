@@ -195,14 +195,24 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private function createAuthorization(array $config, ContainerBuilder $container)
     {
         foreach ($config['access_control'] as $access) {
-            $matcher = $this->createRequestMatcher(
-                $container,
-                $access['path'],
-                $access['host'],
-                $access['port'],
-                $access['methods'],
-                $access['ips']
-            );
+            if (isset($access['request_matcher'])) {
+                if (
+                    isset($access['path']) || isset($access['host']) || isset($access['port'])
+                    || [] !== $access['ips'] || [] !== $access['methods']
+                ) {
+                    throw new InvalidConfigurationException('The "request_matcher" option should not be specified alongside other options. Consider integrating your constraints inside your RequestMatcher directly.');
+                }
+                $matcher = new Reference($access['request_matcher']);
+            } else {
+                $matcher = $this->createRequestMatcher(
+                    $container,
+                    $access['path'],
+                    $access['host'],
+                    $access['port'],
+                    $access['methods'],
+                    $access['ips']
+                );
+            }
 
             $attributes = $access['roles'];
             if ($access['allow_if']) {

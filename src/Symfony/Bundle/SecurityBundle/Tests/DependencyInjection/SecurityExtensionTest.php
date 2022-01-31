@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -248,6 +249,80 @@ class SecurityExtensionTest extends TestCase
             new IteratorArgument([new Reference($expressionId)]),
             $container->getDefinition('security.cache_warmer.expression')->getArgument(0)
         );
+    }
+
+    public function testRegisterAccessControlWithSpecifiedRequestMatcherService()
+    {
+        $container = $this->getRawContainer();
+
+        $requestMatcherId = 'My\Test\RequestMatcher';
+        $requestMatcher = new RequestMatcher('/');
+        $container->set($requestMatcherId, $requestMatcher);
+
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['request_matcher' => $requestMatcherId],
+            ],
+        ]);
+
+        $container->compile();
+        $accessMap = $container->getDefinition('security.access_map');
+        $this->assertCount(1, $accessMap->getMethodCalls());
+        $call = $accessMap->getMethodCalls()[0];
+        $this->assertSame('add', $call[0]);
+        $args = $call[1];
+        $this->assertCount(3, $args);
+        $this->assertSame($requestMatcherId, (string) $args[0]);
+    }
+
+    /** @dataProvider provideAdditionalRequestMatcherConstraints */
+    public function testRegisterAccessControlWithRequestMatcherAndAdditionalOptionsThrowsInvalidException(array $additionalConstraints)
+    {
+        $container = $this->getRawContainer();
+
+        $requestMatcherId = 'My\Test\RequestMatcher';
+        $requestMatcher = new RequestMatcher('/');
+        $container->set($requestMatcherId, $requestMatcher);
+
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                array_merge(['request_matcher' => $requestMatcherId], $additionalConstraints),
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "request_matcher" option should not be specified alongside other options. Consider integrating your constraints inside your RequestMatcher directly.');
+
+        $container->compile();
+    }
+
+    public function provideAdditionalRequestMatcherConstraints()
+    {
+        yield 'Invalid configuration with path' => [['path' => '^/url']];
+        yield 'Invalid configuration with host' => [['host' => 'example.com']];
+        yield 'Invalid configuration with port' => [['port' => 80]];
+        yield 'Invalid configuration with methods' => [['methods' => ['POST']]];
+        yield 'Invalid configuration with ips' => [['ips' => ['0.0.0.0']]];
     }
 
     public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()

@@ -48,6 +48,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->imageLandscape = __DIR__.'/Fixtures/test_landscape.gif';
         $this->imagePortrait = __DIR__.'/Fixtures/test_portrait.gif';
         $this->image4By3 = __DIR__.'/Fixtures/test_4by3.gif';
+        $this->image16By9 = __DIR__.'/Fixtures/test_16by9.gif';
         $this->imageCorrupted = __DIR__.'/Fixtures/test_corrupted.gif';
     }
 
@@ -382,6 +383,28 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         ]);
 
         $this->validator->validate($this->image4By3, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testMinRatioUsesInputMoreDecimals()
+    {
+        $constraint = new Image([
+            'minRatio' => 4 / 3,
+        ]);
+
+        $this->validator->validate($this->image4By3, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testMaxRatioUsesInputMoreDecimals()
+    {
+        $constraint = new Image([
+            'maxRatio' => 16 / 9,
+        ]);
+
+        $this->validator->validate($this->image16By9, $constraint);
 
         $this->assertNoViolation();
     }

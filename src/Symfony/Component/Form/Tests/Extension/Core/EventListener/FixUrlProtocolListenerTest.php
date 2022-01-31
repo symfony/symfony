@@ -20,17 +20,6 @@ use Symfony\Component\Form\FormEvent;
 
 class FixUrlProtocolListenerTest extends TestCase
 {
-    public function provideUrlToFix()
-    {
-        return [
-            ['www.symfony.com'],
-            ['twitter.com/@symfony'],
-            ['symfony.com?foo@bar'],
-            ['symfony.com#foo@bar'],
-            ['localhost'],
-        ];
-    }
-
     /**
      * @dataProvider provideUrlToFix
      */
@@ -42,20 +31,18 @@ class FixUrlProtocolListenerTest extends TestCase
         $filter = new FixUrlProtocolListener('http');
         $filter->onSubmit($event);
 
-        $this->assertEquals('http://'.$data, $event->getData());
+        $this->assertSame('http://'.$data, $event->getData());
     }
 
-    public function provideUrlToSkip()
+    public function provideUrlToFix()
     {
         return [
-            ['http://www.symfony.com'],
-            ['ftp://www.symfony.com'],
-            ['https://twitter.com/@symfony'],
-            ['chrome-extension://foo'],
-            ['h323://foo'],
-            ['iris.beep://foo'],
-            ['foo+bar://foo'],
-            ['fabien@symfony.com'],
+            ['www.symfony.com'],
+            ['symfony.com/doc'],
+            ['twitter.com/@symfony'],
+            ['symfony.com?foo@bar'],
+            ['symfony.com#foo@bar'],
+            ['localhost'],
         ];
     }
 
@@ -70,6 +57,23 @@ class FixUrlProtocolListenerTest extends TestCase
         $filter = new FixUrlProtocolListener('http');
         $filter->onSubmit($event);
 
-        $this->assertEquals($url, $event->getData());
+        $this->assertSame($url, $event->getData());
+    }
+
+    public function provideUrlToSkip()
+    {
+        return [
+            ['http://www.symfony.com'],
+            ['ftp://www.symfony.com'],
+            ['https://twitter.com/@symfony'],
+            ['chrome-extension://foo'],
+            ['h323://foo'],
+            ['iris.beep://foo'],
+            ['foo+bar://foo'],
+            ['fabien@symfony.com'],
+            ['//relative/url'],
+            ['/relative/url'],
+            ['./relative/url'],
+        ];
     }
 }

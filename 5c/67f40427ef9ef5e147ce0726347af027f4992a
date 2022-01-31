@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-10-13T12:15:21Z
+
+Rather than maintaining a stack of current document (which is not properly maintained in case of errors btw, as the unstacking should be done in a `finally` block), a better solution could be to avoid the need for the state at all, by removing `$this->dom`. Instead, the `\DOMDocument` could be passed as argument to private methods needing it (and a bunch of the existing private methods might use `$node->ownerDocument` instead of `$this->dom` to avoid the need to add an argument in their signature).
+
+---------------------------------------------------------------------------
+
+by connorhu at 2020-10-13T13:13:32Z
+
+@stof I have tested the ownerDocument method. It seems to be a working solution and the tests are running but. At the appendNode method the $parentNode argument can be DomDocument so the onwerDocument is null:
+https://github.com/connorhu/symfony/commit/a6f0be318752a230058316a039c5ba2f6a939bb0#diff-b031dbb2186367839adfe20696612866da91513dd315f00ad6df23b5d38fca74L467-R452
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-13T13:36:07Z
+
+@connorhu if the parentNode is already a DomDocument, you already have the DomDocument. That's fine to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-13T13:43:22Z
+
+If we want to make the encoder re-entrant, I think the state in `$this->context` is also an issue, not only `$this->dom`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-14T17:20:45Z
+
+I rebased the PR for branch 3.4 but there are some failure to fix, could you please have a look?
+
+---------------------------------------------------------------------------
+
+by connorhu at 2020-10-14T17:32:45Z
+
+@nicolas-grekas Of course! Thank you!
+
+---------------------------------------------------------------------------
+
+by connorhu at 2020-10-14T20:20:10Z
+
+I think my original bug is now fixed. The current version of XmlEncoder in symfony 3.4 is not so complex. I don't see how can cause the context property a bug like the dom did.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-15T09:45:00Z
+
+@connorhu the issue is exactly the same that with `$this->dom` actually: if you call the serializer again during serialization, sotring the call-specific state in the instance will break as the encoder won't be re-entrant (it handles only one state at a time), and it might end up using the wrong state.
+The reason you don't see an issue in your reproducing code is because you use an empty context for both calls, so using the wrong empty context is not an issue.
+
+---------------------------------------------------------------------------
+
+by connorhu at 2020-10-15T09:57:55Z
+
+@stof I see the possibility of the context bug, but If you use nothing from context after initialization it can't cause a bug. Safer to remove context property instead of making a note for the future code changes.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-10-15T11:04:29Z
+
+@connorhu the thing is, the XmlEncoder *is* using the context in some of the private methods.
+
+---------------------------------------------------------------------------
+
+by connorhu at 2020-10-16T07:56:56Z
+
+@stof Should I merge the context property remove patch into in this PR? The referred bug only describes the bug about the dom property.

@@ -20,6 +20,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\ExtendedUninitializedProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidMethods;
@@ -209,6 +210,28 @@ class PropertyAccessorTest extends TestCase
         };');
 
         $this->propertyAccessor->getValue($object, 'uninitialized');
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testGetValueThrowsExceptionIfUninitializedNotNullableOfParentClass()
+    {
+        $this->expectException(AccessException::class);
+        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
+
+        $this->propertyAccessor->getValue(new ExtendedUninitializedProperty(), 'uninitialized');
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testGetValueThrowsExceptionIfUninitializedNotNullablePropertyWithGetterOfParentClass()
+    {
+        $this->expectException(AccessException::class);
+        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$privateUninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
+
+        $this->propertyAccessor->getValue(new ExtendedUninitializedProperty(), 'privateUninitialized');
     }
 
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousStdClass()

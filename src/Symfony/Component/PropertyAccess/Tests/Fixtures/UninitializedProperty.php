@@ -14,4 +14,15 @@ namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 class UninitializedProperty
 {
     public string $uninitialized;
+    private string $privateUninitialized;
+
+    public function getPrivateUninitialized(): string
+    {
+        return $this->privateUninitialized;
+    }
+
+    public function setPrivateUninitialized(string $privateUninitialized): void
+    {
+        $this->privateUninitialized = $privateUninitialized;
+    }
 }

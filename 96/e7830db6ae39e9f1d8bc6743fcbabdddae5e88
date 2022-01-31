@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by TristanPouliquen at 2021-12-16T16:58:08Z
+
+I am going on holidays, as said in the Symfony Slack, I was unable to do a `composer update` on the 5.4 branch so was unable to run tests locally.
+
+If someone wants to finish the work, go for it, otherwise I'll finish in January :-)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-16T17:02:00Z
+
+> I was unable to do a `composer update` on the 5.4 branch
+
+Note that 6.1 is our current feature branch. 5.4 is closed for features.
+
+---------------------------------------------------------------------------
+
+by TristanPouliquen at 2021-12-16T17:23:52Z
+
+So no way of having this new small feature before SF6.1? That would be a shame imo
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-12-16T17:46:09Z
+
+> So no way of having this new small feature before SF6.1? That would be a shame imo
+
+Yes. We only merge features in the unstable branch. For already released versions, stability is top priority so there should be as little changes in each patch release as possible (and definitely no new features).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-16T17:46:46Z
+
+> So no way of having this new small feature before SF6.1?
+
+No way, sorry.
+
+---------------------------------------------------------------------------
+
+by TristanPouliquen at 2022-01-10T11:11:10Z
+
+The final failing checks fail on issues that I don't think are related to my code. What can I do about it?
+
+---------------------------------------------------------------------------
+
+by TristanPouliquen at 2022-01-25T09:02:08Z
+
+@derrabus Do you have time to review the final changes? Should I implement the configuration exception you were talking about?
+
+---------------------------------------------------------------------------
+
+by TristanPouliquen at 2022-01-26T08:33:33Z
+
+@chalasr I see that your review is required too here :-)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-01-27T10:31:42Z
+
+Looks good to me once Alexander's comment is addressed (please ping if the given material is not enough)
+
+---------------------------------------------------------------------------
+
+by TristanPouliquen at 2022-01-27T14:04:58Z
+
+I still have a failing check with Psalm, but the error seems to be on loading Psalm, so I don't know what I can do about it!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-01-28T14:10:43Z
+
+Can you update the SecurityBundle's changelog? The psalm issue is unrelated.

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-04T08:30:12Z
+
+> What if someone extends XmlFileLoader and expects the $file property to be "validated" after the instantiation (which is not the case anymore)?
+
+That's not the main domain logic of this class, we don't have to preserve such behaviors. And it's not like we're removing the check since we're just moving it to were it's actually needed.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-01-04T17:26:36Z
+
+Let's wait for @umpirsky feedback on the original issue before merging I guess :-)

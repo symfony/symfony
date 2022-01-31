@@ -73,6 +73,43 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame(0, $response->getStatusCode());
     }
 
+    public function testFixContentLength()
+    {
+        $client = new MockHttpClient();
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => 'abc=def',
+            'headers' => ['Content-Length: 4'],
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame('Content-Length: 7', $requestOptions['headers'][0]);
+        $this->assertSame(['Content-Length: 7'], $requestOptions['normalized_headers']['content-length']);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => 'abc=def',
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame('Content-Length: 7', $requestOptions['headers'][1]);
+        $this->assertSame(['Content-Length: 7'], $requestOptions['normalized_headers']['content-length']);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => 'abc=def',
+            'headers' => ['Transfer-Encoding: chunked'],
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertFalse(isset($requestOptions['normalized_headers']['content-length']));
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => '',
+        ]);
+
+        $requestOptions = $response->getRequestOptions();
+        $this->assertFalse(isset($requestOptions['normalized_headers']['content-length']));
+    }
+
     public function testThrowExceptionInBodyGenerator()
     {
         $mockHttpClient = new MockHttpClient([

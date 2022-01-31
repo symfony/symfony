@@ -86,6 +86,14 @@ trait HttpClientTrait
 
         if (isset($options['body'])) {
             $options['body'] = self::normalizeBody($options['body']);
+
+            if (\is_string($options['body'])
+                && (string) \strlen($options['body']) !== substr($h = $options['normalized_headers']['content-length'][0] ?? '', 16)
+                && ('' !== $h || ('' !== $options['body'] && !isset($options['normalized_headers']['transfer-encoding'])))
+            ) {
+                $options['normalized_headers']['content-length'] = [substr_replace($h ?: 'Content-Length: ', \strlen($options['body']), 16)];
+                $options['headers'] = array_merge(...array_values($options['normalized_headers']));
+            }
         }
 
         if (isset($options['peer_fingerprint'])) {

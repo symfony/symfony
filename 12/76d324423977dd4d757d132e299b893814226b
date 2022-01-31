@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-29T21:54:50Z
+
+Are you using the constant and the changed value breaks your stuff? What about making the new constant private instead?
+
+---------------------------------------------------------------------------
+
+by bobthecow at 2022-01-29T23:42:03Z
+
+PsySH extends StringInput for its ShellInput (which basically adds the ability to have a "code" chunk that gets treated literally). It had to implement its own `tokenize` method and was referencing these two constants, since it had so much in common.
+
+If you don't want this to be part of the public API, it'd make sense to make the new one private. I don't think anyone else was silly enough to use it, but there are a lot of PsySH versions going back years that depend on the previous public constants so let's at least keep them working :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-30T09:29:39Z
+
+Thanks for the PR and the details. I'm fine as is :)
+
+---------------------------------------------------------------------------
+
+by bobthecow at 2022-01-30T12:52:33Z
+
+Even if it were possible (I'm not sure it is) any more aggressive deprecation than a comment would violate semver.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-01-30T13:15:48Z
+
+I mean in 6.1. Either we don't deprecate it at all and we remove that comment or we need a strategy on 6.1 to effectively be able to remove the constant in 7.0. I just don't remember if just adding a `@deprecated` comment is enough for a constant.
+
+---------------------------------------------------------------------------
+
+by bobthecow at 2022-01-30T13:51:54Z
+
+I'm not sure what you normally do, but I found several other comment-only deprecation notes that I modeled this after.

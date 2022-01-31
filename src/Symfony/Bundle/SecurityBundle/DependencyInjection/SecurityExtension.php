@@ -196,10 +196,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         foreach ($config['access_control'] as $access) {
             if (isset($access['request_matcher'])) {
-                if (
-                    isset($access['path']) || isset($access['host']) || isset($access['port'])
-                    || [] !== $access['ips'] || [] !== $access['methods']
-                ) {
+                if ($access['path'] || $access['host'] || $access['port'] || $access['ips'] || $access['methods']) {
                     throw new InvalidConfigurationException('The "request_matcher" option should not be specified alongside other options. Consider integrating your constraints inside your RequestMatcher directly.');
                 }
                 $matcher = new Reference($access['request_matcher']);

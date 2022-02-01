@@ -121,7 +121,8 @@ class MailgunHttpTransportTest extends TestCase
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
-        $email->getHeaders()->add(new TagHeader('password-reset'));
+        $email->getHeaders()->add(new TagHeader('tag1'));
+        $email->getHeaders()->add(new TagHeader('tag2'));
         $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
         $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
 
@@ -130,9 +131,10 @@ class MailgunHttpTransportTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 
-        $this->assertCount(3, $email->getHeaders()->toArray());
+        $this->assertCount(4, $email->getHeaders()->toArray());
         $this->assertSame('foo: bar', $email->getHeaders()->get('foo')->toString());
-        $this->assertSame('X-Mailgun-Tag: password-reset', $email->getHeaders()->get('X-Mailgun-Tag')->toString());
+        $this->assertStringContainsString('X-Mailgun-Tag: tag1', $email->getHeaders()->toString());
+        $this->assertStringContainsString('X-Mailgun-Tag: tag2', $email->getHeaders()->toString());
         $this->assertSame('X-Mailgun-Variables: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-Mailgun-Variables')->toString());
     }
 }

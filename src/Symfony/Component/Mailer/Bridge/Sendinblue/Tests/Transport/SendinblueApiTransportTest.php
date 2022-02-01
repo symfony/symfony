@@ -51,7 +51,8 @@ class SendinblueApiTransportTest extends TestCase
         $email = new Email();
         $email->getHeaders()
             ->add(new MetadataHeader('custom', $json))
-            ->add(new TagHeader('TagInHeaders'))
+            ->add(new TagHeader('tag1'))
+            ->add(new TagHeader('tag2'))
             ->addTextHeader('templateId', 1)
             ->addParameterizedHeader('params', 'params', $params)
             ->addTextHeader('foo', 'bar')
@@ -67,7 +68,7 @@ class SendinblueApiTransportTest extends TestCase
         $this->assertEquals($json, $payload['headers']['X-Mailin-Custom']);
 
         $this->assertArrayHasKey('tags', $payload);
-        $this->assertEquals('TagInHeaders', current($payload['tags']));
+        $this->assertEquals(['tag1', 'tag2'], $payload['tags']);
         $this->assertArrayHasKey('templateId', $payload);
         $this->assertEquals(1, $payload['templateId']);
         $this->assertArrayHasKey('params', $payload);

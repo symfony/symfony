@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+* Added a `placeholder` option to all `TextType` including : `TextType`, `EmailType`, `TextareaType`, `SearchType`, `UrlType`, `RangeType`, `TelType`, `ColorType` and `PasswordType`
+
 6.0
 ---
 

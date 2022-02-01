@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Test;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 
 abstract class TypeTestCase extends FormIntegrationTestCase
 {

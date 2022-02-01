@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\MessageStreamHeader;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkSmtpTransport;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
@@ -56,5 +57,20 @@ class PostmarkSmtpTransportTest extends TestCase
         $this->assertSame('X-PM-Metadata-Color: blue', $email->getHeaders()->get('X-PM-Metadata-Color')->toString());
         $this->assertSame('X-PM-Metadata-Client-ID: 12345', $email->getHeaders()->get('X-PM-Metadata-Client-ID')->toString());
         $this->assertSame('X-PM-Message-Stream: broadcasts', $email->getHeaders()->get('X-PM-Message-Stream')->toString());
+    }
+
+    public function testMultipleTagsAreNotAllowed()
+    {
+        $email = new Email();
+        $email->getHeaders()->add(new TagHeader('tag1'));
+        $email->getHeaders()->add(new TagHeader('tag2'));
+
+        $transport = new PostmarkSmtpTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(PostmarkSmtpTransport::class, 'addPostmarkHeaders');
+        $method->setAccessible(true);
+
+        $this->expectException(TransportException::class);
+
+        $method->invoke($transport, $email);
     }
 }

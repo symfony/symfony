@@ -22,6 +22,7 @@ abstract class BaseTypeTest extends TypeTestCase
     use VersionAwareTest;
 
     public const TESTED_TYPE = '';
+    public const PLACEHOLDER_OPTION_TEXT = 'My placeholder...';
 
     public function testPassDisabledAsOption()
     {
@@ -283,6 +284,119 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertSame($emptyData, $form->getViewData());
         $this->assertSame($expectedData, $form->getNormData());
         $this->assertSame($expectedData, $form->getData());
+    }
+
+    public function testTextTypePlaceholderOption()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+        $this->assertSame(static::PLACEHOLDER_OPTION_TEXT, $form->createView()->vars['attr']['placeholder']);
+    }
+
+    public function testEmailTypePlaceholderOption()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\EmailType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+        $this->assertSame(static::PLACEHOLDER_OPTION_TEXT, $form->createView()->vars['attr']['placeholder']);
+    }
+
+    public function testTextareaTypePlaceholderOption()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TextareaType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+        $this->assertSame(static::PLACEHOLDER_OPTION_TEXT, $form->createView()->vars['attr']['placeholder']);
+    }
+
+    public function testSearchTypePlaceholderOption()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SearchType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+        $this->assertSame(static::PLACEHOLDER_OPTION_TEXT, $form->createView()->vars['attr']['placeholder']);
+    }
+
+    public function testUrlTypePlaceholderOption()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\UrlType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+        $this->assertSame(static::PLACEHOLDER_OPTION_TEXT, $form->createView()->vars['attr']['placeholder']);
+    }
+
+    public function testRangeTypePlaceholderOption()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RangeType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+        $this->assertSame(static::PLACEHOLDER_OPTION_TEXT, $form->createView()->vars['attr']['placeholder']);
+    }
+
+    public function testTelTypePlaceholderOption()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TelType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+        $this->assertSame(static::PLACEHOLDER_OPTION_TEXT, $form->createView()->vars['attr']['placeholder']);
+    }
+
+    public function testColorTypePlaceholderOption()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ColorType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+        $this->assertSame(static::PLACEHOLDER_OPTION_TEXT, $form->createView()->vars['attr']['placeholder']);
+    }
+
+    public function testPasswordTypePlaceholderOption()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\PasswordType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+        $this->assertSame(static::PLACEHOLDER_OPTION_TEXT, $form->createView()->vars['attr']['placeholder']);
+    }
+
+    public function testIntegerTypePlaceholderOption()
+    {
+        $this->expectException(UndefinedOptionsException::class);
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\IntegerType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+    }
+
+    /**
+     * @expectedException UndefinedOptionsException
+     */
+    public function testMoneyTypePlaceholderOption()
+    {
+        $this->expectException(UndefinedOptionsException::class);
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\MoneyType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+    }
+
+    /**
+     * @expectedException UndefinedOptionsException
+     */
+    public function testNumberTypePlaceholderOption()
+    {
+        $this->expectException(UndefinedOptionsException::class);
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\NumberType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
+    }
+
+    /**
+     * @expectedException UndefinedOptionsException
+     */
+    public function testPercentTypePlaceholderOption()
+    {
+        $this->expectException(UndefinedOptionsException::class);
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\PercentType', null, [
+            'placeholder' => static::PLACEHOLDER_OPTION_TEXT
+        ]);
     }
 
     protected function getTestedType()

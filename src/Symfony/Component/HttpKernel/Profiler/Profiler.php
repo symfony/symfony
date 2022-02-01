@@ -60,6 +60,11 @@ class Profiler implements ResetInterface
         $this->enabled = true;
     }
 
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
     /**
      * Loads the Profile for the given Response.
      */

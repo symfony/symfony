@@ -48,6 +48,11 @@ final class Window implements LimiterStateInterface
         return $this->intervalInSeconds;
     }
 
+    public function getTimer(): float
+    {
+        return $this->timer;
+    }
+
     public function add(int $hits = 1, float $now = null)
     {
         $now = $now ?? microtime(true);

@@ -77,7 +77,7 @@ final class TokenBucketLimiter implements LimiterInterface
                 $remainingTokens = $tokens - $availableTokens;
                 $waitDuration = $this->rate->calculateTimeForTokens($remainingTokens);
                 $timerDate = \DateTimeImmutable::createFromFormat('U.u', $bucket->getTimer());
-                $retryAfterDate = $timerDate->modify('+' . ceil($bucket->getExpirationTime() / $this->maxBurst) . ' seconds');
+                $retryAfterDate = $timerDate->modify('+'.ceil($bucket->getExpirationTime() / $this->maxBurst).' seconds');
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval

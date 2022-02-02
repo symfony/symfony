@@ -70,7 +70,7 @@ final class FixedWindowLimiter implements LimiterInterface
             } else {
                 $waitDuration = $window->calculateTimeForTokens($tokens);
                 $timerDate = \DateTimeImmutable::createFromFormat('U.u', $window->getTimer());
-                $retryAfterDate = $timerDate->modify('+' . ceil($window->getExpirationTime()) . ' seconds');
+                $retryAfterDate = $timerDate->modify('+'.ceil($window->getExpirationTime()).' seconds');
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by driesvints at 2022-01-28T13:49:36Z
+
+Not sure why Psalm fails because a type check for the correct type is done right before the place it notes an incompatible type.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2022-01-28T13:49:53Z
+
+Maybe would be better to use `Symfony\Component\Mailer\Header\TagHeader` as in other transports?
+
+---------------------------------------------------------------------------
+
+by driesvints at 2022-01-28T13:54:11Z
+
+@norkunas hmm maybe yeah but I'm a bit unfamiliar with. Also, it seems from the AWS docs that it keeps all values in a single value. It would solve the issue with escaping which @jderusse explains though.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2022-01-28T13:57:44Z
+
+Each transport can serialize tags how it needs, so using that header the tags would also work when switching transports
+
+---------------------------------------------------------------------------
+
+by driesvints at 2022-02-01T13:24:40Z
+
+Hey all, we decided to restore our old custom `SesTransport` for Laravel 9. I'll leave this PR in draft for now until I can finish it up with the suggestion from @norkunas. If anyone wants to steal the code to get this in sooner feel free to 👍
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-02-01T21:18:10Z
+
+We'll definitely want to use ~`TagHeader`~ `MetadataHeader` here.
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-02-01T23:31:59Z
+
+Hey @driesvints, I took the liberty to complete this PR using the `MetadataHeader`. Amazon calls these tags but in Symfony, they would be considered "metadata" as these "tags" have a key and a value.
+
+[This doc section](https://symfony.com/doc/current/mailer.html#adding-tags-and-metadata-to-emails) describes the usage of `MetadataHeader`. Many transports support tags/metadata. Could be an interesting feature to add to Laravel's mailables/notifications.

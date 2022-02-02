@@ -13,7 +13,12 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\RawMessage;
 
 /**
  * @author Kevin Verschaeve
@@ -29,5 +34,31 @@ class SesSmtpTransport extends EsmtpTransport
 
         $this->setUsername($username);
         $this->setPassword($password);
+    }
+
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    {
+        if ($message instanceof Message) {
+            $this->addSesHeaders($message);
+        }
+
+        return parent::send($message, $envelope);
+    }
+
+    private function addSesHeaders(Message $message): void
+    {
+        $metadata = [];
+        $headers = $message->getHeaders();
+
+        foreach ($headers->all() as $name => $header) {
+            if ($header instanceof MetadataHeader) {
+                $metadata[] = "{$header->getKey()}={$header->getValue()}";
+                $headers->remove($name);
+            }
+        }
+
+        if ($metadata) {
+            $headers->addTextHeader('X-SES-MESSAGE-TAGS', implode(', ', $metadata));
+        }
     }
 }

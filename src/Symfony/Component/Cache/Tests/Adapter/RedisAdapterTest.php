@@ -130,4 +130,24 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
             ['redis://'],
         ];
     }
+
+    public function testAclUserPasswordAuth()
+    {
+        $redis = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+
+        if (version_compare($redis->info()['redis_version'], '6.0', '<')) {
+            $this->markTestSkipped('Redis server >= 6.0 required');
+        }
+
+        $this->assertTrue($redis->acl('SETUSER', 'alice', 'on'));
+        $this->assertTrue($redis->acl('SETUSER', 'alice', '>password'));
+        $this->assertTrue($redis->acl('SETUSER', 'alice', 'allkeys'));
+        $this->assertTrue($redis->acl('SETUSER', 'alice', '+@all'));
+
+        $redis = RedisAdapter::createConnection('redis://alice:password@'.getenv('REDIS_HOST'));
+        $this->assertTrue($redis->set(__FUNCTION__, 'value2'));
+
+        $redis = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+        $this->assertSame(1, $redis->acl('DELUSER', 'alice'));
+    }
 }

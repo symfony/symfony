@@ -118,4 +118,53 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
             ['redis://'],
         ];
     }
+
+    public function testDefaultUserPasswordAuth(): void
+    {
+        $redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+        // set password for default user
+        $redis->config('SET', 'requirepass', 'password');
+
+        // connect with only default user password
+        $redis = AbstractAdapter::createConnection('redis://password@'.getenv('REDIS_HOST'));
+        $redis->set(__FUNCTION__, 'value1');
+        self::assertSame('value1', $redis->get(__FUNCTION__));
+
+        // connect with default username and password
+        $redis = AbstractAdapter::createConnection('redis://default:password@'.getenv('REDIS_HOST'));
+        $redis->set(__FUNCTION__, 'value2');
+        self::assertSame('value2', $redis->get(__FUNCTION__));
+        $redis->config('SET', 'requirepass', null);
+
+        // connect with no password
+        $redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+        $redis->set(__FUNCTION__, 'value3');
+        self::assertSame('value3', $redis->get(__FUNCTION__));
+    }
+
+    public function testAclUserPasswordAuth(): void
+    {
+        $redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+        $redisServerInfo = $redis->info('server');
+        if (-1 === version_compare($redisServerInfo['redis_version'], '6.0.0')) {
+            self::markTestSkipped('Redis server version should be greater than 6.0.0 for testing ACL features');
+        }
+
+        self::assertTrue($redis->acl('SETUSER', 'alice', 'on'));
+        self::assertTrue($redis->acl('SETUSER', 'alice', '>password'));
+        self::assertTrue($redis->acl('SETUSER', 'alice', 'allkeys'));
+        self::assertTrue($redis->acl('SETUSER', 'alice', 'allchannels'));
+        self::assertTrue($redis->acl('SETUSER', 'alice', '+@all'));
+        self::assertTrue($redis->acl('SETUSER', 'alice', '>password'));
+
+        // auth by ACL user
+        $redis = AbstractAdapter::createConnection('redis://alice:password@'.getenv('REDIS_HOST'));
+        self::assertTrue($redis->set(__FUNCTION__, 'value2'));
+        self::assertSame('value2', $redis->get(__FUNCTION__));
+        self::assertSame(1, $redis->del(__FUNCTION__));
+
+        // ACL delete user
+        $redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+        self::assertSame(1, $redis->acl('DELUSER', 'alice'));
+    }
 }

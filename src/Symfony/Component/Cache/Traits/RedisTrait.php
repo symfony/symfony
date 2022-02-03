@@ -93,15 +93,19 @@ trait RedisTrait
             throw new CacheException(sprintf('Cannot find the "redis" extension nor the "predis/predis" package: "%s".', $dsn));
         }
 
-        $params = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:[^:@]*+:)?([^@]*+)@)?#', function ($m) use (&$auth) {
-            if (isset($m[2])) {
-                $auth = $m[2];
+        $params = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
+            if (isset($m['password'])) {
+                // if user is not `default` then it is acl user
+                if (!empty($m['user']) && $m['user'] !== 'default') {
+                    $auth = [$m['user'], $m['password']];
+                } else {
+                    $auth = $m['password'];
+                }
 
                 if ('' === $auth) {
                     $auth = null;
                 }
             }
-
             return 'file:'.($m[1] ?? '');
         }, $dsn);
 
@@ -299,7 +303,7 @@ trait RedisTrait
                 $params['parameters']['database'] = $params['dbindex'];
             }
             if (null !== $auth) {
-                $params['parameters']['password'] = $auth;
+                $params['parameters']['password'] = is_array($auth) ? $auth[1] : $auth;
             }
             if (1 === \count($hosts) && !($params['redis_cluster'] || $params['redis_sentinel'])) {
                 $hosts = $hosts[0];

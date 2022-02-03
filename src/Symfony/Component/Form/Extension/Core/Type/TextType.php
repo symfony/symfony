@@ -37,7 +37,7 @@ class TextType extends AbstractType implements DataTransformerInterface
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        if (isset($options['placeholder']) && $options['placeholder'] != '') {
+        if (isset($options['placeholder']) && '' != $options['placeholder']) {
             $view->vars['attr']['placeholder'] = $options['placeholder'];
         }
     }
@@ -49,7 +49,7 @@ class TextType extends AbstractType implements DataTransformerInterface
     {
         $resolver->setDefaults([
             'compound' => false,
-            'placeholder' => ''
+            'placeholder' => '',
         ]);
     }
 

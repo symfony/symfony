@@ -237,6 +237,7 @@ class FrameworkExtension extends Extension
     private bool $mailerConfigEnabled = false;
     private bool $httpClientConfigEnabled = false;
     private bool $notifierConfigEnabled = false;
+    private bool $serializerConfigEnabled = false;
     private bool $propertyAccessConfigEnabled = false;
     private static bool $lockConfigEnabled = false;
 
@@ -386,7 +387,7 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('exception_listener')->replaceArgument(3, $config['exceptions']);
 
-        if ($this->isConfigEnabled($container, $config['serializer'])) {
+        if ($this->serializerConfigEnabled = $this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists(\Symfony\Component\Serializer\Serializer::class)) {
                 throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed. Try running "composer require symfony/serializer-pack".');
             }
@@ -516,7 +517,7 @@ class FrameworkExtension extends Extension
             $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
         }
 
-        // profiler depends on form, validation, translation, messenger, mailer, http-client, notifier being registered
+        // profiler depends on form, validation, translation, messenger, mailer, http-client, notifier, serializer being registered
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
 
         $this->addAnnotatedClassesToCompile([
@@ -796,6 +797,10 @@ class FrameworkExtension extends Extension
 
         if ($this->notifierConfigEnabled) {
             $loader->load('notifier_debug.php');
+        }
+
+        if ($this->serializerConfigEnabled) {
+            $loader->load('serializer_debug.php');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);

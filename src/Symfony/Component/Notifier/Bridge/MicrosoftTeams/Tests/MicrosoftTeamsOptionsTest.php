@@ -30,7 +30,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
     public function testGetRecipientIdReturnsRecipientWhenSetViaConstructor()
     {
         $options = new MicrosoftTeamsOptions([
-            'recipient_id' => $recipient = '/webhook/foo',
+            'recipient_id' => $recipient = '/webhookb2/foo',
         ]);
 
         $this->assertSame($recipient, $options->getRecipientId());
@@ -39,7 +39,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
     public function testGetRecipientIdReturnsRecipientWhenSetSetter()
     {
         $options = (new MicrosoftTeamsOptions())
-            ->recipient($recipient = '/webhook/foo');
+            ->recipient($recipient = '/webhookb2/foo');
 
         $this->assertSame($recipient, $options->getRecipientId());
     }
@@ -58,7 +58,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $recipient = 'foo';
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('"%s" require recipient id format to be "/webhook/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}", "%s" given.', MicrosoftTeamsOptions::class, $recipient));
+        $this->expectExceptionMessage(sprintf('"%s" require recipient id format to be "/webhookb2/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}", "%s" given.', MicrosoftTeamsOptions::class, $recipient));
 
         $options->recipient($recipient);
     }

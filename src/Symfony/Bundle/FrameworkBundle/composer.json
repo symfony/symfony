@@ -21,7 +21,7 @@
         "ext-xml": "*",
         "symfony/cache": "^5.4|^6.0",
         "symfony/config": "^5.4|^6.0",
-        "symfony/dependency-injection": "^5.4|^6.0",
+        "symfony/dependency-injection": "^5.4.5|^6.0.5",
         "symfony/event-dispatcher": "^5.4|^6.0",
         "symfony/error-handler": "^5.4|^6.0",
         "symfony/http-foundation": "^5.4|^6.0",

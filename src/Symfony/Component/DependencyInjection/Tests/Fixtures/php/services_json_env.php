@@ -35,7 +35,7 @@ class Symfony_DI_PhpDumper_Test_JsonParameters extends Container
         return true;
     }
 
-    public function getParameter(string $name): array|string|int|float|bool|null
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));

@@ -39,7 +39,7 @@ jobs:
       redis:
         image: redis:6.0.0
         ports:
-          - 6379:6379
+          - 16379:6379
       redis-cluster:
         image: grokzen/redis-cluster:5.0.4
         ports:
@@ -108,7 +108,10 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::install tools & libraries"
-          sudo apt-get install librdkafka-dev
+          sudo apt-get install librdkafka-dev redis-server
+          sudo -- sh -c 'echo unixsocket /var/run/redis/redis-server.sock >> /etc/redis/redis.conf'
+          sudo -- sh -c 'echo unixsocketperm 777 >> /etc/redis/redis.conf'
+          sudo service redis-server restart
           echo "::endgroup::"
 
       - name: Configure Couchbase
@@ -157,6 +160,7 @@ jobs:
       - name: Run tests
         run: ./phpunit --group integration -v
         env:
+          REDIS_HOST: 'localhost:16379'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
           REDIS_SENTINEL_HOSTS: 'localhost:26379'
           REDIS_SENTINEL_SERVICE: redis_sentinel

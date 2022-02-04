@@ -44,9 +44,9 @@ namespace Symfony\Component\Console\Helper;
  */
 class OutputWrapper implements OutputWrapperInterface
 {
-    const URL_PATTERN = 'https?://[^ ]+';
+    public const URL_PATTERN = 'https?://[^ ]+';
 
-    private $allowCutUrls = false;
+    private bool $allowCutUrls = false;
 
     public function isAllowCutUrls(): bool
     {

@@ -484,7 +484,7 @@ class SymfonyStyle extends OutputStyle
                 explode(\PHP_EOL, $this->outputWrapper->wrap(
                     $message,
                     $this->lineLength - $prefixLength - $indentLength,
-                    PHP_EOL
+                    \PHP_EOL
                 ))
             );
 

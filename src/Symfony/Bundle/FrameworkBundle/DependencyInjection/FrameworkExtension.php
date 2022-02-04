@@ -637,6 +637,7 @@ class FrameworkExtension extends Extension
             'container.service_locator',
             'container.service_subscriber',
             'kernel.event_subscriber',
+            'kernel.event_listener',
             'kernel.locale_aware',
             'kernel.reset',
         ]);

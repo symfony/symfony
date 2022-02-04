@@ -1971,6 +1971,7 @@ abstract class FrameworkExtensionTest extends TestCase
             'container.service_locator',
             'container.service_subscriber',
             'kernel.event_subscriber',
+            'kernel.event_listener',
             'kernel.locale_aware',
             'kernel.reset',
         ], $container->getParameter('container.behavior_describing_tags'));

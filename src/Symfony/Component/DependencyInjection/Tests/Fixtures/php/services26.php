@@ -68,7 +68,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
     }
 
     /**
-     * @return array|bool|float|int|string|null
+     * @return array|bool|float|int|string|\UnitEnum|null
      */
     public function getParameter(string $name)
     {

@@ -419,6 +419,9 @@ class XmlDescriptor extends Descriptor
                 foreach ($this->getArgumentNodes($argument, $dom) as $childArgumentXML) {
                     $argumentXML->appendChild($childArgumentXML);
                 }
+            } elseif ($argument instanceof \UnitEnum) {
+                $argumentXML->setAttribute('type', 'constant');
+                $argumentXML->appendChild(new \DOMText(var_export($argument, true)));
             } else {
                 $argumentXML->appendChild(new \DOMText($argument));
             }

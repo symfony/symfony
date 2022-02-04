@@ -24,7 +24,7 @@
         "symfony/service-contracts": "^1.1.6|^2"
     },
     "require-dev": {
-        "symfony/yaml": "^4.4|^5.0|^6.0",
+        "symfony/yaml": "^4.4.26|^5.0|^6.0",
         "symfony/config": "^5.3|^6.0",
         "symfony/expression-language": "^4.4|^5.0|^6.0"
     },
@@ -40,7 +40,7 @@
         "symfony/config": "<5.3",
         "symfony/finder": "<4.4",
         "symfony/proxy-manager-bridge": "<4.4",
-        "symfony/yaml": "<4.4"
+        "symfony/yaml": "<4.4.26"
     },
     "provide": {
         "psr/container-implementation": "1.0",

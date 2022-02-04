@@ -45,7 +45,7 @@ interface ParameterBagInterface
     /**
      * Gets a service container parameter.
      *
-     * @return array|bool|string|int|float|null
+     * @return array|bool|string|int|float|\UnitEnum|null
      *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
@@ -59,7 +59,7 @@ interface ParameterBagInterface
     /**
      * Sets a service container parameter.
      *
-     * @param array|bool|string|int|float|null $value The parameter value
+     * @param array|bool|string|int|float|\UnitEnum|null $value The parameter value
      *
      * @throws LogicException if the parameter cannot be set
      */

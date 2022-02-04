@@ -374,6 +374,20 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertNotEmpty($traceInfo['debug']);
     }
 
+    public function testFixContentLength()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'body' => 'abc=def',
+            'headers' => ['Content-Length: 4'],
+        ]);
+
+        $body = $response->toArray();
+
+        $this->assertSame(['abc' => 'def', 'REQUEST_METHOD' => 'POST'], $body);
+    }
+
     public function testNegativeTimeout()
     {
         $client = $this->getHttpClient(__FUNCTION__);

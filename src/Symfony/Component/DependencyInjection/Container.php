@@ -107,7 +107,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a parameter.
      *
-     * @return array|bool|string|int|float|null
+     * @return array|bool|string|int|float|\UnitEnum|null
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
@@ -127,8 +127,8 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Sets a parameter.
      *
-     * @param string                           $name  The parameter name
-     * @param array|bool|string|int|float|null $value The parameter value
+     * @param string                                     $name  The parameter name
+     * @param array|bool|string|int|float|\UnitEnum|null $value The parameter value
      */
     public function setParameter(string $name, $value)
     {

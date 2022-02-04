@@ -184,6 +184,14 @@ class JsonDescriptor extends Descriptor
     {
         $flags = $options['json_encoding'] ?? 0;
 
+        // Recursively search for enum values, so we can replace it
+        // before json_encode (which will not display anything for \UnitEnum otherwise)
+        array_walk_recursive($data, static function (&$value) {
+            if ($value instanceof \UnitEnum) {
+                $value = var_export($value, true);
+            }
+        });
+
         $this->write(json_encode($data, $flags | \JSON_PRETTY_PRINT)."\n");
     }
 

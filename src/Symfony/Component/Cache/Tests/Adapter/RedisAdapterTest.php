@@ -40,30 +40,42 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
         return $adapter;
     }
 
-    public function testCreateConnection()
+    public function testCreateHostConnection()
     {
         $redis = RedisAdapter::createConnection('redis:?host[h1]&host[h2]&host[/foo:]');
         $this->assertInstanceOf(\RedisArray::class, $redis);
         $this->assertSame(['h1:6379', 'h2:6379', '/foo'], $redis->_hosts());
         @$redis = null; // some versions of phpredis connect on destruct, let's silence the warning
 
-        $redisHost = getenv('REDIS_HOST');
+        $this->doTestCreateConnection(getenv('REDIS_HOST'));
+    }
 
-        $redis = RedisAdapter::createConnection('redis://'.$redisHost);
+    public function testCreateSocketConnection()
+    {
+        if (!getenv('REDIS_SOCKET') || !file_exists(getenv('REDIS_SOCKET'))) {
+            $this->markTestSkipped('Redis socket not found');
+        }
+
+        $this->doTestCreateConnection(getenv('REDIS_SOCKET'));
+    }
+
+    private function doTestCreateConnection(string $uri)
+    {
+        $redis = RedisAdapter::createConnection('redis://'.$uri);
         $this->assertInstanceOf(\Redis::class, $redis);
         $this->assertTrue($redis->isConnected());
         $this->assertSame(0, $redis->getDbNum());
 
-        $redis = RedisAdapter::createConnection('redis://'.$redisHost.'/2');
+        $redis = RedisAdapter::createConnection('redis://'.$uri.'/2');
         $this->assertSame(2, $redis->getDbNum());
 
-        $redis = RedisAdapter::createConnection('redis://'.$redisHost, ['timeout' => 3]);
+        $redis = RedisAdapter::createConnection('redis://'.$uri, ['timeout' => 3]);
         $this->assertEquals(3, $redis->getTimeout());
 
-        $redis = RedisAdapter::createConnection('redis://'.$redisHost.'?timeout=4');
+        $redis = RedisAdapter::createConnection('redis://'.$uri.'?timeout=4');
         $this->assertEquals(4, $redis->getTimeout());
 
-        $redis = RedisAdapter::createConnection('redis://'.$redisHost, ['read_timeout' => 5]);
+        $redis = RedisAdapter::createConnection('redis://'.$uri, ['read_timeout' => 5]);
         $this->assertEquals(5, $redis->getReadTimeout());
     }
 

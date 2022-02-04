@@ -168,6 +168,20 @@ abstract class Descriptor implements DescriptorInterface
      */
     protected function formatParameter($value): string
     {
+        if ($value instanceof \UnitEnum) {
+            return var_export($value, true);
+        }
+
+        // Recursively search for enum values, so we can replace it
+        // before json_encode (which will not display anything for \UnitEnum otherwise)
+        if (\is_array($value)) {
+            array_walk_recursive($value, static function (&$value) {
+                if ($value instanceof \UnitEnum) {
+                    $value = var_export($value, true);
+                }
+            });
+        }
+
         if (\is_bool($value) || \is_array($value) || (null === $value)) {
             $jsonString = json_encode($value);
 

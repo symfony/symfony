@@ -142,6 +142,9 @@ class YamlDumperTest extends TestCase
             ->setPublic(true)
             ->addArgument(FooUnitEnum::BAR);
 
+        $container->setParameter('unit_enum', FooUnitEnum::BAR);
+        $container->setParameter('enum_array', [FooUnitEnum::BAR, FooUnitEnum::FOO]);
+
         $container->compile();
         $dumper = new YamlDumper($container);
 

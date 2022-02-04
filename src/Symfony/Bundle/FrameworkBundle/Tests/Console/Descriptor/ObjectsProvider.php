@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Suit;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -61,14 +63,26 @@ class ObjectsProvider
 
     public static function getContainerParameters()
     {
-        return [
-            'parameters_1' => new ParameterBag([
-                'integer' => 12,
-                'string' => 'Hello world!',
-                'boolean' => true,
-                'array' => [12, 'Hello world!', true],
-            ]),
-        ];
+        yield 'parameters_1' => new ParameterBag([
+            'integer' => 12,
+            'string' => 'Hello world!',
+            'boolean' => true,
+            'array' => [12, 'Hello world!', true],
+        ]);
+
+        if (\PHP_VERSION_ID < 80100) {
+            return;
+        }
+
+        yield 'parameters_enums' => new ParameterBag([
+            'unit_enum' => FooUnitEnum::BAR,
+            'backed_enum' => Suit::Hearts,
+            'array_of_enums' => Suit::cases(),
+            'map' => [
+                'mixed' => [Suit::Hearts, FooUnitEnum::BAR],
+                'single' => FooUnitEnum::BAR,
+            ],
+        ]);
     }
 
     public static function getContainerParameter()

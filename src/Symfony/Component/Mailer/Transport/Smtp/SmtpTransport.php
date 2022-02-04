@@ -257,7 +257,14 @@ class SmtpTransport extends AbstractTransport
         $this->getLogger()->debug(sprintf('Email transport "%s" started', __CLASS__));
     }
 
-    private function stop(): void
+    /**
+     * Manually disconnect from the SMTP server.
+     *
+     * In most cases this is not necessary since the disconnect happens automatically on termination.
+     * In cases of long-running scripts, this might however make sense to avoid keeping an open
+     * connection to the SMTP server in between sending emails.
+     */
+    public function stop(): void
     {
         if (!$this->started) {
             return;

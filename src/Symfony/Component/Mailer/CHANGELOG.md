@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+* Allow manually stop() of `SmtpTransport`
+
 6.0
 ---
 

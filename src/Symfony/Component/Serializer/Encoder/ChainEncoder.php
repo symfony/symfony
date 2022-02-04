@@ -61,6 +61,10 @@ class ChainEncoder implements ContextAwareEncoderInterface
     {
         $encoder = $this->getEncoder($format, $context);
 
+        if ($encoder instanceof TraceableEncoder && $encoder->needsNormalization()) {
+            return true;
+        }
+
         if (!$encoder instanceof NormalizationAwareInterface) {
             return true;
         }

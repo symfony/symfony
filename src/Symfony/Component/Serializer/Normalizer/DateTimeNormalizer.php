@@ -57,6 +57,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         if (!$object instanceof \DateTimeInterface) {
             throw new InvalidArgumentException('The object must implement the "\DateTimeInterface".');
         }
+        usleep(200000);
 
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY];
         $timezone = $this->getTimezone($context);
@@ -76,6 +77,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      */
     public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */): bool
     {
+        usleep(20000);
         return $data instanceof \DateTimeInterface;
     }
 

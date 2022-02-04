@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer;
 
+use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
 use Symfony\Component\Serializer\Encoder\ChainDecoder;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
@@ -75,11 +76,15 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     private $denormalizerCache = [];
     private $normalizerCache = [];
 
+    private ?SerializerDataCollector $serializerDataCollector;
+
+    private bool $debug;
+
     /**
      * @param array<NormalizerInterface|DenormalizerInterface> $normalizers
      * @param array<EncoderInterface|DecoderInterface>         $encoders
      */
-    public function __construct(array $normalizers = [], array $encoders = [])
+    public function __construct(array $normalizers = [], array $encoders = [], ?SerializerDataCollector $serializerDataCollector = null, bool $debug = false)
     {
         foreach ($normalizers as $normalizer) {
             if ($normalizer instanceof SerializerAwareInterface) {
@@ -119,6 +124,9 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         }
         $this->encoder = new ChainEncoder($realEncoders);
         $this->decoder = new ChainDecoder($decoders);
+
+        $this->serializerDataCollector = $serializerDataCollector;
+        $this->debug = $debug;
     }
 
     /**
@@ -158,6 +166,10 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     {
         // If a normalizer supports the given data, use it
         if ($normalizer = $this->getNormalizer($data, $format, $context)) {
+            if ($this->debug && $this->serializerDataCollector) {
+                // $this->serializerDataCollector->collectNormalize($normalizer, $data, $format, $context);
+            }
+
             return $normalizer->normalize($data, $format, $context);
         }
 

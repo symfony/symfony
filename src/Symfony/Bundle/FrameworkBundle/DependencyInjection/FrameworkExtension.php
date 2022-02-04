@@ -229,6 +229,7 @@ class FrameworkExtension extends Extension
     private bool $mailerConfigEnabled = false;
     private bool $httpClientConfigEnabled = false;
     private bool $notifierConfigEnabled = false;
+    private bool $serializerConfigEnabled = false;
     private bool $propertyAccessConfigEnabled = false;
     private static bool $lockConfigEnabled = false;
 
@@ -423,7 +424,6 @@ class FrameworkExtension extends Extension
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale'], $config['enabled_locales']);
-        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
@@ -433,7 +433,7 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('exception_listener')->replaceArgument(3, $config['exceptions']);
 
-        if ($this->isConfigEnabled($container, $config['serializer'])) {
+        if ($this->serializerConfigEnabled = $this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists(\Symfony\Component\Serializer\Serializer::class)) {
                 throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed. Try running "composer require symfony/serializer-pack".');
             }
@@ -629,6 +629,8 @@ class FrameworkExtension extends Extension
             'kernel.locale_aware',
             'kernel.reset',
         ]);
+
+        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
     }
 
     /**
@@ -769,6 +771,10 @@ class FrameworkExtension extends Extension
 
         if ($this->notifierConfigEnabled) {
             $loader->load('notifier_debug.php');
+        }
+
+        if ($this->serializerConfigEnabled) {
+            $loader->load('serializer_debug.php');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);

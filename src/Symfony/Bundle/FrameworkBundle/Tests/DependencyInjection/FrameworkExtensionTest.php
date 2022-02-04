@@ -1520,6 +1520,7 @@ abstract class FrameworkExtensionTest extends TestCase
             $this->assertEquals([
                 ['setLogger', [new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]],
             ], $tagAwareDefinition->getMethodCalls());
+            $this->assertSame([['channel' => 'cache']], $tagAwareDefinition->getTag('monolog.logger'));
         }
     }
 

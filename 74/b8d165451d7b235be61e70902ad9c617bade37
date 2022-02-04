@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2021-12-07T00:08:27Z
+
+I'm not sure to understand why PHPUnit tests are failing:
+> Symfony\Component\DependencyInjection\Exception\InvalidArgumentException: Invalid definition for service "translation.provider_factory.loco": "Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory::__construct()" requires 5 arguments, 4 passed
+
+The file `src/Symfony/Bundle/FrameworkBundle/Resources/config/translation_providers.php` has been updated and service reference `translator` have been added as 5th argument to `translation.provider_factory.loco` service, but it fails.
+
+Do someknow what's going on here? Thanks!
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-12-07T19:23:24Z
+
+Hey!
+
+I think @rvanlaak has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Kocal at 2021-12-10T10:38:49Z
+
+Thanks for your comments :)
+
+We still have the issue when running tests, and this issue only happens in CI:
+> Symfony\Component\DependencyInjection\Exception\InvalidArgumentException: Invalid definition for service "translation.provider_factory.loco": "Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory::__construct()" requires 5 arguments, 4 passed
+
+ping @nicolas-grekas @stof, do you know what can happens here? Thanks!
+
+---------------------------------------------------------------------------
+
+by Kocal at 2021-12-14T21:26:58Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-12-21T14:29:19Z
+
+New constructor parameters should be mentioned in CHANGELOG/UPGRADE files also
+
+---------------------------------------------------------------------------
+
+by Kocal at 2021-12-21T16:26:40Z
+
+Thanks for your comments @chalasr, the `symfony/translation` dependency bump was the key! :)
+
+The failures are unrelated IMO.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by Kocal at 2021-12-28T15:02:02Z
+
+Review comments have been addressed, deprecations have been removed and some tests fixed.
+Failures are not related.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by Kocal at 2022-01-05T23:12:05Z
+
+The PR has been rebased, failures are not related.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2022-02-04T08:47:30Z
+
+Is there anything else to do?

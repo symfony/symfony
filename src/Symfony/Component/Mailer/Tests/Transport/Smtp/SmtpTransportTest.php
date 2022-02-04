@@ -133,6 +133,19 @@ class SmtpTransportTest extends TestCase
         $this->assertContains("RCPT TO:<recipient@xn--exmple-cua.org>\r\n", $stream->getCommands());
         $this->assertContains("RCPT TO:<recipient2@example.org>\r\n", $stream->getCommands());
     }
+
+    public function testStop()
+    {
+        $stream = new DummyStream();
+        $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
+
+        $transport = new SmtpTransport($stream);
+        $transport->send(new RawMessage('Message 1'), $envelope);
+        $this->assertFalse($stream->isClosed());
+
+        $transport->stop();
+        $this->assertTrue($stream->isClosed());
+    }
 }
 
 class DummyStream extends AbstractStream

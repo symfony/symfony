@@ -99,6 +99,14 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooClass.php');
     }
 
+    public function testLoadAbstractClass()
+    {
+        $this->reader->expects($this->never())->method('getClassAnnotation');
+        $this->reader->expects($this->never())->method('getMethodAnnotations');
+
+        $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/AbstractClass.php');
+    }
+
     private function expectAnnotationsToBeReadFrom(array $classes)
     {
         $this->reader->expects($this->exactly(\count($classes)))

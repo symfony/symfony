@@ -28,6 +28,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypedProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyDynamicallyCreated;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyGetterOnObject;
@@ -904,5 +905,17 @@ class PropertyAccessorTest extends TestCase
         $path = 'b';
         $object = new TestPublicPropertyGetterOnObjectMagicGet();
         $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testSetValueWrongTypeShouldThrowWrappedException()
+    {
+        $object = new TestClassTypedProperty();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected argument of type "float", "string" given at property path "publicProperty"');
+        $this->propertyAccessor->setValue($object, 'publicProperty', 'string');
     }
 }

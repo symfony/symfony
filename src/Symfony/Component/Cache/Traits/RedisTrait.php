@@ -180,7 +180,7 @@ trait RedisTrait
 
             $initializer = static function ($redis) use ($connect, $params, $dsn, $auth, $hosts, $tls) {
                 $host = $hosts[0]['host'] ?? $hosts[0]['path'];
-                $port = $hosts[0]['port'] ?? 6379;
+                $port = $hosts[0]['port'] ?? 0;
 
                 if (isset($hosts[0]['host']) && $tls) {
                     $host = 'tls://'.$host;

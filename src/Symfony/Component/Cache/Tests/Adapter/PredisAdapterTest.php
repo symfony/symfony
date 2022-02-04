@@ -22,7 +22,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        self::$redis = new \Predis\Client(['host' => getenv('REDIS_HOST')], ['prefix' => 'prefix_']);
+        self::$redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => 6379]), ['prefix' => 'prefix_']);
     }
 
     public function testCreateConnection()
@@ -35,10 +35,11 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
         $connection = $redis->getConnection();
         $this->assertInstanceOf(StreamConnection::class, $connection);
 
+        $redisHost = explode(':', $redisHost);
         $params = [
             'scheme' => 'tcp',
-            'host' => $redisHost,
-            'port' => 6379,
+            'host' => $redisHost[0],
+            'port' => (int) ($redisHost[1] ?? 6379),
             'persistent' => 0,
             'timeout' => 3,
             'read_write_timeout' => 0,

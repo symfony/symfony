@@ -268,7 +268,7 @@ index 0532120adf..78fba5ef79 100644
       * @throws InvalidArgumentException if the parameter is not defined
       */
 -    public function getParameter(string $name)
-+    public function getParameter(string $name): array|bool|string|int|float|null
++    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
      {
          return $this->parameterBag->get($name);
 diff --git a/src/Symfony/Component/DependencyInjection/ContainerInterface.php b/src/Symfony/Component/DependencyInjection/ContainerInterface.php
@@ -279,7 +279,7 @@ index aa5d6b317e..31ffbca4ef 100644
       * @throws InvalidArgumentException if the parameter is not defined
       */
 -    public function getParameter(string $name);
-+    public function getParameter(string $name): array|bool|string|int|float|null;
++    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null;
  
      public function hasParameter(string $name): bool;
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php

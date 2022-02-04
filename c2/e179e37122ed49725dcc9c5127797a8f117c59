@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-30T23:23:36Z
+
+Either way, allowing enums in parameters would be a new feature. I don't think we should add that functionality to 4.4.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2021-12-31T07:59:30Z
+
+I kind of agree, despite https://github.com/symfony/symfony/pull/40857 being on 4.4. But the difference is parameters never supported objects.
+So let's make that clear by throwing in 4.4 and see what we can do/if we want to support enum in parameters later?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-31T08:31:06Z
+
+Sounds good. 🙂
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-12T18:23:47Z
+
+How do we move forward on this one?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-01-12T18:44:13Z
+
+Sorry, didn't have time to go further. The plan was to throw either in the `ParameterBag` or the `PhpDumper` so that's explicit enum types are not supported as parameters ; since it even goes against the `ParameterBagInterface::get/set` contract.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-01-26T09:59:45Z
+
+Updated the PR so that we simply throw on attempting to set an enum or array containing an enum as a DI parameter : this should be enough for our goal: explicit the fact enums aren't supported as such.
+Of course, the phpdoc already tells this, and we won't check for any other infringement to it ; but since the DI loaders allow such a thing indirectly:
+
+```yml
+# services.yaml
+parameters:
+    default_status: !php/const App\Status::Draft
+    statuses:
+        - !php/const App\Status::Draft
+        - !php/const App\Status::Deleted
+        - !php/const App\Status::Published
+```
+
+we might want to handle this specific case here so the user notices it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-01-28T09:11:10Z
+
+I'm sorry I'm not super convinced by this. It would be strange to me to allow direct references to enums in service arguments, but to disallow indirect references via DI parameters:
+
+```yaml
+parameters:
+    foo: !php/const Some\Enum::Case
+
+services:
+    bar: ['%foo%']
+```
+
+I'd prefer to fix supporting them when dumping, and widen the types on 6.0. I don't think anybody is going to be hit by the BC break.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-01-28T09:56:28Z
+
+Honestly, I'd be way more satisfied this way too :)
+I'll revert to the previous state of this PR.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-01-31T18:19:24Z
+
+Alright, PR updated. Hopefully I haven't missed anything.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-02-04T08:30:44Z
+
+We stopped adding new features for supporting newer PHP versions a while ago, so this is a new feature that should go into 6.1.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-04T14:14:08Z
+
+This is edgy, but after a private chat with @fabpot, I've got a go for merging. Now doing it.

@@ -13,6 +13,7 @@ CHANGELOG
  * Deprecate `DoctrineProvider` and `DoctrineAdapter` because these classes have been added to the `doctrine/cache` package
  * Add `DoctrineDbalAdapter` identical to `PdoAdapter` for `Doctrine\DBAL\Connection` or DBAL URL
  * Deprecate usage of `PdoAdapter` with `Doctrine\DBAL\Connection` or DBAL URL
+ * added support of DSN username:password section in RedisAdapter which allows using ACL AUTH. Use `default` username for default user.
 
 5.3
 ---

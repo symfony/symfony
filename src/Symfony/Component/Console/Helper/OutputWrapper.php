@@ -66,7 +66,7 @@ class OutputWrapper implements OutputWrapperInterface
             return $text;
         }
 
-        $tagPattern = sprintf('<(?:(?:%1$s)|/(?:%1$s)?)>', '[a-z][^<>]*+');
+        $tagPattern = sprintf('<(?:(?:%s)|/(?:%s)?)>', OutputWrapperInterface::TAG_OPEN_REGEX, OutputWrapperInterface::TAG_CLOSE_REGEX);
         $limitPattern = "{1,$width}";
         $patternBlocks = [$tagPattern];
         if (!$this->allowCutUrls) {

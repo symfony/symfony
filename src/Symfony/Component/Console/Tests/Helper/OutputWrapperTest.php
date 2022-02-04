@@ -52,7 +52,7 @@ Donec ullamcorper
 risus at <error>libero
 ornare</error> efficitur.
 EOS;
-        $wrapper->setAllowCutUrls(false);
+        $wrapper->setAllowCutUrls(true);
         $result = $wrapper->wrap($text, 20);
         $this->assertEquals($URLwrappedExpected, $result);
     }

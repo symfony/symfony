@@ -469,7 +469,7 @@ class SymfonyStyle extends OutputStyle
 
         if (null !== $type) {
             $type = sprintf('[%s] ', $type);
-            $indentLength = Helper::strlen($type);
+            $indentLength = Helper::width($type);
             $lineIndentation = str_repeat(' ', $indentLength);
         }
 
@@ -479,7 +479,14 @@ class SymfonyStyle extends OutputStyle
                 $message = OutputFormatter::escape($message);
             }
 
-            $lines = array_merge($lines, explode(\PHP_EOL, $this->outputWrapper->wrap($message, $this->lineLength - $prefixLength - $indentLength, PHP_EOL)));
+            $lines = array_merge(
+                $lines,
+                explode(\PHP_EOL, $this->outputWrapper->wrap(
+                    $message,
+                    $this->lineLength - $prefixLength - $indentLength,
+                    PHP_EOL
+                ))
+            );
 
             if (\count($messages) > 1 && $key < \count($messages) - 1) {
                 $lines[] = '';

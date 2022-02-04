@@ -39,7 +39,7 @@ abstract class AbstractRedisCacheTest extends CacheTestCase
             throw new SkippedTestSuiteError('Extension redis required.');
         }
         try {
-            (new \Redis())->connect(getenv('REDIS_HOST'));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
         } catch (\Exception $e) {
             throw new SkippedTestSuiteError($e->getMessage());
         }

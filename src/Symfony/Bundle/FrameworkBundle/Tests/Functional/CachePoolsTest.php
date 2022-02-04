@@ -121,7 +121,7 @@ class CachePoolsTest extends AbstractWebTestCase
     private function skipIfRedisUnavailable()
     {
         try {
-            (new \Redis())->connect(getenv('REDIS_HOST'));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
         } catch (\Exception $e) {
             self::markTestSkipped($e->getMessage());
         }

@@ -57,11 +57,11 @@ final class FixedWindowLimiter implements LimiterInterface
 
         try {
             $window = $this->storage->fetch($this->id);
+            $now = microtime(true);
             if (!$window instanceof Window) {
-                $window = new Window($this->id, $this->interval, $this->limit);
+                $window = new Window($this->id, $this->interval, $this->limit, $now);
             }
 
-            $now = microtime(true);
             $availableTokens = $window->getAvailableTokens($now);
             if ($availableTokens >= $tokens) {
                 $window->add($tokens, $now);
@@ -69,17 +69,17 @@ final class FixedWindowLimiter implements LimiterInterface
                 $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->limit));
             } else {
                 $waitDuration = $window->calculateTimeForTokens($tokens);
-                $timerDate = \DateTimeImmutable::createFromFormat('U.u', $window->getTimer());
-                $retryAfterDate = $timerDate->modify('+'.ceil($window->getExpirationTime()).' seconds');
+                $retryAfter = $window->getTimer() + $window->getExpirationTime();
+                $rateLimit = new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U.u', $retryAfter), false, $this->limit);
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
-                    throw new MaxWaitDurationExceededException(sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($window->getAvailableTokens($now), $retryAfterDate, false, $this->limit));
+                    throw new MaxWaitDurationExceededException(sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), $rateLimit);
                 }
 
                 $window->add($tokens, $now);
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), $retryAfterDate, false, $this->limit));
+                $reservation = new Reservation($retryAfter, $rateLimit);
             }
             $this->storage->save($window);
         } finally {

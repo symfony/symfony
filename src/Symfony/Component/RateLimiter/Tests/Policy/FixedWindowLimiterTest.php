@@ -86,6 +86,40 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertEqualsWithDelta($start + 60, microtime(true), 1);
     }
 
+    public function testWaitIntervalOnConsumeOverLimitWithWindowTimerInPast()
+    {
+        // 10 seconds ago
+        $windowTimer = microtime(true) - 10;
+        $window = new Window('test', 60, 10, $windowTimer);
+        $this->storage->save($window);
+        $limiter = $this->createLimiter();
+
+        // initial consume
+        $limiter->consume(8);
+        // consumer over the limit
+        $rateLimit = $limiter->consume(4);
+
+        $rateLimit->wait(); // wait 1 minute from $windowTimer/50 seconds from now
+        $this->assertEqualsWithDelta($windowTimer + 60, microtime(true), 1);
+    }
+
+    public function testWaitIntervalOnReserveOverLimitWithWindowTimerInPast()
+    {
+        // 10 seconds ago
+        $windowTimer = microtime(true) - 10;
+        $window = new Window('test', 60, 10, $windowTimer);
+        $this->storage->save($window);
+        $limiter = $this->createLimiter();
+
+        // initial consume
+        $limiter->consume(8);
+        // reserve over the limit
+        $reservation = $limiter->reserve(4);
+
+        $reservation->wait(); // wait 1 minute from $windowTimer/50 seconds from now
+        $this->assertEqualsWithDelta($windowTimer + 60, microtime(true), 1);
+    }
+
     public function testWrongWindowFromCache()
     {
         $this->storage->save(new DummyWindow());

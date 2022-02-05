@@ -400,6 +400,43 @@ class DebugClassLoaderTest extends TestCase
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::static()" might add "static" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
         ], $deprecations);
     }
+
+    public function testOverrideFinalConstant()
+    {
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        class_exists( Fixtures\FinalConstant\OverrideFinalConstant::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\FinalConstants::OVERRIDDEN_FINAL_PARENT_CLASS" constant is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\OverrideFinalConstant".',
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\FinalConstants2::OVERRIDDEN_FINAL_PARENT_PARENT_CLASS" constant is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\OverrideFinalConstant".',
+        ], $deprecations);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testOverrideFinalConstant81()
+    {
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        class_exists( Fixtures\FinalConstant\OverrideFinalConstant81::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\FinalConstantsInterface::OVERRIDDEN_FINAL_INTERFACE" constant is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\OverrideFinalConstant81".',
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\FinalConstantsInterface2::OVERRIDDEN_FINAL_INTERFACE_2" constant is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalConstant\OverrideFinalConstant81".',
+        ], $deprecations);
+    }
 }
 
 class ClassLoader

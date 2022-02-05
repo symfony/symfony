@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Report overridden `@final` constants
+
 5.4
 ---
 

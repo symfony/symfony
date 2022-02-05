@@ -112,6 +112,7 @@ class DebugClassLoader
     private static array $checkedClasses = [];
     private static array $final = [];
     private static array $finalMethods = [];
+    private static array $finalConstants = [];
     private static array $deprecated = [];
     private static array $internal = [];
     private static array $internalMethods = [];
@@ -468,8 +469,9 @@ class DebugClassLoader
         self::$finalMethods[$class] = [];
         self::$internalMethods[$class] = [];
         self::$annotatedParameters[$class] = [];
+        self::$finalConstants[$class] = [];
         foreach ($parentAndOwnInterfaces as $use) {
-            foreach (['finalMethods', 'internalMethods', 'annotatedParameters', 'returnTypes'] as $property) {
+            foreach (['finalMethods', 'internalMethods', 'annotatedParameters', 'returnTypes', 'finalConstants'] as $property) {
                 if (isset(self::${$property}[$use])) {
                     self::${$property}[$class] = self::${$property}[$class] ? self::${$property}[$use] + self::${$property}[$class] : self::${$property}[$use];
                 }
@@ -622,6 +624,24 @@ class DebugClassLoader
                     self::$annotatedParameters[$class][$method->name][$parameterName] = sprintf('The "%%s::%s()" method will require a new "%s$%s" argument in the next major version of its %s "%s", not defining it is deprecated.', $method->name, $parameterType ? $parameterType.' ' : '', $parameterName, interface_exists($className) ? 'interface' : 'parent class', $className);
                 }
             }
+        }
+
+        foreach ($refl->getReflectionConstants(\ReflectionClassConstant::IS_PUBLIC | \ReflectionClassConstant::IS_PROTECTED) as $constant) {
+            if ($constant->class !== $class) {
+                continue;
+            }
+
+            foreach ($parentAndOwnInterfaces as $use) {
+                if (isset(self::$finalConstants[$use][$constant->name])) {
+                    $deprecations[] = sprintf('The "%s::%s" constant is considered final. You should not override it in "%s".', self::$finalConstants[$use][$constant->name], $constant->name, $class);
+                }
+            }
+
+            if (!($doc = $this->parsePhpDoc($constant)) || !isset($doc['final'])) {
+                continue;
+            }
+
+            self::$finalConstants[$class][$constant->name] = $class;
         }
 
         return $deprecations;

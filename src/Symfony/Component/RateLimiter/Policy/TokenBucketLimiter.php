@@ -61,11 +61,11 @@ final class TokenBucketLimiter implements LimiterInterface
 
         try {
             $bucket = $this->storage->fetch($this->id);
+            $now = microtime(true);
             if (!$bucket instanceof TokenBucket) {
-                $bucket = new TokenBucket($this->id, $this->maxBurst, $this->rate);
+                $bucket = new TokenBucket($this->id, $this->maxBurst, $this->rate, $now);
             }
 
-            $now = microtime(true);
             $availableTokens = $bucket->getAvailableTokens($now);
             if ($availableTokens >= $tokens) {
                 // tokens are now available, update bucket

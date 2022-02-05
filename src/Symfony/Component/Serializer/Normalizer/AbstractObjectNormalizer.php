@@ -145,17 +145,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
-        if (isset($context[self::CALLBACKS])) {
-            if (!\is_array($context[self::CALLBACKS])) {
-                throw new InvalidArgumentException(sprintf('The "%s" context option must be an array of callables.', self::CALLBACKS));
-            }
-
-            foreach ($context[self::CALLBACKS] as $attribute => $callback) {
-                if (!\is_callable($callback)) {
-                    throw new InvalidArgumentException(sprintf('Invalid callback found for attribute "%s" in the "%s" context option.', $attribute, self::CALLBACKS));
-                }
-            }
-        }
+        $this->validateCallbackContext($context);
 
         if ($this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object, $format, $context);
@@ -203,13 +193,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $attributeValue = $maxDepthHandler($attributeValue, $object, $attribute, $format, $context);
             }
 
-            /**
-             * @var callable|null
-             */
-            $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? $this->callbacks[$attribute] ?? null;
-            if ($callback) {
-                $attributeValue = $callback($attributeValue, $object, $attribute, $format, $context);
-            }
+            $attributeValue = $this->applyCallbacks($attributeValue, $object, $attribute, $format, $context);
 
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
                 $stack[$attribute] = $attributeValue;
@@ -346,6 +330,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
+        $this->validateCallbackContext($context);
+
         $allowedAttributes = $this->getAllowedAttributes($type, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
         $extraAttributes = [];
@@ -375,6 +361,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             $value = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $context);
+            $value = $this->applyCallbacks($value, $resolvedClass, $attribute, $format, $context);
+
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $context);
             } catch (InvalidArgumentException $e) {
@@ -509,7 +497,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
         }
 
-        return $this->validateAndDenormalize($class->getName(), $parameterName, $parameterData, $format, $context);
+        $parameterData = $this->validateAndDenormalize($class->getName(), $parameterName, $parameterData, $format, $context);
+
+        return $this->applyCallbacks($parameterData, $class->getName(), $parameterName, $format, $context);
     }
 
     /**

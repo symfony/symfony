@@ -399,7 +399,7 @@ class ObjectNormalizerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideCallbacks
+     * @dataProvider provideNormalizeCallbacks
      */
     public function testLegacyCallbacks($callbacks, $value, $result)
     {
@@ -420,6 +420,11 @@ class ObjectNormalizerTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $this->normalizer->setCallbacks($callbacks);
+    }
+
+    protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): ObjectNormalizer
+    {
+        return new ObjectNormalizer(null, null, null, $this->getCallbackPropertyTypeExtractor());
     }
 
     // circular reference

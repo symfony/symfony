@@ -188,7 +188,7 @@ class PropertyNormalizerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideCallbacks
+     * @dataProvider provideNormalizeCallbacks
      */
     public function testLegacyCallbacks($callbacks, $value, $result)
     {
@@ -210,6 +210,11 @@ class PropertyNormalizerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $this->normalizer->setCallbacks($callbacks);
+    }
+
+    protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): PropertyNormalizer
+    {
+        return new PropertyNormalizer(null, null, $this->getCallbackPropertyTypeExtractor());
     }
 
     protected function getNormalizerForCircularReference(array $defaultContext): PropertyNormalizer

@@ -141,8 +141,8 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     {
         $offset = 0;
         $output = '';
-        $openTagRegex = OutputWrapperInterface::TAG_OPEN_REGEX;
-        $closeTagRegex = OutputWrapperInterface::TAG_CLOSE_REGEX;
+        $openTagRegex = OutputWrapperInterface::TAG_OPEN_REGEX_SEGMENT;
+        $closeTagRegex = OutputWrapperInterface::TAG_CLOSE_REGEX_SEGMENT;
         $currentLineLength = 0;
         preg_match_all("#<(($openTagRegex) | /($closeTagRegex)?)>#ix", $message, $matches, \PREG_OFFSET_CAPTURE);
         foreach ($matches[0] as $i => $match) {

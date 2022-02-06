@@ -13,8 +13,8 @@ namespace Symfony\Component\Console\Helper;
 
 interface OutputWrapperInterface
 {
-    public const TAG_OPEN_REGEX = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
-    public const TAG_CLOSE_REGEX = '[a-z][^<>]*+';
+    public const TAG_OPEN_REGEX_SEGMENT = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
+    public const TAG_CLOSE_REGEX_SEGMENT = '[a-z][^<>]*+';
 
     /**
      * @param positive-int|0 $width

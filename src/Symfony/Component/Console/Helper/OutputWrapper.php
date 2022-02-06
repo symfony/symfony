@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Helper;
 
 /**
  * Simple output wrapper for "tagged outputs" instead of wordwrap(). This solution is based on a StackOverflow
- * answer: https://stackoverflow.com/a/20434776/1476819 from SLN.
+ * answer: https://stackoverflow.com/a/20434776/1476819 from user557597 (alias SLN).
  *
  *  (?:
  *       # -- Words/Characters
@@ -42,9 +42,9 @@ namespace Symfony\Component\Console\Helper;
  *
  * @see https://stackoverflow.com/a/20434776/1476819
  */
-class OutputWrapper implements OutputWrapperInterface
+final class OutputWrapper implements OutputWrapperInterface
 {
-    public const URL_PATTERN = 'https?://\S+';
+    private const URL_PATTERN = 'https?://\S+';
 
     private bool $allowCutUrls = false;
 
@@ -66,7 +66,7 @@ class OutputWrapper implements OutputWrapperInterface
             return $text;
         }
 
-        $tagPattern = sprintf('<(?:(?:%s)|/(?:%s)?)>', OutputWrapperInterface::TAG_OPEN_REGEX, OutputWrapperInterface::TAG_CLOSE_REGEX);
+        $tagPattern = sprintf('<(?:(?:%s)|/(?:%s)?)>', OutputWrapperInterface::TAG_OPEN_REGEX_SEGMENT, OutputWrapperInterface::TAG_CLOSE_REGEX_SEGMENT);
         $limitPattern = "{1,$width}";
         $patternBlocks = [$tagPattern];
         if (!$this->allowCutUrls) {

@@ -22,7 +22,7 @@ class OutputWrapperTest extends TestCase
     public function testBasicWrap(string $text, int $width, ?bool $allowCutUrls, string $expected)
     {
         $wrapper = new OutputWrapper();
-        if (is_bool($allowCutUrls)) {
+        if (\is_bool($allowCutUrls)) {
             $wrapper->setAllowCutUrls($allowCutUrls);
         }
         $result = $wrapper->wrap($text, $width);

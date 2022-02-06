@@ -19,7 +19,7 @@ class OutputWrapperTest extends TestCase
     /**
      * @dataProvider textProvider
      */
-    public function testBasicWrap(string $text, int $width, ?bool $allowCutUrls, string $expected): void
+    public function testBasicWrap(string $text, int $width, ?bool $allowCutUrls, string $expected)
     {
         $wrapper = new OutputWrapper();
         if (is_bool($allowCutUrls)) {
@@ -29,7 +29,8 @@ class OutputWrapperTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public static function textProvider(): iterable {
+    public static function textProvider(): iterable
+    {
         $baseTextWithUtf8AndUrl = 'Árvíztűrőtükörfúrógép https://github.com/symfony/symfony Lorem ipsum <comment>dolor</comment> sit amet, consectetur adipiscing elit. Praesent vestibulum nulla quis urna maximus porttitor. Donec ullamcorper risus at <error>libero ornare</error> efficitur.';
 
         yield 'Default URL cut' => [

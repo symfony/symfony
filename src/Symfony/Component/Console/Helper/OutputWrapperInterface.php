@@ -16,5 +16,8 @@ interface OutputWrapperInterface
     public const TAG_OPEN_REGEX = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
     public const TAG_CLOSE_REGEX = '[a-z][^<>]*+';
 
+    /**
+     * @param positive-int|0 $width
+     */
     public function wrap(string $text, int $width, string $break = "\n"): string;
 }

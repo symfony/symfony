@@ -16,7 +16,7 @@ use Symfony\Component\Console\Helper\OutputWrapper;
 
 class OutputWrapperTest extends TestCase
 {
-    public function testBasicWrap()
+    public function testBasicWrap(): void
     {
         $wrapper = new OutputWrapper();
         // Test UTF-8 chars + URL

@@ -51,4 +51,12 @@ class PasswordTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull($expected, $norm, '');
     }
+
+    public function testPlaceholderOption(){
+        $placeholder_option_text = 'my placeholder...';
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'placeholder' => $placeholder_option_text,
+        ]);
+        $this->assertSame($placeholder_option_text, $form->createView()->vars['attr']['placeholder']);
+    }
 }

@@ -58,4 +58,12 @@ class TextTypeTest extends BaseTypeTest
         $this->assertSame($dataAsString, $view->vars['value']);
         $this->assertSame($dataAsString, $form->getData());
     }
+
+    public function testPlaceholderOption(){
+        $placeholder_option_text = 'my placeholder...';
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'placeholder' => $placeholder_option_text,
+        ]);
+        $this->assertSame($placeholder_option_text, $form->createView()->vars['attr']['placeholder']);
+    }
 }

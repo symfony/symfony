@@ -168,7 +168,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             $nextIndex = $index($choice, $key, $value);
 
             if (!\is_string($nextIndex)) {
-                trigger_deprecation('symfony/form', '6.0.0', 'The "choice_name" callback returns "%s", return "string" instead.', gettype($nextIndex));
+                trigger_deprecation('symfony/form', '6.0.0', 'The "choice_name" callback returns "%s", return "string" instead.', \gettype($nextIndex));
             }
         }
 

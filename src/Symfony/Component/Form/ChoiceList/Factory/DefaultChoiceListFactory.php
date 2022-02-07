@@ -162,7 +162,15 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         // $value may be an integer or a string, since it's stored in the array
         // keys. We want to guarantee it's a string though.
         $key = $keys[$value];
-        $nextIndex = \is_int($index) ? $index++ : $index($choice, $key, $value);
+        if (\is_int($index)) {
+            $nextIndex = (string) $index++;
+        } else {
+            $nextIndex = $index($choice, $key, $value);
+
+            if (!\is_string($nextIndex)) {
+                trigger_deprecation('symfony/form', '6.0.0', 'The "choice_name" callback returns "%s", return "string" instead.', gettype($nextIndex));
+            }
+        }
 
         // BC normalize label to accept a false value
         if (null === $label) {

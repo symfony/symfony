@@ -19,7 +19,7 @@ trait ContextBuilderTrait
     /**
      * @var array<string, mixed>
      */
-    protected array $context = [];
+    private array $context = [];
 
     protected function with(string $key, mixed $value): static
     {

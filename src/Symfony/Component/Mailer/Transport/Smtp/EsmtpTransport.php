@@ -179,7 +179,7 @@ class EsmtpTransport extends SmtpTransport
                 }
 
                 // keep the error message, but tries the other authenticators
-                $errors[$authenticator->getAuthKeyword()] = $e;
+                $errors[$authenticator->getAuthKeyword()] = $e->getMessage();
             }
         }
 

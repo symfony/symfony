@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2022-02-08T08:52:10Z
+
+Indeed, there is no need to keep the `$context` protected. I think it's a leftover from the "abstract class" implementation.
+Nice catch!

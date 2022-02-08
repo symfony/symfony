@@ -390,6 +390,18 @@
                 <source>This value should be a valid expression.</source>
                 <target>Bu değer geçerli bir ifade olmalıdır.</target>
             </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Bu değer geçerli bir CSS rengi değil.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Bu değer geçerli bir CIDR yazımı değil.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Netmask'in değeri {{ min }} ve {{ max }} arasında olmaldır.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

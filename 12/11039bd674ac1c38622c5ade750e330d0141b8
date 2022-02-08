@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-05T11:24:28Z
+
+I can answer part of my questions with https://redis.io/commands/auth:
+> When ACLs are used, the single argument form of the command, where only the password is specified, assumes that the implicit username is "default".
+
+> right now, the user part of the credentials is simply ignored.
+could you please give my case a try and see if `AUTH user pwd` is able to ignore the `user`  part if `pwd` matched the `requirepass` option?
+
+Could you also please see how your patch behaves on older versions of Redis?
+
+---------------------------------------------------------------------------
+
+by gam6itko at 2022-02-06T08:37:35Z
+
+This feature not breaks BC with redis v5 and redis v4.
+I've added a few tests for redis versions bellow 6. If you pass username:password when the server will throw exception like `AUTH failed: ERR wrong number of arguments for 'auth' command `.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-07T18:33:17Z
+
+I just pushed some changes (see 2nd commit).
+Please fetch + reset --hard before continuing.
+
+Tests fails, see CI. I'm able to reproduce the failures locally by running `docker run --rm -p 16379:6379 --name redis6 redis:6.0.0` in one term, then launching tests in another:
+`REDIS_HOST=localhost:16379 ./phpunit src/Symfony/Component/Cache/ --filter edis --stop-on-failure`
+
+Failures were already there before my changes ;)
+Can you please have a look?
+
+---------------------------------------------------------------------------
+
+by gam6itko at 2022-02-07T18:40:25Z
+
+@nicolas-grekas I neet to fix tests for AppVeyor CI?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-07T18:46:53Z
+
+On Linux, see "Integration / Tests" line.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-07T18:48:10Z
+
+An easy fix might be to remove testDefaultUserPasswordAuth
+I'd be fine with it.

@@ -18,16 +18,11 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @requires extension fileinfo
+ *
+ * @extends ConstraintValidatorTestCase<ImageValidator>
  */
 class ImageValidatorTest extends ConstraintValidatorTestCase
 {
-    protected $context;
-
-    /**
-     * @var ImageValidator
-     */
-    protected $validator;
-
     protected $path;
     protected $image;
     protected $imageLandscape;

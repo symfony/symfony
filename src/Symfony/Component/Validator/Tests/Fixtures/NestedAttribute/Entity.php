@@ -67,7 +67,7 @@ class Entity extends EntityParent implements EntityInterfaceB
             new Assert\Range(min: 5),
         ]),
     ]
-    public $firstName;
+    public string $firstName;
     #[Assert\Valid]
     public $childA;
     #[Assert\Valid]

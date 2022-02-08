@@ -79,10 +79,10 @@ class MaxIdLengthAdapterTest extends TestCase
 
 abstract class MaxIdLengthAdapter extends AbstractAdapter
 {
-    protected $maxIdLength = 50;
-
     public function __construct(string $ns)
     {
+        $this->maxIdLength = 50;
+
         parent::__construct($ns);
     }
 }

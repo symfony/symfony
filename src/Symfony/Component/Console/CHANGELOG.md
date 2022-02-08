@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Add method `__toString()` to `InputInterface`
- * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead.
+ * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
 
 6.0
 ---

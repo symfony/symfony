@@ -1,6 +1,11 @@
 UPGRADE FROM 6.0 to 6.1
 =======================
 
+Console
+-------
+
+ * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead.
+
 Serializer
 ----------
 

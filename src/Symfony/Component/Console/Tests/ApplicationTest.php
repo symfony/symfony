@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\LazyCommand;
@@ -1968,12 +1969,11 @@ class DisabledCommand extends Command
     }
 }
 
+#[AsCommand(name: 'signal')]
 class SignableCommand extends Command implements SignalableCommandInterface
 {
     public $signaled = false;
     public $loop = 100;
-
-    protected static $defaultName = 'signal';
 
     public function getSubscribedSignals(): array
     {

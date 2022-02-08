@@ -39,11 +39,15 @@ class Command
 
     /**
      * @var string|null The default command name
+     *
+     * @deprecated since Symfony 6.1, use the AsCommand attribute instead
      */
     protected static $defaultName;
 
     /**
      * @var string|null The default command description
+     *
+     * @deprecated since Symfony 6.1, use the AsCommand attribute instead
      */
     protected static $defaultDescription;
 
@@ -72,7 +76,13 @@ class Command
 
         $r = new \ReflectionProperty($class, 'defaultName');
 
-        return $class === $r->class ? static::$defaultName : null;
+        if ($class !== $r->class || null === static::$defaultName) {
+            return null;
+        }
+
+        trigger_deprecation('symfony/console', '6.1', 'Relying on the static property "$defaultName" for setting a command name is deprecated. Add the "%s" attribute to the "%s" class instead.', AsCommand::class, static::class);
+
+        return static::$defaultName;
     }
 
     public static function getDefaultDescription(): ?string
@@ -85,7 +95,13 @@ class Command
 
         $r = new \ReflectionProperty($class, 'defaultDescription');
 
-        return $class === $r->class ? static::$defaultDescription : null;
+        if ($class !== $r->class || null === static::$defaultDescription) {
+            return null;
+        }
+
+        trigger_deprecation('symfony/console', '6.1', 'Relying on the static property "$defaultDescription" for setting a command description is deprecated. Add the "%s" attribute to the "%s" class instead.', AsCommand::class, static::class);
+
+        return static::$defaultDescription;
     }
 
     /**

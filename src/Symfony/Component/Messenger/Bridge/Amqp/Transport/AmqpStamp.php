@@ -62,6 +62,7 @@ final class AmqpStamp implements NonSendableStampInterface
         $attr['expiration'] = $attr['expiration'] ?? $amqpEnvelope->getExpiration();
         $attr['type'] = $attr['type'] ?? $amqpEnvelope->getType();
         $attr['reply_to'] = $attr['reply_to'] ?? $amqpEnvelope->getReplyTo();
+        $attr['correlation_id'] = $attr['correlation_id'] ?? $amqpEnvelope->getCorrelationId();
 
         if (null === $retryRoutingKey) {
             $stamp = new self($previousStamp->routingKey ?? $amqpEnvelope->getRoutingKey(), $previousStamp->flags ?? \AMQP_NOPARAM, $attr);

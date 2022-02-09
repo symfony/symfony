@@ -42,6 +42,7 @@ class AmqpStampTest extends TestCase
         $amqpEnvelope->method('getDeliveryMode')->willReturn(2);
         $amqpEnvelope->method('getPriority')->willReturn(5);
         $amqpEnvelope->method('getAppId')->willReturn('appid');
+        $amqpEnvelope->method('getCorrelationId')->willReturn('foo');
 
         $stamp = AmqpStamp::createFromAmqpEnvelope($amqpEnvelope);
 
@@ -49,6 +50,7 @@ class AmqpStampTest extends TestCase
         $this->assertSame($amqpEnvelope->getDeliveryMode(), $stamp->getAttributes()['delivery_mode']);
         $this->assertSame($amqpEnvelope->getPriority(), $stamp->getAttributes()['priority']);
         $this->assertSame($amqpEnvelope->getAppId(), $stamp->getAttributes()['app_id']);
+        $this->assertSame($amqpEnvelope->getCorrelationId(), $stamp->getAttributes()['correlation_id']);
         $this->assertSame(\AMQP_NOPARAM, $stamp->getFlags());
     }
 
@@ -59,8 +61,12 @@ class AmqpStampTest extends TestCase
         $amqpEnvelope->method('getDeliveryMode')->willReturn(2);
         $amqpEnvelope->method('getPriority')->willReturn(5);
         $amqpEnvelope->method('getAppId')->willReturn('appid');
+        $amqpEnvelope->method('getCorrelationId')->willReturn('foo');
 
-        $previousStamp = new AmqpStamp('otherroutingkey', \AMQP_MANDATORY, ['priority' => 8]);
+        $previousStamp = new AmqpStamp('otherroutingkey', \AMQP_MANDATORY, [
+            'priority' => 8,
+            'correlation_id' => 'bar',
+        ]);
 
         $stamp = AmqpStamp::createFromAmqpEnvelope($amqpEnvelope, $previousStamp);
 
@@ -68,6 +74,7 @@ class AmqpStampTest extends TestCase
         $this->assertSame($amqpEnvelope->getDeliveryMode(), $stamp->getAttributes()['delivery_mode']);
         $this->assertSame(8, $stamp->getAttributes()['priority']);
         $this->assertSame($amqpEnvelope->getAppId(), $stamp->getAttributes()['app_id']);
+        $this->assertSame('bar', $stamp->getAttributes()['correlation_id']);
         $this->assertSame(\AMQP_MANDATORY, $stamp->getFlags());
     }
 }

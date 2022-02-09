@@ -41,7 +41,7 @@ Or dump the script to a local file and source it:
 Dynamic installation
 --------------------
 
-Add this add the end of your shell configuration file (e.g. "~/.bashrc"):
+Add this to the end of your shell configuration file (e.g. "~/.bashrc"):
 
     eval "$(%%PHP_SELF_FULL%% completion bash)"
 

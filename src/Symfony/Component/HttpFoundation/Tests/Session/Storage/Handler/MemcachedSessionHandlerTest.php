@@ -142,7 +142,6 @@ class MemcachedSessionHandlerTest extends TestCase
     public function testGetConnection()
     {
         $method = new \ReflectionMethod($this->storage, 'getMemcached');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(\Memcached::class, $method->invoke($this->storage));
     }

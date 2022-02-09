@@ -34,7 +34,7 @@ final class SignalRegistry
 
         $this->signalHandlers[$signal][] = $signalHandler;
 
-        pcntl_signal($signal, [$this, 'handle']);
+        pcntl_signal($signal, $this->handle(...));
     }
 
     public static function isSupported(): bool

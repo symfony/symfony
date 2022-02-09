@@ -48,11 +48,11 @@ class HtmlErrorRenderer implements ErrorRendererInterface
      */
     public function __construct(bool|callable $debug = false, string $charset = null, string|FileLinkFormatter $fileLinkFormat = null, string $projectDir = null, string|callable $outputBuffer = '', LoggerInterface $logger = null)
     {
-        $this->debug = \is_bool($debug) || $debug instanceof \Closure ? $debug : \Closure::fromCallable($debug);
+        $this->debug = \is_bool($debug) ? $debug : $debug(...);
         $this->charset = $charset ?: (ini_get('default_charset') ?: 'UTF-8');
         $this->fileLinkFormat = $fileLinkFormat ?: (ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format'));
         $this->projectDir = $projectDir;
-        $this->outputBuffer = \is_string($outputBuffer) || $outputBuffer instanceof \Closure ? $outputBuffer : \Closure::fromCallable($outputBuffer);
+        $this->outputBuffer = \is_string($outputBuffer) ? $outputBuffer : $outputBuffer(...);
         $this->logger = $logger;
     }
 

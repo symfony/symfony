@@ -296,7 +296,6 @@ class PdoSessionHandlerTest extends TestCase
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
 
         $method = new \ReflectionMethod($storage, 'getConnection');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
@@ -306,7 +305,6 @@ class PdoSessionHandlerTest extends TestCase
         $storage = new PdoSessionHandler('sqlite::memory:');
 
         $method = new \ReflectionMethod($storage, 'getConnection');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
@@ -324,7 +322,6 @@ class PdoSessionHandlerTest extends TestCase
                 continue;
             }
             $property = $reflection->getProperty($property);
-            $property->setAccessible(true);
             $this->assertSame($expectedValue, $property->getValue($storage));
         }
     }

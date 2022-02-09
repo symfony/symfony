@@ -46,8 +46,8 @@ class LintCommand extends Command
     {
         parent::__construct($name);
 
-        $this->directoryIteratorProvider = null === $directoryIteratorProvider || $directoryIteratorProvider instanceof \Closure ? $directoryIteratorProvider : \Closure::fromCallable($directoryIteratorProvider);
-        $this->isReadableProvider = null === $isReadableProvider || $isReadableProvider instanceof \Closure ? $isReadableProvider : \Closure::fromCallable($isReadableProvider);
+        $this->directoryIteratorProvider = null === $directoryIteratorProvider ? null : $directoryIteratorProvider(...);
+        $this->isReadableProvider = null === $isReadableProvider ? null : $isReadableProvider(...);
     }
 
     /**

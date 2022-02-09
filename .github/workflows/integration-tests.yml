@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.0']
+        php: ['8.1']
 
     services:
       postgres:
@@ -129,7 +129,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          extensions: "json,couchbase,memcached,mongodb-1.10.0,redis-5.3.4,rdkafka,xsl,ldap"
+          extensions: "json,couchbase,memcached,mongodb-1.12.0,redis-5.3.4,rdkafka,xsl,ldap"
           ini-values: date.timezone=Europe/Paris,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
           php-version: "${{ matrix.php }}"
           tools: pecl
@@ -153,7 +153,7 @@ jobs:
           echo COMPOSER_ROOT_VERSION=$COMPOSER_ROOT_VERSION >> $GITHUB_ENV
 
           echo "::group::composer update"
-          composer require --dev --no-update mongodb/mongodb:"1.9.1@dev|^1.9.1@stable"
+          composer require --dev --no-update mongodb/mongodb:"^1.11"
           composer update --no-progress --ansi
           echo "::endgroup::"
 
@@ -176,11 +176,11 @@ jobs:
           POSTGRES_HOST: localhost
 
       #- name: Run HTTP push tests
-      #  if: matrix.php == '8.0'
+      #  if: matrix.php == '8.1'
       #  run: |
       #    [ -d .phpunit ] && mv .phpunit .phpunit.bak
       #    wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin
-      #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.0-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
+      #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.1-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
 

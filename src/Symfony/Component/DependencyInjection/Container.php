@@ -194,7 +194,7 @@ class Container implements ContainerInterface, ResetInterface
     {
         return $this->services[$id]
             ?? $this->services[$id = $this->aliases[$id] ?? $id]
-            ?? ('service_container' === $id ? $this : ($this->factories[$id] ?? [$this, 'make'])($id, $invalidBehavior));
+            ?? ('service_container' === $id ? $this : ($this->factories[$id] ?? $this->make(...))($id, $invalidBehavior));
     }
 
     /**
@@ -345,7 +345,7 @@ class Container implements ContainerInterface, ResetInterface
         if (!$this->has($id = 'container.env_var_processors_locator')) {
             $this->set($id, new ServiceLocator([]));
         }
-        $this->getEnv ??= \Closure::fromCallable([$this, 'getEnv']);
+        $this->getEnv ??= $this->getEnv(...);
         $processors = $this->get($id);
 
         if (false !== $i = strpos($name, ':')) {

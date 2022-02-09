@@ -38,13 +38,13 @@ final class WorkflowExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('workflow_can', [$this, 'canTransition']),
-            new TwigFunction('workflow_transitions', [$this, 'getEnabledTransitions']),
-            new TwigFunction('workflow_transition', [$this, 'getEnabledTransition']),
-            new TwigFunction('workflow_has_marked_place', [$this, 'hasMarkedPlace']),
-            new TwigFunction('workflow_marked_places', [$this, 'getMarkedPlaces']),
-            new TwigFunction('workflow_metadata', [$this, 'getMetadata']),
-            new TwigFunction('workflow_transition_blockers', [$this, 'buildTransitionBlockerList']),
+            new TwigFunction('workflow_can', $this->canTransition(...)),
+            new TwigFunction('workflow_transitions', $this->getEnabledTransitions(...)),
+            new TwigFunction('workflow_transition', $this->getEnabledTransition(...)),
+            new TwigFunction('workflow_has_marked_place', $this->hasMarkedPlace(...)),
+            new TwigFunction('workflow_marked_places', $this->getMarkedPlaces(...)),
+            new TwigFunction('workflow_metadata', $this->getMetadata(...)),
+            new TwigFunction('workflow_transition_blockers', $this->buildTransitionBlockerList(...)),
         ];
     }
 

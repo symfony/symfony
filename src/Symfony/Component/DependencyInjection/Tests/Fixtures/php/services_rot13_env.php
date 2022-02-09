@@ -15,11 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 {
     protected $parameters = [];
-    protected $getService;
+    protected \Closure $getService;
 
     public function __construct()
     {
-        $this->getService = \Closure::fromCallable([$this, 'getService']);
+        $this->getService = $this->getService(...);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];

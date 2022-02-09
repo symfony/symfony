@@ -310,7 +310,6 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response = new BinaryFileResponse($file, 200, ['Content-Type' => 'application/octet-stream']);
         $reflection = new \ReflectionObject($response);
         $property = $reflection->getProperty('file');
-        $property->setAccessible(true);
         $property->setValue($response, $file);
 
         $response->prepare($request);

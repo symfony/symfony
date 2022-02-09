@@ -230,7 +230,6 @@ class CommandTest extends TestCase
 
         $r = new \ReflectionObject($command);
         $m = $r->getMethod('mergeApplicationDefinition');
-        $m->setAccessible(true);
         $m->invoke($command);
         $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
         $this->assertTrue($command->getDefinition()->hasArgument('bar'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
@@ -252,7 +251,6 @@ class CommandTest extends TestCase
 
         $r = new \ReflectionObject($command);
         $m = $r->getMethod('mergeApplicationDefinition');
-        $m->setAccessible(true);
         $m->invoke($command, false);
         $this->assertTrue($command->getDefinition()->hasOption('bar'), '->mergeApplicationDefinition(false) merges the application and the command options');
         $this->assertFalse($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition(false) does not merge the application arguments');
@@ -470,13 +468,11 @@ class CommandTest extends TestCase
         $apl = new Application();
         $apl->setDefaultCommand(Php8Command::getDefaultName());
         $property = new \ReflectionProperty($apl, 'defaultCommand');
-        $property->setAccessible(true);
 
         $this->assertEquals('foo', $property->getValue($apl));
 
         $apl->setDefaultCommand(Php8Command2::getDefaultName());
         $property = new \ReflectionProperty($apl, 'defaultCommand');
-        $property->setAccessible(true);
 
         $this->assertEquals('foo2', $property->getValue($apl));
     }

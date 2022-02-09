@@ -76,13 +76,11 @@ class SessionListenerTest extends TestCase
 
     public function provideSessionOptions(): \Generator
     {
-        if (\PHP_VERSION_ID > 70300) {
-            yield 'set_samesite_by_php' => [
-                'phpSessionOptions' => ['samesite' => Cookie::SAMESITE_STRICT],
-                'sessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true],
-                'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_STRICT],
-            ];
-        }
+        yield 'set_samesite_by_php' => [
+            'phpSessionOptions' => ['samesite' => Cookie::SAMESITE_STRICT],
+            'sessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true],
+            'expectedSessionOptions' => ['cookie_path' => '/test/', 'cookie_domain' => '', 'cookie_secure' => true, 'cookie_httponly' => true, 'cookie_samesite' => Cookie::SAMESITE_STRICT],
+        ];
 
         yield 'set_cookie_path_by_php' => [
             'phpSessionOptions' => ['path' => '/prod/'],
@@ -678,7 +676,7 @@ class SessionListenerTest extends TestCase
 
         $container = new Container();
         $container->set('request_stack', $requestStack);
-        $container->set('session_collector', \Closure::fromCallable([$collector, 'collectSessionUsage']));
+        $container->set('session_collector', $collector->collectSessionUsage(...));
 
         $this->expectException(UnexpectedSessionUsageException::class);
         (new SessionListener($container, true))->onSessionUsage();

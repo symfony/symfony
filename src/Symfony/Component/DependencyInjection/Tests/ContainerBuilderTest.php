@@ -1172,7 +1172,6 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $r = new \ReflectionProperty($container, 'resources');
-        $r->setAccessible(true);
         $resources = $r->getValue($container);
 
         $classInList = false;

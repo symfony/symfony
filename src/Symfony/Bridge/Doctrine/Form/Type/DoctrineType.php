@@ -156,7 +156,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $choiceValue = function (Options $options) {
             // If the entity has a single-column ID, use that ID as value
             if ($options['id_reader'] instanceof IdReader && $options['id_reader']->isSingleId()) {
-                return ChoiceList::value($this, [$options['id_reader'], 'getIdValue'], $options['id_reader']);
+                return ChoiceList::value($this, $options['id_reader']->getIdValue(...), $options['id_reader']);
             }
 
             // Otherwise, an incrementing integer is used as value automatically

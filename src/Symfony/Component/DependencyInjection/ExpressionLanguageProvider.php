@@ -32,7 +32,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 
     public function __construct(callable $serviceCompiler = null, \Closure $getEnv = null)
     {
-        $this->serviceCompiler = null !== $serviceCompiler && !$serviceCompiler instanceof \Closure ? \Closure::fromCallable($serviceCompiler) : $serviceCompiler;
+        $this->serviceCompiler = null === $serviceCompiler ? null : $serviceCompiler(...);
         $this->getEnv = $getEnv;
     }
 

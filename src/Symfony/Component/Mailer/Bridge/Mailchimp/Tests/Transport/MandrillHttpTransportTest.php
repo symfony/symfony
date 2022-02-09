@@ -118,7 +118,6 @@ class MandrillHttpTransportTest extends TestCase
 
         $transport = new MandrillHttpTransport('key');
         $method = new \ReflectionMethod(MandrillHttpTransport::class, 'addMandrillHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(3, $email->getHeaders()->toArray());

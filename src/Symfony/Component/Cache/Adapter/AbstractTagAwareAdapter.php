@@ -170,7 +170,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     public function commit(): bool
     {
         $ok = true;
-        $byLifetime = (self::$mergeByLifetime)($this->deferred, $expiredIds, \Closure::fromCallable([$this, 'getId']), self::TAGS_PREFIX, $this->defaultLifetime);
+        $byLifetime = (self::$mergeByLifetime)($this->deferred, $expiredIds, $this->getId(...), self::TAGS_PREFIX, $this->defaultLifetime);
         $retry = $this->deferred = [];
 
         if ($expiredIds) {

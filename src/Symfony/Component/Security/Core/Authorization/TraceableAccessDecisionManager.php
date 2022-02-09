@@ -39,10 +39,8 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         if ($this->manager instanceof AccessDecisionManager) {
             // The strategy and voters are stored in a private properties of the decorated service
             $reflection = new \ReflectionProperty(AccessDecisionManager::class, 'strategy');
-            $reflection->setAccessible(true);
             $this->strategy = $reflection->getValue($manager);
             $reflection = new \ReflectionProperty(AccessDecisionManager::class, 'voters');
-            $reflection->setAccessible(true);
             $this->voters = $reflection->getValue($manager);
         }
     }

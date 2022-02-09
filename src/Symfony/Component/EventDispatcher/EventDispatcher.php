@@ -267,10 +267,10 @@ class EventDispatcher implements EventDispatcherInterface
                             $listener[0] = $listener[0]();
                             $listener[1] ??= '__invoke';
                         }
-                        ($closure = \Closure::fromCallable($listener))(...$args);
+                        ($closure = $listener(...))(...$args);
                     };
                 } else {
-                    $closure = $listener instanceof \Closure || $listener instanceof WrappedListener ? $listener : \Closure::fromCallable($listener);
+                    $closure = $listener instanceof WrappedListener ? $listener : $listener(...);
                 }
             }
         }

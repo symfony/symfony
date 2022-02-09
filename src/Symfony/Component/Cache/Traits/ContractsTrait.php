@@ -31,10 +31,7 @@ trait ContractsTrait
         doGet as private contractsGet;
     }
 
-    /**
-     * @var callable
-     */
-    private $callbackWrapper;
+    private \Closure $callbackWrapper;
     private array $computing = [];
 
     /**
@@ -45,7 +42,7 @@ trait ContractsTrait
     public function setCallbackWrapper(?callable $callbackWrapper): callable
     {
         if (!isset($this->callbackWrapper)) {
-            $this->callbackWrapper = [LockRegistry::class, 'compute'];
+            $this->callbackWrapper = LockRegistry::compute(...);
 
             if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
                 $this->setCallbackWrapper(null);
@@ -53,7 +50,7 @@ trait ContractsTrait
         }
 
         if (null !== $callbackWrapper && !$callbackWrapper instanceof \Closure) {
-            $callbackWrapper = \Closure::fromCallable($callbackWrapper);
+            $callbackWrapper = $callbackWrapper(...);
         }
 
         $previousWrapper = $this->callbackWrapper;
@@ -85,7 +82,7 @@ trait ContractsTrait
             CacheItem::class
         );
 
-        $this->callbackWrapper ??= \Closure::fromCallable([LockRegistry::class, 'compute']);
+        $this->callbackWrapper ??= LockRegistry::compute(...);
 
         return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata, &$metadata, $key) {
             // don't wrap nor save recursive calls

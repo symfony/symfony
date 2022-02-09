@@ -60,7 +60,6 @@ class SendinblueApiTransportTest extends TestCase
 
         $transport = new SendinblueApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendinblueApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('X-Mailin-Custom', $payload['headers']);

@@ -82,7 +82,7 @@ class EntityType extends DoctrineType
 
         return [
             $queryBuilder->getQuery()->getSQL(),
-            array_map([$this, 'parameterToArray'], $queryBuilder->getParameters()->toArray()),
+            array_map($this->parameterToArray(...), $queryBuilder->getParameters()->toArray()),
         ];
     }
 

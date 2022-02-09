@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - php: '8.1'
-          - php: '8.0'
+          - php: '8.1'
             mode: high-deps
           - php: '8.1'
             mode: low-deps
@@ -144,8 +144,8 @@ jobs:
           patch -sp1 < .github/expected-missing-return-types.diff
           git add .
           composer install -q --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.0' php .github/patch-types.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.0' php .github/patch-types.php # ensure the script is idempotent
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php # ensure the script is idempotent
           git diff --exit-code
 
       - name: Run tests
@@ -222,12 +222,12 @@ jobs:
             script -e -c './phpunit --group tty' /dev/null
 
       - name: Run tests with SIGCHLD enabled PHP
-        if: "matrix.php == '8.0' && ! matrix.mode"
+        if: "matrix.php == '8.1' && ! matrix.mode"
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.0.2-pcntl-sigchild.tar.bz2
-          tar -xjf php-8.0.2-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.1.2-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.1.2-pcntl-sigchild.tar.bz2
           cd ..
 
           ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process

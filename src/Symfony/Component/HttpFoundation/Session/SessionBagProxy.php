@@ -28,7 +28,7 @@ final class SessionBagProxy implements SessionBagInterface
         $this->bag = $bag;
         $this->data = &$data;
         $this->usageIndex = &$usageIndex;
-        $this->usageReporter = $usageReporter instanceof \Closure || !\is_callable($usageReporter) ? $usageReporter : \Closure::fromCallable($usageReporter);
+        $this->usageReporter = null === $usageReporter ? null : $usageReporter(...);
     }
 
     public function getBag(): SessionBagInterface

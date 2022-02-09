@@ -104,7 +104,6 @@ final class ContainerLintCommand extends Command
             (new XmlFileLoader($container = new ContainerBuilder($parameterBag = new EnvPlaceholderParameterBag()), new FileLocator()))->load($kernelContainer->getParameter('debug.container.dump'));
 
             $refl = new \ReflectionProperty($parameterBag, 'resolved');
-            $refl->setAccessible(true);
             $refl->setValue($parameterBag, true);
 
             $skippedIds = [];

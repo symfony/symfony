@@ -19,10 +19,7 @@ use Symfony\Component\Form\Tests\Fixtures\Suit;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
-/**
- * @requires PHP 8.1
- */
-final class EnumTypeTest extends BaseTypeTest
+class EnumTypeTest extends BaseTypeTest
 {
     public const TESTED_TYPE = EnumType::class;
 

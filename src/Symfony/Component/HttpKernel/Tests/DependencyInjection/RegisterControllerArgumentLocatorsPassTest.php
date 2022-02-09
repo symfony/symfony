@@ -401,9 +401,6 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEqualsCanonicalizing([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testEnumArgumentIsIgnored()
     {
         $container = new ContainerBuilder();

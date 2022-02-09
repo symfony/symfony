@@ -29,9 +29,6 @@ class GetterMetadataTest extends TestCase
 
     public function testGetPropertyValueFromPublicGetter()
     {
-        // private getters don't work yet because ReflectionMethod::setAccessible()
-        // does not exist yet in a stable PHP release
-
         $entity = new Entity('foobar');
         $metadata = new GetterMetadata(self::CLASSNAME, 'internal');
 

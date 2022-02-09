@@ -80,7 +80,7 @@ class ElasticsearchLogstashHandler extends AbstractHandler
 
     public function handleBatch(array $records): void
     {
-        $records = array_filter($records, [$this, 'isHandling']);
+        $records = array_filter($records, $this->isHandling(...));
 
         if ($records) {
             $this->sendToElasticsearch($records);

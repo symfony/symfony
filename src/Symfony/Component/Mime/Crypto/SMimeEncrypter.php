@@ -33,7 +33,7 @@ final class SMimeEncrypter extends SMime
         }
 
         if (\is_array($certificate)) {
-            $this->certs = array_map([$this, 'normalizeFilePath'], $certificate);
+            $this->certs = array_map($this->normalizeFilePath(...), $certificate);
         } else {
             $this->certs = $this->normalizeFilePath($certificate);
         }

@@ -47,7 +47,6 @@ class MailjetApiTransportTest extends TestCase
 
         $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
         $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('Messages', $payload);
@@ -98,7 +97,6 @@ class MailjetApiTransportTest extends TestCase
 
         $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
         $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
 
         $this->expectExceptionMessage('Mailjet\'s API only supports one Reply-To email, 2 given.');
 

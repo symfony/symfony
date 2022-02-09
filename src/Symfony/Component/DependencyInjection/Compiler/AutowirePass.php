@@ -205,7 +205,7 @@ class AutowirePass extends AbstractRecursivePass
                     continue;
                 }
 
-                if (\PHP_VERSION_ID >= 80100 && (\is_array($value->value) ? $value->value : \is_object($value->value))) {
+                if (\is_array($value->value) ? $value->value : \is_object($value->value)) {
                     unset($arguments[$j]);
                     $namedArguments = $value->names;
                 } else {

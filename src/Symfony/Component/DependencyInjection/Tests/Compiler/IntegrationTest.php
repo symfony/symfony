@@ -563,7 +563,6 @@ class IntegrationTest extends TestCase
 
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
-        $factories->setAccessible(true);
 
         self::assertSame([FooTagClass::class, BarTagClass::class], array_keys($factories->getValue($locator)));
     }
@@ -593,7 +592,6 @@ class IntegrationTest extends TestCase
 
         // We need to check priority of instances in the factories
         $factories = (new \ReflectionClass($locator))->getProperty('factories');
-        $factories->setAccessible(true);
 
         self::assertSame(['foo_tag_class', 'bar_tag_class'], array_keys($factories->getValue($locator)));
         self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tag_class'));

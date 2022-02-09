@@ -58,7 +58,6 @@ final class OhMySmtpApiTransportTest extends TestCase
 
         $transport = new OhMySmtpApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(OhMySmtpApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('Headers', $payload);
@@ -132,7 +131,6 @@ final class OhMySmtpApiTransportTest extends TestCase
 
         $transport = new OhMySmtpApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(OhMySmtpApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayNotHasKey('Headers', $payload);

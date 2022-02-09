@@ -68,9 +68,6 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testProcessEnum()
     {
         $container = new ContainerBuilder();

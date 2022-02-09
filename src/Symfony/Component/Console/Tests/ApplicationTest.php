@@ -234,7 +234,6 @@ class ApplicationTest extends TestCase
         // simulate --help
         $r = new \ReflectionObject($application);
         $p = $r->getProperty('wantHelps');
-        $p->setAccessible(true);
         $p->setValue($application, true);
         $command = $application->get('foo:bar');
         $this->assertInstanceOf(HelpCommand::class, $command, '->get() returns the help command if --help is provided as the input');

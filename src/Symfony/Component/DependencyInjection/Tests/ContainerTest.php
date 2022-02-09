@@ -369,7 +369,6 @@ class ContainerTest extends TestCase
     protected function getField($obj, $field)
     {
         $reflection = new \ReflectionProperty($obj, $field);
-        $reflection->setAccessible(true);
 
         return $reflection->getValue($obj);
     }

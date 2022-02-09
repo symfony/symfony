@@ -50,7 +50,6 @@ class DebugClassLoaderTest extends TestCase
             if (\is_array($function) && $function[0] instanceof DebugClassLoader) {
                 $reflClass = new \ReflectionClass($function[0]);
                 $reflProp = $reflClass->getProperty('classLoader');
-                $reflProp->setAccessible(true);
 
                 $this->assertNotInstanceOf(DebugClassLoader::class, $reflProp->getValue($function[0]));
 
@@ -439,9 +438,6 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testOverrideFinalConstant81()
     {
         $deprecations = [];

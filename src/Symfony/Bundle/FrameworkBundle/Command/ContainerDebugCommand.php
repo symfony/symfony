@@ -132,7 +132,7 @@ EOF
             $options = ['env-vars' => true, 'name' => $envVar];
         } elseif ($input->getOption('types')) {
             $options = [];
-            $options['filter'] = [$this, 'filterToServiceTypes'];
+            $options['filter'] = $this->filterToServiceTypes(...);
         } elseif ($input->getOption('parameters')) {
             $parameters = [];
             foreach ($object->getParameterBag()->all() as $k => $v) {

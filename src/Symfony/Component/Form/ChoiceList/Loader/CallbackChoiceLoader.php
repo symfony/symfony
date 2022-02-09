@@ -25,7 +25,7 @@ class CallbackChoiceLoader extends AbstractChoiceLoader
      */
     public function __construct(callable $callback)
     {
-        $this->callback = $callback instanceof \Closure ? $callback : \Closure::fromCallable($callback);
+        $this->callback = $callback(...);
     }
 
     protected function loadChoices(): iterable

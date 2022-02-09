@@ -144,7 +144,7 @@ class ReflectionCaster
             array_unshift($trace, [
                 'function' => 'yield',
                 'file' => $function->getExecutingFile(),
-                'line' => $function->getExecutingLine() - (int) (\PHP_VERSION_ID < 80100),
+                'line' => $function->getExecutingLine(),
             ]);
             $trace[] = $frame;
             $a[$prefix.'trace'] = new TraceStub($trace, false, 0, -1, -1);

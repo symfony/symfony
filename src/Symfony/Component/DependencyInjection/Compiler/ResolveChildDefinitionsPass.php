@@ -63,7 +63,6 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             throw $e;
         } catch (ExceptionInterface $e) {
             $r = new \ReflectionProperty($e, 'message');
-            $r->setAccessible(true);
             $r->setValue($e, sprintf('Service "%s": %s', $this->currentId, $e->getMessage()));
 
             throw $e;

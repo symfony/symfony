@@ -729,7 +729,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function setIsEmptyCallback(?callable $isEmptyCallback): static
     {
-        $this->isEmptyCallback = null === $isEmptyCallback || $isEmptyCallback instanceof \Closure ? $isEmptyCallback : \Closure::fromCallable($isEmptyCallback);
+        $this->isEmptyCallback = null === $isEmptyCallback ? null : $isEmptyCallback(...);
 
         return $this;
     }

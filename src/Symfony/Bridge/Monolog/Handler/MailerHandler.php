@@ -32,7 +32,7 @@ class MailerHandler extends AbstractProcessingHandler
         parent::__construct($level, $bubble);
 
         $this->mailer = $mailer;
-        $this->messageTemplate = !\is_callable($messageTemplate) || $messageTemplate instanceof \Closure ? $messageTemplate : \Closure::fromCallable($messageTemplate);
+        $this->messageTemplate = $messageTemplate instanceof Email ? $messageTemplate : $messageTemplate(...);
     }
 
     /**

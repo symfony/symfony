@@ -32,7 +32,7 @@
         "symfony/translation-implementation": "2.3|3.0"
     },
     "require": {
-        "php": ">=8.0.2",
+        "php": ">=8.1",
         "composer-runtime-api": ">=2.1",
         "ext-xml": "*",
         "friendsofphp/proxy-manager-lts": "^1.0.2",
@@ -51,7 +51,6 @@
         "symfony/polyfill-intl-idn": "^1.10",
         "symfony/polyfill-intl-normalizer": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php81": "^1.23",
         "symfony/polyfill-uuid": "^1.15"
     },
     "replace": {

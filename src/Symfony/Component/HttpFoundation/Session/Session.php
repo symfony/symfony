@@ -43,7 +43,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null, callable $usageReporter = null)
     {
         $this->storage = $storage ?? new NativeSessionStorage();
-        $this->usageReporter = $usageReporter instanceof \Closure || !\is_callable($usageReporter) ? $usageReporter : \Closure::fromCallable($usageReporter);
+        $this->usageReporter = null === $usageReporter ? null : $usageReporter(...);
 
         $attributes ??= new AttributeBag();
         $this->attributeName = $attributes->getName();

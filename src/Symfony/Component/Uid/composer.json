@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0.2",
+        "php": ">=8.1",
         "symfony/polyfill-uuid": "^1.15"
     },
     "require-dev": {

@@ -77,9 +77,6 @@ abstract class ProviderTestCase extends TestCase
         return $this->xliffFileDumper ??= $this->createMock(XliffFileDumper::class);
     }
 
-    /**
-     * @return TranslatorBagInterface|TranslatorBagInterface&MockObject
-     */
     protected function getTranslatorBag(): TranslatorBagInterface
     {
         return $this->translatorBag ??= $this->createMock(TranslatorBagInterface::class);

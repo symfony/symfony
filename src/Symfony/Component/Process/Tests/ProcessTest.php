@@ -176,7 +176,6 @@ class ProcessTest extends TestCase
 
         // Don't call Process::run nor Process::wait to avoid any read of pipes
         $h = new \ReflectionProperty($p, 'process');
-        $h->setAccessible(true);
         $h = $h->getValue($p);
         $s = @proc_get_status($h);
 
@@ -568,7 +567,6 @@ class ProcessTest extends TestCase
         $process = $this->getProcess('');
         $r = new \ReflectionObject($process);
         $p = $r->getProperty('exitcode');
-        $p->setAccessible(true);
 
         $p->setValue($process, 2);
         $this->assertEquals('Misuse of shell builtins', $process->getExitCodeText());

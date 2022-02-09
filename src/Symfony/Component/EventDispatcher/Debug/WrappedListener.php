@@ -37,7 +37,7 @@ final class WrappedListener
     public function __construct(callable|array $listener, ?string $name, Stopwatch $stopwatch, EventDispatcherInterface $dispatcher = null, int $priority = null)
     {
         $this->listener = $listener;
-        $this->optimizedListener = $listener instanceof \Closure ? $listener : (\is_callable($listener) ? \Closure::fromCallable($listener) : null);
+        $this->optimizedListener = $listener instanceof \Closure ? $listener : (\is_callable($listener) ? $listener(...) : null);
         $this->stopwatch = $stopwatch;
         $this->dispatcher = $dispatcher;
         $this->priority = $priority;

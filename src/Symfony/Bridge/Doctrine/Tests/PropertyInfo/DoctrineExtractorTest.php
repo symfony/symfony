@@ -128,9 +128,6 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals($expectedTypes, $actualTypes);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testExtractEnum()
     {
         if (!property_exists(Column::class, 'enumType')) {

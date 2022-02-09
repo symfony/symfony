@@ -156,7 +156,7 @@ class MailjetApiTransport extends AbstractApiTransport
 
     private function formatAddresses(array $addresses): array
     {
-        return array_map([$this, 'formatAddress'], $addresses);
+        return array_map($this->formatAddress(...), $addresses);
     }
 
     private function formatAddress(Address $address): array

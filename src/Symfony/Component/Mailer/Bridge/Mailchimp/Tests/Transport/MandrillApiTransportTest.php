@@ -59,7 +59,6 @@ class MandrillApiTransportTest extends TestCase
 
         $transport = new MandrillApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('message', $payload);
@@ -133,7 +132,6 @@ class MandrillApiTransportTest extends TestCase
 
         $transport = new MandrillApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('message', $payload);
@@ -153,7 +151,6 @@ class MandrillApiTransportTest extends TestCase
 
         $transport = new MandrillApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('message', $payload);

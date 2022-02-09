@@ -73,7 +73,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
                 $output = fopen($output, 'w');
             }
             $this->outputStream = $output;
-            $this->lineDumper = [$this, 'echoLine'];
+            $this->lineDumper = $this->echoLine(...);
         }
 
         return $prev;

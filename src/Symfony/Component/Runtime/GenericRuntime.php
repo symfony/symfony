@@ -88,10 +88,7 @@ class GenericRuntime implements RuntimeInterface
      */
     public function getResolver(callable $callable, \ReflectionFunction $reflector = null): ResolverInterface
     {
-        if (!$callable instanceof \Closure) {
-            $callable = \Closure::fromCallable($callable);
-        }
-
+        $callable = $callable(...);
         $parameters = ($reflector ?? new \ReflectionFunction($callable))->getParameters();
         $arguments = function () use ($parameters) {
             $arguments = [];
@@ -139,7 +136,7 @@ class GenericRuntime implements RuntimeInterface
                 throw new \LogicException(sprintf('"%s" doesn\'t know how to handle apps of type "%s".', get_debug_type($this), get_debug_type($application)));
             }
 
-            $application = \Closure::fromCallable($application);
+            $application = $application(...);
         }
 
         if ($_SERVER[$this->options['debug_var_name']] && ($r = new \ReflectionFunction($application)) && $r->getNumberOfRequiredParameters()) {

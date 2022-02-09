@@ -75,7 +75,6 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/ini'));
         $r = new \ReflectionObject($loader);
         $m = $r->getMethod('parseFileToDOM');
-        $m->setAccessible(true);
 
         try {
             $m->invoke($loader, self::$fixturesPath.'/ini/parameters.ini');
@@ -860,9 +859,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame(['foo' => [[]], 'bar' => [[]]], $definition->getTags());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testEnumeration()
     {
         $container = new ContainerBuilder();
@@ -874,9 +870,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame([FooUnitEnum::BAR], $definition->getArguments());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testInvalidEnumeration()
     {
         $container = new ContainerBuilder();

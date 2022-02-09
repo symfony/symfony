@@ -68,12 +68,12 @@ final class FormExtension extends AbstractExtension
             new TwigFunction('form_end', null, ['node_class' => RenderBlockNode::class, 'is_safe' => ['html']]),
             new TwigFunction('csrf_token', [FormRenderer::class, 'renderCsrfToken']),
             new TwigFunction('form_parent', 'Symfony\Bridge\Twig\Extension\twig_get_form_parent'),
-            new TwigFunction('field_name', [$this, 'getFieldName']),
-            new TwigFunction('field_value', [$this, 'getFieldValue']),
-            new TwigFunction('field_label', [$this, 'getFieldLabel']),
-            new TwigFunction('field_help', [$this, 'getFieldHelp']),
-            new TwigFunction('field_errors', [$this, 'getFieldErrors']),
-            new TwigFunction('field_choices', [$this, 'getFieldChoices']),
+            new TwigFunction('field_name', $this->getFieldName(...)),
+            new TwigFunction('field_value', $this->getFieldValue(...)),
+            new TwigFunction('field_label', $this->getFieldLabel(...)),
+            new TwigFunction('field_help', $this->getFieldHelp(...)),
+            new TwigFunction('field_errors', $this->getFieldErrors(...)),
+            new TwigFunction('field_choices', $this->getFieldChoices(...)),
         ];
     }
 

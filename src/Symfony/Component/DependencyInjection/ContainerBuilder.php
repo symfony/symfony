@@ -1154,7 +1154,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     $types[$k] = $v instanceof TypedReference ? $v->getType() : '?';
                 }
             }
-            $value = new ServiceLocator(\Closure::fromCallable([$this, 'resolveServices']), $refs, $types);
+            $value = new ServiceLocator($this->resolveServices(...), $refs, $types);
         } elseif ($value instanceof Reference) {
             $value = $this->doGet((string) $value, $value->getInvalidBehavior(), $inlineServices, $isConstructorArgument);
         } elseif ($value instanceof Definition) {
@@ -1586,7 +1586,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if (!class_exists(\Symfony\Component\ExpressionLanguage\ExpressionLanguage::class)) {
                 throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
-            $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders, null, \Closure::fromCallable([$this, 'getEnv']));
+            $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders, null, $this->getEnv(...));
         }
 
         return $this->expressionLanguage;

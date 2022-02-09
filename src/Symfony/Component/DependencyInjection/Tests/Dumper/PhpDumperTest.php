@@ -936,11 +936,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        if (80100 <= \PHP_VERSION_ID) {
-            $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber_php81.php', $dumper->dump());
-        } else {
-            $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber.php', $dumper->dump());
-        }
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber.php', $dumper->dump());
     }
 
     public function testPrivateWithIgnoreOnInvalidReference()
@@ -1209,9 +1205,6 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $container->get('bar'));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testNewInInitializer()
     {
         $container = new ContainerBuilder();
@@ -1227,9 +1220,6 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_new_in_initializer.php', $dumper->dump());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpHandlesEnumeration()
     {
         $container = new ContainerBuilder();

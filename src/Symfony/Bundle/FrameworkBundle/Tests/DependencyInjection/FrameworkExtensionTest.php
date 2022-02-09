@@ -31,6 +31,8 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -1625,6 +1627,55 @@ abstract class FrameworkExtensionTest extends TestCase
             ['cache_app_redis_tag_aware'],
             ['cache_app_redis_tag_aware_pool'],
         ];
+    }
+
+    public function testCacheTaggableTagAppliedToPools()
+    {
+        $container = $this->createContainerFromFile('cache');
+
+        $servicesToCheck = [
+            'cache.app.taggable' => 'cache.app',
+            'cache.redis_tag_aware.bar' => 'cache.redis_tag_aware.bar',
+            '.cache.foobar.taggable' => 'cache.foobar',
+        ];
+
+        foreach ($servicesToCheck as $id => $expectedPool) {
+            $this->assertTrue($container->hasDefinition($id));
+
+            $def = $container->getDefinition($id);
+
+            $this->assertTrue($def->hasTag('cache.taggable'));
+            $this->assertSame($expectedPool, $def->getTag('cache.taggable')[0]['pool'] ?? null);
+        }
+    }
+
+    /**
+     * @dataProvider appRedisTagAwareConfigProvider
+     */
+    public function testCacheTaggableTagAppliedToRedisAwareAppPool(string $configFile)
+    {
+        $container = $this->createContainerFromFile($configFile);
+
+        $def = $container->getDefinition('cache.app');
+
+        $this->assertTrue($def->hasTag('cache.taggable'));
+        $this->assertSame('cache.app', $def->getTag('cache.taggable')[0]['pool'] ?? null);
+    }
+
+    public function testCachePoolInvalidateTagsCommandRegistered()
+    {
+        $container = $this->createContainerFromFile('cache');
+        $this->assertTrue($container->hasDefinition('console.command.cache_pool_invalidate_tags'));
+
+        $locator = $container->getDefinition('console.command.cache_pool_invalidate_tags')->getArgument(0);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $locator);
+
+        $iterator = $locator->getTaggedIteratorArgument();
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $iterator);
+
+        $this->assertSame('cache.taggable', $iterator->getTag());
+        $this->assertSame('pool', $iterator->getIndexAttribute());
+        $this->assertTrue($iterator->needsIndexes());
     }
 
     public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()

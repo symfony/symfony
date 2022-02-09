@@ -2145,9 +2145,11 @@ class FrameworkExtension extends Extension
 
             if ($isRedisTagAware && 'cache.app' === $name) {
                 $container->setAlias('cache.app.taggable', $name);
+                $definition->addTag('cache.taggable', ['pool' => $name]);
             } elseif ($isRedisTagAware) {
                 $tagAwareId = $name;
                 $container->setAlias('.'.$name.'.inner', $name);
+                $definition->addTag('cache.taggable', ['pool' => $name]);
             } elseif ($pool['tags']) {
                 if (true !== $pool['tags'] && ($config['pools'][$pool['tags']]['tags'] ?? false)) {
                     $pool['tags'] = '.'.$pool['tags'].'.inner';
@@ -2156,6 +2158,7 @@ class FrameworkExtension extends Extension
                     ->addArgument(new Reference('.'.$name.'.inner'))
                     ->addArgument(true !== $pool['tags'] ? new Reference($pool['tags']) : null)
                     ->setPublic($pool['public'])
+                    ->addTag('cache.taggable', ['pool' => $name])
                 ;
 
                 if (method_exists(TagAwareAdapter::class, 'setLogger')) {
@@ -2172,6 +2175,7 @@ class FrameworkExtension extends Extension
                 $tagAwareId = '.'.$name.'.taggable';
                 $container->register($tagAwareId, TagAwareAdapter::class)
                     ->addArgument(new Reference($name))
+                    ->addTag('cache.taggable', ['pool' => $name])
                 ;
             }
 

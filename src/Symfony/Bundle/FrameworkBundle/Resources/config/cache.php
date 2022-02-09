@@ -39,6 +39,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('cache.app.taggable', TagAwareAdapter::class)
             ->args([service('cache.app')])
+            ->tag('cache.taggable', ['pool' => 'cache.app'])
 
         ->set('cache.system')
             ->parent('cache.adapter.system')

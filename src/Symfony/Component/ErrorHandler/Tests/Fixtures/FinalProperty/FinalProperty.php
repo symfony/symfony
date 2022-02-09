@@ -18,4 +18,15 @@ class FinalProperty
      * @final
      */
     private $priv;
+
+    /**
+     * @final
+     */
+    public $notOverriden;
+
+    protected $implicitlyFinal;
+
+    protected string $typedSoNotFinal;
+
+    protected $deprecated;
 }

@@ -9,4 +9,10 @@ class OverrideFinalProperty extends FinalProperty
     public $pub;
     protected $prot;
     private $priv;
+    protected $implicitlyFinal;
+    protected string $typedSoNotFinal;
+    /**
+     * @deprecated
+     */
+    protected $deprecated;
 }

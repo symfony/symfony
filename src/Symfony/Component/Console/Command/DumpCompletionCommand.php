@@ -68,7 +68,7 @@ Or dump the script to a local file and source it:
 <comment>Dynamic installation
 --------------------</>
 
-Add this add the end of your shell configuration file (e.g. <info>"~/.bashrc"</>):
+Add this to the end of your shell configuration file (e.g. <info>"~/.bashrc"</>):
 
     <info>eval "$(${fullCommand} completion bash)"</>
 EOH

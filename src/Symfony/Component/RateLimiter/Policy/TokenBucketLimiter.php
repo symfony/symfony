@@ -72,24 +72,27 @@ final class TokenBucketLimiter implements LimiterInterface
                 $bucket->setTokens($availableTokens - $tokens);
                 $bucket->setTimer($now);
 
-                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->maxBurst));
+                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U.u', $now), true, $this->maxBurst));
             } else {
                 $remainingTokens = $tokens - $availableTokens;
                 $waitDuration = $this->rate->calculateTimeForTokens($remainingTokens);
-                $retryAfter = $bucket->getTimer() + $bucket->getExpirationTime() / $this->maxBurst;
-                $rateLimit = new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U.u', $retryAfter), false, $this->maxBurst);
+
+                $retryAfter = $bucket->getTimer() + $waitDuration;
+                $retryAfterDate = \DateTimeImmutable::createFromFormat('U.u', $retryAfter);
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
+                    $rateLimit = new RateLimit($availableTokens, $retryAfterDate, false, $this->maxBurst);
+
                     throw new MaxWaitDurationExceededException(sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), $rateLimit);
                 }
 
-                // at $now + $waitDuration all tokens will be reserved for this process,
+                // at $retryAfter all tokens will be reserved for this process,
                 // so no tokens are left for other processes.
                 $bucket->setTokens($availableTokens - $tokens);
                 $bucket->setTimer($now);
 
-                $reservation = new Reservation($retryAfter, $rateLimit);
+                $reservation = new Reservation($retryAfter, new RateLimit(0, $retryAfterDate, false, $this->maxBurst));
             }
 
             $this->storage->save($bucket);

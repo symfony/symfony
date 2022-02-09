@@ -105,6 +105,38 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertEqualsWithDelta($start + 1, microtime(true), 1);
     }
 
+    public function testWaitIntervalOnConsumeOverLimitWithDelayBeforeConsume()
+    {
+        // 10 tokens per minute
+        $limiter = $this->createLimiter(10, Rate::perMinute(10));
+
+        // initial consume
+        $limiter->consume(8);
+        sleep(5);
+        // consumer over the limit
+        $rateLimit = $limiter->consume(4);
+
+        $start = microtime(true);
+        $rateLimit->wait(); // wait 55 seconds (inteval is 1 minute - 5 seconds waiting between consumes)
+        $this->assertEqualsWithDelta($start + 55, microtime(true), 1);
+    }
+
+    public function testWaitIntervalOnReserveOverLimitWithDelayBeforeReservation()
+    {
+        // 10 tokens per minute
+        $limiter = $this->createLimiter(10, Rate::perMinute(10));
+
+        // initial consume
+        $limiter->consume(8);
+        sleep(5);
+        // reserve over the limit
+        $reservation = $limiter->reserve(4);
+
+        $start = microtime(true);
+        $reservation->wait(); // wait 55 seconds (inteval is 1 minute - 5 seconds waiting between consumes)
+        $this->assertEqualsWithDelta($start + 55, microtime(true), 1);
+    }
+
     public function testWrongWindowFromCache()
     {
         $this->storage->save(new DummyWindow());

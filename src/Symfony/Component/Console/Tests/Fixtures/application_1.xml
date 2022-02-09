@@ -76,7 +76,7 @@
  &lt;comment&gt;Dynamic installation
  --------------------&lt;/&gt;
  
- Add this add the end of your shell configuration file (e.g. &lt;info&gt;"~/.bashrc"&lt;/&gt;):
+ Add this to the end of your shell configuration file (e.g. &lt;info&gt;"~/.bashrc"&lt;/&gt;):
  
      &lt;info&gt;eval "$(%%PHP_SELF_FULL%% completion bash)"&lt;/&gt;</help>
       <arguments>

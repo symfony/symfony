@@ -37,7 +37,7 @@ class Image extends File
 
     // Include the mapping from the base class
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NOT_FOUND_ERROR => 'NOT_FOUND_ERROR',
         self::NOT_READABLE_ERROR => 'NOT_READABLE_ERROR',
         self::EMPTY_ERROR => 'EMPTY_ERROR',
@@ -57,6 +57,11 @@ class Image extends File
         self::PORTRAIT_NOT_ALLOWED_ERROR => 'PORTRAIT_NOT_ALLOWED_ERROR',
         self::CORRUPTED_IMAGE_ERROR => 'CORRUPTED_IMAGE_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $mimeTypes = 'image/*';
     public $minWidth;

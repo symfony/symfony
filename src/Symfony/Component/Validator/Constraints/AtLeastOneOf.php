@@ -22,9 +22,14 @@ class AtLeastOneOf extends Composite
 {
     public const AT_LEAST_ONE_OF_ERROR = 'f27e6d6c-261a-4056-b391-6673a623531c';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::AT_LEAST_ONE_OF_ERROR => 'AT_LEAST_ONE_OF_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $constraints = [];
     public $message = 'This value should satisfy at least one of the following constraints:';

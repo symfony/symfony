@@ -29,7 +29,7 @@ class Cidr extends Constraint
     public const INVALID_CIDR_ERROR = '5649e53a-5afb-47c5-a360-ffbab3be8567';
     public const OUT_OF_RANGE_ERROR = 'b9f14a51-acbd-401a-a078-8c6b204ab32f';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_CIDR_ERROR => 'INVALID_CIDR_ERROR',
         self::OUT_OF_RANGE_ERROR => 'OUT_OF_RANGE_VIOLATION',
     ];
@@ -39,6 +39,11 @@ class Cidr extends Constraint
         Ip::V4 => 32,
         Ip::V6 => 128,
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $version = Ip::ALL;
 

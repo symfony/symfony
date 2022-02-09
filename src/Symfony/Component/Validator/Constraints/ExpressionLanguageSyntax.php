@@ -24,9 +24,14 @@ class ExpressionLanguageSyntax extends Constraint
 {
     public const EXPRESSION_LANGUAGE_SYNTAX_ERROR = '1766a3f3-ff03-40eb-b053-ab7aa23d988a';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::EXPRESSION_LANGUAGE_SYNTAX_ERROR => 'EXPRESSION_LANGUAGE_SYNTAX_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This value should be a valid expression.';
     public $service;

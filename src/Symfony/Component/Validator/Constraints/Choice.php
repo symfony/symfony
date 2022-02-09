@@ -26,11 +26,16 @@ class Choice extends Constraint
     public const TOO_FEW_ERROR = '11edd7eb-5872-4b6e-9f12-89923999fd0e';
     public const TOO_MANY_ERROR = '9bd98e49-211c-433f-8630-fd1c2d0f08c3';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NO_SUCH_CHOICE_ERROR => 'NO_SUCH_CHOICE_ERROR',
         self::TOO_FEW_ERROR => 'TOO_FEW_ERROR',
         self::TOO_MANY_ERROR => 'TOO_MANY_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $choices;
     public $callback;

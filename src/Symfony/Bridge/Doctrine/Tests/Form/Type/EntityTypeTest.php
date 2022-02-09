@@ -63,8 +63,6 @@ class EntityTypeTest extends BaseTypeTest
      */
     private $emRegistry;
 
-    protected static $supportedFeatureSetVersion = 404;
-
     protected function setUp(): void
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();

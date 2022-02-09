@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-17T17:00:58Z
+
+Please implement the `complete()` for pools :)
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-12-17T19:15:01Z
+
+Thanks for the reviews! I made the following changes:
+1. Implemented `complete()`
+2. Replaced compiler pass with `tagged_locator`
+3. Made `--pool` option an array
+4. Exceptions thrown when invalidating tags are displayed but don't cause the command to fail until all pools are attempted.
+
+---------------------------------------------------------------------------
+
+by kbond at 2021-12-22T18:24:39Z
+
+Tests added. I believe this PR to be ready.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2021-12-27T16:07:08Z
+
+nice addition :)
+May I ask you if https://github.com/symfony/symfony/pull/37880 could be reconsidered for v6? thank you
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-02-08T12:19:31Z
+
+@kbond can you rebase this one?
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-02-08T16:32:51Z
+
+Rebased.

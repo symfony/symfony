@@ -324,6 +324,14 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require $autoloadFile;
+require __DIR__.'/{$options['class']}.php';
+
+if (\PHP_VERSION_ID < 80100) {
+    // Preloading on PHP 8.0 fails with a fatal error when typed properties are used
+    // if some of those types are referencing optional and non-installed dependencies.
+    return;
+}
+
 (require __DIR__.'/{$options['class']}.php')->set(\\Container{$hash}\\{$options['class']}::class, null);
 $preloadedFiles
 \$classes = [];

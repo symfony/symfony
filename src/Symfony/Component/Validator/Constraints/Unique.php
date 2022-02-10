@@ -25,9 +25,14 @@ class Unique extends Constraint
 {
     public const IS_NOT_UNIQUE = '7911c98d-b845-4da0-94b7-a8dac36bc55a';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::IS_NOT_UNIQUE => 'IS_NOT_UNIQUE',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This collection should contain only unique elements.';
     public $normalizer;

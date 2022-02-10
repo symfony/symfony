@@ -26,11 +26,16 @@ class DateTime extends Constraint
     public const INVALID_DATE_ERROR = 'd52afa47-620d-4d99-9f08-f4d85b36e33c';
     public const INVALID_TIME_ERROR = '5e797c9d-74f7-4098-baa3-94390c447b27';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',
         self::INVALID_DATE_ERROR => 'INVALID_DATE_ERROR',
         self::INVALID_TIME_ERROR => 'INVALID_TIME_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $format = 'Y-m-d H:i:s';
     public $message = 'This value is not a valid datetime.';

@@ -31,12 +31,17 @@ class Range extends Constraint
     public const TOO_HIGH_ERROR = '2d28afcb-e32e-45fb-a815-01c431a86a69';
     public const TOO_LOW_ERROR = '76454e69-502c-46c5-9643-f447d837c4d5';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
         self::NOT_IN_RANGE_ERROR => 'NOT_IN_RANGE_ERROR',
         self::TOO_HIGH_ERROR => 'TOO_HIGH_ERROR',
         self::TOO_LOW_ERROR => 'TOO_LOW_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $notInRangeMessage = 'This value should be between {{ min }} and {{ max }}.';
     public $minMessage = 'This value should be {{ limit }} or more.';

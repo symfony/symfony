@@ -29,11 +29,16 @@ class Isin extends Constraint
     public const INVALID_PATTERN_ERROR = '3d08ce0-ded9-a93d-9216-17ac21265b65e';
     public const INVALID_CHECKSUM_ERROR = '32089b-0ee1-93ba-399e-aa232e62f2d29d';
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::INVALID_LENGTH_ERROR => 'INVALID_LENGTH_ERROR',
         self::INVALID_PATTERN_ERROR => 'INVALID_PATTERN_ERROR',
         self::INVALID_CHECKSUM_ERROR => 'INVALID_CHECKSUM_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $message = 'This value is not a valid International Securities Identification Number (ISIN).';
 

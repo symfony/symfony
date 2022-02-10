@@ -503,13 +503,27 @@ class Php8Command2 extends Command
 
 class MyCommand extends Command
 {
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultName = 'my:command';
+
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultDescription = 'This is a command I wrote all by myself';
 }
 
 #[AsCommand(name: 'my:command', description: 'This is a command I wrote all by myself')]
 class MyAnnotatedCommand extends Command
 {
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultName = 'i-shall-be-ignored';
+
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultDescription = 'This description should be ignored.';
 }

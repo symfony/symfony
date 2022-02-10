@@ -401,13 +401,34 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
+    public function testOverrideFinalProperty()
+    {
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        class_exists(Fixtures\OverrideFinalProperty::class, true);
+        class_exists(Fixtures\FinalProperty\OverrideFinalPropertySameNamespace::class, true);
+        class_exists('Test\\'.OverrideOutsideFinalProperty::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalProperty\FinalProperty::$pub" property is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\OverrideFinalProperty".',
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalProperty\FinalProperty::$prot" property is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\OverrideFinalProperty".',
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalProperty\FinalProperty::$implicitlyFinal" property is considered final. You should not override it in "Symfony\Component\ErrorHandler\Tests\Fixtures\OverrideFinalProperty".',
+            'The "Test\Symfony\Component\ErrorHandler\Tests\FinalProperty\OutsideFinalProperty::$final" property is considered final. You should not override it in "Test\Symfony\Component\ErrorHandler\Tests\OverrideOutsideFinalProperty".'
+        ], $deprecations);
+    }
+
     public function testOverrideFinalConstant()
     {
         $deprecations = [];
         set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
         $e = error_reporting(E_USER_DEPRECATED);
 
-        class_exists( Fixtures\FinalConstant\OverrideFinalConstant::class, true);
+        class_exists(Fixtures\FinalConstant\OverrideFinalConstant::class, true);
 
         error_reporting($e);
         restore_error_handler();
@@ -523,6 +544,10 @@ class ClassLoader
             return $fixtureDir.\DIRECTORY_SEPARATOR.'ReturnType.php';
         } elseif ('Test\\'.Fixtures\OutsideInterface::class === $class) {
             return $fixtureDir.\DIRECTORY_SEPARATOR.'OutsideInterface.php';
+        } elseif ('Test\\'.OverrideOutsideFinalProperty::class === $class) {
+            return $fixtureDir.'OverrideOutsideFinalProperty.php';
+        } elseif ('Test\\Symfony\\Component\\ErrorHandler\\Tests\\FinalProperty\\OutsideFinalProperty' === $class) {
+            return $fixtureDir.'FinalProperty'.\DIRECTORY_SEPARATOR.'OutsideFinalProperty.php';
         }
     }
 }

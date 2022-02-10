@@ -1,10 +1,16 @@
 UPGRADE FROM 6.0 to 6.1
 =======================
 
+All components
+--------------
+
+ * Public and protected properties are now considered final;
+   instead of overriding a property, consider setting its value in the constructor
+
 Console
 -------
 
- * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead.
+ * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
 
 Serializer
 ----------

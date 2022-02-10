@@ -4,7 +4,7 @@ CHANGELOG
 6.1
 ---
 
- * Report overridden `@final` constants
+ * Report overridden `@final` constants and properties
 
 5.4
 ---

@@ -26,9 +26,6 @@ class Query extends AbstractQuery
 {
     public const PAGINATION_OID = \LDAP_CONTROL_PAGEDRESULTS;
 
-    /** @var Connection */
-    protected $connection;
-
     /** @var resource[]|Result[] */
     private array $results;
 

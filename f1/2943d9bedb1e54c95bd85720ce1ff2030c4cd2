@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by flack at 2022-02-09T13:29:45Z
+
+There's a coding style violation that wants me to add a trailing comma in the regex array. AFAIK that is only supported on PHP 7.3+, so it'll probably cause CI to fail. Should I still do it?
+
+---------------------------------------------------------------------------
+
+by flack at 2022-02-09T13:30:37Z
+
+also, what is your policy with implementing review comments, should I make new commits or squash immediately?
+
+---------------------------------------------------------------------------
+
+by flack at 2022-02-09T13:41:55Z
+
+implemented review comments (except for the trailing comma one, see above)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-09T14:03:27Z
+
+> There's a coding style violation that wants me to add a trailing comma in the regex array. AFAIK that is only supported on PHP 7.3+, so it'll probably cause CI to fail. Should I still do it?
+
+Trailing commas in array constructors are allowed in PHP 7.1 already, no worries.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-09T14:04:10Z
+
+> also, what is your policy with implementing review comments, should I make new commits or squash immediately?
+
+As you wish, we can squash while merging.
+
+---------------------------------------------------------------------------
+
+by flack at 2022-02-09T14:12:27Z
+
+alright, thx. All suggestions should be implemented now
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-02-10T13:58:24Z
+
+I'm merging it in 6.1 as this is a new feature (this was not supported before).
+
+---------------------------------------------------------------------------
+
+by flack at 2022-02-10T14:01:46Z
+
+well, it worked with Swiftmailer, so from the point of view of the user it's still a regression

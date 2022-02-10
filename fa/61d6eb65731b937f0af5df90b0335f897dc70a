@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-09T10:40:00Z
+
+I can't help myself, but I always find it weird to override a constant. Designing an API around that feels even weirder. An alternative approach could be to move constraints towards overriding `Constraint::getErrorName()` instead. That method could be implemented with a simple `match` expression.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-09T10:42:58Z
+
+@derrabus mmmm :) This API is just a declarative piece of code, it needs only a constant, not runtime logic.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-02-09T18:17:25Z
+
+do we understand the purpose of `getErrorName`? If so, would it be reasonable to have a dynamic default implementation? If not, could we deprecate it?
+
+https://symfony.com/doc/current/validation/custom_constraint.html#creating-the-constraint-class
+https://github.com/symfony/symfony/search?q=getErrorName
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-02-10T07:53:21Z
+
+> do we understand the purpose of getErrorName?
+
+See https://github.com/symfony/symfony/pull/12021
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-02-10T08:11:18Z
+
+> The getErrorName() method is especially helpful for REST APIs, where you can return both an error code and a description of that error now.
+
+i don't think getErrorName is that useful :) from the constraint violation POV your have the code+message
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-10T08:24:30Z
+
+@ro0NL that discussion is unrelated to the PR. We have to keep things working. Please open an issue if you want to have a discussion about this method.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-02-10T08:27:55Z
+
+i think 1 migration path is enough for a while :)
+
+thus either deal with "deprecated prop", or deal with "deprecated method"
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-10T08:34:18Z
+
+This PR is motivated by #45360: deprecating the properties is required for it.
+
+Deprecating the method is not motivated by any actual data. We actually have data that supports the method: someone contributed it. So clearly this shows the path to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-10T09:54:23Z
+
+> Could we add a runtime deprecation on Constraint::getErrorName() if the error code is found in the deprecated property
+
+good idea, updated.

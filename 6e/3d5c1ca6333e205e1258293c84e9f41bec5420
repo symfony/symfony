@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-09T10:13:52Z
+
+> test with two classes in the same namespace
+> test with a class outside the Symfony\ namespace
+> test that the behavior is different when the property is typed
+
+PR welcome on my fork :)
+
+> test that the behavior is different for a static property
+
+I removed that check
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-09T10:15:31Z
+
+This PR will be green after #45371 is merged. Review welcome.

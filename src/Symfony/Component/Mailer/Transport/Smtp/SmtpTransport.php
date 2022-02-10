@@ -240,7 +240,7 @@ class SmtpTransport extends AbstractTransport
         $this->executeCommand(sprintf("RCPT TO:<%s>\r\n", $address), [250, 251, 252]);
     }
 
-    private function start(): void
+    public function start(): void
     {
         if ($this->started) {
             return;

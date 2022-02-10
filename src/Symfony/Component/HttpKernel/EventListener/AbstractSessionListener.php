@@ -79,7 +79,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
                  * Do not set it when a native php session is active.
                  */
                 if ($sess && !$sess->isStarted() && \PHP_SESSION_ACTIVE !== session_status()) {
-                    $sessionId = $request->cookies->get($sess->getName(), '');
+                    $sessionId = $request->cookies->get($sess->getName(), $sess->getId());
                     $sess->setId($sessionId);
                 }
 

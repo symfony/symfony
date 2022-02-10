@@ -189,7 +189,7 @@ class ExceptionListener
             $this->throwUnauthorizedException($authException);
         }
 
-        $this->logger?->debug('Calling Authentication entry point.');
+        $this->logger?->debug('Calling Authentication entry point.', ['entry_point' => $this->authenticationEntryPoint]);
 
         if (!$this->stateless) {
             $this->setTargetPath($request);

@@ -4,7 +4,7 @@ CHANGELOG
 6.1
 ---
 
-* Allow manually stop() of `SmtpTransport`
+* Make `start()` and `stop()` methods on `SmtpTransport`
 
 6.0
 ---

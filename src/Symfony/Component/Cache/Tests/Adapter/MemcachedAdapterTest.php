@@ -33,7 +33,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     public static function setUpBeforeClass(): void
     {
         if (!MemcachedAdapter::isSupported()) {
-            throw new SkippedTestSuiteError('Extension memcached >=2.2.0 required.');
+            throw new SkippedTestSuiteError('Extension memcached '.(\PHP_VERSION_ID >= 80100 ? '> 3.1.5' : '>= 2.2.0').' required.');
         }
         self::$client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['binary_protocol' => false]);
         self::$client->get('foo');

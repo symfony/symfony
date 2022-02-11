@@ -691,4 +691,12 @@ CSV;
 
         $this->assertSame("foo,bar\r\nhello,test\r\n", $this->encoder->encode($value, 'csv', [CsvEncoder::END_OF_LINE => "\r\n"]));
     }
+
+    public function testEndOfLinePassedInConstructor()
+    {
+        $value = ['foo' => 'hello', 'bar' => 'test'];
+
+        $encoder = new CsvEncoder([CsvEncoder::END_OF_LINE => "\r\n"]);
+        $this->assertSame("foo,bar\r\nhello,test\r\n", $encoder->encode($value, 'csv'));
+    }
 }

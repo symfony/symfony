@@ -400,6 +400,11 @@ class ObjectNormalizerTest extends TestCase
         return new ObjectNormalizer();
     }
 
+    protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): ObjectNormalizer
+    {
+        return new ObjectNormalizer(null, null, null, $this->getCallbackPropertyTypeExtractor());
+    }
+
     // circular reference
 
     protected function getNormalizerForCircularReference(array $defaultContext): ObjectNormalizer

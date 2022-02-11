@@ -72,17 +72,17 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
             $request->setSessionFactory(function () use (&$sess, $request) {
                 if (!$sess) {
                     $sess = $this->getSession();
-                }
 
-                /*
-                 * For supporting sessions in php runtime with runners like roadrunner or swoole, the session
-                 * cookie needs to be read from the cookie bag and set on the session storage.
-                 *
-                 * Do not set it when a native php session is active.
-                 */
-                if ($sess && !$sess->isStarted() && \PHP_SESSION_ACTIVE !== session_status()) {
-                    $sessionId = $request->cookies->get($sess->getName(), '');
-                    $sess->setId($sessionId);
+                    /*
+                     * For supporting sessions in php runtime with runners like roadrunner or swoole, the session
+                     * cookie needs to be read from the cookie bag and set on the session storage.
+                     *
+                     * Do not set it when a native php session is active.
+                     */
+                    if ($sess && !$sess->isStarted() && \PHP_SESSION_ACTIVE !== session_status()) {
+                        $sessionId = $sess->getId() ?: $request->cookies->get($sess->getName(), '');
+                        $sess->setId($sessionId);
+                    }
                 }
 
                 return $sess;

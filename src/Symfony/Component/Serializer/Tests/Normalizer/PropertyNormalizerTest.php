@@ -192,6 +192,11 @@ class PropertyNormalizerTest extends TestCase
         return new PropertyNormalizer();
     }
 
+    protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): PropertyNormalizer
+    {
+        return new PropertyNormalizer(null, null, $this->getCallbackPropertyTypeExtractor());
+    }
+
     protected function getNormalizerForCircularReference(array $defaultContext): PropertyNormalizer
     {
         $normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext);

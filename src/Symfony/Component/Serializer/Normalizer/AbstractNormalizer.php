@@ -80,15 +80,15 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const DEFAULT_CONSTRUCTOR_ARGUMENTS = 'default_constructor_arguments';
 
     /**
-     * Hashmap of field name => callable to normalize this field.
+     * Hashmap of field name => callable to (de)normalize this field.
      *
      * The callable is called if the field is encountered with the arguments:
      *
-     * - mixed  $attributeValue value of this field
-     * - object $object         the whole object being normalized
-     * - string $attributeName  name of the attribute being normalized
-     * - string $format         the requested format
-     * - array  $context        the serialization context
+     * - mixed         $attributeValue value of this field
+     * - object|string $object         the whole object being normalized or the object's class being denormalized
+     * - string        $attributeName  name of the attribute being (de)normalized
+     * - string        $format         the requested format
+     * - array         $context        the serialization context
      */
     public const CALLBACKS = 'callbacks';
 
@@ -143,17 +143,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         $this->nameConverter = $nameConverter;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
 
-        if (isset($this->defaultContext[self::CALLBACKS])) {
-            if (!\is_array($this->defaultContext[self::CALLBACKS])) {
-                throw new InvalidArgumentException(sprintf('The "%s" default context option must be an array of callables.', self::CALLBACKS));
-            }
-
-            foreach ($this->defaultContext[self::CALLBACKS] as $attribute => $callback) {
-                if (!\is_callable($callback)) {
-                    throw new InvalidArgumentException(sprintf('Invalid callback found for attribute "%s" in the "%s" default context option.', $attribute, self::CALLBACKS));
-                }
-            }
-        }
+        $this->validateCallbackContext($this->defaultContext, 'default');
 
         if (isset($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER]) && !\is_callable($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER])) {
             throw new InvalidArgumentException(sprintf('Invalid callback found in the "%s" default context option.', self::CIRCULAR_REFERENCE_HANDLER));
@@ -450,7 +440,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     throw new LogicException(sprintf('Cannot create an instance of "%s" from serialized data because the serializer inject in "%s" is not a denormalizer.', $parameterClass, static::class));
                 }
 
-                return $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $parameterName, $format));
+                $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $parameterName, $format));
             }
         } catch (\ReflectionException $e) {
             throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $parameterName), 0, $e);
@@ -462,7 +452,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             return null;
         }
 
-        return $parameterData;
+        return $this->applyCallbacks($parameterData, $class->getName(), $parameterName, $format, $context);
     }
 
     /**
@@ -477,5 +467,47 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         return $parentContext;
+    }
+
+    /**
+     * Validate callbacks set in context.
+     *
+     * @param string $contextType Used to specify which context is invalid in exceptions
+     *
+     * @throws InvalidArgumentException
+     */
+    final protected function validateCallbackContext(array $context, string $contextType = ''): void
+    {
+        if (!isset($context[self::CALLBACKS])) {
+            return;
+        }
+
+        if (!\is_array($context[self::CALLBACKS])) {
+            throw new InvalidArgumentException(sprintf('The "%s"%s context option must be an array of callables.', self::CALLBACKS, '' !== $contextType ? " $contextType" : ''));
+        }
+
+        foreach ($context[self::CALLBACKS] as $attribute => $callback) {
+            if (!\is_callable($callback)) {
+                throw new InvalidArgumentException(sprintf('Invalid callback found for attribute "%s" in the "%s"%s context option.', $attribute, self::CALLBACKS, '' !== $contextType ? " $contextType" : ''));
+            }
+        }
+    }
+
+    /**
+     * Apply callbacks set in context.
+     *
+     * @param mixed         $value
+     * @param object|string $object Can be either the object being normalizing or the object's class being denormalized
+     *
+     * @return mixed
+     */
+    final protected function applyCallbacks($value, $object, string $attribute, ?string $format, array $context)
+    {
+        /**
+         * @var callable|null
+         */
+        $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? null;
+
+        return $callback ? $callback($value, $object, $attribute, $format, $context) : $value;
     }
 }

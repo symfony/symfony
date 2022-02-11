@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by dkarlovi at 2022-02-11T13:39:44Z
+
+@Ahummeling if I understood correctly, it means the positive priorities are sorted correct, but negative are not?
+
+Is `sortTaggedServicesByPriority` used to actually inject the services into the serializer? It seems unfortunate we'd have one method sorting them for display and another sorting them for injection, they'd always be in danger to go out of sync. :thinking:
+
+---------------------------------------------------------------------------
+
+by Ahummeling at 2022-02-11T13:47:04Z
+
+> @Ahummeling if I understood correctly, it means the positive priorities are sorted correct, but negative are not?
+>
+> Is `sortTaggedServicesByPriority` used to actually inject the services into the serializer? It seems unfortunate we'd have one method sorting them for display and another sorting them for injection, they'd always be in danger to go out of sync. thinking
+
+Yes you are understanding this correctly.
+
+The class responsible for sorting the output of the debug command is the `Symfony\Bundle\FrameworkBundle\Console\Descriptor\Descriptor`. I can't imagine this is used in the serializer, which would explain the differences.
+
+---------------------------------------------------------------------------
+
+by Ahummeling at 2022-02-11T13:54:00Z
+
+The `SerializerPass` seems to call `Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait::findAndSortTaggedServices`
+which has a completely different algorithm for sorting the services, but I believe it still initializes default priority to 0 in the case of the serializers. I am not quite sure how it works exactly, as it's quite a bit more complicated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-11T14:22:34Z
+
+Can you please add a test case?
+
+---------------------------------------------------------------------------
+
+by Ahummeling at 2022-02-11T14:23:57Z
+
+> Can you please add a test case?
+
+Certainly, sorry should've done that before making the PR
+
+---------------------------------------------------------------------------
+
+by Ahummeling at 2022-02-11T14:56:23Z
+
+Added a test case to the relevant provider that would fail without the proposed change and updated the relevant fixtures to reflect this additional testcase.

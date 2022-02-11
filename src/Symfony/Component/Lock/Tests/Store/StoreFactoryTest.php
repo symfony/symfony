@@ -13,6 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\MemcachedStore;
@@ -56,7 +57,7 @@ class StoreFactoryTest extends TestCase
         if (\extension_loaded('sysvsem')) {
             yield ['semaphore', SemaphoreStore::class];
         }
-        if (class_exists(\Memcached::class) && class_exists(AbstractAdapter::class)) {
+        if (class_exists(AbstractAdapter::class) && MemcachedAdapter::isSupported()) {
             yield ['memcached://server.com', MemcachedStore::class];
             yield ['memcached:?host[localhost]&host[localhost:12345]', MemcachedStore::class];
         }

@@ -261,7 +261,7 @@ abstract class Descriptor implements DescriptorInterface
     {
         $maxPriority = [];
         foreach ($services as $service => $tags) {
-            $maxPriority[$service] = 0;
+            $maxPriority[$service] = \PHP_INT_MIN;
             foreach ($tags as $tag) {
                 $currentPriority = $tag['priority'] ?? 0;
                 if ($maxPriority[$service] < $currentPriority) {

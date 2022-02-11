@@ -171,6 +171,7 @@ class ObjectsProvider
         $definition1 = new Definition('Full\\Qualified\\Class1');
         $definition2 = new Definition('Full\\Qualified\\Class2');
         $definition3 = new Definition('Full\\Qualified\\Class3');
+        $definition4 = new Definition('Full\\Qualified\\Class4');
 
         return [
             'definition_1' => $definition1
@@ -199,6 +200,13 @@ class ObjectsProvider
                 ->setAbstract(false)
                 ->addTag('tag1', ['attr1' => 'val1', 'attr2' => 'val2', 'priority' => 0])
                 ->addTag('tag1', ['attr3' => 'val3', 'priority' => 40]),
+            'definition_4' => $definition4
+                ->setPublic(true)
+                ->setSynthetic(true)
+                ->setFile('/path/to/file')
+                ->setLazy(false)
+                ->setAbstract(false)
+                ->addTag('tag1', ['priority' => 0]),
         ];
     }
 

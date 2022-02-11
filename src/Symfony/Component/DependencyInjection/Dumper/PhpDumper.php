@@ -1159,6 +1159,10 @@ EOTXT
                 return $return.sprintf("[%s, '%s'](%s)", $class, $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
             }
 
+            if ($callable instanceof Expression) {
+                return $return.$this->getExpressionLanguage()->compile((string) $callable, ['this' => 'container']).$tail;
+            }
+
             return $return.sprintf('%s(%s)', $this->dumpLiteralClass($this->dumpValue($callable)), $arguments ? implode(', ', $arguments) : '').$tail;
         }
 

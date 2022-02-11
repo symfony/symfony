@@ -701,9 +701,13 @@ class YamlFileLoader extends FileLoader
     /**
      * @throws InvalidArgumentException When errors occur
      */
-    private function parseCallable(mixed $callable, string $parameter, string $id, string $file): string|array|Reference
+    private function parseCallable(mixed $callable, string $parameter, string $id, string $file): string|array|Expression|Reference
     {
         if (\is_string($callable)) {
+            if ('factory' === $parameter && str_starts_with($callable, '@=')) {
+                return $this->resolveServices($callable, $file);
+            }
+
             if ('' !== $callable && '@' === $callable[0]) {
                 if (!str_contains($callable, ':')) {
                     return [$this->resolveServices($callable, $file), '__invoke'];

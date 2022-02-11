@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class XmlDumperTest extends TestCase
 {
@@ -242,6 +243,28 @@ class XmlDumperTest extends TestCase
         $dumper = new XmlDumper($container);
 
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_abstract.xml'), $dumper->dump());
+    }
+
+    public function testDumpExpressionFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', 'Bar\FooClass')
+            ->setFactory(new Expression("service('foo').getInstance()"))
+            ->setPublic(true)
+        ;
+
+        $dumper = new XmlDumper($container);
+
+        $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
+  <services>
+    <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
+    <service id=\"bar\" class=\"Bar\FooClass\" public=\"true\">
+      <factory expression=\"service('foo').getInstance()\"/>
+    </service>
+  </services>
+</container>
+", $dumper->dump());
     }
 
     /**

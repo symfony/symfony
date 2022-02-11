@@ -224,6 +224,10 @@ class YamlDumper extends Dumper
      */
     private function dumpCallable(mixed $callable): mixed
     {
+        if ($callable instanceof Expression) {
+            return $this->getExpressionCall((string) $callable);
+        }
+
         if (\is_array($callable)) {
             if ($callable[0] instanceof Reference) {
                 $callable = [$this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]];

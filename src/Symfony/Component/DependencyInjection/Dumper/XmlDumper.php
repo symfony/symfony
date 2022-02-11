@@ -171,6 +171,8 @@ class XmlDumper extends Dumper
                     $factory->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 }
                 $factory->setAttribute('method', $callable[1]);
+            } elseif ($callable instanceof Expression) {
+                $factory->setAttribute('expression', $callable);
             } else {
                 $factory->setAttribute('function', $callable);
             }

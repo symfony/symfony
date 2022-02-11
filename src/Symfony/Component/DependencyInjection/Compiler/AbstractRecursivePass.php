@@ -123,6 +123,10 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
             return $r;
         }
 
+        if ($factory instanceof Expression) {
+            return new \ReflectionFunction(static function () {});
+        }
+
         if ($factory) {
             [$class, $method] = $factory;
 

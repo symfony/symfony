@@ -1367,6 +1367,24 @@ PHP
         $this->assertSame($foo5, $locator->get('foo5'));
     }
 
+    public function testFactoryExpression()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'Bar\FooClass');
+        $builder->register('bar', 'Bar\FooClass')
+            ->setFactory(new Expression('service("foo").getInstance()'))
+            ->setPublic(true)
+        ;
+        $builder->compile();
+
+        $dumper = new PhpDumper($builder);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Factory_Expression']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Factory_Expression();
+
+        $this->assertTrue($container->get('bar')->called, '->createService() uses expression as factory');
+    }
+
     public function testScalarService()
     {
         $container = new ContainerBuilder();

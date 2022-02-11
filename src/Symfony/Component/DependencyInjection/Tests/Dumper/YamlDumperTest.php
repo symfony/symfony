@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
@@ -131,6 +132,29 @@ class YamlDumperTest extends TestCase
 
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_service_closure.yml', $dumper->dump());
+    }
+
+    public function testDumpExpressionFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', 'Bar\FooClass')
+            ->setFactory(new Expression('service("foo").getInstance()'))
+            ->setPublic(true)
+        ;
+
+        $dumper = new YamlDumper($container);
+
+        $this->assertEquals("
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    bar:
+        class: Bar\FooClass
+        public: true
+        factory: '@=service(\"foo\").getInstance()'
+", $dumper->dump());
     }
 
     /**

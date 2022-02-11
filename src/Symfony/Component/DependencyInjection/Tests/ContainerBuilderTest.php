@@ -413,6 +413,21 @@ class ContainerBuilderTest extends TestCase
         $this->assertTrue($builder->get('baz')->called, '->createService() uses another service as factory');
     }
 
+    public function testCreateServiceFactoryExpression()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'Bar\FooClass')
+            ->setPublic(true)
+        ;
+        $builder->register('bar', 'Bar\FooClass')
+            ->setFactory(new Expression('service("foo").getInstance()'))
+            ->setPublic(true)
+        ;
+        $builder->compile();
+
+        $this->assertTrue($builder->get('bar')->called, '->createService() uses expression as factory');
+    }
+
     public function testCreateServiceMethodCalls()
     {
         $builder = new ContainerBuilder();

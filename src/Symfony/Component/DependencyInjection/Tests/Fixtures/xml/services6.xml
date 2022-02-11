@@ -63,6 +63,9 @@
     <service id="new_factory5" class="FooBarClass">
       <factory service="baz" />
     </service>
+    <service id="factory_expression" class="FooClass">
+      <factory expression="service('foo').getInstance()" />
+    </service>
     <service id="alias_for_foo" alias="foo" />
     <service id="another_alias_for_foo" alias="foo" public="true"/>
     <service id="0" class="FooClass" />

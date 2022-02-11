@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * Definition represents a service definition.
@@ -26,7 +27,7 @@ class Definition
 
     private ?string $class = null;
     private ?string $file = null;
-    private string|array|null $factory = null;
+    private string|array|Expression|null $factory = null;
     private bool $shared = true;
     private array $deprecation = [];
     private array $properties = [];
@@ -94,11 +95,11 @@ class Definition
     /**
      * Sets a factory.
      *
-     * @param string|array|Reference|null $factory A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param string|array|Expression|Reference|null $factory A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
-    public function setFactory(string|array|Reference|null $factory): static
+    public function setFactory(string|array|Expression|Reference|null $factory): static
     {
         $this->changes['factory'] = true;
 
@@ -116,9 +117,9 @@ class Definition
     /**
      * Gets the factory.
      *
-     * @return string|array|null The PHP function or an array containing a class/Reference and a method to call
+     * @return string|array|Expression|null The PHP function or an array containing a class/Reference and a method to call
      */
-    public function getFactory(): string|array|null
+    public function getFactory(): string|array|Expression|null
     {
         return $this->factory;
     }

@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator\Traits;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ReferenceConfigurator;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 trait FactoryTrait
 {
@@ -21,7 +22,7 @@ trait FactoryTrait
      *
      * @return $this
      */
-    final public function factory(string|array|ReferenceConfigurator $factory): static
+    final public function factory(string|array|Expression|ReferenceConfigurator $factory): static
     {
         if (\is_string($factory) && 1 === substr_count($factory, ':')) {
             $factoryParts = explode(':', $factory);

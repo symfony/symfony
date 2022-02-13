@@ -65,8 +65,8 @@ final class CurlResponse implements ResponseInterface
         $this->info['http_method'] = $method;
         $this->info['user_data'] = $options['user_data'] ?? null;
         $this->info['start_time'] = $this->info['start_time'] ?? microtime(true);
-        $this->info['proxy']['HTTP_PROXY'] = array_key_exists('HTTP_PROXY', $_SERVER) ? $_SERVER['HTTP_PROXY'] : null;
-        $this->info['proxy']['HTTPS_PROXY'] = array_key_exists('HTTPS_PROXY', $_SERVER) ? $_SERVER['HTTPS_PROXY'] : null;
+        $this->info['proxy']['HTTP_PROXY'] = \array_key_exists('HTTP_PROXY', $_SERVER) ? $_SERVER['HTTP_PROXY'] : null;
+        $this->info['proxy']['HTTPS_PROXY'] = \array_key_exists('HTTPS_PROXY', $_SERVER) ? $_SERVER['HTTPS_PROXY'] : null;
         $info = &$this->info;
         $headers = &$this->headers;
         $debugBuffer = $this->debugBuffer;

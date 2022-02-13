@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-11-24T21:27:10Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-11-25T17:32:07Z
+
+Hey!
+
+I think @rfaivre has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-15T14:43:16Z
+
+Changing the public API looks wrong to me. Your child class should call `setUser()` instead.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-15T15:20:41Z
+
+The type declaration has been removed from the 6.0 branch already which also explains the merge conflict, GitHub reports.
+
+@nicolas-grekas I think, this error is raised if we attempt to serialize an instance of this class without setting a user. The instance would kind-of be in an invalid state without the user, but the error message that is triggered is probably not helpful.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-12-15T15:37:54Z
+
+the error also happens if someone calls the getter on an exception on which the setter has not been called.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-15T16:00:33Z
+
+> the error also happens if someone calls the getter on an exception on which the setter has not been called.
+
+Yes. And this basically tells us that the `@return` on 5.4 was lying: That method could return `null` previously.
+
+I think, we have two options here:
+
+* Raise a `LogicException` if the getter is called without a prior setter call because it's clearly a mistake that the exceotion is raised without a user being set.
+* Make the return type nullable. Even if there is already code out there that provides a custom child class, PHP would allow us to do that because a child class may narrow down a nullable return type to non-nullable.
+
+Either way, on 6.1 we would need to fix the serialization. I don't think that we should rais an exception when serializing/deserializing this class, even if it's in an invalid state.

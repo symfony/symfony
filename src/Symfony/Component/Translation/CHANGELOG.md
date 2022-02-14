@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Parameters implementing `TranslatableInterface` are processed
+ * `XliffFileDumper` can now be instantiated with the extension for example `xliff`
 
 5.4
 ---

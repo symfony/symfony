@@ -95,7 +95,7 @@ EOF
     private function createCommand(): CommandTester
     {
         $application = new Application();
-        $application->add(new DotenvDumpCommand(__DIR__.'/.env'));
+        $application->add(new DotenvDumpCommand(__DIR__));
 
         return new CommandTester($application->find('dotenv:dump'));
     }

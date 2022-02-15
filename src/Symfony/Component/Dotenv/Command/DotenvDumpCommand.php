@@ -24,18 +24,18 @@ use Symfony\Component\Dotenv\Dotenv;
  *
  * @internal
  */
-#[Autoconfigure(bind: ['$dotenvPath' => '%kernel.project_dir%/.env', '$defaultEnv' => '%kernel.environment%'])]
+#[Autoconfigure(bind: ['$projectDir' => '%kernel.project_dir%', '$defaultEnv' => '%kernel.environment%'])]
 final class DotenvDumpCommand extends Command
 {
     protected static $defaultName = 'dotenv:dump';
     protected static $defaultDescription = 'Compiles .env files to .env.local.php';
 
-    private $dotenvPath;
+    private $projectDir;
     private $defaultEnv;
 
-    public function __construct(string $dotenvPath, string $defaultEnv = null)
+    public function __construct(string $projectDir, string $defaultEnv = null)
     {
-        $this->dotenvPath = $dotenvPath;
+        $this->projectDir = $projectDir;
         $this->defaultEnv = $defaultEnv;
 
         parent::__construct();
@@ -65,13 +65,23 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $config = [];
+        if (is_file($projectDir = $this->projectDir)) {
+            $config = ['dotenv_path' => basename($projectDir)];
+            $projectDir = \dirname($projectDir);
+        }
+
+        $composerFile = $projectDir.'/composer.json';
+        $config += (is_file($composerFile) ? json_decode(file_get_contents($composerFile), true) : [])['extra']['runtime'] ?? [];
+        $dotenvPath = $projectDir.'/'.($config['dotenv_path'] ?? '.env');
         $env = $input->getArgument('env') ?? $this->defaultEnv;
+        $envKey = $config['env_var_name'] ?? 'APP_ENV';
 
         if ($input->getOption('empty')) {
-            $vars = ['APP_ENV' => $env];
+            $vars = [$envKey => $env];
         } else {
-            $vars = $this->loadEnv($env);
-            $env = $vars['APP_ENV'];
+            $vars = $this->loadEnv($dotenvPath, $env, $config);
+            $env = $vars[$envKey];
         }
 
         $vars = var_export($vars, true);
@@ -83,26 +93,26 @@ EOT
 return $vars;
 
 EOF;
-        file_put_contents($this->dotenvPath.'.local.php', $vars, \LOCK_EX);
+        file_put_contents($dotenvPath.'.local.php', $vars, \LOCK_EX);
 
         $output->writeln(sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));
 
         return 0;
     }
 
-    private function loadEnv(string $env): array
+    private function loadEnv(string $dotenvPath, string $env, array $config): array
     {
         $dotenv = new Dotenv();
-        $composerFile = \dirname($this->dotenvPath).'/composer.json';
-        $testEnvs = (is_file($composerFile) ? json_decode(file_get_contents($composerFile), true) : [])['extra']['runtime']['test_envs'] ?? ['test'];
+        $envKey = $config['env_var_name'] ?? 'APP_ENV';
+        $testEnvs = $config['test_envs'] ?? ['test'];
 
         $globalsBackup = [$_SERVER, $_ENV];
-        unset($_SERVER['APP_ENV']);
-        $_ENV = ['APP_ENV' => $env];
+        unset($_SERVER[$envKey]);
+        $_ENV = [$envKey => $env];
         $_SERVER['SYMFONY_DOTENV_VARS'] = implode(',', array_keys($_SERVER));
 
         try {
-            $dotenv->loadEnv($this->dotenvPath, null, 'dev', $testEnvs);
+            $dotenv->loadEnv($dotenvPath, null, 'dev', $testEnvs);
             unset($_ENV['SYMFONY_DOTENV_VARS']);
 
             return $_ENV;

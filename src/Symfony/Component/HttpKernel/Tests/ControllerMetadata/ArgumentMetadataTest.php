@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\ControllerMetadata;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\FooParam;
 
 class ArgumentMetadataTest extends TestCase
 {
@@ -45,7 +45,7 @@ class ArgumentMetadataTest extends TestCase
 
     public function testGetAttributes()
     {
-        $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value', true, [new Foo('bar')]);
-        $this->assertEquals([new Foo('bar')], $argument->getAttributes());
+        $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value', true, [new FooParam('bar')]);
+        $this->assertEquals([new FooParam('bar')], $argument->getAttributes());
     }
 }

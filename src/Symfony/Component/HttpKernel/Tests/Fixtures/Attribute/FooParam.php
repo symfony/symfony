@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Fixtures\Attribute;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-class Foo
+class FooParam
 {
     private $foo;
 

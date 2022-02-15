@@ -11,19 +11,19 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fixtures\Controller;
 
-use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\FooParam;
 
-class AttributeController
+class ArgumentAttributeController
 {
-    public function action(#[Foo('bar')] string $baz)
+    public function action(#[FooParam('bar')] string $baz)
     {
     }
 
-    public function multiAttributeArg(#[Foo('bar'), Undefined('bar')] string $baz)
+    public function multiAttributeArg(#[FooParam('bar'), Undefined('bar')] string $baz)
     {
     }
 
-    public function issue41478(#[Foo('bar')] string $baz, string $bat)
+    public function issue41478(#[FooParam('bar')] string $baz, string $bat)
     {
     }
 }

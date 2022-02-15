@@ -67,7 +67,7 @@ class Uuid extends AbstractUid
             return new NilUuid();
         }
 
-        switch ($uuid[14]) {
+        switch ((int) $uuid[14]) {
             case UuidV1::TYPE: return new UuidV1($uuid);
             case UuidV3::TYPE: return new UuidV3($uuid);
             case UuidV4::TYPE: return new UuidV4($uuid);

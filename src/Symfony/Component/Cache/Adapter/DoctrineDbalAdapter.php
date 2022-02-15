@@ -338,28 +338,17 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         $platform = $this->conn->getDatabasePlatform();
 
-        switch (true) {
-            case $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform:
-                return $this->platformName = 'mysql';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform:
-                return $this->platformName = 'sqlite';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform:
-                return $this->platformName = 'pgsql';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform:
-                return $this->platformName = 'oci';
-
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform:
-            case $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform:
-                return $this->platformName = 'sqlsrv';
-
-            default:
-                return $this->platformName = \get_class($platform);
-        }
+        return match (true) {
+            $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform => $this->platformName = 'mysql',
+            $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform => $this->platformName = 'sqlite',
+            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform => $this->platformName = 'pgsql',
+            $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform => $this->platformName = 'oci',
+            $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform,
+            $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform => $this->platformName = 'sqlsrv',
+            default => $this->platformName = \get_class($platform),
+        };
     }
 
     private function getServerVersion(): string

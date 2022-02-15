@@ -297,19 +297,11 @@ class TwigExtensionTest extends TestCase
     {
         $locator = new FileLocator(__DIR__.'/Fixtures/'.$format);
 
-        switch ($format) {
-            case 'php':
-                $loader = new PhpFileLoader($container, $locator);
-                break;
-            case 'xml':
-                $loader = new XmlFileLoader($container, $locator);
-                break;
-            case 'yml':
-                $loader = new YamlFileLoader($container, $locator);
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf('Unsupported format: "%s"', $format));
-        }
+        $loader = match ($format) {
+            'php' => new PhpFileLoader($container, $locator),
+            'xml' => new XmlFileLoader($container, $locator),
+            'yml' => new YamlFileLoader($container, $locator),
+        };
 
         $loader->load($file.'.'.$format);
     }

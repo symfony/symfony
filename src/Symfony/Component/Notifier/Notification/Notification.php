@@ -167,17 +167,12 @@ class Notification
             return '';
         }
 
-        switch ($this->importance) {
-            case self::IMPORTANCE_URGENT:
-                return '🌩️';
-            case self::IMPORTANCE_HIGH:
-                return '🌧️';
-            case self::IMPORTANCE_MEDIUM:
-                return '🌦️';
-            case self::IMPORTANCE_LOW:
-            default:
-                return '⛅';
-        }
+        return match ($this->importance) {
+            self::IMPORTANCE_URGENT => '🌩️',
+            self::IMPORTANCE_HIGH => '🌧️',
+            self::IMPORTANCE_MEDIUM => '🌦️',
+            default => '⛅',
+        };
     }
 
     private function computeExceptionAsString(\Throwable $exception): string

@@ -105,10 +105,10 @@ class ProjectServiceContainer extends Container
 
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'foo': $value = $this->getEnv('FOO'); break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
+        $value = match ($name) {
+            'foo' => $this->getEnv('FOO'),
+            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+        };
         $this->loadedDynamicParameters[$name] = true;
 
         return $this->dynamicParameters[$name] = $value;

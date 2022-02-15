@@ -258,18 +258,15 @@ class AbstractObjectNormalizerTest extends TestCase
         $classDiscriminatorResolver = new class() implements ClassDiscriminatorResolverInterface {
             public function getMappingForClass(string $class): ?ClassDiscriminatorMapping
             {
-                switch ($class) {
-                    case AbstractDummy::class:
-                        return new ClassDiscriminatorMapping('type', [
-                            'foo' => AbstractDummyFirstChild::class,
-                        ]);
-                    case AbstractDummyFirstChild::class:
-                        return new ClassDiscriminatorMapping('nested_type', [
-                            'bar' => AbstractDummySecondChild::class,
-                        ]);
-                    default:
-                        return null;
-                }
+                return match ($class) {
+                    AbstractDummy::class => new ClassDiscriminatorMapping('type', [
+                        'foo' => AbstractDummyFirstChild::class,
+                    ]),
+                    AbstractDummyFirstChild::class => new ClassDiscriminatorMapping('nested_type', [
+                        'bar' => AbstractDummySecondChild::class,
+                    ]),
+                    default => null,
+                };
             }
 
             public function getMappingForMappedObject($object): ?ClassDiscriminatorMapping

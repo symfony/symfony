@@ -166,26 +166,15 @@ final class PhpDocTypeHelper
 
     private function normalizeType(string $docType): string
     {
-        switch ($docType) {
-            case 'integer':
-                return 'int';
-
-            case 'boolean':
-                return 'bool';
-
+        return match ($docType) {
+            'integer' => 'int',
+            'boolean' => 'bool',
             // real is not part of the PHPDoc standard, so we ignore it
-            case 'double':
-                return 'float';
-
-            case 'callback':
-                return 'callable';
-
-            case 'void':
-                return 'null';
-
-            default:
-                return $docType;
-        }
+            'double' => 'float',
+            'callback' => 'callable',
+            'void' => 'null',
+            default => $docType,
+        };
     }
 
     private function getPhpTypeAndClass(string $docType): array

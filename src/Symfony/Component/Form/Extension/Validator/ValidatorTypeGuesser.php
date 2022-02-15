@@ -16,6 +16,9 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\IsTrue;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
@@ -166,14 +169,12 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessRequiredForConstraint(Constraint $constraint): ?ValueGuess
     {
-        switch (\get_class($constraint)) {
-            case 'Symfony\Component\Validator\Constraints\NotNull':
-            case 'Symfony\Component\Validator\Constraints\NotBlank':
-            case 'Symfony\Component\Validator\Constraints\IsTrue':
-                return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
-        }
-
-        return null;
+        return match (\get_class($constraint)) {
+            NotNull::class,
+            NotBlank::class,
+            IsTrue::class => new ValueGuess(true, Guess::HIGH_CONFIDENCE),
+            default => null,
+        };
     }
 
     /**

@@ -494,18 +494,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             return (float) $data;
                         }
 
-                        switch ($data) {
-                            case 'NaN':
-                                return \NAN;
-                            case 'INF':
-                                return \INF;
-                            case '-INF':
-                                return -\INF;
-                            default:
-                                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_FLOAT], $context['deserialization_path'] ?? null);
-                        }
-
-                        break;
+                        return match ($data) {
+                            'NaN' => \NAN,
+                            'INF' => \INF,
+                            '-INF' => -\INF,
+                            default => throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_FLOAT], $context['deserialization_path'] ?? null),
+                        };
                 }
             }
 

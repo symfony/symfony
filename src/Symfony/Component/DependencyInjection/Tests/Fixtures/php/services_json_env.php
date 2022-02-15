@@ -78,11 +78,11 @@ class Symfony_DI_PhpDumper_Test_JsonParameters extends Container
 
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'hello': $value = $this->getEnv('json:foo'); break;
-            case 'hello-bar': $value = $this->getEnv('json:bar'); break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
+        $value = match ($name) {
+            'hello' => $this->getEnv('json:foo'),
+            'hello-bar' => $this->getEnv('json:bar'),
+            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+        };
         $this->loadedDynamicParameters[$name] = true;
 
         return $this->dynamicParameters[$name] = $value;

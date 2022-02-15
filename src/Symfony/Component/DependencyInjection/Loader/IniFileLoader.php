@@ -83,21 +83,18 @@ class IniFileLoader extends FileLoader
         }
         $lowercaseValue = strtolower($value);
 
-        switch (true) {
-            case \defined($value):
-                return \constant($value);
-            case 'yes' === $lowercaseValue || 'on' === $lowercaseValue:
-                return true;
-            case 'no' === $lowercaseValue || 'off' === $lowercaseValue || 'none' === $lowercaseValue:
-                return false;
-            case isset($value[1]) && (
+        return match (true) {
+            \defined($value) => \constant($value),
+            'yes' === $lowercaseValue,
+            'on' === $lowercaseValue => true,
+            'no' === $lowercaseValue,
+            'off' === $lowercaseValue,
+            'none' === $lowercaseValue => false,
+            isset($value[1]) && (
                 ("'" === $value[0] && "'" === $value[\strlen($value) - 1]) ||
                 ('"' === $value[0] && '"' === $value[\strlen($value) - 1])
-            ):
-                // quoted string
-                return substr($value, 1, -1);
-            default:
-                return XmlUtils::phpize($value);
-        }
+            ) => substr($value, 1, -1), // quoted string
+            default => XmlUtils::phpize($value),
+        };
     }
 }

@@ -349,7 +349,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         if ($constructor) {
             $createInstanceWithoutConstructor = (
                 \array_key_exists(self::CREATE_INSTANCE_WITHOUT_CONSTRUCTOR, $context)
-                && ($context[self::CREATE_INSTANCE_WITHOUT_CONSTRUCTOR] === true)
+                && (true === $context[self::CREATE_INSTANCE_WITHOUT_CONSTRUCTOR])
             );
             if (true !== $constructor->isPublic() || $createInstanceWithoutConstructor) {
                 return $reflectionClass->newInstanceWithoutConstructor();

@@ -961,6 +961,24 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(\BazClass::class, $container->get('bar')->getBaz());
     }
 
+    public function testEnvExpressionFunction()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', 'BarClass')
+            ->setPublic(true)
+            ->setProperty('foo', new Expression('env("BAR_FOO")'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Env_Expression_Function']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Env_Expression_Function();
+
+        $_ENV['BAR_FOO'] = 'Foo value';
+
+        $this->assertEquals('Foo value', $container->get('bar')->foo);
+    }
+
     public function testArrayParameters()
     {
         $container = new ContainerBuilder();

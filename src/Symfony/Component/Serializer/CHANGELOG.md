@@ -9,6 +9,7 @@ CHANGELOG
  * Return empty collections as `ArrayObject` from `Serializer::normalize()` when `PRESERVE_EMPTY_OBJECTS` is set
  * Add support for collecting type errors during denormalization
  * Add missing arguments in `MissingConstructorArgumentsException`
+ * Add support for denormalizing objects without using constructor
 
 5.3
 ---

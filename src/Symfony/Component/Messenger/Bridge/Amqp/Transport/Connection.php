@@ -57,6 +57,7 @@ class Connection
         'key',
         'verify',
         'sasl_method',
+        'connection_name',
     ];
 
     private const AVAILABLE_QUEUE_OPTIONS = [

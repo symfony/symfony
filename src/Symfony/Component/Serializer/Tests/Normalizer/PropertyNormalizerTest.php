@@ -545,10 +545,10 @@ class PropertyConstructorWithValidationDummy
 
     public function __construct($foo, $bar)
     {
-        if ('foo' === $foo){
+        if ('foo' === $foo) {
             throw new \LogicException(sprintf('Argument "%s" is not acceptable as first argument of "%s"', $foo, self::class));
         }
-        if ('bar' === $bar){
+        if ('bar' === $bar) {
             throw new \LogicException(sprintf('Argument "%s" is not acceptable as second argument of "%s"', $bar, self::class));
         }
         $this->foo = $foo;

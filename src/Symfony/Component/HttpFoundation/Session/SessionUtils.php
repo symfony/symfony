@@ -53,7 +53,6 @@ final class SessionUtils
             return null;
         }
 
-
         header_remove('Set-Cookie');
         foreach ($otherCookies as $h) {
             header($h, false);

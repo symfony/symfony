@@ -27,6 +27,10 @@ final class SessionUtils
      */
     public static function popSessionCookie(string $sessionName, string $sessionId): ?string
     {
+        if (headers_sent()) {
+            return null;
+        }
+
         $sessionCookie = null;
         $sessionCookiePrefix = sprintf(' %s=', urlencode($sessionName));
         $sessionCookieWithId = sprintf('%s%s;', $sessionCookiePrefix, urlencode($sessionId));
@@ -49,11 +53,10 @@ final class SessionUtils
             return null;
         }
 
-        if (!headers_sent()) {
-            header_remove('Set-Cookie');
-            foreach ($otherCookies as $h) {
-                header($h, false);
-            }
+
+        header_remove('Set-Cookie');
+        foreach ($otherCookies as $h) {
+            header($h, false);
         }
 
         return $sessionCookie;

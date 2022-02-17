@@ -79,7 +79,9 @@ class PasswordMigratingListener implements EventSubscriberInterface
             $userLoader = $userBadge->getUserLoader();
             if (\is_array($userLoader) && $userLoader[0] instanceof PasswordUpgraderInterface) {
                 $passwordUpgrader = $userLoader[0];
-            } else {
+            } elseif (!$userLoader instanceof \Closure
+                || !($passwordUpgrader = (new \ReflectionFunction($userLoader))->getClosureThis()) instanceof PasswordUpgraderInterface
+            ) {
                 return;
             }
         }

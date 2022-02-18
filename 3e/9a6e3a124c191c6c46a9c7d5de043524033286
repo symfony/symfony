@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-13T15:55:47Z
+
+Did you experience any nasty side effect of this not being reset? Can you add a corresponding test case?
+
+---------------------------------------------------------------------------
+
+by core23 at 2022-02-13T17:04:23Z
+
+> Did you experience any nasty side effect of this not being reset?
+
+IMHO it should only have a minimum performance impact, because the name is resolved for every test: https://github.com/symfony/symfony/blob/53c0f9fd1dbca874b2e2752598fc11281c0b9761/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php#L126-L128
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-14T11:58:36Z
+
+It could have a performance impact. That's why I'm asking. Why do you want to reset this property, if everything is fine when it is not reset?
+
+---------------------------------------------------------------------------
+
+by core23 at 2022-02-14T12:22:04Z
+
+I have some projects that will perform web tests with different kernel configuration. This can also be the case, if you provide a bundle with optional dependencies that will result in a slightly different service configuration.
+
+At the moment, I have to manuell reset the `::$class` after every test with a local `tearDown` method. When I don't do this, the first  (randomly selected) test will reserve the kernel class and all other test will fail, because they expect a different kernel class.

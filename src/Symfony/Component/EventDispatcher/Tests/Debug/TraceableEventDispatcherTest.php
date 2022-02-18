@@ -125,6 +125,18 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertEquals([], $tdispatcher->getNotCalledListeners());
     }
 
+    public function testGetNotCalledClosureListeners()
+    {
+        $instantiationCount = 0;
+
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', [static function () use (&$instantiationCount) { ++$instantiationCount; }, 'onFoo']);
+
+        $tdispatcher->getNotCalledListeners();
+
+        $this->assertSame(0, $instantiationCount);
+    }
+
     public function testClearCalledListeners()
     {
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());

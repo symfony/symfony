@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-02-17T13:50:52Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Lenny4 at 2022-02-17T14:19:16Z
+
+@nicolas-grekas
+Which PHP version were you using ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-17T14:20:50Z
+
+With both PHP 8.1 and 7.4
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-17T14:21:33Z
+
+I ran the test case with
+`./phpunit src/Symfony/Component/Intl/ --group intl-data --filter testGetRawOffsetChangeTimeCountry`
+
+---------------------------------------------------------------------------
+
+by Lenny4 at 2022-02-17T14:31:56Z
+
+This is really strange I got the same result as you.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-02-17T15:13:57Z
+
+for me the patch works
+
+```
+docker run -it -v "$(pwd):/app" -w /app php:8.1 ./phpunit src/Symfony/Component/Intl/ --group intl-data --filter testGetRawOffsetChangeTimeCountry
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-17T15:15:20Z
+
+@ro0NL the issue is not that tests are red, it's that they are always green, even when using PHP 8.1 BEFORE THE PATCH.

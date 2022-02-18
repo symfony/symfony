@@ -12,6 +12,11 @@ Console
 
  * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
 
+HttpKernel
+----------
+
+ * Deprecate StreamedResponseListener, it's not needed anymore
+
 Serializer
 ----------
 

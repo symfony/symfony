@@ -26,7 +26,6 @@ use Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
-use Symfony\Component\HttpKernel\EventListener\StreamedResponseListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
 
 return static function (ContainerConfigurator $container) {
@@ -77,9 +76,6 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.charset'),
                 abstract_arg('The "set_content_language_from_locale" config value'),
             ])
-            ->tag('kernel.event_subscriber')
-
-        ->set('streamed_response_listener', StreamedResponseListener::class)
             ->tag('kernel.event_subscriber')
 
         ->set('locale_listener', LocaleListener::class)

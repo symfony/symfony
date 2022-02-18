@@ -29,6 +29,7 @@ use Symfony\Component\Form\FormTypeInterface;
 abstract class AbstractStaticOption
 {
     private static $options = [];
+    private static $canaryMap;
 
     /** @var bool|callable|string|array|\Closure|ChoiceLoaderInterface */
     private $option;
@@ -44,7 +45,44 @@ abstract class AbstractStaticOption
             throw new \TypeError(sprintf('Expected an instance of "%s" or "%s", but got "%s".', FormTypeInterface::class, FormTypeExtensionInterface::class, get_debug_type($formType)));
         }
 
-        $hash = CachingFactoryDecorator::generateHash([static::class, $formType, $vary]);
+        $canary = null;
+        $key = [static::class, $formType, $vary];
+        array_walk_recursive($key, static function (&$v) use (&$canary) {
+            if (!\is_object($v)) {
+                return;
+            }
+
+            if (\PHP_VERSION_ID < 80000) {
+                $v = spl_object_hash($v);
+
+                return;
+            }
+
+            self::$canaryMap = self::$canaryMap ?? new \WeakMap();
+            $canary = $canary ?? new class () {
+                public $hash = '';
+                public $options = [];
+
+                public function __destruct()
+                {
+                    unset($this->options[$this->hash]);
+                }
+            };
+
+            if (isset(self::$canaryMap[$k = $v])) {
+                self::$canaryMap[$k][] = $canary;
+            } else {
+                self::$canaryMap[$k] = [$canary];
+            }
+
+            $v = spl_object_hash($v);
+        });
+        $hash = hash('sha256', ':'.serialize($key));
+
+        if ($canary) {
+            $canary->hash = $hash;
+            $canary->options =& self::$options;
+        }
 
         $this->option = self::$options[$hash] ?? self::$options[$hash] = $option;
     }
@@ -60,5 +98,6 @@ abstract class AbstractStaticOption
     final public static function reset(): void
     {
         self::$options = [];
+        self::$canaryMap = null;
     }
 }

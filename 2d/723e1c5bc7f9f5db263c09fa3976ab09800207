@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2022-01-27T11:10:33Z
+
+I also updated XML and Yaml loader.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2022-01-28T14:53:01Z
+
+I added some tests but Psalm still warns about `ClassStub`. Its constructor called with a string as second argument.
+
+Updating Psalm annotation makes the CI throw a `Attempt to modify property "parent_nodes" on null` error. Any idea ?
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2022-02-14T15:57:44Z
+
+OK great ! Thanks.

@@ -246,7 +246,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
     {
         return [
             KernelEvents::REQUEST => ['onKernelRequest', 128],
-            // low priority to come after regular response listeners, but higher than StreamedResponseListener
+            // low priority to come after regular response listeners
             KernelEvents::RESPONSE => ['onKernelResponse', -1000],
         ];
     }

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `BackedEnumValueResolver` to resolve backed enum cases from request attributes in controller arguments
+ * Deprecate StreamedResponseListener, it's not needed anymore
 
 6.0
 ---

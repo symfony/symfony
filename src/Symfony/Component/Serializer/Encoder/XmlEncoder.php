@@ -126,10 +126,13 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $rootNode = null;
         $decoderIgnoredNodeTypes = $context[self::DECODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::DECODER_IGNORED_NODE_TYPES];
         foreach ($dom->childNodes as $child) {
+            if (\in_array($child->nodeType, $decoderIgnoredNodeTypes, true)) {
+                continue;
+            }
             if (\XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
                 throw new NotEncodableValueException('Document types are not allowed.');
             }
-            if (!$rootNode && !\in_array($child->nodeType, $decoderIgnoredNodeTypes, true)) {
+            if (!$rootNode) {
                 $rootNode = $child;
             }
         }

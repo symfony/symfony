@@ -30,6 +30,8 @@ namespace Symfony\Component\Validator;
  * element is still the person, but the property path is "address.street".
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @method string __toString() Converts the violation into a string for debugging purposes. Not implementing it is deprecated since Symfony 6.1.
  */
 interface ConstraintViolationInterface
 {

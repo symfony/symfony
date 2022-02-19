@@ -18,6 +18,8 @@ namespace Symfony\Component\Validator;
  *
  * @extends \ArrayAccess<int, ConstraintViolationInterface>
  * @extends \Traversable<int, ConstraintViolationInterface>
+ *
+ * @method string __toString() Converts the violation into a string for debugging purposes. Not implementing it is deprecated since Symfony 6.1.
  */
 interface ConstraintViolationListInterface extends \Traversable, \Countable, \ArrayAccess
 {

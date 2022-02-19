@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-02-16T10:54:47Z
+
+I'm totally in favor of switching to FQCN but it needs to be done globally in another PR I guess. That's unrelated to the match expression for me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-16T11:02:44Z
+
+We prefer changing lines once in a single PR, because that helps when running git blame later on.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-18T09:23:02Z
+
+Looks like PHP CS Fixer does not like the code style proposed by @nicolas-grekas (yet).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-18T09:27:51Z
+
+> Looks like PHP CS Fixer does not like the code style proposed by @nicolas-grekas (yet).
+
+I'm fine adopting php-cs-fixer suggestion then (after removing the trailing coma)

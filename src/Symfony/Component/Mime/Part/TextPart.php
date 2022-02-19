@@ -101,6 +101,14 @@ class TextPart extends AbstractPart
         return $this;
     }
 
+    /**
+     * Gets the name of the file (used by FormDataPart).
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
     public function getBody(): string
     {
         if (null === $this->seekable) {

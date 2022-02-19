@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.
@@ -116,7 +117,12 @@ class Client extends HttpKernelBrowser
         // avoid shutting down the Kernel if no request has been performed yet
         // WebTestCase::createClient() boots the Kernel but do not handle a request
         if ($this->hasPerformedRequest && $this->reboot) {
+            $container = $this->kernel->getContainer();
             $this->kernel->shutdown();
+
+            if ($container instanceof ResetInterface) {
+                $container->reset();
+            }
         } else {
             $this->hasPerformedRequest = true;
         }

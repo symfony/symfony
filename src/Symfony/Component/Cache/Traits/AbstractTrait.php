@@ -119,13 +119,16 @@ trait AbstractTrait
                 }
             }
             $namespaceToClear = $this->namespace.$namespaceVersionToClear;
-            $namespaceVersion = strtr(substr_replace(base64_encode(pack('V', mt_rand())), static::NS_SEPARATOR, 5), '/', '_');
+            $namespaceVersion = self::formatNamespaceVersion(mt_rand());
             try {
-                $cleared = $this->doSave([static::NS_SEPARATOR.$this->namespace => $namespaceVersion], 0);
+                $e = $this->doSave([static::NS_SEPARATOR.$this->namespace => $namespaceVersion], 0);
             } catch (\Exception $e) {
-                $cleared = false;
             }
-            if ($cleared = true === $cleared || [] === $cleared) {
+            if (true !== $e && [] !== $e) {
+                $cleared = false;
+                $message = 'Failed to save the new namespace'.($e instanceof \Exception ? ': '.$e->getMessage() : '.');
+                CacheItem::log($this->logger, $message, ['exception' => $e instanceof \Exception ? $e : null]);
+            } else {
                 $this->namespaceVersion = $namespaceVersion;
                 $this->ids = [];
             }
@@ -267,11 +270,16 @@ trait AbstractTrait
                 foreach ($this->doFetch([static::NS_SEPARATOR.$this->namespace]) as $v) {
                     $this->namespaceVersion = $v;
                 }
+                $e = true;
                 if ('1'.static::NS_SEPARATOR === $this->namespaceVersion) {
-                    $this->namespaceVersion = strtr(substr_replace(base64_encode(pack('V', time())), static::NS_SEPARATOR, 5), '/', '_');
-                    $this->doSave([static::NS_SEPARATOR.$this->namespace => $this->namespaceVersion], 0);
+                    $this->namespaceVersion = self::formatNamespaceVersion(time());
+                    $e = $this->doSave([static::NS_SEPARATOR.$this->namespace => $this->namespaceVersion], 0);
                 }
             } catch (\Exception $e) {
+            }
+            if (true !== $e && [] !== $e) {
+                $message = 'Failed to save the new namespace'.($e instanceof \Exception ? ': '.$e->getMessage() : '.');
+                CacheItem::log($this->logger, $message, ['exception' => $e instanceof \Exception ? $e : null]);
             }
         }
 
@@ -303,5 +311,10 @@ trait AbstractTrait
     public static function handleUnserializeCallback($class)
     {
         throw new \DomainException('Class not found: '.$class);
+    }
+
+    private static function formatNamespaceVersion(int $value): string
+    {
+        return strtr(substr_replace(base64_encode(pack('V', $value)), static::NS_SEPARATOR, 5), '/', '_');
     }
 }

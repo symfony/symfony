@@ -30,6 +30,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     protected $image4By3;
     protected $imageCorrupted;
     protected $notAnImage;
+    protected $imageSvg;
+    protected $imageSvgLandscape;
+    protected $imageSvgPortrait;
 
     protected function createValidator()
     {
@@ -47,6 +50,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->image16By9 = __DIR__.'/Fixtures/test_16by9.gif';
         $this->imageCorrupted = __DIR__.'/Fixtures/test_corrupted.gif';
         $this->notAnImage = __DIR__.'/Fixtures/ccc.txt';
+        $this->imageSvg = __DIR__.'/Fixtures/test_svg.svg';
+        $this->imageSvgLandscape = __DIR__.'/Fixtures/test_svg_landscape.svg';
+        $this->imageSvgPortrait = __DIR__.'/Fixtures/test_svg_portrait.svg';
     }
 
     public function testNullIsValid()
@@ -533,6 +539,62 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ types }}', '"image/*"')
             ->setParameter('{{ name }}', '"ccc.txt"')
             ->setCode(Image::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testSvgSize()
+    {
+        $constraint = new Image([
+            'minWidth' => 1,
+            'maxWidth' => 2,
+            'minHeight' => 1,
+            'maxHeight' => 2,
+        ]);
+
+        $this->validator->validate($this->imageSvg, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider provideAllowSquareConstraints
+     */
+    public function testSquareNotAllowedOnSvg(Image $constraint)
+    {
+        $this->validator->validate($this->imageSvg, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ width }}', 1)
+            ->setParameter('{{ height }}', 1)
+            ->setCode(Image::SQUARE_NOT_ALLOWED_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider provideAllowLandscapeConstraints
+     */
+    public function testLandscapeNotAllowedOnSvg(Image $constraint)
+    {
+        $this->validator->validate($this->imageSvgLandscape, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ width }}', 2)
+            ->setParameter('{{ height }}', 1)
+            ->setCode(Image::LANDSCAPE_NOT_ALLOWED_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider provideAllowPortraitConstraints
+     */
+    public function testPortraitNotAllowedOnSvg(Image $constraint)
+    {
+        $this->validator->validate($this->imageSvgPortrait, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ width }}', 1)
+            ->setParameter('{{ height }}', 2)
+            ->setCode(Image::PORTRAIT_NOT_ALLOWED_ERROR)
             ->assertRaised();
     }
 

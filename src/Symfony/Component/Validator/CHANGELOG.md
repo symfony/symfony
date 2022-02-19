@@ -3,7 +3,8 @@ CHANGELOG
 
 6.1
 ---
-
+ 
+ * Support `SVGs` when validating image dimensions
  * Deprecate `Constraint::$errorNames`, use `Constraint::ERROR_NAMES` instead
 
 6.0

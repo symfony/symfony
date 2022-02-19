@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\HttpFoundation\File\File as FileObject;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -53,7 +55,18 @@ class ImageValidator extends FileValidator
             return;
         }
 
-        $size = @getimagesize($value);
+        if ($this->isSvg($value)) {
+            $size = $this->getSvgSize($value);
+            if (null === $size) {
+                $this->context->buildViolation($constraint->corruptedMessage)
+                    ->setCode(Image::CORRUPTED_IMAGE_ERROR)
+                    ->addViolation();
+
+                return;
+            }
+        } else {
+            $size = @getimagesize($value);
+        }
 
         if (empty($size) || (0 === $size[0]) || (0 === $size[1])) {
             $this->context->buildViolation($constraint->sizeNotDetectedMessage)
@@ -233,5 +246,47 @@ class ImageValidator extends FileValidator
 
             imagedestroy($resource);
         }
+    }
+
+    /**
+     * Check whether a value is an SVG image
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     * <b>TRUE</b> if <i>value</i> is an SVG, <b>FALSE</b> if it's not, or if we can't detect its MimeType;
+     */
+    private function isSvg(mixed $value)
+    {
+        if ($value instanceof FileObject) {
+            $mime = $value->getMimeType();
+        } elseif (class_exists(MimeTypes::class)) {
+            $mime = MimeTypes::getDefault()->guessMimeType($value);
+        } elseif (!class_exists(FileObject::class)) {
+            return false;
+        } else {
+            $mime = (new FileObject($value))->getMimeType();
+        }
+
+        return 'image/svg+xml' === $mime;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return array|null
+     * <b>array</b> contains the width and height of the image
+     * <b>null</b> if the XML is corrupted
+     */
+    private function getSvgSize(mixed $value)
+    {
+        if (false === $xmlValue = simplexml_load_file($value)) {
+            return null;
+        }
+        $svgAttributes = $xmlValue->attributes();
+        $width = intval($svgAttributes->width);
+        $height = intval($svgAttributes->height);
+
+        return [$width, $height];
     }
 }

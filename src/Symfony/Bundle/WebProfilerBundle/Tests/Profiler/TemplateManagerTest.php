@@ -75,24 +75,20 @@ class TemplateManagerTest extends TestCase
 
     public function profilerHasCallback($panel)
     {
-        switch ($panel) {
-            case 'foo':
-            case 'bar':
-                return true;
-            default:
-                return false;
-        }
+        return match ($panel) {
+            'foo',
+            'bar' => true,
+            default => false,
+        };
     }
 
     public function profileHasCollectorCallback($panel)
     {
-        switch ($panel) {
-            case 'foo':
-            case 'baz':
-                return true;
-            default:
-                return false;
-        }
+        return match ($panel) {
+            'foo',
+            'baz' => true,
+            default => false,
+        };
     }
 
     protected function mockTwigEnvironment()
@@ -120,12 +116,10 @@ class ProfileDummy extends Profile
 
     public function hasCollector(string $name): bool
     {
-        switch ($name) {
-            case 'foo':
-            case 'bar':
-                return true;
-            default:
-                return false;
-        }
+        return match ($name) {
+            'foo',
+            'bar' => true,
+            default => false,
+        };
     }
 }

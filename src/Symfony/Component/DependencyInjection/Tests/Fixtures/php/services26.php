@@ -104,13 +104,13 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'bar': $value = $this->getEnv('FOO'); break;
-            case 'baz': $value = $this->getEnv('int:Baz'); break;
-            case 'json': $value = $this->getEnv('json:file:json_file'); break;
-            case 'db_dsn': $value = $this->getEnv('resolve:DB'); break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
+        $value = match ($name) {
+            'bar' => $this->getEnv('FOO'),
+            'baz' => $this->getEnv('int:Baz'),
+            'json' => $this->getEnv('json:file:json_file'),
+            'db_dsn' => $this->getEnv('resolve:DB'),
+            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+        };
         $this->loadedDynamicParameters[$name] = true;
 
         return $this->dynamicParameters[$name] = $value;

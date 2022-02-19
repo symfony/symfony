@@ -77,10 +77,10 @@ class Symfony_DI_PhpDumper_Test_CsvParameters extends Container
 
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'hello': $value = $this->getEnv('csv:foo'); break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
+        $value = match ($name) {
+            'hello' => $this->getEnv('csv:foo'),
+            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+        };
         $this->loadedDynamicParameters[$name] = true;
 
         return $this->dynamicParameters[$name] = $value;

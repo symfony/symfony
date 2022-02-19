@@ -369,13 +369,13 @@ trait HttpClientTrait
     private static function normalizePeerFingerprint(mixed $fingerprint): array
     {
         if (\is_string($fingerprint)) {
-            switch (\strlen($fingerprint = str_replace(':', '', $fingerprint))) {
-                case 32: $fingerprint = ['md5' => $fingerprint]; break;
-                case 40: $fingerprint = ['sha1' => $fingerprint]; break;
-                case 44: $fingerprint = ['pin-sha256' => [$fingerprint]]; break;
-                case 64: $fingerprint = ['sha256' => $fingerprint]; break;
-                default: throw new InvalidArgumentException(sprintf('Cannot auto-detect fingerprint algorithm for "%s".', $fingerprint));
-            }
+            $fingerprint = match (\strlen($fingerprint = str_replace(':', '', $fingerprint))) {
+                32 => ['md5' => $fingerprint],
+                40 => ['sha1' => $fingerprint],
+                44 => ['pin-sha256' => [$fingerprint]],
+                64 => ['sha256' => $fingerprint],
+                default => throw new InvalidArgumentException(sprintf('Cannot auto-detect fingerprint algorithm for "%s".', $fingerprint)),
+            };
         } elseif (\is_array($fingerprint)) {
             foreach ($fingerprint as $algo => $hash) {
                 $fingerprint[$algo] = 'pin-sha256' === $algo ? (array) $hash : str_replace(':', '', $hash);

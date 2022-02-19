@@ -192,17 +192,12 @@ class NotificationEmail extends TemplatedEmail
 
     private function determinePriority(string $importance): int
     {
-        switch ($importance) {
-            case self::IMPORTANCE_URGENT:
-                return self::PRIORITY_HIGHEST;
-            case self::IMPORTANCE_HIGH:
-                return self::PRIORITY_HIGH;
-            case self::IMPORTANCE_MEDIUM:
-                return self::PRIORITY_NORMAL;
-            case self::IMPORTANCE_LOW:
-            default:
-                return self::PRIORITY_LOW;
-        }
+        return match ($importance) {
+            self::IMPORTANCE_URGENT => self::PRIORITY_HIGHEST,
+            self::IMPORTANCE_HIGH => self::PRIORITY_HIGH,
+            self::IMPORTANCE_MEDIUM => self::PRIORITY_NORMAL,
+            default => self::PRIORITY_LOW,
+        };
     }
 
     private function getExceptionAsString(\Throwable|FlattenException $exception): string

@@ -1257,14 +1257,14 @@ class PhpDumperTest extends TestCase
 %A
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'unit_enum': $value = \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR; break;
-            case 'enum_array': $value = [
+        $value = match ($name) {
+            'unit_enum' => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
+            'enum_array' => [
                 0 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
                 1 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::FOO,
-            ]; break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
+            ],
+            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+        };
 %A
 PHP
             , $dumpedContainer

@@ -174,18 +174,14 @@ class Serializer implements SerializerInterface
 
     private function getMimeTypeForFormat(): ?string
     {
-        switch ($this->format) {
-            case 'json':
-                return 'application/json';
-            case 'xml':
-                return 'application/xml';
-            case 'yml':
-            case 'yaml':
-                return 'application/x-yaml';
-            case 'csv':
-                return 'text/csv';
-        }
+        return match ($this->format) {
+            'json' => 'application/json',
+            'xml' => 'application/xml',
+            'yml',
+            'yaml' => 'application/x-yaml',
+            'csv' => 'text/csv',
+            default => null,
+        };
 
-        return null;
     }
 }

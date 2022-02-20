@@ -163,6 +163,7 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -182,6 +183,9 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
+use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
@@ -510,7 +514,7 @@ class FrameworkExtension extends Extension
             '**\\Entity\\',
 
             // Added explicitly so that we don't rely on the class map being dumped to make it work
-            'Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController',
+            AbstractController::class,
         ]);
 
         if (ContainerBuilder::willBeAvailable('symfony/mime', MimeTypes::class, ['symfony/framework-bundle'])) {
@@ -1731,7 +1735,7 @@ class FrameworkExtension extends Extension
         $serializerLoaders = [];
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
             $annotationLoader = new Definition(
-                'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
+                AnnotationLoader::class,
                 [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)]
             );
             $annotationLoader->setPublic(false);
@@ -1740,7 +1744,7 @@ class FrameworkExtension extends Extension
         }
 
         $fileRecorder = function ($extension, $path) use (&$serializerLoaders) {
-            $definition = new Definition(\in_array($extension, ['yaml', 'yml']) ? 'Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader' : 'Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', [$path]);
+            $definition = new Definition(\in_array($extension, ['yaml', 'yml']) ? YamlFileLoader::class : XmlFileLoader::class, [$path]);
             $definition->setPublic(false);
             $serializerLoaders[] = $definition;
         };
@@ -1813,7 +1817,7 @@ class FrameworkExtension extends Extension
         }
 
         if (ContainerBuilder::willBeAvailable('phpdocumentor/reflection-docblock', DocBlockFactoryInterface::class, ['symfony/framework-bundle', 'symfony/property-info'], true)) {
-            $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
+            $definition = $container->register('property_info.php_doc_extractor', PhpDocExtractor::class);
             $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
             $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
         }

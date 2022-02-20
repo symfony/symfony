@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\Proxy;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
@@ -49,7 +50,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     public function guessType(string $class, string $property): ?TypeGuess
     {
         if (!$ret = $this->getMetadata($class)) {
-            return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TextType', [], Guess::LOW_CONFIDENCE);
+            return new TypeGuess(TextType::class, [], Guess::LOW_CONFIDENCE);
         }
 
         [$metadata, $name] = $ret;
@@ -58,7 +59,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             $multiple = $metadata->isCollectionValuedAssociation($property);
             $mapping = $metadata->getAssociationMapping($property);
 
-            return new TypeGuess('Symfony\Bridge\Doctrine\Form\Type\EntityType', ['em' => $name, 'class' => $mapping['targetEntity'], 'multiple' => $multiple], Guess::HIGH_CONFIDENCE);
+            return new TypeGuess(EntityType::class, ['em' => $name, 'class' => $mapping['targetEntity'], 'multiple' => $multiple], Guess::HIGH_CONFIDENCE);
         }
 
         return match ($metadata->getTypeOfField($property)) {

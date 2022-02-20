@@ -16,7 +16,7 @@ namespace Symfony\Bridge\Doctrine\Middleware\Debug;
  */
 class DebugDataHolder
 {
-    private $data = [];
+    private array $data = [];
 
     public function addQuery(string $connectionName, Query $query): void
     {

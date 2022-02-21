@@ -40,7 +40,6 @@
         "doctrine/annotations": "^1.10.4"
     },
     "conflict": {
-        "symfony/dependency-injection": "<5.4",
         "symfony/framework-bundle": "<5.4",
         "symfony/translation": "<5.4"
     },

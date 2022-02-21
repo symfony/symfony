@@ -19,6 +19,7 @@
         "php": ">=8.0.2",
         "composer-runtime-api": ">=2.1",
         "symfony/config": "^5.4|^6.0",
+        "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/twig-bridge": "^5.4|^6.0",
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4|^6.0",
@@ -28,7 +29,6 @@
     "require-dev": {
         "symfony/asset": "^5.4|^6.0",
         "symfony/stopwatch": "^5.4|^6.0",
-        "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/expression-language": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",
         "symfony/form": "^5.4|^6.0",

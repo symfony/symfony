@@ -585,20 +585,20 @@ final class Path
      * into forward slashes.
      *
      * ```php
-     * $basePath = Path::getLongestCommonBasePath([
+     * $basePath = Path::getLongestCommonBasePath(
      *     '/symfony/css/style.css',
      *     '/symfony/css/..'
-     * ]);
+     * );
      * // => /symfony
      * ```
      *
      * The root is returned if no common base path can be found:
      *
      * ```php
-     * $basePath = Path::getLongestCommonBasePath([
+     * $basePath = Path::getLongestCommonBasePath(
      *     '/symfony/css/style.css',
      *     '/puli/css/..'
-     * ]);
+     * );
      * // => /
      * ```
      *
@@ -606,10 +606,10 @@ final class Path
      * returned.
      *
      * ```php
-     * $basePath = Path::getLongestCommonBasePath([
+     * $basePath = Path::getLongestCommonBasePath(
      *     'C:/symfony/css/style.css',
      *     'D:/symfony/css/..'
-     * ]);
+     * );
      * // => null
      * ```
      */

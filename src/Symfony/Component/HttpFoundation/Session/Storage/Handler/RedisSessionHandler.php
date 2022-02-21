@@ -96,6 +96,7 @@ class RedisSessionHandler extends AbstractSessionHandler
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function close(): bool
     {
         return true;

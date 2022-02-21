@@ -663,4 +663,10 @@ class TimezonesTest extends ResourceBundleTestCase
             return [$country];
         }, Countries::getCountryCodes());
     }
+
+    public function testGetRawOffsetChangeTimeCountry()
+    {
+        $this->assertSame(7200, Timezones::getRawOffset('Europe/Paris', (new \DateTime('2022-07-16 00:00:00+00:00'))->getTimestamp()));
+        $this->assertSame(3600, Timezones::getRawOffset('Europe/Paris', (new \DateTime('2022-02-16 00:00:00+00:00'))->getTimestamp()));
+    }
 }

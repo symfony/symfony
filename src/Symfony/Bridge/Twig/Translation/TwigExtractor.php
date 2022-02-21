@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Translation;
 
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Extractor\AbstractFileExtractor;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
@@ -68,7 +69,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
 
     protected function extractTemplate(string $template, MessageCatalogue $catalogue)
     {
-        $visitor = $this->twig->getExtension('Symfony\Bridge\Twig\Extension\TranslationExtension')->getTranslationNodeVisitor();
+        $visitor = $this->twig->getExtension(TranslationExtension::class)->getTranslationNodeVisitor();
         $visitor->enable();
 
         $this->twig->parse($this->twig->tokenize(new Source($template, '')));

@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
+use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 /**
  * Default implementation of {@link ClassMetadataInterface}.
@@ -453,7 +454,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
             throw new GroupDefinitionException('Defining a group sequence provider is not allowed with a static group sequence.');
         }
 
-        if (!$this->getReflectionClass()->implementsInterface('Symfony\Component\Validator\GroupSequenceProviderInterface')) {
+        if (!$this->getReflectionClass()->implementsInterface(GroupSequenceProviderInterface::class)) {
             throw new GroupDefinitionException(sprintf('Class "%s" must implement GroupSequenceProviderInterface.', $this->name));
         }
 

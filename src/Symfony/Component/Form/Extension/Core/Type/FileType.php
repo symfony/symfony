@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -114,9 +115,9 @@ class FileType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $dataClass = null;
-        if (class_exists(\Symfony\Component\HttpFoundation\File\File::class)) {
+        if (class_exists(File::class)) {
             $dataClass = function (Options $options) {
-                return $options['multiple'] ? null : 'Symfony\Component\HttpFoundation\File\File';
+                return $options['multiple'] ? null : File::class;
             };
         }
 

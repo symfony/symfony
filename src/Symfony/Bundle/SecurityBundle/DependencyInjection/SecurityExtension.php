@@ -30,7 +30,9 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
@@ -43,6 +45,7 @@ use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
@@ -306,7 +309,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // register an autowire alias for the UserCheckerInterface if no custom user checker service is configured
         if (!$customUserChecker) {
-            $container->setAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', new Alias('security.user_checker', false));
+            $container->setAlias(UserCheckerInterface::class, new Alias('security.user_checker', false));
         }
     }
 
@@ -842,7 +845,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         $container
-            ->register($id, 'Symfony\Component\ExpressionLanguage\Expression')
+            ->register($id, Expression::class)
             ->setPublic(false)
             ->addArgument($expression)
         ;
@@ -881,7 +884,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         $container
-            ->register($id, 'Symfony\Component\HttpFoundation\RequestMatcher')
+            ->register($id, RequestMatcher::class)
             ->setPublic(false)
             ->setArguments($arguments)
         ;

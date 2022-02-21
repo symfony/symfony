@@ -10,6 +10,7 @@ CHANGELOG
  * Deprecate `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
  * Deprecate `ContextAwareEncoderInterface`, use `EncoderInterface` instead
  * Deprecate `ContextAwareDecoderInterface`, use `DecoderInterface` instead
+ * Add the ability to only check the first element in `ArrayDenormalizer`
 
 6.0
 ---

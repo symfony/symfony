@@ -111,6 +111,89 @@ class ArrayDenormalizerTest extends TestCase
             )
         );
     }
+
+    public function testSupportsOtherDatatype()
+    {
+        $this->assertFalse(
+            $this->denormalizer->supportsDenormalization(
+                '83fd8e7c-61d4-4318-af88-fb34bd05e31f',
+                __NAMESPACE__.'\Uuid'
+            )
+        );
+
+        $denormalizer2 = new ArrayDenormalizer(true);
+        $denormalizer2->setDenormalizer($this->serializer);
+
+        $this->assertFalse(
+            $denormalizer2->supportsDenormalization(
+                '83fd8e7c-61d4-4318-af88-fb34bd05e31f',
+                __NAMESPACE__.'\Uuid'
+            )
+        );
+    }
+
+    public function testSupportsValidFirstArrayElement()
+    {
+        $denormalizer = new ArrayDenormalizer(true);
+        $denormalizer->setDenormalizer($this->serializer);
+
+        $this->serializer->expects($this->once())
+            ->method('supportsDenormalization')
+            ->with(['foo' => 'one', 'bar' => 'two'], ArrayDummy::class, 'json', [])
+            ->willReturn(true);
+
+        $this->assertTrue(
+            $denormalizer->supportsDenormalization(
+                [
+                    ['foo' => 'one', 'bar' => 'two'],
+                    ['foo' => 'three', 'bar' => 'four'],
+                ],
+                __NAMESPACE__.'\ArrayDummy[]',
+                'json'
+            )
+        );
+    }
+
+    public function testSupportsInValidFirstArrayElement()
+    {
+        $denormalizer = new ArrayDenormalizer(true);
+        $denormalizer->setDenormalizer($this->serializer);
+
+        $this->serializer->expects($this->once())
+            ->method('supportsDenormalization')
+            ->with(['foo' => 'one', 'bar' => 'two'], ArrayDummy::class, 'json', [])
+            ->willReturn(false);
+
+        $this->assertFalse(
+            $denormalizer->supportsDenormalization(
+                [
+                    ['foo' => 'one', 'bar' => 'two'],
+                    ['foo' => 'three', 'bar' => 'four'],
+                ],
+                __NAMESPACE__.'\ArrayDummy[]',
+                'json'
+            )
+        );
+    }
+
+    public function testSupportsNoFirstArrayElement()
+    {
+        $denormalizer = new ArrayDenormalizer(true);
+        $denormalizer->setDenormalizer($this->serializer);
+
+        $this->serializer->expects($this->once())
+            ->method('supportsDenormalization')
+            ->with($this->isNull(), ArrayDummy::class, 'json', [])
+            ->willReturn(true);
+
+        $this->assertTrue(
+            $denormalizer->supportsDenormalization(
+                [],
+                __NAMESPACE__.'\ArrayDummy[]',
+                'json'
+            )
+        );
+    }
 }
 
 class ArrayDummy

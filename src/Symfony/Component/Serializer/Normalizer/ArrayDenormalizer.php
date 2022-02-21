@@ -26,6 +26,10 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
 {
     use DenormalizerAwareTrait;
 
+    public function __construct(private bool $checkFirstElement = false)
+    {
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -69,8 +73,16 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
             throw new BadMethodCallException(sprintf('The nested denormalizer needs to be set to allow "%s()" to be used.', __METHOD__));
         }
 
-        return str_ends_with($type, '[]')
-            && $this->denormalizer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
+        if (!str_ends_with($type, '[]')) {
+            return false;
+        }
+
+        if ($this->checkFirstElement) {
+            $data = \is_array($data) ? $data : [];
+            $data = 0 === \count($data) ? null : reset($data);
+        }
+
+        return $this->denormalizer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
     }
 
     /**

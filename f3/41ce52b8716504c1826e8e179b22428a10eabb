@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stijnhau at 2022-02-10T14:58:25Z
+
+This shouldn't be added.
+I prefer seeing all of them at once.
+Maybe add an option to define the number in some sort of configration.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-13T15:59:33Z
+
+@stijnhau what do you mean by "seeing all of them at once"? All deprecation are still displayed after this change. The only thing that is limited is the list of triggering test cases. And I don't think this list is super useful past the first few ones. The reason why I think so is because of the iterative nature of fixing deprecations: you start by the most triggering places, and you iterate.

@@ -331,9 +331,14 @@ class DeprecationErrorHandler
 
                     $countsByCaller = $notice->getCountsByCaller();
                     arsort($countsByCaller);
+                    $limit = 5;
 
                     foreach ($countsByCaller as $method => $count) {
                         if ('count' !== $method) {
+                            if (!$limit--) {
+                                fwrite($handle, "    ...\n");
+                                break;
+                            }
                             fwrite($handle, sprintf("    %dx in %s\n", $count, preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method)));
                         }
                     }

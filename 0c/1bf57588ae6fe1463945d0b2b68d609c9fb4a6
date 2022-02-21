@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-02-02T06:09:06Z
+
+Hey!
+
+I think @mtarld has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-02-02T07:37:19Z
+
+If I get it right, the "collaborating services" will depend on the `profiler` service, which is not needed currently. Don't you get a circular depencency (`profiler -> collector -> collaborating service -> profiler`) ?
+
+Alternative proposition : propagate status to the collectors when `Profiler::disable()` is called.
+
+---------------------------------------------------------------------------
+
+by Bilge at 2022-02-02T07:51:52Z
+
+This has nothing to do with collectors.
+
+On Wed, 2 Feb 2022, 07:37 Jérôme Tamarelle, ***@***.***>
+wrote:
+
+> If I get it right, the "collaborating services" will depends on the
+> profiler service, which is not needed currently. You don't get a circular
+> depencency (profiler -> collector -> collaborating service -> profiler) ?
+>
+> Alternative proposition : propagate status to the collectors when
+> Profiler::disable() is called.
+>
+> —
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/45265#issuecomment-1027661424>,
+> or unsubscribe
+> <https://github.com/notifications/unsubscribe-auth/AADS4YQOR6R6E7HS77YZR6LUZDNLXANCNFSM5NIVTLCA>
+> .
+> Triage notifications on the go with GitHub Mobile for iOS
+> <https://apps.apple.com/app/apple-store/id1477376905?ct=notification-email&mt=8&pt=524675>
+> or Android
+> <https://play.google.com/store/apps/details?id=com.github.android&referrer=utm_campaign%3Dnotification-email%26utm_medium%3Demail%26utm_source%3Dgithub>.
+>
+> You are receiving this because you authored the thread.Message ID:
+> ***@***.***>
+>
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-02-02T10:03:23Z
+
+> This has nothing to do with collectors.
+
+Well, could you describe your use-case a little more. What is a "collaborating service that collect profiling data on behalf of those collectors" ?
+
+---------------------------------------------------------------------------
+
+by Bilge at 2022-02-02T10:10:16Z
+
+Sure. I wrote a database profiler similar to the one you know in Doctrine, but for the [Amp](https://amphp.org/) drivers instead (see also: https://github.com/doctrine/DoctrineBundle/issues/1464). The regular connection pool is decorated with a profiled pool; this is the collaborating service. This service is injected into the collector. When the profiler is disabled the collector will not be called, but the pool is still decorated and still collects data anyway, since it is unaware of the status of the profiler.
+
+---------------------------------------------------------------------------
+
+by SHTIKOV at 2022-02-07T06:35:59Z
+
+@fabpot can you check my [PR #44787](https://github.com/symfony/symfony/pull/44787) ?
+
+---------------------------------------------------------------------------
+
+by Bilge at 2022-02-21T16:10:46Z
+
+Can this be included in 5.4 somehow?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-02-21T16:21:39Z
+
+No, new features are always merged on the upcoming branch.

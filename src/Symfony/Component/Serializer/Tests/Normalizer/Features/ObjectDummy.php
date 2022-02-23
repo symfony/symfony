@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
+#[\AllowDynamicProperties]
 class ObjectDummy
 {
     protected $foo;

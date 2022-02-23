@@ -4,6 +4,7 @@ namespace Bar;
 
 class FooClass
 {
+    public $qux;
     public $foo;
     public $moo;
 

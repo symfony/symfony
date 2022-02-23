@@ -194,6 +194,7 @@ EOPHP;
     }
 }
 
+#[\AllowDynamicProperties]
 final class DummyClass implements DummyInterface, SunnyInterface
 {
     private $ref;

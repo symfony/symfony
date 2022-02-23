@@ -175,7 +175,7 @@ EODUMP;
   <span class=sf-dump-meta>trace</span>: {<samp>
     <span class=sf-dump-meta title="%sExceptionCasterTest.php
 Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span>Tests%eCaster%eExceptionCasterTest.php</span>:<span class=sf-dump-num>%d</span>
-     &hellip;%d
+     &#8230;%d
   </samp>}
 </samp>}
 </bar>

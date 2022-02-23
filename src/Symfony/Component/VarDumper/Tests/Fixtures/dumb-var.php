@@ -3,6 +3,7 @@
 namespace Symfony\Component\VarDumper\Tests\Fixture;
 
 if (!class_exists(\Symfony\Component\VarDumper\Tests\Fixture\DumbFoo::class)) {
+    #[\AllowDynamicProperties]
     class DumbFoo
     {
         public $foo = 'foo';

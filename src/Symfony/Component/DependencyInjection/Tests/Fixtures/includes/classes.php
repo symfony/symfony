@@ -56,6 +56,7 @@ class BazClass
 
 class BarUserClass
 {
+    public $foo;
     public $bar;
 
     public function __construct(BarClass $bar)

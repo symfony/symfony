@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-08-10T12:47:00Z
+
+Hey!
+
+I think @przemyslaw-bogusz has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-11-28T14:27:21Z
+
+Shouldn't this be covered by some tests?
+/cc @xabbuh available for a review please? :pray:
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-12-31T10:34:44Z
+
+I added a test. I reverted the assertEquals() for objects because it's in the case where you mutate the validated value in the validator (for example, the value in the validator is a string, you construct a \DateTime from it and you validate the \DateTime instance). I guess that could be considered as a bad practice so I decided I don't care for now.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-02-23T13:19:10Z
+
+@fabpot @xabbuh @nicolas-grekas I'm attempting another ping on this one because it's a real bug and I would like it to be fixed :sweat_smile:

@@ -78,6 +78,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertFalse($this->loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
         $this->assertTrue($this->loader->supports($fixturesDir, 'annotation'), '->supports() checks the resource type if specified');
+        $this->assertTrue($this->loader->supports($fixturesDir, 'attribute'), '->supports() checks the resource type if specified');
         $this->assertFalse($this->loader->supports($fixturesDir, 'foo'), '->supports() checks the resource type if specified');
     }
 

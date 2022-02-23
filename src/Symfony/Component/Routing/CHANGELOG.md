@@ -9,6 +9,7 @@ CHANGELOG
  * Support the `attribute` type (alias of `annotation`) in annotation loaders
  * Already encoded slashes are not decoded nor double-encoded anymore when generating URLs (query parameters)
  * Add `EnumRequirement` to help generate route requirements from a `\BackedEnum`
+ * Add `Requirement`, a collection of universal regular-expression constants to use as route parameter requirements
 
 5.3
 ---

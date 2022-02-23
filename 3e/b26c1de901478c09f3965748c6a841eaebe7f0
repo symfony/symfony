@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-12-14T18:08:51Z
+
+No strong feelings here. Please note that selecting `annotation` currently enables support for attributes as well. Adding an alias would do the same thing, meaning that setting `attribute` would also enable Doctrine-style annotations. Not sure if that makes it any less confusing for newcomers.
+
+To explain why things currently are as they are: `annotation` simply means that the controller classes are annotated with the route configuration. That setting does not say _how_ they're annotated. Our reader supports two possible ways, Doctrine-style annotations and PHP's native attributes. I realize that this might cause confusion because for many PHP developers, the word "annotations" has become a synonym for the Doctrine Annotations library.
+
+The alternative would have been to create a separate reader for attributes. This is kind-of what Doctrine ORM did.
+
+I ultimately decided against that because I wanted people to be able to mix and match both annotation types, to allow an iterative transition from Doctrine-style annotations to attributes. Simply registering both readers on the same controllers would have made that iterative approach a bit difficult because the order in which routes are registered could matter under certain circumstances.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2022-02-22T14:08:52Z
+
+@nicolas-grekas or anybody else, what do you think of this one? Looks like we are stuck with a +1 and a +0 :sweat_smile:

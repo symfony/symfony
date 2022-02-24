@@ -199,11 +199,7 @@ trait HttpClientTrait
         // Option "query" is never inherited from defaults
         $options['query'] = $options['query'] ?? [];
 
-        foreach ($defaultOptions as $k => $v) {
-            if ('normalized_headers' !== $k && !isset($options[$k])) {
-                $options[$k] = $v;
-            }
-        }
+        $options += $defaultOptions;
 
         if (isset($defaultOptions['extra'])) {
             $options['extra'] += $defaultOptions['extra'];

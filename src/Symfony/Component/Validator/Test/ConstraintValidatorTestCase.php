@@ -467,6 +467,17 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         $this->context = $context;
     }
 
+    public function __destruct()
+    {
+        if ($this->expectedAtPath) {
+            throw new ExpectationFailedException('Some expected validation calls for paths were not done.');
+        }
+
+        if ($this->expectedValidate) {
+            throw new ExpectationFailedException('Some expected validation calls for values were not done.');
+        }
+    }
+
     public function atPath(string $path): static
     {
         throw new \BadMethodCallException();
@@ -483,7 +494,10 @@ class AssertingContextualValidator implements ContextualValidatorInterface
             throw new ExpectationFailedException(sprintf('Validation for property path "%s" was not expected.', $path));
         }
 
-        Assert::assertSame($this->expectedAtPath[$this->atPathCalls], $path);
+        $expectedPath = $this->expectedAtPath[$this->atPathCalls];
+        unset($this->expectedAtPath[$this->atPathCalls]);
+
+        Assert::assertSame($expectedPath, $path);
 
         return $this;
     }
@@ -505,6 +519,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         }
 
         [$expectedValue, $expectedGroup, $expectedConstraints, $violation] = $this->expectedValidate[$this->validateCalls];
+        unset($this->expectedValidate[$this->validateCalls]);
 
         Assert::assertSame($expectedValue, $value);
         $expectedConstraints($constraints);

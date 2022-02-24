@@ -185,6 +185,9 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     public function provideMaxSizeNotExceededTests()
     {
         return [
+            // 0 has no effect
+            [100, 0],
+
             // limit in bytes
             [1000, 1000],
             [1000000, 1000000],

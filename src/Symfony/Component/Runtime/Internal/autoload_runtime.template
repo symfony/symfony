@@ -18,13 +18,13 @@ if (!is_object($app)) {
     throw new TypeError(sprintf('Invalid return value: callable object expected, "%s" returned from "%s".', get_debug_type($app), $_SERVER['SCRIPT_FILENAME']));
 }
 
-$options = $_SERVER['APP_RUNTIME_OPTIONS'] ?? $_ENV['APP_RUNTIME_OPTIONS'] ?? [];
-if (!is_array($options) && is_array($json = json_decode($options, true))) {
-    $options = $json;
+if (is_string($options = $_SERVER['APP_RUNTIME_OPTIONS'] ?? $_ENV['APP_RUNTIME_OPTIONS'] ?? [])) {
+    $options = json_decode($options, true, JSON_THROW_ON_ERROR);
 }
 
+$options += %runtime_options%;
 $runtime = $_SERVER['APP_RUNTIME'] ?? $_ENV['APP_RUNTIME'] ?? %runtime_class%;
-$runtime = new $runtime($options + %runtime_options%);
+$runtime = new $runtime($options);
 
 [$app, $args] = $runtime
     ->getResolver($app)

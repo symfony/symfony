@@ -44,7 +44,7 @@ index 697e34cb77..9a1e4c5618 100644
       */
 -    abstract protected function doRequest(object $request);
 +    abstract protected function doRequest(object $request): object;
- 
+
      /**
 @@ -460,5 +460,5 @@ abstract class AbstractBrowser
       * @return object
@@ -122,21 +122,21 @@ index b94a4378f5..db502e12a7 100644
       */
 -    public function load(mixed $resource, string $type = null);
 +    public function load(mixed $resource, string $type = null): mixed;
- 
+
      /**
 @@ -35,5 +35,5 @@ interface LoaderInterface
       * @return bool
       */
 -    public function supports(mixed $resource, string $type = null);
 +    public function supports(mixed $resource, string $type = null): bool;
- 
+
      /**
 @@ -42,5 +42,5 @@ interface LoaderInterface
       * @return LoaderResolverInterface
       */
 -    public function getResolver();
 +    public function getResolver(): LoaderResolverInterface;
- 
+
      /**
 diff --git a/src/Symfony/Component/Config/ResourceCheckerInterface.php b/src/Symfony/Component/Config/ResourceCheckerInterface.php
 index 6b1c6c5fbe..bb80ed461e 100644
@@ -147,7 +147,7 @@ index 6b1c6c5fbe..bb80ed461e 100644
       */
 -    public function supports(ResourceInterface $metadata);
 +    public function supports(ResourceInterface $metadata): bool;
- 
+
      /**
 @@ -42,4 +42,4 @@ interface ResourceCheckerInterface
       * @return bool
@@ -226,6 +226,30 @@ index 0bd3426c07..b38caf989e 100644
 +    protected function execute(InputInterface $input, OutputInterface $output): int
      {
          throw new LogicException('You must override the execute() method in the concrete command class.');
+diff --git a/src/Symfony/Component/Console/Formatter/OutputFormatter.php b/src/Symfony/Component/Console/Formatter/OutputFormatter.php
+index 5f75bf1..75f95fb 100644
+--- a/src/Symfony/Component/Console/Formatter/OutputFormatter.php
++++ b/src/Symfony/Component/Console/Formatter/OutputFormatter.php
+@@ -136,7 +136,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
+     /**
+      * {@inheritdoc}
+      */
+-    public function formatAndWrap(?string $message, int $width)
++    public function formatAndWrap(?string $message, int $width): string
+     {
+         $offset = 0;
+         $output = '';
+diff --git a/src/Symfony/Component/Console/Formatter/WrappableOutputFormatterInterface.php b/src/Symfony/Component/Console/Formatter/WrappableOutputFormatterInterface.php
+index 746cd27..52c6142 100644
+--- a/src/Symfony/Component/Console/Formatter/WrappableOutputFormatterInterface.php
++++ b/src/Symfony/Component/Console/Formatter/WrappableOutputFormatterInterface.php
+@@ -23,5 +23,5 @@ interface WrappableOutputFormatterInterface extends OutputFormatterInterface
+      *
+      * @return string
+      */
+-    public function formatAndWrap(?string $message, int $width);
++    public function formatAndWrap(?string $message, int $width): string;
+ }
 diff --git a/src/Symfony/Component/Console/Helper/HelperInterface.php b/src/Symfony/Component/Console/Helper/HelperInterface.php
 index 1d2b7bfb84..cb1f66152d 100644
 --- a/src/Symfony/Component/Console/Helper/HelperInterface.php
@@ -245,21 +269,21 @@ index 3af991a76f..742e2508f3 100644
       */
 -    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false);
 +    public function getParameterOption(string|array $values, string|bool|int|float|array|null $default = false, bool $onlyParams = false): mixed;
- 
+
      /**
 @@ -87,5 +87,5 @@ interface InputInterface
       * @throws InvalidArgumentException When argument given doesn't exist
       */
 -    public function getArgument(string $name);
 +    public function getArgument(string $name): mixed;
- 
+
      /**
 @@ -115,5 +115,5 @@ interface InputInterface
       * @throws InvalidArgumentException When option given doesn't exist
       */
 -    public function getOption(string $name);
 +    public function getOption(string $name): mixed;
- 
+
      /**
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 index c2824f4578..032f5c2318 100644
@@ -292,7 +316,7 @@ index aa5d6b317e..31ffbca4ef 100644
       */
 -    public function getParameter(string $name);
 +    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null;
- 
+
      public function hasParameter(string $name): bool;
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php
 index a42967f4da..4e86e16f9d 100644
@@ -338,14 +362,14 @@ index f2373ed5ea..1eec21a938 100644
       */
 -    public function getNamespace();
 +    public function getNamespace(): string;
- 
+
      /**
 @@ -40,5 +40,5 @@ interface ExtensionInterface
       * @return string|false
       */
 -    public function getXsdValidationBasePath();
 +    public function getXsdValidationBasePath(): string|false;
- 
+
      /**
 @@ -49,4 +49,4 @@ interface ExtensionInterface
       * @return string
@@ -410,7 +434,7 @@ index 3dbe0a8420..b4179c785c 100644
       */
 -    abstract protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName);
 +    abstract protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool;
- 
+
      /**
 diff --git a/src/Symfony/Component/Form/AbstractType.php b/src/Symfony/Component/Form/AbstractType.php
 index 3325b8bc27..1cc22a1dab 100644
@@ -439,7 +463,7 @@ index 8495905e17..1e53be60be 100644
       */
 -    public function transform(mixed $value);
 +    public function transform(mixed $value): mixed;
- 
+
      /**
 @@ -89,4 +89,4 @@ interface DataTransformerInterface
       * @throws TransformationFailedException when the transformation fails
@@ -466,21 +490,21 @@ index 61e2c5f80d..4d6b335474 100644
       */
 -    public function guessType(string $class, string $property);
 +    public function guessType(string $class, string $property): ?Guess\TypeGuess;
- 
+
      /**
 @@ -29,5 +29,5 @@ interface FormTypeGuesserInterface
       * @return Guess\ValueGuess|null
       */
 -    public function guessRequired(string $class, string $property);
 +    public function guessRequired(string $class, string $property): ?Guess\ValueGuess;
- 
+
      /**
 @@ -36,5 +36,5 @@ interface FormTypeGuesserInterface
       * @return Guess\ValueGuess|null
       */
 -    public function guessMaxLength(string $class, string $property);
 +    public function guessMaxLength(string $class, string $property): ?Guess\ValueGuess;
- 
+
      /**
 @@ -50,4 +50,4 @@ interface FormTypeGuesserInterface
       * @return Guess\ValueGuess|null
@@ -497,7 +521,7 @@ index 2b9066a511..1c9e9f5a26 100644
       */
 -    public function getBlockPrefix();
 +    public function getBlockPrefix(): string;
- 
+
      /**
 @@ -84,4 +84,4 @@ interface FormTypeInterface
       * @return string|null
@@ -584,14 +608,14 @@ index 19ff0db181..f0f4a5829f 100644
       */
 -    public function getLogs(Request $request = null);
 +    public function getLogs(Request $request = null): array;
- 
+
      /**
 @@ -37,5 +37,5 @@ interface DebugLoggerInterface
       * @return int
       */
 -    public function countErrors(Request $request = null);
 +    public function countErrors(Request $request = null): int;
- 
+
      /**
 diff --git a/src/Symfony/Component/Lock/LockFactory.php b/src/Symfony/Component/Lock/LockFactory.php
 index 125b6eae50..ac327e8981 100644
@@ -659,35 +683,35 @@ index fbb37d9f94..522e0487a9 100644
       */
 -    public function getLength();
 +    public function getLength(): int;
- 
+
      /**
 @@ -43,5 +43,5 @@ interface PropertyPathInterface extends \Traversable
       * @return self|null
       */
 -    public function getParent();
 +    public function getParent(): ?\Symfony\Component\PropertyAccess\PropertyPathInterface;
- 
+
      /**
 @@ -50,5 +50,5 @@ interface PropertyPathInterface extends \Traversable
       * @return list<string>
       */
 -    public function getElements();
 +    public function getElements(): array;
- 
+
      /**
 @@ -61,5 +61,5 @@ interface PropertyPathInterface extends \Traversable
       * @throws Exception\OutOfBoundsException If the offset is invalid
       */
 -    public function getElement(int $index);
 +    public function getElement(int $index): string;
- 
+
      /**
 @@ -72,5 +72,5 @@ interface PropertyPathInterface extends \Traversable
       * @throws Exception\OutOfBoundsException If the offset is invalid
       */
 -    public function isProperty(int $index);
 +    public function isProperty(int $index): bool;
- 
+
      /**
 @@ -83,4 +83,4 @@ interface PropertyPathInterface extends \Traversable
       * @throws Exception\OutOfBoundsException If the offset is invalid
@@ -715,7 +739,7 @@ index f9ee787130..61f8b6d5be 100644
       */
 -    public function isReadable(string $class, string $property, array $context = []);
 +    public function isReadable(string $class, string $property, array $context = []): ?bool;
- 
+
      /**
 @@ -31,4 +31,4 @@ interface PropertyAccessExtractorInterface
       * @return bool|null
@@ -784,7 +808,7 @@ index eda4730004..00cfc5b9c7 100644
       */
 -    public function loadTokenBySeries(string $series);
 +    public function loadTokenBySeries(string $series): PersistentTokenInterface;
- 
+
      /**
 diff --git a/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php b/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
 index 7e401c3ff3..6b446ff376 100644
@@ -816,14 +840,14 @@ index ec90d413fa..9f1401aa91 100644
       */
 -    public function refreshUser(UserInterface $user);
 +    public function refreshUser(UserInterface $user): UserInterface;
- 
+
      /**
 @@ -52,5 +52,5 @@ interface UserProviderInterface
       * @return bool
       */
 -    public function supportsClass(string $class);
 +    public function supportsClass(string $class): bool;
- 
+
      /**
 diff --git a/src/Symfony/Component/Security/Http/EntryPoint/AuthenticationEntryPointInterface.php b/src/Symfony/Component/Security/Http/EntryPoint/AuthenticationEntryPointInterface.php
 index 91271d14a3..100c2fb549 100644
@@ -865,7 +889,7 @@ index f38069e471..0966eb3e89 100644
       */
 -    public function decode(string $data, string $format, array $context = []);
 +    public function decode(string $data, string $format, array $context = []): mixed;
- 
+
      /**
 @@ -45,4 +45,4 @@ interface DecoderInterface
       * @return bool
@@ -928,14 +952,14 @@ index a8943113c4..2983dabd0f 100644
       */
 -    abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
 +    abstract protected function extractAttributes(object $object, string $format = null, array $context = []): array;
- 
+
      /**
 @@ -348,5 +348,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @return mixed
       */
 -    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 +    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed;
- 
+
      /**
 @@ -355,5 +355,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
       * @param array $context
@@ -960,7 +984,7 @@ index 1c708738a1..3b6c9d5056 100644
       */
 -    public function denormalize(mixed $data, string $type, string $format = null, array $context = []);
 +    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed;
- 
+
      /**
 @@ -57,4 +57,4 @@ interface DenormalizerInterface
       * @return bool
@@ -977,7 +1001,7 @@ index 741f19e50b..acf3be931b 100644
       */
 -    public function normalize(mixed $object, string $format = null, array $context = []);
 +    public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null;
- 
+
      /**
 @@ -48,4 +48,4 @@ interface NormalizerInterface
       * @return bool
@@ -994,7 +1018,7 @@ index 5dade65db5..db0d0a00ea 100644
       */
 -    public function getName();
 +    public function getName(): string;
- 
+
      /**
 diff --git a/src/Symfony/Component/Translation/Extractor/AbstractFileExtractor.php b/src/Symfony/Component/Translation/Extractor/AbstractFileExtractor.php
 index 4c088b94f9..86107a636d 100644
@@ -1005,7 +1029,7 @@ index 4c088b94f9..86107a636d 100644
       */
 -    abstract protected function canBeExtracted(string $file);
 +    abstract protected function canBeExtracted(string $file): bool;
- 
+
      /**
       * @return iterable
       */

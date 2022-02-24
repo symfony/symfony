@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2021-12-17T05:46:57Z
+
+Nice, I was just thinking of making something like this 👍 I am just trying to figure out now how is the best way to make route parameter requirements based on Uid
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-17T09:06:12Z
+
+> I am just trying to figure out now how is the best way to make route parameter requirements based on Uid
+
+That's a good question actually. If we figure out how to make this, we might be able to remove the proposed `AsUid` attribute and move the check to the router level.
+
+Any idea how to do this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-17T09:24:32Z
+
+Now I'm wondering: what about removing the "format" configuration setting and attribute, and instead accept only the canonical representation?
+Eg here, if one prefers representing their UUID as base58, shouldn't they create a custom class that extends Uuid?
+Adding config options is increasing complexity at all levels, we'd better be sure that this is needed before doing it.
+
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2021-12-17T09:37:09Z
+
+> Any idea how to do this?
+
+I haven't yet looked into the router, but I am wondering is there some kind of parser level for parameters before generating URL matchers? If so we could add some extension in that point which would mark that param as UID
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-12-17T09:49:40Z
+
+We could define a `uid_base58` parameter and use `{id<%uid_base58%>}`. Or we could improve the routing configuration to add support for predefined requirements (aka aliased regexps).
+
+If this looks like a useful path forward, we could then simplify this PR and make the resolver accept any format.
+
+I think that's my current preference (and we could define these `uid_*` parameters or do this improvement of the routing system in a separate PR.)
+
+---------------------------------------------------------------------------
+
+by aurimasniekis at 2021-12-17T09:55:09Z
+
+My previous implementation was basically like you mention parameter + argument resolver, but I was planning to look into something nicer

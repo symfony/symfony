@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient\Tests;
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -269,6 +270,15 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertInstanceOf(ErrorChunk::class, $chunks[2]);
         $this->assertSame(3, $chunks[2]->getOffset());
         $this->assertSame('bar ccc', $chunks[2]->getError());
+    }
+
+    public function testMergeDefaultOptions()
+    {
+        $mockHttpClient = new MockHttpClient(null, 'https://example.com');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid URL: scheme is missing');
+        $mockHttpClient->request('GET', '/foo', ['base_uri' => null]);
     }
 
     public function testExceptionDirectlyInBody()

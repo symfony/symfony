@@ -169,10 +169,18 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
         $this->getInternalStore()->save($key);
 
+        $lockAcquired = false;
         $sql = 'SELECT pg_advisory_lock(:key)';
-        $this->conn->executeStatement($sql, [
-            'key' => $this->getHashedKey($key),
-        ]);
+        try {
+            $this->conn->executeStatement($sql, [
+                'key' => $this->getHashedKey($key),
+            ]);
+            $lockAcquired = true;
+        } finally {
+            if (!$lockAcquired) {
+                $this->getInternalStore()->delete($key);
+            }
+        }
 
         // release lock in case of promotion
         $this->unlockShared($key);
@@ -184,10 +192,18 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
         $this->getInternalStore()->saveRead($key);
 
+        $lockAcquired = false;
         $sql = 'SELECT pg_advisory_lock_shared(:key)';
-        $this->conn->executeStatement($sql, [
-            'key' => $this->getHashedKey($key),
-        ]);
+        try {
+            $this->conn->executeStatement($sql, [
+                'key' => $this->getHashedKey($key),
+            ]);
+            $lockAcquired = true;
+        } finally {
+            if (!$lockAcquired) {
+                $this->getInternalStore()->delete($key);
+            }
+        }
 
         // release lock in case of demotion
         $this->unlock($key);

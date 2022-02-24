@@ -1,0 +1,5 @@
+imports:
+    - { resource: "../config/default.yml" }
+
+framework:
+    uid: ~

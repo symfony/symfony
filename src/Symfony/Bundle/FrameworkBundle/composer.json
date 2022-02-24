@@ -62,6 +62,7 @@
         "symfony/workflow": "^5.4|^6.0",
         "symfony/yaml": "^5.4|^6.0",
         "symfony/property-info": "^5.4|^6.0",
+        "symfony/uid": "^5.4|^6.0",
         "symfony/web-link": "^5.4|^6.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
         "paragonie/sodium_compat": "^1.8",

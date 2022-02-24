@@ -241,7 +241,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected function expectValidateValue(int $i, mixed $value, array $constraints = [], string|GroupSequence|array $group = null)
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
-        $contextualValidator->expectValidation($i, '', $value, $group, function ($passedConstraints) use ($constraints) {
+        $contextualValidator->expectValidation($i, null, $value, $group, function ($passedConstraints) use ($constraints) {
             if (\is_array($constraints) && !\is_array($passedConstraints)) {
                 $passedConstraints = [$passedConstraints];
             }
@@ -253,7 +253,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected function expectFailingValueValidation(int $i, mixed $value, array $constraints, string|GroupSequence|array|null $group, ConstraintViolationInterface $violation)
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
-        $contextualValidator->expectValidation($i, '', $value, $group, function ($passedConstraints) use ($constraints) {
+        $contextualValidator->expectValidation($i, null, $value, $group, function ($passedConstraints) use ($constraints) {
             if (\is_array($constraints) && !\is_array($passedConstraints)) {
                 $passedConstraints = [$passedConstraints];
             }
@@ -575,9 +575,12 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         $this->expectNoValidate = true;
     }
 
-    public function expectValidation(string $call, string $propertyPath, mixed $value, string|GroupSequence|array|null $group, callable $constraints, ConstraintViolationInterface $violation = null)
+    public function expectValidation(string $call, ?string $propertyPath, mixed $value, string|GroupSequence|array|null $group, callable $constraints, ConstraintViolationInterface $violation = null)
     {
-        $this->expectedAtPath[$call] = $propertyPath;
+        if (null !== $propertyPath) {
+            $this->expectedAtPath[$call] = $propertyPath;
+        }
+
         $this->expectedValidate[$call] = [$value, $group, $constraints, $violation];
     }
 }

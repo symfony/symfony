@@ -189,6 +189,10 @@ class ParserTest extends TestCase
                 new Node\BinaryNode('..', new Node\ConstantNode(0), new Node\ConstantNode(3)),
                 '0..3',
             ],
+            [
+                new Node\BinaryNode('+', new Node\ConstantNode(0), new Node\ConstantNode(0.1)),
+                '0+.1',
+            ],
         ];
     }
 

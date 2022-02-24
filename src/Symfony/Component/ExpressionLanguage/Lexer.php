@@ -38,13 +38,13 @@ class Lexer
                 continue;
             }
 
-            if (preg_match('/[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/A', $expression, $match, 0, $cursor)) {
+            if (preg_match('/
+                (?(DEFINE)(?P<LNUM>[0-9]+(_[0-9]+)*))
+                (?:\.(?&LNUM)|(?&LNUM)(?:\.(?!\.)(?&LNUM)?)?)(?:[eE][+-]?(?&LNUM))?/Ax',
+                $expression, $match, 0, $cursor)
+            ) {
                 // numbers
-                $number = (float) $match[0];  // floats
-                if (preg_match('/^[0-9]+$/', $match[0]) && $number <= \PHP_INT_MAX) {
-                    $number = (int) $match[0]; // integers lower than the maximum
-                }
-                $tokens[] = new Token(Token::NUMBER_TYPE, $number, $cursor + 1);
+                $tokens[] = new Token(Token::NUMBER_TYPE, 0 + str_replace('_', '', $match[0]), $cursor + 1);
                 $cursor += \strlen($match[0]);
             } elseif (str_contains('([{', $expression[$cursor])) {
                 // opening bracket

@@ -41,11 +41,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     private string $locale;
 
     /**
-     * @var string[]
-     */
-    private array $fallbackLocales = [];
-
-    /**
      * @var LoaderInterface[]
      */
     private array $loaders = [];
@@ -62,14 +57,17 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
     private ?ConfigCacheFactoryInterface $configCacheFactory;
 
-    private array $parentLocales;
-
     private bool $hasIntlFormatter;
+
+    /**
+     * @var FallbackLocaleProvider
+     */
+    private $fallbackLocaleProvider;
 
     /**
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [])
+    public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [], FallbackLocaleProvider $fallbackLocaleProvider = null)
     {
         $this->setLocale($locale);
 
@@ -82,6 +80,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         $this->debug = $debug;
         $this->cacheVary = $cacheVary;
         $this->hasIntlFormatter = $formatter instanceof IntlFormatterInterface;
+        $this->fallbackLocaleProvider = $fallbackLocaleProvider ?? new FallbackLocaleProvider();
     }
 
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
@@ -118,7 +117,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
         $this->resources[$locale][] = [$format, $resource, $domain];
 
-        if (\in_array($locale, $this->fallbackLocales)) {
+        if (\in_array($locale, $this->fallbackLocaleProvider->getFallbackLocales())) {
             $this->catalogues = [];
         } else {
             unset($this->catalogues[$locale]);
@@ -158,17 +157,16 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
             $this->assertValidLocale($locale);
         }
 
-        $this->fallbackLocales = $this->cacheVary['fallback_locales'] = $locales;
+        $this->fallbackLocaleProvider->setFallbackLocales($locales);
+        $this->cacheVary['fallback_locales'] = $locales;
     }
 
     /**
-     * Gets the fallback locales.
-     *
      * @internal
      */
     public function getFallbackLocales(): array
     {
-        return $this->fallbackLocales;
+        return $this->fallbackLocaleProvider->getFallbackLocales();
     }
 
     /**
@@ -393,43 +391,7 @@ EOF
 
     protected function computeFallbackLocales(string $locale)
     {
-        $this->parentLocales ??= json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
-
-        $originLocale = $locale;
-        $locales = [];
-
-        while ($locale) {
-            $parent = $this->parentLocales[$locale] ?? null;
-
-            if ($parent) {
-                $locale = 'root' !== $parent ? $parent : null;
-            } elseif (\function_exists('locale_parse')) {
-                $localeSubTags = locale_parse($locale);
-                $locale = null;
-                if (1 < \count($localeSubTags)) {
-                    array_pop($localeSubTags);
-                    $locale = locale_compose($localeSubTags) ?: null;
-                }
-            } elseif ($i = strrpos($locale, '_') ?: strrpos($locale, '-')) {
-                $locale = substr($locale, 0, $i);
-            } else {
-                $locale = null;
-            }
-
-            if (null !== $locale) {
-                $locales[] = $locale;
-            }
-        }
-
-        foreach ($this->fallbackLocales as $fallback) {
-            if ($fallback === $originLocale) {
-                continue;
-            }
-
-            $locales[] = $fallback;
-        }
-
-        return array_unique($locales);
+        return $this->fallbackLocaleProvider->computeFallbackLocales($locale);
     }
 
     /**

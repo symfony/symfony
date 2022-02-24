@@ -34,6 +34,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     protected $imagePortrait;
     protected $image4By3;
     protected $imageCorrupted;
+    protected $notAnImage;
 
     protected function createValidator()
     {
@@ -50,6 +51,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->image4By3 = __DIR__.'/Fixtures/test_4by3.gif';
         $this->image16By9 = __DIR__.'/Fixtures/test_16by9.gif';
         $this->imageCorrupted = __DIR__.'/Fixtures/test_corrupted.gif';
+        $this->notAnImage = __DIR__.'/Fixtures/ccc.txt';
     }
 
     public function testNullIsValid()
@@ -414,6 +416,21 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setCode(Image::CORRUPTED_IMAGE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testInvalidMimeType()
+    {
+        $this->validator->validate($this->notAnImage, $constraint = new Image());
+
+        $this->assertSame('image/*', $constraint->mimeTypes);
+
+        $this->buildViolation('This file is not a valid image.')
+            ->setParameter('{{ file }}', sprintf('"%s"', $this->notAnImage))
+            ->setParameter('{{ type }}', '"text/plain"')
+            ->setParameter('{{ types }}', '"image/*"')
+            ->setParameter('{{ name }}', '"ccc.txt"')
+            ->setCode(Image::INVALID_MIME_TYPE_ERROR)
             ->assertRaised();
     }
 }

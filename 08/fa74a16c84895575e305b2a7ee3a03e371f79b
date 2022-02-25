@@ -1,0 +1,560 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-02-09T14:46:48Z
+
+In the past, the most common argument against bumping the PHP version was that some major Linux versions were using an older version. This time, as you said, at least Ubuntu LTS is aligning perfectly with our needs, so hopefully other major Linux distributions do the same. 👍
+
+---------------------------------------------------------------------------
+
+by 94noni at 2022-02-09T15:02:01Z
+
+According to:
+
+- https://packagist.org/packages/symfony/console/php-stats#6
+- https://packagist.org/packages/symfony/http-foundation/php-stats#6
+
+~50% at the time of writing, is already running php v8.1 :)
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2022-02-09T15:18:37Z
+
+> Also, looking at https://packagist.org/packages/symfony/framework-bundle/php-stats#6.0, early adopters of Symfony 6 are already using PHP 8.1 en masse, and it's growing fast.
+
+This is only because Laravel 9 only was released only yesterday. Lots of those users will be on PHP 8.0.
+
+---------------------------------------------------------------------------
+
+by jenkoian at 2022-02-09T15:57:39Z
+
+Not sure if this will affect your decision or not but [AWS EB doesn't yet support PHP 8.1](https://docs.aws.amazon.com/elasticbeanstalk/latest/platforms/platform-history-php.html).  I think most of the other PAAS providers offer PHP 8.1 though (except Google AppEngine which afaict doesn't even offer 8.0 support yet).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-09T16:21:25Z
+
+>  ldap_rename(): Passing null to parameter #4 ($new_parent) of type string is deprecated
+
+This shoud be fixed on lower branches. ~PR welcome anyone, that's a good first contrib :)~ Fixed in 9ce4531a55
+
+> TypeError: Memcached::setMulti(): Argument #2 ($expiration) must be of type int, int given
+
+:facepalm:
+
+Anyway, this PR is ready to go from a technical pov, remaining failures are false positives.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-09T16:23:20Z
+
+> Not sure if this will affect your decision or not but [AWS EB doesn't yet support PHP 8.1](https://docs.aws.amazon.com/elasticbeanstalk/latest/platforms/platform-history-php.html)
+
+Thanks for the info @jenkoian. That shouldn't be a blocker to me.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-09T16:49:16Z
+
+The Packagist statistics seem to be in your favor:
+
+* Among the consumers of FrameworkBundle 6.0, PHP 8.1 is already the dominant PHP branch. https://packagist.org/packages/symfony/framework-bundle/php-stats#6.0
+* If we look at the 4.4 branch, our LTS that is approaching EOL, we see that we maintain support for a PHP version 7.1 that is almost irrelevant for the consumers of that package. https://packagist.org/packages/symfony/framework-bundle/php-stats#4.4
+* On 5.4, it's a similar story. We support PHP 7.2 and 7.3 for a very small fraction of our userbase: https://packagist.org/packages/symfony/framework-bundle/php-stats#5.4
+
+However, this is a major change in our release strategy: we haven't bumped the PHP language level in a minor release yet. If we take that road, I believe we should announce this a bit ahead of time. The fixed release cycles of PHP and Symfony should encourage development teams to schedule their framework and infrstructure upgrades ahead of time. Projects that chose to start with or upgrade to Symfony 6 might have done so trusting that they can remain on PHP 8.0 for a certain period of time. If we bump now, we basically force those projects to either reschedule infrastructure upgrades or to remain on Symfony 6.0 beyond its EOL.
+
+If we would've discussed and announced that course of action before the 6.0 release, I would be all cool with it. But bumping to PHP 8.1 on such a short notice might make Symfony's release strategy appear erradic.
+
+How would you feel about postponing this language level bump to the 6.2 release? That could give downstream projects a bit more time to adjust their development schedule accordingly.
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2022-02-09T16:53:07Z
+
+For us that means that we need to delay our Symfony update to 6.0, since its maintenance is that limited and we'd be locked with an unmaintained version until we get 8.1 support done.
+Get the motivation though, only sharing the impact for us.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-02-09T17:16:14Z
+
+Same for us. We usually skip the `*.0` release of a new major, to have 6 months to fix the deprecations introduced in 5.4. So our infrastructure (PHP 8.0 at the moment) is not reflected in the Packagist statistics for 6.0.
+
+This is a deviation from the standard release schedule. We usually do not "push" the industry to upgrade their infrastructure, but instead consider our minimum PHP version when the current one has reached eol (or is about to), giving the largest amount of time for everyone to upgrade a single thing at the time.
+
+I think it comes down to weighing this deviation with postponing typed properties for another 6 months.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2022-02-09T17:19:50Z
+
+I do love to remove code and I also appreciate using the latest version of PHP.
+
+This goes against what Symfony has done in the past (for better or for worse). I would suggest to be boring and keep 8.0 compatibility. At least for SF6.1. Im more open to drop PHP 8.0 it in SF6.2 if we still think we have a strong case for it.
+
+---------------------------------------------------------------------------
+
+by catch56 at 2022-02-09T17:46:07Z
+
+Just briefly from Drupal's standpoint:
+
+We're planning to release Drupal 10 on Symfony 6 this year. We've set our minimum requirement at PHP 8.0.2 because that's the current minimum of Symfony 6.0, however we're already recommending PHP 8.1.
+
+We have active discussions happening about requiring PHP 8.1 or not (https://www.drupal.org/project/drupal/issues/3223435 / https://www.drupal.org/project/drupal/issues/3173787). And we've notified people that we'll announce an 8.1 bump at least five months in advance: https://www.drupal.org/about/core/blog/drupal-10-php-requirements-announcements
+
+There are several reasons we'd like to require PHP 8.1, but we're also balancing it against distro/hosting availability (which is somewhere between promising and mixed). Obviously this issue was just opened in the past 24 hours so that's new information for us that hasn't fed into the current discussions yet.
+
+If Symfony definitely goes ahead with this, it would be good to know as soon as possible. Based on the state of the discussions we're having, I don't think it's likely we'd try to stop you, but we also haven't definitely decided to require PHP 8.1 ourselves independently yet.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-09T18:46:38Z
+
+It's important to acknowledge the reason why I'm proposing this. We *do* have a strong case here, and it's not going to go away. PHP 8.0+preloading+typed props is broken, see linked issue.
+
+I'm personally fine postponing to 6.2 if that's useful for the ecosystem. We'll need to reverse once more the types added to private properties before tagging 6.1.
+
+On the other hand, we are months ahead the release of 6.1. We're not rushing anything here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-09T20:22:10Z
+
+Talking with others from the core-team on Slack, it looks like we have two ways forward:
+- postpone this to 6.2 and revert typed properties from 6.1. There's an issue with this approach: ppl on PHP8.0+SF6.1 will remain with an unmaintained version of SF once 6.1 is EOL. Considering security issues, that's not great. Hoping that nobody will end up in this situation in a wild dream I fear. To fix this trap, we might need to extend the security maintenance of 6.2 by 8 months to overlap with 6.3.
+- which leads to this alternative: do this in 6.1, and extend the security maintenance of 6.0 to the EOL of 6.1.
+
+My preference is for the latter: it allows sending the message sooner and provides a smooth way forward while saving maintainers' time.
+
+---------------------------------------------------------------------------
+
+by xjm at 2022-02-09T21:55:35Z
+
+Just following up on @catch56's comment -- Would it be possible to let us know by **March 17, 2022** whether Symfony 6 is likely to introduce a PHP 8.1 requirement (whether in 6.1, 6.2, or some future release)? That's the deadline we committed to for announcing any further increase to Drupal 10's platform requirements. (We try to only increase PHP version requirements in majors because our audience includes a lot of long-tail end users who struggle with the disruption of it; when we dropped PHP 5 support in a minor release we gave like 18 months' advance warning and folks still struggled.)
+
+We'd really appreciate the favor if it's possible. :) We'll be watching this PR closely. Thanks! 🤞
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2022-02-09T21:57:49Z
+
+For Laravel 9 users, extending the security EOL of the 6.0.x series to only the EOL of the 6.1.x series wouldn't be enough, but delaying the bump to 6.2, and security EOL of 6.1 to EOL of 6.2 would work I think.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-09T22:14:26Z
+
+> Would it be possible to let us know by **March 17, 2022** whether Symfony 6 is likely to introduce a PHP 8.1 requirement (whether in 6.1, 6.2, or some future release)?
+
+I feel pretty confident that Symfony 6 won't enter the LTS phase still supporting PHP 8.0, if that answers your question.
+
+> That's the deadline we committed to for announcing any further increase to Drupal 10's platform requirements.
+
+No matter how we decide, I personally would recommend to anyone who starts a new project now or plans to bump the PHP requirement of their library/application, to skip PHP 7.4 and 8.0 and go straight to 8.1. Even if you don't use typed properties now, you will start using them once they become available to you. If you use typed properties and a user of your piece of software dares to preload your stuff, you'll likely find yourself in the misery that we're stuck in now.
+
+> We try to only increase PHP version requirements in majors
+
+So do we. The step we're discussing here is unprecedented for us. 😓
+
+---------------------------------------------------------------------------
+
+by xjm at 2022-02-09T22:25:43Z
+
+> No matter how we decide, I personally would recommend to anyone who starts a new project now or plans to bump the PHP requirement of their library/application, to skip PHP 7.4 and 8.0 and go straight to 8.1. Even if you don't use typed properties now, you will start using them once they become available to you. If you use types properties and a user of your piece of software dares to preload your stuff, you'll likely find yourself in the misery that we're stuck in now.
+
+Oh -- agreed absolutely. I'm one of the release managers for Drupal core; I'm familiar with the value of PHP 8.1 language features and I actually have a lightning talk I give about why it's important to require the highest versions of your dependencies available to you in a new major to the extent that you can. ;)
+
+It's just that we're in a tight spot because Drupal 9 has to be EOL in November 2023, and by the time Drupal 10 is out folks will have barely a year (if that) to do a major version upgrade from Drupal 9 to 10. Meanwhile 30-40% of folks' hosting service providers in our ecosystem still don't support PHP 8.1, the distros don't have PHP 8.1 natively in releases yet, etc. so all that narrows their time to upgrade further. It's quite the balancing act.
+
+If we had the option of a longer LTS for Drupal 9 (e.g. if we'd managed to get Drupal 9 on Symfony 5 among other factors with other dependencies), then we would have increased the requirement to PHP 8.1 already. And we should be in a better position in the future by having Drupal 10 require Symfony 6 so we have the option of an LTS in the future. :)
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2022-02-09T22:53:56Z
+
+What about sticking with PHP 8.0 support and trigger an error/throw an exception if the `config/preload.php` script is executed?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-09T23:24:57Z
+
+@fbourigault we don't decide when/how ppl use preloading. There are many ways to use it and the generated preloading script is just one of them. Think about ppl that don't use fullstack-Symfony.
+
+Also we cannot just postpone adding typed properties to Symfony 7.0, because this issue will also arise when other libs will adopt typed properties.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-02-09T23:49:35Z
+
+@nicolas-grekas you are trying to fix hypothetical other's bugs.
+
+> There are many ways to use it and the generated preloading script is just one of them
+
+Then, people'll face the same bug and will have to fix their script. This is not the Symfony's call to fix it.
+
+> because this issue will also arise when other libs will adopt typed properties.
+
+That's their problem. Except for symfony/di >4.4 that generate a broken preload file which is not addressed by this PR.
+
+IMHO:
+- fix broken dumped file by disabling preload for PHP 8.0 in symfony/di 4.4 (or at least remove class with type properties)
+- add type properties in 6.1 and let people realize that their homemade dumped preloaded file is also broken and should be fixed.
+
+---------------------------------------------------------------------------
+
+by azjezz at 2022-02-10T02:59:20Z
+
+👍 for bumping the minimum to 8.1, BC and Symfony release schedule aside, Symfony could benefit a lot from using `Fiber` ( refs #41520 ), this will also allow Symfony to simplify other parts of the code ( e.g: the symfony bridge to amphp http client would reduce dramatically in complexity when switching to Amphp http client v3, which requires PHP 8.1 due to Fiber usage - Amphp also supports PHP 8.0 with ext-fiber, but 99% of users will not have it by default, so it doesn't make sense to require it in Symfony ).
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2022-02-10T07:44:59Z
+
+> fix broken dumped file by disabling preload for PHP 8.0 in symfony/di 4.4 (or at least remove class with type properties)
+
+I would add that Symfony should also deprecate preload support. It's either broken with PHP 8.0 or useless with PHP 8.1+.
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2022-02-10T08:21:29Z
+
+This is probably too late now...
+Laravel 9 (based on Symfony 6) has been released and require PHP 8.0 as a minimum requirement.
+
+PHP & Symfony roadmaps are both in sync and new PHP and major Symfony versions are released on the same month (November).
+Because PHP 8.1 and Symfony 6 were released the same month, it was impossible to decide if Symfony 6 minimum requirement can be PHP 8.1
+The same problem will happen with Symfony 7
+
+In order to prevent this in the future, we should probably think about postponing the release calendar for 2 or 3 months after PHP releases (every november)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-10T08:47:05Z
+
+@jderusse I submitted https://github.com/symfony/symfony/pull/45384 to follow your proposal. Preloading is the primary motivation of this PR. If we don't have an agreement about the primary reason, the secondary reasons - all the shiny new feats of 8.1 - are irrelevant indeed. Please have a look.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-10T08:48:40Z
+
+> I would add that Symfony should also deprecate preload support. It's either broken with PHP 8.0 or useless with PHP 8.1+.
+
+@fbourigault I'm also wondering about that myself, but the claim that it's "useless with PHP 8.1+" is not backed by any data, [not even by Nikita](https://github.com/symfony/symfony/pull/44380#issuecomment-996174208). It'd be great to gather some to decide this. Would you like to have a look and report back?
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2022-02-10T08:51:33Z
+
+Although controversial, another point of view could be; what would it take to fix the preloading for PHP 8.0?
+
+As can be read in @nicolas-grekas his comments preloading not working as expected clearly can be seen as a bug. I vaguely remember having read why fixing preloading was not possible, but can not find back the link to the arguments against it.
+
+Given that the core argument for bumping to 8.1 seems that preloading is broken, why not focus on fixing that? Being able to do so would solve all timing related issues for Symfony, Laravel, Drupal etc. at once.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-10T09:06:38Z
+
+> Although controversial, another point of view could be; what would it take to fix the preloading for PHP 8.0?
+
+see #44380
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2022-02-10T10:30:00Z
+
+> @fbourigault I'm also wondering about that myself, but the claim that it's "useless with PHP 8.1+" is not backed by any data, [not even by Nikita](https://github.com/symfony/symfony/pull/44380#issuecomment-996174208). It'd be great to gather some to decide this. Would you like to have a look and report back?
+
+I did some profiling on the symfony/demo application: https://blackfire.io/profiles/compare/430f1a06-f796-4c3f-beb2-0a41b11b6d6b/graph
+
+Still 16% gain.
+
+Can anyone else confirm this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-10T10:32:32Z
+
+@fbourigault can you try with `ab` instead of Blackfire, just in case its profiling instrumentation gets in the way on this topic?
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2022-02-10T11:08:08Z
+
+With `ab -n 10000 -c 5 127.0.0.1:8004/fr/blog/`, preload seems ~7% slower!
+
+Disclamer: this bench was run on my laptop. The results may have been altered by other running programs.
+
+With preload:
+```
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+Server Software:
+Server Hostname:        127.0.0.1
+Server Port:            8004
+SSL/TLS Protocol:       TLSv1.2,ECDHE-RSA-AES128-GCM-SHA256,2048,128
+Server Temp Key:        ECDH P-256 256 bits
+
+Document Path:          /fr/blog/
+Document Length:        28066 bytes
+
+Concurrency Level:      5
+Time taken for tests:   45.488 seconds
+Complete requests:      10000
+Failed requests:        6
+   (Connect: 0, Receive: 0, Length: 6, Exceptions: 0)
+Non-2xx responses:      6
+Total transferred:      282681094 bytes
+HTML transferred:       280491604 bytes
+Requests per second:    219.84 [#/sec] (mean)
+Time per request:       22.744 [ms] (mean)
+Time per request:       4.549 [ms] (mean, across all concurrent requests)
+Transfer rate:          6068.75 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        3    5   0.9      5      22
+Processing:     3   18   3.6     18     111
+Waiting:        2   18   3.6     18     110
+Total:          7   23   3.8     23     115
+
+Percentage of the requests served within a certain time (ms)
+  50%     23
+  66%     24
+  75%     24
+  80%     25
+  90%     25
+  95%     26
+  98%     28
+  99%     29
+ 100%    115 (longest request)
+```
+
+Without preload:
+```
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+Server Software:
+Server Hostname:        127.0.0.1
+Server Port:            8004
+SSL/TLS Protocol:       TLSv1.2,ECDHE-RSA-AES128-GCM-SHA256,2048,128
+Server Temp Key:        ECDH P-256 256 bits
+
+Document Path:          /fr/blog/
+Document Length:        28066 bytes
+
+Concurrency Level:      5
+Time taken for tests:   48.771 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      282850000 bytes
+HTML transferred:       280660000 bytes
+Requests per second:    205.04 [#/sec] (mean)
+Time per request:       24.386 [ms] (mean)
+Time per request:       4.877 [ms] (mean, across all concurrent requests)
+Transfer rate:          5663.57 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        3    5   0.9      5      18
+Processing:    13   20   6.0     20     306
+Waiting:       13   19   6.0     19     305
+Total:         17   24   6.2     24     309
+
+Percentage of the requests served within a certain time (ms)
+  50%     24
+  66%     25
+  75%     26
+  80%     26
+  90%     28
+  95%     28
+  98%     30
+  99%     31
+ 100%    309 (longest request)
+```
+
+---------------------------------------------------------------------------
+
+by JDDoesDev at 2022-02-10T15:15:34Z
+
+@xjm
+
+> Meanwhile 30-40% of folks' hosting service providers in our ecosystem still don't support PHP 8.1, the distros don't have PHP 8.1 natively in releases yet, etc. so all that narrows their time to upgrade further. It's quite the balancing act.
+
+I completely agree with your points, however this may be an occasion where the consumers (meaning us as Drupal developers, our clients, etc.) can shape the market by pushing hosting providers to make the change to support 8.1.  If it becomes a requirement of Symfony, and therefore a requirement of Drupal, then hosting providers who specialize in Drupal will have the option to either support it, or get grief from customers who are frustrated with being stuck on an outdated version of Drupal.  "If Host X won't let me upgrade, maybe it's time to move to Host Y"
+
+I realize that we have internal Drupal issues discussing this in the d.o queue, however I believe that as users of Symfony as the backbone of Drupal, it makes sense to have our voices heard on this issue as well.
+
+---------------------------------------------------------------------------
+
+by xjm at 2022-02-10T17:16:28Z
+
+> @xjm
+>
+> > Meanwhile 30-40% of folks' hosting service providers in our ecosystem still don't support PHP 8.1, the distros don't have PHP 8.1 natively in releases yet, etc. so all that narrows their time to upgrade further. It's quite the balancing act.
+>
+> I completely agree with your points, however this may be an occasion where the consumers (meaning us as Drupal developers, our clients, etc.) can shape the market by pushing hosting providers to make the change to support 8.1. If it becomes a requirement of Symfony, and therefore a requirement of Drupal, then hosting providers who specialize in Drupal will have the option to either support it, or get grief from customers who are frustrated with being stuck on an outdated version of Drupal. "If Host X won't let me upgrade, maybe it's time to move to Host Y"
+
+Thanks @JDDoesDev . I agree that this will be a natural process. It's just the huge risk for us because of our very short overlap between Drupal 9 and Drupal 10 as described in https://github.com/symfony/symfony/pull/45377#issuecomment-1034260022, Switching HSPs also adds upgrade time, as does the process of waiting on HSPs that do have it on their roadmap. People need all that, and the upgrade of contrib modules and custom code, etc., and they need to solve it in possibly less than a year. 😔
+
+Anyway this is probably OT for the Symfony threads. If Symfony adopts PHP 8.1 before March 17 we will come along and give our users the best support we can with the hosting situation. There are risks of not requiring PHP 8.1 too. It's just our job as release managers to balance those risks. 🙂
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-02-10T17:37:16Z
+
+Alpine Linux (mostly used for containers) will support PHP 8.1 for its next release, on June 2022, after the release of Symfony 6.1.
+
+---------------------------------------------------------------------------
+
+by xorik at 2022-02-10T17:42:20Z
+
+@GromNaN no,`php:8.1-alpine` exists since PHP 8.1 release (over 2 months ago)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-02-10T17:56:29Z
+
+@xorik @GromNaN is talking about the alpine Linux not php alpine I guess.
+
+---------------------------------------------------------------------------
+
+by beberlei at 2022-02-10T19:08:58Z
+
+@fbourigault 7% slower with the mean, but you need to look at the percentiles. 99% of requests take below 29ms with preloading and 31ms without preloading.
+
+---------------------------------------------------------------------------
+
+by DarkGhostHunter at 2022-02-10T19:57:38Z
+
+> So here we are: what about bumping Symfony 6.1 to PHP 8.1 minimum?
+
+I think it should if it was the minimum stable version, but it does not. There are multiple software stacks that use PHP 8.0 for that very reason, now that PHP as moved into a 3 year cycle.
+
+Next year PHP 8.1 will be the minimum. The PHP ecosystem should be aligned themselves to PHP lifecycle by now. No problem if 6.1 was supported until the last day of 2023, but I don't think it will be (correct me if I'm wrong).
+
+---------------------------------------------------------------------------
+
+by xjm at 2022-02-10T20:19:12Z
+
+> Next year PHP 8.1 will be the minimum. The PHP ecosystem should be aligned themselves to PHP lifecycle by now.
+
+You would think so, but not quite yet. And even as PHP projects themselves are trying to catch up (like us, like Symfony), our downstream users still expect LTS support, and they expect that means not having to upgrade their whole hosting platform within a major.
+
+Furthermore, the distros are still behind while Composer projects start to catch up. They're still providing LTS releases for more than 3 years and paid support into like eternity. Users of those platforms get PHP security fixes from the distro without needing to upgrade, so there is a disconnect between Composer projects that might drop support for old PHP, versus platforms that still support and patch PHP even after the PHP maintainers themselves stop providing coverage. The distros haven't solved this disconnect yet, and projects like CMSes get stuck in the middle. :)
+
+That's why I value Symfony's stability and conservative-ish approach to date for such changes. Drupal has removed other dependencies specifically to avoid the disruption of sudden increases in PHP requirements (as well the opposite, failure to keep up with new PHP). I think Symfony is a community leader in how to provide a stable framework, so I think this potential change needs to be handled carefully in a way that reflects Symfony's commitment to stability and predictability. (And thank you for being that framework.)
+
+As an aside, Drupal is also trying to solve this problem. We naturally have many more upstream dependencies than Symfony does, and we can't predict their lifecycles or when they might drop support for PHP versions or anything else.
+
+Our current idea is to officially drop support when the PHP version is EOL according to PHP, but we _won't_ increase our constraint yet so long as our dependencies are still compatible. However, these users receive warnings and errors telling them that their site is unsupported and they need to upgrade their PHP to continue receiving updates.
+
+Then, if one of our dependencies does suddenly increase their PHP requirement (and stops supporting versions with the lower PHP requirement), we will issue a new minor off-schedule that does actually increase the Composer constraint, and EOL the minor that depended on the old versions and old PHP. Users might get some security updates, but as soon as the package with the increased PHP version releases a security update, they're out of luck.
+
+Maybe there's some analogous approach Symfony could take to rolling and deprecating PHP support in a predictable and non-disruptive way. Certainly for Symfony 7.
+
+The tricky part is what to do for Symfony 6 given that it's already stable. I think extending security support for the minors with the old PHP to 1 or even 2 years, and announcing the requirement increase at least one release in advance, might be a way to mitigate the problem. Maybe projects affected like Laravel can help with that in some limited capacity (the way that Drupal is now for the little gap between Symfony's minor version coverage and ours). Just an idea. 💡
+
+---------------------------------------------------------------------------
+
+by DarkGhostHunter at 2022-02-10T21:03:40Z
+
+> Furthermore, the distros are still behind while Composer projects start to catch up. They're still providing LTS releases for more than 3 years and paid support into like eternity.
+
+That's a nice pitch for another source of revenue. "Want PHP 7.3 support right now? Pay up." Suddenly everyone will start to use stable versions.
+
+---------------------------------------------------------------------------
+
+by robinmalburn at 2022-02-10T21:36:14Z
+
+It seems like a less nuclear approach is to document that there are serious considerations and issues with using preloading if using PHP < 8.1.  Regardless of whether you use typed properties directly, a dependency might and you can run afoul of issues with preloading.  Even the fix for Symfony 6.0 referenced in this issue doesn't actually resolve the underlying issue, it just fixes it in Symfony core itself by removing type hints, but third party packages could still cause issues.
+
+Given the fact the issue persists in Symfony 6.0 and the wide ranging ramifications and upheaval changing the PHP minimum version causes in a point release, surely it would be better to document the foibles and advise caveat emptor in the [existing documentation](https://symfony.com/doc/current/performance.html#use-the-opcache-class-preloading).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-02-10T22:54:40Z
+
+Unfortunately documentation alone doesn't do much, except from giving us a place to reference when closing yet another reported preloading bug.
+
+---
+
+I want to stress again that this minimum bump, if it's going to be merged, is not driven by the idealogy of pushing the ecosystem in a faster upgrade pace. Symfony has always been purely pragmatic about this and will keep that way, as far as I can see.
+If this PR is merged, it'll be done purely to fix the practical and big bug that is php <8.1+typed properties+preloading.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-11T14:42:05Z
+
+Thank you all for the very constructive discussion, special thanks to @xjm for Drupal. We're also discussing this in a private Slack channel within the core-team. We're going to post a summary/decision soon.
+
+---------------------------------------------------------------------------
+
+by mxr576 at 2022-02-17T06:18:12Z
+
+So this was resolved/decided on the Drupal side sooner than here.
+
+> Drupal 10 minimum PHP requirement raised to PHP 8.1
+
+https://www.drupal.org/node/3264830
+
+---------------------------------------------------------------------------
+
+by xjm at 2022-02-20T20:58:09Z
+
+> So this was resolved/decided on the Drupal side sooner than here.
+
+@mxr576 , Drupal's decision is not unrelated to this PR. ;) Also, the Drupal community had already been agonizing over the decision of PHP 8.0 vs. 8.1 for 6 months, and we were fortunate enough to be in the development phase of a new major. I think we can all be patient for a couple weeks here. :)
+
+---------------------------------------------------------------------------
+
+by mxr576 at 2022-02-21T04:57:44Z
+
+@xjm my previous comment was just an FYI for ppl involved in this decision here. It was not positive or negative. I am sorry if someone can felt otherwise.
+
+(Personally, I can fully support that decision , it is a future proof one.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-25T11:02:19Z
+
+In case you missed it, we're going to merge this PR.
+See https://symfony.com/blog/symfony-6-1-will-require-php-8-1
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-25T11:07:19Z
+
+PR is ready, failures are:
+- a false-positive on GHA
+- a legit failure on appveyor, but the fix should land on branch 4.4 (I'm going to have a look).

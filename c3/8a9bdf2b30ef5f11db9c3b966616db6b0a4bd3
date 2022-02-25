@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-02-15T11:10:02Z
+
+Hey!
+
+I think @natewiebe13 has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2022-02-16T20:06:25Z
+
+What about adding a configuration so you can set the extension from there? or maybe an argument for the command?
+
+---------------------------------------------------------------------------
+
+by DanielBadura at 2022-02-16T20:09:52Z
+
+The command get's the allowed format types from the list of dumper services AFAIK. I dont understand the part with the configuration in the xml. If I generate a new file, there is no existing file and therefore no place to configure it, right?
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2022-02-16T20:16:17Z
+
+Sorry, I had a typo. I haven't yet looked into how the command retrieves available extensions, but this makes sense. Unfortunate that it already uses xliff for the service name. Since there's really no difference in terms of content, it might be worth looking into changing how this works to be more flexible. For example passing more than one file extension.
+
+---------------------------------------------------------------------------
+
+by DanielBadura at 2022-02-16T20:19:47Z
+
+The proposed solution is the same like how it was handled with `yml` and `yaml` the only difference there is that the service names matches with suffix :D
+
+But i think the name is just a minor thing, so i hope someone has a good naming proposal :)
+
+---------------------------------------------------------------------------
+
+by DanielBadura at 2022-02-21T15:27:05Z
+
+Failing CI seems unrelated

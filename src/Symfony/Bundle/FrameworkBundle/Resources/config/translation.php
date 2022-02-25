@@ -114,6 +114,10 @@ return static function (ContainerConfigurator $container) {
         ->set('translation.dumper.xliff', XliffFileDumper::class)
             ->tag('translation.dumper', ['alias' => 'xlf'])
 
+        ->set('translation.dumper.xliff.xliff', XliffFileDumper::class)
+            ->args(['xliff'])
+            ->tag('translation.dumper', ['alias' => 'xliff'])
+
         ->set('translation.dumper.po', PoFileDumper::class)
             ->tag('translation.dumper', ['alias' => 'po'])
 

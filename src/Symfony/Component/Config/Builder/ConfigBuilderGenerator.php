@@ -64,14 +64,12 @@ public function NAME(): string
             $this->writeClasses();
         }
 
-        $loader = \Closure::fromCallable(function () use ($path, $rootClass) {
+        return function () use ($path, $rootClass) {
             require_once $path;
             $className = $rootClass->getFqcn();
 
             return new $className();
-        });
-
-        return $loader;
+        };
     }
 
     private function getFullPath(ClassBuilder $class): string

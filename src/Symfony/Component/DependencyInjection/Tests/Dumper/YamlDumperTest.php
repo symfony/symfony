@@ -133,9 +133,6 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_service_closure.yml', $dumper->dump());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpHandlesEnumeration()
     {
         $container = new ContainerBuilder();

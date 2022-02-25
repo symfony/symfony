@@ -321,7 +321,6 @@ class RedisExtIntegrationTest extends TestCase
     private function getConnectionGroup(Connection $connection): string
     {
         $property = (new \ReflectionClass(Connection::class))->getProperty('group');
-        $property->setAccessible(true);
 
         return $property->getValue($connection);
     }
@@ -329,7 +328,6 @@ class RedisExtIntegrationTest extends TestCase
     private function getConnectionStream(Connection $connection): string
     {
         $property = (new \ReflectionClass(Connection::class))->getProperty('stream');
-        $property->setAccessible(true);
 
         return $property->getValue($connection);
     }

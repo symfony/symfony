@@ -929,9 +929,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testIntersectionTypePassesWithReference()
     {
         $container = new ContainerBuilder();
@@ -945,9 +942,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testIntersectionTypeFailsWithReference()
     {
         $container = new ContainerBuilder();

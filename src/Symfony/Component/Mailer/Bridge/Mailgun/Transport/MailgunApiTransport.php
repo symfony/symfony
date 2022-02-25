@@ -160,7 +160,6 @@ class MailgunApiTransport extends AbstractApiTransport
                     $new = basename($filename);
                     $html = str_replace('cid:'.$filename, 'cid:'.$new, $html);
                     $p = new \ReflectionProperty($attachment, 'filename');
-                    $p->setAccessible(true);
                     $p->setValue($attachment, $new);
                 }
                 $inlines[] = $attachment;

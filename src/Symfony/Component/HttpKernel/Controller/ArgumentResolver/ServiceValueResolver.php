@@ -84,7 +84,6 @@ final class ServiceValueResolver implements ArgumentValueResolverInterface
             }
 
             $r = new \ReflectionProperty($e, 'message');
-            $r->setAccessible(true);
             $r->setValue($e, $message);
 
             throw $e;

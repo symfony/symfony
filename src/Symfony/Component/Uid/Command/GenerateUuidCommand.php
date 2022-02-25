@@ -166,11 +166,11 @@ EOF
                 break;
 
             case $random:
-                $create = [$this->factory->randomBased(), 'create'];
+                $create = $this->factory->randomBased()->create(...);
                 break;
 
             default:
-                $create = [$this->factory, 'create'];
+                $create = $this->factory->create(...);
                 break;
         }
 

@@ -75,9 +75,9 @@ final class SecurityExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('is_granted', [$this, 'isGranted']),
-            new TwigFunction('impersonation_exit_url', [$this, 'getImpersonateExitUrl']),
-            new TwigFunction('impersonation_exit_path', [$this, 'getImpersonateExitPath']),
+            new TwigFunction('is_granted', $this->isGranted(...)),
+            new TwigFunction('impersonation_exit_url', $this->getImpersonateExitUrl(...)),
+            new TwigFunction('impersonation_exit_path', $this->getImpersonateExitPath(...)),
         ];
     }
 }

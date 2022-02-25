@@ -402,7 +402,7 @@ class XmlFileLoader extends FileLoader
     private function parseFileToDOM(string $file): \DOMDocument
     {
         try {
-            $dom = XmlUtils::loadFile($file, [$this, 'validateSchema']);
+            $dom = XmlUtils::loadFile($file, $this->validateSchema(...));
         } catch (\InvalidArgumentException $e) {
             throw new InvalidArgumentException(sprintf('Unable to parse file "%s": ', $file).$e->getMessage(), $e->getCode(), $e);
         }

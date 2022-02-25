@@ -204,9 +204,6 @@ class FormBuilderTest extends TestCase
         $children = $reflClass->getProperty('children');
         $unresolvedChildren = $reflClass->getProperty('unresolvedChildren');
 
-        $children->setAccessible(true);
-        $unresolvedChildren->setAccessible(true);
-
         $this->assertEmpty($children->getValue($config));
         $this->assertEmpty($unresolvedChildren->getValue($config));
     }

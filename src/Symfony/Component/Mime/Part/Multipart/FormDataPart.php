@@ -96,10 +96,7 @@ final class FormDataPart extends AbstractMultipartPart
     {
         static $r;
 
-        if (null === $r) {
-            $r = new \ReflectionProperty(TextPart::class, 'encoding');
-            $r->setAccessible(true);
-        }
+        $r ??= new \ReflectionProperty(TextPart::class, 'encoding');
 
         $part->setDisposition('form-data');
         $part->setName($name);

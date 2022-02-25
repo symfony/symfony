@@ -122,9 +122,7 @@ abstract class AbstractDescriptorTest extends TestCase
             $definitionsWithArgs[str_replace('definition_', 'definition_arguments_', $key)] = $definition;
         }
 
-        if (\PHP_VERSION_ID >= 80100) {
-            $definitionsWithArgs['definition_arguments_with_enum'] = (new Definition('definition_with_enum'))->setArgument(0, FooUnitEnum::FOO);
-        }
+        $definitionsWithArgs['definition_arguments_with_enum'] = (new Definition('definition_with_enum'))->setArgument(0, FooUnitEnum::FOO);
 
         return $this->getDescriptionTestData($definitionsWithArgs);
     }

@@ -584,9 +584,6 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::dump($dateTime));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpUnitEnum()
     {
         $this->assertSame("!php/const Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));

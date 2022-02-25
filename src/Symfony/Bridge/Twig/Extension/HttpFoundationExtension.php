@@ -36,8 +36,8 @@ final class HttpFoundationExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('absolute_url', [$this, 'generateAbsoluteUrl']),
-            new TwigFunction('relative_path', [$this, 'generateRelativePath']),
+            new TwigFunction('absolute_url', $this->generateAbsoluteUrl(...)),
+            new TwigFunction('relative_path', $this->generateRelativePath(...)),
         ];
     }
 

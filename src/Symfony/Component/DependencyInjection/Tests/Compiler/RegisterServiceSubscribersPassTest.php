@@ -131,9 +131,6 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionServices()
     {
         $container = new ContainerBuilder();
@@ -173,9 +170,6 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testIntersectionServices()
     {
         $container = new ContainerBuilder();
@@ -310,9 +304,6 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $subscriber::getSubscribedServices();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testServiceSubscriberTraitWithUnionReturnType()
     {
         if (!class_exists(SubscribedService::class)) {
@@ -340,9 +331,6 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testServiceSubscriberTraitWithIntersectionReturnType()
     {
         if (!class_exists(SubscribedService::class)) {

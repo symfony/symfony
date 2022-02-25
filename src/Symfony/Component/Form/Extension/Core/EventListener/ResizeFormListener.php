@@ -37,7 +37,7 @@ class ResizeFormListener implements EventSubscriberInterface
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
         $this->options = $options;
-        $this->deleteEmpty = $deleteEmpty instanceof \Closure || !\is_callable($deleteEmpty) ? $deleteEmpty : \Closure::fromCallable($deleteEmpty);
+        $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);
     }
 
     public static function getSubscribedEvents(): array

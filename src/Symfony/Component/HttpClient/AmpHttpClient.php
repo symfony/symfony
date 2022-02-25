@@ -56,7 +56,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
      */
     public function __construct(array $defaultOptions = [], callable $clientConfigurator = null, int $maxHostConnections = 6, int $maxPendingPushes = 50)
     {
-        $this->defaultOptions['buffer'] = $this->defaultOptions['buffer'] ?? \Closure::fromCallable([__CLASS__, 'shouldBuffer']);
+        $this->defaultOptions['buffer'] ??= self::shouldBuffer(...);
 
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);

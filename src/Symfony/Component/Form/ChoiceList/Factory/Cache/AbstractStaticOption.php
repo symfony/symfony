@@ -40,7 +40,7 @@ abstract class AbstractStaticOption
     {
         $hash = CachingFactoryDecorator::generateHash([static::class, $formType, $vary]);
 
-        $this->option = self::$options[$hash] ??= $option instanceof \Closure || !\is_callable($option) ? $option : \Closure::fromCallable($option);
+        $this->option = self::$options[$hash] ??= $option instanceof \Closure || \is_string($option) || \is_bool($option) || $option instanceof ChoiceLoaderInterface || !\is_callable($option) ? $option : $option(...);
     }
 
     final public function getOption(): mixed

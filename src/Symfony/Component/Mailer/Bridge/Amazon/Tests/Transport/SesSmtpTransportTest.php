@@ -26,7 +26,6 @@ class SesSmtpTransportTest extends TestCase
 
         $transport = new SesSmtpTransport('user', 'pass');
         $method = new \ReflectionMethod(SesSmtpTransport::class, 'addSesHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(1, $email->getHeaders()->toArray());

@@ -81,7 +81,6 @@ class Compiler
 
                 if ($msg !== $resolvedMsg = $container->resolveEnvPlaceholders($msg, null, $usedEnvs)) {
                     $r = new \ReflectionProperty($prev, 'message');
-                    $r->setAccessible(true);
                     $r->setValue($prev, $resolvedMsg);
                 }
             } while ($prev = $prev->getPrevious());

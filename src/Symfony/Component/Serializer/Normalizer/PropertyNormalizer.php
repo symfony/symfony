@@ -132,11 +132,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
             return null;
         }
 
-        // Override visibility
-        if (!$reflectionProperty->isPublic()) {
-            $reflectionProperty->setAccessible(true);
-        }
-
         if ($reflectionProperty->hasType()) {
             return $reflectionProperty->getValue($object);
         }
@@ -168,11 +163,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
 
         if ($reflectionProperty->isStatic()) {
             return;
-        }
-
-        // Override visibility
-        if (!$reflectionProperty->isPublic()) {
-            $reflectionProperty->setAccessible(true);
         }
 
         $reflectionProperty->setValue($object, $value);

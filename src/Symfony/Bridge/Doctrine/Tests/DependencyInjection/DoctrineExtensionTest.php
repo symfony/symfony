@@ -79,7 +79,6 @@ class DoctrineExtensionTest extends TestCase
 
         $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('fixManagersAutoMappings');
-        $method->setAccessible(true);
 
         $method->invoke($this->extension, $emConfigs, $bundles);
     }
@@ -168,7 +167,6 @@ class DoctrineExtensionTest extends TestCase
 
         $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('fixManagersAutoMappings');
-        $method->setAccessible(true);
 
         $newEmConfigs = $method->invoke($this->extension, $emConfigs, $bundles);
 
@@ -186,7 +184,6 @@ class DoctrineExtensionTest extends TestCase
 
         $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('detectMappingType');
-        $method->setAccessible(true);
 
         // The ordinary fixtures contain annotation
         $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures', $container);
@@ -329,7 +326,6 @@ class DoctrineExtensionTest extends TestCase
 
         $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('getMappingDriverBundleConfigDefaults');
-        $method->setAccessible(true);
 
         $this->assertSame(
             [
@@ -346,8 +342,6 @@ class DoctrineExtensionTest extends TestCase
     protected function invokeLoadCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)
     {
         $method = new \ReflectionMethod($this->extension, 'loadObjectManagerCacheDriver');
-
-        $method->setAccessible(true);
 
         $method->invokeArgs($this->extension, [$objectManager, $container, $cacheName]);
     }

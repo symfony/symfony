@@ -1838,7 +1838,6 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $me = new \ReflectionMethod($request, 'getUrlencodedPrefix');
-        $me->setAccessible(true);
 
         $this->assertSame($expect, $me->invoke($request, $string, $prefix));
     }
@@ -1861,7 +1860,6 @@ class RequestTest extends TestCase
     {
         $class = new \ReflectionClass(Request::class);
         $property = $class->getProperty('httpMethodParameterOverride');
-        $property->setAccessible(true);
         $property->setValue(false);
     }
 

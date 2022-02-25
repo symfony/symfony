@@ -180,10 +180,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($item->isHit());
     }
 
-    /**
-     * @return PruneableInterface&MockObject
-     */
-    private function getPruneableMock(): PruneableInterface
+    private function getPruneableMock(): PruneableInterface&MockObject
     {
         $pruneable = $this->createMock(PrunableAdapter::class);
 
@@ -195,10 +192,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         return $pruneable;
     }
 
-    /**
-     * @return PruneableInterface&MockObject
-     */
-    private function getFailingPruneableMock(): PruneableInterface
+    private function getFailingPruneableMock(): PruneableInterface&MockObject
     {
         $pruneable = $this->createMock(PrunableAdapter::class);
 
@@ -210,10 +204,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         return $pruneable;
     }
 
-    /**
-     * @return AdapterInterface&MockObject
-     */
-    private function getNonPruneableMock(): AdapterInterface
+    private function getNonPruneableMock(): AdapterInterface&MockObject
     {
         return $this->createMock(AdapterInterface::class);
     }

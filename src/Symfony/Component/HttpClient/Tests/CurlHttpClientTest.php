@@ -38,7 +38,6 @@ class CurlHttpClientTest extends HttpClientTestCase
         $response->getStatusCode();
 
         $r = new \ReflectionProperty($response, 'handle');
-        $r->setAccessible(true);
 
         $curlInfo = curl_getinfo($r->getValue($response));
 
@@ -60,7 +59,6 @@ class CurlHttpClientTest extends HttpClientTestCase
         $httpClient = $this->getHttpClient(__FUNCTION__);
 
         $r = new \ReflectionProperty($httpClient, 'multi');
-        $r->setAccessible(true);
         $clientState = $r->getValue($httpClient);
         $initialShareId = $clientState->share;
         $httpClient->reset();

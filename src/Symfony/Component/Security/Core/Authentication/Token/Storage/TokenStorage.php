@@ -56,7 +56,7 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
 
     public function setInitializer(?callable $initializer): void
     {
-        $this->initializer = null === $initializer || $initializer instanceof \Closure ? $initializer : \Closure::fromCallable($initializer);
+        $this->initializer = null === $initializer ? null : $initializer(...);
     }
 
     public function reset()

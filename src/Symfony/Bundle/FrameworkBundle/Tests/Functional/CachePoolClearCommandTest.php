@@ -86,7 +86,6 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $pool->save($item);
         $r = new \ReflectionObject($pool);
         $p = $r->getProperty('directory');
-        $p->setAccessible(true);
         $poolDir = $p->getValue($pool);
 
         /** @var SplFileInfo $entry */

@@ -68,7 +68,7 @@ class TemplateManagerTest extends TestCase
         $this->profiler->expects($this->any())
             ->method('has')
             ->withAnyParameters()
-            ->willReturnCallback([$this, 'profilerHasCallback']);
+            ->willReturnCallback($this->profilerHasCallback(...));
 
         $this->assertEquals('@Foo/Collector/foo.html.twig', $this->templateManager->getName(new ProfileDummy(), 'foo'));
     }

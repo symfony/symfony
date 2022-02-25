@@ -67,7 +67,6 @@ class MessageConverterTest extends TestCase
     private function assertConversion(Email $expected)
     {
         $r = new \ReflectionMethod($expected, 'generateBody');
-        $r->setAccessible(true);
 
         $message = new Message($expected->getHeaders(), $r->invoke($expected));
         $converted = MessageConverter::toEmail($message);

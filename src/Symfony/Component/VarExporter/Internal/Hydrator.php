@@ -81,7 +81,7 @@ class Hydrator
         switch ($class) {
             case 'ArrayIterator':
             case 'ArrayObject':
-                $constructor = \Closure::fromCallable([$classReflector->getConstructor(), 'invokeArgs']);
+                $constructor = $classReflector->getConstructor()->invokeArgs(...);
 
                 return self::$hydrators[$class] = static function ($properties, $objects) use ($constructor) {
                     foreach ($properties as $name => $values) {
@@ -125,8 +125,7 @@ class Hydrator
         $propertySetters = [];
         foreach ($classReflector->getProperties() as $propertyReflector) {
             if (!$propertyReflector->isStatic()) {
-                $propertyReflector->setAccessible(true);
-                $propertySetters[$propertyReflector->name] = \Closure::fromCallable([$propertyReflector, 'setValue']);
+                $propertySetters[$propertyReflector->name] = $propertyReflector->setValue(...);
             }
         }
 

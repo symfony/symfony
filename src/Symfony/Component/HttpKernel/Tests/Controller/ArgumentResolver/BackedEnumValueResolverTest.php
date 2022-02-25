@@ -18,9 +18,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 
-/**
- * @requires PHP 8.1
- */
 class BackedEnumValueResolverTest extends TestCase
 {
     /**

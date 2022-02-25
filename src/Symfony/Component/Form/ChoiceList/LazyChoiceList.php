@@ -48,7 +48,7 @@ class LazyChoiceList implements ChoiceListInterface
     public function __construct(ChoiceLoaderInterface $loader, callable $value = null)
     {
         $this->loader = $loader;
-        $this->value = null === $value || $value instanceof \Closure ? $value : \Closure::fromCallable($value);
+        $this->value = null === $value ? null : $value(...);
     }
 
     /**

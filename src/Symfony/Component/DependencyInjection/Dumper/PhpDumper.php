@@ -226,7 +226,7 @@ class PhpDumper extends Dumper
         if ($this->addGetService) {
             $code = preg_replace(
                 "/(\r?\n\r?\n    public function __construct.+?\\{\r?\n)/s",
-                "\n    protected \$getService;$1        \$this->getService = \\Closure::fromCallable([\$this, 'getService']);\n",
+                "\n    protected \Closure \$getService;$1        \$this->getService = \$this->getService(...);\n",
                 $code,
                 1
             );
@@ -334,7 +334,7 @@ EOF;
                     if (!$class || str_contains($class, '$') || \in_array($class, ['int', 'float', 'string', 'bool', 'resource', 'object', 'array', 'null', 'callable', 'iterable', 'mixed', 'void'], true)) {
                         continue;
                     }
-                    if (!(class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) || ((new \ReflectionClass($class))->isUserDefined() && !\in_array($class, ['Attribute', 'JsonException', 'ReturnTypeWillChange', 'Stringable', 'UnhandledMatchError', 'ValueError'], true))) {
+                    if (!(class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) || (new \ReflectionClass($class))->isUserDefined()) {
                         $code[$options['class'].'.preload.php'] .= sprintf("\$classes[] = '%s';\n", $class);
                     }
                 }
@@ -891,7 +891,7 @@ EOF;
                         $code .= "            return self::do(\$container);\n";
                         $code .= "        };\n\n";
                     } else {
-                        $code .= sprintf("\\Closure::fromCallable([\$this, '%s']);\n\n", $methodName);
+                        $code .= sprintf("\$this->%s(...);\n\n", $methodName);
                     }
                 }
 

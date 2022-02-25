@@ -25,7 +25,6 @@ final class OhMySmtpSmtpTransportTest extends TestCase
 
         $transport = new OhMySmtpSmtpTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(OhMySmtpSmtpTransport::class, 'addOhMySmtpHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(1, $email->getHeaders()->toArray());
@@ -41,7 +40,6 @@ final class OhMySmtpSmtpTransportTest extends TestCase
 
         $transport = new OhMySmtpSmtpTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(OhMySmtpSmtpTransport::class, 'addOhMySmtpHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(2, $email->getHeaders()->toArray());

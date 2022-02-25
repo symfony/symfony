@@ -34,7 +34,7 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         }
 
         foreach ($container->getAutoconfiguredAttributes() as $attributeName => $callable) {
-            $callableReflector = new \ReflectionFunction(\Closure::fromCallable($callable));
+            $callableReflector = new \ReflectionFunction($callable(...));
             if ($callableReflector->getNumberOfParameters() <= 2) {
                 $this->classAttributeConfigurators[$attributeName] = $callable;
                 continue;

@@ -271,9 +271,6 @@ class AutowirePassTest extends TestCase
         $this->assertSame('b', (string) $aDefinition->getArgument(0));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testTypeNotGuessableIntersectionType()
     {
         $container = new ContainerBuilder();
@@ -291,9 +288,6 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testGuessableIntersectionType()
     {
         $container = new ContainerBuilder();

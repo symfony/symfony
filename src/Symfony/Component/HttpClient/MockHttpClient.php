@@ -56,7 +56,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
             })();
         }
 
-        $this->responseFactory = !\is_callable($responseFactory) || $responseFactory instanceof \Closure ? $responseFactory : \Closure::fromCallable($responseFactory);
+        $this->responseFactory = !\is_callable($responseFactory) ? $responseFactory : $responseFactory(...);
     }
 
     /**

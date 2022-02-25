@@ -34,7 +34,7 @@ class CustomCredentials implements CredentialsInterface
      */
     public function __construct(callable $customCredentialsChecker, mixed $credentials)
     {
-        $this->customCredentialsChecker = $customCredentialsChecker instanceof \Closure ? $customCredentialsChecker : \Closure::fromCallable($customCredentialsChecker);
+        $this->customCredentialsChecker = $customCredentialsChecker(...);
         $this->credentials = $credentials;
     }
 

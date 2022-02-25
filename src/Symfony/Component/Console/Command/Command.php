@@ -350,7 +350,7 @@ class Command
                 }
             }
         } else {
-            $code = \Closure::fromCallable($code);
+            $code = $code(...);
         }
 
         $this->code = $code;

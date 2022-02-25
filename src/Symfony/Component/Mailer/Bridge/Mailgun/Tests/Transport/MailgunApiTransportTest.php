@@ -73,7 +73,6 @@ class MailgunApiTransportTest extends TestCase
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
@@ -110,7 +109,6 @@ class MailgunApiTransportTest extends TestCase
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('h:bar', $payload, 'We should prefix headers with "h:" to keep BC');
@@ -255,7 +253,6 @@ class MailgunApiTransportTest extends TestCase
 
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
         $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
         $this->assertEquals($json, $payload['h:x-mailgun-variables']);

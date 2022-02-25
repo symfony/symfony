@@ -41,7 +41,6 @@ class TwigExtractorTest extends TestCase
         $catalogue = new MessageCatalogue('en');
 
         $m = new \ReflectionMethod($extractor, 'extractTemplate');
-        $m->setAccessible(true);
         $m->invoke($extractor, $template, $catalogue);
 
         if (0 === \count($messages)) {

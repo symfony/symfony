@@ -294,7 +294,7 @@ EOF
             }
 
             foreach ($namespaces as $namespace) {
-                $paths = array_map([$this, 'getRelativePath'], $loader->getPaths($namespace));
+                $paths = array_map($this->getRelativePath(...), $loader->getPaths($namespace));
 
                 if (FilesystemLoader::MAIN_NAMESPACE === $namespace) {
                     $namespace = '(None)';

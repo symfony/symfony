@@ -571,9 +571,6 @@ EOTXT;
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testPhp81Enums()
     {
         $data = new Php81Enums();

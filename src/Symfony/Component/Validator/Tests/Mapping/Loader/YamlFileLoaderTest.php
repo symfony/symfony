@@ -36,7 +36,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
 
         $r = new \ReflectionProperty($loader, 'classes');
-        $r->setAccessible(true);
         $this->assertSame([], $r->getValue($loader));
     }
 

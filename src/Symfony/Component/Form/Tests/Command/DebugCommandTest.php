@@ -266,7 +266,6 @@ TXT
     {
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
-        $loadTypesRefMethod->setAccessible(true);
         $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
         $coreTypes = array_map(function (FormTypeInterface $type) { return \get_class($type); }, $coreTypes);
         sort($coreTypes);

@@ -222,7 +222,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
             }
         }
 
-        uasort($notCalled, [$this, 'sortNotCalledListeners']);
+        uasort($notCalled, $this->sortNotCalledListeners(...));
 
         return $notCalled;
     }

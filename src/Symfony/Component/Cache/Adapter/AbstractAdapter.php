@@ -147,7 +147,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
     public function commit(): bool
     {
         $ok = true;
-        $byLifetime = (self::$mergeByLifetime)($this->deferred, $this->namespace, $expiredIds, \Closure::fromCallable([$this, 'getId']), $this->defaultLifetime);
+        $byLifetime = (self::$mergeByLifetime)($this->deferred, $this->namespace, $expiredIds, $this->getId(...), $this->defaultLifetime);
         $retry = $this->deferred = [];
 
         if ($expiredIds) {

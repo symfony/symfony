@@ -40,7 +40,6 @@ class TerminalTest extends TestCase
     {
         foreach (['height', 'width', 'stty'] as $name) {
             $property = new \ReflectionProperty(Terminal::class, $name);
-            $property->setAccessible(true);
             $property->setValue(null);
         }
     }

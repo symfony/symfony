@@ -161,7 +161,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('headers', $payload);
@@ -183,7 +182,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('from', $payload);
@@ -211,7 +209,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('from', $payload);
@@ -239,7 +236,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('categories', $payload);

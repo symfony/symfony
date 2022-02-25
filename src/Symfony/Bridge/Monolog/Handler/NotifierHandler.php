@@ -46,7 +46,7 @@ class NotifierHandler extends AbstractHandler
 
     public function handleBatch(array $records): void
     {
-        if ($records = array_filter($records, [$this, 'isHandling'])) {
+        if ($records = array_filter($records, $this->isHandling(...))) {
             $this->notify($records);
         }
     }

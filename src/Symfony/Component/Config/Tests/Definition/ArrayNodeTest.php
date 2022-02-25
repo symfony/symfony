@@ -90,7 +90,6 @@ class ArrayNodeTest extends TestCase
         $node = new ArrayNode('foo');
 
         $r = new \ReflectionMethod($node, 'preNormalize');
-        $r->setAccessible(true);
 
         $this->assertSame($normalized, $r->invoke($node, $denormalized));
     }
@@ -132,7 +131,6 @@ class ArrayNodeTest extends TestCase
         $rootNode->addChild($fiveNode);
         $rootNode->addChild(new ScalarNode('string_key'));
         $r = new \ReflectionMethod($rootNode, 'normalizeValue');
-        $r->setAccessible(true);
 
         $this->assertSame($normalized, $r->invoke($rootNode, $denormalized));
     }
@@ -179,7 +177,6 @@ class ArrayNodeTest extends TestCase
         $node->addChild($scalar2);
 
         $r = new \ReflectionMethod($node, 'normalizeValue');
-        $r->setAccessible(true);
 
         $this->assertSame($normalized, $r->invoke($node, $prenormalized));
     }
@@ -278,7 +275,6 @@ class ArrayNodeTest extends TestCase
         $node->setIgnoreExtraKeys(false);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
-        $r->setAccessible(true);
 
         $r->invoke($node, ...$prenormalizeds);
     }
@@ -296,7 +292,6 @@ class ArrayNodeTest extends TestCase
         $node->setIgnoreExtraKeys(true);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
-        $r->setAccessible(true);
 
         $r->invoke($node, ...$prenormalizeds);
     }
@@ -312,7 +307,6 @@ class ArrayNodeTest extends TestCase
         $node->setIgnoreExtraKeys(true, false);
 
         $r = new \ReflectionMethod($node, 'mergeValues');
-        $r->setAccessible(true);
 
         $this->assertEquals($merged, $r->invoke($node, ...$prenormalizeds));
     }

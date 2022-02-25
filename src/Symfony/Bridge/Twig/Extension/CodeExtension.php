@@ -39,16 +39,16 @@ final class CodeExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('abbr_class', [$this, 'abbrClass'], ['is_safe' => ['html']]),
-            new TwigFilter('abbr_method', [$this, 'abbrMethod'], ['is_safe' => ['html']]),
-            new TwigFilter('format_args', [$this, 'formatArgs'], ['is_safe' => ['html']]),
-            new TwigFilter('format_args_as_text', [$this, 'formatArgsAsText']),
-            new TwigFilter('file_excerpt', [$this, 'fileExcerpt'], ['is_safe' => ['html']]),
-            new TwigFilter('format_file', [$this, 'formatFile'], ['is_safe' => ['html']]),
-            new TwigFilter('format_file_from_text', [$this, 'formatFileFromText'], ['is_safe' => ['html']]),
-            new TwigFilter('format_log_message', [$this, 'formatLogMessage'], ['is_safe' => ['html']]),
-            new TwigFilter('file_link', [$this, 'getFileLink']),
-            new TwigFilter('file_relative', [$this, 'getFileRelative']),
+            new TwigFilter('abbr_class', $this->abbrClass(...), ['is_safe' => ['html']]),
+            new TwigFilter('abbr_method', $this->abbrMethod(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_args', $this->formatArgs(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_args_as_text', $this->formatArgsAsText(...)),
+            new TwigFilter('file_excerpt', $this->fileExcerpt(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_file', $this->formatFile(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_file_from_text', $this->formatFileFromText(...), ['is_safe' => ['html']]),
+            new TwigFilter('format_log_message', $this->formatLogMessage(...), ['is_safe' => ['html']]),
+            new TwigFilter('file_link', $this->getFileLink(...)),
+            new TwigFilter('file_relative', $this->getFileRelative(...)),
         ];
     }
 

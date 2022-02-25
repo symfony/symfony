@@ -28,7 +28,7 @@ final class ExpressionExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('expression', [$this, 'createExpression']),
+            new TwigFunction('expression', $this->createExpression(...)),
         ];
     }
 

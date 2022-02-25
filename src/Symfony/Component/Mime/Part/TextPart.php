@@ -212,7 +212,6 @@ class TextPart extends AbstractPart
     public function __wakeup()
     {
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');
-        $r->setAccessible(true);
         $r->setValue($this, $this->_headers);
         unset($this->_headers);
     }

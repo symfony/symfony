@@ -91,7 +91,7 @@ class PasswordMigratingListenerTest extends TestCase
         $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', [$userLoader, 'loadUserByIdentifier']), [new PasswordUpgradeBadge('pa$$word')]));
         $this->listener->onLoginSuccess($event);
 
-        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', \Closure::fromCallable([$userLoader, 'loadUserByIdentifier'])), [new PasswordUpgradeBadge('pa$$word')]));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', $userLoader->loadUserByIdentifier(...)), [new PasswordUpgradeBadge('pa$$word')]));
         $this->listener->onLoginSuccess($event);
     }
 

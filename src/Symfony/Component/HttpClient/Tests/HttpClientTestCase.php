@@ -321,7 +321,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
         $process->start();
 
-        register_shutdown_function([$process, 'stop']);
+        register_shutdown_function($process->stop(...));
         sleep('\\' === \DIRECTORY_SEPARATOR ? 10 : 1);
 
         if (!$process->isRunning()) {
@@ -353,7 +353,6 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             unset($e);
 
             $r = new \ReflectionProperty($client, 'multi');
-            $r->setAccessible(true);
             /** @var ClientState $clientState */
             $clientState = $r->getValue($client);
 

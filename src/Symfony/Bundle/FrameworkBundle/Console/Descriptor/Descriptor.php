@@ -326,7 +326,6 @@ abstract class Descriptor implements DescriptorInterface
         $getDefaultParameter = $getDefaultParameter->bindTo($bag, \get_class($bag));
 
         $getEnvReflection = new \ReflectionMethod($container, 'getEnv');
-        $getEnvReflection->setAccessible(true);
 
         $envs = [];
 

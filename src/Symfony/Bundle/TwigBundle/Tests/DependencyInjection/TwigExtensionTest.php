@@ -225,7 +225,6 @@ class TwigExtensionTest extends TestCase
 
         $tokenParsers = $container->get('test.twig.extension.debug.stopwatch')->getTokenParsers();
         $stopwatchIsAvailable = new \ReflectionProperty($tokenParsers[0], 'stopwatchIsAvailable');
-        $stopwatchIsAvailable->setAccessible(true);
 
         $this->assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
     }

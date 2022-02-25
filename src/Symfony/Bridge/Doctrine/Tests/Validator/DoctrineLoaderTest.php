@@ -151,9 +151,6 @@ class DoctrineLoaderTest extends TestCase
         $this->assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testExtractEnum()
     {
         if (!property_exists(Column::class, 'enumType')) {

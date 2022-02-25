@@ -248,7 +248,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('web.php');
 
-        if (\PHP_VERSION_ID < 80100 || !class_exists(BackedEnumValueResolver::class)) {
+        if (!class_exists(BackedEnumValueResolver::class)) {
             $container->removeDefinition('argument_resolver.backed_enum_resolver');
         }
 

@@ -333,11 +333,9 @@ class StoreTest extends TestCase
     {
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('getMetadata');
-        $m->setAccessible(true);
 
         if ($key instanceof Request) {
             $m1 = $r->getMethod('getCacheKey');
-            $m1->setAccessible(true);
             $key = $m1->invoke($this->store, $key);
         }
 
@@ -348,7 +346,6 @@ class StoreTest extends TestCase
     {
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('getPath');
-        $m->setAccessible(true);
 
         return $m->invoke($this->store, $key);
     }

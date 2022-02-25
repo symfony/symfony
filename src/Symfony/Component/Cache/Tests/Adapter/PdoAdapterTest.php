@@ -101,7 +101,6 @@ class PdoAdapterTest extends AdapterTestCase
         $o = new \ReflectionObject($cache);
 
         $getPdoConn = $o->getMethod('getConnection');
-        $getPdoConn->setAccessible(true);
 
         /** @var \PDOStatement $select */
         $select = $getPdoConn->invoke($cache)->prepare('SELECT 1 FROM cache_items WHERE item_id LIKE :id');

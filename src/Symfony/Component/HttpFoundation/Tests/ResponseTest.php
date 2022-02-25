@@ -832,7 +832,6 @@ class ResponseTest extends ResponseTestCase
         $response->setStatusCode($code, $text);
 
         $statusText = new \ReflectionProperty($response, 'statusText');
-        $statusText->setAccessible(true);
 
         $this->assertEquals($expectedText, $statusText->getValue($response));
     }

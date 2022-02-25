@@ -151,9 +151,6 @@ class InMemoryTransport implements TransportInterface, ResetInterface
             return $messagesEncoded;
         }
 
-        return array_map(
-            [$this->serializer, 'decode'],
-            $messagesEncoded
-        );
+        return array_map($this->serializer->decode(...), $messagesEncoded);
     }
 }

@@ -109,7 +109,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testNamedClosure()
     {
-        $arguments = $this->factory->createArgumentMetadata(\Closure::fromCallable([$this, 'signature1']));
+        $arguments = $this->factory->createArgumentMetadata($this->signature1(...));
 
         $this->assertEquals([
             new ArgumentMetadata('foo', self::class, false, false, null),

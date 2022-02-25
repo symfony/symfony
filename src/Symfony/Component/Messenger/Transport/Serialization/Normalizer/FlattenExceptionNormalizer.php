@@ -77,11 +77,9 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
         }
 
         $property = new \ReflectionProperty(FlattenException::class, 'trace');
-        $property->setAccessible(true);
         $property->setValue($object, (array) $data['trace']);
 
         $property = new \ReflectionProperty(FlattenException::class, 'traceAsString');
-        $property->setAccessible(true);
         $property->setValue($object, $data['trace_as_string']);
 
         return $object;

@@ -61,7 +61,6 @@ class PostmarkApiTransportTest extends TestCase
 
         $transport = new PostmarkApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('Headers', $payload);
@@ -136,7 +135,6 @@ class PostmarkApiTransportTest extends TestCase
 
         $transport = new PostmarkApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayNotHasKey('Headers', $payload);
@@ -158,7 +156,6 @@ class PostmarkApiTransportTest extends TestCase
 
         $transport = new PostmarkApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
 
         $this->expectException(TransportException::class);
 

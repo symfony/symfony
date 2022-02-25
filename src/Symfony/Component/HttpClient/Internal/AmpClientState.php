@@ -54,7 +54,7 @@ final class AmpClientState extends ClientState
     public function __construct(?callable $clientConfigurator, int $maxHostConnections, int $maxPendingPushes, ?LoggerInterface &$logger)
     {
         $clientConfigurator ??= static fn (PooledHttpClient $client) => new InterceptedHttpClient($client, new RetryRequests(2));
-        $this->clientConfigurator = $clientConfigurator instanceof \Closure ? $clientConfigurator : \Closure::fromCallable($clientConfigurator);
+        $this->clientConfigurator = $clientConfigurator(...);
 
         $this->maxHostConnections = $maxHostConnections;
         $this->maxPendingPushes = $maxPendingPushes;

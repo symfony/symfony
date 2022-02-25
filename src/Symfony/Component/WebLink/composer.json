@@ -19,7 +19,7 @@
         "psr/link-implementation": "1.0|2.0"
     },
     "require": {
-        "php": ">=8.0.2",
+        "php": ">=8.1",
         "psr/link": "^1.1|^2.0"
     },
     "suggest": {

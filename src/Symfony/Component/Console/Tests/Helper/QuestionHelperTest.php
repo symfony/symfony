@@ -872,7 +872,6 @@ EOD;
             $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
         } finally {
             $reflection = new \ReflectionProperty(QuestionHelper::class, 'stty');
-            $reflection->setAccessible(true);
             $reflection->setValue(null, true);
         }
     }

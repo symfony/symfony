@@ -37,9 +37,6 @@ class UserProviderListenerTest extends TestCase
 
         $this->listener->checkPassport(new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport));
 
-        $badge = $passport->getBadge(UserBadge::class);
-        $this->assertEquals([$this->userProvider, 'loadUserByIdentifier'], $badge->getUserLoader());
-
         $user = new InMemoryUser('wouter', null);
         $this->userProvider->createUser($user);
         $this->assertTrue($user->isEqualTo($passport->getUser()));

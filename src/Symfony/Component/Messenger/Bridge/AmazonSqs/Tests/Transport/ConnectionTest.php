@@ -290,7 +290,6 @@ class ConnectionTest extends TestCase
 
         $r = new \ReflectionObject($connection);
         $queueProperty = $r->getProperty('queueUrl');
-        $queueProperty->setAccessible(true);
 
         $this->assertSame($queueUrl, $queueProperty->getValue($connection));
     }
@@ -311,7 +310,6 @@ class ConnectionTest extends TestCase
 
         $r = new \ReflectionObject($connection);
         $queueProperty = $r->getProperty('queueUrl');
-        $queueProperty->setAccessible(true);
 
         $this->assertNull($queueProperty->getValue($connection));
     }

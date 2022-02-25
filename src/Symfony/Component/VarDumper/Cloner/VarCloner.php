@@ -121,46 +121,8 @@ class VarCloner extends AbstractCloner
                         }
                         $stub = $arrayStub;
 
-                        if (\PHP_VERSION_ID >= 80100) {
-                            $stub->class = array_is_list($v) ? Stub::ARRAY_INDEXED : Stub::ARRAY_ASSOC;
-                            $a = $v;
-                            break;
-                        }
-
-                        $stub->class = Stub::ARRAY_INDEXED;
-
-                        $j = -1;
-                        foreach ($v as $gk => $gv) {
-                            if ($gk !== ++$j) {
-                                $stub->class = Stub::ARRAY_ASSOC;
-                                $a = $v;
-                                $a[$gid] = true;
-                                break;
-                            }
-                        }
-
-                        // Copies of $GLOBALS have very strange behavior,
-                        // let's detect them with some black magic
-                        if (isset($v[$gid])) {
-                            unset($v[$gid]);
-                            $a = [];
-                            foreach ($v as $gk => &$gv) {
-                                if ($v === $gv && !isset($hardRefs[\ReflectionReference::fromArrayElement($v, $gk)->getId()])) {
-                                    unset($v);
-                                    $v = new Stub();
-                                    $v->value = [$v->cut = \count($gv), Stub::TYPE_ARRAY => 0];
-                                    $v->handle = -1;
-                                    $gv = &$a[$gk];
-                                    $hardRefs[\ReflectionReference::fromArrayElement($a, $gk)->getId()] = &$gv;
-                                    $gv = $v;
-                                }
-
-                                $a[$gk] = &$gv;
-                            }
-                            unset($gv);
-                        } else {
-                            $a = $v;
-                        }
+                        $stub->class = array_is_list($v) ? Stub::ARRAY_INDEXED : Stub::ARRAY_ASSOC;
+                        $a = $v;
                         break;
 
                     case \is_object($v):

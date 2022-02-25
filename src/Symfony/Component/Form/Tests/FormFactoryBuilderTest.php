@@ -27,7 +27,6 @@ class FormFactoryBuilderTest extends TestCase
     {
         $factory = new \ReflectionClass(FormFactory::class);
         $this->registry = $factory->getProperty('registry');
-        $this->registry->setAccessible(true);
 
         $this->guesser = $this->createMock(FormTypeGuesserInterface::class);
         $this->type = new FooType();

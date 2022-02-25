@@ -30,7 +30,7 @@ class SessionFactory implements SessionFactoryInterface
     {
         $this->requestStack = $requestStack;
         $this->storageFactory = $storageFactory;
-        $this->usageReporter = $usageReporter instanceof \Closure || !\is_callable($usageReporter) ? $usageReporter : \Closure::fromCallable($usageReporter);
+        $this->usageReporter = null === $usageReporter ? null : $usageReporter(...);
     }
 
     public function createSession(): SessionInterface

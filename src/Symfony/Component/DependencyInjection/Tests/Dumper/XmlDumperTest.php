@@ -237,9 +237,6 @@ class XmlDumperTest extends TestCase
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services_abstract.xml'), $dumper->dump());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testDumpHandlesEnumeration()
     {
         $container = new ContainerBuilder();

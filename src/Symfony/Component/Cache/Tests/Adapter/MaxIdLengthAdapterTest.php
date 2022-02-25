@@ -48,7 +48,6 @@ class MaxIdLengthAdapterTest extends TestCase
         $reflectionClass = new \ReflectionClass(AbstractAdapter::class);
 
         $reflectionMethod = $reflectionClass->getMethod('getId');
-        $reflectionMethod->setAccessible(true);
 
         // No versioning enabled
         $this->assertEquals('--------------------------:------------', $reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)]));
@@ -57,7 +56,6 @@ class MaxIdLengthAdapterTest extends TestCase
         $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 40)])));
 
         $reflectionProperty = $reflectionClass->getProperty('versioningIsEnabled');
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($cache, true);
 
         // Versioning enabled

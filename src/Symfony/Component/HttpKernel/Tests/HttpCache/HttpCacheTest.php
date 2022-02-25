@@ -696,7 +696,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $tmp[0][1]['date'] = $time->format(\DATE_RFC2822);
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
-        $m->setAccessible(true);
         $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         $this->request('GET', '/');
@@ -746,7 +745,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $tmp[0][1]['date'] = $time->format(\DATE_RFC2822);
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
-        $m->setAccessible(true);
         $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         $this->request('GET', '/');
@@ -806,7 +804,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $tmp[0][1]['expires'] = $time->format(\DATE_RFC2822);
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
-        $m->setAccessible(true);
         $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         // build subsequent request; should be found but miss due to freshness

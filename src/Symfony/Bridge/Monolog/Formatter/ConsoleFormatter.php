@@ -72,14 +72,14 @@ class ConsoleFormatter implements FormatterInterface
         if (class_exists(VarCloner::class)) {
             $this->cloner = new VarCloner();
             $this->cloner->addCasters([
-                '*' => [$this, 'castObject'],
+                '*' => $this->castObject(...),
             ]);
 
             $this->outputBuffer = fopen('php://memory', 'r+');
             if ($this->options['multiline']) {
                 $output = $this->outputBuffer;
             } else {
-                $output = [$this, 'echoLine'];
+                $output = $this->echoLine(...);
             }
 
             $this->dumper = new CliDumper($output, null, CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR);

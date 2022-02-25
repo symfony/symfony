@@ -17,3 +17,5 @@ Resources
    in the [main Symfony repository](https://github.com/symfony/symfony)
  * [Docker images with intl support](https://hub.docker.com/r/jakzal/php-intl)
    (for the Intl component development)
+
+[0]: https://php.net/intl.setup

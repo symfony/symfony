@@ -83,7 +83,7 @@ class ProfilerController
         }
 
         if (!$profile = $this->profiler->loadProfile($token)) {
-            return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', ['about' => 'no_token', 'token' => $token, 'request' => $request]), 200, ['Content-Type' => 'text/html']);
+            return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/info.html.twig', ['about' => 'no_token', 'token' => $token, 'request' => $request]);
         }
 
         if (null === $panel) {
@@ -106,7 +106,7 @@ class ProfilerController
             throw new NotFoundHttpException(sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
         }
 
-        return new Response($this->twig->render($this->getTemplateManager()->getName($profile, $panel), [
+        return $this->renderWithCspNonces($request, $this->getTemplateManager()->getName($profile, $panel), [
             'token' => $token,
             'profile' => $profile,
             'collector' => $profile->getCollector($panel),
@@ -116,7 +116,7 @@ class ProfilerController
             'templates' => $this->getTemplateManager()->getNames($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
             'profiler_markup_version' => 2, // 1 = original profiler, 2 = Symfony 2.8+ profiler
-        ]), 200, ['Content-Type' => 'text/html']);
+        ]);
     }
 
     /**
@@ -238,7 +238,7 @@ class ProfilerController
         $end = $request->query->get('end', null);
         $limit = $request->query->get('limit');
 
-        return new Response($this->twig->render('@WebProfiler/Profiler/results.html.twig', [
+        return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/results.html.twig', [
             'request' => $request,
             'token' => $token,
             'profile' => $profile,
@@ -251,7 +251,7 @@ class ProfilerController
             'end' => $end,
             'limit' => $limit,
             'panel' => null,
-        ]), 200, ['Content-Type' => 'text/html']);
+        ]);
     }
 
     /**
@@ -347,11 +347,11 @@ class ProfilerController
             throw new NotFoundHttpException(sprintf('The file "%s" cannot be opened.', $file));
         }
 
-        return new Response($this->twig->render('@WebProfiler/Profiler/open.html.twig', [
+        return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/open.html.twig', [
             'filename' => $filename,
             'file' => $file,
             'line' => $line,
-         ]), 200, ['Content-Type' => 'text/html']);
+        ]);
     }
 
     /**

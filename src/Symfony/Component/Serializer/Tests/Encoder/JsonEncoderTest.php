@@ -66,6 +66,22 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals($expected, $this->serializer->serialize($arr, 'json'), 'Context should not be persistent');
     }
 
+    public function testWithDefaultContext()
+    {
+        $defaultContext = [
+            'json_encode_options' => \JSON_UNESCAPED_UNICODE,
+            'json_decode_associative' => false,
+        ];
+
+        $encoder = new JsonEncoder(null, null, $defaultContext);
+
+        $data = new \stdClass();
+        $data->msg = '你好';
+
+        $this->assertEquals('{"msg":"你好"}', $json = $encoder->encode($data, 'json'));
+        $this->assertEquals($data, $encoder->decode($json, 'json'));
+    }
+
     public function testEncodeNotUtf8WithoutPartialOnError()
     {
         $this->expectException(UnexpectedValueException::class);

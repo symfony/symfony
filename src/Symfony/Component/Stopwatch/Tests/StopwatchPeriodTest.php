@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Stopwatch\Tests;
 
+use Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\StopwatchPeriod;
 
@@ -43,7 +44,7 @@ class StopwatchPeriodTest extends TestCase
         $this->assertSame($duration, $period->getDuration());
     }
 
-    public function provideTimeValues(): array
+    public function provideTimeValues(): Generator
     {
         yield [0, false, 0];
         yield [0, true, 0.0];
@@ -53,7 +54,7 @@ class StopwatchPeriodTest extends TestCase
         yield [2.71, true, 2.71];
     }
 
-    public function provideDurationValues(): array
+    public function provideDurationValues(): Generator
     {
         yield [0, 0, false, 0];
         yield [0, 0, true, 0.0];

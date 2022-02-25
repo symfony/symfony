@@ -27,7 +27,7 @@ class StopwatchTest extends TestCase
 {
     private const DELTA = 20;
 
-    public function testStart(): void
+    public function testStart()
     {
         $stopwatch = new Stopwatch();
         $event = $stopwatch->start('foo', 'cat');
@@ -37,7 +37,7 @@ class StopwatchTest extends TestCase
         $this->assertSame($event, $stopwatch->getEvent('foo'));
     }
 
-    public function testStartWithoutCategory(): void
+    public function testStartWithoutCategory()
     {
         $stopwatch = new Stopwatch();
         $stopwatchEvent = $stopwatch->start('bar');
@@ -45,7 +45,7 @@ class StopwatchTest extends TestCase
         $this->assertSame($stopwatchEvent, $stopwatch->getEvent('bar'));
     }
 
-    public function testIsStarted(): void
+    public function testIsStarted()
     {
         $stopwatch = new Stopwatch();
         $stopwatch->start('foo', 'cat');
@@ -53,14 +53,14 @@ class StopwatchTest extends TestCase
         $this->assertTrue($stopwatch->isStarted('foo'));
     }
 
-    public function testIsNotStarted(): void
+    public function testIsNotStarted()
     {
         $stopwatch = new Stopwatch();
 
         $this->assertFalse($stopwatch->isStarted('foo'));
     }
 
-    public function testIsNotStartedEvent(): void
+    public function testIsNotStartedEvent()
     {
         $stopwatch = new Stopwatch();
 
@@ -76,7 +76,7 @@ class StopwatchTest extends TestCase
         $this->assertFalse($stopwatch->isStarted('foo'));
     }
 
-    public function testStop(): void
+    public function testStop()
     {
         $stopwatch = new Stopwatch();
         $stopwatch->start('foo', 'cat');
@@ -87,21 +87,21 @@ class StopwatchTest extends TestCase
         $this->assertEqualsWithDelta(200, $event->getDuration(), self::DELTA);
     }
 
-    public function testUnknownEvent(): void
+    public function testUnknownEvent()
     {
         $this->expectException(\LogicException::class);
         $stopwatch = new Stopwatch();
         $stopwatch->getEvent('foo');
     }
 
-    public function testStopWithoutStart(): void
+    public function testStopWithoutStart()
     {
         $this->expectException(\LogicException::class);
         $stopwatch = new Stopwatch();
         $stopwatch->stop('foo');
     }
 
-    public function testMorePrecision(): void
+    public function testMorePrecision()
     {
         $stopwatch = new Stopwatch(true);
 
@@ -113,7 +113,7 @@ class StopwatchTest extends TestCase
         $this->assertIsFloat($event->getDuration());
     }
 
-    public function testSection(): void
+    public function testSection()
     {
         $stopwatch = new Stopwatch();
 
@@ -140,7 +140,7 @@ class StopwatchTest extends TestCase
         $this->assertCount(2, $stopwatch->getSectionEvents('0'));
     }
 
-    public function testReopenASection(): void
+    public function testReopenASection()
     {
         $stopwatch = new Stopwatch();
 
@@ -158,14 +158,14 @@ class StopwatchTest extends TestCase
         $this->assertCount(2, $events['__section__']->getPeriods());
     }
 
-    public function testReopenANewSectionShouldThrowAnException(): void
+    public function testReopenANewSectionShouldThrowAnException()
     {
         $this->expectException(\LogicException::class);
         $stopwatch = new Stopwatch();
         $stopwatch->openSection('section');
     }
 
-    public function testReset(): void
+    public function testReset()
     {
         $stopwatch = new Stopwatch();
 

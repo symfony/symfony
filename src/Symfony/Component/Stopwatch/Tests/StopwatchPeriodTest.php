@@ -19,7 +19,7 @@ class StopwatchPeriodTest extends TestCase
     /**
      * @dataProvider provideTimeValues
      */
-    public function testGetStartTime(int|float $start, bool $useMorePrecision, int|float $expected): void
+    public function testGetStartTime(int|float $start, bool $useMorePrecision, int|float $expected)
     {
         $period = new StopwatchPeriod($start, $start, $useMorePrecision);
         $this->assertSame($expected, $period->getStartTime());
@@ -28,7 +28,7 @@ class StopwatchPeriodTest extends TestCase
     /**
      * @dataProvider provideTimeValues
      */
-    public function testGetEndTime(int|float $end, bool $useMorePrecision, int|float $expected): void
+    public function testGetEndTime(int|float $end, bool $useMorePrecision, int|float $expected)
     {
         $period = new StopwatchPeriod($end, $end, $useMorePrecision);
         $this->assertSame($expected, $period->getEndTime());
@@ -37,7 +37,7 @@ class StopwatchPeriodTest extends TestCase
     /**
      * @dataProvider provideDurationValues
      */
-    public function testGetDuration(int|float $start, int|float $end, bool $useMorePrecision, int|float $duration): void
+    public function testGetDuration(int|float $start, int|float $end, bool $useMorePrecision, int|float $duration)
     {
         $period = new StopwatchPeriod($start, $end, $useMorePrecision);
         $this->assertSame($duration, $period->getDuration());

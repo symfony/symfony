@@ -24,6 +24,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 trait HttpClientTrait
 {
     private static $CHUNK_SIZE = 16372;
+    private static $emptyDefaults;
 
     /**
      * {@inheritdoc}
@@ -49,6 +50,16 @@ trait HttpClientTrait
             }
             if (!$method) {
                 throw new InvalidArgumentException('The HTTP method cannot be empty.');
+            }
+        }
+
+        if (null === self::$emptyDefaults) {
+            self::$emptyDefaults = [];
+
+            foreach ($defaultOptions as $k => $v) {
+                if (null !== $v) {
+                    self::$emptyDefaults[$k] = $v;
+                }
             }
         }
 
@@ -201,6 +212,16 @@ trait HttpClientTrait
 
         $options += $defaultOptions;
 
+        if (null === self::$emptyDefaults) {
+            self::$emptyDefaults = [];
+        }
+
+        foreach (self::$emptyDefaults as $k => $v) {
+            if (!isset($options[$k])) {
+                $options[$k] = $v;
+            }
+        }
+
         if (isset($defaultOptions['extra'])) {
             $options['extra'] += $defaultOptions['extra'];
         }
@@ -233,9 +254,9 @@ trait HttpClientTrait
 
             $alternatives = [];
 
-            foreach ($defaultOptions as $key => $v) {
-                if (levenshtein($name, $key) <= \strlen($name) / 3 || str_contains($key, $name)) {
-                    $alternatives[] = $key;
+            foreach ($defaultOptions as $k => $v) {
+                if (levenshtein($name, $k) <= \strlen($name) / 3 || str_contains($k, $name)) {
+                    $alternatives[] = $k;
                 }
             }
 

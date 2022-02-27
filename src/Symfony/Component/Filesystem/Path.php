@@ -183,11 +183,11 @@ final class Path
      *  - UNIX
      *  - Windows8 and upper
      *
-     * If your operation system or environment isn't supported, an exception is thrown.
+     * If your operating system or environment isn't supported, an exception is thrown.
      *
      * The result is a canonical path.
      *
-     * @throws RuntimeException If your operation system or environment isn't supported
+     * @throws RuntimeException If your operating system or environment isn't supported
      */
     public static function getHomeDirectory(): string
     {
@@ -201,7 +201,7 @@ final class Path
             return self::canonicalize(getenv('HOMEDRIVE').getenv('HOMEPATH'));
         }
 
-        throw new RuntimeException("Cannot find the home directory path: Your environment or operation system isn't supported.");
+        throw new RuntimeException("Cannot find the home directory path: Your environment or operating system isn't supported.");
     }
 
     /**

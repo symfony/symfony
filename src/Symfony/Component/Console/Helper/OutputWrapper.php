@@ -62,7 +62,7 @@ final class OutputWrapper implements OutputWrapperInterface
 
     public function wrap(string $text, int $width, string $break = "\n"): string
     {
-        if (0 === $width) {
+        if (!$width) {
             return $text;
         }
 

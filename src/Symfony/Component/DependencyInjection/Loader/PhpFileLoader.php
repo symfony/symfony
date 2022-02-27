@@ -102,7 +102,9 @@ class PhpFileLoader extends FileLoader
 
         $attribute = null;
         foreach ($r->getAttributes(When::class) as $attribute) {
-            if ($this->env === $attribute->newInstance()->env) {
+            $attributeEnv = (array) $attribute->newInstance()->env;
+
+            if (\in_array($this->env, $attributeEnv, true)) {
                 $attribute = null;
                 break;
             }

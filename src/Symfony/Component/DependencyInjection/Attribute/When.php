@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Attribute;
 
 /**
- * An attribute to tell under which environement this class should be registered as a service.
+ * An attribute to tell under which environment this class should be registered as a service.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -20,7 +20,7 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 class When
 {
     public function __construct(
-        public string $env,
+        public array|string $env,
     ) {
     }
 }

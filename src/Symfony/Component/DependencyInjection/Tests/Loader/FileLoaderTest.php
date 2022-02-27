@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\FooInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\AnotherSub\DeeperBaz;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Baz;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Qux;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\BarInterface;
 
@@ -265,6 +266,25 @@ class FileLoaderTest extends TestCase
         );
 
         $this->assertSame($expected, $container->has(Foo::class));
+    }
+
+    /**
+     * @testWith ["prod", true]
+     *           ["dev", true]
+     *           ["bar", false]
+     *           [null, true]
+     */
+    public function testRegisterClassesWithWhenEnvAsArray(?string $env, bool $expected)
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), $env);
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/{Qux.php}'
+        );
+
+        $this->assertSame($expected, $container->has(Qux::class));
     }
 }
 

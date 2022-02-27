@@ -148,17 +148,6 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertNotSame($initialShareId, $clientState->share);
     }
 
-    public function testNullBody()
-    {
-        $httpClient = $this->getHttpClient(__FUNCTION__);
-
-        $httpClient->request('POST', 'http://localhost:8057/post', [
-            'body' => null,
-        ]);
-
-        $this->expectNotToPerformAssertions();
-    }
-
     public function testProcessAfterReset()
     {
         $client = $this->getHttpClient(__FUNCTION__);

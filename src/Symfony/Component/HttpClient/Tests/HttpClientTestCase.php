@@ -202,4 +202,15 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'timeout' => -1,
         ])->getStatusCode());
     }
+
+    public function testNullBody()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+
+        $httpClient->request('POST', 'http://localhost:8057/post', [
+            'body' => null,
+        ]);
+
+        $this->expectNotToPerformAssertions();
+    }
 }

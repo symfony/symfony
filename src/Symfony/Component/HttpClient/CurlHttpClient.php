@@ -40,6 +40,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         'auth_ntlm' => null, // array|string - an array containing the username as first value, and optionally the
                              //   password as the second one; or string like username:password - enabling NTLM auth
     ];
+    private static $emptyDefaults = self::OPTIONS_DEFAULTS + ['auth_ntlm' => null];
 
     /**
      * @var LoggerInterface|null

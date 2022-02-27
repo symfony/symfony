@@ -1121,4 +1121,23 @@ class AutowirePassTest extends TestCase
         static::assertInstanceOf(DecoratedDecorator::class, $container->get(DecoratorInterface::class));
         static::assertInstanceOf(DecoratedDecorator::class, $container->get(DecoratorImpl::class));
     }
+
+    public function testServiceAttributeParameter()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AutowireServiceParameter::class)
+            ->setAutowired(true)
+        ;
+
+        $container->register('some.id', \stdClass::class);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition(AutowireServiceParameter::class);
+
+        $this->assertCount(1, $definition->getArguments());
+        $this->assertSame('some.id', (string) $definition->getArgument(0));
+    }
 }

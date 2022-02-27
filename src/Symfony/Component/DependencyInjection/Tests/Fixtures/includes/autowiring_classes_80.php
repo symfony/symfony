@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use Symfony\Component\DependencyInjection\Attribute\Service;
 use Symfony\Contracts\Service\Attribute\Required;
 
 class AutowireSetter
@@ -25,4 +26,11 @@ class AutowireProperty
 {
     #[Required]
     public Foo $foo;
+}
+
+class AutowireServiceParameter
+{
+    public function __construct(#[Service('some.id')] $service)
+    {
+    }
 }

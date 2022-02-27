@@ -249,18 +249,7 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
  */
 class FrameworkExtension extends Extension
 {
-    private bool $formConfigEnabled = false;
-    private bool $translationConfigEnabled = false;
-    private bool $sessionConfigEnabled = false;
-    private bool $annotationsConfigEnabled = false;
-    private bool $validatorConfigEnabled = false;
-    private bool $messengerConfigEnabled = false;
-    private bool $mailerConfigEnabled = false;
-    private bool $httpClientConfigEnabled = false;
-    private bool $notifierConfigEnabled = false;
-    private bool $serializerConfigEnabled = false;
-    private bool $propertyAccessConfigEnabled = false;
-    private static bool $lockConfigEnabled = false;
+    private array $configsEnabled = [];
 
     /**
      * Responds to the app.config configuration parameter.
@@ -313,14 +302,17 @@ class FrameworkExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $this->annotationsConfigEnabled = $this->isConfigEnabled($container, $config['annotations']);
-        $this->translationConfigEnabled = $this->isConfigEnabled($container, $config['translator']);
+        // warmup config enabled
+        $this->readConfigEnabled('annotations', $container, $config['annotations']);
+        $this->readConfigEnabled('translator', $container, $config['translator']);
+        $this->readConfigEnabled('property_access', $container, $config['property_access']);
+        $this->readConfigEnabled('profiler', $container, $config['profiler']);
 
         // A translator must always be registered (as support is included by
         // default in the Form and Validator component). If disabled, an identity
         // translator will be used and everything will still work as expected.
-        if ($this->isConfigEnabled($container, $config['translator']) || $this->isConfigEnabled($container, $config['form']) || $this->isConfigEnabled($container, $config['validation'])) {
-            if (!class_exists(Translator::class) && $this->isConfigEnabled($container, $config['translator'])) {
+        if ($this->readConfigEnabled('translator', $container, $config['translator']) || $this->readConfigEnabled('form', $container, $config['form']) || $this->readConfigEnabled('validation', $container, $config['validation'])) {
+            if (!class_exists(Translator::class) && $this->readConfigEnabled('translator', $container, $config['translator'])) {
                 throw new LogicException('Translation support cannot be enabled as the Translation component is not installed. Try running "composer require symfony/translation".');
             }
 
@@ -376,11 +368,11 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if ($this->isConfigEnabled($container, $config['request'])) {
+        if ($this->readConfigEnabled('request', $container, $config['request'])) {
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['assets'])) {
+        if ($this->readConfigEnabled('assets', $container, $config['assets'])) {
             if (!class_exists(\Symfony\Component\Asset\Package::class)) {
                 throw new LogicException('Asset support cannot be enabled as the Asset component is not installed. Try running "composer require symfony/asset".');
             }
@@ -388,19 +380,19 @@ class FrameworkExtension extends Extension
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
         }
 
-        if ($this->httpClientConfigEnabled = $this->isConfigEnabled($container, $config['http_client'])) {
-            $this->registerHttpClientConfiguration($config['http_client'], $container, $loader, $config['profiler']);
+        if ($this->readConfigEnabled('http_client', $container, $config['http_client'])) {
+            $this->registerHttpClientConfiguration($config['http_client'], $container, $loader);
         }
 
-        if ($this->mailerConfigEnabled = $this->isConfigEnabled($container, $config['mailer'])) {
+        if ($this->readConfigEnabled('mailer', $container, $config['mailer'])) {
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
+
+            if (!class_exists(MailerTestCommand::class)) {
+                $container->removeDefinition('console.command.mailer_test');
+            }
         }
 
-        if (!$this->mailerConfigEnabled || !class_exists(MailerTestCommand::class)) {
-            $container->removeDefinition('console.command.mailer_test');
-        }
-
-        $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
+        $propertyInfoEnabled = $this->readConfigEnabled('property_info', $container, $config['property_info']);
         $this->registerHttpCacheConfiguration($config['http_cache'], $container, $config['http_method_override']);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
@@ -415,7 +407,7 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('exception_listener')->replaceArgument(3, $config['exceptions']);
 
-        if ($this->serializerConfigEnabled = $this->isConfigEnabled($container, $config['serializer'])) {
+        if ($this->readConfigEnabled('serializer', $container, $config['serializer'])) {
             if (!class_exists(\Symfony\Component\Serializer\Serializer::class)) {
                 throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed. Try running "composer require symfony/serializer-pack".');
             }
@@ -427,15 +419,15 @@ class FrameworkExtension extends Extension
             $this->registerPropertyInfoConfiguration($container, $loader);
         }
 
-        if (self::$lockConfigEnabled = $this->isConfigEnabled($container, $config['lock'])) {
+        if ($this->readConfigEnabled('lock', $container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['semaphore'])) {
+        if ($this->readConfigEnabled('semaphore', $container, $config['semaphore'])) {
             $this->registerSemaphoreConfiguration($config['semaphore'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['rate_limiter'])) {
+        if ($this->readConfigEnabled('rate_limiter', $container, $config['rate_limiter'])) {
             if (!interface_exists(LimiterInterface::class)) {
                 throw new LogicException('Rate limiter support cannot be enabled as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
             }
@@ -443,7 +435,7 @@ class FrameworkExtension extends Extension
             $this->registerRateLimiterConfiguration($config['rate_limiter'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['web_link'])) {
+        if ($this->readConfigEnabled('web_link', $container, $config['web_link'])) {
             if (!class_exists(HttpHeaderSerializer::class)) {
                 throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed. Try running "composer require symfony/weblink".');
             }
@@ -451,7 +443,7 @@ class FrameworkExtension extends Extension
             $loader->load('web_link.php');
         }
 
-        if ($this->isConfigEnabled($container, $config['uid'])) {
+        if ($this->readConfigEnabled('uid', $container, $config['uid'])) {
             if (!class_exists(UuidFactory::class)) {
                 throw new LogicException('Uid support cannot be enabled as the Uid component is not installed. Try running "composer require symfony/uid".');
             }
@@ -464,12 +456,11 @@ class FrameworkExtension extends Extension
         // register cache before session so both can share the connection services
         $this->registerCacheConfiguration($config['cache'], $container);
 
-        if ($this->isConfigEnabled($container, $config['session'])) {
+        if ($this->readConfigEnabled('session', $container, $config['session'])) {
             if (!\extension_loaded('session')) {
                 throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://php.net/session.installation for instructions.');
             }
 
-            $this->sessionConfigEnabled = true;
             $this->registerSessionConfiguration($config['session'], $container, $loader);
             if (!empty($config['test'])) {
                 // test listener will replace the existing session listener
@@ -482,28 +473,27 @@ class FrameworkExtension extends Extension
 
         // csrf depends on session being registered
         if (null === $config['csrf_protection']['enabled']) {
-            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && ContainerBuilder::willBeAvailable('symfony/security-csrf', CsrfTokenManagerInterface::class, ['symfony/framework-bundle']);
+            $this->writeConfigEnabled('csrf_protection', $this->readConfigEnabled('session', $container, $config['session']) && !class_exists(FullStack::class) && ContainerBuilder::willBeAvailable('symfony/security-csrf', CsrfTokenManagerInterface::class, ['symfony/framework-bundle']), $config['csrf_protection']);
         }
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         // form depends on csrf being registered
-        if ($this->isConfigEnabled($container, $config['form'])) {
+        if ($this->readConfigEnabled('form', $container, $config['form'])) {
             if (!class_exists(Form::class)) {
                 throw new LogicException('Form support cannot be enabled as the Form component is not installed. Try running "composer require symfony/form".');
             }
 
-            $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
 
             if (ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/framework-bundle', 'symfony/form'])) {
-                $config['validation']['enabled'] = true;
+                $this->writeConfigEnabled('validation', true, $config['validation']);
             } else {
                 $container->setParameter('validator.translation_domain', 'validators');
 
                 $container->removeDefinition('form.type_extension.form.validator');
                 $container->removeDefinition('form.type_guesser.validator');
             }
-            if (!$this->isConfigEnabled($container, $config['html_sanitizer']) || !class_exists(TextTypeHtmlSanitizerExtension::class)) {
+            if (!$this->readConfigEnabled('html_sanitizer', $container, $config['html_sanitizer']) || !class_exists(TextTypeHtmlSanitizerExtension::class)) {
                 $container->removeDefinition('form.type_extension.form.html_sanitizer');
             }
         } else {
@@ -514,7 +504,7 @@ class FrameworkExtension extends Extension
         $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
 
         // messenger depends on validation being registered
-        if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {
+        if ($this->readConfigEnabled('messenger', $container, $config['messenger'])) {
             $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['validation']);
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
@@ -549,14 +539,14 @@ class FrameworkExtension extends Extension
         }
 
         // notifier depends on messenger, mailer being registered
-        if ($this->notifierConfigEnabled = $this->isConfigEnabled($container, $config['notifier'])) {
+        if ($this->readConfigEnabled('notifier', $container, $config['notifier'])) {
             $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
         }
 
         // profiler depends on form, validation, translation, messenger, mailer, http-client, notifier, serializer being registered
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
 
-        if ($this->isConfigEnabled($container, $config['html_sanitizer'])) {
+        if ($this->readConfigEnabled('html_sanitizer', $container, $config['html_sanitizer'])) {
             if (!class_exists(HtmlSanitizerConfig::class)) {
                 throw new LogicException('HtmlSanitizer support cannot be enabled as the HtmlSanitizer component is not installed. Try running "composer require symfony/html-sanitizer".');
             }
@@ -723,10 +713,10 @@ class FrameworkExtension extends Extension
         $loader->load('form.php');
 
         if (null === $config['form']['csrf_protection']['enabled']) {
-            $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
+            $this->writeConfigEnabled('form.csrf_protection', $config['csrf_protection']['enabled'], $config['form']['csrf_protection']);
         }
 
-        if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
+        if ($this->readConfigEnabled('form.csrf_protection', $container, $config['form']['csrf_protection'])) {
             if (!$container->hasDefinition('security.csrf.token_generator')) {
                 throw new \LogicException('To use form CSRF protection, "framework.csrf_protection" must be enabled.');
             }
@@ -772,7 +762,7 @@ class FrameworkExtension extends Extension
 
     private function registerEsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->readConfigEnabled('esi', $container, $config)) {
             $container->removeDefinition('fragment.renderer.esi');
 
             return;
@@ -783,7 +773,7 @@ class FrameworkExtension extends Extension
 
     private function registerSsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->readConfigEnabled('ssi', $container, $config)) {
             $container->removeDefinition('fragment.renderer.ssi');
 
             return;
@@ -794,7 +784,7 @@ class FrameworkExtension extends Extension
 
     private function registerFragmentsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->readConfigEnabled('fragments', $container, $config)) {
             $container->removeDefinition('fragment.renderer.hinclude');
 
             return;
@@ -808,7 +798,7 @@ class FrameworkExtension extends Extension
 
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->readConfigEnabled('profiler', $container, $config)) {
             // this is needed for the WebProfiler to work even if the profiler is disabled
             $container->setParameter('data_collector.templates', []);
 
@@ -819,37 +809,37 @@ class FrameworkExtension extends Extension
         $loader->load('collectors.php');
         $loader->load('cache_debug.php');
 
-        if ($this->formConfigEnabled) {
+        if ($this->isInitializedConfigEnabled('form')) {
             $loader->load('form_debug.php');
         }
 
-        if ($this->validatorConfigEnabled) {
+        if ($this->isInitializedConfigEnabled('validation')) {
             $loader->load('validator_debug.php');
         }
 
-        if ($this->translationConfigEnabled) {
+        if ($this->isInitializedConfigEnabled('translator')) {
             $loader->load('translation_debug.php');
 
             $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
         }
 
-        if ($this->messengerConfigEnabled) {
+        if ($this->isInitializedConfigEnabled('messenger')) {
             $loader->load('messenger_debug.php');
         }
 
-        if ($this->mailerConfigEnabled) {
+        if ($this->isInitializedConfigEnabled('mailer')) {
             $loader->load('mailer_debug.php');
         }
 
-        if ($this->httpClientConfigEnabled) {
+        if ($this->isInitializedConfigEnabled('http_client')) {
             $loader->load('http_client_debug.php');
         }
 
-        if ($this->notifierConfigEnabled) {
+        if ($this->isInitializedConfigEnabled('notifier')) {
             $loader->load('notifier_debug.php');
         }
 
-        if ($this->serializerConfigEnabled && $config['collect_serializer_data']) {
+        if ($this->isInitializedConfigEnabled('serializer') && $config['collect_serializer_data']) {
             $loader->load('serializer_debug.php');
         }
 
@@ -1114,7 +1104,7 @@ class FrameworkExtension extends Extension
 
     private function registerRouterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, array $enabledLocales = [])
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->readConfigEnabled('router', $container, $config)) {
             $container->removeDefinition('console.command.router_debug');
             $container->removeDefinition('console.command.router_match');
             $container->removeDefinition('messenger.middleware.router_context');
@@ -1301,7 +1291,7 @@ class FrameworkExtension extends Extension
 
     private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, string $defaultLocale, array $enabledLocales)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->readConfigEnabled('translator', $container, $config)) {
             $container->removeDefinition('console.command.translation_debug');
             $container->removeDefinition('console.command.translation_extract');
             $container->removeDefinition('console.command.translation_pull');
@@ -1497,7 +1487,7 @@ class FrameworkExtension extends Extension
 
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $propertyInfoEnabled)
     {
-        if (!$this->validatorConfigEnabled = $this->isConfigEnabled($container, $config)) {
+        if (!$this->readConfigEnabled('validation', $container, $config)) {
             $container->removeDefinition('console.command.validator_debug');
 
             return;
@@ -1533,7 +1523,7 @@ class FrameworkExtension extends Extension
 
         if (\array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             $validatorBuilder->addMethodCall('enableAnnotationMapping', [true]);
-            if ($this->annotationsConfigEnabled) {
+            if ($this->isInitializedConfigEnabled('annotations')) {
                 $validatorBuilder->addMethodCall('setDoctrineAnnotationReader', [new Reference('annotation_reader')]);
             }
         }
@@ -1632,7 +1622,7 @@ class FrameworkExtension extends Extension
 
     private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
-        if (!$this->annotationsConfigEnabled) {
+        if (!$this->isInitializedConfigEnabled('annotations')) {
             return;
         }
 
@@ -1687,7 +1677,7 @@ class FrameworkExtension extends Extension
 
     private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        if (!$this->propertyAccessConfigEnabled = $this->isConfigEnabled($container, $config)) {
+        if (!$this->readConfigEnabled('property_access', $container, $config)) {
             return;
         }
 
@@ -1713,7 +1703,7 @@ class FrameworkExtension extends Extension
 
     private function registerSecretsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->readConfigEnabled('secrets', $container, $config)) {
             $container->removeDefinition('console.command.secrets_set');
             $container->removeDefinition('console.command.secrets_list');
             $container->removeDefinition('console.command.secrets_remove');
@@ -1753,7 +1743,7 @@ class FrameworkExtension extends Extension
 
     private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->readConfigEnabled('csrf_protection', $container, $config)) {
             return;
         }
 
@@ -1761,7 +1751,7 @@ class FrameworkExtension extends Extension
             throw new LogicException('CSRF support cannot be enabled as the Security CSRF component is not installed. Try running "composer require symfony/security-csrf".');
         }
 
-        if (!$this->sessionConfigEnabled) {
+        if (!$this->isInitializedConfigEnabled('session')) {
             throw new \LogicException('CSRF protection needs sessions to be enabled.');
         }
 
@@ -1782,7 +1772,7 @@ class FrameworkExtension extends Extension
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
-        if (!$this->propertyAccessConfigEnabled) {
+        if (!$this->isInitializedConfigEnabled('property_access')) {
             $container->removeAlias('serializer.property_accessor');
             $container->removeDefinition('serializer.normalizer.object');
         }
@@ -1791,7 +1781,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.encoder.yaml');
         }
 
-        if (!class_exists(UnwrappingDenormalizer::class) || !$this->propertyAccessConfigEnabled) {
+        if (!class_exists(UnwrappingDenormalizer::class) || !$this->isInitializedConfigEnabled('property_access')) {
             $container->removeDefinition('serializer.denormalizer.unwrapping');
         }
 
@@ -2329,7 +2319,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerHttpClientConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, array $profilerConfig)
+    private function registerHttpClientConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
         $loader->load('http_client.php');
 
@@ -2347,11 +2337,11 @@ class FrameworkExtension extends Extension
             $container->removeDefinition(HttpClient::class);
         }
 
-        if ($this->isConfigEnabled($container, $retryOptions)) {
+        if ($this->readConfigEnabled('http_client.retry_failed', $container, $retryOptions)) {
             $this->registerRetryableHttpClient($retryOptions, 'http_client', $container);
         }
 
-        $httpClientId = ($retryOptions['enabled'] ?? false) ? 'http_client.retryable.inner' : ($this->isConfigEnabled($container, $profilerConfig) ? '.debug.http_client.inner' : 'http_client');
+        $httpClientId = ($retryOptions['enabled'] ?? false) ? 'http_client.retryable.inner' : ($this->isInitializedConfigEnabled('profiler') ? '.debug.http_client.inner' : 'http_client');
         foreach ($config['scoped_clients'] as $name => $scopeConfig) {
             if ('http_client' === $name) {
                 throw new InvalidArgumentException(sprintf('Invalid scope name: "%s" is reserved.', $name));
@@ -2378,7 +2368,7 @@ class FrameworkExtension extends Extension
                 ;
             }
 
-            if ($this->isConfigEnabled($container, $retryOptions)) {
+            if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'retry_failed', $container, $retryOptions)) {
                 $this->registerRetryableHttpClient($retryOptions, $name, $container);
             }
 
@@ -2525,14 +2515,14 @@ class FrameworkExtension extends Extension
             $container->removeAlias(TexterInterface::class);
         }
 
-        if ($this->mailerConfigEnabled) {
+        if ($this->isInitializedConfigEnabled('mailer')) {
             $sender = $container->getDefinition('mailer.envelope_listener')->getArgument(0);
             $container->getDefinition('notifier.channel.email')->setArgument(2, $sender);
         } else {
             $container->removeDefinition('notifier.channel.email');
         }
 
-        if ($this->messengerConfigEnabled) {
+        if ($this->isInitializedConfigEnabled('messenger')) {
             if ($config['notification_on_failed_messages']) {
                 $container->getDefinition('notifier.failed_message_listener')->addTag('kernel.event_subscriber');
             }
@@ -2653,19 +2643,44 @@ class FrameworkExtension extends Extension
         $loader->load('rate_limiter.php');
 
         foreach ($config['limiters'] as $name => $limiterConfig) {
-            self::registerRateLimiter($container, $name, $limiterConfig, false);
+            // default configuration (when used by other DI extensions)
+            $limiterConfig += ['lock_factory' => 'lock.factory', 'cache_pool' => 'cache.rate_limiter'];
+
+            $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
+
+            if (null !== $limiterConfig['lock_factory']) {
+                if (!interface_exists(LockInterface::class)) {
+                    throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
+                }
+
+                if (!$this->isInitializedConfigEnabled('lock')) {
+                    throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be configured.', $name));
+                }
+
+                $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));
+            }
+            unset($limiterConfig['lock_factory']);
+
+            if (null === $storageId = $limiterConfig['storage_service'] ?? null) {
+                $container->register($storageId = 'limiter.storage.'.$name, CacheStorage::class)->addArgument(new Reference($limiterConfig['cache_pool']));
+            }
+
+            $limiter->replaceArgument(1, new Reference($storageId));
+            unset($limiterConfig['storage_service'], $limiterConfig['cache_pool']);
+
+            $limiterConfig['id'] = $name;
+            $limiter->replaceArgument(0, $limiterConfig);
+
+            $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
         }
     }
 
     /**
-     * @deprecated since Symfony 6.2, to be made private in 7.0
+     * @deprecated since Symfony 6.2
      */
     public static function registerRateLimiter(ContainerBuilder $container, string $name, array $limiterConfig)
     {
-        if (\func_num_args() < 4 || false !== func_get_arg(3)) {
-            // in Symfony 7.0: convert the method in private non-static, remove this trigger_deprecation and change the call from the registerRateLimiterConfiguration method
-            trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s()" method is deprecated, to be made private in 7.0.', __METHOD__);
-        }
+        trigger_deprecation('symfony/framework-bundle', '6.2', 'The "%s()" method is deprecated.', __METHOD__);
 
         // default configuration (when used by other DI extensions)
         $limiterConfig += ['lock_factory' => 'lock.factory', 'cache_pool' => 'cache.rate_limiter'];
@@ -2676,7 +2691,7 @@ class FrameworkExtension extends Extension
             if (!interface_exists(LockInterface::class)) {
                 throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
             }
-            if (!self::$lockConfigEnabled) {
+            if (!$container->hasDefinition('lock.factory.abstract')) {
                 throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be configured.', $name));
             }
 
@@ -2829,5 +2844,34 @@ class FrameworkExtension extends Extension
     public function getNamespace(): string
     {
         return 'http://symfony.com/schema/dic/symfony';
+    }
+
+    protected function isConfigEnabled(ContainerBuilder $container, array $config): bool
+    {
+        throw new \LogicException('To prevent using outdated configuration, you must use the "readConfigEnabled" method instead.');
+    }
+
+    private function isInitializedConfigEnabled(string $path): bool
+    {
+        if (isset($this->configsEnabled[$path])) {
+            return $this->configsEnabled[$path];
+        }
+
+        throw new LogicException(sprintf('Can not read config enabled at "%s" because it has not been initialized.', $path));
+    }
+
+    private function readConfigEnabled(string $path, ContainerBuilder $container, array $config): bool
+    {
+        return $this->configsEnabled[$path] ??= parent::isConfigEnabled($container, $config);
+    }
+
+    private function writeConfigEnabled(string $path, bool $value, array &$config): void
+    {
+        if (isset($this->configsEnabled[$path])) {
+            throw new LogicException('Can not change config enabled because it has already been read.');
+        }
+
+        $this->configsEnabled[$path] = $value;
+        $config['enabled'] = $value;
     }
 }

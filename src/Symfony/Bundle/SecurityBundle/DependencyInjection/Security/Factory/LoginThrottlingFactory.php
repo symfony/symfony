@@ -98,6 +98,9 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
             if (!interface_exists(LockInterface::class)) {
                 throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
             }
+            if (!$container->hasDefinition('lock.factory.abstract')) {
+                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be configured.', $name));
+            }
 
             $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));
         }

@@ -34,7 +34,7 @@ FrameworkBundle
    `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
    `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
  * Deprecate `AbstractController::renderForm()`, use `render()` instead
- * Deprecate `FrameworkExtension::registerRateLimiter()`, to be made private in 7.0
+ * Deprecate `FrameworkExtension::registerRateLimiter()`
 
 HttpFoundation
 --------------

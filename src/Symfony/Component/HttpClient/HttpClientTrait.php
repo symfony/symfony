@@ -201,6 +201,12 @@ trait HttpClientTrait
 
         $options += $defaultOptions;
 
+        foreach (self::$emptyDefaults ?? [] as $k => $v) {
+            if (!isset($options[$k])) {
+                $options[$k] = $v;
+            }
+        }
+
         if (isset($defaultOptions['extra'])) {
             $options['extra'] += $defaultOptions['extra'];
         }
@@ -233,9 +239,9 @@ trait HttpClientTrait
 
             $alternatives = [];
 
-            foreach ($defaultOptions as $key => $v) {
-                if (levenshtein($name, $key) <= \strlen($name) / 3 || str_contains($key, $name)) {
-                    $alternatives[] = $key;
+            foreach ($defaultOptions as $k => $v) {
+                if (levenshtein($name, $k) <= \strlen($name) / 3 || str_contains($k, $name)) {
+                    $alternatives[] = $k;
                 }
             }
 

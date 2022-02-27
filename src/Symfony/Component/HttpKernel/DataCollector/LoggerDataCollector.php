@@ -133,6 +133,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             'priority' => [
                 'Debug' => 100,
                 'Info' => 200,
+                'Notice' => 250,
                 'Warning' => 300,
                 'Error' => 400,
                 'Critical' => 500,

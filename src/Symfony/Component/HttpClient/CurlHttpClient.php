@@ -43,6 +43,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             'curl' => [],    // A list of extra curl options indexed by their corresponding CURLOPT_*
         ],
     ];
+    private static array $emptyDefaults = self::OPTIONS_DEFAULTS + ['auth_ntlm' => null];
 
     private ?LoggerInterface $logger = null;
 

@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2022-02-26T19:06:12Z
+
+note: The signature of the `HttpClientInterface::request` method says
+
+> 'body' => '' // array|string|resource|\Traversable|\Closure - description ...
+
+`null` is not a valid type and the application should not have sent `body => null`.
+
+But from another hand, the same docblock says
+
+>  'auth_basic' => null,   // array|string - description ...
+
+One could think that `null` is not a valid type, but could be interpreted as "I don't want to set the option"
+
+So I believe https://github.com/symfony/symfony/pull/45527 is a BC break for `body` (and maybe other options)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-26T21:14:34Z
+
+> So I believe https://github.com/symfony/symfony/pull/45527 is a BC break for body (and maybe other options)
+
+You are right. I'm annoyed for other options. I'm wondering if we shouldn't revert #45527 and/or review which options need null to be overriding. Can you have a look? I will also as soon as I'm not AFK.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-26T21:45:49Z
+
+Here is what I'd like to try:
+On the first call to prepareRequest, store the defaults in a new property named eg $emptyDefaults.
+When merging options, if the corresponding key in $emptyDefaults is null, allow null to override the defaults. Otherwise no (and keep the previous behavior). That should fix body and all affected options.
+Could you please give it a try?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-02-26T22:06:15Z
+
+> Here is what I'd like to try: On the first call to prepareRequest, store the defaults in a new property named eg $emptyDefaults. When merging options, if the corresponding key in $emptyDefaults is null, allow null to override the defaults. Otherwise no (and keep the previous behavior). That should fix body and all affected options. Could you please give it a try?
+
+I'm not sure to understand: The first call to `prepareRequest` might contain `proxy=FOO` or `body=""` in the first case (proxy=FOO) we want `null` to reset proxy. In the second case (body="") we want `null` to use the default `""`.
+
+I believe the right solution is to have an internal technical default (not paramterizable) that fallbacks nulls to a specific value:
+ - body => ""
+ - proxy => null
+ - max_duration => INF ...
+OR making our implementations resilient to `null` options (adding `if (isset($option['...']))` everywhere).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-26T22:25:58Z
+
+> The first call to prepareRequest might contain proxy=FOO
+
+Actually not, because the first call always happens in the constructor. This call defines what you are looking for, this technical description of which values allow null.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2022-02-26T23:01:11Z
+
+> > The first call to prepareRequest might contain proxy=FOO
+>
+> Actually not, because the first call always happens in the constructor. This call defines what you are looking for, this technical description of which values allow null.
+
+go it.. PR updated.
+Actually, the method is not always called only when the defaultOption is provided (But the result is the same). And the MockClient does not have default options

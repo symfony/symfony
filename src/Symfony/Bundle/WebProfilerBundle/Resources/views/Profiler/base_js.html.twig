@@ -796,7 +796,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                     input.addEventListener('change', () => { Sfjs.updateLogsTable(); });
                 });
 
-                document.querySelectorAll('.filter-select-all-or-none a').forEach((link) => {
+                document.querySelectorAll('.filter-select-all-or-none button').forEach((link) => {
                     link.addEventListener('click', () => {
                         const selectAll = link.classList.contains('select-all');
                         link.closest('.log-filter-content').querySelectorAll('input').forEach((input) => {
@@ -819,6 +819,7 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
             updateLogsTable: function() {
                 const selectedType = document.querySelector('#log-filter-type input:checked').value;
                 const priorities = document.querySelectorAll('#log-filter-priority input');
+                const allPriorities = Array.from(priorities).map((input) => input.value);
                 const selectedPriorities = Array.from(priorities).filter((input) => input.checked).map((input) => input.value);
                 const channels = document.querySelectorAll('#log-filter-channel input');
                 const selectedChannels = Array.from(channels).filter((input) => input.checked).map((input) => input.value);
@@ -836,7 +837,8 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                         return;
                     }
 
-                    if (false === selectedPriorities.includes(row.getAttribute('data-priority'))) {
+                    const priority = row.getAttribute('data-priority');
+                    if (false === selectedPriorities.includes(priority) && true === allPriorities.includes(priority)) {
                         row.style.display = 'none';
                         return;
                     }

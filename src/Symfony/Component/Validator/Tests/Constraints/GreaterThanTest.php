@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Tests\Fixtures\BackedEnumA;
 
 class GreaterThanTest extends TestCase
 {
@@ -38,6 +39,11 @@ class GreaterThanTest extends TestCase
         self::assertSame('b', $cConstraint->propertyPath);
         self::assertSame('myMessage', $cConstraint->message);
         self::assertSame(['foo'], $cConstraint->groups);
+
+        [$dConstraint] = $metadata->properties['d']->getConstraints();
+        self::assertSame(4711, $dConstraint->value);
+        self::assertNull($dConstraint->propertyPath);
+        self::assertSame(['read', 'write'], $dConstraint->groups);
     }
 }
 
@@ -51,4 +57,7 @@ class GreaterThanDummy
 
     #[GreaterThan(propertyPath: 'b', message: 'myMessage', groups: ['foo'])]
     private $c;
+
+    #[GreaterThan(value: 4711, groups: [BackedEnumA::READ, 'write'])]
+    private $d;
 }

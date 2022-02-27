@@ -103,11 +103,11 @@ abstract class Constraint
      * getRequiredOptions() to return the names of these options. If any
      * option is not set here, an exception is thrown.
      *
-     * @param mixed    $options The options (as associative array)
-     *                          or the value for the default
-     *                          option (any other type)
-     * @param string[] $groups  An array of validation groups
-     * @param mixed    $payload Domain-specific data attached to a constraint
+     * @param mixed                     $options The options (as associative array)
+     *                                           or the value for the default
+     *                                           option (any other type)
+     * @param array<string|\BackedEnum> $groups  An array of validation groups
+     * @param mixed                     $payload Domain-specific data attached to a constraint
      *
      * @throws InvalidOptionsException       When you pass the names of non-existing
      *                                       options
@@ -197,12 +197,30 @@ abstract class Constraint
     public function __set(string $option, mixed $value)
     {
         if ('groups' === $option) {
-            $this->groups = (array) $value;
+            $this->groups = $this->normalizeGroups((array) $value);
 
             return;
         }
 
         throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint "%s".', $option, static::class), [$option]);
+    }
+
+    /**
+     * @param array<string|\BackedEnum> $groups
+     *
+     * @return array<string>
+     */
+    protected function normalizeGroups(array $groups): array
+    {
+        $normalized = [];
+        foreach ($groups as $group) {
+            if ($group instanceof \BackedEnum) {
+                $group = $group->value;
+            }
+            $normalized[] = $group;
+        }
+
+        return $normalized;
     }
 
     /**

@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
+use Symfony\Component\Validator\Tests\Fixtures\BackedEnumA;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
@@ -131,6 +132,20 @@ class ConstraintTest extends TestCase
         $constraint = new ConstraintA(['groups' => 'Foo']);
 
         $this->assertEquals(['Foo'], $constraint->groups);
+    }
+
+    public function testGroupsBackedEnumsAreConvertedToValue()
+    {
+        $constraint = new ConstraintA([], ['foo', BackedEnumA::READ]);
+
+        $this->assertSame(['foo', 'read'], $constraint->groups);
+    }
+
+    public function testOptionGroupsBackedEnumsAreConvertedToValue()
+    {
+        $constraint = new ConstraintA(['groups' => ['foo', BackedEnumA::READ]]);
+
+        $this->assertSame(['foo', 'read'], $constraint->groups);
     }
 
     public function testAddDefaultGroupAddsGroup()

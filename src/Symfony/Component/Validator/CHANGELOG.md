@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate `Constraint::$errorNames`, use `Constraint::ERROR_NAMES` instead
+ * Supports PHP backed enumerations in constraint groups
 
 6.0
 ---

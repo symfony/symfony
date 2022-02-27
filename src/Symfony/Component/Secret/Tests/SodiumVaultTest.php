@@ -5,30 +5,25 @@ declare(strict_types=1);
 namespace Symfony\Component\Secret\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Secret\SodiumVault;
 
-final class SodiumSecretTest extends TestCase
+class SodiumVaultTest extends TestCase
 {
     private $secretsDir;
 
     protected function setUp(): void
     {
         $this->secretsDir = sys_get_temp_dir().'/sf_secrets/test/';
-        foreach (glob($this->secretsDir.'/*') as $file) {
-            unlink($file);
-        }
-        @rmdir($this->secretsDir);
+        (new Filesystem())->remove($this->secretsDir);
     }
 
     protected function tearDown(): void
     {
-        foreach (glob($this->secretsDir.'/*') as $file) {
-            unlink($file);
-        }
-        rmdir($this->secretsDir);
+        (new Filesystem())->remove($this->secretsDir);
     }
 
-    public function testGenerateKeys(): void
+    public function testGenerateKeys()
     {
         $vault = new SodiumVault($this->secretsDir);
 
@@ -48,7 +43,7 @@ final class SodiumSecretTest extends TestCase
         $this->assertStringNotEqualsFile($this->secretsDir.'/test.decrypt.private.php', $decKey);
     }
 
-    public function testEncryptAndDecrypt(): void
+    public function testEncryptAndDecrypt()
     {
         $vault = new SodiumVault($this->secretsDir);
         $vault->generateKeys();

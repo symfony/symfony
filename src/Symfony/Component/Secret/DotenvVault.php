@@ -14,13 +14,11 @@ declare(strict_types=1);
 namespace Symfony\Component\Secret;
 
 /**
- * @author Tobias Schultze <http://tobion.de>
- * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class DotenvVault extends AbstractVault
 {
-    private $dotenvFile;
+    private string $dotenvFile;
 
     public function __construct(string $dotenvFile)
     {
@@ -41,11 +39,6 @@ class DotenvVault extends AbstractVault
         $v = str_replace("'", "'\\''", $value);
 
         $content = is_file($this->dotenvFile) ? file_get_contents($this->dotenvFile) : '';
-
-        if (false === is_string($content)) {
-            $content = '';
-        }
-
         $content = preg_replace("/^$name=((\\\\'|'[^']++')++|.*)/m", "$name='$v'", $content, -1, $count);
 
         if (!$count) {
@@ -61,7 +54,7 @@ class DotenvVault extends AbstractVault
     {
         $this->lastMessage = null;
         $this->validateName($name);
-        $v = \is_string($_SERVER[$name] ?? null) && 0 !== strpos($name, 'HTTP_') ? $_SERVER[$name] : ($_ENV[$name] ?? null);
+        $v = \is_string($_SERVER[$name] ?? null) && !str_starts_with($name, 'HTTP_') ? $_SERVER[$name] : ($_ENV[$name] ?? null);
 
         if (null === $v) {
             $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));
@@ -78,11 +71,6 @@ class DotenvVault extends AbstractVault
         $this->validateName($name);
 
         $content = is_file($this->dotenvFile) ? file_get_contents($this->dotenvFile) : '';
-
-        if (false === is_string($content)) {
-            $content = '';
-        }
-
         $content = preg_replace("/^$name=((\\\\'|'[^']++')++|.*)\n?/m", '', $content, -1, $count);
 
         if ($count) {
@@ -115,12 +103,5 @@ class DotenvVault extends AbstractVault
         }
 
         return $secrets;
-    }
-
-    protected function validateName(string $name): void
-    {
-        if (!preg_match('/^\w++$/D', $name)) {
-            throw new \LogicException(sprintf('Invalid secret name "%s": only "word" characters are allowed.', $name));
-        }
     }
 }

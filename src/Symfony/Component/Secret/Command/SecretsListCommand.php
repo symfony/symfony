@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Secret\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,12 +28,11 @@ use Symfony\Component\Secret\AbstractVault;
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
+#[AsCommand(name: 'secrets:list', description: 'List all secrets')]
 final class SecretsListCommand extends Command
 {
-    protected static $defaultName = 'list';
-
-    private $vault;
-    private $localVault;
+    private AbstractVault $vault;
+    private ?AbstractVault $localVault;
 
     public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
     {
@@ -42,12 +42,10 @@ final class SecretsListCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
+    protected function configure()
     {
         $this
-            ->setDescription('List all secrets')
             ->addOption('reveal', 'r', InputOption::VALUE_NONE, 'Display decrypted values alongside names')
-            ->addOption('dir', 'd', InputOption::VALUE_REQUIRED, 'Target directory')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command list all stored secrets.
 
@@ -72,12 +70,12 @@ EOF
         }
 
         $secrets = $this->vault->list($reveal);
-        $localSecrets = null !== $this->localVault ? $this->localVault->list($reveal) : null;
+        $localSecrets = $this->localVault?->list($reveal);
 
         $rows = [];
 
         $dump = new Dumper($output);
-        $dump = static function(?string $v) use ($dump) {
+        $dump = static function (?string $v) use ($dump) {
             return null === $v ? '******' : $dump($v);
         };
 

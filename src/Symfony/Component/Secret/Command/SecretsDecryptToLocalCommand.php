@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Secret\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,12 +25,11 @@ use Symfony\Component\Secret\AbstractVault;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
+#[AsCommand(name: 'secrets:decrypt-to-local', description: 'Decrypt all secrets and stores them in the local vault')]
 final class SecretsDecryptToLocalCommand extends Command
 {
-    protected static $defaultName = 'decrypt-to-local';
-
-    private $vault;
-    private $localVault;
+    private AbstractVault $vault;
+    private ?AbstractVault $localVault;
 
     public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
     {
@@ -39,12 +39,10 @@ final class SecretsDecryptToLocalCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
+    protected function configure()
     {
         $this
-            ->setDescription('Decrypt all secrets and stores them in the local vault')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force overriding of secrets that already exist in the local vault')
-            ->addOption('dir', 'd', InputOption::VALUE_REQUIRED, 'Target directory')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command decrypts all secrets and copies them in the local vault.
 
@@ -91,9 +89,8 @@ EOF
 
         foreach ($secrets as $k => $v) {
             if (null === $v) {
-                $io->error($this->vault->getLastMessage());
-
-                return 1;
+                $io->error($this->vault->getLastMessage() ?? sprintf('Secret "%s" has been skipped as there was an error reading it.', $k));
+                continue;
             }
 
             $this->localVault->seal($k, $v);

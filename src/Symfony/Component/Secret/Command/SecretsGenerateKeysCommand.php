@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Secret\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,12 +27,11 @@ use Symfony\Component\Secret\AbstractVault;
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
+#[AsCommand(name: 'secrets:generate-keys', description: 'Generate new encryption keys')]
 final class SecretsGenerateKeysCommand extends Command
 {
-    protected static $defaultName = 'generate-keys';
-
-    private $vault;
-    private $localVault;
+    private AbstractVault $vault;
+    private ?AbstractVault $localVault;
 
     public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
     {
@@ -41,13 +41,11 @@ final class SecretsGenerateKeysCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
+    protected function configure()
     {
         $this
-            ->setDescription('Generate new encryption keys')
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Update the local vault.')
             ->addOption('rotate', 'r', InputOption::VALUE_NONE, 'Re-encrypt existing secrets with the newly generated keys.')
-            ->addOption('dir', 'd', InputOption::VALUE_REQUIRED, 'Target directory')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command generates a new encryption key.
 

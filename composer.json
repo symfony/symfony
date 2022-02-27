@@ -97,6 +97,7 @@
         "symfony/security-guard": "self.version",
         "symfony/security-http": "self.version",
         "symfony/semaphore": "self.version",
+        "symfony/secret": "self.version",
         "symfony/serializer": "self.version",
         "symfony/stopwatch": "self.version",
         "symfony/string": "self.version",

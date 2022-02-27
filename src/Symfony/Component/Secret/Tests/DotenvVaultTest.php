@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Secret\DotenvVault;
 
-final class DotenvVaultTest extends TestCase
+class DotenvVaultTest extends TestCase
 {
     private $envFile;
 

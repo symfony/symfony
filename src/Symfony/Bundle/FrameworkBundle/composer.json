@@ -29,6 +29,7 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "^5.4|^6.0",
         "symfony/finder": "^5.4|^6.0",
+        "symfony/secret": "^5.4|^6.0",
         "symfony/routing": "^5.4|^6.0"
     },
     "require-dev": {

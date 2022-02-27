@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Bundle\FrameworkBundle\Secrets\DotenvVault;
-use Symfony\Bundle\FrameworkBundle\Secrets\SodiumVault;
+use Symfony\Component\Secret\DotenvVault;
+use Symfony\Component\Secret\SodiumVault;
 
 return static function (ContainerConfigurator $container) {
     $container->services()

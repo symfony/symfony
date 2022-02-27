@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Secret\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -24,12 +24,11 @@ use Symfony\Component\Secret\AbstractVault;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
+#[AsCommand(name: 'secrets:encrypt-from-local', description: 'Encrypt all local secrets to the vault')]
 final class SecretsEncryptFromLocalCommand extends Command
 {
-    protected static $defaultName = 'encrypt-from-local';
-
-    private $vault;
-    private $localVault;
+    private AbstractVault $vault;
+    private ?AbstractVault $localVault;
 
     public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
     {
@@ -39,11 +38,9 @@ final class SecretsEncryptFromLocalCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
+    protected function configure()
     {
         $this
-            ->setDescription('Encrypt all local secrets to the vault')
-            ->addOption('dir', 'd', InputOption::VALUE_REQUIRED, 'Target directory')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command encrypts all locally overridden secrets to the vault.
 

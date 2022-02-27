@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Secret\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,12 +29,11 @@ use Symfony\Component\Secret\AbstractVault;
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
+#[AsCommand(name: 'secrets:remove', description: 'Remove a secret from the vault')]
 final class SecretsRemoveCommand extends Command
 {
-    protected static $defaultName = 'remove';
-
-    private $vault;
-    private $localVault;
+    private AbstractVault $vault;
+    private ?AbstractVault $localVault;
 
     public function __construct(AbstractVault $vault, AbstractVault $localVault = null)
     {
@@ -41,13 +43,11 @@ final class SecretsRemoveCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
+    protected function configure()
     {
         $this
-            ->setDescription('Remove a secret from the vault')
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the secret')
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Update the local vault.')
-            ->addOption('dir', 'd', InputOption::VALUE_REQUIRED, 'Target directory')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command removes a secret from the vault.
 
@@ -74,10 +74,27 @@ EOF
             $io->comment($vault->getLastMessage() ?? 'Secret was not found in the vault.');
         }
 
-        if ($this->vault === $vault && null !== $this->localVault && null !== $this->localVault->reveal($name)) {
+        if ($this->vault === $vault && null !== $this->localVault->reveal($name)) {
             $io->comment('Note that this secret is overridden in the local vault.');
         }
 
         return 0;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if (!$input->mustSuggestArgumentValuesFor('name')) {
+            return;
+        }
+
+        $vaultKeys = array_keys($this->vault->list(false));
+        if ($input->getOption('local')) {
+            if (null === $this->localVault) {
+                return;
+            }
+            $vaultKeys = array_intersect($vaultKeys, array_keys($this->localVault->list(false)));
+        }
+
+        $suggestions->suggestValues($vaultKeys);
     }
 }

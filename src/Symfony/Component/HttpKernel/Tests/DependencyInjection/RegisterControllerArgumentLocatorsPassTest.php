@@ -428,6 +428,9 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
 
+        $container->register(ControllerDummy::class, 'bar');
+        $container->register(ControllerDummy::class.' $imageStorage', 'baz');
+
         $container->register('foo', WithTarget::class)
             ->setBindings(['string $someApiKey' => new Reference('the_api_key')])
             ->addTag('controller.service_arguments');
@@ -437,7 +440,11 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
 
-        $expected = ['apiKey' => new ServiceClosureArgument(new Reference('the_api_key'))];
+        $expected = [
+            'apiKey' => new ServiceClosureArgument(new Reference('the_api_key')),
+            'service1' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'imageStorage')),
+            'service2' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'service2')),
+        ];
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 }
@@ -513,7 +520,10 @@ class WithTarget
 {
     public function fooAction(
         #[Target('some.api.key')]
-        string $apiKey
+        string $apiKey,
+        #[Target('image.storage')]
+        ControllerDummy $service1,
+        ControllerDummy $service2
     ) {
     }
 }

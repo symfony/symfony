@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-27T22:15:18Z
+
+Exception messages are not covered by the promise. Your change should be fine.

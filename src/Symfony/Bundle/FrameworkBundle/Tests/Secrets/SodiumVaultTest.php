@@ -6,6 +6,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Secrets\SodiumVault;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @requires extension sodium
+ */
 class SodiumVaultTest extends TestCase
 {
     private $secretsDir;

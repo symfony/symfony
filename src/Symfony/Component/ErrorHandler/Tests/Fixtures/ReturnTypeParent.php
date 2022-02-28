@@ -127,6 +127,13 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
     }
 
     /**
+     * @return self
+     */
+    public function inheritThroughDoc()
+    {
+    }
+
+    /**
      * @return \ArrayIterator[]|\DirectoryIterator[]
      */
     public function manyIterables()

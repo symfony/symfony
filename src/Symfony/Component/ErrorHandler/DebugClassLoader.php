@@ -570,7 +570,7 @@ class DebugClassLoader
                 if ($canAddReturnType && 'docblock' !== $this->patchTypes['force']) {
                     $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                 }
-                if (!isset($doc['deprecated']) && strncmp($ns, $declaringClass, $len)) {
+                if (!isset($doc['deprecated']) && !isset($doc['inherit']) && strncmp($ns, $declaringClass, $len)) {
                     if ('docblock' === $this->patchTypes['force']) {
                         $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                     } elseif ('' !== $declaringClass && $this->patchTypes['deprecations']) {
@@ -1150,6 +1150,10 @@ EOTXT;
                 }
                 $tagName = $tagContent = '';
                 continue;
+            }
+
+            if ('{@inheritdoc}' === strtolower($line)) {
+                $tags['inherit'] = true;
             }
 
             if ('@' === $line[0]) {

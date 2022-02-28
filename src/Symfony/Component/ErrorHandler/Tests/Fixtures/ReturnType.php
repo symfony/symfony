@@ -33,6 +33,10 @@ class ReturnType extends ReturnTypeParent implements ReturnTypeInterface, Fixtur
      * @return parent - same as parent
      */
     public function optOutThroughDoc() { }
+    /**
+     * {@inheritdoc}
+     */
+    public function inheritThroughDoc() { }
     public function manyIterables() { }
     public function nullableReturnableTypeNormalization() { }
     public function nonNullableReturnableTypeNormalization() { }

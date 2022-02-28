@@ -351,6 +351,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function getLogDir(): string
     {
+        if (!$this instanceof LoggableKernelInterface) {
+            trigger_deprecation('symfony/http-kernel', '6.1', 'Having getLogDir without implementing "%s" is deprecated.', LoggableKernelInterface::class);
+        }
+
         return $this->getProjectDir().'/var/log';
     }
 
@@ -607,7 +611,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             'kernel.debug' => $this->debug,
             'kernel.build_dir' => realpath($buildDir = $this->warmupDir ?: $this->getBuildDir()) ?: $buildDir,
             'kernel.cache_dir' => realpath($cacheDir = ($this->getCacheDir() === $this->getBuildDir() ? ($this->warmupDir ?: $this->getCacheDir()) : $this->getCacheDir())) ?: $cacheDir,
-            'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
+            'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(), // TODO: when removing getLogDir from KernelInterface, add check for LoggableKernelInterface
             'kernel.bundles' => $bundles,
             'kernel.bundles_metadata' => $bundlesMetadata,
             'kernel.charset' => $this->getCharset(),
@@ -622,6 +626,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     protected function buildContainer(): ContainerBuilder
     {
+        // TODO: when removing getLogDir from KernelInterface, add check for LoggableKernelInterface
         foreach (['cache' => $this->getCacheDir(), 'build' => $this->warmupDir ?: $this->getBuildDir(), 'logs' => $this->getLogDir()] as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {

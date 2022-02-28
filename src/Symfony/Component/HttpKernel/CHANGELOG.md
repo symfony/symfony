@@ -4,6 +4,7 @@ CHANGELOG
 6.1
 ---
 
+ * Added `Symfony\Component\HttpKernel\EventListener\LoggableKernelInterface`.
  * Add `BackedEnumValueResolver` to resolve backed enum cases from request attributes in controller arguments
  * Deprecate StreamedResponseListener, it's not needed anymore
  * Add `Profiler::isEnabled()` so collaborating collector services may elect to omit themselves.

@@ -16,6 +16,7 @@ HttpKernel
 ----------
 
  * Deprecate StreamedResponseListener, it's not needed anymore
+ * Implement `Symfony\Component\HttpKernel\EventListener\LoggableKernelInterface` from your kernel, if you want to keep `getLogDir`.
 
 Serializer
 ----------

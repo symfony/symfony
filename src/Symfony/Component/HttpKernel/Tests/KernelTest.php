@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -29,12 +30,15 @@ use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\LoggableKernelInterface;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 class KernelTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     protected function tearDown(): void
     {
         try {
@@ -53,6 +57,26 @@ class KernelTest extends TestCase
         $this->assertEquals($debug, $kernel->isDebug());
         $this->assertFalse($kernel->isBooted());
         $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
+    }
+
+    public function testGetLogDir()
+    {
+        $kernel = new LoggableKernelForTest('test_env', true);
+
+        $this->expectNotToPerformAssertions();
+
+        $kernel->getLogDir();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testGetLogDirWithoutLoggableKernelInterface()
+    {
+        $kernel = new KernelForTest('test_env', true);
+        $kernel->getLogDir();
+
+        $this->expectDeprecation(sprintf('Since symfony/http-kernel 6.1: Having getLogDir without implementing "%s" is deprecated.', LoggableKernelInterface::class));
     }
 
     public function testEmptyEnv()
@@ -756,5 +780,17 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $container->setParameter('test.processed', true);
+    }
+}
+
+class LoggableKernelForTest extends Kernel implements LoggableKernelInterface
+{
+    public function registerBundles(): iterable
+    {
+        return [];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader)
+    {
     }
 }

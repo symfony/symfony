@@ -123,6 +123,8 @@ interface KernelInterface extends HttpKernelInterface
 
     /**
      * Gets the log directory.
+     *
+     * @deprecated implement LoggableKernelInterface
      */
     public function getLogDir(): string;
 

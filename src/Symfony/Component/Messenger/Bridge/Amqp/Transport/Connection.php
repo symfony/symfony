@@ -501,6 +501,7 @@ class Connection
 
     public function queue(string $queueName): \AMQPQueue
     {
+        $this->clearWhenDisconnected();
         if (!isset($this->amqpQueues[$queueName])) {
             $queueConfig = $this->queuesOptions[$queueName];
 

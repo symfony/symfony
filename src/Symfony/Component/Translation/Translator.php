@@ -59,15 +59,12 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
     private bool $hasIntlFormatter;
 
-    /**
-     * @var FallbackLocaleProvider
-     */
-    private $fallbackLocaleProvider;
+    private FallbackLocaleProviderInterface $fallbackLocaleProvider;
 
     /**
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [], FallbackLocaleProvider $fallbackLocaleProvider = null)
+    public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [], FallbackLocaleProviderInterface $fallbackLocaleProvider = null)
     {
         $this->setLocale($locale);
 

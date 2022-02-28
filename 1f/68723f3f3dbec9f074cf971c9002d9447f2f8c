@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-28T14:54:20Z
+
+Is `ext-sodium` enabled in our CI?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-28T14:56:58Z
+
+Good catch. Now it is on appveyor also (it was already on GHA AFAIK.)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-28T15:09:53Z
+
+> it was already on GHA AFAIK
+
+Indeed, Setup PHP seems to load it by default: https://github.com/shivammathur/setup-php/wiki/Php-extensions-loaded-on-ubuntu-20.04
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-02-28T16:02:04Z
+
+You've removed the skips? 🤔
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-28T16:06:35Z
+
+PR now targets 5.4 because I cannot get sodium to work on PHP 7.1.

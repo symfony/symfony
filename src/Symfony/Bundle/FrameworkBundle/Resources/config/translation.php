@@ -61,7 +61,7 @@ return static function (ContainerConfigurator $container) {
                     'debug' => param('kernel.debug'),
                 ],
                 abstract_arg('enabled locales'),
-                service('translation.fallback_locale_provider')
+                service('translation.fallback_locale_provider')->ignoreOnInvalid(),
             ])
             ->call('setConfigCacheFactory', [service('config_cache_factory')])
             ->tag('kernel.locale_aware')
@@ -77,9 +77,6 @@ return static function (ContainerConfigurator $container) {
 
         ->set('translator.formatter.default', MessageFormatter::class)
             ->args([service('identity_translator')])
-
-        ->set('translation.fallback_locale_provider', FallbackLocaleProvider::class)
-        ->alias(FallbackLocaleProviderInterface::class, 'translation.fallback_locale_provider')
 
         ->set('translation.loader.php', PhpFileLoader::class)
             ->tag('translation.loader', ['alias' => 'php'])
@@ -169,4 +166,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.service_subscriber', ['id' => 'translator'])
             ->tag('kernel.cache_warmer')
     ;
+
+    if (class_exists(FallbackLocaleProvider::class)) {
+        $container->services()
+            ->set('translation.fallback_locale_provider', FallbackLocaleProvider::class)
+            ->alias(FallbackLocaleProviderInterface::class, 'translation.fallback_locale_provider');
+    }
 };

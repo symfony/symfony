@@ -147,14 +147,10 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function setFallbackLocales(array $locales)
     {
+        $this->fallbackLocaleProvider->setFallbackLocales($locales);
+
         // needed as the fallback locales are linked to the already loaded catalogues
         $this->catalogues = [];
-
-        foreach ($locales as $locale) {
-            $this->assertValidLocale($locale);
-        }
-
-        $this->fallbackLocaleProvider->setFallbackLocales($locales);
         $this->cacheVary['fallback_locales'] = $locales;
     }
 
@@ -398,9 +394,7 @@ EOF
      */
     protected function assertValidLocale(string $locale)
     {
-        if (!preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
-            throw new InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
-        }
+        LocaleValidator::assertValidLocale($locale);
     }
 
     /**

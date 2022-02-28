@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
+
 /**
  * For a given locale, implementations provide the list of alternative locales to
  * try when a translation cannot be found.
@@ -19,6 +21,13 @@ namespace Symfony\Component\Translation;
  */
 interface FallbackLocaleProviderInterface
 {
+    /**
+     * Sets the fallback locales.
+     *
+     * @param string[] $locales
+     *
+     * @throws InvalidArgumentException If a locale contains invalid characters
+     */
     public function setFallbackLocales(array $locales): void;
 
     /**
@@ -28,6 +37,9 @@ interface FallbackLocaleProviderInterface
     public function getFallbackLocales(): array;
 
     /**
+     * For a given locale, this method provides the ordered list of alternative (fallback) locales
+     * to try.
+     *
      * @return string[]
      */
     public function computeFallbackLocales(string $locale): array;

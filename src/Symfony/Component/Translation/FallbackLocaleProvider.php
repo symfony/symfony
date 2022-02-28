@@ -13,7 +13,7 @@ namespace Symfony\Component\Translation;
 
 /**
  * Derives fallback locales based on ICU parent locale information, by shortening locale
- * sub tags and ultimately by going through a list of configured fallbacl locales.
+ * sub tags and ultimately by going through a list of configured fallback locales.
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
@@ -28,6 +28,10 @@ class FallbackLocaleProvider implements FallbackLocaleProviderInterface
 
     public function setFallbackLocales(array $locales): void
     {
+        foreach ($locales as $locale) {
+            LocaleValidator::assertValidLocale($locale);
+        }
+
         $this->fallbackLocales = $locales;
     }
 
@@ -44,6 +48,8 @@ class FallbackLocaleProvider implements FallbackLocaleProviderInterface
      */
     public function computeFallbackLocales(string $locale): array
     {
+        LocaleValidator::assertValidLocale($locale);
+
         $this->parentLocales ??= json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
 
         $originLocale = $locale;

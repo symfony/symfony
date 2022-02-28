@@ -32,6 +32,7 @@ interface FallbackLocaleProviderInterface
 
     /**
      * @internal
+     *
      * @return string[]
      */
     public function getFallbackLocales(): array;

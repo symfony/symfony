@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
+
 /**
  * Derives fallback locales based on ICU parent locale information, by shortening locale
  * sub tags and ultimately by going through a list of configured fallback locales.
@@ -25,6 +27,16 @@ class FallbackLocaleProvider implements FallbackLocaleProviderInterface
     private array $fallbackLocales = [];
 
     private array $parentLocales;
+
+    /**
+     * @param string[] $locales
+     *
+     * @throws InvalidArgumentException If a locale contains invalid characters
+     */
+    public function __construct(array $locales = [])
+    {
+        $this->setFallbackLocales($locales);
+    }
 
     public function setFallbackLocales(array $locales): void
     {

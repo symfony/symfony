@@ -103,7 +103,7 @@ abstract class KernelTestCase extends TestCase
         }
 
         try {
-            return self::$kernelContainer->get('test.service_container');
+            return self::$kernel->getContainer()->get('test.service_container');
         } catch (ServiceNotFoundException $e) {
             throw new \LogicException('Could not find service "test.service_container". Try updating the "framework.test" config to "true".', 0, $e);
         }

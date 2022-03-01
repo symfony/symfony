@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * KernelTestCase is the base class for tests needing a Kernel.
@@ -41,8 +40,6 @@ abstract class KernelTestCase extends TestCase
     protected static $container;
 
     protected static $booted = false;
-
-    private static $kernelContainer;
 
     protected function tearDown(): void
     {
@@ -80,11 +77,12 @@ abstract class KernelTestCase extends TestCase
     {
         static::ensureKernelShutdown();
 
-        static::$kernel = static::createKernel($options);
-        static::$kernel->boot();
+        $kernel = static::createKernel($options);
+        $kernel->boot();
+        self::$kernel = $kernel;
         static::$booted = true;
 
-        self::$kernelContainer = $container = static::$kernel->getContainer();
+        $container = static::$kernel->getContainer();
         static::$container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
 
         return static::$kernel;
@@ -156,14 +154,11 @@ abstract class KernelTestCase extends TestCase
     protected static function ensureKernelShutdown()
     {
         if (null !== static::$kernel) {
+            static::$kernel->boot();
             static::$kernel->shutdown();
             static::$booted = false;
         }
 
-        if (self::$kernelContainer instanceof ResetInterface) {
-            self::$kernelContainer->reset();
-        }
-
-        static::$container = self::$kernelContainer = null;
+        static::$container = null;
     }
 }

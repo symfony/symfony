@@ -46,6 +46,7 @@ install:
     - echo extension=php_fileinfo.dll >> php.ini-max
     - echo extension=php_pdo_sqlite.dll >> php.ini-max
     - echo extension=php_curl.dll >> php.ini-max
+    - echo extension=php_sodium.dll >> php.ini-max
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
     - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/2.0.0/composer.phar)

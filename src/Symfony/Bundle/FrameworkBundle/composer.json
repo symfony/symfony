@@ -64,7 +64,6 @@
         "symfony/property-info": "^5.4|^6.0",
         "symfony/web-link": "^5.4|^6.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
-        "paragonie/sodium_compat": "^1.8",
         "twig/twig": "^2.10|^3.0",
         "symfony/phpunit-bridge": "^5.4|^6.0"
     },

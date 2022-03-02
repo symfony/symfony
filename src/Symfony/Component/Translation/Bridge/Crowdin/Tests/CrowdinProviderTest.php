@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class CrowdinProviderTest extends ProviderTestCase
 {
-    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, bool $intlIcuEnabled): ProviderInterface
     {
         return new CrowdinProvider($client, $loader, $logger, $this->getXliffFileDumper(), $defaultLocale, $endpoint);
     }

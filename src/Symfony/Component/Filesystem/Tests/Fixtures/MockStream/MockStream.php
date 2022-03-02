@@ -17,6 +17,8 @@ namespace Symfony\Component\Filesystem\Tests\Fixtures\MockStream;
  */
 class MockStream
 {
+    public $context;
+
     /**
      * Opens file or URL.
      *

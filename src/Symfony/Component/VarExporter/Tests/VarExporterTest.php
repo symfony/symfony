@@ -95,7 +95,9 @@ class VarExporterTest extends TestCase
         $dump = "<?php\n\nreturn ".$marshalledValue.";\n";
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
 
-        if (\PHP_VERSION_ID >= 70406 || !\in_array($testName, ['array-object', 'array-iterator', 'array-object-custom', 'spl-object-storage', 'final-array-iterator', 'final-error'], true)) {
+        if (\PHP_VERSION_ID < 80200 && 'datetime' === $testName) {
+            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
+        } elseif (\PHP_VERSION_ID >= 70406 || !\in_array($testName, ['array-object', 'array-iterator', 'array-object-custom', 'spl-object-storage', 'final-array-iterator', 'final-error'], true)) {
             $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
         } elseif (\PHP_VERSION_ID < 70400) {
             $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
@@ -127,9 +129,15 @@ class VarExporterTest extends TestCase
         yield ['bool', true, true];
         yield ['simple-array', [123, ['abc']], true];
         yield ['partially-indexed-array', [5 => true, 1 => true, 2 => true, 6 => true], true];
-        yield ['datetime', \DateTime::createFromFormat('U', 0)];
+        yield ['datetime', [
+            \DateTime::createFromFormat('U', 0),
+            \DateTimeImmutable::createFromFormat('U', 0),
+            new \DateTimeZone('Europe/Paris'),
+            new \DateInterval('P7D'),
+            new \DatePeriod('R4/2012-07-01T00:00:00Z/P7D'),
+        ]];
 
-        $value = new \ArrayObject();
+        $value = \PHP_VERSION_ID >= 70406 ? new ArrayObject() : new \ArrayObject();
         $value[0] = 1;
         $value->foo = new \ArrayObject();
         $value[1] = $value;
@@ -435,4 +443,9 @@ class Php74Serializable implements \Serializable
     {
         throw new \BadMethodCallException();
     }
+}
+
+#[\AllowDynamicProperties]
+class ArrayObject extends \ArrayObject
+{
 }

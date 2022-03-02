@@ -166,11 +166,13 @@ EOTXT;
 
     public function testCastArrayObject()
     {
-        $var = new \ArrayObject([123]);
+        $var = new
+            #[\AllowDynamicProperties]
+            class([123]) extends \ArrayObject {};
         $var->foo = 234;
 
         $expected = <<<EOTXT
-ArrayObject {
+ArrayObject@anonymous {
   +"foo": 234
   -storage: array:1 [
     0 => 123

@@ -857,6 +857,7 @@ class Configuration implements ConfigurationInterface
                                 ->fixXmlConfig('locale')
                                 ->children()
                                     ->scalarNode('dsn')->end()
+                                    ->booleanNode('enable_intl_icu')->defaultFalse()->end()
                                     ->arrayNode('domains')
                                         ->prototype('scalar')->end()
                                         ->defaultValue([])

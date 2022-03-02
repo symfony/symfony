@@ -663,7 +663,7 @@ XLIFF
         $expectedTranslatorBagEn->addCatalogue($arrayLoader->load([
             'index.hello' => 'Hello',
             'index.greetings' => 'Welcome, {firstname}!',
-        ], 'en', 'messages' . MessageCatalogueInterface::INTL_DOMAIN_SUFFIX));
+        ], 'en', 'messages'.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX));
 
         yield ['en', 'messages', <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -693,7 +693,7 @@ XLIFF
         $expectedTranslatorBagFr->addCatalogue($arrayLoader->load([
             'index.hello' => 'Bonjour',
             'index.greetings' => 'Bienvenue, {firstname} !',
-        ], 'fr', 'messages' . MessageCatalogueInterface::INTL_DOMAIN_SUFFIX));
+        ], 'fr', 'messages'.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX));
 
         yield ['fr', 'messages', <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>

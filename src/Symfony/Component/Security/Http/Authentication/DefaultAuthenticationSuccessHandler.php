@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Authentication;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -29,6 +30,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     use TargetPathTrait;
 
     protected $httpUtils;
+    protected $logger;
     protected $options;
     protected $providerKey;
     protected $defaultOptions = [
@@ -42,9 +44,10 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     /**
      * @param array $options Options for processing a successful authentication attempt
      */
-    public function __construct(HttpUtils $httpUtils, array $options = [])
+    public function __construct(HttpUtils $httpUtils, array $options = [], LoggerInterface $logger = null)
     {
         $this->httpUtils = $httpUtils;
+        $this->logger = $logger;
         $this->setOptions($options);
     }
 
@@ -102,8 +105,14 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             return $this->options['default_target_path'];
         }
 
-        if ($targetUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['target_path_parameter'])) {
+        $targetUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['target_path_parameter']);
+
+        if (\is_string($targetUrl) && str_starts_with($targetUrl, '/')) {
             return $targetUrl;
+        }
+
+        if ($this->logger && $targetUrl) {
+            $this->logger->debug(sprintf('Ignoring query parameter "%s": not a valid URL.', $this->options['target_path_parameter']));
         }
 
         if (null !== $this->providerKey && $targetUrl = $this->getTargetPath($request->getSession(), $this->providerKey)) {

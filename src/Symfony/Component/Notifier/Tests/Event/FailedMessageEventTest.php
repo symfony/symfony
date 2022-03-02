@@ -15,7 +15,7 @@ use Symfony\Component\Notifier\Transport\NullTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class FailedMessageEventTest extends TestCase
+class FailedMessageEventTest extends TestCase
 {
     /**
      * @dataProvider messagesProvider
@@ -47,6 +47,8 @@ final class FailedMessageEventTest extends TestCase
         $clientMock = $this->createMock(HttpClientInterface::class);
 
         $transport = new class($clientMock, $eventDispatcherMock) extends AbstractTransport {
+            public NullTransportException $exception;
+
             public function __construct($client, EventDispatcherInterface $dispatcher = null)
             {
                 $this->exception = new NullTransportException();
@@ -65,6 +67,7 @@ final class FailedMessageEventTest extends TestCase
 
             public function __toString(): string
             {
+                return '';
             }
         };
 

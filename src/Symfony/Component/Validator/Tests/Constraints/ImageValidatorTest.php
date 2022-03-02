@@ -28,6 +28,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     protected $imageLandscape;
     protected $imagePortrait;
     protected $image4By3;
+    protected $image16By9;
     protected $imageCorrupted;
     protected $notAnImage;
 

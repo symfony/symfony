@@ -19,6 +19,7 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Test\ProviderTestCase;
 use Symfony\Component\Translation\TranslatorBag;
@@ -27,9 +28,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LokaliseProviderTest extends ProviderTestCase
 {
-    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, bool $intlIcuEnabled): ProviderInterface
     {
-        return new LokaliseProvider($client, $loader, $logger, $defaultLocale, $endpoint);
+        return new LokaliseProvider($client, $loader, $logger, $defaultLocale, $endpoint, $intlIcuEnabled);
     }
 
     public function toStringProvider(): iterable
@@ -38,7 +39,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->createProvider($this->getClient()->withOptions([
                 'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
                 'headers' => ['X-Api-Token' => 'API_KEY'],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com'),
+            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com', false),
             'lokalise://api.lokalise.com',
         ];
 
@@ -46,7 +47,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->createProvider($this->getClient()->withOptions([
                 'base_uri' => 'https://example.com',
                 'headers' => ['X-Api-Token' => 'API_KEY'],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com'),
+            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com', false),
             'lokalise://example.com',
         ];
 
@@ -54,7 +55,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->createProvider($this->getClient()->withOptions([
                 'base_uri' => 'https://example.com:99',
                 'headers' => ['X-Api-Token' => 'API_KEY'],
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com:99'),
+            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com:99', false),
             'lokalise://example.com:99',
         ];
     }
@@ -231,7 +232,7 @@ class LokaliseProviderTest extends ProviderTestCase
         ]))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com', false);
 
         $translatorBag = new TranslatorBag();
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
@@ -256,6 +257,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $expectedBody = json_encode([
                 'format' => 'symfony_xliff',
                 'original_filenames' => true,
+                'placeholder_format' => 'symfony',
                 'directory_prefix' => '%LANG_ISO%',
                 'filter_langs' => [$locale],
                 'filter_filenames' => [$domain.'.xliff'],
@@ -285,7 +287,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($response))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com', false);
         $translatorBag = $provider->read([$domain], [$locale]);
 
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
@@ -329,7 +331,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider = $this->createProvider((new MockHttpClient($response))->withOptions([
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
-        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com', false);
 
         $translatorBag = $provider->read($domains, $locales);
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
@@ -412,7 +414,8 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->getLoader(),
             $this->getLogger(),
             $this->getDefaultLocale(),
-            'api.lokalise.com'
+            'api.lokalise.com',
+            false
         );
 
         $provider->delete($translatorBag);
@@ -599,6 +602,121 @@ XLIFF
                 ],
             ],
             $expectedTranslatorBag,
+        ];
+    }
+
+    /**
+     * @dataProvider getResponsesForOneLocaleAndOneDomainWithIntlIcuEnabled
+     */
+    public function testReadForOneLocaleAndOneDomainWithIntlIcuEnabled(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag)
+    {
+        $response = function (string $method, string $url, array $options = []) use ($locale, $domain, $responseContent): ResponseInterface {
+            $expectedBody = json_encode([
+                'format' => 'symfony_xliff',
+                'original_filenames' => true,
+                'placeholder_format' => 'icu',
+                'directory_prefix' => '%LANG_ISO%',
+                'filter_langs' => [$locale],
+                'filter_filenames' => [$domain.'.xliff'],
+                'export_empty_as' => 'skip',
+            ]);
+
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/files/export', $url);
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+
+            return new MockResponse(json_encode([
+                'files' => [
+                    $locale => [
+                        $domain.'.xliff' => [
+                            'content' => $responseContent,
+                        ],
+                    ],
+                ],
+            ]));
+        };
+
+        $loader = $this->getLoader();
+        $loader->expects($this->once())
+            ->method('load')
+            ->willReturn((new XliffFileLoader())->load($responseContent, $locale, $domain));
+
+        $provider = $this->createProvider((new MockHttpClient($response))->withOptions([
+            'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
+            'headers' => ['X-Api-Token' => 'API_KEY'],
+        ]), $loader, $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com', true);
+        $translatorBag = $provider->read([$domain], [$locale]);
+
+        // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
+        foreach ($translatorBag->getCatalogues() as $catalogue) {
+            $catalogue->deleteMetadata('', '');
+        }
+
+        $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
+    }
+
+    public function getResponsesForOneLocaleAndOneDomainWithIntlIcuEnabled(): \Generator
+    {
+        $arrayLoader = new ArrayLoader();
+
+        $expectedTranslatorBagEn = new TranslatorBag();
+        $expectedTranslatorBagEn->addCatalogue($arrayLoader->load([
+            'index.hello' => 'Hello',
+            'index.greetings' => 'Welcome, {firstname}!',
+        ], 'en', 'messages' . MessageCatalogueInterface::INTL_DOMAIN_SUFFIX));
+
+        yield ['en', 'messages', <<<'XLIFF'
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+  <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="en">
+    <header>
+      <tool tool-id="lokalise.com" tool-name="Lokalise"/>
+    </header>
+    <body>
+      <trans-unit id="index.greetings" resname="index.greetings">
+        <source>index.greetings</source>
+        <target>Welcome, {firstname}!</target>
+      </trans-unit>
+      <trans-unit id="index.hello" resname="index.hello">
+        <source>index.hello</source>
+        <target>Hello</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
+XLIFF
+            ,
+            $expectedTranslatorBagEn,
+        ];
+
+        $expectedTranslatorBagFr = new TranslatorBag();
+        $expectedTranslatorBagFr->addCatalogue($arrayLoader->load([
+            'index.hello' => 'Bonjour',
+            'index.greetings' => 'Bienvenue, {firstname} !',
+        ], 'fr', 'messages' . MessageCatalogueInterface::INTL_DOMAIN_SUFFIX));
+
+        yield ['fr', 'messages', <<<'XLIFF'
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+  <file original="" datatype="plaintext" xml:space="preserve" source-language="en" target-language="fr">
+    <header>
+      <tool tool-id="lokalise.com" tool-name="Lokalise"/>
+    </header>
+    <body>
+      <trans-unit id="index.greetings" resname="index.greetings">
+        <source>index.greetings</source>
+        <target>Bienvenue, {firstname} !</target>
+      </trans-unit>
+      <trans-unit id="index.hello" resname="index.hello">
+        <source>index.hello</source>
+        <target>Bonjour</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
+XLIFF
+            ,
+            $expectedTranslatorBagFr,
         ];
     }
 }

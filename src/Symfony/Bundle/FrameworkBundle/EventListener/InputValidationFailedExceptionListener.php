@@ -37,6 +37,7 @@ class InputValidationFailedExceptionListener
                 'title' => 'Validation Failed',
                 'errors' => [],
             ];
+            $reason = '';
 
             foreach ($throwable->getViolations() as $violation) {
                 $data['errors'][] = [
@@ -44,6 +45,7 @@ class InputValidationFailedExceptionListener
                     'message' => $violation->getMessage(),
                     'code' => $violation->getCode(),
                 ];
+                $reason .= "{$violation->getPropertyPath()}: {$violation->getMessage()} ";
             }
             $response = new Response($this->serializer->serialize($data, $format), Response::HTTP_UNPROCESSABLE_ENTITY);
         }

@@ -12,23 +12,34 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntax;
-use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntaxValidator;
+use Symfony\Component\Validator\Constraints\ExpressionSyntax;
+use Symfony\Component\Validator\Constraints\ExpressionSyntaxValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-/**
- * @group legacy
- */
-class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
+class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {
-        return new ExpressionLanguageSyntaxValidator(new ExpressionLanguage());
+        return new ExpressionSyntaxValidator(new ExpressionLanguage());
+    }
+
+    public function testNullIsValid()
+    {
+        $this->validator->validate(null, new ExpressionSyntax());
+
+        $this->assertNoViolation();
+    }
+
+    public function testEmptyStringIsValid()
+    {
+        $this->validator->validate('', new ExpressionSyntax());
+
+        $this->assertNoViolation();
     }
 
     public function testExpressionValid()
     {
-        $this->validator->validate('1 + 1', new ExpressionLanguageSyntax([
+        $this->validator->validate('1 + 1', new ExpressionSyntax([
             'message' => 'myMessage',
             'allowedVariables' => [],
         ]));
@@ -38,7 +49,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpressionWithoutNames()
     {
-        $this->validator->validate('1 + 1', new ExpressionLanguageSyntax([
+        $this->validator->validate('1 + 1', new ExpressionSyntax([
             'message' => 'myMessage',
         ]));
 
@@ -47,7 +58,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpressionWithAllowedVariableName()
     {
-        $this->validator->validate('a + 1', new ExpressionLanguageSyntax([
+        $this->validator->validate('a + 1', new ExpressionSyntax([
             'message' => 'myMessage',
             'allowedVariables' => ['a'],
         ]));
@@ -57,7 +68,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpressionIsNotValid()
     {
-        $this->validator->validate('a + 1', new ExpressionLanguageSyntax([
+        $this->validator->validate('a + 1', new ExpressionSyntax([
             'message' => 'myMessage',
             'allowedVariables' => [],
         ]));
@@ -65,7 +76,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ syntax_error }}', '"Variable "a" is not valid around position 1 for expression `a + 1`."')
             ->setInvalidValue('a + 1')
-            ->setCode(ExpressionLanguageSyntax::EXPRESSION_LANGUAGE_SYNTAX_ERROR)
+            ->setCode(ExpressionSyntax::EXPRESSION_SYNTAX_ERROR)
             ->assertRaised();
     }
 }

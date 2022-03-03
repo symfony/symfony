@@ -12,38 +12,35 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntax;
-use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntaxValidator;
+use Symfony\Component\Validator\Constraints\ExpressionSyntax;
+use Symfony\Component\Validator\Constraints\ExpressionSyntaxValidator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @group legacy
- */
-class ExpressionLanguageSyntaxTest extends TestCase
+class ExpressionSyntaxTest extends TestCase
 {
     public function testValidatedByStandardValidator()
     {
-        $constraint = new ExpressionLanguageSyntax();
+        $constraint = new ExpressionSyntax();
 
-        self::assertSame(ExpressionLanguageSyntaxValidator::class, $constraint->validatedBy());
+        self::assertSame(ExpressionSyntaxValidator::class, $constraint->validatedBy());
     }
 
     /**
      * @dataProvider provideServiceValidatedConstraints
      */
-    public function testValidatedByService(ExpressionLanguageSyntax $constraint)
+    public function testValidatedByService(ExpressionSyntax $constraint)
     {
         self::assertSame('my_service', $constraint->validatedBy());
     }
 
     public function provideServiceValidatedConstraints(): iterable
     {
-        yield 'Doctrine style' => [new ExpressionLanguageSyntax(['service' => 'my_service'])];
+        yield 'Doctrine style' => [new ExpressionSyntax(['service' => 'my_service'])];
 
-        yield 'named arguments' => [new ExpressionLanguageSyntax(service: 'my_service')];
+        yield 'named arguments' => [new ExpressionSyntax(service: 'my_service')];
 
-        $metadata = new ClassMetadata(ExpressionLanguageSyntaxDummy::class);
+        $metadata = new ClassMetadata(ExpressionSyntaxDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
 
         yield 'attribute' => [$metadata->properties['b']->constraints[0]];
@@ -51,7 +48,7 @@ class ExpressionLanguageSyntaxTest extends TestCase
 
     public function testAttributes()
     {
-        $metadata = new ClassMetadata(ExpressionLanguageSyntaxDummy::class);
+        $metadata = new ClassMetadata(ExpressionSyntaxDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
 
         [$aConstraint] = $metadata->properties['a']->getConstraints();
@@ -61,7 +58,7 @@ class ExpressionLanguageSyntaxTest extends TestCase
         [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('my_service', $bConstraint->service);
         self::assertSame('myMessage', $bConstraint->message);
-        self::assertSame(['Default', 'ExpressionLanguageSyntaxDummy'], $bConstraint->groups);
+        self::assertSame(['Default', 'ExpressionSyntaxDummy'], $bConstraint->groups);
 
         [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['foo', 'bar'], $cConstraint->allowedVariables);
@@ -69,14 +66,14 @@ class ExpressionLanguageSyntaxTest extends TestCase
     }
 }
 
-class ExpressionLanguageSyntaxDummy
+class ExpressionSyntaxDummy
 {
-    #[ExpressionLanguageSyntax]
+    #[ExpressionSyntax]
     private $a;
 
-    #[ExpressionLanguageSyntax(service: 'my_service', message: 'myMessage')]
+    #[ExpressionSyntax(service: 'my_service', message: 'myMessage')]
     private $b;
 
-    #[ExpressionLanguageSyntax(allowedVariables: ['foo', 'bar'], groups: ['my_group'])]
+    #[ExpressionSyntax(allowedVariables: ['foo', 'bar'], groups: ['my_group'])]
     private $c;
 }

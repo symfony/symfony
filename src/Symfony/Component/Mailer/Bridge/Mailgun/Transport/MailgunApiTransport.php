@@ -139,7 +139,7 @@ class MailgunApiTransport extends AbstractApiTransport
             if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'])) {
                 $headerName = $name;
             } else {
-                $headerName = 'h:'.$name;
+                $headerName = 'h:'.mb_convert_case($name, MB_CASE_TITLE, 'UTF-8');
             }
 
             $payload[$headerName] = $header->getBodyAsString();

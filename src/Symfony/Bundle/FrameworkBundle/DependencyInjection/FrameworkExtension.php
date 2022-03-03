@@ -25,7 +25,9 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
+use Symfony\Bundle\FrameworkBundle\ArgumentResolver\UserInputResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\FrameworkBundle\EventListener\InputValidationFailedExceptionListener;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
@@ -527,6 +529,17 @@ class FrameworkExtension extends Extension
 
         if (ContainerBuilder::willBeAvailable('symfony/mime', MimeTypes::class, ['symfony/framework-bundle'])) {
             $loader->load('mime_type.php');
+        }
+
+        if ($this->isConfigEnabled($container, $config['validation']) && $this->isConfigEnabled($container, $config['serializer'])) {
+            $container->register(InputValidationFailedExceptionListener::class)
+                ->setArguments([new Reference('serializer'), new Reference('logger')])
+                // Must run before Symfony\Component\HttpKernel\EventListener\ErrorListener::onKernelException()
+                ->addTag('kernel.event_listener', ['event' => 'kernel.exception', 'priority' => 10]);
+
+            $container->register(UserInputResolver::class)
+                ->setArguments([new Reference('validator'), new Reference('serializer')])
+                ->addTag('controller.argument_value_resolver');
         }
 
         $container->registerForAutoconfiguration(PackageInterface::class)

@@ -54,12 +54,4 @@ class EnumNode extends ScalarNode
 
         return $value;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function allowPlaceholders(): bool
-    {
-        return false;
-    }
 }

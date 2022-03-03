@@ -8,6 +8,7 @@ CHANGELOG
  * Load PHP configuration files by default in the `MicroKernelTrait`
  * Add `cache:pool:invalidate-tags` command
  * Add `xliff` support in addition to `xlf` for `XliffFileDumper`
+ * Add an ArgumentResolver to deserialize & validate user input
 
 6.0
 ---

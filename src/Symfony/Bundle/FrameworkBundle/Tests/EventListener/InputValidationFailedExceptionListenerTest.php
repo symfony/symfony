@@ -41,7 +41,7 @@ class InputValidationFailedExceptionListenerTest extends TestCase
             $this->assertFalse($event->hasResponse(), 'Unexpected response');
         } else {
             $this->assertTrue($event->hasResponse(), 'Expected a response');
-            $this->assertStringContainsString($event->getResponse()->getContent(), $expected);
+            $this->assertStringContainsString($expected, $event->getResponse()->getContent());
         }
     }
 

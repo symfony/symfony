@@ -26,19 +26,29 @@ class Store implements StoreInterface
 {
     protected $root;
     private $keyCache;
-    private $locks;
+    private $locks = [];
+    private $options;
 
     /**
+     * Constructor.
+     *
+     * The available options are:
+     *
+     *   * private_headers  Set of response headers that should not be stored
+     *                      when a response is cached. (default: Set-Cookie)
+     *
      * @throws \RuntimeException
      */
-    public function __construct(string $root)
+    public function __construct(string $root, array $options = [])
     {
         $this->root = $root;
         if (!file_exists($this->root) && !@mkdir($this->root, 0777, true) && !is_dir($this->root)) {
             throw new \RuntimeException(sprintf('Unable to create the store directory (%s).', $this->root));
         }
         $this->keyCache = new \SplObjectStorage();
-        $this->locks = [];
+        $this->options = array_merge([
+            'private_headers' => ['Set-Cookie'],
+        ], $options);
     }
 
     /**
@@ -214,6 +224,10 @@ class Store implements StoreInterface
 
         $headers = $this->persistResponse($response);
         unset($headers['age']);
+
+        foreach ($this->options['private_headers'] as $h) {
+            unset($headers[strtolower($h)]);
+        }
 
         array_unshift($entries, [$storedEnv, $headers]);
 

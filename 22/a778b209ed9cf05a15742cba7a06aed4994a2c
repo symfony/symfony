@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-02-27T08:47:44Z
+
+https://github.com/symfony/symfony/pull/43526#issuecomment-944454472
+
+are we ready for it now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-27T09:45:38Z
+
+No we're not ready to mark the package as abandoned. I don't think doing so would be a good idea actually as it might confuse ppl a lot.

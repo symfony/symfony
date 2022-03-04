@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate `Constraint::$errorNames`, use `Constraint::ERROR_NAMES` instead
+ * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
 
 6.0
 ---

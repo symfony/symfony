@@ -130,6 +130,8 @@ EOF
             }
         }
 
+        natsort($foundRoutesNames);
+
         return $foundRoutesNames;
     }
 

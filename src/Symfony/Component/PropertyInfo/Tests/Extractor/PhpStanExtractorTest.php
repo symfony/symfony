@@ -384,7 +384,7 @@ class PhpStanExtractorTest extends TestCase
         );
     }
 
-    public function testInheritedNamespace(): void
+    public function testInheritedNamespace()
     {
         $this->assertEquals(
             [
@@ -392,7 +392,7 @@ class PhpStanExtractorTest extends TestCase
                     Type::BUILTIN_TYPE_OBJECT,
                     false,
                     'Symfony\Component\PropertyInfo\Tests\Fixtures\Inheritance\Parent\SiblingDummy'
-                )
+                ),
             ],
             $this->extractor->getTypes(
                 'Symfony\Component\PropertyInfo\Tests\Fixtures\Inheritance\Child\ChildDummy',

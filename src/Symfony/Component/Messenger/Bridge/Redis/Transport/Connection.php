@@ -348,9 +348,11 @@ class Connection
         $queuedMessageCount = $this->rawCommand('ZCOUNT', 0, $now);
 
         while ($queuedMessageCount--) {
-            if (![$queuedMessage, $expiry] = $this->rawCommand('ZPOPMIN', 1)) {
+            if (!$message = $this->rawCommand('ZPOPMIN', 1)) {
                 break;
             }
+
+            [$queuedMessage, $expiry] = $message;
 
             if (\strlen($expiry) === \strlen($now) ? $expiry > $now : \strlen($expiry) < \strlen($now)) {
                 // if a future-placed message is popped because of a race condition with

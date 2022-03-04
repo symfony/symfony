@@ -237,7 +237,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 $url['authority'] = substr_replace($url['authority'], $ip, -\strlen($host) - \strlen($port), \strlen($host));
             }
 
-            return [self::createRedirectResolver($options, $host, $proxy, $info, $onProgress), implode('', $url)];
+            return [self::createRedirectResolver($options, $host, $port, $proxy, $info, $onProgress), implode('', $url)];
         };
 
         return new NativeResponse($this->multi, $context, implode('', $url), $options, $info, $resolver, $onProgress, $this->logger);
@@ -331,11 +331,11 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     /**
      * Handles redirects - the native logic is too buggy to be used.
      */
-    private static function createRedirectResolver(array $options, string $host, ?array $proxy, array &$info, ?\Closure $onProgress): \Closure
+    private static function createRedirectResolver(array $options, string $host, string $port, ?array $proxy, array &$info, ?\Closure $onProgress): \Closure
     {
         $redirectHeaders = [];
         if (0 < $maxRedirects = $options['max_redirects']) {
-            $redirectHeaders = ['host' => $host];
+            $redirectHeaders = ['host' => $host, 'port' => $port];
             $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static function ($h) {
                 return 0 !== stripos($h, 'Host:');
             });
@@ -392,7 +392,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
             if (false !== (parse_url($location, \PHP_URL_HOST) ?? false)) {
                 // Authorization and Cookie headers MUST NOT follow except for the initial host name
-                $requestHeaders = $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+                $requestHeaders = $redirectHeaders['host'] === $host && $redirectHeaders['port'] === $port ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 $requestHeaders[] = 'Host: '.$host.$port;
                 $dnsResolve = !self::configureHeadersAndProxy($context, $host, $requestHeaders, $proxy, 'https:' === $url['scheme']);
             } else {

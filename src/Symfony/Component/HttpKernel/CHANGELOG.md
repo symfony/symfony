@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate StreamedResponseListener, it's not needed anymore
  * Add `Profiler::isEnabled()` so collaborating collector services may elect to omit themselves.
  * Add the `UidValueResolver` argument value resolver
+ * Allow `Kernel::getLogDir()` to return the empty string when there is no log dir
 
 6.0
 ---

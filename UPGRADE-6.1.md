@@ -4,6 +4,7 @@ UPGRADE FROM 6.0 to 6.1
 All components
 --------------
 
+ * Deprecate requiring the "symfony/symfony" package; replace it with standalone components instead
  * Public and protected properties are now considered final;
    instead of overriding a property, consider setting its value in the constructor
 

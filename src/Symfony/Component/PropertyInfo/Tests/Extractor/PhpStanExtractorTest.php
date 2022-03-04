@@ -383,6 +383,23 @@ class PhpStanExtractorTest extends TestCase
             $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace', 'dummy')
         );
     }
+
+    public function testInheritedNamespace(): void
+    {
+        $this->assertEquals(
+            [
+                new Type(
+                    Type::BUILTIN_TYPE_OBJECT,
+                    false,
+                    'Symfony\Component\PropertyInfo\Tests\Fixtures\Inheritance\Parent\SiblingDummy'
+                )
+            ],
+            $this->extractor->getTypes(
+                'Symfony\Component\PropertyInfo\Tests\Fixtures\Inheritance\Child\ChildDummy',
+                'sibling'
+            )
+        );
+    }
 }
 
 class PhpStanOmittedParamTagTypeDocBlock

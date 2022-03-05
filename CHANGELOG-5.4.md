@@ -7,6 +7,18 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.6 (2022-03-05)
+
+ * bug #45619 [redis-messenger] remove undefined array key warnings (PhilETaylor)
+ * bug #45637 [Cache] do not pass DBAL connections to PDO adapters (xabbuh)
+ * bug #45631 [HttpFoundation] Fix PHP 8.1 deprecation in `Response::isNotModified` (HypeMC)
+ * bug #45610 [HttpKernel] Guard against bad profile data (nicolas-grekas)
+ * bug #45532 Fix deprecations on PHP 8.2 (nicolas-grekas)
+ * bug #45595 [FrameworkBundle] Fix resetting container between tests (nicolas-grekas)
+ * bug #45590 [Console] Revert StringInput bc break from #45088 (bobthecow)
+ * bug #45585 [HttpClient] fix checking for unset property on PHP <= 7.1.4 (nicolas-grekas)
+ * bug #45583 [WebProfilerBundle] Fixes HTML syntax regression introduced by #44570 (xavismeh)
+
 * 5.4.5 (2022-02-28)
 
  * bug #45351 [WebProfilerBundle] Log section minor fixes (missing "notice" filter, log priority, accessibility) (Amunak)

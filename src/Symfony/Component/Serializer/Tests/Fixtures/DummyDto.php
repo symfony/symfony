@@ -1,12 +1,14 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation;
+namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Bundle\FrameworkBundle\ArgumentResolver\UserInputInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class DummyDto implements UserInputInterface
+class DummyDto
 {
+    #[Assert\NotBlank(groups: ['Foo'])]
+    public ?string $propWithValidationGroups = null;
+
     #[Assert\NotBlank()]
     public ?string $randomText = null;
 

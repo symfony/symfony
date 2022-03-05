@@ -1,17 +1,16 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\ArgumentResolver;
+namespace Symfony\Component\Serializer\Tests\ArgumentResolver;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\ArgumentResolver\UserInputResolver;
-use Symfony\Bundle\FrameworkBundle\Exception\UnparsableInputException;
-use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\Category;
-use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\DummyDto;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\Serializer\Annotation\Input;
+use Symfony\Component\Serializer\ArgumentResolver\UserInputResolver;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyDto;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validation;
 
@@ -31,7 +30,7 @@ class UserInputResolverTest extends TestCase
     {
         $this->assertTrue($this->resolver->supports(new Request(), $this->createMetadata()), 'Should be supported');
 
-        $this->assertFalse($this->resolver->supports(new Request(), $this->createMetadata(Category::class)), 'Should not be supported');
+        $this->assertFalse($this->resolver->supports(new Request(), $this->createMetadata([])), 'Should not be supported');
     }
 
     public function testResolveWithValidValue(): void
@@ -49,28 +48,30 @@ class UserInputResolverTest extends TestCase
     /**
      * @dataProvider provideInvalidValues
      */
-    public function testResolveWithInvalidValue(string $content, string $expected): void
+    public function testResolveWithInvalidValue(string $content, array $groups = ['Default']): void
     {
-        $this->expectException($expected);
+        $this->expectException(ValidationFailedException::class);
         $request = new Request(content: $content);
 
-        iterator_to_array($this->resolver->resolve($request, $this->createMetadata()));
+        iterator_to_array($this->resolver->resolve($request, $this->createMetadata([new Input(validationGroups: $groups)])));
     }
 
     public function provideInvalidValues(): \Generator
     {
-        yield 'Invalid value' => ['{"itMustBeTrue": false}', ValidationFailedException::class];
-        yield 'Not normalizable' => ['{"randomText": ["Did", "You", "Expect", "That?"]}', UnparsableInputException::class];
+        yield 'Invalid value' => ['{"itMustBeTrue": false}'];
+        yield 'Invalid value with groups' => ['{"randomText": "Valid"}', ['Default', 'Foo']];
+        yield 'Not normalizable' => ['{"randomText": ["Did", "You", "Expect", "That?"]}'];
     }
 
-    private function createMetadata(string $type = DummyDto::class): ArgumentMetadata
+    private function createMetadata(array $attributes = [new Input()]): ArgumentMetadata
     {
         $arguments = [
             'name' => 'foo',
             'isVariadic' => false,
             'hasDefaultValue' => false,
             'defaultValue' => null,
-            'type' => $type,
+            'type' => DummyDto::class,
+            'attributes' => $attributes,
         ];
 
         return new ArgumentMetadata(...$arguments);

@@ -287,6 +287,20 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isNotModified($request));
     }
 
+    public function testIfNoneMatchWithoutETag()
+    {
+        $request = new Request();
+        $request->headers->set('If-None-Match', 'randomly_generated_etag');
+
+        $this->assertFalse((new Response())->isNotModified($request));
+
+        // Test wildcard
+        $request = new Request();
+        $request->headers->set('If-None-Match', '*');
+
+        $this->assertFalse((new Response())->isNotModified($request));
+    }
+
     public function testIsValidateable()
     {
         $response = new Response('', 200, ['Last-Modified' => $this->createDateTimeOneHourAgo()->format(\DATE_RFC2822)]);

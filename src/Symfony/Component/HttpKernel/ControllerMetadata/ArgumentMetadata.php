@@ -101,7 +101,11 @@ class ArgumentMetadata
     }
 
     /**
-     * @return object[]
+     * @template T
+     *
+     * @param class-string<T> $name
+     *
+     * @return T[]
      */
     public function getAttributes(string $name = null, int $flags = 0): array
     {

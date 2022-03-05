@@ -26,14 +26,14 @@ class UserInputResolverTest extends TestCase
         $this->resolver = new UserInputResolver(Validation::createValidatorBuilder()->enableAnnotationMapping()->getValidator(), new Serializer($normalizers, $encoders));
     }
 
-    public function testSupports(): void
+    public function testSupports()
     {
         $this->assertTrue($this->resolver->supports(new Request(), $this->createMetadata()), 'Should be supported');
 
         $this->assertFalse($this->resolver->supports(new Request(), $this->createMetadata([])), 'Should not be supported');
     }
 
-    public function testResolveWithValidValue(): void
+    public function testResolveWithValidValue()
     {
         $json = '{"randomText": "Lorem ipsum"}';
         $request = new Request(content: $json);
@@ -48,7 +48,7 @@ class UserInputResolverTest extends TestCase
     /**
      * @dataProvider provideInvalidValues
      */
-    public function testResolveWithInvalidValue(string $content, array $groups = ['Default']): void
+    public function testResolveWithInvalidValue(string $content, array $groups = ['Default'])
     {
         $this->expectException(ValidationFailedException::class);
         $request = new Request(content: $content);

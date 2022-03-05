@@ -21,9 +21,9 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 final class InputBag extends ParameterBag
 {
     /**
-     * Returns a scalar input value by name.
+     * Returns an input value by name.
      *
-     * @param string|int|float|bool|null $default The default value if the input key does not exist
+     * @param array|string|int|float|bool|null $default The default value if the input key does not exist
      */
     public function get(string $key, mixed $default = null): string|int|float|bool|null
     {

@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -29,6 +30,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
@@ -1120,5 +1122,38 @@ class AutowirePassTest extends TestCase
 
         static::assertInstanceOf(DecoratedDecorator::class, $container->get(DecoratorInterface::class));
         static::assertInstanceOf(DecoratedDecorator::class, $container->get(DecoratorImpl::class));
+    }
+
+    public function testAutowireAttribute()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AutowireAttribute::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->register('some.id', \stdClass::class);
+        $container->setParameter('some.parameter', 'foo');
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition(AutowireAttribute::class);
+
+        $this->assertCount(4, $definition->getArguments());
+        $this->assertEquals(new Reference('some.id'), $definition->getArgument(0));
+        $this->assertEquals(new Expression("parameter('some.parameter')"), $definition->getArgument(1));
+        $this->assertSame('%some.parameter%/bar', $definition->getArgument(2));
+        $this->assertEquals(new Reference('invalid.id', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(3));
+
+        $container->compile();
+
+        $service = $container->get(AutowireAttribute::class);
+
+        $this->assertInstanceOf(\stdClass::class, $service->service);
+        $this->assertSame('foo', $service->expression);
+        $this->assertSame('foo/bar', $service->value);
+        $this->assertNull($service->invalid);
     }
 }

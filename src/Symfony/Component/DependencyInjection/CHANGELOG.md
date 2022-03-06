@@ -7,6 +7,7 @@ CHANGELOG
  * Add `$exclude` to `TaggedIterator` and `TaggedLocator` attributes
  * Add `$exclude` to `tagged_iterator` and `tagged_locator` configurator
  * Add an `env` function to the expression language provider
+ * Add an `Autowire` attribute to tell a parameter how to be autowired
 
 6.0
 ---

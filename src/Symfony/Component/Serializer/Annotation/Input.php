@@ -19,22 +19,10 @@ namespace Symfony\Component\Serializer\Annotation;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class Input
 {
-    public function __construct(private ?string $format = null, private array $serializationContext = [], private array $validationGroups = ['Default'])
-    {
-    }
-
-    public function getFormat(): ?string
-    {
-        return $this->format;
-    }
-
-    public function getSerializationContext(): array
-    {
-        return $this->serializationContext;
-    }
-
-    public function getValidationGroups(): array
-    {
-        return $this->validationGroups;
+    public function __construct(
+        public readonly ?string $format = null,
+        public readonly array $serializationContext = [],
+        public readonly array $validationGroups = ['Default']
+    ) {
     }
 }

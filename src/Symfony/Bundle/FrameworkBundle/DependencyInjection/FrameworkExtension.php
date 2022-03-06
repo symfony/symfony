@@ -531,17 +531,6 @@ class FrameworkExtension extends Extension
             $loader->load('mime_type.php');
         }
 
-        if ($this->isConfigEnabled($container, $config['validation']) && $this->isConfigEnabled($container, $config['serializer'])) {
-            $container->register(InputValidationFailedExceptionListener::class)
-                ->setArguments([new Reference('serializer'), new Reference('logger')])
-                // Must run before Symfony\Component\HttpKernel\EventListener\ErrorListener::onKernelException()
-                ->addTag('kernel.event_listener', ['event' => 'kernel.exception', 'priority' => 10]);
-
-            $container->register(UserInputResolver::class)
-                ->setArguments([new Reference('validator'), new Reference('serializer')])
-                ->addTag('controller.argument_value_resolver');
-        }
-
         $container->registerForAutoconfiguration(PackageInterface::class)
             ->addTag('assets.package');
         $container->registerForAutoconfiguration(Command::class)

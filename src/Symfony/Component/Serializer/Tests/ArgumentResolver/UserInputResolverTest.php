@@ -22,8 +22,9 @@ class UserInputResolverTest extends TestCase
     {
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
+        $validator = Validation::createValidatorBuilder()->enableAnnotationMapping()->getValidator();
 
-        $this->resolver = new UserInputResolver(Validation::createValidatorBuilder()->enableAnnotationMapping()->getValidator(), new Serializer($normalizers, $encoders));
+        $this->resolver = new UserInputResolver(serializer: new Serializer($normalizers, $encoders), validator: $validator);
     }
 
     public function testSupports()
@@ -63,7 +64,7 @@ class UserInputResolverTest extends TestCase
         yield 'Not normalizable' => ['{"randomText": ["Did", "You", "Expect", "That?"]}'];
     }
 
-    private function createMetadata(array $attributes = [new Input()]): ArgumentMetadata
+    private function createMetadata(?array $attributes = [new Input()]): ArgumentMetadata
     {
         $arguments = [
             'name' => 'foo',

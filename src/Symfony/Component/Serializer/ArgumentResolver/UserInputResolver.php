@@ -14,13 +14,14 @@ namespace Symfony\Component\Serializer\ArgumentResolver;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Annotation\Input;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Exception\ValidationFailedException;
+use Symfony\Component\Validator\Exception\InputValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -32,7 +33,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class UserInputResolver implements ArgumentValueResolverInterface
 {
-    public function __construct(private ValidatorInterface $validator, private SerializerInterface $serializer, )
+    public function __construct(private SerializerInterface $serializer, private ?ValidatorInterface $validator = null)
     {
     }
 
@@ -55,12 +56,13 @@ class UserInputResolver implements ArgumentValueResolverInterface
         ]);
         $format = $attribute->format ?? $request->attributes->get('_format', 'json');
 
-        $input = null;
         try {
             $input = $this->serializer->deserialize(data: $request->getContent(), type: $argument->getType(), format: $format, context: $context);
-
-            $errors = $this->validator->validate(value: $input, groups: $attribute->validationGroups);
         } catch (PartialDenormalizationException $e) {
+            if (null === $this->validator) {
+                throw new UnprocessableEntityHttpException(message: $e->getMessage(), previous: $e);
+            }
+
             $errors = new ConstraintViolationList();
 
             foreach ($e->getErrors() as $exception) {
@@ -73,10 +75,16 @@ class UserInputResolver implements ArgumentValueResolverInterface
 
                 $errors->add(new ConstraintViolation($message, '', $parameters, null, $exception->getPath(), null));
             }
+
+            throw new InputValidationFailedException(null, $errors);
         }
 
-        if ($errors->count() > 0) {
-            throw new ValidationFailedException($input, $errors);
+        if ($this->validator) {
+            $errors = $this->validator->validate(value: $input, groups: $attribute->validationGroups);
+
+            if ($errors->count() > 0) {
+                throw new InputValidationFailedException($input, $errors);
+            }
         }
 
         yield $input;

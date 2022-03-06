@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Exception\ValidationFailedException;
+use Symfony\Component\Validator\Exception\InputValidationFailedException;
 
 /**
  * Works in duo with Symfony\Bundle\FrameworkBundle\ArgumentResolver\UserInputResolver.
@@ -33,7 +33,7 @@ class InputValidationFailedExceptionListener
         $throwable = $event->getThrowable();
         $format = $event->getRequest()->attributes->get('_format', 'json');
 
-        if (!$throwable instanceof ValidationFailedException) {
+        if (!$throwable instanceof InputValidationFailedException) {
             return;
         }
 

@@ -14,15 +14,18 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
+use Symfony\Component\Serializer\ArgumentResolver\UserInputResolver;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
+use Symfony\Component\Serializer\EventListener\InputValidationFailedExceptionListener;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
@@ -67,6 +70,17 @@ return static function (ContainerConfigurator $container) {
         ->alias(DecoderInterface::class, 'serializer')
 
         ->alias('serializer.property_accessor', 'property_accessor')
+
+        // Argument Resolvers
+        ->set(UserInputResolver::class)
+            ->args([service('serializer'), service('validator')->nullOnInvalid()])
+            ->tag('controller.argument_value_resolver')
+
+        // Event Listeners
+        ->set(InputValidationFailedExceptionListener::class)
+            ->args([service('serializer'), service('logger')])
+            // Must run before Symfony\Component\HttpKernel\EventListener\ErrorListener::onKernelException()
+            ->tag('kernel.event_listener', ['event' => 'kernel.exception', 'priority' => 10])
 
         // Discriminator Map
         ->set('serializer.mapping.class_discriminator_resolver', ClassDiscriminatorFromClassMetadata::class)

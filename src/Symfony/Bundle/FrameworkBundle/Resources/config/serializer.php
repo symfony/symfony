@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;

@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyDto;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Exception\ValidationFailedException;
+use Symfony\Component\Validator\Exception\InputValidationFailedException;
 
 class InputValidationFailedExceptionListenerTest extends TestCase
 {
@@ -48,6 +48,6 @@ class InputValidationFailedExceptionListenerTest extends TestCase
     public function provideExceptions(): \Generator
     {
         yield 'Unrelated exception' => [new \Exception('Nothing to see here'), null];
-        yield 'Validation exception' => [new ValidationFailedException(new DummyDto(), ConstraintViolationList::createFromMessage('This value should not be blank')), 'This value should not be blank'];
+        yield 'Validation exception' => [new InputValidationFailedException(new DummyDto(), ConstraintViolationList::createFromMessage('This value should not be blank')), 'This value should not be blank'];
     }
 }

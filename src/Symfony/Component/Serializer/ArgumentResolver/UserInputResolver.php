@@ -50,16 +50,16 @@ class UserInputResolver implements ArgumentValueResolverInterface
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         $attribute = $this->getAttribute($argument);
-        $context = array_merge($attribute->getSerializationContext(), [
+        $context = array_merge($attribute->serializationContext, [
             DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
         ]);
-        $format = $attribute->getFormat() ?? $request->attributes->get('_format', 'json');
+        $format = $attribute->format ?? $request->attributes->get('_format', 'json');
 
         $input = null;
         try {
             $input = $this->serializer->deserialize(data: $request->getContent(), type: $argument->getType(), format: $format, context: $context);
 
-            $errors = $this->validator->validate(value: $input, groups: $attribute->getValidationGroups());
+            $errors = $this->validator->validate(value: $input, groups: $attribute->validationGroups);
         } catch (PartialDenormalizationException $e) {
             $errors = new ConstraintViolationList();
 

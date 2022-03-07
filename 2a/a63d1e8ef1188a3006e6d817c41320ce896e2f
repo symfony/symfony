@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-06T10:17:47Z
+
+The issue happens where there are no bindings, but only a named autowiring alias.
+This "else" block should look for a `Target` attribute:
+https://github.com/symfony/symfony/blob/ca27974f5138120a43a874aa5f21a808ee8ce91c/src/Symfony/Component/HttpKernel/DependencyInjection/RegisterControllerArgumentLocatorsPass.php#L193-L196
+
+Please target 5.4 as this is a bugfix IMHO.
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-03-07T13:31:59Z
+
+I've changed to a 5.4 bug fix. Please confirm the test is done correctly.

@@ -54,10 +54,10 @@ class UserInputResolver implements ArgumentValueResolverInterface
         $context = array_merge($attribute->serializationContext, [
             DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
         ]);
-        $format = $attribute->format ?? $request->attributes->get('_format', 'json');
+        $format = $attribute->format ?? $request->getContentType() ?? 'json';
 
         try {
-            $input = $this->serializer->deserialize(data: $request->getContent(), type: $argument->getType(), format: $format, context: $context);
+            $input = $this->serializer->deserialize($request->getContent(), $argument->getType(), $format, $context);
         } catch (PartialDenormalizationException $e) {
             if (null === $this->validator) {
                 throw new UnprocessableEntityHttpException(message: $e->getMessage(), previous: $e);

@@ -60,6 +60,12 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 
                 return ($this->getEnv)($value);
             }),
+
+            new ExpressionFunction('arg', function ($arg) {
+                return sprintf('$args?->get(%s)', $arg);
+            }, function (array $variables, $value) {
+                return $variables['args']?->get($value);
+            }),
         ];
     }
 }

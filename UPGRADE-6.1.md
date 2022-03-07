@@ -15,6 +15,11 @@ Console
  * Add argument `$suggestedValues` to `Command::addArgument` and `Command::addOption`
  * Add argument `$suggestedValues` to `InputArgument` and `InputOption` constructors
 
+DependencyInjection
+-------------------
+
+ * Deprecate `ReferenceSetArgumentTrait`
+
 FrameworkBundle
 ---------------
 

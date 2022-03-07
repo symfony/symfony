@@ -293,6 +293,9 @@ class XmlDumper extends Dumper
             } elseif ($value instanceof ServiceLocatorArgument) {
                 $element->setAttribute('type', 'service_locator');
                 $this->convertParameters($value->getValues(), $type, $element, 'key');
+            } elseif ($value instanceof ServiceClosureArgument && !$value->getValues()[0] instanceof Reference) {
+                $element->setAttribute('type', 'service_closure');
+                $this->convertParameters($value->getValues(), $type, $element, 'key');
             } elseif ($value instanceof Reference || $value instanceof ServiceClosureArgument) {
                 $element->setAttribute('type', 'service');
                 if ($value instanceof ServiceClosureArgument) {

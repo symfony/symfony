@@ -115,6 +115,17 @@
     <xsd:attribute name="function" type="xsd:string" />
   </xsd:complexType>
 
+  <xsd:complexType name="factory">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element name="service" type="service" minOccurs="0" maxOccurs="1" />
+    </xsd:choice>
+    <xsd:attribute name="service" type="xsd:string" />
+    <xsd:attribute name="class" type="xsd:string" />
+    <xsd:attribute name="method" type="xsd:string" />
+    <xsd:attribute name="function" type="xsd:string" />
+    <xsd:attribute name="expression" type="xsd:string" />
+  </xsd:complexType>
+
   <xsd:complexType name="defaults">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
@@ -135,7 +146,7 @@
       <xsd:element name="file" type="xsd:string" minOccurs="0" maxOccurs="1" />
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="factory" type="factory" minOccurs="0" maxOccurs="1" />
       <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
@@ -179,7 +190,7 @@
     <xsd:choice maxOccurs="unbounded">
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="factory" type="factory" minOccurs="0" maxOccurs="1" />
       <xsd:element name="deprecated" type="deprecated" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />

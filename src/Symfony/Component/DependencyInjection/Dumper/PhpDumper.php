@@ -806,7 +806,7 @@ EOF;
             $return[] = sprintf(str_starts_with($class, '%') ? '@return object A %1$s instance' : '@return \%s', ltrim($class, '\\'));
         } elseif ($definition->getFactory()) {
             $factory = $definition->getFactory();
-            if (\is_string($factory)) {
+            if (\is_string($factory) && !str_starts_with($factory, '@=')) {
                 $return[] = sprintf('@return object An instance returned by %s()', $factory);
             } elseif (\is_array($factory) && (\is_string($factory[0]) || $factory[0] instanceof Definition || $factory[0] instanceof Reference)) {
                 $class = $factory[0] instanceof Definition ? $factory[0]->getClass() : (string) $factory[0];
@@ -1157,6 +1157,13 @@ EOTXT
                 }
 
                 return $return.sprintf("[%s, '%s'](%s)", $class, $callable[1], $arguments ? implode(', ', $arguments) : '').$tail;
+            }
+
+            if (str_starts_with($callable, '@=')) {
+                return $return.sprintf('(($args = %s) ? (%s) : null)',
+                    $this->dumpValue(new ServiceLocatorArgument($definition->getArguments())),
+                    $this->getExpressionLanguage()->compile(substr($callable, 2), ['this' => 'container', 'args' => 'args'])
+                ).$tail;
             }
 
             return $return.sprintf('%s(%s)', $this->dumpLiteralClass($this->dumpValue($callable)), $arguments ? implode(', ', $arguments) : '').$tail;
@@ -1740,7 +1747,7 @@ EOF;
                     $code = sprintf('return %s;', $code);
 
                     $attribute = '';
-                    if ($value) {
+                    if ($value instanceof Reference) {
                         $attribute = 'name: '.$this->dumpValue((string) $value, $interpolate);
 
                         if ($this->container->hasDefinition($value) && ($class = $this->container->findDefinition($value)->getClass()) && $class !== (string) $value) {
@@ -1787,7 +1794,9 @@ EOF;
                     $serviceMap = '';
                     $serviceTypes = '';
                     foreach ($value->getValues() as $k => $v) {
-                        if (!$v) {
+                        if (!$v instanceof Reference) {
+                            $serviceMap .= sprintf("\n            %s => [%s],", $this->export($k), $this->dumpValue($v));
+                            $serviceTypes .= sprintf("\n            %s => '?',", $this->export($k));
                             continue;
                         }
                         $id = (string) $v;

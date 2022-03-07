@@ -37,7 +37,11 @@ class ServiceLocator extends BaseServiceLocator
      */
     public function get(string $id): mixed
     {
-        return isset($this->serviceMap[$id]) ? ($this->factory)(...$this->serviceMap[$id]) : parent::get($id);
+        return match (\count($this->serviceMap[$id] ?? [])) {
+            0 => parent::get($id),
+            1 => $this->serviceMap[$id][0],
+            default => ($this->factory)(...$this->serviceMap[$id]),
+        };
     }
 
     /**

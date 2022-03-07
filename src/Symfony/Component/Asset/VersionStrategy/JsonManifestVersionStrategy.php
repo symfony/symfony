@@ -54,7 +54,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
     {
         if (null === $this->manifestData) {
             if (!file_exists($this->manifestPath)) {
-                throw new \RuntimeException(sprintf('Asset manifest file "%s" does not exist.', $this->manifestPath));
+                throw new \RuntimeException(sprintf('Asset manifest file "%s" does not exist. Did you forget to build the assets with npm or yarn?', $this->manifestPath));
             }
 
             $this->manifestData = json_decode(file_get_contents($this->manifestPath), true);

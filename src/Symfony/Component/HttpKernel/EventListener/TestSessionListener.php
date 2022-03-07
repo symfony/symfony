@@ -14,6 +14,8 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
+trigger_deprecation('symfony/http-kernel', '5.4', '"%s" is deprecated, use "%s" instead.', TestSessionListener::class, SessionListener::class);
+
 /**
  * Sets the session in the request.
  *
@@ -21,7 +23,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  *
  * @final
  *
- * @deprecated the TestSessionListener use the default SessionListener instead
+ * @deprecated since Symfony 5.4, use SessionListener instead
  */
 class TestSessionListener extends AbstractTestSessionListener
 {
@@ -33,13 +35,8 @@ class TestSessionListener extends AbstractTestSessionListener
         parent::__construct($sessionOptions);
     }
 
-    /**
-     * @deprecated since Symfony 5.4, will be removed in 6.0.
-     */
     protected function getSession(): ?SessionInterface
     {
-        trigger_deprecation('symfony/http-kernel', '5.4', '"%s" is deprecated and will be removed in 6.0, inject a session in the request instead.', __METHOD__);
-
         if ($this->container->has('session')) {
             return $this->container->get('session');
         }

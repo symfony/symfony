@@ -43,7 +43,7 @@ FrameworkBundle
 HttpKernel
 ----------
 
- * Deprecate `AbstractTestSessionListener::getSession` inject a session in the request instead
+ * Deprecate `AbstractTestSessionListener` and `TestSessionListener`, use `AbstractSessionListener` and `SessionListener` instead
 
 HttpFoundation
 --------------

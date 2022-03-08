@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-04T15:50:32Z
+
+Thanks for the description of the issue.
+
+As a rule of thumb, introducing a new method is a hint for a new feature.
+I'd really prefer not adding any new method to fix the issue, because from an API pov, it makes things more complex.
+
+Can you give the simpler solution a try instead please?
+
+---------------------------------------------------------------------------
+
+by LANGERGabrielle at 2022-03-04T17:41:53Z
+
+@nicolas-grekas done.
+If you'd like, I can open a PR for the more future proof fix against 6.1.
+
+---------------------------------------------------------------------------
+
+by LANGERGabrielle at 2022-03-04T17:57:49Z
+
+Currently `ContainerLintCommand` is not tested in any way.
+I could add a test, not sure which level would be best (I like full integration tests but that might not be the best).
+I tested this manually quickly on a mid size application, and it succeeds.
+
+---------------------------------------------------------------------------
+
+by LANGERGabrielle at 2022-03-04T18:37:01Z
+
+This seems related to https://github.com/symfony/symfony/pull/30930

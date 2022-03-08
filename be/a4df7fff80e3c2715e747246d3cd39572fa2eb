@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by AsuRaHan at 2022-03-08T10:49:56Z
+
+Слава Украине!
+
+---------------------------------------------------------------------------
+
+by yunmoxue at 2022-03-08T13:54:26Z
+
+It's a bad pr. It breaks the development experience.
+why did it on this?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-03-08T14:03:36Z
+
+> It breaks the development experience.
+
+Please elaborate.
+
+---------------------------------------------------------------------------
+
+by kevinpapst at 2022-03-08T14:12:47Z
+
+I wanted to check how the result of this PR looks like in my SF 4.4 application (Console v4.4.37) and it seems the OutputFormatterStyle does not allow arbitrary colors.
+
+PHPStorm Console (Mac, zsh):
+<img width="1065" alt="Bildschirmfoto 2022-03-08 um 14 38 10" src="https://user-images.githubusercontent.com/533162/157248945-2bf3b669-645a-485d-bba3-c7edef99a1f3.png">
+
+Replacing the colors with `yellow` and `blue` would work:
+<img width="569" alt="Bildschirmfoto 2022-03-08 um 14 49 47" src="https://user-images.githubusercontent.com/533162/157250936-ba1f77e2-40ba-4712-9bba-dadf9ce718a7.png">
+
+---------------------------------------------------------------------------
+
+by yunmoxue at 2022-03-08T14:41:45Z
+
+> > It breaks the development experience.
+>
+> Please elaborate.
+
+@derrabus
+Code is pure, clean, simple.  There should be no political positions.
+There is one time, will be countless times.
+Today it could be Ukraine, tomorrow could be CN, US, GB or other.
+
+I don't mean to be rude, but seeing “stand with Ukraine” will make me unhappy, beacause the symfony is the greate framework in my heart, i don’t want it to be a political tool.
+
+but sadly, and your ceo looks very glad to do it.
+look https://github.com/symfony-cli/symfony-cli/commit/d09ad2d8eb57a9bc910226a188bea3c8d240ffca
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-08T14:42:55Z
+
+My mistake, I created the PR on 5.4 first, then backported it to 4.4. Will fix it before the merge of course.
+
+---------------------------------------------------------------------------
+
+by williamdes at 2022-03-08T14:48:07Z
+
+> > > It breaks the development experience.
+> >
+> >
+> > Please elaborate.
+>
+> @derrabus Code is pure, clean, simple. There should be no political positions. There is one time, will be countless times. Today it could be Ukraine, tomorrow could be CN, US, GB or other.
+>
+> I don't mean to be rude, but seeing “stand with Ukraine” will make me unhappy, beacause the symfony is the greate framework in my heart, i don’t want it to be a political tool.
+>
+> but sadly, and your ceo looks very glad to do it. look [symfony-cli/symfony-cli@d09ad2d](https://github.com/symfony-cli/symfony-cli/commit/d09ad2d8eb57a9bc910226a188bea3c8d240ffca)
+
+I agree too, in my opinion code should not spread any political position.
+That said if tools want to add some notice in places that do not affect any user directly (like packagist or phpunit did in the version lines) that's kind of okay.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-08T14:53:32Z
+
+> That said if tools want to add some notice in places that do not affect any user directly (like packagist or phpunit did in the version lines) that's kind of okay.
+
+Which is exactly what we are doing here, right?
+
+---------------------------------------------------------------------------
+
+by yunmoxue at 2022-03-08T14:58:59Z
+
+> > That said if tools want to add some notice in places that do not affect any user directly (like packagist or phpunit did in the version lines) that's kind of okay.
+>
+> Which is exactly what we are doing here, right?
+
+<img width="1454" alt="image" src="https://user-images.githubusercontent.com/2329555/157263797-67ae9c3c-2c58-44aa-8878-1c0f77b879d3.png">
+
+I think you put your idea on the website is enough.  There is no need to add it to the code.
+
+even It's already affecting me to read the document, and not only me.
+
+---------------------------------------------------------------------------
+
+by williamdes at 2022-03-08T15:17:56Z
+
+> > That said if tools want to add some notice in places that do not affect any user directly (like packagist or phpunit did in the version lines) that's kind of okay.
+>
+> Which is exactly what we are doing here, right?
+
+Probably, this PR is missing a description screenshot as reading the code is not very clear how it will affect outputs ;)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-03-08T15:22:21Z
+
+> There should be no political positions.
+
+Opposing a war is not a political position. Helping the victims of a war is not a political position.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-03-08T15:22:52Z
+
+Screenshots were added for more clarity.
+
+---------------------------------------------------------------------------
+
+by yunmoxue at 2022-03-08T15:35:32Z
+
+> > There should be no political positions.
+>
+> Opposing a war is not a political position. Helping the victims of a war is not a political position.
+
+yes, i absolutely agree with you.
+
+Uh....em...  but, is not The Syrian and Iraq in the war?
+
+i will never reply it, If you put the text "love and peace", "hope the world haven't war".
+
+you stand with Ukraine , why don't stand with Syrian and Iraq or other country in the war together?
+
+it's is why i say it is political position.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-03-08T15:38:09Z
+
+> Uh....em... but, is not The Syrian and Iraq in the war?
+
+Please look up "whataboutism". I'm not taking that bait.

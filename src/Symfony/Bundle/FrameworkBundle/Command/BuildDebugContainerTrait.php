@@ -53,6 +53,10 @@ trait BuildDebugContainerTrait
             (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
             $locatorPass = new ServiceLocatorTagPass();
             $locatorPass->process($container);
+
+            $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
+            $container->getCompilerPassConfig()->setOptimizationPasses([]);
+            $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
         }
 
         return $this->containerBuilder = $container;

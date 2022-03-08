@@ -153,19 +153,6 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame(['scalar_node' => $expected], $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEnvIsIncompatibleWithEnumNode()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('A dynamic value is not compatible with a "Symfony\Component\Config\Definition\EnumNode" node type at path "env_extension.enum_node".');
-        $container = new ContainerBuilder();
-        $container->registerExtension(new EnvExtension());
-        $container->prependExtensionConfig('env_extension', [
-            'enum_node' => '%env(FOO)%',
-        ]);
-
-        $this->doProcess($container);
-    }
-
     public function testEnvIsIncompatibleWithArrayNode()
     {
         $this->expectException(InvalidConfigurationException::class);

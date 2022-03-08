@@ -527,6 +527,13 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/dir/foo/bar%2Fbaz/dir2', $this->getGenerator($routes)->generate('test', ['path' => 'foo/bar%2Fbaz']));
     }
 
+    public function testEncodingOfSlashInQueryParameters()
+    {
+        $routes = $this->getRoutes('test', new Route('/get'));
+        $this->assertSame('/app.php/get?query=foo/bar', $this->getGenerator($routes)->generate('test', ['query' => 'foo/bar']));
+        $this->assertSame('/app.php/get?query=foo%2Fbar', $this->getGenerator($routes)->generate('test', ['query' => 'foo%2Fbar']));
+    }
+
     public function testAdjacentVariables()
     {
         $routes = $this->getRoutes('test', new Route('/{x}{y}{z}.{_format}', ['z' => 'default-z', '_format' => 'html'], ['y' => '\d+']));

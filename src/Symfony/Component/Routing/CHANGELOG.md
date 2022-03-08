@@ -7,6 +7,7 @@ CHANGELOG
  * Add `getMissingParameters` and `getRouteName` methods on `MissingMandatoryParametersException`
  * Allow using UTF-8 parameter names
  * Support the `attribute` type (alias of `annotation`) in annotation loaders
+ * Already encoded slashes are not decoded nor double-encoded anymore when generating URLs (query parameters)
 
 5.3
 ---

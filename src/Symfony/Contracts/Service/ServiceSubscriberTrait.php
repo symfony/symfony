@@ -12,6 +12,7 @@
 namespace Symfony\Contracts\Service;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 
 /**
@@ -67,9 +68,7 @@ trait ServiceSubscriberTrait
         return $services;
     }
 
-    /**
-     * @required
-     */
+    #[Required]
     public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
         $this->container = $container;

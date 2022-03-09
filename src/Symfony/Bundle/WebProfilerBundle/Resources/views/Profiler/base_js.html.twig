@@ -39,11 +39,29 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
         }
 
         if (navigator.clipboard) {
-            document.querySelectorAll('[data-clipboard-text]').forEach(function(element) {
-                removeClass(element, 'hidden');
-                element.addEventListener('click', function() {
-                    navigator.clipboard.writeText(element.getAttribute('data-clipboard-text'));
-                })
+            document.addEventListener('readystatechange', () => {
+                if (document.readyState !== 'complete') {
+                    return;
+                }
+
+                document.querySelectorAll('[data-clipboard-text]').forEach(function (element) {
+                    removeClass(element, 'hidden');
+                    element.addEventListener('click', function () {
+                        navigator.clipboard.writeText(element.getAttribute('data-clipboard-text'));
+
+                        if (element.classList.contains("label")) {
+                            let oldContent = element.textContent;
+
+                            element.textContent = "✅ Copied!";
+                            element.classList.add("status-success");
+
+                            setTimeout(() => {
+                                element.textContent = oldContent;
+                                element.classList.remove("status-success");
+                            }, 7000);
+                        }
+                    });
+                });
             });
         }
 

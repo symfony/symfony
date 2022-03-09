@@ -163,8 +163,61 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             unset($traces[$i]['info']); // break PHP reference used by TraceableHttpClient
             $traces[$i]['info'] = $this->cloneVar($info);
             $traces[$i]['options'] = $this->cloneVar($trace['options']);
+            $traces[$i]['curlCommand'] = $this->getCurlCommand($trace);
         }
 
         return [$errorCount, $traces];
+    }
+
+    private function getCurlCommand(array $trace): ?string
+    {
+        $debug = explode("\n", $trace['info']['debug']);
+        $url = $trace['url'];
+        $command = ['curl', '--compressed'];
+
+        $dataArg = [];
+
+        if ($json = $trace['options']['json'] ?? null) {
+            $dataArg[] = '--data '.escapeshellarg(json_encode($json, \JSON_PRETTY_PRINT));
+        } elseif ($body = $trace['options']['body'] ?? null) {
+            if (\is_string($body)) {
+                $dataArg[] = '--data '.escapeshellarg($body);
+            } elseif (\is_array($body)) {
+                foreach ($body as $key => $value) {
+                    $dataArg[] = '--data '.escapeshellarg("$key=$value");
+                }
+            } else {
+                return null;
+            }
+        }
+
+        $dataArg = empty($dataArg) ? null : implode(' ', $dataArg);
+
+        foreach ($debug as $line) {
+            $line = substr($line, 0, -1);
+
+            if (str_starts_with('< ', $line)) {
+                // End of the request, beginning of the response. Stop parsing.
+                break;
+            }
+
+            if ('' === $line || preg_match('/^[*<]|(Host: )/', $line)) {
+                continue;
+            }
+
+            if (preg_match('/^> ([A-Z]+)/', $line, $match)) {
+                $command[] = sprintf('--request %s', $match[1]);
+                $command[] = sprintf('--url %s', escapeshellarg($url));
+                continue;
+            }
+
+            $command[] = '--header '.escapeshellarg($line);
+        }
+
+        if (null !== $dataArg) {
+            $command[] = $dataArg;
+        }
+
+        return implode(" \\\n  ", $command);
     }
 }

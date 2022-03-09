@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-11-04T16:03:41Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-04T16:26:59Z
+
+> * Make the _cURL' button show a small window that displays the `curl` command to copy (useful on browsers that do not support `navigator.clipboard`) along with a button to copy.
+
+The WebProfiler pages are targetting modern browsers only. And all modern browsers support it `navigator.clipboard`. However, they support it only in secure contexts.
+So the cases that would benefit from the displayed text are not older browsers, but non secure contexts.
+
+---------------------------------------------------------------------------
+
+by Deuchnord at 2021-11-05T16:14:08Z
+
+@stof @nicolas-grekas I'm not really sure of how I should handle the body in the generated `curl` command when it is a closure or a resource? (see https://symfony.com/doc/current/http_client.html#uploading-data)
+
+---------------------------------------------------------------------------
+
+by stof at 2021-11-05T22:26:00Z
+
+@Deuchnord for such cases, I would suggest skipping the "copy as curl" button
+
+---------------------------------------------------------------------------
+
+by Deuchnord at 2021-12-05T15:54:44Z
+
+I think it is RFR. The tests failing don't seem to be part of my changes.
+Please let me know if you want something to be changed :)
+
+---------------------------------------------------------------------------
+
+by Deuchnord at 2022-03-04T15:20:47Z
+
+> I'm not sure the current logic works when there are redirects involved. Can you add a test case that hits `http://symfony.com/releases.json` to trigger one? The curl command-line should only contain the first call of course.
+
+Looks like `$trace['info']['url']` only contains the last URL of the redirection chain. Does it make sense it for you if the generated cURL command gives it directly?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-04T16:17:29Z
+
+> Looks like $trace['info']['url'] only contains the last URL of the redirection chain
+
+indeed, but why don't we use `$trace['url']` instead?
+
+---------------------------------------------------------------------------
+
+by Deuchnord at 2022-03-04T17:02:00Z
+
+Because I didn't spot it until now, thanks for pointing it :sweat_smile:
+It's fixed :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-04T17:11:23Z
+
+There's a failure on appveyor :)
+
+---------------------------------------------------------------------------
+
+by Deuchnord at 2022-03-08T13:23:02Z
+
+I'm not sure to understand the error given by the tests on AppVeyor:
+
+```
+1) Symfony\Component\HttpClient\Tests\DataCollector\HttpClientDataCollectorTest::testItGeneratesCurlCommandsAsExpected
+Symfony\Component\HttpClient\Exception\TransportException: fopen(): Unable to find the wrapper "https" - did you forget to enable it when you configured PHP?
+```
+
+If I read the config file correctly, the `php_openssl.dll` is already activated, isn't it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-08T14:56:21Z
+
+openssl is first disabled then re-enabled, to ensure that the test suite doesn't rely on implicit deps, including ext-openssl.

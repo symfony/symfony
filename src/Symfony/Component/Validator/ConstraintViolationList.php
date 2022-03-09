@@ -46,7 +46,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     }
 
     /**
-     * Converts the violation into a string for debugging purposes.
+     * {@inheritdoc}
      */
     public function __toString(): string
     {

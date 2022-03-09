@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-08T22:43:03Z
+
+> Can't use for Symfony\Bundle\FrameworkBundle\Controller::setContainer()
+
+maybe add both the annotation and the attribute?
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-03-09T13:35:41Z
+
+> maybe add both the annotation and the attribute?
+
+Done.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-09T14:14:00Z
+
+Do you mean to target 6.0 or 6.1? 6.1 I guess, since that's not a bugfix, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-03-09T14:14:34Z
+
+Or 5.4 if it's a bugfix?
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-03-09T14:19:25Z
+
+I meant to target 6.0 as a _minor_ change. Not really a bug fix or feature but can target 6.1 if desired. If I target 5.4, I'll have to leave the `@required` annotation for ServiceSubscriber trait - with 6.0+, I don't have to.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-03-09T14:58:47Z
+
+We'd better merge this on 6.1 IMHO

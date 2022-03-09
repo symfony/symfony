@@ -5,9 +5,10 @@ namespace Symfony\Component\Serializer\Tests\ArgumentResolver;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\Serializer\Annotation\Input;
+use Symfony\Component\Serializer\Annotation\RequestBody;
 use Symfony\Component\Serializer\ArgumentResolver\UserInputResolver;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyDto;
@@ -22,9 +23,8 @@ class UserInputResolverTest extends TestCase
     {
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
-        $validator = Validation::createValidatorBuilder()->enableAnnotationMapping()->getValidator();
 
-        $this->resolver = new UserInputResolver(serializer: new Serializer($normalizers, $encoders), validator: $validator);
+        $this->resolver = new UserInputResolver(new Serializer($normalizers, $encoders));
     }
 
     public function testSupports()
@@ -46,25 +46,15 @@ class UserInputResolverTest extends TestCase
         $this->assertSame('Lorem ipsum', $resolved[0]->randomText);
     }
 
-    /**
-     * @dataProvider provideInvalidValues
-     */
-    public function testResolveWithInvalidValue(string $content, array $groups = ['Default'])
+    public function testResolveWithInvalidValue()
     {
-        $this->expectException(ValidationFailedException::class);
-        $request = new Request(content: $content);
+        $this->expectException(PartialDenormalizationException::class);
+        $request = new Request(content: '{"randomText": ["Did", "You", "Expect", "That?"]}');
 
-        iterator_to_array($this->resolver->resolve($request, $this->createMetadata([new Input(validationGroups: $groups)])));
+        iterator_to_array($this->resolver->resolve($request, $this->createMetadata()));
     }
 
-    public function provideInvalidValues(): \Generator
-    {
-        yield 'Invalid value' => ['{"itMustBeTrue": false}'];
-        yield 'Invalid value with groups' => ['{"randomText": "Valid"}', ['Default', 'Foo']];
-        yield 'Not normalizable' => ['{"randomText": ["Did", "You", "Expect", "That?"]}'];
-    }
-
-    private function createMetadata(?array $attributes = [new Input()]): ArgumentMetadata
+    private function createMetadata(?array $attributes = [new RequestBody()]): ArgumentMetadata
     {
         $arguments = [
             'name' => 'foo',

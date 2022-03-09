@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate `ContextAwareDecoderInterface`, use `DecoderInterface` instead
  * Deprecate supporting denormalization for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
  * Deprecate denormalizing to an abstract class in `UidNormalizer`
+ * Add an ArgumentResolver to deserialize arguments with `Symfony\Component\Serializer\Annotation\RequestBody` attribute
 
 6.0
 ---

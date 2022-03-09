@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Allow using environment variables in `EnumNode`
+
 6.0
 ---
 

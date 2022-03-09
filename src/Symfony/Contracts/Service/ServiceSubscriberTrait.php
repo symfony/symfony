@@ -35,7 +35,7 @@ trait ServiceSubscriberTrait
             return $services;
         }
 
-        $services = \is_callable(['parent', __FUNCTION__]) ? parent::getSubscribedServices() : [];
+        $services = method_exists(get_parent_class(self::class) ?: '', __FUNCTION__) ? parent::getSubscribedServices() : [];
 
         foreach ((new \ReflectionClass(self::class))->getMethods() as $method) {
             if ($method->isStatic() || $method->isAbstract() || $method->isGenerator() || $method->isInternal() || $method->getNumberOfRequiredParameters()) {
@@ -69,7 +69,7 @@ trait ServiceSubscriberTrait
     {
         $this->container = $container;
 
-        if (\is_callable(['parent', __FUNCTION__])) {
+        if (method_exists(get_parent_class(self::class) ?: '', __FUNCTION__)) {
             return parent::setContainer($container);
         }
 

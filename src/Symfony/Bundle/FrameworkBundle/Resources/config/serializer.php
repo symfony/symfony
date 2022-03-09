@@ -72,7 +72,7 @@ return static function (ContainerConfigurator $container) {
 
         // Argument Resolvers
         ->set(UserInputResolver::class)
-            ->args([service('serializer'), service('validator')->nullOnInvalid()])
+            ->args([service('serializer')])
             ->tag('controller.argument_value_resolver')
 
         // Event Listeners

@@ -189,7 +189,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header 'Accept: */*' \\
   --header 'Accept-Encoding: gzip' \\
   --header 'User-Agent: Symfony HttpClient/Native'", $curlCommand
-);
+        );
     }
 
     /**
@@ -215,7 +215,7 @@ class HttpClientDataCollectorTest extends TestCase
   --header 'Accept: */*' \\
   --header 'Accept-Encoding: gzip' \\
   --header 'User-Agent: Symfony HttpClient/Native'", $curlCommand
-);
+        );
     }
 
     /**
@@ -237,8 +237,7 @@ class HttpClientDataCollectorTest extends TestCase
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
-        self::assertNull($curlCommand
-);
+        self::assertNull($curlCommand);
     }
 
     private function httpClientThatHasTracedRequests($tracedRequests): TraceableHttpClient

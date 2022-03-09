@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-03-03T12:13:04Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-03-03T12:33:34Z
+
+maybe reasonable :+1:
+
+(the reason behind current behavior is we cant assume env values always fit the enum)
+
+---------------------------------------------------------------------------
+
+by ecourtial at 2022-03-03T12:53:23Z
+
+What are the differences between the `high-deps` and the `low_deps jobs`? The first one is failing like if one of the changes is not considered. I guess it is related to the fact it is in two separate modules?

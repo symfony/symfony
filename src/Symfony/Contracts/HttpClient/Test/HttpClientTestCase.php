@@ -929,6 +929,16 @@ abstract class HttpClientTestCase extends TestCase
 
         $body = $response->toArray();
         $this->assertSame('Basic Zm9vOmI9YXI=', $body['HTTP_PROXY_AUTHORIZATION']);
+
+        $_SERVER['http_proxy'] = 'http://localhost:8057';
+        try {
+            $response = $client->request('GET', 'http://localhost:8057/');
+            $body = $response->toArray();
+            $this->assertSame('localhost:8057', $body['HTTP_HOST']);
+            $this->assertMatchesRegularExpression('#^http://(localhost|127\.0\.0\.1):8057/$#', $body['REQUEST_URI']);
+        } finally {
+            unset($_SERVER['http_proxy']);
+        }
     }
 
     public function testNoProxy()

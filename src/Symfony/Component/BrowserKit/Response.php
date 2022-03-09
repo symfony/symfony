@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\BrowserKit;
 
+use Symfony\Component\BrowserKit\Exception\JsonException;
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -19,6 +21,7 @@ final class Response
     private string $content;
     private int $status;
     private array $headers;
+    private array $jsonData;
 
     /**
      * The headers array is a set of key/value pairs. If a header is present multiple times
@@ -86,5 +89,24 @@ final class Response
         }
 
         return $first ? null : [];
+    }
+
+    public function toArray(): array
+    {
+        if (isset($this->jsonData)) {
+            return $this->jsonData;
+        }
+
+        try {
+            $content = json_decode($this->content, true, flags: \JSON_BIGINT_AS_STRING | \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new JsonException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        if (!\is_array($content)) {
+            throw new JsonException(sprintf('JSON content was expected to decode to an array, "%s" returned.', get_debug_type($content)));
+        }
+
+        return $this->jsonData = $content;
     }
 }

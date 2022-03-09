@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add `toArray` method to `Response`
+
 5.3
 ---
 

@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-02-20T12:59:56Z
+
+Hey!
+
+I think @jschaedl has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-21T12:44:52Z
+
+What's the use case that made you open this?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-02-21T16:10:21Z
+
+> What's the use case that made you open this?
+
+The use case is casting the errors to a string for dev messages, which should be legit according to the docs, but then static analysis tools complain, which makes sense since there's no guarantee that the implementation being use is stringable. Adding it to the interface would assure that changing the implantation wont break any code and will satisfy static analysis tools.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-02-23T16:32:14Z
+
+im not sure docs should rely on a debugging-string, but rather should show a serialized constraint violation list or some manually constructed payload

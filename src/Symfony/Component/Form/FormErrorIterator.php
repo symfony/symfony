@@ -29,9 +29,11 @@ use Symfony\Component\Validator\ConstraintViolation;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @implements \ArrayAccess<int, FormError|FormErrorIterator>
- * @implements \RecursiveIterator<int, FormError|FormErrorIterator>
- * @implements \SeekableIterator<int, FormError|FormErrorIterator>
+ * @template T of FormError|FormErrorIterator
+ *
+ * @implements \ArrayAccess<int, T>
+ * @implements \RecursiveIterator<int, T>
+ * @implements \SeekableIterator<int, T>
  */
 class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \ArrayAccess, \Countable
 {
@@ -41,10 +43,14 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     public const INDENTATION = '    ';
 
     private $form;
+
+    /**
+     * @var list<T>
+     */
     private $errors;
 
     /**
-     * @param list<FormError|self> $errors
+     * @param list<T> $errors
      *
      * @throws InvalidArgumentException If the errors are invalid
      */
@@ -74,7 +80,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
                 $string .= 'ERROR: '.$error->getMessage()."\n";
             } else {
                 /* @var self $error */
-                $string .= $error->form->getName().":\n";
+                $string .= $error->getForm()->getName().":\n";
                 $string .= self::indent((string) $error);
             }
         }
@@ -95,7 +101,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns the current element of the iterator.
      *
-     * @return FormError|self An error or an iterator containing nested errors
+     * @return T An error or an iterator containing nested errors
      */
     #[\ReturnTypeWillChange]
     public function current()
@@ -164,7 +170,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @param int $position The position
      *
-     * @return FormError|FormErrorIterator
+     * @return T
      *
      * @throws OutOfBoundsException If the given position does not exist
      */
@@ -227,7 +233,10 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
             // throw new LogicException(sprintf('The current element is not iterable. Use "%s" to get the current element.', self::class.'::current()'));
         }
 
-        return current($this->errors);
+        /** @var self $children */
+        $children = current($this->errors);
+
+        return $children;
     }
 
     /**

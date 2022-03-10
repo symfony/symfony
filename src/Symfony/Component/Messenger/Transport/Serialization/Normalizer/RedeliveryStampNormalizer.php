@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Messenger\Transport\Serialization\Normalizer;
 
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -18,7 +17,7 @@ class RedeliveryStampNormalizer implements DenormalizerInterface
 
     public function supportsDenormalization($data, string $type, string $format = null): bool
     {
-        return $type === RedeliveryStamp::class
+        return RedeliveryStamp::class === $type
             && null === ($data['exceptionMessage'] ?? null)
             && null === ($data['flattenException'] ?? null)
         ;

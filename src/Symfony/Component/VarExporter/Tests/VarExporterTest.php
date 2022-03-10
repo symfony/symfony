@@ -83,6 +83,11 @@ class VarExporterTest extends TestCase
      */
     public function testExport(string $testName, $value, bool $staticValueExpected = false)
     {
+        if ('datetime' === $testName) {
+            var_dump($value[3]);
+            var_dump(clone $value[3]);
+            var_dump(\Symfony\Component\VarExporter\Internal\Registry::p('DateInterval'));
+        }
         $dumpedValue = $this->getDump($value);
         $isStaticValue = true;
         $marshalledValue = VarExporter::export($value, $isStaticValue);

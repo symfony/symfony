@@ -1958,6 +1958,7 @@ class FrameworkExtension extends Extension
 
         if (!interface_exists(DenormalizerInterface::class)) {
             $container->removeDefinition('serializer.normalizer.flatten_exception');
+            $container->removeDefinition('serializer.normalizer.redelivery_stamp');
         }
 
         if (ContainerBuilder::willBeAvailable('symfony/amqp-messenger', AmqpTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'], true)) {

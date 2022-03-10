@@ -182,13 +182,13 @@ class HttpClientDataCollectorTest extends TestCase
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
-        self::assertEquals("curl \\
+        self::assertEquals(sprintf('curl \\
   --compressed \\
   --request GET \\
-  --url 'https://symfony.com/releases.json' \\
-  --header 'Accept: */*' \\
-  --header 'Accept-Encoding: gzip' \\
-  --header 'User-Agent: Symfony HttpClient/Native'", $curlCommand
+  --url %1$shttps://symfony.com/releases.json%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient/Native%1$s', '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand
         );
     }
 
@@ -208,13 +208,13 @@ class HttpClientDataCollectorTest extends TestCase
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
-        self::assertEquals("curl \\
+        self::assertEquals(sprintf('curl \\
   --compressed \\
   --request GET \\
-  --url 'http://symfony.com/releases.json' \\
-  --header 'Accept: */*' \\
-  --header 'Accept-Encoding: gzip' \\
-  --header 'User-Agent: Symfony HttpClient/Native'", $curlCommand
+  --url %1$shttp://symfony.com/releases.json%1$s \\
+  --header %1$sAccept: */*%1$s \\
+  --header %1$sAccept-Encoding: gzip%1$s \\
+  --header %1$sUser-Agent: Symfony HttpClient/Native%1$s', '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand
         );
     }
 

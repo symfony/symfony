@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Descriptor\JsonDescriptor;
 use Symfony\Component\Console\Descriptor\MarkdownDescriptor;
+use Symfony\Component\Console\Descriptor\ReStructuredTextDescriptor;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -38,6 +39,7 @@ class DescriptorHelper extends Helper
             ->register('xml', new XmlDescriptor())
             ->register('json', new JsonDescriptor())
             ->register('md', new MarkdownDescriptor())
+            ->register('rst', new ReStructuredTextDescriptor())
         ;
     }
 

@@ -15,7 +15,6 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class RedeliveryStampNormalizer implements DenormalizerInterface
 {
@@ -53,8 +52,6 @@ class RedeliveryStampNormalizer implements DenormalizerInterface
 
     public function supportsNormalization($data, string $format = null): bool
     {
-        return Kernel::VERSION_ID >= 50200
-            && $data instanceof RedeliveryStamp
-        ;
+        return $data instanceof RedeliveryStamp;
     }
 }

@@ -32,9 +32,10 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 {
     protected $propertyAccessor;
 
-    private $discriminatorCache = [];
+    /** @var array<string, string|null> */
+    private array $discriminatorCache = [];
 
-    private $objectClassResolver;
+    private readonly \Closure $objectClassResolver;
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
     {
@@ -46,7 +47,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
 
-        $this->objectClassResolver = $objectClassResolver ?? fn ($class) => \is_object($class) ? $class::class : $class;
+        $this->objectClassResolver = ($objectClassResolver ?? static fn ($class) => \is_object($class) ? $class::class : $class)(...);
     }
 
     public function getSupportedTypes(?string $format): array

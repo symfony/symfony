@@ -33,10 +33,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
         File::class => true,
     ];
 
-    /**
-     * @var MimeTypeGuesserInterface|null
-     */
-    private $mimeTypeGuesser;
+    private readonly ?MimeTypeGuesserInterface $mimeTypeGuesser;
 
     public function __construct(MimeTypeGuesserInterface $mimeTypeGuesser = null)
     {
@@ -150,11 +147,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
             return $object->getMimeType();
         }
 
-        if ($this->mimeTypeGuesser && $mimeType = $this->mimeTypeGuesser->guessMimeType($object->getPathname())) {
-            return $mimeType;
-        }
-
-        return 'application/octet-stream';
+        return $this->mimeTypeGuesser?->guessMimeType($object->getPathname()) ?: 'application/octet-stream';
     }
 
     /**

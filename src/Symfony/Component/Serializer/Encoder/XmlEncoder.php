@@ -59,7 +59,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const TYPE_CAST_ATTRIBUTES = 'xml_type_cast_attributes';
     public const VERSION = 'xml_version';
 
-    private $defaultContext = [
+    private array $defaultContext = [
         self::AS_COLLECTION => false,
         self::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE, \XML_COMMENT_NODE],
         self::ENCODER_IGNORED_NODE_TYPES => [],

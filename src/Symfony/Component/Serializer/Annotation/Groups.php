@@ -28,7 +28,7 @@ class Groups
     /**
      * @var string[]
      */
-    private array $groups;
+    private readonly array $groups;
 
     /**
      * @param string|string[] $groups

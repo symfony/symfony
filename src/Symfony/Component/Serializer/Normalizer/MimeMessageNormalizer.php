@@ -32,13 +32,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {
     private NormalizerInterface&DenormalizerInterface $serializer;
-    private PropertyNormalizer $normalizer;
     private array $headerClassMap;
     private \ReflectionProperty $headersProperty;
 
-    public function __construct(PropertyNormalizer $normalizer)
+    public function __construct(private readonly PropertyNormalizer $normalizer)
     {
-        $this->normalizer = $normalizer;
         $this->headerClassMap = (new \ReflectionClassConstant(Headers::class, 'HEADER_CLASS_MAP'))->getValue();
         $this->headersProperty = new \ReflectionProperty(Headers::class, 'headers');
     }

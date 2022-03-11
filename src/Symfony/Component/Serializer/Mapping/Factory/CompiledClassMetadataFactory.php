@@ -21,14 +21,14 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
  */
 final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterface
 {
-    private $compiledClassMetadata = [];
+    private array $compiledClassMetadata = [];
 
-    private $loadedClasses = [];
+    private array $loadedClasses = [];
 
-    private $classMetadataFactory;
-
-    public function __construct(string $compiledClassMetadataFile, ClassMetadataFactoryInterface $classMetadataFactory)
-    {
+    public function __construct(
+        string $compiledClassMetadataFile,
+        private readonly ClassMetadataFactoryInterface $classMetadataFactory,
+    ) {
         if (!file_exists($compiledClassMetadataFile)) {
             throw new \RuntimeException("File \"{$compiledClassMetadataFile}\" could not be found.");
         }
@@ -39,7 +39,6 @@ final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterfac
         }
 
         $this->compiledClassMetadata = $compiledClassMetadata;
-        $this->classMetadataFactory = $classMetadataFactory;
     }
 
     public function getMetadataFor(string|object $value): ClassMetadataInterface

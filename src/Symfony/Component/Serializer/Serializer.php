@@ -62,25 +62,33 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     ];
 
     /**
-     * @var Encoder\ChainEncoder
+     * @var ChainEncoder
      */
     protected $encoder;
 
     /**
-     * @var Encoder\ChainDecoder
+     * @var ChainDecoder
      */
     protected $decoder;
 
-    private $normalizers = [];
-    private $denormalizerCache = [];
-    private $normalizerCache = [];
+    /**
+     * @var array<string, array<string, array<bool>>>
+     */
+    private array $denormalizerCache = [];
+
+    /**
+     * @var array<string, array<string, array<bool>>>
+     */
+    private array $normalizerCache = [];
 
     /**
      * @param array<NormalizerInterface|DenormalizerInterface> $normalizers
      * @param array<EncoderInterface|DecoderInterface>         $encoders
      */
-    public function __construct(array $normalizers = [], array $encoders = [])
-    {
+    public function __construct(
+        private array $normalizers = [],
+        array $encoders = [],
+    ) {
         foreach ($normalizers as $normalizer) {
             if ($normalizer instanceof SerializerAwareInterface) {
                 $normalizer->setSerializer($this);
@@ -98,7 +106,6 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', get_debug_type($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
             }
         }
-        $this->normalizers = $normalizers;
 
         $decoders = [];
         $realEncoders = [];

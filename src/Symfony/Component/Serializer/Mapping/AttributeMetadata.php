@@ -23,32 +23,28 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getName()} instead.
      */
-    public $name;
+    public string $name;
 
     /**
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getGroups()} instead.
      */
-    public $groups = [];
+    public array $groups = [];
 
     /**
-     * @var int|null
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getMaxDepth()} instead.
      */
-    public $maxDepth;
+    public ?int $maxDepth = null;
 
     /**
-     * @var string|null
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getSerializedName()} instead.
      */
-    public $serializedName;
+    public ?string $serializedName = null;
 
     /**
      * @internal This property is public in order to reduce the size of the
@@ -58,13 +54,11 @@ class AttributeMetadata implements AttributeMetadataInterface
     public ?PropertyPath $serializedPath = null;
 
     /**
-     * @var bool
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link isIgnored()} instead.
      */
-    public $ignore = false;
+    public bool $ignore = false;
 
     /**
      * @var array[] Normalization contexts per group name ("*" applies to all groups)
@@ -73,7 +67,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getNormalizationContexts()} instead.
      */
-    public $normalizationContexts = [];
+    public array $normalizationContexts = [];
 
     /**
      * @var array[] Denormalization contexts per group name ("*" applies to all groups)
@@ -82,7 +76,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getDenormalizationContexts()} instead.
      */
-    public $denormalizationContexts = [];
+    public array $denormalizationContexts = [];
 
     public function __construct(string $name)
     {

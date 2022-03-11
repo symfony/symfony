@@ -37,7 +37,7 @@ interface ClassMetadataInterface
     /**
      * Gets the list of {@link AttributeMetadataInterface}.
      *
-     * @return AttributeMetadataInterface[]
+     * @return array<string, AttributeMetadataInterface>
      */
     public function getAttributesMetadata(): array;
 

@@ -25,7 +25,7 @@ class JsonEncode implements EncoderInterface
      */
     public const OPTIONS = 'json_encode_options';
 
-    private $defaultContext = [
+    private array $defaultContext = [
         self::OPTIONS => \JSON_PRESERVE_ZERO_FRACTION,
     ];
 

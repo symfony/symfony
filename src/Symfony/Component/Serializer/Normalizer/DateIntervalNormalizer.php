@@ -26,7 +26,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
 {
     public const FORMAT_KEY = 'dateinterval_format';
 
-    private $defaultContext = [
+    private array $defaultContext = [
         self::FORMAT_KEY => '%rP%yY%mM%dDT%hH%iM%sS',
     ];
 

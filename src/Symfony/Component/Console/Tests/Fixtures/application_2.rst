@@ -36,11 +36,11 @@ Static installation
 
 Dump the script to a global completion file and restart your shell:
 
-    ./phpunit completion bash | sudo tee /etc/bash_completion.d/phpunit
+    %%PHP_SELF%% completion bash | sudo tee /etc/bash_completion.d/%%COMMAND_NAME%%
 
 Or dump the script to a local file and source it:
 
-    ./phpunit completion bash > completion.sh
+    %%PHP_SELF%% completion bash > completion.sh
 
     # source the file whenever you use the project
     source completion.sh

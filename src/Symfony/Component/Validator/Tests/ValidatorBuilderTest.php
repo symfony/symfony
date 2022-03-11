@@ -144,4 +144,9 @@ class ValidatorBuilderTest extends TestCase
     {
         $this->assertInstanceOf(RecursiveValidator::class, $this->builder->getValidator());
     }
+
+    public function testAutoSequenceConstraints()
+    {
+        $this->assertSame($this->builder, $this->builder->enableConstraintsAutoSequencing()->disableConstraintsAutoSequencing());
+    }
 }

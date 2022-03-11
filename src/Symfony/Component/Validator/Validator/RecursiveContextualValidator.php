@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\Existence;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -56,7 +57,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @param ObjectInitializerInterface[] $objectInitializers The object initializers
      */
-    public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [])
+    public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [], private readonly bool $autoSequenceConstraints = false)
     {
         $this->context = $context;
         $this->defaultPropertyPath = $context->getPropertyPath();
@@ -723,7 +724,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     {
         $context->setGroup($group);
 
-        foreach ($metadata->findConstraints($group) as $constraint) {
+        $constraints = $metadata->findConstraints($group);
+        if ($this->autoSequenceConstraints && 1 < \count($constraints)) {
+            $constraints = [new Sequentially($constraints)];
+        }
+
+        foreach ($constraints as $constraint) {
             if ($constraint instanceof Existence) {
                 continue;
             }

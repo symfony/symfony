@@ -438,6 +438,7 @@ class ConfigurationTest extends TestCase
                     'enabled' => true,
                     'endpoint' => null,
                 ],
+                'auto_sequence_constraints' => false,
             ],
             'annotations' => [
                 'cache' => 'php_array',

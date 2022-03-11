@@ -936,6 +936,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                        ->booleanNode('auto_sequence_constraints')->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end()

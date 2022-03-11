@@ -1520,6 +1520,10 @@ class FrameworkExtension extends Extension
         if (!class_exists(ExpressionLanguage::class)) {
             $container->removeDefinition('validator.expression_language');
         }
+
+        if ($config['auto_sequence_constraints']) {
+            $validatorBuilder->addMethodCall('enableConstraintsAutoSequencing');
+        }
     }
 
     private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files)

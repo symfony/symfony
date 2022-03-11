@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
  * Add method `__toString()` to `ConstraintViolationInterface` & `ConstraintViolationListInterface`
  * Allow creating constraints with required arguments
+ * Add support for automatically sequencing constraints (with `Sequentially`) in `RecursiveContextualValidator`
 
 6.0
 ---

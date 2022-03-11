@@ -2055,7 +2055,7 @@ class RecursiveValidatorTest extends TestCase
         $this->assertCount(3, $violations);
     }
 
-    protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = []): ValidatorInterface
+    protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = [], bool $autoSequenceConstraints = false): ValidatorInterface
     {
         $translator = new IdentityTranslator();
         $translator->setLocale('en');
@@ -2063,7 +2063,7 @@ class RecursiveValidatorTest extends TestCase
         $contextFactory = new ExecutionContextFactory($translator);
         $validatorFactory = new ConstraintValidatorFactory();
 
-        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $objectInitializers);
+        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $objectInitializers, $autoSequenceConstraints);
     }
 
     public function testEmptyGroupsArrayDoesNotTriggerDeprecation()
@@ -2353,6 +2353,166 @@ class RecursiveValidatorTest extends TestCase
             ->validate($entity->getLastName(), $constraint);
 
         $this->assertCount(2, $validator->getViolations());
+    }
+
+    public function testValidateWithAutoSequenceConstraints()
+    {
+        $validator = $this->createValidator(new FakeMetadataFactory(), [], true);
+
+        // 1 constraint makes no difference
+        $violations = $validator->validate(123, [
+            new Type('string'),
+        ]);
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+
+        $violations = $validator->validate(123, [
+            new Type('string'),
+            new Length(['min' => 10]),
+        ]);
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+
+        $violations = $validator->validate(123, [
+            new Type(['type' => 'string', 'groups' => 'Group1']),
+            new Length(['min' => 10, 'groups' => 'Group1']),
+        ], 'Group1');
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+
+        $violations = $validator->validate(123, [
+            new Type(['type' => 'string', 'groups' => 'Group2']),
+            new Length(['min' => 10, 'groups' => 'Group1']),
+        ], 'Group1');
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value is too short. It should have 10 characters or more.', $violations[0]->getMessage());
+
+        $violations = $validator->validate(123, [
+            new Type(['type' => 'int', 'groups' => 'Group1']),
+            new Type(['type' => 'string', 'groups' => 'Group2']),
+            new Length(['min' => 10, 'groups' => 'Group2']),
+        ], new GroupSequence(['Group1', 'Group2']));
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+
+        $violations = $validator->validate([123], [
+            new Type('array'),
+            new All([
+                new Type('array'),
+                new All([
+                    new Type('string'),
+                    new Length(['min' => 10]),
+                ]),
+            ]),
+        ]);
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type array.', $violations[0]->getMessage());
+
+        $violations = $validator->validate([[123]], [
+            new Type('array'),
+            new All([
+                new Type('array'),
+                new All([
+                    new Type('string'),
+                    new Length(['min' => 10]),
+                ]),
+            ]),
+        ]);
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+    }
+
+    public function testValidatePropertyWithAutoSequenceConstraints()
+    {
+        $getValidator = function (array $constraints): ValidatorInterface {
+            $validator = $this->createValidator($metadataFactory = new FakeMetadataFactory(), [], true);
+            $metadataFactory->addMetadata($classMetadata = new ClassMetadata(Entity::class));
+            $classMetadata->addPropertyConstraints('firstName', $constraints);
+
+            return $validator;
+        };
+
+        $e = new Entity();
+        $e->firstName = 123;
+
+        // 1 constraint makes no difference
+        $violations = $getValidator([new Type('string')])->validateProperty($e, 'firstName');
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+
+        $violations = $getValidator([
+            new Type('string'),
+            new Length(['min' => 10]),
+        ])->validateProperty($e, 'firstName');
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+
+        $violations = $getValidator([
+            new Type(['type' => 'string', 'groups' => 'Group1']),
+            new Length(['min' => 10, 'groups' => 'Group1']),
+        ])->validateProperty($e, 'firstName', 'Group1');
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+
+        $violations = $getValidator([
+            new Type(['type' => 'string', 'groups' => 'Group2']),
+            new Length(['min' => 10, 'groups' => 'Group1']),
+        ])->validateProperty($e, 'firstName', 'Group1');
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value is too short. It should have 10 characters or more.', $violations[0]->getMessage());
+
+        $violations = $getValidator([
+            new Type(['type' => 'int', 'groups' => 'Group1']),
+            new Type(['type' => 'string', 'groups' => 'Group2']),
+            new Length(['min' => 10, 'groups' => 'Group2']),
+        ])->validateProperty($e, 'firstName', new GroupSequence(['Group1', 'Group2']));
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+    }
+
+    public function testValidatePropertyValueWithAutoSequenceConstraints()
+    {
+        $getValidator = function (array $constraints): ValidatorInterface {
+            $validator = $this->createValidator($metadataFactory = new FakeMetadataFactory(), [], true);
+            $metadataFactory->addMetadata($classMetadata = new ClassMetadata(Entity::class));
+            $classMetadata->addPropertyConstraints('firstName', $constraints);
+
+            return $validator;
+        };
+
+        // 1 constraint makes no difference
+        $violations = $getValidator([new Type('string')])->validatePropertyValue(Entity::class, 'firstName', 123);
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+
+        $violations = $getValidator([
+            new Type('string'),
+            new Length(['min' => 10]),
+        ])->validatePropertyValue(Entity::class, 'firstName', 123);
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+
+        $violations = $getValidator([
+            new Type(['type' => 'string', 'groups' => 'Group1']),
+            new Length(['min' => 10, 'groups' => 'Group1']),
+        ])->validatePropertyValue(Entity::class, 'firstName', 123, 'Group1');
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
+
+        $violations = $getValidator([
+            new Type(['type' => 'string', 'groups' => 'Group2']),
+            new Length(['min' => 10, 'groups' => 'Group1']),
+        ])->validatePropertyValue(Entity::class, 'firstName', 123, 'Group1');
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value is too short. It should have 10 characters or more.', $violations[0]->getMessage());
+
+        $violations = $getValidator([
+            new Type(['type' => 'int', 'groups' => 'Group1']),
+            new Type(['type' => 'string', 'groups' => 'Group2']),
+            new Length(['min' => 10, 'groups' => 'Group2']),
+        ])->validatePropertyValue(Entity::class, 'firstName', 123, new GroupSequence(['Group1', 'Group2']));
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
     }
 }
 

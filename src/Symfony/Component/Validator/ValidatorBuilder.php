@@ -55,6 +55,7 @@ class ValidatorBuilder
     private ?CacheItemPoolInterface $mappingCache = null;
     private ?TranslatorInterface $translator = null;
     private ?string $translationDomain = null;
+    private bool $autoSequenceConstraints = false;
 
     /**
      * Adds an object initializer to the validator.
@@ -343,6 +344,20 @@ class ValidatorBuilder
         return array_merge($loaders, $this->loaders);
     }
 
+    public function enableConstraintsAutoSequencing(): static
+    {
+        $this->autoSequenceConstraints = true;
+
+        return $this;
+    }
+
+    public function disableConstraintsAutoSequencing(): static
+    {
+        $this->autoSequenceConstraints = false;
+
+        return $this;
+    }
+
     /**
      * Builds and returns a new validator object.
      */
@@ -379,7 +394,7 @@ class ValidatorBuilder
 
         $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
 
-        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
+        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers, $this->autoSequenceConstraints);
     }
 
     private function createAnnotationReader(): Reader

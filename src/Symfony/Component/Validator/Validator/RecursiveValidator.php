@@ -38,7 +38,7 @@ class RecursiveValidator implements ValidatorInterface
      *
      * @param ObjectInitializerInterface[] $objectInitializers The object initializers
      */
-    public function __construct(ExecutionContextFactoryInterface $contextFactory, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [])
+    public function __construct(ExecutionContextFactoryInterface $contextFactory, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [], private readonly bool $autoSequenceConstraints = false)
     {
         $this->contextFactory = $contextFactory;
         $this->metadataFactory = $metadataFactory;
@@ -55,7 +55,8 @@ class RecursiveValidator implements ValidatorInterface
             $this->contextFactory->createContext($this, $root),
             $this->metadataFactory,
             $this->validatorFactory,
-            $this->objectInitializers
+            $this->objectInitializers,
+            $this->autoSequenceConstraints,
         );
     }
 
@@ -68,7 +69,8 @@ class RecursiveValidator implements ValidatorInterface
             $context,
             $this->metadataFactory,
             $this->validatorFactory,
-            $this->objectInitializers
+            $this->objectInitializers,
+            $this->autoSequenceConstraints,
         );
     }
 

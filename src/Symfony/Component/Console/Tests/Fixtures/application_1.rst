@@ -269,19 +269,19 @@ Usage
 
 The list command lists all commands:
 
-  ./phpunit list
+  %%PHP_SELF%% list
 
 You can also display the commands for a specific namespace:
 
-  ./phpunit list test
+  %%PHP_SELF%% list test
 
 You can also output the information in other formats by using the --format option:
 
-  ./phpunit list --format=xml
+  %%PHP_SELF%% list --format=xml
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  ./phpunit list --raw
+  %%PHP_SELF%% list --raw
 
 Arguments
 =========

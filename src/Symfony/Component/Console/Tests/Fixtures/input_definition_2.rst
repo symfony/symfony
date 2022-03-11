@@ -1,7 +1,9 @@
-### Arguments
+Arguments
+=========
 
-#### `argument_name`
+``argument_name``
+-----------------
 
-* Is required: yes
-* Is array: no
-* Default: `NULL`
+- Is required: yes
+- Is array: no
+- Default: ``NULL``

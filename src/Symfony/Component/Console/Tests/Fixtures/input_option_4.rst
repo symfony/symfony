@@ -1,9 +1,10 @@
-#### `--option_name|-o`
+``--option_name|-o``
+--------------------
 
 option description
 
-* Accept value: yes
-* Is value required: no
-* Is multiple: yes
-* Is negatable: no
-* Default: `array ()`
+- Accept value: yes
+- Is value required: no
+- Is multiple: yes
+- Is negatable: no
+- Default: ``array ()``

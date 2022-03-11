@@ -53,7 +53,7 @@ Dynamic installation
 
 Add this to the end of your shell configuration file (e.g. "~/.bashrc"):
 
-    eval "$(/Users/matt.grasmick/Sites/projects/symfony/phpunit completion bash)"
+    eval "$(%%PHP_SELF_FULL%% completion bash)"
 
 Arguments
 =========

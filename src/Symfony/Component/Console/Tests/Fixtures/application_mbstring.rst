@@ -150,11 +150,11 @@ Usage
 
 The help command displays help for a given command:
 
-  ./phpunit help list
+  %%PHP_SELF%% help list
 
 You can also output the help in other formats by using the --format option:
 
-  ./phpunit help --format=xml list
+  %%PHP_SELF%% help --format=xml list
 
 To display the list of available commands, please use the list command.
 

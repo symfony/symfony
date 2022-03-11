@@ -1,22 +1,13 @@
-My Symfony application v1.0
-###########################
+MbString åpplicätion
+####################
 
-- `alias1`_
-- `alias2`_
 - `completion`_
 - `help`_
 - `list`_
 
-**command4:**
-
-- `command4:descriptor`_
-
 **descriptor:**
 
-- `descriptor:alias_command4`_
-- `descriptor:command1`_
-- `descriptor:command2`_
-- `descriptor:command4`_
+- `descriptor:åèä`_
 
 ``completion``
 **************
@@ -410,112 +401,25 @@ Do not ask any interactive question
 - Is negatable: no
 - Default: ``false``
 
-.. _alias1:
+``descriptor:åèä``
+******************
 
-.. _alias2:
-
-``descriptor:command1``
-***********************
-
-command 1 description
+command åèä description
 
 Usage
 =====
 
-- ``descriptor:command1``
-- ``alias1``
-- ``alias2``
+- ``descriptor:åèä [-o|--option_åèä] [--] <argument_åèä>``
+- ``descriptor:åèä -o|--option_name <argument_name>``
+- ``descriptor:åèä <argument_name>``
 
-command 1 help
-
-Options
-=======
-
-``--help|-h``
--------------
-
-Display help for the given command. When no command is given display help for the list command
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: no
-- Default: ``false``
-
-``--quiet|-q``
---------------
-
-Do not output any message
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: no
-- Default: ``false``
-
-``--verbose|-v|-vv|-vvv``
--------------------------
-
-Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: no
-- Default: ``false``
-
-``--version|-V``
-----------------
-
-Display this application version
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: no
-- Default: ``false``
-
-``--ansi|--no-ansi``
---------------------
-
-Force (or disable --no-ansi) ANSI output
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: yes
-- Default: ``NULL``
-
-``--no-interaction|-n``
------------------------
-
-Do not ask any interactive question
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: no
-- Default: ``false``
-
-``descriptor:command2``
-***********************
-
-command 2 description
-
-Usage
-=====
-
-- ``descriptor:command2 [-o|--option_name] [--] <argument_name>``
-- ``descriptor:command2 -o|--option_name <argument_name>``
-- ``descriptor:command2 <argument_name>``
-
-command 2 help
+command åèä help
 
 Arguments
 =========
 
-``argument_name``
------------------
+``argument_åèä``
+----------------
 
 - Is required: yes
 - Is array: no
@@ -524,98 +428,14 @@ Arguments
 Options
 =======
 
-``--option_name|-o``
---------------------
+``--option_åèä|-o``
+-------------------
 
 - Accept value: no
 - Is value required: no
 - Is multiple: no
 - Is negatable: no
 - Default: ``false``
-
-``--help|-h``
--------------
-
-Display help for the given command. When no command is given display help for the list command
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: no
-- Default: ``false``
-
-``--quiet|-q``
---------------
-
-Do not output any message
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: no
-- Default: ``false``
-
-``--verbose|-v|-vv|-vvv``
--------------------------
-
-Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: no
-- Default: ``false``
-
-``--version|-V``
-----------------
-
-Display this application version
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: no
-- Default: ``false``
-
-``--ansi|--no-ansi``
---------------------
-
-Force (or disable --no-ansi) ANSI output
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: yes
-- Default: ``NULL``
-
-``--no-interaction|-n``
------------------------
-
-Do not ask any interactive question
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Is negatable: no
-- Default: ``false``
-
-.. _descriptor:alias_command4:
-
-.. _command4:descriptor:
-
-``descriptor:command4``
-***********************
-
-Usage
-=====
-
-- ``descriptor:command4``
-- ``descriptor:alias_command4``
-- ``command4:descriptor``
-
-
-Options
-=======
 
 ``--help|-h``
 -------------

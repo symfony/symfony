@@ -138,7 +138,6 @@ class ReStructuredTextDescriptor extends Descriptor
 
     foreach ($command->getAliases() as $alias) {
       $this->write('.. _' . $alias . ":\n\n");
-      //'.. _' . str_replace(':', '-', $command->getName()) . ':' . "\n\n"
     }
     $this->write(
       '``' . $command->getName() . "``\n"

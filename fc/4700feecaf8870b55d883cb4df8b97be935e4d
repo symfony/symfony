@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2022-03-10T14:49:34Z
+
+I added a commit to fix the psalm build @stof ; but I don't know why it wasn't failing before.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-03-10T16:16:43Z
+
+I don't understand this change. The current annotations look correct to me and why would `FormErrorIterator` need a type variable?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2022-03-10T17:11:56Z
+
+> I don't understand this change. The current annotations look correct to me and why would `FormErrorIterator` need a type variable?
+
+Currently `$form->getErrors()` is returning `FormErrorIterator` which means a `FormErrorIterator<FormError|FormErrorIterator>`.
+
+This can be more precise according to
+https://github.com/symfony/symfony/blob/6.1/src/Symfony/Component/Form/FormInterface.php#L90-L94
+
+`$form->getErrors()`, `$form->getErrors(false)`, `$form->getErrors(true)` or `$form->getErrors(true, true)` are only returning a flatten result. So it's a `FormErrorIterator<FormError>` which is more precise than `FormErrorIterator<FormError|FormErrorIterator>`. This allow to avoid useless checks when iterating on the errors.
+
+ReturnTypeProvider for phpstan/psalm can be implemented and already half done but they require the class to be a generic.
+
+Knowing the result is only a FormErrorIterator<FormError> can allow to write
+```
+        $errors = [];
+        foreach ($form->getErrors(true) as $error) {
+            $errors[] = $error->getMessage();
+        }
+```
+without any complaints.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-03-10T23:20:24Z
+
+> `$form->getErrors()`, `$form->getErrors(false)`, `$form->getErrors(true)` or `$form->getErrors(true, true)` are only returning a flatten result.
+
+Oh right. Makes sense, thanks for the explanation.

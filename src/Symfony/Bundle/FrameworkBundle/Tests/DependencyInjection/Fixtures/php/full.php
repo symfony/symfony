@@ -11,6 +11,7 @@ $container->loadFromExtension('framework', [
         ],
     ],
     'http_method_override' => false,
+    'trust_x_sendfile_type_header' => true,
     'esi' => [
         'enabled' => true,
     ],

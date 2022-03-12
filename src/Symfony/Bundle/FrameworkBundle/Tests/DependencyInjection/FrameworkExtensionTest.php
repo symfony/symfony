@@ -179,6 +179,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->getParameter('kernel.http_method_override'));
     }
 
+    public function testTrustXSendfileTypeHeader()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertTrue($container->getParameter('kernel.trust_x_sendfile_type_header'));
+    }
+
     public function testEsi()
     {
         $container = $this->createContainerFromFile('full');

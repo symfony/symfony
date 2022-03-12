@@ -3,8 +3,12 @@
 namespace Symfony\Component\Mailer\Bridge\Mailjet\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetApiTransport;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
@@ -83,6 +87,183 @@ class MailjetApiTransportTest extends TestCase
         $this->assertIsArray($replyTo);
         $this->assertEquals('qux@example.com', $replyTo['Email']);
         $this->assertEquals('Qux', $replyTo['Name']);
+    }
+
+    public function testSendSuccess()
+    {
+        $json = json_encode([
+            'Messages' => [
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $responseHeaders = [
+            'x-mj-request-guid' => ['baz'],
+        ];
+
+        $response = new MockResponse($json, ['response_headers' => $responseHeaders]);
+
+        $client = new MockHttpClient($response);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD, $client);
+
+        $email = new Email();
+        $email
+            ->from('foo@example.com')
+            ->to('bar@example.com')
+            ->text('foobar');
+
+        $sentMessage = $transport->send($email);
+        $this->assertInstanceOf(SentMessage::class, $sentMessage);
+        $this->assertSame('baz', $sentMessage->getMessageId());
+    }
+
+    public function testSendWithDecodingException()
+    {
+        $response = new MockResponse('cannot-be-decoded');
+
+        $client = new MockHttpClient($response);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD, $client);
+
+        $email = new Email();
+        $email
+            ->from('foo@example.com')
+            ->to('bar@example.com')
+            ->text('foobar');
+
+        $this->expectExceptionObject(
+            new HttpTransportException('Unable to send an email: "cannot-be-decoded" (code 200).', $response)
+        );
+
+        $transport->send($email);
+    }
+
+    public function testSendWithTransportException()
+    {
+        $response = new MockResponse('', ['error' => 'foo']);
+
+        $client = new MockHttpClient($response);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD, $client);
+
+        $email = new Email();
+        $email
+            ->from('foo@example.com')
+            ->to('bar@example.com')
+            ->text('foobar');
+
+        $this->expectExceptionObject(
+            new HttpTransportException('Could not reach the remote Mailjet server.', $response)
+        );
+
+        $transport->send($email);
+    }
+
+    public function testSendWithBadRequestResponse()
+    {
+        $json = json_encode([
+            'Messages' => [
+                [
+                    'Errors' => [
+                        [
+                            'ErrorIdentifier' => '8e28ac9c-1fd7-41ad-825f-1d60bc459189',
+                            'ErrorCode' => 'mj-0005',
+                            'StatusCode' => 400,
+                            'ErrorMessage' => 'The To is mandatory but missing from the input',
+                            'ErrorRelatedTo' => ['To'],
+                        ],
+                    ],
+                    'Status' => 'error',
+                ],
+            ],
+        ]);
+
+        $response = new MockResponse($json, ['http_code' => 400]);
+
+        $client = new MockHttpClient($response);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD, $client);
+
+        $email = new Email();
+        $email
+            ->from('foo@example.com')
+            ->to('bar@example.com')
+            ->text('foobar');
+
+        $this->expectExceptionObject(
+            new HttpTransportException('Unable to send an email: "The To is mandatory but missing from the input" (code 400).', $response)
+        );
+
+        $transport->send($email);
+    }
+
+    public function testSendWithNoErrorMessageBadRequestResponse()
+    {
+        $response = new MockResponse('response-content', ['http_code' => 400]);
+
+        $client = new MockHttpClient($response);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD, $client);
+
+        $email = new Email();
+        $email
+            ->from('foo@example.com')
+            ->to('bar@example.com')
+            ->text('foobar');
+
+        $this->expectExceptionObject(
+            new HttpTransportException('Unable to send an email: "response-content" (code 400).', $response)
+        );
+
+        $transport->send($email);
+    }
+
+    /**
+     * @dataProvider getMalformedResponse
+     */
+    public function testSendWithMalformedResponse(array $body)
+    {
+        $json = json_encode($body);
+
+        $response = new MockResponse($json);
+
+        $client = new MockHttpClient($response);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD, $client);
+
+        $email = new Email();
+        $email
+            ->from('foo@example.com')
+            ->to('bar@example.com')
+            ->text('foobar');
+
+        $this->expectExceptionObject(
+            new HttpTransportException(sprintf('Unable to send an email: "%s" malformed api response.', $json), $response)
+        );
+
+        $transport->send($email);
+    }
+
+    public function getMalformedResponse(): \Generator
+    {
+        yield 'Missing Messages key' => [
+            [
+                'foo' => 'bar',
+            ],
+        ];
+
+        yield 'Messages is not an array' => [
+            [
+                'Messages' => 'bar',
+            ],
+        ];
+
+        yield 'Messages is an empty array' => [
+            [
+                'Messages' => [],
+            ],
+        ];
     }
 
     public function testReplyTo()

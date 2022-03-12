@@ -13,6 +13,9 @@ namespace Symfony\Component\Finder\Iterator;
 
 use Symfony\Component\Finder\Gitignore;
 
+/**
+ * @extends \FilterIterator<string, \SplFileInfo>
+ */
 final class VcsIgnoredFilterIterator extends \FilterIterator
 {
     /**
@@ -30,6 +33,9 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
      */
     private $ignoredPathsCache = [];
 
+    /**
+     * @param \Iterator<string, \SplFileInfo> $iterator
+     */
     public function __construct(\Iterator $iterator, string $baseDir)
     {
         $this->baseDir = $this->normalizePath($baseDir);

@@ -28,6 +28,7 @@ class SortableIterator implements \IteratorAggregate
     public const SORT_BY_MODIFIED_TIME = 5;
     public const SORT_BY_NAME_NATURAL = 6;
 
+    /** @var \Traversable<string, \SplFileInfo> $iterator */
     private \Traversable $iterator;
     private \Closure|int $sort;
 

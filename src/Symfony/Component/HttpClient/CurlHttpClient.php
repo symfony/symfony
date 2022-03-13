@@ -90,6 +90,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         $scheme = $url['scheme'];
         $authority = $url['authority'];
         $host = parse_url($authority, \PHP_URL_HOST);
+        $proxy = $options['proxy']
+            ?? ('https:' === $url['scheme'] ? $_SERVER['https_proxy'] ?? $_SERVER['HTTPS_PROXY'] ?? null : null)
+            // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities
+            ?? $_SERVER['http_proxy'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_SERVER['HTTP_PROXY'] ?? null : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null;
         $url = implode('', $url);
 
         if (!isset($options['normalized_headers']['user-agent'])) {
@@ -105,7 +109,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_MAXREDIRS => 0 < $options['max_redirects'] ? $options['max_redirects'] : 0,
             \CURLOPT_COOKIEFILE => '', // Keep track of cookies during redirects
             \CURLOPT_TIMEOUT => 0,
-            \CURLOPT_PROXY => $options['proxy'],
+            \CURLOPT_PROXY => $proxy,
             \CURLOPT_NOPROXY => $options['no_proxy'] ?? $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '',
             \CURLOPT_SSL_VERIFYPEER => $options['verify_peer'],
             \CURLOPT_SSL_VERIFYHOST => $options['verify_host'] ? 2 : 0,
@@ -402,8 +406,15 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
 
             $url = self::parseUrl(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL));
+            $url = self::resolveUrl($location, $url);
 
-            return implode('', self::resolveUrl($location, $url));
+            curl_setopt($ch, \CURLOPT_PROXY, $options['proxy']
+                ?? ('https:' === $url['scheme'] ? $_SERVER['https_proxy'] ?? $_SERVER['HTTPS_PROXY'] ?? null : null)
+                // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities
+                ?? $_SERVER['http_proxy'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_SERVER['HTTP_PROXY'] ?? null : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null
+            );
+
+            return implode('', $url);
         };
     }
 

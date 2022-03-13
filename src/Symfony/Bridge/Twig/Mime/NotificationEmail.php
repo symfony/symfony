@@ -44,7 +44,7 @@ class NotificationEmail extends TemplatedEmail
     {
         $missingPackages = [];
         if (!class_exists(CssInlinerExtension::class)) {
-            $missingPackages['twig/cssinliner-extra'] = ' CSS Inliner';
+            $missingPackages['twig/cssinliner-extra'] = 'CSS Inliner';
         }
 
         if (!class_exists(InkyExtension::class)) {

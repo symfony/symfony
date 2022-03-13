@@ -81,13 +81,15 @@ class MailjetApiTransport extends AbstractApiTransport
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
         } catch (DecodingExceptionInterface $e) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $response->getContent(false), $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Mailjet server.', $response, 0, $e);
         }
 
         if (200 !== $statusCode) {
-            throw new HttpTransportException('Unable to send an email: '.$result['Message'].sprintf(' (code %d).', $statusCode), $response);
+            $errorDetails = $result['Messages'][0]['Errors'][0]['ErrorMessage'] ?? $response->getContent(false);
+
+            throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $errorDetails, $statusCode), $response);
         }
 
         // The response needs to contains a 'Messages' key that is an array

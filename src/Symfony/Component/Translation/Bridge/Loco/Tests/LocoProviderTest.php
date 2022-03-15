@@ -241,6 +241,328 @@ class LocoProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
+    public function testCompleteWriteProcessWithTranslatedAndUntranslatedMessages()
+    {
+        $expectedAuthHeader = 'Authorization: Loco API_KEY';
+
+        $responses = [
+            'createAsset1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $expectedBody = http_build_query([
+                    'id' => 'messages__a',
+                    'text' => 'a',
+                    'type' => 'text',
+                    'default' => 'untranslated',
+                ]);
+
+                $this->assertSame('POST', $method);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame($expectedBody, $options['body']);
+
+                return new MockResponse('{"id": "messages__a"}', ['http_code' => 201]);
+            },
+            'getTags1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/tags.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[]');
+            },
+            'createTag1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/tags.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame(http_build_query(['name' => 'messages']), $options['body']);
+
+                return new MockResponse('', ['http_code' => 201]);
+            },
+            'tagAsset1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/tags/messages.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('messages__a', $options['body']);
+
+                return new MockResponse();
+            },
+            'createAsset2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $expectedBody = http_build_query([
+                    'id' => 'validators__post.num_comments',
+                    'text' => 'post.num_comments',
+                    'type' => 'text',
+                    'default' => 'untranslated',
+                ]);
+
+                $this->assertSame('POST', $method);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame($expectedBody, $options['body']);
+
+                return new MockResponse('{"id": "validators__post.num_comments"}', ['http_code' => 201]);
+            },
+            'getTags2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/tags.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('["messages"]');
+            },
+            'createTag2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/tags.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame(http_build_query(['name' => 'validators']), $options['body']);
+
+                return new MockResponse('', ['http_code' => 201]);
+            },
+            'tagAsset2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/tags/validators.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('validators__post.num_comments', $options['body']);
+
+                return new MockResponse();
+            },
+            'getLocales1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/locales', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"code":"en"}]');
+            },
+            'getAssetsIds1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/assets?filter=messages', $url);
+                $this->assertSame(['filter' => 'messages'], $options['query']);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"id":"messages__foo.existing_key"},{"id":"messages__a"}]');
+            },
+            'translateAsset1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/translations/messages__a/en', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('trans_en_a', $options['body']);
+
+                return new MockResponse();
+            },
+            'getAssetsIds2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/assets?filter=validators', $url);
+                $this->assertSame(['filter' => 'validators'], $options['query']);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"id":"validators__foo.existing_key"},{"id":"validators__post.num_comments"}]');
+            },
+            'getLocales2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/locales', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"code":"en"}]');
+            },
+            'createLocale1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/locales', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('code=fr', $options['body']);
+
+                return new MockResponse('', ['http_code' => 201]);
+            },
+            'getAssetsIds3' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/assets?filter=messages', $url);
+                $this->assertSame(['filter' => 'messages'], $options['query']);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"id":"messages__a"}]');
+            },
+            'translateAsset3' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/translations/messages__a/fr', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('trans_fr_a', $options['body']);
+
+                return new MockResponse();
+            },
+            'getAssetsIds4' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/assets?filter=validators', $url);
+                $this->assertSame(['filter' => 'validators'], $options['query']);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"id":"validators__post.num_comments"}]');
+            },
+        ];
+
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue(new MessageCatalogue('en', [
+            'messages' => ['a' => 'trans_en_a'],
+            'validators' => ['post.num_comments' => '__post.num_comments'],
+        ]));
+        $translatorBag->addCatalogue(new MessageCatalogue('fr', [
+            'messages' => ['a' => 'trans_fr_a'],
+            'validators' => ['post.num_comments' => '__post.num_comments'],
+        ]));
+
+        $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://localise.biz/api/',
+            'headers' => ['Authorization' => 'Loco API_KEY'],
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+
+        $provider->write($translatorBag);
+    }
+
+    public function testCompleteWriteProcessWithOnlyUntranslatedMessages()
+    {
+        $expectedAuthHeader = 'Authorization: Loco API_KEY';
+
+        $responses = [
+            'createAsset1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $expectedBody = http_build_query([
+                    'id' => 'messages__a',
+                    'text' => 'a',
+                    'type' => 'text',
+                    'default' => 'untranslated',
+                ]);
+
+                $this->assertSame('POST', $method);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame($expectedBody, $options['body']);
+
+                return new MockResponse('{"id": "messages__a"}', ['http_code' => 201]);
+            },
+            'getTags1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/tags.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[]');
+            },
+            'createTag1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/tags.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame(http_build_query(['name' => 'messages']), $options['body']);
+
+                return new MockResponse('', ['http_code' => 201]);
+            },
+            'tagAsset1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/tags/messages.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('messages__a', $options['body']);
+
+                return new MockResponse();
+            },
+            'createAsset2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $expectedBody = http_build_query([
+                    'id' => 'validators__post.num_comments',
+                    'text' => 'post.num_comments',
+                    'type' => 'text',
+                    'default' => 'untranslated',
+                ]);
+
+                $this->assertSame('POST', $method);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame($expectedBody, $options['body']);
+
+                return new MockResponse('{"id": "validators__post.num_comments"}', ['http_code' => 201]);
+            },
+            'getTags2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/tags.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('["messages"]');
+            },
+            'createTag2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/tags.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame(http_build_query(['name' => 'validators']), $options['body']);
+
+                return new MockResponse('', ['http_code' => 201]);
+            },
+            'tagAsset2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/tags/validators.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('validators__post.num_comments', $options['body']);
+
+                return new MockResponse();
+            },
+            'getLocales1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/locales', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"code":"en"}]');
+            },
+            'getAssetsIds1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/assets?filter=messages', $url);
+                $this->assertSame(['filter' => 'messages'], $options['query']);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"id":"messages__foo.existing_key"},{"id":"messages__a"}]');
+            },
+            'getAssetsIds2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/assets?filter=validators', $url);
+                $this->assertSame(['filter' => 'validators'], $options['query']);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"id":"validators__foo.existing_key"},{"id":"validators__post.num_comments"}]');
+            },
+            'getLocales2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/locales', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"code":"en"}]');
+            },
+            'createLocale1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/locales', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('code=fr', $options['body']);
+
+                return new MockResponse('', ['http_code' => 201]);
+            },
+            'getAssetsIds3' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/assets?filter=messages', $url);
+                $this->assertSame(['filter' => 'messages'], $options['query']);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"id":"messages__a"}]');
+            },
+            'getAssetsIds4' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/assets?filter=validators', $url);
+                $this->assertSame(['filter' => 'validators'], $options['query']);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+
+                return new MockResponse('[{"id":"validators__post.num_comments"}]');
+            },
+        ];
+
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue(new MessageCatalogue('en', [
+            'messages' => ['a' => 'a'],
+            'validators' => ['post.num_comments' => '__post.num_comments'],
+        ]));
+        $translatorBag->addCatalogue(new MessageCatalogue('fr', [
+            'messages' => ['a' => 'a'],
+            'validators' => ['post.num_comments' => '__post.num_comments'],
+        ]));
+
+        $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://localise.biz/api/',
+            'headers' => ['Authorization' => 'Loco API_KEY'],
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+
+        $provider->write($translatorBag);
+    }
+
     /**
      * @dataProvider getResponsesForOneLocaleAndOneDomain
      */

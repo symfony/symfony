@@ -205,6 +205,11 @@ final class LocoProvider implements ProviderInterface
         $responses = [];
 
         foreach ($translations as $id => $message) {
+            // Skip if message is not translated yet to keep asset in "untranslated" state.
+            if (str_ends_with($id, $message)) {
+                continue;
+            }
+
             $responses[$id] = $this->client->request('POST', sprintf('translations/%s/%s', rawurlencode($id), rawurlencode($locale)), [
                 'body' => $message,
             ]);

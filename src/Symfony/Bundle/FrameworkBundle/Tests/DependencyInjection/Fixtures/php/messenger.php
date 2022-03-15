@@ -4,6 +4,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
 
 $container->loadFromExtension('framework', [
+    'stop_signals'=> \SIGTERM,
     'messenger' => [
         'routing' => [
             FooMessage::class => ['sender.bar', 'sender.biz'],

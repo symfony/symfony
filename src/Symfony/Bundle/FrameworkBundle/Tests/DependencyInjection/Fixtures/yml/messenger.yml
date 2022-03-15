@@ -1,5 +1,6 @@
 framework:
     messenger:
+        stop_signals: SIGTERM
         routing:
             'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage': ['sender.bar', 'sender.biz']
             'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage': 'sender.foo'

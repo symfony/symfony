@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/error-handler": "^5.4|^6.0",
+        "symfony/error-handler": "^6.1",
         "symfony/event-dispatcher": "^5.4|^6.0",
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/polyfill-ctype": "^1.8",

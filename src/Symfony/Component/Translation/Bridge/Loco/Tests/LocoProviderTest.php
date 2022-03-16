@@ -23,6 +23,11 @@ class LocoProviderTest extends ProviderTestCase
         return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint);
     }
 
+    public function createProviderWithSkip(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
+    {
+        return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint, true);
+    }
+
     public function toStringProvider(): iterable
     {
         yield [
@@ -402,7 +407,7 @@ class LocoProviderTest extends ProviderTestCase
             'validators' => ['post.num_comments' => '__post.num_comments'],
         ]));
 
-        $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
+        $provider = $this->createProviderWithSkip((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => ['Authorization' => 'Loco API_KEY'],
         ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
@@ -555,7 +560,7 @@ class LocoProviderTest extends ProviderTestCase
             'validators' => ['post.num_comments' => '__post.num_comments'],
         ]));
 
-        $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
+        $provider = $this->createProviderWithSkip((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => ['Authorization' => 'Loco API_KEY'],
         ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');

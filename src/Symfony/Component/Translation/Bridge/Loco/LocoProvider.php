@@ -35,14 +35,16 @@ final class LocoProvider implements ProviderInterface
     private $logger;
     private $defaultLocale;
     private $endpoint;
+    private $skipTranslationIfTargetEqualsSource;
 
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
+    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, bool $skipTranslationIfTargetEqualsSource = false)
     {
         $this->client = $client;
         $this->loader = $loader;
         $this->logger = $logger;
         $this->defaultLocale = $defaultLocale;
         $this->endpoint = $endpoint;
+        $this->skipTranslationIfTargetEqualsSource = $skipTranslationIfTargetEqualsSource;
     }
 
     public function __toString(): string
@@ -206,7 +208,7 @@ final class LocoProvider implements ProviderInterface
 
         foreach ($translations as $id => $message) {
             // Skip if message is not translated yet to keep asset in "untranslated" state.
-            if (str_ends_with($id, $message)) {
+            if ($this->skipTranslationIfTargetEqualsSource && str_ends_with($id, $message)) {
                 continue;
             }
 

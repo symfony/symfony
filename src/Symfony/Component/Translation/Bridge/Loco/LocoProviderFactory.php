@@ -58,7 +58,9 @@ final class LocoProviderFactory extends AbstractProviderFactory
             ],
         ]);
 
-        return new LocoProvider($client, $this->loader, $this->logger, $this->defaultLocale, $endpoint);
+        $skipTranslationIfTargetEqualsSource = (bool) $dsn->getOption('skipTranslationIfTargetEqualsSource');
+
+        return new LocoProvider($client, $this->loader, $this->logger, $this->defaultLocale, $endpoint, $skipTranslationIfTargetEqualsSource);
     }
 
     protected function getSupportedSchemes(): array
